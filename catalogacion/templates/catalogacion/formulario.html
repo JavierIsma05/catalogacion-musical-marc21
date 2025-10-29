@@ -1,0 +1,270 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario MARC21 Musical</title>
+    <link rel="stylesheet" href="{% static 'catalogacion/css/styles.css' %}">
+</head>
+
+<body>
+
+<header>
+    <h2>Modificar Obra</h2>
+    <p>Datos de Cabecera o Líder</p>
+</header>
+
+<div class="container">
+
+    <!-- 🔸 CABECERA DE REGISTRO -->
+    <fieldset class="fieldset-block">
+        <legend>Datos de Cabecera</legend>
+
+        <div class="field-group">
+            <label>Estado del Registro.</label>
+            <select>
+                <option>n - Nuevo.</option>
+                <option>c - Corregido.</option>
+                <option>d - Eliminado.</option>
+            </select>
+        </div>
+
+        <div class="field-group">
+            <label>Tipo de Registro.</label>
+            <select>
+                <option>c - Música notada impresa.</option>
+                <option>d - Música notada manuscrita.</option>
+            </select>
+        </div>
+
+        <div class="field-group">
+            <label>Nivel Bibliográfico.</label>
+            <select>
+                <option>b - Parte componente seriada.</option>
+                <option>m - Monografía.</option>
+            </select>
+        </div>
+
+        <div class="field-group">
+            <label>Nivel de Codificación.</label>
+            <select>
+                <option>7 - Nivel mínimo.</option>
+                <option>n - Completo.</option>
+            </select>
+        </div>
+
+        <div class="field-group">
+            <label>Forma de Catalogación Descriptiva.</label>
+            <select>
+                <option>a - AACR 2.</option>
+                <option>i - ISBD.</option>
+            </select>
+        </div>
+    </fieldset>
+
+    <!-- 🔹 BARRA DE PESTAÑAS -->
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('tab0xx', this)">0XX</button>
+        <button class="tab" onclick="showTab('tab1xx', this)">1XX</button>
+        <button class="tab" onclick="showTab('tab2xx', this)">2XX</button>
+        <button class="tab" onclick="showTab('tab3xx', this)">3XX</button>
+        <button class="tab" onclick="showTab('tab5xx', this)">5XX</button>
+        <button class="tab" onclick="showTab('tab6xx', this)">6XX</button>
+        <button class="tab" onclick="showTab('tab7xx', this)">7XX</button>
+        <button class="tab" onclick="showTab('tab8xx', this)">8XX</button>
+        <button class="tab" onclick="showTab('tab9xx', this)">9XX</button>
+        <button class="tab" onclick="hideAll()">Ocultar Campos</button>
+    </div>
+
+    <!-- 🔻 CONTENIDO DE PESTAÑAS -->
+    <div id="tab0xx" class="tab-content active">
+        <div class="section-title">0XX - Identificadores y códigos</div>
+
+        <fieldset class="fieldset-block">
+            <legend>008 - Códigos de información de longitud fija</legend>
+            <div class="field-group"><label>[06] Tipo de fecha/estado de la publicación.</label><select><option>c - Publicación en curso</option></select></div>
+            <div class="field-group"><label>[07-10] Primera fecha.</label><input type="text" placeholder="1878"></div>
+            <div class="field-group"><label>[11-14] Segunda fecha.</label><input type="text"></div>
+            <div class="field-group"><label>[15-17] Lugar de publicación, producción o ejecución.</label><input type="text"></div>
+            <div class="field-group"><label>[18-19] Forma de la composición.</label><input type="text" placeholder="Partitura"></div>
+            <div class="field-group"><label>[20] No definida.</label><select><option>a - Partitura</option></select></div>
+            <div class="field-group"><label>[21] Tipo de recurso continuado.</label><select><option># - Ninguno de los siguientes</option></select></div>
+            <div class="field-group"><label>[24-27] Material anejo.</label><input type="text"></div>
+            <div class="field-group"><label>[35-37] Lengua.</label><input type="text" placeholder="spa"></div>
+        </fieldset>
+
+        <fieldset class="fieldset-block">
+            <legend>017 - Número de copyright o depósito legal</legend>
+            <div class="field-group"><label>$a Número de copyright o de depósito legal</label><input type="text"></div>
+        </fieldset>
+
+        <fieldset class="fieldset-block">
+            <legend>020 - ISBN</legend>
+            <div class="field-group"><label>$a ISBN</label><input type="text"></div>
+            <div class="field-group"><label>$c Términos de disponibilidad</label><input type="text"></div>
+            <div class="field-group"><label>$z ISBN inválido</label><input type="text"></div>
+        </fieldset>
+
+        <fieldset class="fieldset-block">
+            <legend>024 - ISMN</legend>
+            <div class="field-group"><label>I1 Tipo de número</label><select><option>0 - Código Internacional Normalizado para Grabaciones</option></select></div>
+            <div class="field-group"><label>I2 No definido</label><select><option># - No se proporciona información</option></select></div>
+            <div class="field-group"><label>$a ISMN</label><input type="text"></div>
+            <div class="field-group"><label>$y ISMN incorrecto</label><input type="text"></div>
+        </fieldset>
+    </div>
+
+    <div id="tab1xx" class="tab-content">
+        <div class="section-title">1XX - Encabezamientos principales</div>
+        <fieldset class="fieldset-block">
+            <legend>100 - Autor personal</legend>
+            <div class="field-group"><label>$a Nombre personal</label><input type="text"></div>
+            <div class="field-group"><label>$d Fechas</label><input type="text"></div>
+            <div class="field-group"><label>$e Función</label><input type="text"></div>
+        </fieldset>
+    </div>
+
+    <div id="tab2xx" class="tab-content">
+        <div class="section-title">2XX - Título y responsabilidad</div>
+        <fieldset class="fieldset-block">
+            <legend>245 - Mención de título</legend>
+            <div class="field-group"><label>$a Título principal</label><input type="text"></div>
+            <div class="field-group"><label>$b Resto del título</label><input type="text"></div>
+            <div class="field-group"><label>$c Mención de responsabilidad</label><input type="text"></div>
+        </fieldset>
+    </div>
+
+    <div id="tab3xx" class="tab-content">
+        <div class="section-title">3XX - Descripción física y técnica</div>
+
+        <fieldset class="fieldset-block">
+            <legend>340 - Medio físico</legend>
+            <div class="field-group"><label>$d Técnica o soporte</label><input type="text"></div>
+        </fieldset>
+
+        <fieldset class="fieldset-block">
+            <legend>382 - Medio de interpretación musical</legend>
+            <div class="field-group"><label>$a Instrumento o voz</label><input type="text"></div>
+            <div class="field-group"><label>$b Solista</label><input type="text"></div>
+            <div class="field-group"><label>$n Número de intérpretes</label><input type="text"></div>
+        </fieldset>
+
+        <fieldset class="fieldset-block">
+            <legend>028 - Número de plancha</legend>
+            <div class="field-group"><label>$a Número de plancha</label><input type="text"></div>
+            <div class="field-group"><label>$b Fuente del número de plancha</label><input type="text"></div>
+        </fieldset>
+
+        <fieldset class="fieldset-block">
+            <legend>031 - Información del incipit musical</legend>
+            <div class="field-group"><label>$a Número de una obra</label><input type="text"></div>
+            <div class="field-group"><label>$b Número de movimiento</label><input type="text"></div>
+            <div class="field-group"><label>$c Número del pasaje</label><input type="text"></div>
+            <div class="field-group"><label>$d Título o encabezamiento</label><input type="text" placeholder="Ej. No me olvides"></div>
+            <div class="field-group"><label>$g Clave</label><input type="text" placeholder="Ej. G-2"></div>
+            <div class="field-group"><label>$m Voz/Instrumento</label><input type="text" placeholder="Ej. Piano, Violín, etc."></div>
+            <div class="field-group"><label>$n Armadura</label><input type="text" placeholder="Ej. bBE"></div>
+            <div class="field-group"><label>$p Notación musical (token)</label>
+                <textarea rows="3" placeholder="Ejemplo: #@%G4^/A#FGB..."></textarea>
+            </div>
+            <div class="field-group"><label>$q Nota general</label><input type="text"></div>
+            <div class="field-group"><label>$r Tonalidad o modo</label><input type="text" placeholder="Ej. g"></div>
+            <div class="field-group"><label>$s Nota de validez codificada</label><input type="text"></div>
+        </fieldset>
+    </div>
+
+    <div id="tab5xx" class="tab-content">
+        <div class="section-title">5XX - Notas</div>
+        <fieldset class="fieldset-block">
+            <legend>500 - Nota general</legend>
+            <div class="field-group"><label>$a Observaciones</label><textarea rows="3"></textarea></div>
+        </fieldset>
+        <fieldset class="fieldset-block">
+            <legend>518 - Fecha/Lugar de ejecución</legend>
+            <div class="field-group"><label>$a Información</label><input type="text"></div>
+        </fieldset>
+    </div>
+
+    <div id="tab6xx" class="tab-content">
+        <div class="section-title">6XX - Términos temáticos</div>
+        <fieldset class="fieldset-block">
+            <legend>650 - Tema principal</legend>
+            <div class="field-group"><label>$a Término temático</label><input type="text"></div>
+        </fieldset>
+    </div>
+
+    <div id="tab7xx" class="tab-content">
+        <div class="section-title">7XX - Entradas secundarias</div>
+        <fieldset class="fieldset-block">
+            <legend>700 - Autor adicional</legend>
+            <div class="field-group"><label>$a Nombre personal</label><input type="text"></div>
+            <div class="field-group"><label>$e Función</label><input type="text"></div>
+        </fieldset>
+    </div>
+
+    <div id="tab8xx" class="tab-content">
+        <div class="section-title">8XX - Series</div>
+        <fieldset class="fieldset-block">
+            <legend>830 - Título uniforme de serie</legend>
+            <div class="field-group"><label>$a Título de la serie</label><input type="text"></div>
+        </fieldset>
+    </div>
+
+    <div id="tab9xx" class="tab-content">
+        <div class="section-title">9XX - Datos locales</div>
+
+        <fieldset class="fieldset-block">
+            <legend>092 - Clasificación local (COTA)</legend>
+            <div class="field-group"><label>$a A disposición del centro catalogador.</label><input type="text"></div>
+            <div class="field-group"><label>$b A disposición del centro catalogador.</label><input type="text"></div>
+            <div class="field-group"><label>$c A disposición del centro catalogador.</label><input type="text"></div>
+        </fieldset>
+
+        <fieldset class="fieldset-block">
+            <legend>856 - Enlace electrónico</legend>
+            <div class="field-group"><label>$u URL del recurso</label><input type="text"></div>
+        </fieldset>
+
+        <fieldset class="fieldset-block">
+            <legend>Portada de la obra (preferiblemente jpg o gif). (Obligatorio).</legend>
+            <div class="field-group">
+                <label>Seleccionar archivo:</label>
+                <input type="file" accept=".jpg,.jpeg,.png,.gif">
+            </div>
+        </fieldset>
+
+        <fieldset class="fieldset-block">
+            <legend>Archivo o Documento (preferiblemente pdf o doc). (Obligatorio).</legend>
+            <div class="field-group">
+                <label>Seleccionar archivo:</label>
+                <input type="file" accept=".pdf,.doc,.docx">
+            </div>
+        </fieldset>
+
+        <div class="field-group" style="background-color:#fff;">
+            <label>Publicado</label>
+            <input type="checkbox" checked>
+        </div>
+
+        <div class="save-buttons" style="justify-content: space-between; display: flex;">
+            <button type="button" onclick="scrollToTop()">Ir Arriba</button>
+            <div>
+                <button type="submit">Guardar</button>
+                <button type="reset">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="{% static 'catalogacion/js/tabs.js' %}"></script>
+<script>
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>

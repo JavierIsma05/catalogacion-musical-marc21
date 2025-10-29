@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -205,3 +206,21 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+=======
+# Ignorar entorno virtual
+venv/
+__pycache__/
+*.pyc
+
+# Archivos de base de datos locales
+db.sqlite3
+
+# Archivos temporales
+*.log
+*.pot
+*.py[cod]
+*.sqlite3
+
+# Configuraciones privadas
+.env
+>>>>>>> fa669f1 (Reestructura correcta del proyecto)
