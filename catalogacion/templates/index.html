@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio | MARC21 Musical{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h2 class="fw-bold text-primary">Bienvenido al Sistema de Catalogación MARC21 Musical 🎶</h2>
+    <p class="lead mt-3">Gestione obras musicales, registros de colección y plantillas fácilmente.</p>
+    <a href="{% url 'plantillas' %}" class="btn btn-outline-primary mt-3">Ir a Plantillas</a>
+</div>
+{% endblock %}
