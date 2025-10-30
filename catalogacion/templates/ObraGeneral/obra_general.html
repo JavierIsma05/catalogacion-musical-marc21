@@ -1,278 +1,858 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block title %}Registrar Obra | MARC21 Musical{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}Registrar Obra |
+MARC21 Musical{% endblock %} {% block content %}
 <div class="container-fluid mt-4">
-  <div class="row">
-
-    <!-- 🔸 COLUMNA IZQUIERDA -->
-    <div class="col-md-9">
-      <div class="card shadow-sm mb-4">
-        <div class="card-header bg-success text-white">
-          <h5 class="mb-0">Registro MARC21 Musical</h5>
-        </div>
-        <div class="card-body">
-          <form method="POST">
-            {% csrf_token %}
-
-            <!-- 🟩 CABECERA O LÍDER -->
-            <h5 class="text-primary" id="cabecera">Cabecera o Líder</h5>
-            <div class="marc-block mb-4">
-              <div class="row mb-2">
-                <div class="col-md-6">
-                  <label>06 – Tipo de registro</label>
-                  {{ form.tipo_registro }}
+    <div class="row">
+        <!-- 🔸 COLUMNA IZQUIERDA -->
+        <div class="col-md-9">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Registro MARC21 Musical</h5>
                 </div>
-                <div class="col-md-6">
-                  <label>07 – Nivel bibliográfico</label>
-                  {{ form.nivel_bibliografico }}
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <!-- 🟩 CABECERA O LÍDER -->
+                        <h5 class="text-primary" id="cabecera">
+                            Cabecera o Líder
+                        </h5>
+                        <div class="marc-block mb-4">
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <label>06 – Tipo de registro</label>
+                                    {{ form.tipo_registro }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label>07 – Nivel bibliográfico</label>
+                                    {{ form.nivel_bibliografico }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 🟨 BLOQUE 0XX -->
+                        <h5 class="text-primary mt-4" id="bloque-0xx">
+                            Bloque 0XX – Campos de longitud variable
+                        </h5>
+
+                        <!-- 020 ## Número Internacional Normalizado para Libros -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>020 ##</strong> — Número Internacional
+                                Normalizado para Libros (ISBN)
+                            </h6>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-md-4">
+                                    <label>$a ISBN</label>
+                                </div>
+                                <div class="col-md-8">{{ form.isbn }}</div>
+                            </div>
+                        </div>
+
+                        <!-- 024 2# Otros identificadores normalizados -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>024 2#</strong> — Otros identificadores
+                                normalizados (ISMN)
+                            </h6>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-md-4">
+                                    <label>$a ISMN</label>
+                                </div>
+                                <div class="col-md-8">{{ form.ismn }}</div>
+                            </div>
+                        </div>
+
+                        <!-- 028 20 Número de editor -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>028 20</strong> — Número de editor o
+                                distribuidor
+                            </h6>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$a Número de editor</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.numero_editor }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Indicador</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.indicador_028 }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 031 ## Información del íncipit musical -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>031 ##</strong> — Información del
+                                íncipit musical
+                            </h6>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$a Nº de obra</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.incipit_num_obra }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$b Nº de movimiento</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.incipit_num_movimiento }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$c Nº de pasaje</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.incipit_num_pasaje }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$d Título o encabezamiento</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.incipit_titulo }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$m Voz/instrumento</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.incipit_voz_instrumento }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$p Notación musical</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.incipit_notacion }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$u URL (íncipit externo)</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.incipit_url }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 040 ## Fuente de catalogación -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>040 ##</strong> — Fuente de catalogación
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$a Centro catalogador</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.centro_catalogador }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 041 0# Código de lengua -->
+                        <div class="marc-block mb-4">
+                            <h6><strong>041 0#</strong> — Código de lengua</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$a Idioma</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.codigo_lengua }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 044 ## Código del país -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>044 ##</strong> — País de la entidad
+                                editora/productora
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$a País</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.codigo_pais }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 092 ## Clasificación local -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>092 ##</strong> — Clasificación local
+                            </h6>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$a Institución</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.clasif_institucion }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$b Proyecto</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.clasif_proyecto }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$c País</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.clasif_pais }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$d Ms/Imp</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.clasif_ms_imp }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 🟦 BLOQUE 1XX -->
+                        <h5 class="text-primary mt-4" id="bloque-1xx">
+                            Bloque 1XX – Asientos principales (punto de acceso)
+                        </h5>
+
+                        <!-- 100 1# Compositor -->
+                        <div class="marc-block mb-4">
+                            <h6><strong>100 1#</strong> — Compositor (NR)</h6>
+
+                            <!-- Select de compositor existente -->
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label>$a Compositor (seleccionar)</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.compositor }}
+                                    <small class="form-text text-muted"
+                                        >Seleccione un compositor existente o
+                                        cree uno nuevo abajo</small
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Campos para crear nuevo compositor -->
+                            <div class="alert alert-info">
+                                <strong
+                                    >🆕 Crear nuevo compositor (si no existe en
+                                    la lista)</strong
+                                >
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        {{
+                                        form.nuevo_compositor_apellidos_nombres
+                                        }}
+                                        <small class="form-text text-muted"
+                                            >{{
+                                            form.nuevo_compositor_apellidos_nombres.help_text
+                                            }}</small
+                                        >
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.nuevo_compositor_fechas }}
+                                        <small class="form-text text-muted"
+                                            >{{
+                                            form.nuevo_compositor_fechas.help_text
+                                            }}</small
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$e Función</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.compositor_funcion }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$j Autoría</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.compositor_autoria }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 130 0# Título uniforme -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>130 0#</strong> — Título uniforme (punto
+                                de acceso principal) (NR)
+                            </h6>
+
+                            <!-- Select de título existente -->
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label
+                                        >$a Título uniforme (seleccionar)</label
+                                    >
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_uniforme }}
+                                    <small class="form-text text-muted"
+                                        >Seleccione un título existente o cree
+                                        uno nuevo abajo</small
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Campo para crear nuevo título -->
+                            <div class="alert alert-info">
+                                <strong
+                                    >🆕 Crear nuevo título uniforme (si no
+                                    existe en la lista)</strong
+                                >
+                                <div class="row mt-2">
+                                    <div class="col-md-12">
+                                        {{ form.nuevo_titulo_uniforme }}
+                                        <small class="form-text text-muted"
+                                            >{{
+                                            form.nuevo_titulo_uniforme.help_text
+                                            }}</small
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label>$k Forma musical</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_uniforme_forma }}
+                                    <small class="form-text text-muted"
+                                        >O cree una nueva:</small
+                                    >
+                                    {{ form.nueva_forma_130 }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$m Medio de interpretación</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_uniforme_medio_interpretacion
+                                    }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$n Número de parte/sección</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_uniforme_num_parte }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$o Arreglo</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_uniforme_arreglo }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$p Nombre de parte/sección</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_uniforme_nombre_parte }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$r Tonalidad</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_uniforme_tonalidad }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 🟦 BLOQUE 2XX -->
+                        <h5 class="text-primary mt-4" id="bloque-2xx">
+                            Bloque 2XX – Títulos y mención de responsabilidad
+                        </h5>
+
+                        <!-- 240 10 Título uniforme -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>240 10</strong> — Título uniforme (NR)
+                            </h6>
+
+                            <!-- Select de título existente -->
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label
+                                        >$a Título uniforme (seleccionar)</label
+                                    >
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_240 }}
+                                    <small class="form-text text-muted"
+                                        >Seleccione un título existente o cree
+                                        uno nuevo abajo</small
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Campo para crear nuevo título -->
+                            <div class="alert alert-info">
+                                <strong
+                                    >🆕 Crear nuevo título 240 (si no existe en
+                                    la lista)</strong
+                                >
+                                <div class="row mt-2">
+                                    <div class="col-md-12">
+                                        {{ form.nuevo_titulo_240 }}
+                                        <small class="form-text text-muted"
+                                            >{{ form.nuevo_titulo_240.help_text
+                                            }}</small
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label>$k Forma musical</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_240_forma }}
+                                    <small class="form-text text-muted"
+                                        >O cree una nueva:</small
+                                    >
+                                    {{ form.nueva_forma_240 }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$m Medio de interpretación</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_240_medio_interpretacion }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$n Número de parte/sección</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_240_num_parte }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$o Arreglo</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_240_arreglo }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$p Nombre de parte/sección</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_240_nombre_parte }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$r Tonalidad</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_240_tonalidad }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 245 10 Mención de título -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>245 10</strong> — Mención de título (NR)
+                            </h6>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$a Título principal</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_principal }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label
+                                        >$b Resto del título / Subtítulo</label
+                                    >
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.resto_titulo }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$c Mención de responsabilidad</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.mencion_responsabilidad }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$n Número de parte/sección</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.numero_parte_245 }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$p Nombre de parte/sección</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.nombre_parte_245 }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 246 ## Forma variante del título -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>246 ##</strong> — Forma variante del
+                                título (R)
+                            </h6>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$a Título variante</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_variante }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$b Resto del título</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.resto_titulo_variante }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 254 ## Presentación musical -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>254 ##</strong> — Presentación musical
+                                (NR)
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$a Presentación musical</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.presentacion_musical }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 260 ## Publicación, distribución, etc. -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>260 ##</strong> — Publicación,
+                                distribución, etc. (Pie de imprenta) (R)
+                            </h6>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$a Lugar de publicación</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.lugar_publicacion }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$b Nombre del editor</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.nombre_editor }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$c Fecha de publicación</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.fecha_publicacion }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 300 ## Descripción física -->
+                        <div class="marc-block mb-4">
+                            <h6>
+                                <strong>300 ##</strong> — Descripción física (R)
+                            </h6>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$a Extensión</label>
+                                </div>
+                                <div class="col-md-8">{{ form.extension }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$b Otros detalles físicos</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.otros_detalles_fisicos }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <label>$c Dimensiones</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.dimensiones }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>$e Material acompañante</label>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form.material_acompanante }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3 mt-4">
+                            <button
+                                type="submit"
+                                name="guardar_continuar"
+                                class="btn btn-success"
+                            >
+                                Guardar y continuar editando
+                            </button>
+                            <button
+                                type="submit"
+                                name="guardar_cerrar"
+                                class="btn btn-primary"
+                            >
+                                Guardar y cerrar
+                            </button>
+                        </div>
+                    </form>
                 </div>
-              </div>
             </div>
 
-            <!-- 🟨 BLOQUE 0XX -->
-            <h5 class="text-primary mt-4" id="bloque-0xx">Bloque 0XX – Campos de longitud variable</h5>
-
-            <!-- 020 ## Número Internacional Normalizado para Libros -->
-            <div class="marc-block mb-4">
-              <h6><strong>020 ##</strong> — Número Internacional Normalizado para Libros (ISBN)</h6>
-              <div class="row align-items-center mb-2">
-                <div class="col-md-4">
-                  <label>$a ISBN</label>
+            <!-- 🟦 TABLA DE OBRAS -->
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">Obras registradas</h6>
                 </div>
-                <div class="col-md-8">
-                  {{ form.isbn }}
+                <div class="card-body">
+                    <table class="table table-bordered table-striped mt-2">
+                        <thead class="table-success">
+                            <tr>
+                                <th>001 Nº Control</th>
+                                <th>100 Compositor</th>
+                                <th>245 Título</th>
+                                <th>260 Editor</th>
+                                <th>260 Fecha</th>
+                                <th>044 País</th>
+                                <th>041 Idioma</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for obra in obras %}
+                            <tr>
+                                <td>{{ obra.num_control }}</td>
+                                <td>
+                                    {% if obra.compositor %} {{
+                                    obra.compositor.apellidos_nombres }} {% if
+                                    obra.compositor.fechas %} ({{
+                                    obra.compositor.fechas }}) {% endif %} {%
+                                    else %} - {% endif %}
+                                </td>
+                                <td>
+                                    {% if obra.titulo_principal %} {{
+                                    obra.titulo_principal }} {% elif
+                                    obra.titulo_uniforme %} {{
+                                    obra.titulo_uniforme.titulo }} {% elif
+                                    obra.titulo_240 %} {{ obra.titulo_240.titulo
+                                    }} {% else %} - {% endif %}
+                                </td>
+                                <td>{{ obra.nombre_editor|default:"-" }}</td>
+                                <td>
+                                    {{ obra.fecha_publicacion|default:"-" }}
+                                </td>
+                                <td>{{ obra.get_codigo_pais_display }}</td>
+                                <td>{{ obra.get_codigo_lengua_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    No hay registros aún.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-              </div>
             </div>
-
-            <!-- 024 2# Otros identificadores normalizados -->
-            <div class="marc-block mb-4">
-              <h6><strong>024 2#</strong> — Otros identificadores normalizados (ISMN)</h6>
-              <div class="row align-items-center mb-2">
-                <div class="col-md-4"><label>$a ISMN</label></div>
-                <div class="col-md-8">{{ form.ismn }}</div>
-              </div>
-            </div>
-
-            <!-- 028 20 Número de editor -->
-            <div class="marc-block mb-4">
-              <h6><strong>028 20</strong> — Número de editor o distribuidor</h6>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$a Número de editor</label></div>
-                <div class="col-md-8">{{ form.numero_editor }}</div>
-              </div>
-              <div class="row">
-                <div class="col-md-4"><label>Indicador</label></div>
-                <div class="col-md-8">{{ form.indicador_028 }}</div>
-              </div>
-            </div>
-
-            <!-- 031 ## Información del íncipit musical -->
-            <div class="marc-block mb-4">
-              <h6><strong>031 ##</strong> — Información del íncipit musical</h6>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$a Nº de obra</label></div>
-                <div class="col-md-8">{{ form.incipit_num_obra }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$b Nº de movimiento</label></div>
-                <div class="col-md-8">{{ form.incipit_num_movimiento }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$c Nº de pasaje</label></div>
-                <div class="col-md-8">{{ form.incipit_num_pasaje }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$d Título o encabezamiento</label></div>
-                <div class="col-md-8">{{ form.incipit_titulo }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$m Voz/instrumento</label></div>
-                <div class="col-md-8">{{ form.incipit_voz_instrumento }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$p Notación musical</label></div>
-                <div class="col-md-8">{{ form.incipit_notacion }}</div>
-              </div>
-              <div class="row">
-                <div class="col-md-4"><label>$u URL (íncipit externo)</label></div>
-                <div class="col-md-8">{{ form.incipit_url }}</div>
-              </div>
-            </div>
-
-            <!-- 040 ## Fuente de catalogación -->
-            <div class="marc-block mb-4">
-              <h6><strong>040 ##</strong> — Fuente de catalogación</h6>
-              <div class="row">
-                <div class="col-md-4"><label>$a Centro catalogador</label></div>
-                <div class="col-md-8">{{ form.centro_catalogador }}</div>
-              </div>
-            </div>
-
-            <!-- 041 0# Código de lengua -->
-            <div class="marc-block mb-4">
-              <h6><strong>041 0#</strong> — Código de lengua</h6>
-              <div class="row">
-                <div class="col-md-4"><label>$a Idioma</label></div>
-                <div class="col-md-8">{{ form.codigo_lengua }}</div>
-              </div>
-            </div>
-
-            <!-- 044 ## Código del país -->
-            <div class="marc-block mb-4">
-              <h6><strong>044 ##</strong> — País de la entidad editora/productora</h6>
-              <div class="row">
-                <div class="col-md-4"><label>$a País</label></div>
-                <div class="col-md-8">{{ form.codigo_pais }}</div>
-              </div>
-            </div>
-
-            <!-- 092 ## Clasificación local -->
-            <div class="marc-block mb-4">
-              <h6><strong>092 ##</strong> — Clasificación local</h6>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$a Institución</label></div>
-                <div class="col-md-8">{{ form.clasif_institucion }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$b Proyecto</label></div>
-                <div class="col-md-8">{{ form.clasif_proyecto }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$c País</label></div>
-                <div class="col-md-8">{{ form.clasif_pais }}</div>
-              </div>
-              <div class="row">
-                <div class="col-md-4"><label>$d Ms/Imp</label></div>
-                <div class="col-md-8">{{ form.clasif_ms_imp }}</div>
-              </div>
-            </div>
-
-            <!-- 🟦 BLOQUE 1XX -->
-            <h5 class="text-primary mt-4" id="bloque-1xx">Bloque 1XX – Asientos principales (punto de acceso)</h5>
-
-            <!-- 100 1# Compositor -->
-            <div class="marc-block mb-4">
-              <h6><strong>100 1#</strong> — Compositor (NR)</h6>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$a Apellidos, Nombres</label></div>
-                <div class="col-md-8">{{ form.compositor_apellidos_nombres }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$d Coordenadas biográficas</label></div>
-                <div class="col-md-8">{{ form.compositor_coordenadas_biograficas }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$e Función</label></div>
-                <div class="col-md-8">{{ form.compositor_funcion }}</div>
-              </div>
-              <div class="row">
-                <div class="col-md-4"><label>$j Autoría</label></div>
-                <div class="col-md-8">{{ form.compositor_autoria }}</div>
-              </div>
-            </div>
-
-            <!-- 130 0# Título uniforme -->
-            <div class="marc-block mb-4">
-              <h6><strong>130 0#</strong> — Título uniforme (punto de acceso principal) (NR)</h6>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$a Título uniforme</label></div>
-                <div class="col-md-8">{{ form.titulo_uniforme }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$k Subencabezamiento de forma</label></div>
-                <div class="col-md-8">{{ form.titulo_uniforme_subencabezamiento_forma }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$m Medio de interpretación</label></div>
-                <div class="col-md-8">{{ form.titulo_uniforme_medio_interpretacion }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$n Número de parte/sección</label></div>
-                <div class="col-md-8">{{ form.titulo_uniforme_num_parte_seccion }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$o Arreglo</label></div>
-                <div class="col-md-8">{{ form.titulo_uniforme_arreglo }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-md-4"><label>$p Nombre de parte/sección</label></div>
-                <div class="col-md-8">{{ form.titulo_uniforme_nombre_parte_seccion }}</div>
-              </div>
-              <div class="row">
-                <div class="col-md-4"><label>$r Tonalidad</label></div>
-                <div class="col-md-8">{{ form.titulo_uniforme_tonalidad }}</div>
-              </div>
-            </div>
-
-            <div class="d-flex gap-3 mt-4">
-              <button type="submit" name="guardar_continuar" class="btn btn-success">
-                Guardar y continuar editando
-              </button>
-              <button type="submit" name="guardar_cerrar" class="btn btn-primary">
-                Guardar y cerrar
-              </button>
-            </div>
-          </form>
         </div>
-      </div>
 
-      <!-- 🟦 TABLA DE OBRAS -->
-      <div class="card shadow-sm mt-3">
-        <div class="card-header bg-secondary text-white">
-          <h6 class="mb-0">Obras registradas</h6>
+        <!-- 🔹 COLUMNA DERECHA -->
+        <div class="col-md-3">
+            <div class="sidebar rounded shadow-sm p-3 bg-white">
+                <h6 class="fw-bold mb-3">📋 Navegación MARC21</h6>
+                <a href="#cabecera" class="d-block mb-2 text-decoration-none"
+                    >🟩 Cabecera o Líder</a
+                >
+                <a href="#bloque-0xx" class="d-block mb-2 text-decoration-none"
+                    >🟦 Bloque 0XX - Campos variables</a
+                >
+                <a href="#bloque-1xx" class="d-block mb-2 text-decoration-none"
+                    >🟦 Bloque 1XX - Asientos principales</a
+                >
+                <a href="#bloque-2xx" class="d-block mb-2 text-decoration-none"
+                    >🟦 Bloque 2XX - Títulos</a
+                >
+                <hr />
+                <h6 class="fw-bold mb-3">🎯 Acciones</h6>
+                <a href="#" class="d-block mb-2 text-decoration-none"
+                    >💾 Guardar borrador</a
+                >
+                <a href="#" class="d-block mb-2 text-decoration-none"
+                    >🔍 Vista preliminar</a
+                >
+                <a href="#" class="d-block mb-2 text-decoration-none"
+                    >⚠️ Validar registro</a
+                >
+            </div>
         </div>
-        <div class="card-body">
-          <table class="table table-bordered table-striped mt-2">
-            <thead class="table-success">
-              <tr>
-                <th>001 Nº Control</th>
-                <th>100 Compositor</th>
-                <th>130 Título uniforme</th>
-                <th>020 ISBN</th>
-                <th>024 ISMN</th>
-                <th>044 País</th>
-                <th>041 Idioma</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for obra in obras %}
-              <tr>
-                <td>{{ obra.num_control }}</td>
-                <td>{{ obra.compositor_apellidos_nombres|default:"-" }}</td>
-                <td>{{ obra.titulo_uniforme|default:"-" }}</td>
-                <td>{{ obra.isbn|default:"-" }}</td>
-                <td>{{ obra.ismn|default:"-" }}</td>
-                <td>{{ obra.get_codigo_pais_display }}</td>
-                <td>{{ obra.get_codigo_lengua_display }}</td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="7" class="text-center">No hay registros aún.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
-
-    <!-- 🔹 COLUMNA DERECHA -->
-    <div class="col-md-3">
-      <div class="sidebar rounded shadow-sm p-3 bg-white">
-        <h6 class="fw-bold mb-3">📋 Navegación MARC21</h6>
-        <a href="#cabecera" class="d-block mb-2 text-decoration-none">🟩 Cabecera o Líder</a>
-        <a href="#bloque-0xx" class="d-block mb-2 text-decoration-none">🟦 Bloque 0XX - Campos variables</a>
-        <a href="#bloque-1xx" class="d-block mb-2 text-decoration-none">🟦 Bloque 1XX - Asientos principales</a>
-        <hr>
-        <h6 class="fw-bold mb-3">🎯 Acciones</h6>
-        <a href="#" class="d-block mb-2 text-decoration-none">💾 Guardar borrador</a>
-        <a href="#" class="d-block mb-2 text-decoration-none">🔍 Vista preliminar</a>
-        <a href="#" class="d-block mb-2 text-decoration-none">⚠️ Validar registro</a>
-      </div>
-    </div>
-  </div>
 </div>
+{% endblock %} {% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Inicializar Select2 en todos los campos de autoridades
+        $("#id_compositor").select2({
+            width: "100%",
+            allowClear: true,
+            placeholder: "Seleccione un compositor",
+            theme: "bootstrap-5",
+        });
+
+        $("#id_titulo_uniforme").select2({
+            width: "100%",
+            allowClear: true,
+            placeholder: "Seleccione un título uniforme",
+            theme: "bootstrap-5",
+        });
+
+        $("#id_titulo_240").select2({
+            width: "100%",
+            allowClear: true,
+            placeholder: "Seleccione un título uniforme (240)",
+            theme: "bootstrap-5",
+        });
+
+        $("#id_titulo_uniforme_forma").select2({
+            width: "100%",
+            allowClear: true,
+            placeholder: "Seleccione una forma musical",
+            theme: "bootstrap-5",
+        });
+
+        $("#id_titulo_240_forma").select2({
+            width: "100%",
+            allowClear: true,
+            placeholder: "Seleccione una forma musical",
+            theme: "bootstrap-5",
+        });
+
+        // Smooth scroll para la navegación
+        $('a[href^="#"]').on("click", function (e) {
+            e.preventDefault();
+            var target = $(this.getAttribute("href"));
+            if (target.length) {
+                $("html, body")
+                    .stop()
+                    .animate(
+                        {
+                            scrollTop: target.offset().top - 80,
+                        },
+                        600
+                    );
+            }
+        });
+
+        // Resaltar el campo de autoridad cuando se escribe en el campo de creación
+        $("#id_nuevo_compositor_apellidos_nombres").on("input", function () {
+            if ($(this).val().trim() !== "") {
+                $("#id_compositor")
+                    .next(".select2-container")
+                    .css("opacity", "0.5");
+            } else {
+                $("#id_compositor")
+                    .next(".select2-container")
+                    .css("opacity", "1");
+            }
+        });
+
+        $("#id_nuevo_titulo_uniforme").on("input", function () {
+            if ($(this).val().trim() !== "") {
+                $("#id_titulo_uniforme")
+                    .next(".select2-container")
+                    .css("opacity", "0.5");
+            } else {
+                $("#id_titulo_uniforme")
+                    .next(".select2-container")
+                    .css("opacity", "1");
+            }
+        });
+
+        $("#id_nuevo_titulo_240").on("input", function () {
+            if ($(this).val().trim() !== "") {
+                $("#id_titulo_240")
+                    .next(".select2-container")
+                    .css("opacity", "0.5");
+            } else {
+                $("#id_titulo_240")
+                    .next(".select2-container")
+                    .css("opacity", "1");
+            }
+        });
+    });
+</script>
 {% endblock %}

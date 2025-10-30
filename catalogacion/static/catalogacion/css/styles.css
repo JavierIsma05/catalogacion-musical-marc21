@@ -62,3 +62,48 @@ label {
         margin-bottom: 20px;
     }
 }
+
+/* Estilos para Select2 */
+.select2-container--bootstrap-5 .select2-selection {
+    min-height: 38px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single {
+    padding: 0.375rem 0.75rem;
+}
+
+/* Estilos para alertas de creación de autoridades */
+.alert-info {
+    background-color: #e7f3ff;
+    border-color: #b3d9ff;
+    color: #004085;
+}
+
+.alert-info strong {
+    color: #003366;
+}
+
+/* Animación suave para campos deshabilitados */
+.select2-container {
+    transition: opacity 0.3s ease;
+}
+
+/* Mejora visual de los campos del formulario */
+.marc-block .form-control:focus,
+.marc-block .form-select:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 80, 0.15);
+}
+
+/* Espaciado mejorado para las alertas */
+.marc-block .alert {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+/* Estilo para los help texts */
+.form-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
