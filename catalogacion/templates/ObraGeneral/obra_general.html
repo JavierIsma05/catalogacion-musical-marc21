@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Obra | MARC21 Musical{% endblock %}
+
+{% block content %}
+<!-- aquí va todo el formulario con la barra lateral -->
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- 🔸 Columna izquierda (formulario) -->
+        <div class="col-md-9">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white fw-bold">
+                    Información del repositorio y sus relaciones
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- 🔹 Columna derecha (acciones) -->
+        <div class="col-md-3">
+            <div class="sidebar rounded shadow-sm">
+                <h6>Secciones y acciones</h6>
+                <a href="#" class="d-block mb-2 text-decoration-none">Información del repositorio y sus relaciones</a>
+                <a href="#" class="d-block mb-2 text-decoration-none">Personas e instituciones</a>
+                <a href="#" class="d-block mb-2 text-decoration-none">Título y descripción del contenido</a>
+                <a href="#" class="d-block mb-2 text-decoration-none">Referencias y notas</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
