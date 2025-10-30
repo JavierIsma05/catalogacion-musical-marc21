@@ -120,3 +120,112 @@ class ObraGeneral(models.Model):
 
     def __str__(self):
         return f"Obra {self.num_control} ({self.get_tipo_registro_display()})"
+    
+    # ------------------------------------------------
+    # 🟦 BLOQUE 1XX – Asientos principales (punto de acceso)
+    # ------------------------------------------------
+    
+    # 100 1# Compositor (NR - No Repetible)
+    compositor_apellidos_nombres = models.CharField(
+        max_length=200, blank=True, null=True,
+        help_text="100 $a – Apellidos, Nombres del compositor. Cruzar con campos 600 y 700."
+    )
+    compositor_coordenadas_biograficas = models.CharField(
+        max_length=50, blank=True, null=True,
+        help_text="100 $d – Coordenadas biográficas (fecha nacimiento - fecha muerte)."
+    )
+    compositor_funcion = models.CharField(
+        max_length=20, blank=True, null=True,
+        choices=[
+            ('arreglista', 'Arreglista'),
+            ('coeditor', 'Coeditor'),
+            ('compilador', 'Compilador'),
+            ('compositor', 'Compositor'),
+            ('copista', 'Copista'),
+            ('dedicatario', 'Dedicatario'),
+            ('editor', 'Editor'),
+            ('prologuista', 'Prologuista'),
+        ],
+        default='compositor',
+        help_text="100 $e – Función (R - Repetible)."
+    )
+    compositor_autoria = models.CharField(
+        max_length=15, blank=True, null=True,
+        choices=[
+            ('atribuida', 'Atribuida'),
+            ('certificada', 'Certificada'),
+            ('errónea', 'Errónea'),
+        ],
+        default='certificada',
+        help_text="100 $j – Autoría (R - Repetible)."
+    )
+    
+    # 130 0# Título uniforme (punto de acceso principal) (NR - No Repetible)
+    titulo_uniforme = models.CharField(
+        max_length=300, blank=True, null=True,
+        help_text="130 $a – Título uniforme."
+    )
+    titulo_uniforme_subencabezamiento_forma = models.CharField(
+        max_length=20, blank=True, null=True,
+        choices=[
+            ('adaptación', 'Adaptación'),
+            ('boceto', 'Boceto'),
+            ('fragmento', 'Fragmento'),
+            ('selección', 'Selección'),
+            ('tema con variaciones', 'Tema con variaciones'),
+        ],
+        help_text="130 $k – Subencabezamiento de forma (R - Repetible). Cruzar con campo 655."
+    )
+    titulo_uniforme_medio_interpretacion = models.CharField(
+        max_length=100, blank=True, null=True,
+        default='piano',
+        help_text="130 $m – Medio de interpretación (R - Repetible). Ej: piano."
+    )
+    titulo_uniforme_num_parte_seccion = models.CharField(
+        max_length=50, blank=True, null=True,
+        help_text="130 $n – Número de parte o sección de la obra (R - Repetible)."
+    )
+    titulo_uniforme_arreglo = models.CharField(
+        max_length=10, blank=True, null=True,
+        default='arreglo',
+        help_text="130 $o – Arreglo (NR - No Repetible)."
+    )
+    titulo_uniforme_nombre_parte_seccion = models.CharField(
+        max_length=100, blank=True, null=True,
+        help_text="130 $p – Nombre de parte o sección de la obra (R - Repetible)."
+    )
+    titulo_uniforme_tonalidad = models.CharField(
+        max_length=15, blank=True, null=True,
+        choices=[
+            ('Do mayor', 'Do mayor'),
+            ('Do menor', 'Do menor'),
+            ('Do# mayor', 'Do# mayor'),
+            ('Do# menor', 'Do# menor'),
+            ('Reb mayor', 'Reb mayor'),
+            ('Reb menor', 'Reb menor'),
+            ('Re mayor', 'Re mayor'),
+            ('Re menor', 'Re menor'),
+            ('Mib mayor', 'Mib mayor'),
+            ('Mib menor', 'Mib menor'),
+            ('Mi mayor', 'Mi mayor'),
+            ('Mi menor', 'Mi menor'),
+            ('Fa mayor', 'Fa mayor'),
+            ('Fa menor', 'Fa menor'),
+            ('Fa# mayor', 'Fa# mayor'),
+            ('Fa# menor', 'Fa# menor'),
+            ('Sol mayor', 'Sol mayor'),
+            ('Sol menor', 'Sol menor'),
+            ('Sol# mayor', 'Sol# mayor'),
+            ('Sol# menor', 'Sol# menor'),
+            ('Lab mayor', 'Lab mayor'),
+            ('Lab menor', 'Lab menor'),
+            ('La mayor', 'La mayor'),
+            ('La menor', 'La menor'),
+            ('Sib mayor', 'Sib mayor'),
+            ('Sib menor', 'Sib menor'),
+            ('Si mayor', 'Si mayor'),
+            ('Si menor', 'Si menor'),
+        ],
+        help_text="130 $r – Tonalidad (NR - No Repetible). 24 tonalidades mayores y menores."
+    )
+    

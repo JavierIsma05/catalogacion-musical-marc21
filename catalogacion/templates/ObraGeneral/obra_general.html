@@ -17,7 +17,7 @@
             {% csrf_token %}
 
             <!-- 🟩 CABECERA O LÍDER -->
-            <h5 class="text-primary">Cabecera o Líder</h5>
+            <h5 class="text-primary" id="cabecera">Cabecera o Líder</h5>
             <div class="marc-block mb-4">
               <div class="row mb-2">
                 <div class="col-md-6">
@@ -32,7 +32,7 @@
             </div>
 
             <!-- 🟨 BLOQUE 0XX -->
-            <h5 class="text-primary mt-4">Bloque 0XX – Campos de longitud variable</h5>
+            <h5 class="text-primary mt-4" id="bloque-0xx">Bloque 0XX – Campos de longitud variable</h5>
 
             <!-- 020 ## Número Internacional Normalizado para Libros -->
             <div class="marc-block mb-4">
@@ -150,6 +150,63 @@
               </div>
             </div>
 
+            <!-- 🟦 BLOQUE 1XX -->
+            <h5 class="text-primary mt-4" id="bloque-1xx">Bloque 1XX – Asientos principales (punto de acceso)</h5>
+
+            <!-- 100 1# Compositor -->
+            <div class="marc-block mb-4">
+              <h6><strong>100 1#</strong> — Compositor (NR)</h6>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$a Apellidos, Nombres</label></div>
+                <div class="col-md-8">{{ form.compositor_apellidos_nombres }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$d Coordenadas biográficas</label></div>
+                <div class="col-md-8">{{ form.compositor_coordenadas_biograficas }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$e Función</label></div>
+                <div class="col-md-8">{{ form.compositor_funcion }}</div>
+              </div>
+              <div class="row">
+                <div class="col-md-4"><label>$j Autoría</label></div>
+                <div class="col-md-8">{{ form.compositor_autoria }}</div>
+              </div>
+            </div>
+
+            <!-- 130 0# Título uniforme -->
+            <div class="marc-block mb-4">
+              <h6><strong>130 0#</strong> — Título uniforme (punto de acceso principal) (NR)</h6>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$a Título uniforme</label></div>
+                <div class="col-md-8">{{ form.titulo_uniforme }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$k Subencabezamiento de forma</label></div>
+                <div class="col-md-8">{{ form.titulo_uniforme_subencabezamiento_forma }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$m Medio de interpretación</label></div>
+                <div class="col-md-8">{{ form.titulo_uniforme_medio_interpretacion }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$n Número de parte/sección</label></div>
+                <div class="col-md-8">{{ form.titulo_uniforme_num_parte_seccion }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$o Arreglo</label></div>
+                <div class="col-md-8">{{ form.titulo_uniforme_arreglo }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$p Nombre de parte/sección</label></div>
+                <div class="col-md-8">{{ form.titulo_uniforme_nombre_parte_seccion }}</div>
+              </div>
+              <div class="row">
+                <div class="col-md-4"><label>$r Tonalidad</label></div>
+                <div class="col-md-8">{{ form.titulo_uniforme_tonalidad }}</div>
+              </div>
+            </div>
+
             <div class="d-flex gap-3 mt-4">
               <button type="submit" name="guardar_continuar" class="btn btn-success">
                 Guardar y continuar editando
@@ -172,22 +229,22 @@
             <thead class="table-success">
               <tr>
                 <th>001 Nº Control</th>
-                <th>005 Fecha/Hora</th>
-                <th>008 Código</th>
-                <th>ISBN</th>
-                <th>ISMN</th>
-                <th>País</th>
-                <th>Idioma</th>
+                <th>100 Compositor</th>
+                <th>130 Título uniforme</th>
+                <th>020 ISBN</th>
+                <th>024 ISMN</th>
+                <th>044 País</th>
+                <th>041 Idioma</th>
               </tr>
             </thead>
             <tbody>
               {% for obra in obras %}
               <tr>
                 <td>{{ obra.num_control }}</td>
-                <td>{{ obra.fecha_hora_ultima_transaccion }}</td>
-                <td>{{ obra.codigo_informacion }}</td>
-                <td>{{ obra.isbn }}</td>
-                <td>{{ obra.ismn }}</td>
+                <td>{{ obra.compositor_apellidos_nombres|default:"-" }}</td>
+                <td>{{ obra.titulo_uniforme|default:"-" }}</td>
+                <td>{{ obra.isbn|default:"-" }}</td>
+                <td>{{ obra.ismn|default:"-" }}</td>
                 <td>{{ obra.get_codigo_pais_display }}</td>
                 <td>{{ obra.get_codigo_lengua_display }}</td>
               </tr>
@@ -205,31 +262,17 @@
     <!-- 🔹 COLUMNA DERECHA -->
     <div class="col-md-3">
       <div class="sidebar rounded shadow-sm p-3 bg-white">
-        <h6>Secciones y acciones</h6>
-        <a href="#" class="d-block mb-2 text-decoration-none">Información del repositorio y sus relaciones</a>
-        <a href="#" class="d-block mb-2 text-decoration-none">Personas e instituciones</a>
-        <a href="#" class="d-block mb-2 text-decoration-none">Título y descripción del contenido</a>
-        <a href="#" class="d-block mb-2 text-decoration-none">Referencias y notas</a>
+        <h6 class="fw-bold mb-3">📋 Navegación MARC21</h6>
+        <a href="#cabecera" class="d-block mb-2 text-decoration-none">🟩 Cabecera o Líder</a>
+        <a href="#bloque-0xx" class="d-block mb-2 text-decoration-none">🟦 Bloque 0XX - Campos variables</a>
+        <a href="#bloque-1xx" class="d-block mb-2 text-decoration-none">🟦 Bloque 1XX - Asientos principales</a>
+        <hr>
+        <h6 class="fw-bold mb-3">🎯 Acciones</h6>
+        <a href="#" class="d-block mb-2 text-decoration-none">💾 Guardar borrador</a>
+        <a href="#" class="d-block mb-2 text-decoration-none">🔍 Vista preliminar</a>
+        <a href="#" class="d-block mb-2 text-decoration-none">⚠️ Validar registro</a>
       </div>
     </div>
   </div>
 </div>
-
-<!-- 🔹 ESTILO ESPECÍFICO MARC -->
-<style>
-  .marc-block {
-    border-left: 4px solid #198754;
-    padding-left: 10px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-  }
-  .marc-block h6 {
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: #333;
-  }
-  label {
-    font-weight: 500;
-  }
-</style>
 {% endblock %}

@@ -10,7 +10,14 @@ class ObraForm(forms.ModelForm):
             'incipit_num_obra', 'incipit_num_movimiento', 'incipit_num_pasaje',
             'incipit_titulo', 'incipit_voz_instrumento', 'incipit_notacion', 'incipit_url',
             'centro_catalogador', 'codigo_lengua', 'codigo_pais',
-            'clasif_institucion', 'clasif_proyecto', 'clasif_pais', 'clasif_ms_imp'
+            'clasif_institucion', 'clasif_proyecto', 'clasif_pais', 'clasif_ms_imp',
+            # Bloque 1XX
+            'compositor_apellidos_nombres', 'compositor_coordenadas_biograficas',
+            'compositor_funcion', 'compositor_autoria',
+            'titulo_uniforme', 'titulo_uniforme_subencabezamiento_forma',
+            'titulo_uniforme_medio_interpretacion', 'titulo_uniforme_num_parte_seccion',
+            'titulo_uniforme_arreglo', 'titulo_uniforme_nombre_parte_seccion',
+            'titulo_uniforme_tonalidad'
         ]
         widgets = {
             'tipo_registro': forms.Select(attrs={'class': 'form-select'}),
@@ -24,6 +31,18 @@ class ObraForm(forms.ModelForm):
             'codigo_lengua': forms.Select(attrs={'class': 'form-select'}),
             'codigo_pais': forms.Select(attrs={'class': 'form-select'}),
             'clasif_ms_imp': forms.Select(attrs={'class': 'form-select'}),
+            # Bloque 1XX
+            'compositor_apellidos_nombres': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos, Nombres'}),
+            'compositor_coordenadas_biograficas': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 1756-1791'}),
+            'compositor_funcion': forms.Select(attrs={'class': 'form-select'}),
+            'compositor_autoria': forms.Select(attrs={'class': 'form-select'}),
+            'titulo_uniforme': forms.TextInput(attrs={'class': 'form-control'}),
+            'titulo_uniforme_subencabezamiento_forma': forms.Select(attrs={'class': 'form-select'}),
+            'titulo_uniforme_medio_interpretacion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: piano'}),
+            'titulo_uniforme_num_parte_seccion': forms.TextInput(attrs={'class': 'form-control'}),
+            'titulo_uniforme_arreglo': forms.TextInput(attrs={'class': 'form-control'}),
+            'titulo_uniforme_nombre_parte_seccion': forms.TextInput(attrs={'class': 'form-control'}),
+            'titulo_uniforme_tonalidad': forms.Select(attrs={'class': 'form-select'}),
         }
         help_texts = {
             'isbn': '020 $a – ISBN tomado tal como aparece en la fuente. Genera vista de usuario.',
