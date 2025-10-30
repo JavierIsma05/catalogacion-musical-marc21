@@ -1,48 +1,183 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Registrar Obra | MARC21 Musical{% endblock %}
-{% block content %}
 
+{% block content %}
 <div class="container-fluid mt-4">
   <div class="row">
-    <!-- 🔸 Columna izquierda (Formulario) -->
+
+    <!-- 🔸 COLUMNA IZQUIERDA -->
     <div class="col-md-9">
       <div class="card shadow-sm mb-4">
         <div class="card-header bg-success text-white">
-          <h5 class="mb-0">Registrar nueva obra MARC21</h5>
+          <h5 class="mb-0">Registro MARC21 Musical</h5>
         </div>
         <div class="card-body">
           <form method="POST">
             {% csrf_token %}
-            <h5>Cabecera o Lider</h5>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="id_tipo_registro" class="form-label">06 – Tipo de registro</label>
-                {{ form.tipo_registro }}
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="id_nivel_bibliografico" class="form-label">07 – Nivel bibliográfico</label>
-                {{ form.nivel_bibliografico }}
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="id_descripcion" class="form-label">Descripción</label>
-              {{ form.descripcion }}
-            </div>
-            
-          </form>
 
-          <hr>
-          <h6 class="mt-4">Obras registradas</h6>
-          <table class="table table-bordered table-striped mt-3">
+            <!-- 🟩 CABECERA O LÍDER -->
+            <h5 class="text-primary">Cabecera o Líder</h5>
+            <div class="marc-block mb-4">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label>06 – Tipo de registro</label>
+                  {{ form.tipo_registro }}
+                </div>
+                <div class="col-md-6">
+                  <label>07 – Nivel bibliográfico</label>
+                  {{ form.nivel_bibliografico }}
+                </div>
+              </div>
+            </div>
+
+            <!-- 🟨 BLOQUE 0XX -->
+            <h5 class="text-primary mt-4">Bloque 0XX – Campos de longitud variable</h5>
+
+            <!-- 020 ## Número Internacional Normalizado para Libros -->
+            <div class="marc-block mb-4">
+              <h6><strong>020 ##</strong> — Número Internacional Normalizado para Libros (ISBN)</h6>
+              <div class="row align-items-center mb-2">
+                <div class="col-md-4">
+                  <label>$a ISBN</label>
+                </div>
+                <div class="col-md-8">
+                  {{ form.isbn }}
+                </div>
+              </div>
+            </div>
+
+            <!-- 024 2# Otros identificadores normalizados -->
+            <div class="marc-block mb-4">
+              <h6><strong>024 2#</strong> — Otros identificadores normalizados (ISMN)</h6>
+              <div class="row align-items-center mb-2">
+                <div class="col-md-4"><label>$a ISMN</label></div>
+                <div class="col-md-8">{{ form.ismn }}</div>
+              </div>
+            </div>
+
+            <!-- 028 20 Número de editor -->
+            <div class="marc-block mb-4">
+              <h6><strong>028 20</strong> — Número de editor o distribuidor</h6>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$a Número de editor</label></div>
+                <div class="col-md-8">{{ form.numero_editor }}</div>
+              </div>
+              <div class="row">
+                <div class="col-md-4"><label>Indicador</label></div>
+                <div class="col-md-8">{{ form.indicador_028 }}</div>
+              </div>
+            </div>
+
+            <!-- 031 ## Información del íncipit musical -->
+            <div class="marc-block mb-4">
+              <h6><strong>031 ##</strong> — Información del íncipit musical</h6>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$a Nº de obra</label></div>
+                <div class="col-md-8">{{ form.incipit_num_obra }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$b Nº de movimiento</label></div>
+                <div class="col-md-8">{{ form.incipit_num_movimiento }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$c Nº de pasaje</label></div>
+                <div class="col-md-8">{{ form.incipit_num_pasaje }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$d Título o encabezamiento</label></div>
+                <div class="col-md-8">{{ form.incipit_titulo }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$m Voz/instrumento</label></div>
+                <div class="col-md-8">{{ form.incipit_voz_instrumento }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$p Notación musical</label></div>
+                <div class="col-md-8">{{ form.incipit_notacion }}</div>
+              </div>
+              <div class="row">
+                <div class="col-md-4"><label>$u URL (íncipit externo)</label></div>
+                <div class="col-md-8">{{ form.incipit_url }}</div>
+              </div>
+            </div>
+
+            <!-- 040 ## Fuente de catalogación -->
+            <div class="marc-block mb-4">
+              <h6><strong>040 ##</strong> — Fuente de catalogación</h6>
+              <div class="row">
+                <div class="col-md-4"><label>$a Centro catalogador</label></div>
+                <div class="col-md-8">{{ form.centro_catalogador }}</div>
+              </div>
+            </div>
+
+            <!-- 041 0# Código de lengua -->
+            <div class="marc-block mb-4">
+              <h6><strong>041 0#</strong> — Código de lengua</h6>
+              <div class="row">
+                <div class="col-md-4"><label>$a Idioma</label></div>
+                <div class="col-md-8">{{ form.codigo_lengua }}</div>
+              </div>
+            </div>
+
+            <!-- 044 ## Código del país -->
+            <div class="marc-block mb-4">
+              <h6><strong>044 ##</strong> — País de la entidad editora/productora</h6>
+              <div class="row">
+                <div class="col-md-4"><label>$a País</label></div>
+                <div class="col-md-8">{{ form.codigo_pais }}</div>
+              </div>
+            </div>
+
+            <!-- 092 ## Clasificación local -->
+            <div class="marc-block mb-4">
+              <h6><strong>092 ##</strong> — Clasificación local</h6>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$a Institución</label></div>
+                <div class="col-md-8">{{ form.clasif_institucion }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$b Proyecto</label></div>
+                <div class="col-md-8">{{ form.clasif_proyecto }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-4"><label>$c País</label></div>
+                <div class="col-md-8">{{ form.clasif_pais }}</div>
+              </div>
+              <div class="row">
+                <div class="col-md-4"><label>$d Ms/Imp</label></div>
+                <div class="col-md-8">{{ form.clasif_ms_imp }}</div>
+              </div>
+            </div>
+
+            <div class="d-flex gap-3 mt-4">
+              <button type="submit" name="guardar_continuar" class="btn btn-success">
+                Guardar y continuar editando
+              </button>
+              <button type="submit" name="guardar_cerrar" class="btn btn-primary">
+                Guardar y cerrar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- 🟦 TABLA DE OBRAS -->
+      <div class="card shadow-sm mt-3">
+        <div class="card-header bg-secondary text-white">
+          <h6 class="mb-0">Obras registradas</h6>
+        </div>
+        <div class="card-body">
+          <table class="table table-bordered table-striped mt-2">
             <thead class="table-success">
               <tr>
                 <th>001 Nº Control</th>
-                <th>005 Fecha/Hora Transacción</th>
-                <th>008 Código Información</th>
-                <th>Tipo</th>
-                <th>Nivel</th>
-                <th>Descripción</th>
+                <th>005 Fecha/Hora</th>
+                <th>008 Código</th>
+                <th>ISBN</th>
+                <th>ISMN</th>
+                <th>País</th>
+                <th>Idioma</th>
               </tr>
             </thead>
             <tbody>
@@ -51,13 +186,14 @@
                 <td>{{ obra.num_control }}</td>
                 <td>{{ obra.fecha_hora_ultima_transaccion }}</td>
                 <td>{{ obra.codigo_informacion }}</td>
-                <td>{{ obra.get_tipo_registro_display }}</td>
-                <td>{{ obra.get_nivel_bibliografico_display }}</td>
-                <td>{{ obra.descripcion }}</td>
+                <td>{{ obra.isbn }}</td>
+                <td>{{ obra.ismn }}</td>
+                <td>{{ obra.get_codigo_pais_display }}</td>
+                <td>{{ obra.get_codigo_lengua_display }}</td>
               </tr>
               {% empty %}
               <tr>
-                <td colspan="6" class="text-center">No hay registros aún.</td>
+                <td colspan="7" class="text-center">No hay registros aún.</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -66,7 +202,7 @@
       </div>
     </div>
 
-    <!-- 🔹 Columna derecha (Acciones) -->
+    <!-- 🔹 COLUMNA DERECHA -->
     <div class="col-md-3">
       <div class="sidebar rounded shadow-sm p-3 bg-white">
         <h6>Secciones y acciones</h6>
@@ -74,12 +210,26 @@
         <a href="#" class="d-block mb-2 text-decoration-none">Personas e instituciones</a>
         <a href="#" class="d-block mb-2 text-decoration-none">Título y descripción del contenido</a>
         <a href="#" class="d-block mb-2 text-decoration-none">Referencias y notas</a>
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        
       </div>
-      
     </div>
   </div>
 </div>
 
+<!-- 🔹 ESTILO ESPECÍFICO MARC -->
+<style>
+  .marc-block {
+    border-left: 4px solid #198754;
+    padding-left: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+  }
+  .marc-block h6 {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  label {
+    font-weight: 500;
+  }
+</style>
 {% endblock %}
