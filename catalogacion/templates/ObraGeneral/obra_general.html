@@ -1,36 +1,85 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Registrar Obra | MARC21 Musical{% endblock %}
-
 {% block content %}
-<!-- aquí va todo el formulario con la barra lateral -->
-<div class="container-fluid">
-    <div class="row">
 
-        <!-- 🔸 Columna izquierda (formulario) -->
-        <div class="col-md-9">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-secondary text-white fw-bold">
-                    Información del repositorio y sus relaciones
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                    </form>
-                </div>
-            </div>
+<div class="container-fluid mt-4">
+  <div class="row">
+    <!-- 🔸 Columna izquierda (Formulario) -->
+    <div class="col-md-9">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">Registrar nueva obra MARC21</h5>
         </div>
-        <!-- 🔹 Columna derecha (acciones) -->
-        <div class="col-md-3">
-            <div class="sidebar rounded shadow-sm">
-                <h6>Secciones y acciones</h6>
-                <a href="#" class="d-block mb-2 text-decoration-none">Información del repositorio y sus relaciones</a>
-                <a href="#" class="d-block mb-2 text-decoration-none">Personas e instituciones</a>
-                <a href="#" class="d-block mb-2 text-decoration-none">Título y descripción del contenido</a>
-                <a href="#" class="d-block mb-2 text-decoration-none">Referencias y notas</a>
+        <div class="card-body">
+          <form method="POST">
+            {% csrf_token %}
+            <h5>Cabecera o Lider</h5>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="id_tipo_registro" class="form-label">06 – Tipo de registro</label>
+                {{ form.tipo_registro }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="id_nivel_bibliografico" class="form-label">07 – Nivel bibliográfico</label>
+                {{ form.nivel_bibliografico }}
+              </div>
             </div>
+            <div class="mb-3">
+              <label for="id_descripcion" class="form-label">Descripción</label>
+              {{ form.descripcion }}
+            </div>
+            
+          </form>
+
+          <hr>
+          <h6 class="mt-4">Obras registradas</h6>
+          <table class="table table-bordered table-striped mt-3">
+            <thead class="table-success">
+              <tr>
+                <th>001 Nº Control</th>
+                <th>005 Fecha/Hora Transacción</th>
+                <th>008 Código Información</th>
+                <th>Tipo</th>
+                <th>Nivel</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for obra in obras %}
+              <tr>
+                <td>{{ obra.num_control }}</td>
+                <td>{{ obra.fecha_hora_ultima_transaccion }}</td>
+                <td>{{ obra.codigo_informacion }}</td>
+                <td>{{ obra.get_tipo_registro_display }}</td>
+                <td>{{ obra.get_nivel_bibliografico_display }}</td>
+                <td>{{ obra.descripcion }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="text-center">No hay registros aún.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
+
+    <!-- 🔹 Columna derecha (Acciones) -->
+    <div class="col-md-3">
+      <div class="sidebar rounded shadow-sm p-3 bg-white">
+        <h6>Secciones y acciones</h6>
+        <a href="#" class="d-block mb-2 text-decoration-none">Información del repositorio y sus relaciones</a>
+        <a href="#" class="d-block mb-2 text-decoration-none">Personas e instituciones</a>
+        <a href="#" class="d-block mb-2 text-decoration-none">Título y descripción del contenido</a>
+        <a href="#" class="d-block mb-2 text-decoration-none">Referencias y notas</a>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        
+      </div>
+      
+    </div>
+  </div>
 </div>
 
 {% endblock %}

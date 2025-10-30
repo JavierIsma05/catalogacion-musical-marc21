@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from .models import ObraGeneral
+from .forms import ObraForm
 
 def index(request):
     return render(request, 'index.html')
@@ -7,6 +9,7 @@ def plantillas(request):
     return render(request, 'plantillas.html')
 
 def crear_obra(request):
+    
     return render(request, 'crear_obra.html')
 
 # este obra_general vamos a usar para ir rellenando los campos de la obra general en base al excel 
@@ -15,8 +18,18 @@ def crear_obra(request):
 # pero a mi modo de verlo todos son campos de la obra general que si bien no se va a visualizar de momento si pongamolo como
 # si fuese el padre de los demas
 def obra_general(request):
-    
-    return render(request, 'ObraGeneral/obra_general.html')
+    obras = ObraGeneral.objects.all().order_by('-id')  # lista de obras
+    form = ObraForm(request.POST or None)
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()  # genera automáticamente los campos MARC21 (001, 005, 008)
+        return redirect('obra_general')
+
+    contexto = {
+        'form': form,
+        'obras': obras,
+    }
+    return render(request, 'ObraGeneral/obra_general.html', contexto)
 
 def coleccion_manuscrita(request):
     return render(request, 'ColeccionManuscrita/col_man.html')

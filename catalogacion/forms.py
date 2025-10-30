@@ -1,11 +1,12 @@
 from django import forms
-from .models import ObraMarc
+from .models import ObraGeneral
 
-class ObraMarcForm(forms.ModelForm):
+class ObraForm(forms.ModelForm):
     class Meta:
-        model = ObraMarc
-        fields = '__all__'
+        model = ObraGeneral
+        fields = ['tipo_registro', 'nivel_bibliografico', 'descripcion']
         widgets = {
-            'notacion_token': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Ejemplo: #@%G4^/A#FGB...'}),
-            'nota_general': forms.Textarea(attrs={'rows': 3}),
+            'tipo_registro': forms.Select(attrs={'class': 'form-select'}),
+            'nivel_bibliografico': forms.Select(attrs={'class': 'form-select'}),
+            'descripcion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Descripción opcional'}),
         }
