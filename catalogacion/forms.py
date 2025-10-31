@@ -45,7 +45,7 @@ EdicionFormSet = forms.inlineformset_factory(
 ProduccionPublicacionFormSet = forms.inlineformset_factory(
     ObraGeneral,
     ProduccionPublicacion,
-    fields=['funcion', 'lugar', 'nombre_entidad', 'fecha', 'orden'],
+    fields=['funcion', 'lugar', 'nombre_entidad', 'fecha'],
     extra=1,
     min_num=0,
     max_num=10,
@@ -55,14 +55,13 @@ ProduccionPublicacionFormSet = forms.inlineformset_factory(
         'lugar': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Quito, Madrid'}),
         'nombre_entidad': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del productor/editor'}),
         'fecha': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 2023, ©2020'}),
-        'orden': forms.NumberInput(attrs={'class': 'form-control', 'value': 1}),
     }
 )
 
 DescripcionFisicaFormSet = forms.inlineformset_factory(
     ObraGeneral,
     DescripcionFisica,
-    fields=['extension', 'otras_caracteristicas_fisicas'],
+    fields=['extension', 'otras_caracteristicas_fisicas', 'dimensiones', 'material_acompanante'],
     extra=1,
     min_num=0,
     max_num=5,
@@ -70,6 +69,8 @@ DescripcionFisicaFormSet = forms.inlineformset_factory(
     widgets={
         'extension': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 1 partitura (24 p.)'}),
         'otras_caracteristicas_fisicas': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: ilustraciones'}),
+        'dimensiones': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 30 cm'}),
+        'material_acompanante': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 1 CD'}),
     }
 )
 

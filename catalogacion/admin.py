@@ -121,7 +121,7 @@ class ProduccionPublicacionInline(admin.TabularInline):
     """Inline para campo 264 - Producción/Publicación"""
     model = ProduccionPublicacion
     extra = 1
-    fields = ['funcion', 'lugar', 'nombre_entidad', 'fecha', 'orden']
+    fields = ['funcion', 'lugar', 'nombre_entidad', 'fecha']
     verbose_name_plural = "264 - Producción/Publicación/Distribución/Fabricación/Copyright"
 
 
@@ -129,7 +129,7 @@ class DescripcionFisicaInline(admin.TabularInline):
     """Inline para campo 300 - Descripciones Físicas"""
     model = DescripcionFisica
     extra = 1
-    fields = ['extension', 'otras_caracteristicas_fisicas']
+    fields = ['extension', 'otras_caracteristicas_fisicas', 'dimensiones', 'material_acompanante']
     verbose_name_plural = "300 - Descripciones Físicas"
 
 

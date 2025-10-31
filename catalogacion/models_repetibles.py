@@ -162,18 +162,12 @@ class ProduccionPublicacion(models.Model):
         help_text="Segundo indicador: función de la entidad (0=Producción para manuscritos)"
     )
     
-    # Orden de aparición (para mantener secuencia cuando hay múltiples 264)
-    orden = models.PositiveIntegerField(
-        default=1,
-        help_text="Orden de aparición en el registro MARC"
-    )
-    
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         verbose_name = "Producción/Publicación (264)"
         verbose_name_plural = "Producciones/Publicaciones (264)"
-        ordering = ['obra', 'orden']
+        ordering = ['obra', 'id']
         
     def __str__(self):
         partes = []
@@ -192,6 +186,7 @@ class ProduccionPublicacion(models.Model):
 #===============================================
 # 📌 CAMPO 300: DESCRIPCIÓN FÍSICA 
 # ================================================
+# TODO: Revisar subcampos repetibles
 class DescripcionFisica(models.Model):
     """
     Campo 300 - Descripción física (R)
@@ -219,6 +214,22 @@ class DescripcionFisica(models.Model):
         blank=True,
         null=True,
         help_text="300 $b – Otras características físicas (ej: ilustraciones, notas)"
+    )
+    
+    # Subcampo $c - Dimensiones
+    dimensiones = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="300 $c – Dimensiones (ej: 30 cm)"
+    )
+    
+    # Subcampo $e - Material acompañante
+    material_acompanante = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="300 $e – Material acompañante (ej: 1 CD)"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)

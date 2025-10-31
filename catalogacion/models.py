@@ -258,14 +258,14 @@ class ObraGeneral(models.Model):
         help_text="028 $a – Número de plancha, placa o código del editor"
     )
     
-    # TODO: Cambiar el campo 028 a una clase para manejar múltiples registros 028
+    # TODO: Cambiar a campo repetible
     indicador_028 = models.CharField(
         max_length=2, 
         default='20',
         help_text="028 Indicador (predeterminado '20')"
     )
     
-    # TODO: Cambiar el campo 031 a una clase para manejar múltiples registros 028
+    # TODO: Cambiar a campo repetible
     # 031 ## Íncipit musical
     incipit_num_obra = models.PositiveIntegerField(
         default=1, 
@@ -387,6 +387,7 @@ class ObraGeneral(models.Model):
         help_text="100 $a y $d – Compositor principal (cruzar con 600, 700)"
     )
     
+    # TODO: Repetible
     compositor_funcion = models.CharField(
         max_length=20, 
         blank=True, 
@@ -396,6 +397,7 @@ class ObraGeneral(models.Model):
         help_text="100 $e – Función (predeterminado: compositor)"
     )
     
+    # TODO: Repetible
     compositor_autoria = models.CharField(
         max_length=15, 
         blank=True, 
@@ -406,7 +408,6 @@ class ObraGeneral(models.Model):
     )
     
     # 130 0# Título uniforme como punto de acceso principal (NR)
-    # ⚠️ Usa la tabla de autoridades
     titulo_uniforme = models.ForeignKey(
         AutoridadTituloUniforme,
         on_delete=models.PROTECT,
@@ -416,6 +417,7 @@ class ObraGeneral(models.Model):
         help_text="130 $a – Título uniforme (cruzar con 240)"
     )
     
+    # TODO: Repetible
     titulo_uniforme_forma = models.ForeignKey(
         AutoridadFormaMusical,
         on_delete=models.PROTECT,
@@ -425,6 +427,7 @@ class ObraGeneral(models.Model):
         help_text="130 $k – Forma (cruzar con 240 $k y 655)"
     )
     
+    # TODO: Repetible
     titulo_uniforme_medio_interpretacion = models.CharField(
         max_length=100, 
         blank=True, 
@@ -448,6 +451,7 @@ class ObraGeneral(models.Model):
         help_text="130 $o – Arreglo"
     )
     
+    # TODO: Repetible
     titulo_uniforme_nombre_parte = models.CharField(
         max_length=100, 
         blank=True, 
@@ -467,7 +471,6 @@ class ObraGeneral(models.Model):
     #? 🟦 BLOQUE 2XX – Títulos y mención de responsabilidad
     # ------------------------------------------------
     
-    # 240 10 Título uniforme (NR - No Repetible)
     # ⚠️ Usa LA MISMA tabla de autoridades que 130
     titulo_240 = models.ForeignKey(
         AutoridadTituloUniforme,
@@ -478,6 +481,7 @@ class ObraGeneral(models.Model):
         help_text="240 $a – Título uniforme (cruzar con 130)"
     )
     
+    # TODO: Repetible
     titulo_240_forma = models.ForeignKey(
         AutoridadFormaMusical,
         on_delete=models.PROTECT,
@@ -487,6 +491,7 @@ class ObraGeneral(models.Model):
         help_text="240 $k – Forma (cruzar con 130 $k y 655)"
     )
     
+    # TODO: Repetible
     titulo_240_medio_interpretacion = models.CharField(
         max_length=100, 
         blank=True, 
@@ -494,6 +499,7 @@ class ObraGeneral(models.Model):
         help_text="240 $m – Medio de interpretación"
     )
     
+    # TODO: Repetible
     titulo_240_num_parte = models.CharField(
         max_length=50, 
         blank=True, 
@@ -508,6 +514,7 @@ class ObraGeneral(models.Model):
         help_text="240 $o – Arreglo"
     )
     
+    # TODO: Repetible
     titulo_240_nombre_parte = models.CharField(
         max_length=100, 
         blank=True, 
@@ -555,7 +562,7 @@ class ObraGeneral(models.Model):
     #? 🟦 BLOQUE 3XX – Descripción física
 
     #* Campo 300 implementado como modelo separado: DescripcionFisica
-        
+
     
     # ------------------------------------------------
     # Metadatos del sistema
