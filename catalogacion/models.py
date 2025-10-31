@@ -1,6 +1,6 @@
 from django.db import models
 from datetime import datetime
-from .models_repetibles import TituloAlternativo, Edicion, ProduccionPublicacion
+from .models_repetibles import TituloAlternativo, Edicion, ProduccionPublicacion, DescripcionFisica
 
 # Exportar todos los modelos para que estén disponibles con "from .models import ..."
 __all__ = [
@@ -13,6 +13,7 @@ __all__ = [
     'TituloAlternativo',
     'Edicion',
     'ProduccionPublicacion',
+    'DescripcionFisica',
     # Modelo principal
     'ObraGeneral',
 ]
@@ -231,7 +232,7 @@ class ObraGeneral(models.Model):
     )
     
     # ------------------------------------------------
-    # 🟦 BLOQUE 0XX – Campos de longitud variable
+    # ?🟦 BLOQUE 0XX – Campos de longitud variable
     # ------------------------------------------------
     
     # 020 ## ISBN
@@ -249,7 +250,6 @@ class ObraGeneral(models.Model):
         null=True,
         help_text="024 $a – ISMN (para obras impresas desde 1993 aprox.)"
     )
-    
     # 028 20 Número de editor
     numero_editor = models.CharField(
         max_length=50, 
@@ -258,12 +258,14 @@ class ObraGeneral(models.Model):
         help_text="028 $a – Número de plancha, placa o código del editor"
     )
     
+    # TODO: Cambiar el campo 028 a una clase para manejar múltiples registros 028
     indicador_028 = models.CharField(
         max_length=2, 
         default='20',
         help_text="028 Indicador (predeterminado '20')"
     )
     
+    # TODO: Cambiar el campo 031 a una clase para manejar múltiples registros 028
     # 031 ## Íncipit musical
     incipit_num_obra = models.PositiveIntegerField(
         default=1, 
@@ -371,7 +373,7 @@ class ObraGeneral(models.Model):
     )
     
     # ------------------------------------------------
-    # 🟦 BLOQUE 1XX – Asientos principales
+    #? 🟦 BLOQUE 1XX – Asientos principales
     # ------------------------------------------------
     
     # 100 1# Compositor (NR - No Repetible)
@@ -462,7 +464,7 @@ class ObraGeneral(models.Model):
     )
     
     # ------------------------------------------------
-    # 🟦 BLOQUE 2XX – Títulos y mención de responsabilidad
+    #? 🟦 BLOQUE 2XX – Títulos y mención de responsabilidad
     # ------------------------------------------------
     
     # 240 10 Título uniforme (NR - No Repetible)
@@ -548,36 +550,12 @@ class ObraGeneral(models.Model):
     
     #* Campo 264 implementado como modelo separado: ProduccionPublicacion
     # ------------------------------------------------
-    
-    
-    # 300 ## Descripción física (R)
-    extension = models.CharField(
-        max_length=200, 
-        blank=True, 
-        null=True,
-        help_text="300 $a – Extensión (ej: 1 partitura (24 p.))"
-    )
-    
-    otros_detalles_fisicos = models.CharField(
-        max_length=200, 
-        blank=True, 
-        null=True,
-        help_text="300 $b – Otros detalles físicos"
-    )
-    
-    dimensiones = models.CharField(
-        max_length=100, 
-        blank=True, 
-        null=True,
-        help_text="300 $c – Dimensiones (ej: 30 cm)"
-    )
-    
-    material_acompanante = models.CharField(
-        max_length=200, 
-        blank=True, 
-        null=True,
-        help_text="300 $e – Material acompañante"
-    )
+
+
+    #? 🟦 BLOQUE 3XX – Descripción física
+
+    #* Campo 300 implementado como modelo separado: DescripcionFisica
+        
     
     # ------------------------------------------------
     # Metadatos del sistema

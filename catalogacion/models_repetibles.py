@@ -188,3 +188,45 @@ class ProduccionPublicacion(models.Model):
         info = " : ".join(partes) if partes else "Sin datos"
         
         return f"[{funcion_display}] {info}"
+
+#===============================================
+# 📌 CAMPO 300: DESCRIPCIÓN FÍSICA 
+# ================================================
+class DescripcionFisica(models.Model):
+    """
+    Campo 300 - Descripción física (R)
+    
+    Permite múltiples descripciones físicas para una obra.
+    Ejemplos: diferentes formatos o características físicas de la obra.
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='descripciones_fisicas',
+        help_text="Obra a la que pertenece esta descripción física"
+    )
+    
+    # Subcampo $a - Extensión
+    extension = models.CharField(
+        max_length=200,
+        help_text="300 $a – Extensión (ej: 1 partitura (24 p.))"
+    )
+    
+    # Subcampo $b - Otras características físicas
+    otras_caracteristicas_fisicas = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="300 $b – Otras características físicas (ej: ilustraciones, notas)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Descripción Física (300)"
+        verbose_name_plural = "Descripciones Físicas (300)"
+        ordering = ['obra', 'id']
+        
+    def __str__(self):
+        return self.extension

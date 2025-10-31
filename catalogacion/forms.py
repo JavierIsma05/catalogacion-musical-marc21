@@ -7,7 +7,8 @@ from .models import (
     AutoridadFormaMusical,
     TituloAlternativo,  # ✅ Campo 246
     Edicion,  # ✅ Campo 250
-    ProduccionPublicacion  # ✅ Campo 264
+    ProduccionPublicacion,  # ✅ Campo 264
+    DescripcionFisica  # ✅ Campo 300
 )
 
 # ================================================
@@ -55,6 +56,20 @@ ProduccionPublicacionFormSet = forms.inlineformset_factory(
         'nombre_entidad': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del productor/editor'}),
         'fecha': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 2023, ©2020'}),
         'orden': forms.NumberInput(attrs={'class': 'form-control', 'value': 1}),
+    }
+)
+
+DescripcionFisicaFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    DescripcionFisica,
+    fields=['extension', 'otras_caracteristicas_fisicas'],
+    extra=1,
+    min_num=0,
+    max_num=5,
+    can_delete=True,
+    widgets={
+        'extension': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 1 partitura (24 p.)'}),
+        'otras_caracteristicas_fisicas': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: ilustraciones'}),
     }
 )
 
@@ -193,10 +208,6 @@ class ObraForm(forms.ModelForm):
             'titulo_principal', 
             'subtitulo', 
             'mencion_responsabilidad',
-            'extension', 
-            'otros_detalles_fisicos', 
-            'dimensiones', 
-            'material_acompanante'
         ]
         
         widgets = {
@@ -235,10 +246,6 @@ class ObraForm(forms.ModelForm):
             'titulo_principal': forms.TextInput(attrs={'class': 'form-control'}),
             'subtitulo': forms.TextInput(attrs={'class': 'form-control'}),
             'mencion_responsabilidad': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'extension': forms.TextInput(attrs={'class': 'form-control'}),
-            'otros_detalles_fisicos': forms.TextInput(attrs={'class': 'form-control'}),
-            'dimensiones': forms.TextInput(attrs={'class': 'form-control'}),
-            'material_acompanante': forms.TextInput(attrs={'class': 'form-control'}),
         }
     
     def __init__(self, *args, **kwargs):

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from django.db import models
 from django.forms import TextInput, Textarea, Select, NumberInput
 from .models import (
@@ -7,117 +8,11 @@ from .models import (
     AutoridadTituloUniforme,
     AutoridadFormaMusical,
     AutoridadMateria,
-    TituloAlternativo,        # ✅ Campo 246
-    Edicion,                   # ✅ Campo 250
-    ProduccionPublicacion      # ✅ Campo 264
+    TituloAlternativo,
+    Edicion,
+    ProduccionPublicacion,
+    DescripcionFisica
 )
-
-# ================================================
-# 🎬 INLINES PARA CAMPOS REPETIBLES
-# ================================================
-
-class TituloAlternativoInline(admin.TabularInline):
-    """
-    Inline para gestionar múltiples títulos alternativos (Campo 246)
-    Permite agregar variantes de títulos
-    """
-    model = TituloAlternativo
-    extra = 1
-    min_num = 0
-    max_num = 10
-    
-    fields = ['titulo', 'resto_titulo']
-    
-    formfield_overrides = {
-        models.CharField: {
-            'widget': TextInput(attrs={'size': '60', 'class': 'vTextField'})
-        },
-    }
-    
-    verbose_name = "Título Alternativo (246)"
-    verbose_name_plural = "📚 Títulos Alternativos (Campo 246) - Repetible"
-    classes = ['collapse']
-    
-    def get_formset(self, request, obj=None, **kwargs):
-        """Personalizar el formset"""
-        formset = super().get_formset(request, obj, **kwargs)
-        formset.help_text = (
-            "⚠️ Campo 246 es REPETIBLE. Agregue títulos alternativos, abreviados o variantes "
-            "que aparezcan en el recurso."
-        )
-        return formset
-
-
-class EdicionInline(admin.TabularInline):
-    """
-    Inline para gestionar múltiples ediciones (Campo 250)
-    Permite registrar información de las ediciones
-    """
-    model = Edicion
-    extra = 1
-    min_num = 0
-    max_num = 5
-    
-    fields = ['edicion']
-    
-    formfield_overrides = {
-        models.CharField: {
-            'widget': TextInput(attrs={'size': '60', 'class': 'vTextField'})
-        },
-    }
-    
-    verbose_name = "Edición (250)"
-    verbose_name_plural = "📚 Ediciones (Campo 250) - Repetible"
-    classes = ['collapse']
-    
-    def get_formset(self, request, obj=None, **kwargs):
-        """Personalizar el formset"""
-        formset = super().get_formset(request, obj, **kwargs)
-        formset.help_text = (
-            "⚠️ Campo 250 es REPETIBLE. Agregue diferentes ediciones "
-            "con sus correspondientes datos de edición."
-        )
-        return formset
-
-
-class ProduccionPublicacionInline(admin.TabularInline):
-    """
-    Inline para gestionar múltiples registros 264 (Producción/Publicación)
-    Permite agregar producción, publicación, distribución, fabricación y copyright
-    """
-    model = ProduccionPublicacion
-    extra = 1
-    min_num = 0
-    max_num = 10
-    
-    fields = [
-        'funcion',
-        'lugar',
-        'nombre_entidad',
-        'fecha',
-        'orden'
-    ]
-    
-    formfield_overrides = {
-        models.CharField: {
-            'widget': TextInput(attrs={'size': '40', 'class': 'vTextField'})
-        },
-    }
-    
-    verbose_name = "Registro 264 (Producción/Publicación/Distribución/Fabricación/Copyright)"
-    verbose_name_plural = "📚 BLOQUE 2XX - Producción/Publicación (Campo 264) - Repetible"
-    classes = ['collapse']
-    
-    def get_formset(self, request, obj=None, **kwargs):
-        """Personalizar el formset"""
-        formset = super().get_formset(request, obj, **kwargs)
-        formset.help_text = (
-            "⚠️ Campo 264 es REPETIBLE. Puede agregar múltiples registros para "
-            "distinguir entre producción, publicación, distribución, fabricación y copyright. "
-            "Para manuscritos, use función 'Producción' (0)."
-        )
-        return formset
-
 
 # ================================================
 # 📚 ADMINISTRACIÓN DE TABLAS DE AUTORIDADES
@@ -126,8 +21,7 @@ class ProduccionPublicacionInline(admin.TabularInline):
 @admin.register(AutoridadPersona)
 class AutoridadPersonaAdmin(admin.ModelAdmin):
     """Gestión de nombres de personas normalizados"""
-    
-    list_display = ['apellidos_nombres', 'fechas', 'fecha_creacion']
+    list_display = ['apellidos_nombres', 'fechas', 'num_obras', 'fecha_creacion']
     search_fields = ['apellidos_nombres', 'fechas']
     list_filter = ['fecha_creacion']
     ordering = ['apellidos_nombres']
@@ -139,54 +33,64 @@ class AutoridadPersonaAdmin(admin.ModelAdmin):
         }),
     )
     
-    def get_readonly_fields(self, request, obj=None):
-        if obj:
-            return ['fecha_creacion']
-        return []
+    def num_obras(self, obj):
+        """Mostrar cantidad de obras donde se usa este compositor"""
+        count = obj.obras_como_compositor.count()
+        return format_html(f'<span style="background-color: #d4edda; padding: 3px 8px; border-radius: 3px;"><strong>{count}</strong> obras</span>')
+    num_obras.short_description = '📊 Obras registradas'
 
 
 @admin.register(AutoridadTituloUniforme)
 class AutoridadTituloUniformeAdmin(admin.ModelAdmin):
     """Gestión de títulos uniformes normalizados"""
-    
-    list_display = ['titulo', 'fecha_creacion', 'cantidad_usos']
+    list_display = ['titulo', 'usos_130', 'usos_240', 'fecha_creacion']
     search_fields = ['titulo']
     list_filter = ['fecha_creacion']
     ordering = ['titulo']
     
-    def cantidad_usos(self, obj):
-        """Muestra cuántas obras usan este título"""
-        usos_130 = obj.obras_130.count()
-        usos_240 = obj.obras_240.count()
-        total = usos_130 + usos_240
-        return f"{total} obras ({usos_130} en 130, {usos_240} en 240)"
+    def usos_130(self, obj):
+        """Contar usos en campo 130"""
+        count = obj.obras_130.count()
+        if count > 0:
+            return format_html(f'<span style="background-color: #cfe2ff; padding: 3px 8px; border-radius: 3px;"><strong>{count}</strong></span>')
+        return "-"
+    usos_130.short_description = '📌 Campo 130'
     
-    cantidad_usos.short_description = 'Usos'
+    def usos_240(self, obj):
+        """Contar usos en campo 240"""
+        count = obj.obras_240.count()
+        if count > 0:
+            return format_html(f'<span style="background-color: #d1ecf1; padding: 3px 8px; border-radius: 3px;"><strong>{count}</strong></span>')
+        return "-"
+    usos_240.short_description = '📌 Campo 240'
 
 
 @admin.register(AutoridadFormaMusical)
 class AutoridadFormaMusicalAdmin(admin.ModelAdmin):
-    """Gestión de formas musicales normalizadas"""
-    
-    list_display = ['forma', 'fecha_creacion', 'cantidad_usos']
+    """Gestión de formas musicales"""
+    list_display = ['forma', 'usos_130', 'usos_240', 'usos_655', 'fecha_creacion']
     search_fields = ['forma']
     list_filter = ['fecha_creacion']
     ordering = ['forma']
     
-    def cantidad_usos(self, obj):
-        """Muestra cuántas obras usan esta forma"""
-        usos_130 = obj.obras_130_forma.count()
-        usos_240 = obj.obras_240_forma.count()
-        total = usos_130 + usos_240
-        return f"{total} obras ({usos_130} en 130, {usos_240} en 240)"
+    def usos_130(self, obj):
+        count = obj.obras_130_forma.count()
+        return f"{count}" if count > 0 else "-"
+    usos_130.short_description = 'Campo 130 $k'
     
-    cantidad_usos.short_description = 'Usos'
+    def usos_240(self, obj):
+        count = obj.obras_240_forma.count()
+        return f"{count}" if count > 0 else "-"
+    usos_240.short_description = 'Campo 240 $k'
+    
+    def usos_655(self, obj):
+        return "-"  # Para cuando implantes campo 655
+    usos_655.short_description = 'Campo 655'
 
 
 @admin.register(AutoridadMateria)
 class AutoridadMateriaAdmin(admin.ModelAdmin):
-    """Gestión de términos de materia normalizados"""
-    
+    """Gestión de términos de materia"""
     list_display = ['termino', 'fecha_creacion']
     search_fields = ['termino']
     list_filter = ['fecha_creacion']
@@ -194,33 +98,63 @@ class AutoridadMateriaAdmin(admin.ModelAdmin):
 
 
 # ================================================
-# 🎵 ADMINISTRACIÓN PRINCIPAL - OBRA GENERAL
+# 📌 INLINES PARA CAMPOS REPETIBLES
+# ================================================
+
+class TituloAlternativoInline(admin.TabularInline):
+    """Inline para campo 246 - Títulos Alternativos"""
+    model = TituloAlternativo
+    extra = 1
+    fields = ['titulo', 'resto_titulo']
+    verbose_name_plural = "246 - Títulos Alternativos"
+
+
+class EdicionInline(admin.TabularInline):
+    """Inline para campo 250 - Ediciones"""
+    model = Edicion
+    extra = 1
+    fields = ['edicion']
+    verbose_name_plural = "250 - Ediciones"
+
+
+class ProduccionPublicacionInline(admin.TabularInline):
+    """Inline para campo 264 - Producción/Publicación"""
+    model = ProduccionPublicacion
+    extra = 1
+    fields = ['funcion', 'lugar', 'nombre_entidad', 'fecha', 'orden']
+    verbose_name_plural = "264 - Producción/Publicación/Distribución/Fabricación/Copyright"
+
+
+class DescripcionFisicaInline(admin.TabularInline):
+    """Inline para campo 300 - Descripciones Físicas"""
+    model = DescripcionFisica
+    extra = 1
+    fields = ['extension', 'otras_caracteristicas_fisicas']
+    verbose_name_plural = "300 - Descripciones Físicas"
+
+
+# ================================================
+# 📄 ADMINISTRACIÓN PRINCIPAL - OBRA GENERAL
 # ================================================
 
 @admin.register(ObraGeneral)
 class ObraGeneralAdmin(admin.ModelAdmin):
-    """
-    Administración principal de obras musicales MARC21
-    Organizado según la estructura del documento
-    """
+    """Administración de Obras Musicales MARC21"""
     
-    # ✅ AGREGAR LOS INLINES - Orden importante para visualización
-    inlines = [
-        TituloAlternativoInline,    # Campo 246
-        EdicionInline,               # Campo 250
-        ProduccionPublicacionInline  # Campo 264
+    list_display = [
+        'num_control_display',
+        'punto_acceso_principal',
+        'tipo_registro_display',
+        'codigo_lengua_display',
+        'fecha_creacion_sistema'
     ]
     
-    # ------------------------------------------------
-    # Lista de registros
-    # ------------------------------------------------
-    list_display = [
+    search_fields = [
         'num_control',
-        'get_punto_acceso_principal',
-        'titulo_principal',
-        'get_tipo_registro_display',
-        'get_nivel_bibliografico_display',
-        'fecha_creacion_sistema'
+        'compositor__apellidos_nombres',
+        'titulo_uniforme__titulo',
+        'titulo_240__titulo',
+        'titulo_principal'
     ]
     
     list_filter = [
@@ -231,69 +165,35 @@ class ObraGeneralAdmin(admin.ModelAdmin):
         'fecha_creacion_sistema'
     ]
     
-    search_fields = [
-        'num_control',
-        'compositor__apellidos_nombres',
-        'titulo_uniforme__titulo',
-        'titulo_240__titulo',
-        'titulo_principal',
-        'isbn',
-        'ismn'
-    ]
-    
     ordering = ['-num_control']
+    date_hierarchy = 'fecha_creacion_sistema'
     
-    # ------------------------------------------------
-    # Campos solo lectura (autogenerados)
-    # ------------------------------------------------
-    readonly_fields = [
-        'num_control',
-        'fecha_hora_ultima_transaccion',
-        'codigo_informacion',
-        'clasif_num_control',
-        'estado_registro',
-        'fecha_creacion_sistema',
-        'fecha_modificacion_sistema'
+    # Inlines para campos repetibles
+    inlines = [
+        ProduccionPublicacionInline,
+        DescripcionFisicaInline,
+        TituloAlternativoInline,
+        EdicionInline
     ]
     
-    # ------------------------------------------------
-    # Organización en secciones (fieldsets)
-    # ✅ AJUSTADO: Eliminados campos que ahora son repetibles
-    # ------------------------------------------------
+    # Fieldsets para organizar la información
     fieldsets = (
-        ('🎯 DATOS GENERADOS AUTOMÁTICAMENTE', {
-            'classes': ('collapse',),
-            'fields': (
-                'num_control',
-                'fecha_hora_ultima_transaccion',
-                'codigo_informacion',
-                'estado_registro',
-                'fecha_creacion_sistema',
-                'fecha_modificacion_sistema'
-            ),
-            'description': 'Estos campos se generan automáticamente según MARC21'
+        ('🟩 Cabecera o Líder', {
+            'fields': ('tipo_registro', 'nivel_bibliografico'),
+            'classes': ('wide',)
         }),
         
-        ('📋 CABECERA O LÍDER', {
-            'fields': (
-                'tipo_registro',
-                'nivel_bibliografico'
-            ),
-            'description': 'Posiciones 05, 06, 07 de la cabecera MARC21'
-        }),
-        
-        ('🔢 BLOQUE 0XX - Números e identificadores', {
+        ('🟨 Bloque 0XX - Identificadores', {
             'fields': (
                 ('isbn', 'ismn'),
                 ('numero_editor', 'indicador_028'),
                 'centro_catalogador',
                 ('codigo_lengua', 'codigo_pais'),
             ),
-            'description': 'Campos 020, 024, 028, 040, 041, 044'
+            'classes': ('collapse',)
         }),
         
-        ('🎼 BLOQUE 0XX - Íncipit musical (Campo 031)', {
-            'classes': ('collapse',),
+        ('🟨 Bloque 0XX - Íncipit Musical (031)', {
             'fields': (
                 ('incipit_num_obra', 'incipit_num_movimiento', 'incipit_num_pasaje'),
                 'incipit_titulo',
@@ -301,233 +201,165 @@ class ObraGeneralAdmin(admin.ModelAdmin):
                 'incipit_notacion',
                 'incipit_url'
             ),
-            'description': 'Información del íncipit musical codificado'
+            'classes': ('collapse',)
         }),
         
-        ('📁 BLOQUE 0XX - Clasificación local (Campo 092)', {
+        ('🟨 Bloque 0XX - Clasificación Local (092)', {
             'fields': (
-                ('clasif_institucion', 'clasif_proyecto', 'clasif_pais'),
-                ('clasif_ms_imp', 'clasif_num_control')
+                'clasif_institucion',
+                'clasif_proyecto',
+                'clasif_pais',
+                'clasif_ms_imp'
             ),
-            'description': 'Sistema de clasificación local UNL-BLMP'
+            'classes': ('collapse',)
         }),
         
-        ('👤 BLOQUE 1XX - Punto de acceso principal: COMPOSITOR (Campo 100)', {
+        ('🟦 Bloque 1XX - Compositor (Campo 100)', {
             'fields': (
                 'compositor',
                 ('compositor_funcion', 'compositor_autoria')
             ),
-            'description': '⚠️ Usar SOLO si hay compositor identificado. Si usa esto, debe llenar campo 240 (no 130). Cruzar con campos 600 y 700.'
+            'description': '⚠️ Si hay compositor aquí, use campo 240 abajo, NO use campo 130'
         }),
         
-        ('🎵 BLOQUE 1XX - Punto de acceso principal: TÍTULO UNIFORME (Campo 130)', {
+        ('🟦 Bloque 1XX - Título Uniforme Principal (Campo 130)', {
             'fields': (
                 'titulo_uniforme',
                 'titulo_uniforme_forma',
                 'titulo_uniforme_medio_interpretacion',
-                ('titulo_uniforme_num_parte', 'titulo_uniforme_nombre_parte'),
+                ('titulo_uniforme_num_parte', 'titulo_uniforme_tonalidad'),
                 'titulo_uniforme_arreglo',
-                'titulo_uniforme_tonalidad'
+                'titulo_uniforme_nombre_parte'
             ),
-            'description': '⚠️ Usar SOLO para obras anónimas o sin compositor principal. NO usar si ya llenó campo 100. Cruzar con campo 240.'
+            'description': '⚠️ Solo use este campo si NO hay compositor. Si hay compositor, use campo 240',
+            'classes': ('collapse',)
         }),
         
-        ('🎶 BLOQUE 2XX - Título uniforme secundario (Campo 240)', {
+        ('🟩 Bloque 2XX - Título Uniforme con Compositor (Campo 240)', {
             'fields': (
                 'titulo_240',
                 'titulo_240_forma',
                 'titulo_240_medio_interpretacion',
-                ('titulo_240_num_parte', 'titulo_240_nombre_parte'),
+                ('titulo_240_num_parte', 'titulo_240_tonalidad'),
                 'titulo_240_arreglo',
-                'titulo_240_tonalidad'
+                'titulo_240_nombre_parte'
             ),
-            'description': '⚠️ Usar SOLO cuando hay compositor en campo 100. Cruzar con campo 130.'
+            'description': '⚠️ Solo use este campo si HAY compositor. Si no hay, use campo 130',
+            'classes': ('collapse',)
         }),
         
-        ('📖 BLOQUE 2XX - Título propiamente dicho (Campo 245)', {
+        ('🟩 Bloque 2XX - Título Principal (Campo 245)', {
             'fields': (
                 'titulo_principal',
                 'subtitulo',
                 'mencion_responsabilidad'
-            ),
-            'description': 'Título tal como aparece en la fuente (obligatorio). Los campos 246, 250 y 264 se manejan como modelos repetibles en los inlines.'
+            )
         }),
         
-        ('📏 BLOQUE 3XX - Descripción física (Campo 300)', {
-            'fields': (
-                'extension',
-                'otros_detalles_fisicos',
-                'dimensiones',
-                'material_acompanante'
-            ),
-            'description': 'Características físicas del recurso'
+        ('📚 Campos Repetibles (Inlines arriba)', {
+            'fields': (),
+            'description': 'Campo 246 - Títulos Alternativos | Campo 250 - Ediciones | Campo 264 - Producción/Publicación | Campo 300 - Descripción Física'
         }),
+        
+        ('🔧 Campos Automáticos (Solo Lectura)', {
+            'fields': (
+                'num_control',
+                'estado_registro',
+                'fecha_hora_ultima_transaccion',
+                'codigo_informacion',
+                'clasif_num_control',
+                'fecha_creacion_sistema',
+                'fecha_modificacion_sistema'
+            ),
+            'classes': ('collapse', 'wide'),
+            'description': 'Estos campos se generan automáticamente'
+        })
     )
     
-    # ------------------------------------------------
-    # Personalización de widgets para campos específicos
-    # ------------------------------------------------
+    # Campos solo lectura
+    readonly_fields = (
+        'num_control',
+        'estado_registro',
+        'fecha_hora_ultima_transaccion',
+        'codigo_informacion',
+        'clasif_num_control',
+        'fecha_creacion_sistema',
+        'fecha_modificacion_sistema'
+    )
+    
+    # Personalizar widgets
     formfield_overrides = {
-        models.CharField: {
-            'widget': TextInput(attrs={'size': '80', 'class': 'vTextField'})
-        },
-        models.TextField: {
-            'widget': Textarea(attrs={'rows': 3, 'cols': 80, 'class': 'vLargeTextField'})
-        },
+        models.CharField: {'widget': TextInput(attrs={'size': '80'})},
+        models.TextField: {'widget': Textarea(attrs={'rows': 3, 'cols': 80})},
     }
     
-    # ------------------------------------------------
+    def num_control_display(self, obj):
+        """Mostrar número de control con color"""
+        return format_html(
+            '<span style="background-color: #d4edda; padding: 3px 8px; border-radius: 3px; font-weight: bold;">{}</span>',
+            obj.num_control
+        )
+    num_control_display.short_description = '📄 Nº Control'
+    
+    def punto_acceso_principal(self, obj):
+        """Mostrar el punto de acceso principal (100 o 130)"""
+        if obj.compositor:
+            return format_html(
+                '👤 <strong>{}</strong>',
+                obj.compositor.apellidos_nombres
+            )
+        elif obj.titulo_uniforme:
+            return format_html(
+                '🎵 <strong>{}</strong>',
+                obj.titulo_uniforme.titulo
+            )
+        return "❌ Sin punto de acceso"
+    punto_acceso_principal.short_description = 'Punto de Acceso Principal'
+    
+    def tipo_registro_display(self, obj):
+        """Mostrar tipo de registro con icono"""
+        if obj.tipo_registro == 'c':
+            return format_html('<span style="color: green;">📖 Impreso</span>')
+        else:
+            return format_html('<span style="color: blue;">✍️ Manuscrito</span>')
+    tipo_registro_display.short_description = 'Tipo'
+    
+    def codigo_lengua_display(self, obj):
+        """Mostrar código de lengua con etiqueta"""
+        return obj.get_codigo_lengua_display()
+    codigo_lengua_display.short_description = 'Idioma'
+    
     # Acciones personalizadas
-    # ------------------------------------------------
-    actions = ['duplicar_obra', 'exportar_marc']
+    actions = ['duplicar_obra', 'cambiar_a_impreso', 'cambiar_a_manuscrito']
     
     def duplicar_obra(self, request, queryset):
-        """Duplica las obras seleccionadas con todos sus registros relacionados"""
+        """Duplicar una obra sin número de control"""
         for obra in queryset:
-            # Guardar los registros relacionados antes de duplicar
-            titulos_alt = list(obra.titulos_alternativos.all())
-            ediciones = list(obra.ediciones.all())
-            registros_264 = list(obra.produccion_publicacion.all())
-            
-            # Duplicar la obra principal
-            obra.pk = None
+            obra.id = None
             obra.num_control = None
             obra.save()
-            
-            # Duplicar títulos alternativos (campo 246)
-            for titulo in titulos_alt:
-                titulo.pk = None
-                titulo.obra = obra
-                titulo.save()
-            
-            # Duplicar ediciones (campo 250)
-            for edicion in ediciones:
-                edicion.pk = None
-                edicion.obra = obra
-                edicion.save()
-            
-            # Duplicar registros 264
-            for registro in registros_264:
-                registro.pk = None
-                registro.obra = obra
-                registro.save()
-        
-        self.message_user(
-            request,
-            f"✅ {queryset.count()} obra(s) duplicada(s) con todos sus registros relacionados "
-            f"(246, 250, 264)"
-        )
+        self.message_user(request, f"✅ {queryset.count()} obra(s) duplicada(s) exitosamente")
+    duplicar_obra.short_description = "📋 Duplicar obra seleccionada"
     
-    duplicar_obra.short_description = "Duplicar obras seleccionadas"
+    def cambiar_a_impreso(self, request, queryset):
+        """Cambiar tipo de registro a impreso"""
+        queryset.update(tipo_registro='c')
+        self.message_user(request, f"✅ {queryset.count()} obra(s) cambiada(s) a impreso")
+    cambiar_a_impreso.short_description = "📖 Cambiar a Impreso"
     
-    def exportar_marc(self, request, queryset):
-        """Exportar registros en formato MARC21"""
-        # TODO: Implementar exportación MARC21
-        self.message_user(request, "Funcionalidad en desarrollo")
+    def cambiar_a_manuscrito(self, request, queryset):
+        """Cambiar tipo de registro a manuscrito"""
+        queryset.update(tipo_registro='d')
+        self.message_user(request, f"✅ {queryset.count()} obra(s) cambiada(s) a manuscrito")
+    cambiar_a_manuscrito.short_description = "✍️ Cambiar a Manuscrito"
     
-    exportar_marc.short_description = "Exportar a formato MARC21"
-    
-    # ------------------------------------------------
-    # Métodos personalizados para la lista
-    # ------------------------------------------------
-    def get_punto_acceso_principal(self, obj):
-        """Muestra el punto de acceso principal (100 o 130)"""
-        if obj.compositor:
-            return f"👤 {obj.compositor}"
-        elif obj.titulo_uniforme:
-            return f"🎵 {obj.titulo_uniforme}"
-        return "⚠️ Sin punto de acceso"
-    
-    get_punto_acceso_principal.short_description = 'Punto de Acceso Principal'
-    get_punto_acceso_principal.admin_order_field = 'compositor'
-    
-    # ------------------------------------------------
-    # Validación adicional en el admin
-    # ------------------------------------------------
     def save_model(self, request, obj, form, change):
-        """Validaciones adicionales antes de guardar"""
-        try:
-            obj.full_clean()
-            super().save_model(request, obj, form, change)
-            
-            if obj.compositor:
-                self.message_user(
-                    request,
-                    f"✅ Obra guardada con compositor: {obj.compositor}. Se usó campo 240.",
-                    level='SUCCESS'
-                )
-            elif obj.titulo_uniforme:
-                self.message_user(
-                    request,
-                    f"✅ Obra guardada con título uniforme: {obj.titulo_uniforme}. Se usó campo 130.",
-                    level='SUCCESS'
-                )
-        except Exception as e:
-            self.message_user(request, f"❌ Error: {str(e)}", level='ERROR')
-            raise
-    
-    # ------------------------------------------------
-    # Optimización de consultas
-    # ------------------------------------------------
-    def get_queryset(self, request):
-        """Optimizar consultas con select_related y prefetch_related"""
-        qs = super().get_queryset(request)
-        return qs.select_related(
-            'compositor',
-            'titulo_uniforme',
-            'titulo_uniforme_forma',
-            'titulo_240',
-            'titulo_240_forma'
-        ).prefetch_related(
-            'titulos_alternativos',  # ✅ Campo 246
-            'ediciones',              # ✅ Campo 250
-            'produccion_publicacion'  # ✅ Campo 264
-        )
-    
-    # ------------------------------------------------
-    # Información adicional en la página de cambio
-    # ------------------------------------------------
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        """Agregar contexto adicional a la vista de edición"""
-        extra_context = extra_context or {}
-        obj = self.get_object(request, object_id)
+        """Guardar modelo ejecutando validaciones"""
+        obj.full_clean()  # Ejecutar validaciones del modelo
+        super().save_model(request, obj, form, change)
         
-        if obj:
-            validaciones = []
-            
-            if obj.compositor and obj.titulo_uniforme:
-                validaciones.append({
-                    'tipo': 'error',
-                    'mensaje': '⚠️ ERROR: No puede tener campo 100 (compositor) y 130 (título) simultáneamente'
-                })
-            
-            if not obj.compositor and obj.titulo_240:
-                validaciones.append({
-                    'tipo': 'error',
-                    'mensaje': '⚠️ ERROR: Campo 240 solo debe usarse cuando hay compositor en campo 100'
-                })
-            
-            if obj.compositor and not obj.titulo_240:
-                validaciones.append({
-                    'tipo': 'warning',
-                    'mensaje': '⚠️ ADVERTENCIA: Hay compositor (100) pero no hay título uniforme (240)'
-                })
-            
-            if not obj.titulo_principal:
-                validaciones.append({
-                    'tipo': 'error',
-                    'mensaje': '⚠️ ERROR: Campo 245 (título principal) es obligatorio'
-                })
-            
-            extra_context['validaciones_marc'] = validaciones
-        
-        return super().change_view(request, object_id, form_url, extra_context)
-
-
-# ================================================
-# 🎨 PERSONALIZACIÓN ADICIONAL DEL ADMIN SITE
-# ================================================
-
-admin.site.site_header = "BLMP-UNL - Sistema de Catalogación Musical MARC21"
-admin.site.site_title = "BLMP-UNL Admin"
-admin.site.index_title = "Gestión de Obras Musicales Manuscritas e Impresas"
+    def get_readonly_fields(self, request, obj=None):
+        """Hacer campos readonly solo al editar"""
+        if obj:  # Si existe el objeto (está siendo editado)
+            return self.readonly_fields + ('estado_registro', 'tipo_registro')
+        return self.readonly_fields
