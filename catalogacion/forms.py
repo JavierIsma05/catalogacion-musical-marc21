@@ -5,6 +5,57 @@ from .models import (
     AutoridadPersona, 
     AutoridadTituloUniforme, 
     AutoridadFormaMusical,
+    TituloAlternativo,  # ✅ Campo 246
+    Edicion,  # ✅ Campo 250
+    ProduccionPublicacion  # ✅ Campo 264
+)
+
+# ================================================
+# 📋 FORMSETS PARA CAMPOS REPETIBLES
+# ================================================
+
+TituloAlternativoFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    TituloAlternativo,
+    fields=['titulo', 'resto_titulo'],
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True,
+    widgets={
+        'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título alternativo'}),
+        'resto_titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Resto del título variante'}),
+    }
+)
+
+EdicionFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Edicion,
+    fields=['edicion'],
+    extra=1,
+    min_num=0,
+    max_num=5,
+    can_delete=True,
+    widgets={
+        'edicion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 2a ed., Primera edición'}),
+    }
+)
+
+ProduccionPublicacionFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    ProduccionPublicacion,
+    fields=['funcion', 'lugar', 'nombre_entidad', 'fecha', 'orden'],
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True,
+    widgets={
+        'funcion': forms.Select(attrs={'class': 'form-select'}),
+        'lugar': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Quito, Madrid'}),
+        'nombre_entidad': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del productor/editor'}),
+        'fecha': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 2023, ©2020'}),
+        'orden': forms.NumberInput(attrs={'class': 'form-control', 'value': 1}),
+    }
 )
 
 # Widget personalizado para Select2 con tagging
@@ -24,7 +75,7 @@ class ObraForm(forms.ModelForm):
     """
     
     # ================================================
-    # 🎯 CAMPOS CON SELECT2 TAGGING
+    # 🎯 CAMPOS CON SELECT2
     # ================================================
     
     compositor_select = forms.CharField(
@@ -140,16 +191,8 @@ class ObraForm(forms.ModelForm):
             'titulo_240_nombre_parte', 
             'titulo_240_tonalidad',
             'titulo_principal', 
-            'resto_titulo', 
+            'subtitulo', 
             'mencion_responsabilidad',
-            'numero_parte_245', 
-            'nombre_parte_245',
-            'titulo_variante', 
-            'resto_titulo_variante',
-            'presentacion_musical',
-            'lugar_publicacion', 
-            'nombre_editor', 
-            'fecha_publicacion',
             'extension', 
             'otros_detalles_fisicos', 
             'dimensiones', 
@@ -190,16 +233,8 @@ class ObraForm(forms.ModelForm):
             'titulo_240_nombre_parte': forms.TextInput(attrs={'class': 'form-control'}),
             'titulo_240_tonalidad': forms.Select(attrs={'class': 'form-select'}),
             'titulo_principal': forms.TextInput(attrs={'class': 'form-control'}),
-            'resto_titulo': forms.TextInput(attrs={'class': 'form-control'}),
+            'subtitulo': forms.TextInput(attrs={'class': 'form-control'}),
             'mencion_responsabilidad': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'numero_parte_245': forms.TextInput(attrs={'class': 'form-control'}),
-            'nombre_parte_245': forms.TextInput(attrs={'class': 'form-control'}),
-            'titulo_variante': forms.TextInput(attrs={'class': 'form-control'}),
-            'resto_titulo_variante': forms.TextInput(attrs={'class': 'form-control'}),
-            'presentacion_musical': forms.TextInput(attrs={'class': 'form-control'}),
-            'lugar_publicacion': forms.TextInput(attrs={'class': 'form-control'}),
-            'nombre_editor': forms.TextInput(attrs={'class': 'form-control'}),
-            'fecha_publicacion': forms.TextInput(attrs={'class': 'form-control'}),
             'extension': forms.TextInput(attrs={'class': 'form-control'}),
             'otros_detalles_fisicos': forms.TextInput(attrs={'class': 'form-control'}),
             'dimensiones': forms.TextInput(attrs={'class': 'form-control'}),

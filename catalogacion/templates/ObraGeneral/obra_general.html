@@ -263,78 +263,78 @@ MARC21 Musical{% endblock %} {% block extra_css %}
                         </h5>
 
                         <!-- 100 1# Compositor -->
-<div class="marc-block mb-4">
-    <h6><strong>100 1#</strong> — Compositor (NR)</h6>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_compositor_select">$a Apellidos, Nombres</label></div>
-        <div class="col-md-8">
-            {{ form.compositor_select }}
-            {% if form.compositor_select.errors %}
-            <div class="text-danger">{{ form.compositor_select.errors }}</div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_compositor_fechas">$d Coordenadas biográficas</label></div>
-        <div class="col-md-8">
-            {{ form.compositor_fechas }}
-            {% if form.compositor_fechas.errors %}
-            <div class="text-danger">{{ form.compositor_fechas.errors }}</div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_compositor_funcion">$e Función</label></div>
-        <div class="col-md-8">{{ form.compositor_funcion }}</div>
-    </div>
-    <div class="row">
-        <div class="col-md-4"><label for="id_compositor_autoria">$j Autoría</label></div>
-        <div class="col-md-8">{{ form.compositor_autoria }}</div>
-    </div>
-</div>
+                        <div class="marc-block mb-4">
+                            <h6><strong>100 1#</strong> — Compositor (NR)</h6>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_compositor_select">$a Apellidos, Nombres</label></div>
+                                <div class="col-md-8">
+                                    {{ form.compositor_select }}
+                                    {% if form.compositor_select.errors %}
+                                    <div class="text-danger">{{ form.compositor_select.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_compositor_fechas">$d Coordenadas biográficas</label></div>
+                                <div class="col-md-8">
+                                    {{ form.compositor_fechas }}
+                                    {% if form.compositor_fechas.errors %}
+                                    <div class="text-danger">{{ form.compositor_fechas.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_compositor_funcion">$e Función</label></div>
+                                <div class="col-md-8">{{ form.compositor_funcion }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4"><label for="id_compositor_autoria">$j Autoría</label></div>
+                                <div class="col-md-8">{{ form.compositor_autoria }}</div>
+                            </div>
+                        </div>
 
-                        <!-- 130 0# Título uniforme -->
-<div class="marc-block mb-4">
-    <h6><strong>130 0#</strong> — Título uniforme (punto de acceso principal) (NR)</h6>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_titulo_uniforme_130">$a Título uniforme</label></div>
-        <div class="col-md-8">
-            {{ form.titulo_uniforme_130 }}
-            {% if form.titulo_uniforme_130.errors %}
-            <div class="text-danger">{{ form.titulo_uniforme_130.errors }}</div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_titulo_uniforme_130_forma">$k Subencabezamiento de forma</label></div>
-        <div class="col-md-8">
-            {{ form.titulo_uniforme_130_forma }}
-            {% if form.titulo_uniforme_130_forma.errors %}
-            <div class="text-danger">{{ form.titulo_uniforme_130_forma.errors }}</div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_titulo_uniforme_medio_interpretacion">$m Medio de interpretación</label></div>
-        <div class="col-md-8">{{ form.titulo_uniforme_medio_interpretacion }}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_titulo_uniforme_num_parte">$n Número de parte/sección</label></div>
-        <div class="col-md-8">{{ form.titulo_uniforme_num_parte }}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_titulo_uniforme_arreglo">$o Arreglo</label></div>
-        <div class="col-md-8">{{ form.titulo_uniforme_arreglo }}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_titulo_uniforme_nombre_parte">$p Nombre de parte/sección</label></div>
-        <div class="col-md-8">{{ form.titulo_uniforme_nombre_parte }}</div>
-    </div>
-    <div class="row">
-        <div class="col-md-4"><label for="id_titulo_uniforme_tonalidad">$r Tonalidad</label></div>
-        <div class="col-md-8">{{ form.titulo_uniforme_tonalidad }}</div>
-    </div>
-</div>
+                                                <!-- 130 0# Título uniforme -->
+                        <div class="marc-block mb-4">
+                            <h6><strong>130 0#</strong> — Título uniforme (punto de acceso principal) (NR)</h6>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_titulo_uniforme_130">$a Título uniforme</label></div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_uniforme_130 }}
+                                    {% if form.titulo_uniforme_130.errors %}
+                                    <div class="text-danger">{{ form.titulo_uniforme_130.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_titulo_uniforme_130_forma">$k Subencabezamiento de forma</label></div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_uniforme_130_forma }}
+                                    {% if form.titulo_uniforme_130_forma.errors %}
+                                    <div class="text-danger">{{ form.titulo_uniforme_130_forma.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_titulo_uniforme_medio_interpretacion">$m Medio de interpretación</label></div>
+                                <div class="col-md-8">{{ form.titulo_uniforme_medio_interpretacion }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_titulo_uniforme_num_parte">$n Número de parte/sección</label></div>
+                                <div class="col-md-8">{{ form.titulo_uniforme_num_parte }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_titulo_uniforme_arreglo">$o Arreglo</label></div>
+                                <div class="col-md-8">{{ form.titulo_uniforme_arreglo }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_titulo_uniforme_nombre_parte">$p Nombre de parte/sección</label></div>
+                                <div class="col-md-8">{{ form.titulo_uniforme_nombre_parte }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4"><label for="id_titulo_uniforme_tonalidad">$r Tonalidad</label></div>
+                                <div class="col-md-8">{{ form.titulo_uniforme_tonalidad }}</div>
+                            </div>
+                        </div>
 
                         <!-- 🟩 BLOQUE 2XX -->
                         <h5 class="text-primary mt-4" id="bloque-2xx">
@@ -342,47 +342,47 @@ MARC21 Musical{% endblock %} {% block extra_css %}
                         </h5>
 
                         <!-- 240 10 Título uniforme -->
-<div class="marc-block mb-4">
-    <h6><strong>240 10</strong> — Título uniforme (NR)</h6>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_titulo_240_select">$a Título uniforme</label></div>
-        <div class="col-md-8">
-            {{ form.titulo_240_select }}
-            {% if form.titulo_240_select.errors %}
-            <div class="text-danger">{{ form.titulo_240_select.errors }}</div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_titulo_240_forma_select">$k Subencabezamiento de forma</label></div>
-        <div class="col-md-8">
-            {{ form.titulo_240_forma_select }}
-            {% if form.titulo_240_forma_select.errors %}
-            <div class="text-danger">{{ form.titulo_240_forma_select.errors }}</div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_titulo_240_medio_interpretacion">$m Medio de interpretación</label></div>
-        <div class="col-md-8">{{ form.titulo_240_medio_interpretacion }}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_titulo_240_num_parte">$n Número de parte/sección</label></div>
-        <div class="col-md-8">{{ form.titulo_240_num_parte }}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_titulo_240_arreglo">$o Arreglo</label></div>
-        <div class="col-md-8">{{ form.titulo_240_arreglo }}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-4"><label for="id_titulo_240_nombre_parte">$p Nombre de parte/sección</label></div>
-        <div class="col-md-8">{{ form.titulo_240_nombre_parte }}</div>
-    </div>
-    <div class="row">
-        <div class="col-md-4"><label for="id_titulo_240_tonalidad">$r Tonalidad</label></div>
-        <div class="col-md-8">{{ form.titulo_240_tonalidad }}</div>
-    </div>
-</div>
+                        <div class="marc-block mb-4">
+                            <h6><strong>240 10</strong> — Título uniforme (NR)</h6>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_titulo_240_select">$a Título uniforme</label></div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_240_select }}
+                                    {% if form.titulo_240_select.errors %}
+                                    <div class="text-danger">{{ form.titulo_240_select.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_titulo_240_forma_select">$k Subencabezamiento de forma</label></div>
+                                <div class="col-md-8">
+                                    {{ form.titulo_240_forma_select }}
+                                    {% if form.titulo_240_forma_select.errors %}
+                                    <div class="text-danger">{{ form.titulo_240_forma_select.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_titulo_240_medio_interpretacion">$m Medio de interpretación</label></div>
+                                <div class="col-md-8">{{ form.titulo_240_medio_interpretacion }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_titulo_240_num_parte">$n Número de parte/sección</label></div>
+                                <div class="col-md-8">{{ form.titulo_240_num_parte }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_titulo_240_arreglo">$o Arreglo</label></div>
+                                <div class="col-md-8">{{ form.titulo_240_arreglo }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4"><label for="id_titulo_240_nombre_parte">$p Nombre de parte/sección</label></div>
+                                <div class="col-md-8">{{ form.titulo_240_nombre_parte }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4"><label for="id_titulo_240_tonalidad">$r Tonalidad</label></div>
+                                <div class="col-md-8">{{ form.titulo_240_tonalidad }}</div>
+                            </div>
+                        </div>
 
                         <!-- 245 10 Título principal -->
                         <div class="marc-block mb-4">
@@ -471,41 +471,33 @@ MARC21 Musical{% endblock %} {% block extra_css %}
                             </div>
                         </div>
 
+                        <!-- 264 #1 Producción, publicación, distribución -->
                         <div class="marc-block mb-4">
                             <h6>
-                                <strong>260 ##</strong> — Publicación,
-                                distribución, etc. (R)
-                                <!-- <span class="badge bg-warning text-dark"
-                                    >DEPRECATED</span
-                                > -->
+                                <strong>264 #1</strong> — Producción, publicación, distribución, manufactura y copyright (R)
                             </h6>
-                            <!-- <div class="alert alert-warning">
-                                <strong>⚠️ Nota:</strong> Este campo está
-                                obsoleto. Se recomienda usar el campo 264 en su
-                                lugar.
-                            </div> -->
                             <div class="row mb-2">
                                 <div class="col-md-4">
-                                    <label>$a Lugar de publicación</label>
+                                    <label>$a Lugar de producción/publicación</label>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ form.lugar_publicacion }}
+                                    {{ form.lugar_produccion_264 }}
                                 </div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-md-4">
-                                    <label>$b Nombre del editor</label>
+                                    <label>$b Nombre del productor/editor</label>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ form.nombre_editor }}
+                                    {{ form.nombre_productor_264 }}
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-4">
-                                    <label>$c Fecha de publicación</label>
+                                    <label>$c Fecha de producción/publicación</label>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ form.fecha_publicacion }}
+                                    {{ form.fecha_produccion_264 }}
                                 </div>
                             </div>
                         </div>

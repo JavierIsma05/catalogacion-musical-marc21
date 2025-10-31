@@ -1,6 +1,11 @@
 from django.shortcuts import render,redirect
 from .models import ObraGeneral
-from .forms import ObraForm
+from .forms import (
+    ObraForm, 
+    TituloAlternativoFormSet, 
+    EdicionFormSet, 
+    ProduccionPublicacionFormSet
+)
 
 def index(request):
     return render(request, 'index.html')
@@ -18,15 +23,47 @@ def crear_obra(request):
 # pero a mi modo de verlo todos son campos de la obra general que si bien no se va a visualizar de momento si pongamolo como
 # si fuese el padre de los demas
 def obra_general(request):
-    obras = ObraGeneral.objects.all().order_by('-id')  # lista de obras
-    form = ObraForm(request.POST or None)
-
-    if request.method == 'POST' and form.is_valid():
-        form.save()  # genera automáticamente los campos MARC21 (001, 005, 008)
-        return redirect('obra_general')
-
+    obras = ObraGeneral.objects.all().order_by('-id')
+    
+    if request.method == 'POST':
+        form = ObraForm(request.POST)
+        formset_246 = TituloAlternativoFormSet(request.POST, prefix='titulo_alt')
+        formset_250 = EdicionFormSet(request.POST, prefix='edicion')
+        formset_264 = ProduccionPublicacionFormSet(request.POST, prefix='prod_pub')
+        
+        if form.is_valid() and formset_246.is_valid() and formset_250.is_valid() and formset_264.is_valid():
+            obra = form.save()
+            
+            # Guardar títulos alternativos
+            titulos = formset_246.save(commit=False)
+            for titulo in titulos:
+                titulo.obra = obra
+                titulo.save()
+            
+            # Guardar ediciones
+            ediciones = formset_250.save(commit=False)
+            for edicion in ediciones:
+                edicion.obra = obra
+                edicion.save()
+            
+            # Guardar producción/publicación
+            registros_264 = formset_264.save(commit=False)
+            for registro in registros_264:
+                registro.obra = obra
+                registro.save()
+            
+            return redirect('obra_general')
+    else:
+        form = ObraForm()
+        formset_246 = TituloAlternativoFormSet(prefix='titulo_alt')
+        formset_250 = EdicionFormSet(prefix='edicion')
+        formset_264 = ProduccionPublicacionFormSet(prefix='prod_pub')
+    
     contexto = {
         'form': form,
+        'formset_246': formset_246,
+        'formset_250': formset_250,
+        'formset_264': formset_264,
         'obras': obras,
     }
     return render(request, 'ObraGeneral/obra_general.html', contexto)

@@ -2,83 +2,107 @@ from django.contrib import admin
 from django.db import models
 from django.forms import TextInput, Textarea, Select, NumberInput
 from .models import (
-    ObraGeneral, 
-    AutoridadPersona, 
-    AutoridadTituloUniforme, 
+    ObraGeneral,
+    AutoridadPersona,
+    AutoridadTituloUniforme,
     AutoridadFormaMusical,
-    AutoridadMateria
+    AutoridadMateria,
+    TituloAlternativo,  # ✅ Campo 246
+    Edicion,  # ✅ Campo 250
+    ProduccionPublicacion  # ✅ Campo 264
 )
 
-
 # ================================================
-# 📚 ADMINISTRACIÓN DE TABLAS DE AUTORIDADES
+# 🎬 INLINES PARA CAMPOS REPETIBLES
 # ================================================
 
-@admin.register(AutoridadPersona)
-class AutoridadPersonaAdmin(admin.ModelAdmin):
-    """Gestión de nombres de personas normalizados"""
-    list_display = ['apellidos_nombres', 'fechas', 'fecha_creacion']
-    search_fields = ['apellidos_nombres', 'fechas']
-    list_filter = ['fecha_creacion']
-    ordering = ['apellidos_nombres']
+class TituloAlternativoInline(admin.TabularInline):
+    """
+    Inline para gestionar múltiples títulos alternativos (Campo 246)
+    """
+    model = TituloAlternativo
+    extra = 1
+    min_num = 0
+    max_num = 10
     
-    fieldsets = (
-        ('Información de la Persona', {
-            'fields': ('apellidos_nombres', 'fechas'),
-            'description': 'Formato: Apellidos, Nombres | Fechas: año nacimiento - año muerte'
-        }),
-    )
+    fields = ['titulo', 'resto_titulo']
     
-    def get_readonly_fields(self, request, obj=None):
-        # Solo mostrar fecha_creacion si ya existe
-        if obj:
-            return ['fecha_creacion']
-        return []
+    formfield_overrides = {
+        models.CharField: {
+            'widget': TextInput(attrs={'size': '60', 'class': 'vTextField'})
+        },
+    }
+    
+    verbose_name = "Título Alternativo (246)"
+    verbose_name_plural = "📚 Títulos Alternativos (Campo 246) - Repetible"
+    classes = ['collapse']
 
 
-@admin.register(AutoridadTituloUniforme)
-class AutoridadTituloUniformeAdmin(admin.ModelAdmin):
-    """Gestión de títulos uniformes normalizados"""
-    list_display = ['titulo', 'fecha_creacion', 'cantidad_usos']
-    search_fields = ['titulo']
-    list_filter = ['fecha_creacion']
-    ordering = ['titulo']
+class EdicionInline(admin.TabularInline):
+    """
+    Inline para gestionar múltiples ediciones (Campo 250)
+    """
+    model = Edicion
+    extra = 1
+    min_num = 0
+    max_num = 5
     
-    def cantidad_usos(self, obj):
-        """Muestra cuántas obras usan este título"""
-        usos_130 = obj.obras_130.count()
-        usos_240 = obj.obras_240.count()
-        total = usos_130 + usos_240
-        return f"{total} obras ({usos_130} en 130, {usos_240} en 240)"
+    fields = ['edicion']
     
-    cantidad_usos.short_description = 'Usos'
+    formfield_overrides = {
+        models.CharField: {
+            'widget': TextInput(attrs={'size': '60', 'class': 'vTextField'})
+        },
+    }
+    
+    verbose_name = "Edición (250)"
+    verbose_name_plural = "📚 Ediciones (Campo 250) - Repetible"
+    classes = ['collapse']
 
 
-@admin.register(AutoridadFormaMusical)
-class AutoridadFormaMusicalAdmin(admin.ModelAdmin):
-    """Gestión de formas musicales normalizadas"""
-    list_display = ['forma', 'fecha_creacion', 'cantidad_usos']
-    search_fields = ['forma']
-    list_filter = ['fecha_creacion']
-    ordering = ['forma']
+class ProduccionPublicacionInline(admin.TabularInline):
+    """
+    Inline para gestionar múltiples registros 264 (Producción/Publicación)
+    Permite agregar producción, publicación, distribución, fabricación y copyright
+    """
+    model = ProduccionPublicacion
+    extra = 1  # Muestra 1 formulario vacío por defecto
+    min_num = 0  # Mínimo de registros requeridos
+    max_num = 10  # Máximo de registros 264 permitidos
     
-    def cantidad_usos(self, obj):
-        """Muestra cuántas obras usan esta forma"""
-        usos_130 = obj.obras_130_forma.count()
-        usos_240 = obj.obras_240_forma.count()
-        total = usos_130 + usos_240
-        return f"{total} obras ({usos_130} en 130, {usos_240} en 240)"
+    fields = [
+        'funcion',
+        'lugar',
+        'nombre_entidad',
+        'fecha',
+        'orden'
+    ]
     
-    cantidad_usos.short_description = 'Usos'
-
-
-@admin.register(AutoridadMateria)
-class AutoridadMateriaAdmin(admin.ModelAdmin):
-    """Gestión de términos de materia normalizados"""
-    list_display = ['termino', 'fecha_creacion']
-    search_fields = ['termino']
-    list_filter = ['fecha_creacion']
-    ordering = ['termino']
+    # Personalización de widgets
+    formfield_overrides = {
+        models.CharField: {
+            'widget': TextInput(attrs={'size': '40', 'class': 'vTextField'})
+        },
+    }
+    
+    verbose_name = "Registro 264 (Producción/Publicación/Distribución/Fabricación/Copyright)"
+    verbose_name_plural = "📚 BLOQUE 2XX - Producción/Publicación (Campo 264) - Repetible"
+    
+    # Configuración adicional
+    classes = ['collapse']  # Mostrar colapsado inicialmente (opcional)
+    
+    def get_formset(self, request, obj=None, **kwargs):
+        """Personalizar el formset"""
+        formset = super().get_formset(request, obj, **kwargs)
+        
+        # Mensaje de ayuda adicional
+        formset.help_text = (
+            "⚠️ Campo 264 es REPETIBLE. Puede agregar múltiples registros para "
+            "distinguir entre producción, publicación, distribución, fabricación y copyright. "
+            "Para manuscritos, use función 'Producción' (0)."
+        )
+        
+        return formset
 
 
 # ================================================
@@ -91,6 +115,12 @@ class ObraGeneralAdmin(admin.ModelAdmin):
     Administración principal de obras musicales MARC21
     Organizado según la estructura del documento
     """
+    
+    # ✅ AGREGAR LOS INLINES (se mostrarán en la posición definida en fieldsets)
+    inlines = [TituloAlternativoInline, EdicionInline, ProduccionPublicacionInline]
+    
+    # Para controlar la posición del inline, usaremos un fieldset personalizado
+    inline_position = None  # Se define en get_fieldsets()
     
     # ------------------------------------------------
     # Lista de registros
@@ -227,31 +257,15 @@ class ObraGeneralAdmin(admin.ModelAdmin):
         ('📖 BLOQUE 2XX - Título propiamente dicho (Campo 245)', {
             'fields': (
                 'titulo_principal',
-                'resto_titulo',
-                'mencion_responsabilidad',
-                ('numero_parte_245', 'nombre_parte_245')
+                'subtitulo',
+                'mencion_responsabilidad'
             ),
             'description': 'Título tal como aparece en la fuente (obligatorio)'
         }),
         
-        ('📝 BLOQUE 2XX - Títulos adicionales', {
-            'classes': ('collapse',),
-            'fields': (
-                ('titulo_variante', 'resto_titulo_variante'),
-                'presentacion_musical'
-            ),
-            'description': 'Campos 246 (variante de título) y 254 (presentación musical)'
-        }),
-        
-        ('📚 BLOQUE 2XX - Publicación (Campo 260 - DEPRECATED)', {
-            'classes': ('collapse',),
-            'fields': (
-                'lugar_publicacion',
-                'nombre_editor',
-                'fecha_publicacion'
-            ),
-            'description': '⚠️ DEPRECATED - Usar campo 264 en su lugar (pendiente de implementar)'
-        }),
+        # ⚠️ NOTA: Los inlines de campos repetibles (246, 250, 264) 
+        # aparecen automáticamente después de este punto
+        # Django Admin muestra los inlines al final de los fieldsets
         
         ('📏 BLOQUE 3XX - Descripción física (Campo 300)', {
             'fields': (
@@ -284,10 +298,34 @@ class ObraGeneralAdmin(admin.ModelAdmin):
     def duplicar_obra(self, request, queryset):
         """Duplica las obras seleccionadas (sin número de control)"""
         for obra in queryset:
+            # Guardar los registros relacionados antes de duplicar
+            titulos_alt = list(obra.titulos_alternativos.all())
+            ediciones = list(obra.ediciones.all())
+            registros_264 = list(obra.produccion_publicacion.all())
+            
             obra.pk = None
             obra.num_control = None
             obra.save()
-        self.message_user(request, f"{queryset.count()} obra(s) duplicada(s)")
+            
+            # Duplicar títulos alternativos
+            for titulo in titulos_alt:
+                titulo.pk = None
+                titulo.obra = obra
+                titulo.save()
+            
+            # Duplicar ediciones
+            for edicion in ediciones:
+                edicion.pk = None
+                edicion.obra = obra
+                edicion.save()
+            
+            # Duplicar registros 264
+            for registro in registros_264:
+                registro.pk = None
+                registro.obra = obra
+                registro.save()
+        
+        self.message_user(request, f"{queryset.count()} obra(s) duplicada(s) con sus registros relacionados")
     
     duplicar_obra.short_description = "Duplicar obras seleccionadas"
     
@@ -324,13 +362,13 @@ class ObraGeneralAdmin(admin.ModelAdmin):
             # Mensaje de éxito con información
             if obj.compositor:
                 self.message_user(
-                    request, 
+                    request,
                     f"✅ Obra guardada con compositor: {obj.compositor}. Se usó campo 240.",
                     level='SUCCESS'
                 )
             elif obj.titulo_uniforme:
                 self.message_user(
-                    request, 
+                    request,
                     f"✅ Obra guardada con título uniforme: {obj.titulo_uniforme}. Se usó campo 130.",
                     level='SUCCESS'
                 )
@@ -350,54 +388,17 @@ class ObraGeneralAdmin(admin.ModelAdmin):
             'titulo_uniforme_forma',
             'titulo_240',
             'titulo_240_forma'
+        ).prefetch_related(
+            'titulos_alternativos',  # ✅ Campo 246
+            'ediciones',  # ✅ Campo 250
+            'produccion_publicacion'  # ✅ Campo 264
         )
     
     # ------------------------------------------------
-    # Información adicional en la página de cambio
+    # Reorganizar inline de campo 264 después de campo 246
     # ------------------------------------------------
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        """Agregar contexto adicional a la vista de edición"""
-        extra_context = extra_context or {}
-        
-        obj = self.get_object(request, object_id)
-        if obj:
-            # Información de validación MARC21
-            validaciones = []
-            
-            if obj.compositor and obj.titulo_uniforme:
-                validaciones.append({
-                    'tipo': 'error',
-                    'mensaje': '⚠️ ERROR: No puede tener campo 100 (compositor) y 130 (título) simultáneamente'
-                })
-            
-            if not obj.compositor and obj.titulo_240:
-                validaciones.append({
-                    'tipo': 'error',
-                    'mensaje': '⚠️ ERROR: Campo 240 solo debe usarse cuando hay compositor en campo 100'
-                })
-            
-            if obj.compositor and not obj.titulo_240:
-                validaciones.append({
-                    'tipo': 'warning',
-                    'mensaje': '⚠️ ADVERTENCIA: Hay compositor (100) pero no hay título uniforme (240)'
-                })
-            
-            if not obj.titulo_principal:
-                validaciones.append({
-                    'tipo': 'error',
-                    'mensaje': '⚠️ ERROR: Campo 245 (título principal) es obligatorio'
-                })
-            
-            extra_context['validaciones_marc'] = validaciones
-        
-        return super().change_view(request, object_id, form_url, extra_context)
-
-
-# ================================================
-# 🎨 PERSONALIZACIÓN ADICIONAL DEL ADMIN SITE
-# ================================================
-
-# Cambiar títulos del admin
-admin.site.site_header = "BLMP-UNL - Sistema de Catalogación Musical MARC21"
-admin.site.site_title = "BLMP-UNL Admin"
-admin.site.index_title = "Gestión de Obras Musicales Manuscritas e Impresas"
+    class Media:
+        css = {
+            'all': ('admin/css/admin_inline_264.css',)
+        }
+        js = ('admin/js/reorganizar_inline_264.js',)
