@@ -399,13 +399,13 @@ MARC21 Musical{% endblock %} {% block extra_css %}
                             </div>
                             <div class="row mb-2">
                                 <div class="col-md-4">
-                                    <label>$b Resto del título</label>
+                                    <label>$b Subtítulo</label>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ form.resto_titulo }}
+                                    {{ form.subtitulo }}
                                 </div>
                             </div>
-                            <div class="row mb-2">
+                            <div class="row">
                                 <div class="col-md-4">
                                     <label>$c Mención de responsabilidad</label>
                                 </div>
@@ -413,93 +413,196 @@ MARC21 Musical{% endblock %} {% block extra_css %}
                                     {{ form.mencion_responsabilidad }}
                                 </div>
                             </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$n Número de parte/sección</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.numero_parte_245 }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$p Nombre de parte/sección</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.nombre_parte_245 }}
-                                </div>
-                            </div>
                         </div>
 
-                        <!-- 246 ## Variante de título -->
+                        <!-- 246 ## Variante de título (Repetible) -->
                         <div class="marc-block mb-4">
                             <h6>
-                                <strong>246 ##</strong> — Forma variante del
-                                título (R)
+                                <strong>246 ##</strong> — Forma variante del título (R)
                             </h6>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$a Título variante</label>
+                            <p class="text-muted small">
+                                ℹ️ Este campo es repetible. Puede agregar múltiples títulos alternativos.
+                            </p>
+                            
+                            {{ formset_246.management_form }}
+                            
+                            <div id="formset-246-container">
+                                {% for form_246 in formset_246 %}
+                                <div class="formset-form-246 border-start border-3 border-info ps-3 mb-3">
+                                    {{ form_246.id }}
+                                    {% if form_246.DELETE %}
+                                        <div class="form-check mb-2">
+                                            {{ form_246.DELETE }}
+                                            <label class="form-check-label text-danger">
+                                                🗑️ Eliminar este título alternativo
+                                            </label>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="row mb-2">
+                                        <div class="col-md-4">
+                                            <label>$a Título alternativo</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ form_246.titulo }}
+                                            {% if form_246.titulo.errors %}
+                                                <div class="text-danger mt-1">{{ form_246.titulo.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>$b Resto del título variante</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ form_246.resto_titulo }}
+                                            {% if form_246.resto_titulo.errors %}
+                                                <div class="text-danger mt-1">{{ form_246.resto_titulo.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_variante }}
-                                </div>
+                                {% endfor %}
                             </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$b Resto del título variante</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.resto_titulo_variante }}
-                                </div>
-                            </div>
+                            
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="add-form-246">
+                                ➕ Agregar otro título alternativo
+                            </button>
                         </div>
 
-                        <!-- 254 ## Presentación musical -->
+                        <!-- 250 ## Edición (Repetible) -->
                         <div class="marc-block mb-4">
                             <h6>
-                                <strong>254 ##</strong> — Presentación musical
-                                (NR)
+                                <strong>250 ##</strong> — Edición (R)
                             </h6>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$a Presentación musical</label>
+                            <p class="text-muted small">
+                                ℹ️ Este campo es repetible. Puede agregar múltiples ediciones.
+                            </p>
+                            
+                            {{ formset_250.management_form }}
+                            
+                            <div id="formset-250-container">
+                                {% for form_250 in formset_250 %}
+                                <div class="formset-form-250 border-start border-3 border-success ps-3 mb-3">
+                                    {{ form_250.id }}
+                                    {% if form_250.DELETE %}
+                                        <div class="form-check mb-2">
+                                            {{ form_250.DELETE }}
+                                            <label class="form-check-label text-danger">
+                                                🗑️ Eliminar esta edición
+                                            </label>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>$a Edición</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ form_250.edicion }}
+                                            {% if form_250.edicion.errors %}
+                                                <div class="text-danger mt-1">{{ form_250.edicion.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-8">
-                                    {{ form.presentacion_musical }}
-                                </div>
+                                {% endfor %}
                             </div>
+                            
+                            <button type="button" class="btn btn-sm btn-outline-success" id="add-form-250">
+                                ➕ Agregar otra edición
+                            </button>
                         </div>
 
-                        <!-- 264 #1 Producción, publicación, distribución -->
+                        <!-- 264 ## Producción, publicación, distribución (Repetible) -->
                         <div class="marc-block mb-4">
                             <h6>
-                                <strong>264 #1</strong> — Producción, publicación, distribución, manufactura y copyright (R)
+                                <strong>264 ##</strong> — Producción, publicación, distribución, manufactura y copyright (R)
                             </h6>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$a Lugar de producción/publicación</label>
+                            <p class="text-muted small">
+                                ℹ️ Este campo es repetible. Use el segundo indicador para distinguir:
+                                0=Producción, 1=Publicación, 2=Distribución, 3=Fabricación, 4=Copyright
+                            </p>
+                            
+                            {{ formset_264.management_form }}
+                            
+                            <div id="formset-264-container">
+                                {% for form_264 in formset_264 %}
+                                <div class="formset-form-264 border-start border-4 border-warning ps-3 mb-3">
+                                    {{ form_264.id }}
+                                    {% if form_264.DELETE %}
+                                        <div class="form-check mb-2">
+                                            {{ form_264.DELETE }}
+                                            <label class="form-check-label text-danger">
+                                                🗑️ Eliminar este registro 264
+                                            </label>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="row mb-2">
+                                        <div class="col-md-4">
+                                            <label>Función (2º indicador)</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ form_264.funcion }}
+                                            {% if form_264.funcion.errors %}
+                                                <div class="text-danger mt-1">{{ form_264.funcion.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-2">
+                                        <div class="col-md-4">
+                                            <label>$a Lugar</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ form_264.lugar }}
+                                            {% if form_264.lugar.errors %}
+                                                <div class="text-danger mt-1">{{ form_264.lugar.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-2">
+                                        <div class="col-md-4">
+                                            <label>$b Nombre entidad</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ form_264.nombre_entidad }}
+                                            {% if form_264.nombre_entidad.errors %}
+                                                <div class="text-danger mt-1">{{ form_264.nombre_entidad.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-2">
+                                        <div class="col-md-4">
+                                            <label>$c Fecha</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ form_264.fecha }}
+                                            {% if form_264.fecha.errors %}
+                                                <div class="text-danger mt-1">{{ form_264.fecha.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>Orden</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ form_264.orden }}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-8">
-                                    {{ form.lugar_produccion_264 }}
-                                </div>
+                                {% endfor %}
                             </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$b Nombre del productor/editor</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.nombre_productor_264 }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$c Fecha de producción/publicación</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.fecha_produccion_264 }}
-                                </div>
-                            </div>
+                            
+                            <button type="button" class="btn btn-sm btn-outline-warning" id="add-form-264">
+                                ➕ Agregar otro registro 264
+                            </button>
                         </div>
 
                         <!-- 300 ## Descripción física -->
@@ -828,6 +931,70 @@ MARC21 Musical{% endblock %} {% block extra_css %}
             console.log("Campo limpiado:", this.id);
             $(this).val(null).trigger("change");
         });
+
+        // ================================================
+        // GESTIÓN DE FORMSETS DINÁMICOS
+        // ================================================
+
+        // Función genérica para agregar formularios a un formset
+        function setupFormsetAdd(prefix, containerSelector, addButtonSelector) {
+            const container = document.querySelector(containerSelector);
+            const addButton = document.querySelector(addButtonSelector);
+            const totalFormsInput = document.querySelector(`[name="${prefix}-TOTAL_FORMS"]`);
+
+            if (!container || !addButton || !totalFormsInput) {
+                console.warn(`Formset ${prefix} no encontrado, saltando...`);
+                return;
+            }
+
+            addButton.addEventListener('click', function() {
+                const formCount = parseInt(totalFormsInput.value);
+                const firstForm = container.querySelector(`.formset-form-${prefix.split('-')[1]}`);
+                
+                if (!firstForm) {
+                    console.warn(`No se encontró el primer formulario para ${prefix}`);
+                    return;
+                }
+
+                const newForm = firstForm.cloneNode(true);
+
+                // Actualizar IDs, nombres y valores
+                newForm.querySelectorAll('input, select, textarea').forEach(input => {
+                    const name = input.getAttribute('name');
+                    const id = input.getAttribute('id');
+
+                    if (name) {
+                        const newName = name.replace(/-\d+-/, `-${formCount}-`);
+                        input.setAttribute('name', newName);
+                        
+                        if (id) {
+                            const newId = id.replace(/-\d+-/, `-${formCount}-`);
+                            input.setAttribute('id', newId);
+                        }
+
+                        // Limpiar valor (excepto checkboxes de DELETE)
+                        if (!name.includes('DELETE') && !name.includes('id')) {
+                            if (input.type === 'checkbox') {
+                                input.checked = false;
+                            } else {
+                                input.value = '';
+                            }
+                        }
+                    }
+                });
+
+                // Limpiar mensajes de error
+                newForm.querySelectorAll('.text-danger').forEach(el => el.remove());
+
+                container.appendChild(newForm);
+                totalFormsInput.value = formCount + 1;
+            });
+        }
+
+        // Configurar formsets
+        setupFormsetAdd('titulo_alt', '#formset-246-container', '#add-form-246');
+        setupFormsetAdd('edicion', '#formset-250-container', '#add-form-250');
+        setupFormsetAdd('prod_pub', '#formset-264-container', '#add-form-264');
     });
 </script>
 {% endblock %}
