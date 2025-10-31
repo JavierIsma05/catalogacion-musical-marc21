@@ -1,29 +1,52 @@
-{% extends 'base.html' %} {% load static %} {% block title %}Registrar Obra |
-MARC21 Musical{% endblock %} {% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}Registrar Obra
+MARC21 Musical{% endblock %} {% block extra_css %}
+<link
+    href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+    rel="stylesheet"
+/>
+<link
+    href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
+    rel="stylesheet"
+/>
+<link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+{% endblock %} {% block content %}
 <div class="container-fluid mt-4">
     <div class="row">
         <!-- 🔸 COLUMNA IZQUIERDA -->
         <div class="col-md-9">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Registro MARC21 Musical</h5>
+                    <h5 class="mb-0">📄 Registro MARC21 Musical</h5>
                 </div>
                 <div class="card-body">
                     <form method="POST">
                         {% csrf_token %}
 
+                        <!-- Errores generales -->
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+
                         <!-- 🟩 CABECERA O LÍDER -->
                         <h5 class="text-primary" id="cabecera">
-                            Cabecera o Líder
+                            🟩 Cabecera o Líder
                         </h5>
                         <div class="marc-block mb-4">
                             <div class="row mb-2">
                                 <div class="col-md-6">
-                                    <label>06 – Tipo de registro</label>
+                                    <label
+                                        ><strong>06</strong> – Tipo de
+                                        registro</label
+                                    >
                                     {{ form.tipo_registro }}
                                 </div>
                                 <div class="col-md-6">
-                                    <label>07 – Nivel bibliográfico</label>
+                                    <label
+                                        ><strong>07</strong> – Nivel
+                                        bibliográfico</label
+                                    >
                                     {{ form.nivel_bibliografico }}
                                 </div>
                             </div>
@@ -31,10 +54,10 @@ MARC21 Musical{% endblock %} {% block content %}
 
                         <!-- 🟨 BLOQUE 0XX -->
                         <h5 class="text-primary mt-4" id="bloque-0xx">
-                            Bloque 0XX – Campos de longitud variable
+                            🟨 Bloque 0XX – Campos de longitud variable
                         </h5>
 
-                        <!-- 020 ## Número Internacional Normalizado para Libros -->
+                        <!-- 020 ## ISBN -->
                         <div class="marc-block mb-4">
                             <h6>
                                 <strong>020 ##</strong> — Número Internacional
@@ -48,7 +71,7 @@ MARC21 Musical{% endblock %} {% block content %}
                             </div>
                         </div>
 
-                        <!-- 024 2# Otros identificadores normalizados -->
+                        <!-- 024 2# ISMN -->
                         <div class="marc-block mb-4">
                             <h6>
                                 <strong>024 2#</strong> — Otros identificadores
@@ -86,7 +109,7 @@ MARC21 Musical{% endblock %} {% block content %}
                             </div>
                         </div>
 
-                        <!-- 031 ## Información del íncipit musical -->
+                        <!-- 031 ## Íncipit musical -->
                         <div class="marc-block mb-4">
                             <h6>
                                 <strong>031 ##</strong> — Información del
@@ -235,275 +258,140 @@ MARC21 Musical{% endblock %} {% block content %}
 
                         <!-- 🟦 BLOQUE 1XX -->
                         <h5 class="text-primary mt-4" id="bloque-1xx">
-                            Bloque 1XX – Asientos principales (punto de acceso)
+                            🟦 Bloque 1XX – Asientos principales (punto de
+                            acceso)
                         </h5>
 
                         <!-- 100 1# Compositor -->
-                        <div class="marc-block mb-4">
-                            <h6><strong>100 1#</strong> — Compositor (NR)</h6>
-
-                            <!-- Select de compositor existente -->
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label>$a Compositor (seleccionar)</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.compositor }}
-                                    <small class="form-text text-muted"
-                                        >Seleccione un compositor existente o
-                                        cree uno nuevo abajo</small
-                                    >
-                                </div>
-                            </div>
-
-                            <!-- Campos para crear nuevo compositor -->
-                            <div class="alert alert-info">
-                                <strong
-                                    >🆕 Crear nuevo compositor (si no existe en
-                                    la lista)</strong
-                                >
-                                <div class="row mt-2">
-                                    <div class="col-md-6">
-                                        {{
-                                        form.nuevo_compositor_apellidos_nombres
-                                        }}
-                                        <small class="form-text text-muted"
-                                            >{{
-                                            form.nuevo_compositor_apellidos_nombres.help_text
-                                            }}</small
-                                        >
-                                    </div>
-                                    <div class="col-md-6">
-                                        {{ form.nuevo_compositor_fechas }}
-                                        <small class="form-text text-muted"
-                                            >{{
-                                            form.nuevo_compositor_fechas.help_text
-                                            }}</small
-                                        >
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$e Función</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.compositor_funcion }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$j Autoría</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.compositor_autoria }}
-                                </div>
-                            </div>
-                        </div>
+<div class="marc-block mb-4">
+    <h6><strong>100 1#</strong> — Compositor (NR)</h6>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_compositor_select">$a Apellidos, Nombres</label></div>
+        <div class="col-md-8">
+            {{ form.compositor_select }}
+            {% if form.compositor_select.errors %}
+            <div class="text-danger">{{ form.compositor_select.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_compositor_fechas">$d Coordenadas biográficas</label></div>
+        <div class="col-md-8">
+            {{ form.compositor_fechas }}
+            {% if form.compositor_fechas.errors %}
+            <div class="text-danger">{{ form.compositor_fechas.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_compositor_funcion">$e Función</label></div>
+        <div class="col-md-8">{{ form.compositor_funcion }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4"><label for="id_compositor_autoria">$j Autoría</label></div>
+        <div class="col-md-8">{{ form.compositor_autoria }}</div>
+    </div>
+</div>
 
                         <!-- 130 0# Título uniforme -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>130 0#</strong> — Título uniforme (punto
-                                de acceso principal) (NR)
-                            </h6>
+<div class="marc-block mb-4">
+    <h6><strong>130 0#</strong> — Título uniforme (punto de acceso principal) (NR)</h6>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_titulo_uniforme_130">$a Título uniforme</label></div>
+        <div class="col-md-8">
+            {{ form.titulo_uniforme_130 }}
+            {% if form.titulo_uniforme_130.errors %}
+            <div class="text-danger">{{ form.titulo_uniforme_130.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_titulo_uniforme_130_forma">$k Subencabezamiento de forma</label></div>
+        <div class="col-md-8">
+            {{ form.titulo_uniforme_130_forma }}
+            {% if form.titulo_uniforme_130_forma.errors %}
+            <div class="text-danger">{{ form.titulo_uniforme_130_forma.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_titulo_uniforme_medio_interpretacion">$m Medio de interpretación</label></div>
+        <div class="col-md-8">{{ form.titulo_uniforme_medio_interpretacion }}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_titulo_uniforme_num_parte">$n Número de parte/sección</label></div>
+        <div class="col-md-8">{{ form.titulo_uniforme_num_parte }}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_titulo_uniforme_arreglo">$o Arreglo</label></div>
+        <div class="col-md-8">{{ form.titulo_uniforme_arreglo }}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_titulo_uniforme_nombre_parte">$p Nombre de parte/sección</label></div>
+        <div class="col-md-8">{{ form.titulo_uniforme_nombre_parte }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4"><label for="id_titulo_uniforme_tonalidad">$r Tonalidad</label></div>
+        <div class="col-md-8">{{ form.titulo_uniforme_tonalidad }}</div>
+    </div>
+</div>
 
-                            <!-- Select de título existente -->
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label
-                                        >$a Título uniforme (seleccionar)</label
-                                    >
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_uniforme }}
-                                    <small class="form-text text-muted"
-                                        >Seleccione un título existente o cree
-                                        uno nuevo abajo</small
-                                    >
-                                </div>
-                            </div>
-
-                            <!-- Campo para crear nuevo título -->
-                            <div class="alert alert-info">
-                                <strong
-                                    >🆕 Crear nuevo título uniforme (si no
-                                    existe en la lista)</strong
-                                >
-                                <div class="row mt-2">
-                                    <div class="col-md-12">
-                                        {{ form.nuevo_titulo_uniforme }}
-                                        <small class="form-text text-muted"
-                                            >{{
-                                            form.nuevo_titulo_uniforme.help_text
-                                            }}</small
-                                        >
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label>$k Forma musical</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_uniforme_forma }}
-                                    <small class="form-text text-muted"
-                                        >O cree una nueva:</small
-                                    >
-                                    {{ form.nueva_forma_130 }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$m Medio de interpretación</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_uniforme_medio_interpretacion
-                                    }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$n Número de parte/sección</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_uniforme_num_parte }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$o Arreglo</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_uniforme_arreglo }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$p Nombre de parte/sección</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_uniforme_nombre_parte }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$r Tonalidad</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_uniforme_tonalidad }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 🟦 BLOQUE 2XX -->
+                        <!-- 🟩 BLOQUE 2XX -->
                         <h5 class="text-primary mt-4" id="bloque-2xx">
-                            Bloque 2XX – Títulos y mención de responsabilidad
+                            🟩 Bloque 2XX – Títulos y mención de responsabilidad
                         </h5>
 
                         <!-- 240 10 Título uniforme -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>240 10</strong> — Título uniforme (NR)
-                            </h6>
+<div class="marc-block mb-4">
+    <h6><strong>240 10</strong> — Título uniforme (NR)</h6>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_titulo_240_select">$a Título uniforme</label></div>
+        <div class="col-md-8">
+            {{ form.titulo_240_select }}
+            {% if form.titulo_240_select.errors %}
+            <div class="text-danger">{{ form.titulo_240_select.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_titulo_240_forma_select">$k Subencabezamiento de forma</label></div>
+        <div class="col-md-8">
+            {{ form.titulo_240_forma_select }}
+            {% if form.titulo_240_forma_select.errors %}
+            <div class="text-danger">{{ form.titulo_240_forma_select.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_titulo_240_medio_interpretacion">$m Medio de interpretación</label></div>
+        <div class="col-md-8">{{ form.titulo_240_medio_interpretacion }}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_titulo_240_num_parte">$n Número de parte/sección</label></div>
+        <div class="col-md-8">{{ form.titulo_240_num_parte }}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_titulo_240_arreglo">$o Arreglo</label></div>
+        <div class="col-md-8">{{ form.titulo_240_arreglo }}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4"><label for="id_titulo_240_nombre_parte">$p Nombre de parte/sección</label></div>
+        <div class="col-md-8">{{ form.titulo_240_nombre_parte }}</div>
+    </div>
+    <div class="row">
+        <div class="col-md-4"><label for="id_titulo_240_tonalidad">$r Tonalidad</label></div>
+        <div class="col-md-8">{{ form.titulo_240_tonalidad }}</div>
+    </div>
+</div>
 
-                            <!-- Select de título existente -->
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label
-                                        >$a Título uniforme (seleccionar)</label
-                                    >
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_240 }}
-                                    <small class="form-text text-muted"
-                                        >Seleccione un título existente o cree
-                                        uno nuevo abajo</small
-                                    >
-                                </div>
-                            </div>
-
-                            <!-- Campo para crear nuevo título -->
-                            <div class="alert alert-info">
-                                <strong
-                                    >🆕 Crear nuevo título 240 (si no existe en
-                                    la lista)</strong
-                                >
-                                <div class="row mt-2">
-                                    <div class="col-md-12">
-                                        {{ form.nuevo_titulo_240 }}
-                                        <small class="form-text text-muted"
-                                            >{{ form.nuevo_titulo_240.help_text
-                                            }}</small
-                                        >
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label>$k Forma musical</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_240_forma }}
-                                    <small class="form-text text-muted"
-                                        >O cree una nueva:</small
-                                    >
-                                    {{ form.nueva_forma_240 }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$m Medio de interpretación</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_240_medio_interpretacion }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$n Número de parte/sección</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_240_num_parte }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$o Arreglo</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_240_arreglo }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$p Nombre de parte/sección</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_240_nombre_parte }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$r Tonalidad</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_240_tonalidad }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 245 10 Mención de título -->
+                        <!-- 245 10 Título principal -->
                         <div class="marc-block mb-4">
                             <h6>
                                 <strong>245 10</strong> — Mención de título (NR)
                             </h6>
                             <div class="row mb-2">
                                 <div class="col-md-4">
-                                    <label>$a Título principal</label>
+                                    <label>$a Título principal *</label>
                                 </div>
                                 <div class="col-md-8">
                                     {{ form.titulo_principal }}
@@ -511,9 +399,7 @@ MARC21 Musical{% endblock %} {% block content %}
                             </div>
                             <div class="row mb-2">
                                 <div class="col-md-4">
-                                    <label
-                                        >$b Resto del título / Subtítulo</label
-                                    >
+                                    <label>$b Resto del título</label>
                                 </div>
                                 <div class="col-md-8">
                                     {{ form.resto_titulo }}
@@ -545,7 +431,7 @@ MARC21 Musical{% endblock %} {% block content %}
                             </div>
                         </div>
 
-                        <!-- 246 ## Forma variante del título -->
+                        <!-- 246 ## Variante de título -->
                         <div class="marc-block mb-4">
                             <h6>
                                 <strong>246 ##</strong> — Forma variante del
@@ -561,7 +447,7 @@ MARC21 Musical{% endblock %} {% block content %}
                             </div>
                             <div class="row">
                                 <div class="col-md-4">
-                                    <label>$b Resto del título</label>
+                                    <label>$b Resto del título variante</label>
                                 </div>
                                 <div class="col-md-8">
                                     {{ form.resto_titulo_variante }}
@@ -585,12 +471,19 @@ MARC21 Musical{% endblock %} {% block content %}
                             </div>
                         </div>
 
-                        <!-- 260 ## Publicación, distribución, etc. -->
                         <div class="marc-block mb-4">
                             <h6>
                                 <strong>260 ##</strong> — Publicación,
-                                distribución, etc. (Pie de imprenta) (R)
+                                distribución, etc. (R)
+                                <!-- <span class="badge bg-warning text-dark"
+                                    >DEPRECATED</span
+                                > -->
                             </h6>
+                            <!-- <div class="alert alert-warning">
+                                <strong>⚠️ Nota:</strong> Este campo está
+                                obsoleto. Se recomienda usar el campo 264 en su
+                                lugar.
+                            </div> -->
                             <div class="row mb-2">
                                 <div class="col-md-4">
                                     <label>$a Lugar de publicación</label>
@@ -654,21 +547,28 @@ MARC21 Musical{% endblock %} {% block content %}
                             </div>
                         </div>
 
+                        <!-- Botones -->
                         <div class="d-flex gap-3 mt-4">
                             <button
                                 type="submit"
                                 name="guardar_continuar"
                                 class="btn btn-success"
                             >
-                                Guardar y continuar editando
+                                💾 Guardar y continuar editando
                             </button>
                             <button
                                 type="submit"
                                 name="guardar_cerrar"
                                 class="btn btn-primary"
                             >
-                                Guardar y cerrar
+                                ✅ Guardar y cerrar
                             </button>
+                            <a
+                                href"#"
+                                class="btn btn-secondary"
+                            >
+                                ❌ Cancelar
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -677,7 +577,7 @@ MARC21 Musical{% endblock %} {% block content %}
             <!-- 🟦 TABLA DE OBRAS -->
             <div class="card shadow-sm mt-3">
                 <div class="card-header bg-secondary text-white">
-                    <h6 class="mb-0">Obras registradas</h6>
+                    <h6 class="mb-0">📋 Obras registradas</h6>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered table-striped mt-2">
@@ -685,9 +585,9 @@ MARC21 Musical{% endblock %} {% block content %}
                             <tr>
                                 <th>001 Nº Control</th>
                                 <th>100 Compositor</th>
-                                <th>245 Título</th>
-                                <th>260 Editor</th>
-                                <th>260 Fecha</th>
+                                <th>130 Título uniforme</th>
+                                <th>020 ISBN</th>
+                                <th>024 ISMN</th>
                                 <th>044 País</th>
                                 <th>041 Idioma</th>
                             </tr>
@@ -697,24 +597,16 @@ MARC21 Musical{% endblock %} {% block content %}
                             <tr>
                                 <td>{{ obra.num_control }}</td>
                                 <td>
-                                    {% if obra.compositor %} {{
-                                    obra.compositor.apellidos_nombres }} {% if
-                                    obra.compositor.fechas %} ({{
-                                    obra.compositor.fechas }}) {% endif %} {%
-                                    else %} - {% endif %}
+                                    {{
+                                    obra.compositor.apellidos_nombres|default:"-"
+                                    }}
                                 </td>
                                 <td>
-                                    {% if obra.titulo_principal %} {{
-                                    obra.titulo_principal }} {% elif
-                                    obra.titulo_uniforme %} {{
-                                    obra.titulo_uniforme.titulo }} {% elif
-                                    obra.titulo_240 %} {{ obra.titulo_240.titulo
-                                    }} {% else %} - {% endif %}
+                                    {{ obra.titulo_uniforme.titulo|default:"-"
+                                    }}
                                 </td>
-                                <td>{{ obra.nombre_editor|default:"-" }}</td>
-                                <td>
-                                    {{ obra.fecha_publicacion|default:"-" }}
-                                </td>
+                                <td>{{ obra.isbn|default:"-" }}</td>
+                                <td>{{ obra.ismn|default:"-" }}</td>
                                 <td>{{ obra.get_codigo_pais_display }}</td>
                                 <td>{{ obra.get_codigo_lengua_display }}</td>
                             </tr>
@@ -739,119 +631,210 @@ MARC21 Musical{% endblock %} {% block content %}
                     >🟩 Cabecera o Líder</a
                 >
                 <a href="#bloque-0xx" class="d-block mb-2 text-decoration-none"
-                    >🟦 Bloque 0XX - Campos variables</a
+                    >🟨 Bloque 0XX - Campos variables</a
                 >
                 <a href="#bloque-1xx" class="d-block mb-2 text-decoration-none"
                     >🟦 Bloque 1XX - Asientos principales</a
                 >
                 <a href="#bloque-2xx" class="d-block mb-2 text-decoration-none"
-                    >🟦 Bloque 2XX - Títulos</a
+                    >🟩 Bloque 2XX - Títulos</a
                 >
                 <hr />
                 <h6 class="fw-bold mb-3">🎯 Acciones</h6>
-                <a href="#" class="d-block mb-2 text-decoration-none"
+                <a
+                    href="#"
+                    class="d-block mb-2 text-decoration-none"
+                    onclick="document.querySelector('form').submit(); return false;"
                     >💾 Guardar borrador</a
                 >
                 <a href="#" class="d-block mb-2 text-decoration-none"
                     >🔍 Vista preliminar</a
-                >
-                <a href="#" class="d-block mb-2 text-decoration-none"
-                    >⚠️ Validar registro</a
                 >
             </div>
         </div>
     </div>
 </div>
 {% endblock %} {% block extra_js %}
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Tabs.js (tu archivo personalizado) -->
+<script src="{% static 'js/tabs.js' %}"></script>
+
+<!-- Configuración Select2 con Autoridades -->
 <script>
     $(document).ready(function () {
-        // Inicializar Select2 en todos los campos de autoridades
-        $("#id_compositor").select2({
-            width: "100%",
-            allowClear: true,
-            placeholder: "Seleccione un compositor",
-            theme: "bootstrap-5",
-        });
+        // Cargar todas las autoridades al inicio
+        var autoridadesCache = {
+            compositor: [],
+            titulo_uniforme: [],
+            forma_musical: [],
+        };
 
-        $("#id_titulo_uniforme").select2({
-            width: "100%",
-            allowClear: true,
-            placeholder: "Seleccione un título uniforme",
-            theme: "bootstrap-5",
-        });
+        // Precargar autoridades
+        function preloadAutoridades(modelType) {
+            $.ajax({
+                url: '{% url "get_autoridades_json" %}',
+                data: { model: modelType, q: "" },
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    autoridadesCache[modelType] = data.results;
+                },
+            });
+        }
 
-        $("#id_titulo_240").select2({
-            width: "100%",
-            allowClear: true,
-            placeholder: "Seleccione un título uniforme (240)",
-            theme: "bootstrap-5",
-        });
+        // Precargar todas las autoridades
+        preloadAutoridades("compositor");
+        preloadAutoridades("titulo_uniforme");
+        preloadAutoridades("forma_musical");
 
-        $("#id_titulo_uniforme_forma").select2({
-            width: "100%",
-            allowClear: true,
-            placeholder: "Seleccione una forma musical",
-            theme: "bootstrap-5",
-        });
+        // Configuración para cada campo con Select2
+        function initializeSelect2Tagging(fieldId, modelType) {
+            var $field = $("#" + fieldId);
+            var initialValue = $field.val();
 
-        $("#id_titulo_240_forma").select2({
-            width: "100%",
-            allowClear: true,
-            placeholder: "Seleccione una forma musical",
-            theme: "bootstrap-5",
-        });
+            // Construir opciones iniciales
+            var data = autoridadesCache[modelType].map(function (item) {
+                return {
+                    id: item.id,
+                    text: item.text,
+                    fechas: item.fechas,
+                };
+            });
 
-        // Smooth scroll para la navegación
-        $('a[href^="#"]').on("click", function (e) {
-            e.preventDefault();
-            var target = $(this.getAttribute("href"));
-            if (target.length) {
-                $("html, body")
-                    .stop()
-                    .animate(
-                        {
-                            scrollTop: target.offset().top - 80,
-                        },
-                        600
+            $field.select2({
+                theme: "bootstrap-5",
+                tags: true,
+                data: data,
+                placeholder: $field.attr("placeholder"),
+                allowClear: true,
+                width: "100%",
+                createTag: function (params) {
+                    var term = $.trim(params.term);
+
+                    if (term === "") {
+                        return null;
+                    }
+
+                    // Verificar si ya existe
+                    var exists = false;
+                    data.forEach(function (item) {
+                        if (item.id.toLowerCase() === term.toLowerCase()) {
+                            exists = true;
+                        }
+                    });
+
+                    if (exists) {
+                        return null;
+                    }
+
+                    return {
+                        id: term,
+                        text: term,
+                        newTag: true,
+                    };
+                },
+                templateResult: function (data) {
+                    if (data.loading) {
+                        return "Buscando...";
+                    }
+
+                    var $result = $("<span></span>");
+
+                    if (data.newTag) {
+                        $result.html(
+                            '<strong style="color: #198754;">✨ Crear nuevo:</strong> ' +
+                                data.text
+                        );
+                    } else {
+                        $result.text(data.text);
+                    }
+
+                    return $result;
+                },
+                templateSelection: function (data) {
+                    return data.text || data.id;
+                },
+            });
+
+            // Si hay valor inicial, seleccionarlo
+            if (initialValue && initialValue.trim() !== "") {
+                var found = false;
+                data.forEach(function (item) {
+                    if (item.id === initialValue) {
+                        $field.val(item.id).trigger("change");
+                        found = true;
+                    }
+                });
+
+                if (!found) {
+                    var newOption = new Option(
+                        initialValue,
+                        initialValue,
+                        true,
+                        true
                     );
+                    $field.append(newOption).trigger("change");
+                }
+            }
+
+            // Manejar el evento de selección para forzar actualización
+            $field.on("select2:select", function (e) {
+                var data = e.params.data;
+
+                if (data.newTag) {
+                    $field.find("option").each(function () {
+                        if ($(this).val() === data.id && $(this).data("temp")) {
+                            $(this).remove();
+                        }
+                    });
+
+                    var newOption = new Option(data.id, data.id, true, true);
+                    $field.append(newOption);
+                    $field.val(data.id).trigger("change.select2");
+                    $field.select2("close");
+                }
+            });
+        }
+
+        // Inicializar todos los campos
+        initializeSelect2Tagging("id_compositor_select", "compositor");
+        initializeSelect2Tagging("id_titulo_uniforme_130", "titulo_uniforme");
+        initializeSelect2Tagging(
+            "id_titulo_uniforme_130_forma",
+            "forma_musical"
+        );
+        initializeSelect2Tagging("id_titulo_240_select", "titulo_uniforme");
+        initializeSelect2Tagging("id_titulo_240_forma_select", "forma_musical");
+
+        // Sincronizar fechas del compositor
+        $("#id_compositor_select").on("select2:select", function (e) {
+            var data = e.params.data;
+            console.log("Compositor seleccionado:", data);
+
+            if (data.fechas) {
+                $("#id_compositor_fechas").val(data.fechas);
+            } else if (data.newTag) {
+                $("#id_compositor_fechas").val("").focus();
             }
         });
 
-        // Resaltar el campo de autoridad cuando se escribe en el campo de creación
-        $("#id_nuevo_compositor_apellidos_nombres").on("input", function () {
-            if ($(this).val().trim() !== "") {
-                $("#id_compositor")
-                    .next(".select2-container")
-                    .css("opacity", "0.5");
-            } else {
-                $("#id_compositor")
-                    .next(".select2-container")
-                    .css("opacity", "1");
+        $("#id_compositor_select").on(
+            "select2:unselect select2:clear",
+            function (e) {
+                console.log("Compositor removido");
+                $(this).val(null).trigger("change");
+                $("#id_compositor_fechas").val("");
             }
-        });
+        );
 
-        $("#id_nuevo_titulo_uniforme").on("input", function () {
-            if ($(this).val().trim() !== "") {
-                $("#id_titulo_uniforme")
-                    .next(".select2-container")
-                    .css("opacity", "0.5");
-            } else {
-                $("#id_titulo_uniforme")
-                    .next(".select2-container")
-                    .css("opacity", "1");
-            }
-        });
-
-        $("#id_nuevo_titulo_240").on("input", function () {
-            if ($(this).val().trim() !== "") {
-                $("#id_titulo_240")
-                    .next(".select2-container")
-                    .css("opacity", "0.5");
-            } else {
-                $("#id_titulo_240")
-                    .next(".select2-container")
-                    .css("opacity", "1");
-            }
+        $(".form-control[data-model]").on("select2:clear", function (e) {
+            console.log("Campo limpiado:", this.id);
+            $(this).val(null).trigger("change");
         });
     });
 </script>
