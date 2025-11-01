@@ -156,25 +156,6 @@ TONALIDADES = [
     ('Si menor', 'Si menor'),
 ]
 
-FUNCIONES_PERSONA = [
-    ('arreglista', 'Arreglista'),
-    ('compositor', 'Compositor'),
-    # ('coeditor', 'Coeditor'),
-    # ('compilador', 'Compilador'),
-    # ('copista', 'Copista'),
-    # ('dedicatario', 'Dedicatario'),
-    # ('editor', 'Editor'),
-    # ('letrista', 'Letrista'),
-    # ('prologuista', 'Prologuista'),
-]
-
-CALIFICADORES_AUTORIA = [
-    ('atribuida', 'Atribuida'),
-    ('certificada', 'Certificada'),
-    # ('dudosa', 'Dudosa'),
-    # ('erronea', 'Errónea'),
-]
-
 # ================================================
 # 📄 MODELO PRINCIPAL - OBRA GENERAL
 # ================================================
@@ -254,10 +235,7 @@ class ObraGeneral(models.Model):
         help_text="040 $a – Centro catalogador (predeterminado: UNL)"
     )
     
-    # 041 0# Código de lengua
     #* Campo 041 implementado como modelo repetible: CodigoLengua en models_repetibles.py 
-    
-    # 044 ## Código del país
     #* Campo 044 implementado como modelo repetible: CodigoPaisEntidad en models_repetibles.py
     
     #* 092 ## Clasificación local
@@ -315,8 +293,7 @@ class ObraGeneral(models.Model):
     #? 🟦 BLOQUE 1XX – Asientos principales
     # ------------------------------------------------
     
-    # 100 1# Compositor (NR - No Repetible)
-    # ⚠️ USA la tabla de autoridades
+    #* 100 1# Compositor (NR - No Repetible)
     compositor = models.ForeignKey(
         AutoridadPersona,
         on_delete=models.PROTECT,
@@ -326,27 +303,10 @@ class ObraGeneral(models.Model):
         help_text="100 $a y $d – Compositor principal (cruzar con 600, 700)"
     )
     
-    # TODO: Repetible
-    compositor_funcion = models.CharField(
-        max_length=20, 
-        blank=True, 
-        null=True,
-        choices=FUNCIONES_PERSONA,
-        default='compositor',
-        help_text="100 $e – Función (predeterminado: compositor)"
-    )
+    #* Subcampo $e (R) - Funciones del compositor implementado como modelo repetible: FuncionCompositor
+    #* Subcampo $j (R) - Atribución del compositor implementado como modelo repetible: AtribucionCompositor
     
-    # TODO: Repetible
-    compositor_autoria = models.CharField(
-        max_length=15, 
-        blank=True, 
-        null=True,
-        choices=CALIFICADORES_AUTORIA,
-        default='certificada',
-        help_text="100 $j – Calificador de atribución"
-    )
-    
-    # 130 0# Título uniforme como punto de acceso principal (NR)
+    #* 130 0# Título uniforme como punto de acceso principal (NR)
     titulo_uniforme = models.ForeignKey(
         AutoridadTituloUniforme,
         on_delete=models.PROTECT,

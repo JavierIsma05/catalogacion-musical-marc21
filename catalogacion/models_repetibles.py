@@ -509,6 +509,92 @@ class CodigoPaisEntidad(models.Model):
         return f"$a{self.codigo_pais}"
 
 
+# ================================================
+# 📌 CAMPO 100 - SUBCAMPOS REPETIBLES (R)
+# ================================================
+
+class FuncionCompositor(models.Model):
+    """
+    Campo 100 - Subcampo $e (R)
+    Término indicativo de función del compositor
+    Permite múltiples funciones para un compositor en una obra
+    """
+    
+    FUNCIONES = [
+        ('arreglista', 'Arreglista'),
+        ('coeditor', 'Coeditor'),
+        ('compilador', 'Compilador'),
+        ('compositor', 'Compositor'),
+        ('copista', 'Copista'),
+        ('dedicatario', 'Dedicatario'),
+        ('editor', 'Editor'),
+        ('prologuista', 'Prologuista'),
+    ]
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='funciones_compositor',
+        help_text="Obra a la que pertenece esta función"
+    )
+    
+    # Subcampo $e - Función (R)
+    funcion = models.CharField(
+        max_length=20,
+        choices=FUNCIONES,
+        default='compositor',
+        help_text="100 $e – Función del compositor (predeterminado: compositor)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Función Compositor (100 $e)"
+        verbose_name_plural = "Funciones Compositor (100 $e - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        return self.get_funcion_display()
+
+
+class AtribucionCompositor(models.Model):
+    """
+    Campo 100 - Subcampo $j (R)
+    Calificador de atribución de autoría
+    Permite múltiples calificadores de autoría
+    """
+    
+    ATRIBUCIONES = [
+        ('atribuida', 'Atribuida'),
+        ('certificada', 'Certificada'),
+        ('erronea', 'Erronea'),
+    ]
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='atribuciones_compositor',
+        help_text="Obra a la que pertenece esta atribución"
+    )
+    
+    # Subcampo $j - Atribución (R)
+    atribucion = models.CharField(
+        max_length=15,
+        choices=ATRIBUCIONES,
+        default='certificada',
+        help_text="100 $j – Calificador de atribución (predeterminado: certificada)"
+    )
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Atribución Compositor (100 $j)"
+        verbose_name_plural = "Atribuciones Compositor (100 $j - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        return self.get_atribucion_display()
+
 
 # ================================================
 #? 📌 CAMPO 246: TÍTULO ALTERNATIVO (R)
