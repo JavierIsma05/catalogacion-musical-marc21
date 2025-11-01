@@ -1,158 +1,18 @@
+"""
+Modelo Principal MARC21 - ObraGeneral
+======================================
+
+Contiene el modelo principal ObraGeneral que representa un registro 
+bibliográfico MARC 21 para música manuscrita o impresa.
+
+Integra referencias a todos los bloques MARC mediante ForeignKey
+y campos propios para datos no repetibles.
+"""
+
 from django.db import models
 from datetime import datetime
-from .models_repetibles import *
-
-# Exportar todos los modelos para que estén disponibles con "from .models import ..."
-__all__ = [
-    # Autoridades
-    'AutoridadPersona',
-    'AutoridadTituloUniforme',
-    'AutoridadFormaMusical',
-    'AutoridadMateria',
-    # Modelos repetibles 
-    'TituloAlternativo',
-    'Edicion',
-    'ProduccionPublicacion',
-    'ISBN',
-    'ISMN',
-    'NumeroEditor',
-    'IncipitMusical',
-    'CodigoLengua',
-    'CodigoPaisEntidad',
-    'FuncionCompositor',
-    'AtribucionCompositor',
-    'Forma130',
-    'MedioInterpretacion130',
-    'NumeroParteSección130',
-    'NombreParteSección130',
-    'Forma240',
-    'MedioInterpretacion240',
-    'NumeroParteSección240',
-    'NombreParteSección240',
-    'TituloAlternativo',
-    'Edicion',
-    'ProduccionPublicacion',
-    'DescripcionFisica',
-    'Extension300',
-    'Dimension300',
-    'MedioFisico',
-    'Tecnica340',
-    'CaracteristicaMusicaNotada',
-    'Formato348',
-    'MedioInterpretacion382',
-    'MedioInterpretacion382_a',
-    'Solista382',
-    'NumeroInterpretes382',
-    'DesignacionNumericaObra',
-    'NumeroObra383',
-    'Opus383',
-    'MencionSerie490',
-    'TituloSerie490',
-    'VolumenSerie490',
-    
-    # Modelo principal
-    'ObraGeneral',
-]
-
-# ================================================
-# 📚 TABLAS DE AUTORIDADES (Vocabularios Controlados)
-# ================================================
-
-class AutoridadPersona(models.Model):
-    """
-    Base de datos de autoridades para nombres de personas.
-    Se usa en: Campo 100 (compositor), Campo 600 (materia-persona), 
-    Campo 700 (colaborador), Campo 773/774/787 (enlaces)
-    """
-    apellidos_nombres = models.CharField(
-        max_length=200, 
-        unique=True,
-        help_text="Formato: Apellidos, Nombres (normalizado)"
-    )
-    fechas = models.CharField(
-        max_length=50, 
-        blank=True,
-        help_text="Coordenadas biográficas: año nacimiento - año muerte"
-    )
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        verbose_name = "Autoridad - Persona"
-        verbose_name_plural = "Autoridades - Personas"
-        ordering = ['apellidos_nombres']
-    
-    def __str__(self):
-        if self.fechas:
-            return f"{self.apellidos_nombres} {self.fechas}"
-        return self.apellidos_nombres
 
 
-class AutoridadTituloUniforme(models.Model):
-    """
-    Base de datos de autoridades para títulos uniformes.
-    Se usa en: Campo 130 (título principal), Campo 240 (título con compositor)
-    """
-    titulo = models.CharField(
-        max_length=300, 
-        unique=True,
-        help_text="Título uniforme normalizado"
-    )
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        verbose_name = "Autoridad - Título Uniforme"
-        verbose_name_plural = "Autoridades - Títulos Uniformes"
-        ordering = ['titulo']
-    
-    def __str__(self):
-        return self.titulo
-
-
-class AutoridadFormaMusical(models.Model):
-    """
-    Base de datos de autoridades para formas musicales.
-    Se usa en: Campo 130 $k, Campo 240 $k, Campo 655 (género/forma)
-    """
-    forma = models.CharField(
-        max_length=100, 
-        unique=True,
-        help_text="Forma o género musical (ej: Pasillo, Sinfonía, Vals)"
-    )
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        verbose_name = "Autoridad - Forma Musical"
-        verbose_name_plural = "Autoridades - Formas Musicales"
-        ordering = ['forma']
-    
-    def __str__(self):
-        return self.forma
-
-
-class AutoridadMateria(models.Model):
-    """
-    Base de datos de autoridades para términos de materia.
-    Se usa en: Campo 650 (materia general)
-    """
-    termino = models.CharField(
-        max_length=200, 
-        unique=True,
-        help_text="Término de materia normalizado"
-    )
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        verbose_name = "Autoridad - Materia"
-        verbose_name_plural = "Autoridades - Materias"
-        ordering = ['termino']
-    
-    def __str__(self):
-        return self.termino
-
-
-# ================================================
-# CONSTANTES 
-# ================================================
 
 TONALIDADES = [
     # Mayores
@@ -188,8 +48,9 @@ TONALIDADES = [
     ('Si menor', 'Si menor'),
 ]
 
+
 # ================================================
-# 📄 MODELO PRINCIPAL - OBRA GENERAL
+# MODELO PRINCIPAL - OBRA GENERAL
 # ================================================
 
 class ObraGeneral(models.Model):
@@ -199,7 +60,7 @@ class ObraGeneral(models.Model):
     """
     
     # ------------------------------------------------
-    # 🟩 CABECERA O LÍDER
+    #? 🟩 CABECERA O LÍDER
     # ------------------------------------------------
     estado_registro = models.CharField(
         max_length=1, 
@@ -230,7 +91,7 @@ class ObraGeneral(models.Model):
     )
     
     # ------------------------------------------------
-    # 🟨 CAMPOS FIJOS MARC21
+    #? 🟨 CAMPOS FIJOS MARC21
     # ------------------------------------------------
     num_control = models.CharField(
         max_length=6, 
@@ -252,7 +113,7 @@ class ObraGeneral(models.Model):
     )
     
     # ------------------------------------------------
-    # ?🟦 BLOQUE 0XX – Campos de longitud variable
+    #? 🟦 BLOQUE 0XX – Campos de longitud variable
     # ------------------------------------------------
 
     #* Campo 020 implementado como modelo separado: ISBN
@@ -267,10 +128,10 @@ class ObraGeneral(models.Model):
         help_text="040 $a – Centro catalogador (predeterminado: UNL)"
     )
     
-    #* Campo 041 implementado como modelo repetible: CodigoLengua en models_repetibles.py 
-    #* Campo 044 implementado como modelo repetible: CodigoPaisEntidad en models_repetibles.py
-    
+    #* Campo 041 implementado como modelo repetible: CodigoLengua
+    #* Campo 044 implementado como modelo repetible: CodigoPaisEntidad
     #* 092 ## Clasificación local
+    
     # 092 $a - Institución (NR)
     clasif_institucion = models.CharField(
         max_length=10,
@@ -298,7 +159,6 @@ class ObraGeneral(models.Model):
     )
     
     # 092 $d - Ms/Imp (NR)
-    # Se genera automáticamente de la posición 06 de cabecera (tipo_registro)
     clasif_ms_imp = models.CharField(
         max_length=3,
         choices=[
@@ -312,7 +172,6 @@ class ObraGeneral(models.Model):
     )
     
     # 092 $0 - Número de control (NR)
-    # Se genera automáticamente del campo 001
     clasif_num_control = models.CharField(
         max_length=50,
         blank=True,
@@ -327,7 +186,7 @@ class ObraGeneral(models.Model):
     
     #* 100 1# Compositor (NR - No Repetible)
     compositor = models.ForeignKey(
-        AutoridadPersona,
+        'AutoridadPersona',
         on_delete=models.PROTECT,
         blank=True,
         null=True,
@@ -335,12 +194,12 @@ class ObraGeneral(models.Model):
         help_text="100 $a y $d – Compositor principal (cruzar con 600, 700)"
     )
     
-    #* Subcampo $e (R) - Funciones del compositor implementado como modelo repetible: FuncionCompositor
-    #* Subcampo $j (R) - Atribución del compositor implementado como modelo repetible: AtribucionCompositor
-    
-    #* 130 0# Título uniforme como punto de acceso principal (NR)
+    #* Subcampo $e (R) - Funciones del compositor → FuncionCompositor
+    #* Subcampo $j (R) - Atribución del compositor → AtribucionCompositor
+
+    # 130 0# Título uniforme como punto de acceso principal (NR)
     titulo_uniforme = models.ForeignKey(
-        AutoridadTituloUniforme,
+        'AutoridadTituloUniforme',
         on_delete=models.PROTECT,
         blank=True,
         null=True,
@@ -348,11 +207,10 @@ class ObraGeneral(models.Model):
         help_text="130 $a – Título uniforme normalizado (cruzar con campo 240)"
     )
     
-    
-    #* - 130 $k → Forma130 como modelo repetible en models_repetibles.py
-    #* - 130 $m → MedioInterpretacion130 como modelo repetible en models_repetibles.py
-    #* - 130 $n → NumeroParteSección130 como modelo repetible en models_repetibles.py
-    #* - 130 $p → NombreParteSección130 como modelo repetible en models_repetibles.py
+    #* - 130 $k → Forma130
+    #* - 130 $m → MedioInterpretacion130
+    #* - 130 $n → NumeroParteSección130
+    #* - 130 $p → NombreParteSección130
 
     titulo_uniforme_arreglo = models.CharField(
         max_length=10, 
@@ -376,7 +234,7 @@ class ObraGeneral(models.Model):
     
     #* 240 10 Título uniforme con compositor (NR)
     titulo_240 = models.ForeignKey(
-        AutoridadTituloUniforme,
+        'AutoridadTituloUniforme',
         on_delete=models.PROTECT,
         blank=True,
         null=True,
@@ -384,10 +242,10 @@ class ObraGeneral(models.Model):
         help_text="240 $a – Título uniforme normalizado (cruzar con campo 130)"
     )
     
-    #* - 240 $k → Forma240 como modelo repetible en models_repetibles.py
-    #* - 240 $m → MedioInterpretacion240 como modelo repetible en models_repetibles.py
-    #* - 240 $n → NumeroParteSección240 como modelo repetible en models_repetibles.py
-    #* - 240 $p → NombreParteSección240 como modelo repetible en models_repetibles.py
+    #* - 240 $k → Forma240
+    #* - 240 $m → MedioInterpretacion240
+    #* - 240 $n → NumeroParteSección240
+    #* - 240 $p → NombreParteSección240
     
     titulo_240_arreglo = models.CharField(
         max_length=10,
@@ -405,7 +263,7 @@ class ObraGeneral(models.Model):
         help_text="240 $r – Tonalidad (NR - No repetible)"
     )
     
-    #* 245 10 Mención de título (NR)
+    # 245 10 Mención de título (NR)
     titulo_principal = models.CharField(
         max_length=500, 
         blank=True, 
@@ -426,20 +284,19 @@ class ObraGeneral(models.Model):
         help_text="245 $c – Mención de responsabilidad"
     )
     
-    #* Campo 246 implementado como modelo separado: TituloAlternativo
+    #* Campo 246 → TituloAlternativo
+    #* Campo 250 → Edicion
+    #* Campo 264 → ProduccionPublicacion
 
-    #* Campo 250 implementado como modelo separado: Edicion
-    
-    #* Campo 264 implementado como modelo separado: ProduccionPublicacion
+    # ------------------------------------------------
+    #? 🟦 BLOQUE 3XX – Descripción física
     # ------------------------------------------------
 
-    #? 🟦 BLOQUE 3XX 
-
-    #* Campo 300 implementado como modelo separado: DescripcionFisica
-    #* Campo 340 implementado como modelo separado: MedioFisico y Tecnica340
-    #* Campo 348 implementado como modelo repetible: CaracteristicaMusicaNotada
-    #* Campo 382 implementado como modelo repetible: MedioInterpretacion382
-    #* Campo 383 implementado como modelo repetible: DesignacionNumericaObra, NumeroObra383, Opus383
+    #* Campo 300 → DescripcionFisica
+    #* Campo 340 → MedioFisico y Tecnica340
+    #* Campo 348 → CaracteristicaMusicaNotada
+    #* Campo 382 → MedioInterpretacion382
+    #* Campo 383 → DesignacionNumericaObra, NumeroObra383, Opus383
     
     tonalidad_384 = models.CharField(
         max_length=20,
@@ -449,27 +306,22 @@ class ObraGeneral(models.Model):
         help_text="384 $a – Tonalidad (NR)"
     )
     
+    # ------------------------------------------------
+    #? 🟦 BLOQUE 4XX – Series
+    # ------------------------------------------------
     
-    #? 🟦 BLOQUE 4XX 
+    #* Campo 490 → MencionSerie490, TituloSerie490, VolumenSerie490
     
-    #* Campo 490 implementado como modelo repetible: MencionSerie490, TituloSerie490, VolumenSerie490
-    
-    #? 🟦 BLOQUE 5XX 
-    
-    #? 🟦 BLOQUE 6XX 
-    
-    #? 🟦 BLOQUE 7XX
-     
-    #? 🟦 BLOQUE 8XX 
+    # ------------------------------------------------
+    #? 🟦 BLOQUES 5XX, 6XX, 7XX, 8XX
+    # ------------------------------------------------
   
     # ------------------------------------------------
     #? Metadatos del sistema
-    # ------------------------------------------------
     fecha_creacion_sistema = models.DateTimeField(auto_now_add=True)
     fecha_modificacion_sistema = models.DateTimeField(auto_now=True)
     
-    # ------------------------------------------------
-    # Métodos
+    #? Métodos
     # ------------------------------------------------
 
     def generar_clasificacion_092(self):
@@ -532,6 +384,8 @@ class ObraGeneral(models.Model):
         """
         Autogenera MedioFisico con Tecnica340 basado en tipo_registro
         """
+        from .bloque_3xx import MedioFisico, Tecnica340
+        
         # Solo generar si no existen medios físicos aún
         if self.medios_fisicos.exists():
             return
@@ -552,13 +406,12 @@ class ObraGeneral(models.Model):
             tecnica=tecnica_automatica
         )
 
-
     def save(self, *args, **kwargs):
         """
         Override del método save para autogenerar campos automáticos
         según especificaciones MARC21
         """
-
+        # Generar número de control si no existe
         if not self.num_control:
             try:
                 ultima_obra = ObraGeneral.objects.order_by('-id').first()
@@ -569,24 +422,25 @@ class ObraGeneral(models.Model):
             tipo_abrev = 'M' if self.tipo_registro == 'd' else 'I'
             self.num_control = f"{tipo_abrev}{str(siguiente_id).zfill(6)}"
         
-
+        # Generar código de información (campo 008)
         if not self.codigo_informacion:
             fecha_creacion = datetime.now().strftime("%y%m%d")  
             self.codigo_informacion = fecha_creacion + (" " * (40 - len(fecha_creacion)))
         
-
+        # Establecer estado del registro
         if not self.estado_registro:
             self.estado_registro = 'n'  # n = nuevo registro
         
         # Generar clasificación 092
         self.generar_clasificacion_092()
         
-        # Generar medio físico automático (340)
-        self.generar_medio_fisico_automatico()
-
+        # Guardar primero el objeto
         super().save(*args, **kwargs)
         
-
+        # Generar medio físico automático (340) después del save
+        self.generar_medio_fisico_automatico()
+        
+        # Actualizar campos de clasificación
         ObraGeneral.objects.filter(pk=self.pk).update(
             clasif_institucion=self.clasif_institucion,
             clasif_proyecto=self.clasif_proyecto,
@@ -603,7 +457,6 @@ class ObraGeneral(models.Model):
         from django.core.exceptions import ValidationError
         
         errores = {}
-        
         
         # Regla: Si hay compositor (100), NO debe haber 130
         if self.compositor and self.titulo_uniforme:
@@ -632,20 +485,20 @@ class ObraGeneral(models.Model):
                 "Debe haber un punto de acceso principal. Complete el campo 130 (título uniforme) "
                 "o el campo 100 (compositor)."
             )
-
         
+        # Validar título principal obligatorio
         if not self.titulo_principal or not self.titulo_principal.strip():
             errores['titulo_principal'] = (
                 "El título principal (campo 245 $a) es obligatorio."
             )
         
-        
+        # Validar tipo de registro
         if self.tipo_registro not in ['c', 'd']:
             errores['tipo_registro'] = (
                 "El tipo de registro debe ser 'c' (música impresa) o 'd' (música manuscrita)."
             )
         
-        
+        # Validar nivel bibliográfico
         if self.nivel_bibliografico not in ['a', 'c', 'm']:
             errores['nivel_bibliografico'] = (
                 "El nivel bibliográfico debe ser 'a' (parte componente), "
