@@ -1,358 +1,1062 @@
-# from django import forms
-# from django.forms.widgets import Select
-# from .models import (
-#     ObraGeneral, 
-#     AutoridadPersona, 
-#     AutoridadTituloUniforme, 
-#     AutoridadFormaMusical,
-#     TituloAlternativo,  # ✅ Campo 246
-#     Edicion,  # ✅ Campo 250
-#     ProduccionPublicacion,  # ✅ Campo 264
-#     DescripcionFisica  # ✅ Campo 300
-# )
 
-# # ================================================
-# # 📋 FORMSETS PARA CAMPOS REPETIBLES
-# # ================================================
+from django import forms
+from django.forms.widgets import SelectMultiple, CheckboxSelectMultiple
+from django.core.exceptions import ValidationError
 
-# TituloAlternativoFormSet = forms.inlineformset_factory(
-#     ObraGeneral,
-#     TituloAlternativo,
-#     fields=['titulo', 'resto_titulo'],
-#     extra=1,
-#     min_num=0,
-#     max_num=10,
-#     can_delete=True,
-#     widgets={
-#         'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título alternativo'}),
-#         'resto_titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Resto del título variante'}),
-#     }
-# )
+from .models import (
+    # Bloque 0XX
+    ISBN,
+    ISMN,
+    NumeroEditor,
+    IncipitMusical,
+    IncipitURL,
+    CodigoLengua,
+    IdiomaObra,
+    CodigoPaisEntidad,
+    # Bloque 1XX
+    FuncionCompositor,
+    AtribucionCompositor,
+    Forma130,
+    MedioInterpretacion130,
+    NumeroParteSección130,
+    NombreParteSección130,
+    Forma240,
+    MedioInterpretacion240,
+    NumeroParteSección240,
+    NombreParteSección240,
+    # Bloque 2XX
+    TituloAlternativo,
+    Edicion,
+    ProduccionPublicacion,
+    # Bloque 3XX
+    DescripcionFisica,
+    Extension300,
+    Dimension300,
+    MedioFisico,
+    Tecnica340,
+    CaracteristicaMusicaNotada,
+    Formato348,
+    MedioInterpretacion382,
+    MedioInterpretacion382_a,
+    Solista382,
+    NumeroInterpretes382,
+    DesignacionNumericaObra,
+    NumeroObra383,
+    Opus383,
+    # Bloque 4XX
+    MencionSerie490,
+    TituloSerie490,
+    VolumenSerie490,
+    # Principal
+    ObraGeneral,
+    AutoridadPersona,
+    AutoridadTituloUniforme,
+)
 
-# EdicionFormSet = forms.inlineformset_factory(
-#     ObraGeneral,
-#     Edicion,
-#     fields=['edicion'],
-#     extra=1,
-#     min_num=0,
-#     max_num=5,
-#     can_delete=True,
-#     widgets={
-#         'edicion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 2a ed., Primera edición'}),
-#     }
-# )
+# ============================================================
+# 📋 BLOQUE 0XX - CAMPOS DE CONTROL
+# ============================================================
 
-# ProduccionPublicacionFormSet = forms.inlineformset_factory(
-#     ObraGeneral,
-#     ProduccionPublicacion,
-#     fields=['funcion', 'lugar', 'nombre_entidad', 'fecha'],
-#     extra=1,
-#     min_num=0,
-#     max_num=10,
-#     can_delete=True,
-#     widgets={
-#         'funcion': forms.Select(attrs={'class': 'form-select'}),
-#         'lugar': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Quito, Madrid'}),
-#         'nombre_entidad': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del productor/editor'}),
-#         'fecha': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 2023, ©2020'}),
-#     }
-# )
-
-# DescripcionFisicaFormSet = forms.inlineformset_factory(
-#     ObraGeneral,
-#     DescripcionFisica,
-#     fields=['extension', 'otras_caracteristicas_fisicas', 'dimensiones', 'material_acompanante'],
-#     extra=1,
-#     min_num=0,
-#     max_num=5,
-#     can_delete=True,
-#     widgets={
-#         'extension': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 1 partitura (24 p.)'}),
-#         'otras_caracteristicas_fisicas': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: ilustraciones'}),
-#         'dimensiones': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 30 cm'}),
-#         'material_acompanante': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 1 CD'}),
-#     }
-# )
-
-# # Widget personalizado para Select2 con tagging
-# class Select2TaggingWidget(Select):
-#     """Widget Select que permite tanto seleccionar como crear nuevos valores"""
-    
-#     def __init__(self, attrs=None, choices=()):
-#         default_attrs = {'class': 'form-control select2-tagging'}
-#         if attrs:
-#             default_attrs.update(attrs)
-#         super().__init__(default_attrs, choices)
+class ISBNForm(forms.ModelForm):
+    """Formulario para ISBN (020 $a) - Repetible"""
+    class Meta:
+        model = ISBN
+        fields = ['isbn']
+        widgets = {
+            'isbn': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '020 $a - ISBN (ej: 978-3-16-148410-0)',
+                'pattern': '[0-9\-]{10,}',
+                'title': 'Ingrese un ISBN válido'
+            })
+        }
 
 
-# class ObraForm(forms.ModelForm):
-#     """
-#     Formulario principal para catalogación de obras musicales MARC 21
-#     """
+# ISMNFormSet - FormSet para ISMN (024 $a) - Repetible
+ISMNFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    ISMN,
+    fields=['ismn'],
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True,
+    widgets={
+        'ismn': forms.TextInput(attrs={
+            'class': 'form-control form-control-sm',
+            'placeholder': '024 $a - ISMN'
+        })
+    }
+)
+
+
+class NumeroEditorForm(forms.ModelForm):
+    """Formulario para Número de Editor (028) - Repetible"""
+    class Meta:
+        model = NumeroEditor
+        fields = ['numero', 'tipo_numero', 'control_nota']
+        widgets = {
+            'numero': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '028 $a - Número de editor'
+            }),
+            'tipo_numero': forms.RadioSelect(attrs={
+                'class': 'form-check-input'
+            }),
+            'control_nota': forms.RadioSelect(attrs={
+                'class': 'form-check-input'
+            })
+        }
+
+
+class IncipitMusicalForm(forms.ModelForm):
+    """Formulario para Íncipit Musical (031) - Repetible"""
+    class Meta:
+        model = IncipitMusical
+        fields = [
+            'numero_obra', 'numero_movimiento', 'numero_pasaje',
+            'titulo_encabezamiento', 'voz_instrumento', 'notacion_musical'
+        ]
+        widgets = {
+            'numero_obra': forms.NumberInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '031 $a - Número de obra'
+            }),
+            'numero_movimiento': forms.NumberInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '031 $b - Número de movimiento'
+            }),
+            'numero_pasaje': forms.NumberInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '031 $c - Número de pasaje'
+            }),
+            'titulo_encabezamiento': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '031 $d - Título/encabezamiento (ej: Aria, Allegro)'
+            }),
+            'voz_instrumento': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '031 $m - Voz/instrumento'
+            }),
+            'notacion_musical': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': '031 $p - Notación musical codificada'
+            })
+        }
+
+
+class IncipitURLForm(forms.ModelForm):
+    """Formulario para URL de Íncipit (031 $u) - Repetible"""
+    class Meta:
+        model = IncipitURL
+        fields = ['url']
+        widgets = {
+            'url': forms.URLInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '031 $u - URL del íncipit'
+            })
+        }
+
+
+IncipitURLFormSet = forms.inlineformset_factory(
+    IncipitMusical,
+    IncipitURL,
+    form=IncipitURLForm,
+    extra=1,
+    min_num=0,
+    max_num=5,
+    can_delete=True
+)
+
+
+class IdiomaObraForm(forms.ModelForm):
+    """Formulario para Idioma de Obra (041 $a) - Repetible"""
+    class Meta:
+        model = IdiomaObra
+        fields = ['codigo']
+        widgets = {
+            'codigo': forms.Select(attrs={
+                'class': 'form-select form-select-sm'
+            })
+        }
+
+
+IdiomaObraFormSet = forms.inlineformset_factory(
+    CodigoLengua,
+    IdiomaObra,
+    form=IdiomaObraForm,
+    extra=1,
+    min_num=1,
+    max_num=10,
+    can_delete=True
+)
+
+
+class CodigoLenguaForm(forms.ModelForm):
+    """Formulario para Código de Lengua (041) - Principal"""
+    class Meta:
+        model = CodigoLengua
+        fields = ['indicacion_traduccion', 'fuente_codigo', 'fuente_especificada']
+        widgets = {
+            'indicacion_traduccion': forms.RadioSelect(attrs={
+                'class': 'form-check-input'
+            }),
+            'fuente_codigo': forms.RadioSelect(attrs={
+                'class': 'form-check-input'
+            }),
+            'fuente_especificada': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '041 $2 - Fuente del código'
+            })
+        }
+
+
+CodigoPaisEntidadFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    CodigoPaisEntidad,
+    fields=['codigo_pais'],
+    extra=1,
+    min_num=0,
+    max_num=5,
+    can_delete=True,
+    widgets={
+        'codigo_pais': forms.Select(attrs={
+            'class': 'form-select form-select-sm'
+        })
+    }
+)
+
+# ============================================================
+# 📋 BLOQUE 1XX - PUNTOS DE ACCESO
+# ============================================================
+
+class FuncionCompositorForm(forms.ModelForm):
+    """100 $e - Función del compositor (R)"""
+    class Meta:
+        model = FuncionCompositor
+        fields = ['funcion']
+        widgets = {
+            'funcion': forms.Select(attrs={
+                'class': 'form-select'
+            })
+        }
+
+
+FuncionCompositorFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    FuncionCompositor,
+    form=FuncionCompositorForm,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class AtribucionCompositorForm(forms.ModelForm):
+    """100 $j - Atribución del compositor (R)"""
+    class Meta:
+        model = AtribucionCompositor
+        fields = ['atribucion']
+        widgets = {
+            'atribucion': forms.Select(attrs={
+                'class': 'form-select'
+            })
+        }
+
+
+AtribucionCompositorFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    AtribucionCompositor,
+    form=AtribucionCompositorForm,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class Forma130Form(forms.ModelForm):
+    """130 $k - Forma (R)"""
+    class Meta:
+        model = Forma130
+        fields = ['forma']
+        widgets = {
+            'forma': forms.Select(attrs={
+                'class': 'form-select'
+            })
+        }
+
+
+Forma130FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Forma130,
+    form=Forma130Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class MedioInterpretacion130Form(forms.ModelForm):
+    """130 $m - Medio de interpretación (R)"""
+    class Meta:
+        model = MedioInterpretacion130
+        fields = ['medio']
+        widgets = {
+            'medio': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '130 $m - Ej: piano, violín, orquesta'
+            })
+        }
+
+
+MedioInterpretacion130FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    MedioInterpretacion130,
+    form=MedioInterpretacion130Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class NumeroParteSección130Form(forms.ModelForm):
+    """130 $n - Número de parte (R)"""
+    class Meta:
+        model = NumeroParteSección130
+        fields = ['numero']
+        widgets = {
+            'numero': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '130 $n - Ej: I, II, III o 1, 2, 3'
+            })
+        }
+
+
+NumeroParteSección130FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    NumeroParteSección130,
+    form=NumeroParteSección130Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class NombreParteSección130Form(forms.ModelForm):
+    """130 $p - Nombre de parte (R)"""
+    class Meta:
+        model = NombreParteSección130
+        fields = ['nombre']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '130 $p - Ej: Allegro, Andante, Finale'
+            })
+        }
+
+
+NombreParteSección130FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    NombreParteSección130,
+    form=NombreParteSección130Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+# Formularios 240 (idéntico patrón a 130)
+
+class Forma240Form(forms.ModelForm):
+    """240 $k - Forma (R)"""
+    class Meta:
+        model = Forma240
+        fields = ['forma']
+        widgets = {
+            'forma': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '240 $k - Forma'
+            })
+        }
+
+
+Forma240FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Forma240,
+    form=Forma240Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class MedioInterpretacion240Form(forms.ModelForm):
+    """240 $m - Medio de interpretación (R)"""
+    class Meta:
+        model = MedioInterpretacion240
+        fields = ['medio']
+        widgets = {
+            'medio': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '240 $m - Medio de interpretación'
+            })
+        }
+
+
+MedioInterpretacion240FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    MedioInterpretacion240,
+    form=MedioInterpretacion240Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class NumeroParteSección240Form(forms.ModelForm):
+    """240 $n - Número de parte (R)"""
+    class Meta:
+        model = NumeroParteSección240
+        fields = ['numero']
+        widgets = {
+            'numero': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '240 $n - Número'
+            })
+        }
+
+
+NumeroParteSección240FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    NumeroParteSección240,
+    form=NumeroParteSección240Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class NombreParteSección240Form(forms.ModelForm):
+    """240 $p - Nombre de parte (R)"""
+    class Meta:
+        model = NombreParteSección240
+        fields = ['nombre']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '240 $p - Nombre'
+            })
+        }
+
+
+NombreParteSección240FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    NombreParteSección240,
+    form=NombreParteSección240Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ============================================================
+# 📋 BLOQUE 2XX - TÍTULOS Y PUBLICACIÓN
+# ============================================================
+
+class TituloAlternativoForm(forms.ModelForm):
+    """246 - Título alternativo (R)"""
+    class Meta:
+        model = TituloAlternativo
+        fields = ['titulo', 'resto_titulo']
+        widgets = {
+            'titulo': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '246 $a - Título alternativo'
+            }),
+            'resto_titulo': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '246 $b - Resto del título'
+            })
+        }
+
+
+TituloAlternativoFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    TituloAlternativo,
+    form=TituloAlternativoForm,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class EdicionForm(forms.ModelForm):
+    """250 - Edición (R)"""
+    class Meta:
+        model = Edicion
+        fields = ['edicion']
+        widgets = {
+            'edicion': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '250 $a - Edición (ej: 2a ed., Primera edición)'
+            })
+        }
+
+
+EdicionFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Edicion,
+    form=EdicionForm,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class ProduccionPublicacionForm(forms.ModelForm):
+    """264 - Producción/Publicación (R) - LIGADOS"""
+    class Meta:
+        model = ProduccionPublicacion
+        fields = ['funcion', 'lugar', 'nombre_entidad', 'fecha']
+        widgets = {
+            'funcion': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'lugar': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '264 $a - Lugar'
+            }),
+            'nombre_entidad': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '264 $b - Entidad'
+            }),
+            'fecha': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '264 $c - Fecha'
+            })
+        }
+
+
+ProduccionPublicacionFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    ProduccionPublicacion,
+    form=ProduccionPublicacionForm,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ============================================================
+# 📋 BLOQUE 3XX - DESCRIPCIÓN FÍSICA
+# ============================================================
+
+class Extension300Form(forms.ModelForm):
+    """300 $a - Extensión (R)"""
+    class Meta:
+        model = Extension300
+        fields = ['extension']
+        widgets = {
+            'extension': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '300 $a - Ej: 1 partitura (24 p.)'
+            })
+        }
+
+
+Extension300FormSet = forms.inlineformset_factory(
+    DescripcionFisica,
+    Extension300,
+    form=Extension300Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class Dimension300Form(forms.ModelForm):
+    """300 $c - Dimensión (R)"""
+    class Meta:
+        model = Dimension300
+        fields = ['dimension']
+        widgets = {
+            'dimension': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '300 $c - Ej: 30 cm'
+            })
+        }
+
+
+Dimension300FormSet = forms.inlineformset_factory(
+    DescripcionFisica,
+    Dimension300,
+    form=Dimension300Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class DescripcionFisicaForm(forms.ModelForm):
+    """300 - Descripción Física (R)"""
+    class Meta:
+        model = DescripcionFisica
+        fields = ['otras_caracteristicas_fisicas', 'material_acompanante']
+        widgets = {
+            'otras_caracteristicas_fisicas': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '300 $b - Características'
+            }),
+            'material_acompanante': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '300 $e - Material acompañante'
+            })
+        }
+
+
+DescripcionFisicaFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    DescripcionFisica,
+    form=DescripcionFisicaForm,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+# ============ 340 - MEDIO FÍSICO ============
+
+class Tecnica340Form(forms.ModelForm):
+    """340 $d - Técnica (R)"""
+    class Meta:
+        model = Tecnica340
+        fields = ['tecnica']
+        widgets = {
+            'tecnica': forms.Select(attrs={
+                'class': 'form-select'
+            })
+        }
+
+
+Tecnica340FormSet = forms.inlineformset_factory(
+    MedioFisico,
+    Tecnica340,
+    form=Tecnica340Form,
+    extra=1,
+    min_num=1,
+    max_num=10,
+    can_delete=True
+)
+
+
+class MedioFisicoForm(forms.ModelForm):
+    """340 - Medio Físico (R)"""
+    class Meta:
+        model = MedioFisico
+        fields = []
+        widgets = {}
+
+
+MedioFisicoFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    MedioFisico,
+    form=MedioFisicoForm,
+    extra=1,
+    min_num=0,
+    max_num=5,
+    can_delete=True
+)
+
+# ============ 348 - CARACTERÍSTICAS MÚSICA NOTADA ============
+
+class Formato348Form(forms.ModelForm):
+    """348 $a - Formato (R)"""
+    class Meta:
+        model = Formato348
+        fields = ['formato']
+        widgets = {
+            'formato': forms.Select(attrs={
+                'class': 'form-select'
+            })
+        }
+
+
+Formato348FormSet = forms.inlineformset_factory(
+    CaracteristicaMusicaNotada,
+    Formato348,
+    form=Formato348Form,
+    extra=1,
+    min_num=1,
+    max_num=10,
+    can_delete=True
+)
+
+
+class CaracteristicaMusicaNotadaForm(forms.ModelForm):
+    """348 - Características Música Notada (R)"""
+    class Meta:
+        model = CaracteristicaMusicaNotada
+        fields = []
+        widgets = {}
+
+
+CaracteristicaMusicaNotadaFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    CaracteristicaMusicaNotada,
+    form=CaracteristicaMusicaNotadaForm,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ============ 382 - MEDIO DE INTERPRETACIÓN ============
+
+class MedioInterpretacion382_aForm(forms.ModelForm):
+    """382 $a - Medio (R)"""
+    class Meta:
+        model = MedioInterpretacion382_a
+        fields = ['medio']
+        widgets = {
+            'medio': forms.Select(attrs={
+                'class': 'form-select'
+            })
+        }
+
+
+MedioInterpretacion382_aFormSet = forms.inlineformset_factory(
+    MedioInterpretacion382,
+    MedioInterpretacion382_a,
+    form=MedioInterpretacion382_aForm,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class Solista382Form(forms.ModelForm):
+    """382 $b - Solista (R)"""
+    class Meta:
+        model = Solista382
+        fields = ['solista']
+        widgets = {
+            'solista': forms.Select(attrs={
+                'class': 'form-select'
+            })
+        }
+
+
+Solista382FormSet = forms.inlineformset_factory(
+    MedioInterpretacion382,
+    Solista382,
+    form=Solista382Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class NumeroInterpretes382Form(forms.ModelForm):
+    """382 $n - Número (R)"""
+    class Meta:
+        model = NumeroInterpretes382
+        fields = ['numero']
+        widgets = {
+            'numero': forms.NumberInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '382 $n - Ej: 2, 4, 8'
+            })
+        }
+
+
+NumeroInterpretes382FormSet = forms.inlineformset_factory(
+    MedioInterpretacion382,
+    NumeroInterpretes382,
+    form=NumeroInterpretes382Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class MedioInterpretacion382Form(forms.ModelForm):
+    """382 - Medio de Interpretación (R)"""
+    class Meta:
+        model = MedioInterpretacion382
+        fields = []
+        widgets = {}
+
+
+MedioInterpretacion382FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    MedioInterpretacion382,
+    form=MedioInterpretacion382Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ============ 383 - DESIGNACIÓN NUMÉRICA ============
+
+class NumeroObra383Form(forms.ModelForm):
+    """383 $a - Número de obra (R)"""
+    class Meta:
+        model = NumeroObra383
+        fields = ['numero_obra']
+        widgets = {
+            'numero_obra': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '383 $a - Ej: 1, K. 545, BWV 1001'
+            })
+        }
+
+
+NumeroObra383FormSet = forms.inlineformset_factory(
+    DesignacionNumericaObra,
+    NumeroObra383,
+    form=NumeroObra383Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class Opus383Form(forms.ModelForm):
+    """383 $b - Opus (R)"""
+    class Meta:
+        model = Opus383
+        fields = ['opus']
+        widgets = {
+            'opus': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '383 $b - Ej: Op. 27, No. 2'
+            })
+        }
+
+
+Opus383FormSet = forms.inlineformset_factory(
+    DesignacionNumericaObra,
+    Opus383,
+    form=Opus383Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class DesignacionNumericaObraForm(forms.ModelForm):
+    """383 - Designación Numérica (R)"""
+    class Meta:
+        model = DesignacionNumericaObra
+        fields = []
+        widgets = {}
+
+
+DesignacionNumericaObraFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    DesignacionNumericaObra,
+    form=DesignacionNumericaObraForm,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ============================================================
+# 📋 BLOQUE 4XX - SERIES
+# ============================================================
+
+class TituloSerie490Form(forms.ModelForm):
+    """490 $a - Título de serie (R)"""
+    class Meta:
+        model = TituloSerie490
+        fields = ['titulo_serie']
+        widgets = {
+            'titulo_serie': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '490 $a - Título de serie'
+            })
+        }
+
+
+TituloSerie490FormSet = forms.inlineformset_factory(
+    MencionSerie490,
+    TituloSerie490,
+    form=TituloSerie490Form,
+    extra=1,
+    min_num=1,
+    max_num=10,
+    can_delete=True
+)
+
+
+class VolumenSerie490Form(forms.ModelForm):
+    """490 $v - Volumen (R)"""
+    class Meta:
+        model = VolumenSerie490
+        fields = ['volumen']
+        widgets = {
+            'volumen': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '490 $v - Volumen'
+            })
+        }
+
+
+VolumenSerie490FormSet = forms.inlineformset_factory(
+    MencionSerie490,
+    VolumenSerie490,
+    form=VolumenSerie490Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class MencionSerie490Form(forms.ModelForm):
+    """490 - Mención de Serie (R)"""
+    class Meta:
+        model = MencionSerie490
+        fields = ['relacion']
+        widgets = {
+            'relacion': forms.RadioSelect(attrs={
+                'class': 'form-check-input'
+            })
+        }
+
+
+MencionSerie490FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    MencionSerie490,
+    form=MencionSerie490Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ============================================================
+# 🎯 FORMULARIO PRINCIPAL - ObraGeneral
+# ============================================================
+
+class ObraGeneralForm(forms.ModelForm):
+    """Formulario principal para catalogación MARC21"""
     
-#     # ================================================
-#     # 🎯 CAMPOS CON SELECT2
-#     # ================================================
-    
-#     compositor_select = forms.CharField(
-#         max_length=200,
-#         required=False,
-#         label='Compositor (100 $a)',
-#         help_text='Apellidos, Nombres. Escriba o seleccione de la lista.',
-#         widget=forms.TextInput(attrs={
-#             'class': 'form-control',
-#             'id': 'id_compositor_select',
-#             'data-model': 'compositor',
-#             'placeholder': 'Escriba o seleccione un compositor'
-#         })
-#     )
-    
-#     compositor_fechas = forms.CharField(
-#         max_length=50,
-#         required=False,
-#         widget=forms.TextInput(attrs={
-#             'class': 'form-control',
-#             'placeholder': 'Ej: 1876-1935',
-#             'id': 'id_compositor_fechas'
-#         }),
-#         label='Fechas del compositor (100 $d)',
-#         help_text='Año nacimiento - año muerte'
-#     )
-    
-#     titulo_uniforme_130 = forms.CharField(
-#         max_length=300,
-#         required=False,
-#         widget=forms.TextInput(attrs={
-#             'class': 'form-control',
-#             'id': 'id_titulo_uniforme_130',
-#             'data-model': 'titulo_uniforme',
-#             'placeholder': 'Escriba o seleccione un título uniforme'
-#         }),
-#         label='Título uniforme (130 $a)',
-#         help_text='Escriba o seleccione de la lista (cruzar con 240)'
-#     )
-    
-#     titulo_uniforme_130_forma = forms.CharField(
-#         max_length=100,
-#         required=False,
-#         widget=forms.TextInput(attrs={
-#             'class': 'form-control',
-#             'id': 'id_titulo_uniforme_130_forma',
-#             'data-model': 'forma_musical',
-#             'placeholder': 'Ej: Pasillo, Sinfonía, Vals'
-#         }),
-#         label='Forma musical (130 $k)',
-#         help_text='Escriba o seleccione (cruzar con 240 $k y 655)'
-#     )
-    
-#     titulo_240_select = forms.CharField(
-#         max_length=300,
-#         required=False,
-#         widget=forms.TextInput(attrs={
-#             'class': 'form-control',
-#             'id': 'id_titulo_240_select',
-#             'data-model': 'titulo_uniforme',
-#             'placeholder': 'Escriba o seleccione un título uniforme'
-#         }),
-#         label='Título uniforme (240 $a)',
-#         help_text='Escriba o seleccione de la lista (cruzar con 130)'
-#     )
-    
-#     titulo_240_forma_select = forms.CharField(
-#         max_length=100,
-#         required=False,
-#         widget=forms.TextInput(attrs={
-#             'class': 'form-control',
-#             'id': 'id_titulo_240_forma_select',
-#             'data-model': 'forma_musical',
-#             'placeholder': 'Ej: Pasillo, Sinfonía, Vals'
-#         }),
-#         label='Forma musical (240 $k)',
-#         help_text='Escriba o seleccione (cruzar con 130 $k y 655)'
-#     )
-    
-#     class Meta:
-#         model = ObraGeneral
-#         fields = [
-#             'tipo_registro', 
-#             'nivel_bibliografico',
-#             'isbn', 
-#             'ismn', 
-#             'numero_editor', 
-#             'indicador_028',
-#             'incipit_num_obra', 
-#             'incipit_num_movimiento', 
-#             'incipit_num_pasaje',
-#             'incipit_titulo', 
-#             'incipit_voz_instrumento', 
-#             'incipit_notacion', 
-#             'incipit_url',
-#             'centro_catalogador', 
-#             'codigo_lengua', 
-#             'codigo_pais',
-#             'clasif_institucion', 
-#             'clasif_proyecto', 
-#             'clasif_pais', 
-#             'clasif_ms_imp',
-#             'compositor_funcion', 
-#             'compositor_autoria',
-#             'titulo_uniforme_medio_interpretacion', 
-#             'titulo_uniforme_num_parte',
-#             'titulo_uniforme_arreglo', 
-#             'titulo_uniforme_nombre_parte',
-#             'titulo_uniforme_tonalidad',
-#             'titulo_240_medio_interpretacion', 
-#             'titulo_240_num_parte',
-#             'titulo_240_arreglo', 
-#             'titulo_240_nombre_parte', 
-#             'titulo_240_tonalidad',
-#             'titulo_principal', 
-#             'subtitulo', 
-#             'mencion_responsabilidad',
-#         ]
-        
-#         widgets = {
-#             'tipo_registro': forms.Select(attrs={'class': 'form-select'}),
-#             'nivel_bibliografico': forms.Select(attrs={'class': 'form-select'}),
-#             'isbn': forms.TextInput(attrs={'class': 'form-control'}),
-#             'ismn': forms.TextInput(attrs={'class': 'form-control'}),
-#             'numero_editor': forms.TextInput(attrs={'class': 'form-control'}),
-#             'indicador_028': forms.TextInput(attrs={'class': 'form-control', 'value': '20'}),
-#             'incipit_num_obra': forms.NumberInput(attrs={'class': 'form-control', 'value': 1}),
-#             'incipit_num_movimiento': forms.NumberInput(attrs={'class': 'form-control', 'value': 1}),
-#             'incipit_num_pasaje': forms.NumberInput(attrs={'class': 'form-control', 'value': 1}),
-#             'incipit_titulo': forms.TextInput(attrs={'class': 'form-control'}),
-#             'incipit_voz_instrumento': forms.TextInput(attrs={'class': 'form-control'}),
-#             'incipit_notacion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-#             'incipit_url': forms.URLInput(attrs={'class': 'form-control'}),
-#             'centro_catalogador': forms.TextInput(attrs={'class': 'form-control', 'value': 'UNL'}),
-#             'codigo_lengua': forms.Select(attrs={'class': 'form-select'}),
-#             'codigo_pais': forms.Select(attrs={'class': 'form-select'}),
-#             'clasif_institucion': forms.TextInput(attrs={'class': 'form-control', 'value': 'UNL'}),
-#             'clasif_proyecto': forms.TextInput(attrs={'class': 'form-control', 'value': 'BLMP'}),
-#             'clasif_pais': forms.TextInput(attrs={'class': 'form-control', 'value': 'EC'}),
-#             'clasif_ms_imp': forms.Select(attrs={'class': 'form-select'}),
-#             'compositor_funcion': forms.Select(attrs={'class': 'form-select'}),
-#             'compositor_autoria': forms.Select(attrs={'class': 'form-select'}),
-#             'titulo_uniforme_medio_interpretacion': forms.TextInput(attrs={'class': 'form-control', 'value': 'piano'}),
-#             'titulo_uniforme_num_parte': forms.TextInput(attrs={'class': 'form-control'}),
-#             'titulo_uniforme_arreglo': forms.TextInput(attrs={'class': 'form-control'}),
-#             'titulo_uniforme_nombre_parte': forms.TextInput(attrs={'class': 'form-control'}),
-#             'titulo_uniforme_tonalidad': forms.Select(attrs={'class': 'form-select'}),
-#             'titulo_240_medio_interpretacion': forms.TextInput(attrs={'class': 'form-control'}),
-#             'titulo_240_num_parte': forms.TextInput(attrs={'class': 'form-control'}),
-#             'titulo_240_arreglo': forms.TextInput(attrs={'class': 'form-control'}),
-#             'titulo_240_nombre_parte': forms.TextInput(attrs={'class': 'form-control'}),
-#             'titulo_240_tonalidad': forms.Select(attrs={'class': 'form-select'}),
-#             'titulo_principal': forms.TextInput(attrs={'class': 'form-control'}),
-#             'subtitulo': forms.TextInput(attrs={'class': 'form-control'}),
-#             'mencion_responsabilidad': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-#         }
-    
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-        
-#         # Si es edición, cargar los valores
-#         if self.instance and self.instance.pk:
-#             if self.instance.compositor:
-#                 self.fields['compositor_select'].initial = self.instance.compositor.apellidos_nombres
-#                 self.fields['compositor_fechas'].initial = self.instance.compositor.fechas
-            
-#             if self.instance.titulo_uniforme:
-#                 self.fields['titulo_uniforme_130'].initial = self.instance.titulo_uniforme.titulo
-            
-#             if self.instance.titulo_uniforme_forma:
-#                 self.fields['titulo_uniforme_130_forma'].initial = self.instance.titulo_uniforme_forma.forma
-            
-#             if self.instance.titulo_240:
-#                 self.fields['titulo_240_select'].initial = self.instance.titulo_240.titulo
-            
-#             if self.instance.titulo_240_forma:
-#                 self.fields['titulo_240_forma_select'].initial = self.instance.titulo_240_forma.forma
-    
-#     def clean(self):
-#         cleaned_data = super().clean()
-        
-#         compositor = cleaned_data.get('compositor_select')
-#         titulo_130 = cleaned_data.get('titulo_uniforme_130')
-#         titulo_240 = cleaned_data.get('titulo_240_select')
-        
-#         if not compositor and not titulo_130:
-#             raise forms.ValidationError(
-#                 "Debe tener un punto de acceso principal: compositor (100) o título uniforme (130)"
-#             )
-        
-#         if compositor and titulo_130:
-#             raise forms.ValidationError(
-#                 "Si hay compositor (campo 100), debe usar campo 240, no 130"
-#             )
-        
-#         if not compositor and titulo_240:
-#             raise forms.ValidationError(
-#                 "Si no hay compositor, debe usar campo 130, no 240"
-#             )
-        
-#         return cleaned_data
-    
-#     def save(self, commit=True):
-#         instance = super().save(commit=False)
-        
-#         # Crear o buscar compositor
-#         compositor_nombre = self.cleaned_data.get('compositor_select')
-#         if compositor_nombre:
-#             compositor_fechas = self.cleaned_data.get('compositor_fechas', '')
-#             autoridad_persona, created = AutoridadPersona.objects.get_or_create(
-#                 apellidos_nombres=compositor_nombre.strip(),
-#                 defaults={'fechas': compositor_fechas}
-#             )
-#             if not created and compositor_fechas and autoridad_persona.fechas != compositor_fechas:
-#                 autoridad_persona.fechas = compositor_fechas
-#                 autoridad_persona.save()
-#             instance.compositor = autoridad_persona
-#         else:
-#             instance.compositor = None
-        
-#         # Crear o buscar título uniforme 130
-#         titulo_130 = self.cleaned_data.get('titulo_uniforme_130')
-#         if titulo_130:
-#             autoridad_titulo, created = AutoridadTituloUniforme.objects.get_or_create(
-#                 titulo=titulo_130.strip()
-#             )
-#             instance.titulo_uniforme = autoridad_titulo
-#         else:
-#             instance.titulo_uniforme = None
-        
-#         # Crear o buscar forma musical 130
-#         forma_130 = self.cleaned_data.get('titulo_uniforme_130_forma')
-#         if forma_130:
-#             autoridad_forma, created = AutoridadFormaMusical.objects.get_or_create(
-#                 forma=forma_130.strip()
-#             )
-#             instance.titulo_uniforme_forma = autoridad_forma
-#         else:
-#             instance.titulo_uniforme_forma = None
-        
-#         # Crear o buscar título 240
-#         titulo_240 = self.cleaned_data.get('titulo_240_select')
-#         if titulo_240:
-#             autoridad_titulo, created = AutoridadTituloUniforme.objects.get_or_create(
-#                 titulo=titulo_240.strip()
-#             )
-#             instance.titulo_240 = autoridad_titulo
-#         else:
-#             instance.titulo_240 = None
-        
-#         # Crear o buscar forma musical 240
-#         forma_240 = self.cleaned_data.get('titulo_240_forma_select')
-#         if forma_240:
-#             autoridad_forma, created = AutoridadFormaMusical.objects.get_or_create(
-#                 forma=forma_240.strip()
-#             )
-#             instance.titulo_240_forma = autoridad_forma
-#         else:
-#             instance.titulo_240_forma = None
-        
-#         if commit:
-#             instance.save()
-        
-#         return instance
+    class Meta:
+        model = ObraGeneral
+        fields = [
+            'tipo_registro',
+            'nivel_bibliografico',
+            'titulo_principal',
+            'subtitulo',
+            'mencion_responsabilidad',
+            'tonalidad_384',
+            'compositor',
+            'titulo_uniforme'
+        ]
+        widgets = {
+            'tipo_registro': forms.RadioSelect(attrs={
+                'class': 'form-check-input'
+            }),
+            'nivel_bibliografico': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'titulo_principal': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '245 $a - Título principal (obligatorio)',
+                'required': True
+            }),
+            'subtitulo': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '245 $b - Subtítulo'
+            }),
+            'mencion_responsabilidad': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 2,
+                'placeholder': '245 $c - Mención de responsabilidad'
+            }),
+            'tonalidad_384': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'compositor': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'titulo_uniforme': forms.Select(attrs={
+                'class': 'form-select'
+            })
+        }
+
+
+# ============================================================
+# 📦 EXPORTAR TODOS LOS FORMULARIOS
+# ============================================================
+
+__all__ = [
+    # Bloque 0XX
+    'ISBNForm',
+    'ISMNFormSet',
+    'NumeroEditorForm',
+    'IncipitMusicalForm',
+    'IncipitURLFormSet',
+    'IdiomaObraFormSet',
+    'CodigoLenguaForm',
+    'CodigoPaisEntidadFormSet',
+    # Bloque 1XX
+    'FuncionCompositorFormSet',
+    'AtribucionCompositorFormSet',
+    'Forma130FormSet',
+    'MedioInterpretacion130FormSet',
+    'NumeroParteSección130FormSet',
+    'NombreParteSección130FormSet',
+    'Forma240FormSet',
+    'MedioInterpretacion240FormSet',
+    'NumeroParteSección240FormSet',
+    'NombreParteSección240FormSet',
+    # Bloque 2XX
+    'TituloAlternativoFormSet',
+    'EdicionFormSet',
+    'ProduccionPublicacionFormSet',
+    # Bloque 3XX
+    'Extension300FormSet',
+    'Dimension300FormSet',
+    'DescripcionFisicaFormSet',
+    'Tecnica340FormSet',
+    'MedioFisicoFormSet',
+    'Formato348FormSet',
+    'CaracteristicaMusicaNotadaFormSet',
+    'MedioInterpretacion382_aFormSet',
+    'Solista382FormSet',
+    'NumeroInterpretes382FormSet',
+    'MedioInterpretacion382FormSet',
+    'NumeroObra383FormSet',
+    'Opus383FormSet',
+    'DesignacionNumericaObraFormSet',
+    # Bloque 4XX
+    'TituloSerie490FormSet',
+    'VolumenSerie490FormSet',
+    'MencionSerie490FormSet',
+    # Principal
+    'ObraGeneralForm',
+]

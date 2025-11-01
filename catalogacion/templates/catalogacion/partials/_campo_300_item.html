@@ -1,0 +1,243 @@
+<!-- Partial: Item de Campo 300 con datos existentes -->
+<div class="campo-300" id="campo-300-{{ forloop_counter }}">
+    <div class="campo-300-header">
+        <h5 class="mb-0">
+            <span class="badge bg-primary badge-marc">300</span>
+            Descripción Física #{{ forloop_counter|add:1 }}
+        </h5>
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-danger"
+            onclick="eliminarCampo300({{ forloop_counter }})"
+            title="Eliminar campo 300 completo"
+        >
+            <i class="bi bi-trash"></i> Eliminar 300
+        </button>
+    </div>
+
+    <!-- Hidden fields -->
+    <input
+        type="hidden"
+        name="descripcion_fisica_{{ forloop_counter }}_id"
+        value="{{ descripcion.id }}"
+    />
+    <input
+        type="hidden"
+        name="descripcion_fisica_{{ forloop_counter }}_DELETE"
+        value=""
+    />
+    <input
+        type="hidden"
+        id="id_extension_{{ forloop_counter }}_TOTAL_FORMS"
+        name="extension_{{ forloop_counter }}_TOTAL_FORMS"
+        value="{{ descripcion.extensiones|length }}"
+    />
+    <input
+        type="hidden"
+        id="id_dimension_{{ forloop_counter }}_TOTAL_FORMS"
+        name="dimension_{{ forloop_counter }}_TOTAL_FORMS"
+        value="{{ descripcion.dimensiones|length }}"
+    />
+
+    <div class="row g-3">
+        <!-- Columna izquierda: Subcampos repetibles -->
+        <div class="col-lg-6">
+            <!-- Extensiones ($a - Repetible) -->
+            <div class="mb-3">
+                <div
+                    class="d-flex justify-content-between align-items-center mb-2"
+                >
+                    <label class="form-label mb-0">
+                        <span class="badge bg-info badge-marc">$a</span>
+                        Extensión (Repetible)
+                    </label>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-primary"
+                        onclick="agregarExtension({{ forloop_counter }})"
+                    >
+                        <i class="bi bi-plus"></i> Agregar $a
+                    </button>
+                </div>
+
+                <div id="extensiones-container-{{ forloop_counter }}">
+                    {% for ext in descripcion.extensiones %}
+                    <div
+                        class="subcampo-repetible"
+                        id="extension-{{ forloop_counter }}-{{ forloop.counter0 }}"
+                    >
+                        <div class="subcampo-header">
+                            <div class="flex-grow-1">
+                                <input
+                                    type="text"
+                                    name="extension_{{ forloop_counter }}_{{ forloop.counter0 }}_extension"
+                                    value="{{ ext.extension }}"
+                                    class="form-control"
+                                    placeholder="Ej: 1 partitura (24 p.)"
+                                />
+                                <input
+                                    type="hidden"
+                                    name="extension_{{ forloop_counter }}_{{ forloop.counter0 }}_id"
+                                    value="{{ ext.id }}"
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                onclick="eliminarExtension({{ forloop_counter }}, {{ forloop.counter0 }})"
+                                title="Eliminar extensión"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div
+                        class="subcampo-repetible"
+                        id="extension-{{ forloop_counter }}-0"
+                    >
+                        <div class="subcampo-header">
+                            <div class="flex-grow-1">
+                                <input
+                                    type="text"
+                                    name="extension_{{ forloop_counter }}_0_extension"
+                                    class="form-control"
+                                    placeholder="Ej: 1 partitura (24 p.)"
+                                />
+                                <input
+                                    type="hidden"
+                                    name="extension_{{ forloop_counter }}_0_id"
+                                    value=""
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                onclick="eliminarExtension({{ forloop_counter }}, 0)"
+                                title="Eliminar extensión"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Dimensiones ($c - Repetible) -->
+            <div class="mb-3">
+                <div
+                    class="d-flex justify-content-between align-items-center mb-2"
+                >
+                    <label class="form-label mb-0">
+                        <span class="badge bg-warning badge-marc">$c</span>
+                        Dimensión (Repetible)
+                    </label>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-primary"
+                        onclick="agregarDimension({{ forloop_counter }})"
+                    >
+                        <i class="bi bi-plus"></i> Agregar $c
+                    </button>
+                </div>
+
+                <div id="dimensiones-container-{{ forloop_counter }}">
+                    {% for dim in descripcion.dimensiones %}
+                    <div
+                        class="subcampo-repetible"
+                        id="dimension-{{ forloop_counter }}-{{ forloop.counter0 }}"
+                    >
+                        <div class="subcampo-header">
+                            <div class="flex-grow-1">
+                                <input
+                                    type="text"
+                                    name="dimension_{{ forloop_counter }}_{{ forloop.counter0 }}_dimension"
+                                    value="{{ dim.dimension }}"
+                                    class="form-control"
+                                    placeholder="Ej: 30 cm"
+                                />
+                                <input
+                                    type="hidden"
+                                    name="dimension_{{ forloop_counter }}_{{ forloop.counter0 }}_id"
+                                    value="{{ dim.id }}"
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                onclick="eliminarDimension({{ forloop_counter }}, {{ forloop.counter0 }})"
+                                title="Eliminar dimensión"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div
+                        class="subcampo-repetible"
+                        id="dimension-{{ forloop_counter }}-0"
+                    >
+                        <div class="subcampo-header">
+                            <div class="flex-grow-1">
+                                <input
+                                    type="text"
+                                    name="dimension_{{ forloop_counter }}_0_dimension"
+                                    class="form-control"
+                                    placeholder="Ej: 30 cm"
+                                />
+                                <input
+                                    type="hidden"
+                                    name="dimension_{{ forloop_counter }}_0_id"
+                                    value=""
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                onclick="eliminarDimension({{ forloop_counter }}, 0)"
+                                title="Eliminar dimensión"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna derecha: Subcampos no repetibles -->
+        <div class="col-lg-6">
+            <!-- Otras características ($b - No repetible) -->
+            <div class="mb-3">
+                <label class="form-label">
+                    <span class="badge bg-success badge-marc">$b</span> Otras
+                    características físicas
+                </label>
+                <input
+                    type="text"
+                    name="descripcion_fisica_{{ forloop_counter }}_otras_caracteristicas_fisicas"
+                    value="{{ descripcion.otras_caracteristicas|default:'' }}"
+                    class="form-control"
+                    placeholder="Ej: il., música impresa"
+                />
+            </div>
+
+            <!-- Material acompañante ($e - No repetible) -->
+            <div class="mb-3">
+                <label class="form-label">
+                    <span class="badge bg-secondary badge-marc">$e</span>
+                    Material acompañante
+                </label>
+                <input
+                    type="text"
+                    name="descripcion_fisica_{{ forloop_counter }}_material_acompanante"
+                    value="{{ descripcion.material_acompanante|default:'' }}"
+                    class="form-control"
+                    placeholder="Ej: + 1 CD"
+                />
+            </div>
+        </div>
+    </div>
+</div>

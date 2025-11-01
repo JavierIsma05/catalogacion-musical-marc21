@@ -12,4 +12,9 @@ urlpatterns = [
     path('coleccion_impresa/', views.coleccion_impresa, name='coleccion_impresa'),
     path('obra_individual_impresa/', views.obra_individual_impresa, name='obra_individual_impresa'),
     path('api/autoridades/', views.get_autoridades_json, name='get_autoridades_json'),
+    
+    # Rutas de prueba para campo 300
+    path('prueba/campo-300/', views.prueba_campo_300, name='prueba_campo_300'),
+    path('prueba/campo-300/<int:obra_id>/', views.prueba_campo_300, name='prueba_campo_300_obra'),
+    path('prueba/limpiar-300/', views.limpiar_prueba_300, name='limpiar_prueba_300'),
 ]

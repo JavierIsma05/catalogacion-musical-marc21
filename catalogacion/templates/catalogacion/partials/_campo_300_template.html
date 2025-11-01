@@ -1,0 +1,163 @@
+<!-- Template: Nuevo campo 300 vacío (para clonar con JavaScript) -->
+<div class="campo-300" id="campo-300-__prefix__">
+    <div class="campo-300-header">
+        <h5 class="mb-0">
+            <span class="badge bg-primary badge-marc">300</span>
+            Descripción Física (Nuevo)
+        </h5>
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-danger"
+            onclick="eliminarCampo300(__prefix__)"
+            title="Eliminar campo 300 completo"
+        >
+            <i class="bi bi-trash"></i> Eliminar 300
+        </button>
+    </div>
+
+    <!-- Hidden fields -->
+    <input type="hidden" name="descripcion_fisica___prefix___id" value="" />
+    <input type="hidden" name="descripcion_fisica___prefix___DELETE" value="" />
+    <input
+        type="hidden"
+        id="id_extension___prefix___TOTAL_FORMS"
+        name="extension___prefix___TOTAL_FORMS"
+        value="1"
+    />
+    <input
+        type="hidden"
+        id="id_dimension___prefix___TOTAL_FORMS"
+        name="dimension___prefix___TOTAL_FORMS"
+        value="1"
+    />
+
+    <div class="row g-3">
+        <!-- Columna izquierda: Subcampos repetibles -->
+        <div class="col-lg-6">
+            <!-- Extensiones ($a - Repetible) -->
+            <div class="mb-3">
+                <div
+                    class="d-flex justify-content-between align-items-center mb-2"
+                >
+                    <label class="form-label mb-0">
+                        <span class="badge bg-info badge-marc">$a</span>
+                        Extensión (Repetible)
+                    </label>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-primary"
+                        onclick="agregarExtension(__prefix__)"
+                    >
+                        <i class="bi bi-plus"></i> Agregar $a
+                    </button>
+                </div>
+
+                <div id="extensiones-container-__prefix__">
+                    <div class="subcampo-repetible" id="extension-__prefix__-0">
+                        <div class="subcampo-header">
+                            <div class="flex-grow-1">
+                                <input
+                                    type="text"
+                                    name="extension___prefix___0_extension"
+                                    class="form-control"
+                                    placeholder="Ej: 1 partitura (24 p.)"
+                                />
+                                <input
+                                    type="hidden"
+                                    name="extension___prefix___0_id"
+                                    value=""
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                onclick="eliminarExtension(__prefix__, 0)"
+                                title="Eliminar extensión"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dimensiones ($c - Repetible) -->
+            <div class="mb-3">
+                <div
+                    class="d-flex justify-content-between align-items-center mb-2"
+                >
+                    <label class="form-label mb-0">
+                        <span class="badge bg-warning badge-marc">$c</span>
+                        Dimensión (Repetible)
+                    </label>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-primary"
+                        onclick="agregarDimension(__prefix__)"
+                    >
+                        <i class="bi bi-plus"></i> Agregar $c
+                    </button>
+                </div>
+
+                <div id="dimensiones-container-__prefix__">
+                    <div class="subcampo-repetible" id="dimension-__prefix__-0">
+                        <div class="subcampo-header">
+                            <div class="flex-grow-1">
+                                <input
+                                    type="text"
+                                    name="dimension___prefix___0_dimension"
+                                    class="form-control"
+                                    placeholder="Ej: 30 cm"
+                                />
+                                <input
+                                    type="hidden"
+                                    name="dimension___prefix___0_id"
+                                    value=""
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                onclick="eliminarDimension(__prefix__, 0)"
+                                title="Eliminar dimensión"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna derecha: Subcampos no repetibles -->
+        <div class="col-lg-6">
+            <!-- Otras características ($b - No repetible) -->
+            <div class="mb-3">
+                <label class="form-label">
+                    <span class="badge bg-success badge-marc">$b</span> Otras
+                    características físicas
+                </label>
+                <input
+                    type="text"
+                    name="descripcion_fisica___prefix___otras_caracteristicas_fisicas"
+                    class="form-control"
+                    placeholder="Ej: il., música impresa"
+                />
+            </div>
+
+            <!-- Material acompañante ($e - No repetible) -->
+            <div class="mb-3">
+                <label class="form-label">
+                    <span class="badge bg-secondary badge-marc">$e</span>
+                    Material acompañante
+                </label>
+                <input
+                    type="text"
+                    name="descripcion_fisica___prefix___material_acompanante"
+                    class="form-control"
+                    placeholder="Ej: + 1 CD"
+                />
+            </div>
+        </div>
+    </div>
+</div>

@@ -7,6 +7,9 @@ from .models import ObraGeneral
 #     ProduccionPublicacionFormSet
 # )
 
+# Importar vistas de prueba
+from .views_prueba_300 import prueba_campo_300, limpiar_prueba_300
+
 def index(request):
     return render(request, 'index.html')
 
