@@ -1,0 +1,231 @@
+/* ============================================ */
+/* OBRA GENERAL - ESTILOS ESPECÍFICOS */
+/* ============================================ */
+
+/* Variables CSS para fácil mantenimiento */
+:root {
+    --border-light: #dee2e6;
+    --bg-light: #f8f9fa;
+    --text-muted: #6c757d;
+    --sidebar-width: 220px;
+    --primary-color: #0d6efd;
+    --danger-color: #dc3545;
+    --success-color: #198754;
+}
+
+/* ============================================ */
+/* LAYOUT CON SIDEBAR */
+/* ============================================ */
+
+.page-container {
+    display: flex;
+    gap: 2rem;
+    position: relative;
+}
+
+.form-content {
+    flex: 1;
+    max-width: 850px;
+}
+
+/* ============================================ */
+/* SIDEBAR DE NAVEGACIÓN */
+/* ============================================ */
+
+.sidebar-nav {
+    width: var(--sidebar-width);
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 3px;
+}
+
+.nav-section {
+    margin-bottom: 0.5rem;
+}
+
+.nav-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0.5rem 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+.nav-link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: #495057;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.nav-link:hover {
+    background: var(--bg-light);
+    color: var(--primary-color);
+    border-left-color: var(--primary-color);
+}
+
+.nav-link.active {
+    background: #e7f1ff;
+    color: var(--primary-color);
+    border-left-color: var(--primary-color);
+    font-weight: 500;
+}
+
+/* ============================================ */
+/* SECCIONES DEL FORMULARIO */
+/* ============================================ */
+
+.obra-container {
+    width: 100%;
+}
+
+.section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+/* ============================================ */
+/* CAMPOS REPETIBLES */
+/* ============================================ */
+
+.campo-repetible {
+    border: 1px solid var(--border-light);
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    background: white;
+    transition: box-shadow 0.2s;
+}
+
+.campo-repetible:hover {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.campo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--bg-light);
+}
+
+.campo-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #495057;
+}
+
+/* ============================================ */
+/* SUBCAMPOS ANIDADOS */
+/* ============================================ */
+
+.subcampo-group {
+    background: var(--bg-light);
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+.subcampo-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+/* ============================================ */
+/* BOTONES */
+/* ============================================ */
+
+.btn-add-field {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+}
+
+.btn-remove {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* ============================================ */
+/* FORM CONTROLS */
+/* ============================================ */
+
+.form-control,
+.form-select {
+    font-size: 0.875rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15);
+}
+
+/* ============================================ */
+/* SCROLL SUAVE */
+/* ============================================ */
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 20px;
+}
+
+/* ============================================ */
+/* RESPONSIVE */
+/* ============================================ */
+
+@media (max-width: 992px) {
+    .page-container {
+        flex-direction: column-reverse;
+    }
+
+    .sidebar-nav {
+        position: static;
+        width: 100%;
+        max-height: none;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: var(--bg-light);
+        border-radius: 0.375rem;
+    }
+
+    .form-content {
+        max-width: 100%;
+    }
+}
+
+/* ============================================ */
+/* ALERTAS INFORMATIVAS */
+/* ============================================ */
+
+.alert-info {
+    background-color: #e7f3ff;
+    border-left: 4px solid var(--primary-color);
+}
+
+.alert-info i {
+    margin-right: 0.5rem;
+}
