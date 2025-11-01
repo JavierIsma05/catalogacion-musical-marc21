@@ -6,7 +6,9 @@ Vistas generales de navegación y páginas principales.
 No están relacionadas directamente con bloques MARC específicos.
 """
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from ..models import ObraGeneral
 
 
 def index(request):
@@ -29,11 +31,18 @@ def plantillas(request):
 
 def crear_obra(request):
     """
-    Vista para iniciar la creación de una nueva obra
+    Vista para crear una nueva obra general
     
-    Punto de entrada para crear registros MARC21 de obras musicales.
+    Renderiza el formulario completo para catalogar una obra musical
+    incluyendo cabecera y campos 0XX.
     """
-    return render(request, 'crear_obra.html')
+    if request.method == 'POST':
+        # Aquí procesaremos el formulario cuando esté completo
+        # Por ahora solo mostramos el template
+        messages.success(request, 'Funcionalidad de guardado en desarrollo')
+        return redirect('crear_obra')
+    
+    return render(request, 'ObraGeneral/obra_general.html')
 
 
 def coleccion_manuscrita(request):

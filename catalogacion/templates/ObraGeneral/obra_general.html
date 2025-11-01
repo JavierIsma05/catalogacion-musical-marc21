@@ -1,1000 +1,1248 @@
-{% extends 'base.html' %} {% load static %} {% block title %}Registrar Obra
-MARC21 Musical{% endblock %} {% block extra_css %}
-<link
-    href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
-    rel="stylesheet"
-/>
-<link
-    href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
-    rel="stylesheet"
-/>
-<link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+{% extends "base.html" %} {% load static %} {% block extra_css %}
+<style>
+    /* Variables */
+    :root {
+        --border-light: #dee2e6;
+        --bg-light: #f8f9fa;
+        --text-muted: #6c757d;
+    }
+
+    /* Layout minimalista */
+    .obra-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .section-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    /* Campos repetibles */
+    .campo-repetible {
+        border: 1px solid var(--border-light);
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        background: white;
+        transition: box-shadow 0.2s;
+    }
+
+    .campo-repetible:hover {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .campo-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--bg-light);
+    }
+
+    .campo-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .subcampo-group {
+        background: var(--bg-light);
+        padding: 0.75rem;
+        border-radius: 0.25rem;
+        margin-top: 0.5rem;
+    }
+
+    .subcampo-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    /* Botones minimalistas */
+    .btn-add-field {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+    }
+
+    .btn-remove {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    /* Form controls */
+    .form-control,
+    .form-select {
+        font-size: 0.875rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15);
+    }
+</style>
 {% endblock %} {% block content %}
-<div class="container-fluid mt-4">
-    <div class="row">
-        <!-- 🔸 COLUMNA IZQUIERDA -->
-        <div class="col-md-9">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">📄 Registro MARC21 Musical</h5>
-                </div>
-                <div class="card-body">
-                    <form method="POST">
-                        {% csrf_token %}
-
-                        <!-- Errores generales -->
-                        {% if form.non_field_errors %}
-                        <div class="alert alert-danger">
-                            {{ form.non_field_errors }}
-                        </div>
-                        {% endif %}
-
-                        <!-- 🟩 CABECERA O LÍDER -->
-                        <h5 class="text-primary" id="cabecera">
-                            🟩 Cabecera o Líder
-                        </h5>
-                        <div class="marc-block mb-4">
-                            <div class="row mb-2">
-                                <div class="col-md-6">
-                                    <label
-                                        ><strong>06</strong> – Tipo de
-                                        registro</label
-                                    >
-                                    {{ form.tipo_registro }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label
-                                        ><strong>07</strong> – Nivel
-                                        bibliográfico</label
-                                    >
-                                    {{ form.nivel_bibliografico }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 🟨 BLOQUE 0XX -->
-                        <h5 class="text-primary mt-4" id="bloque-0xx">
-                            🟨 Bloque 0XX – Campos de longitud variable
-                        </h5>
-
-                        <!-- 020 ## ISBN -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>020 ##</strong> — Número Internacional
-                                Normalizado para Libros (ISBN)
-                            </h6>
-                            <div class="row align-items-center mb-2">
-                                <div class="col-md-4">
-                                    <label>$a ISBN</label>
-                                </div>
-                                <div class="col-md-8">{{ form.isbn }}</div>
-                            </div>
-                        </div>
-
-                        <!-- 024 2# ISMN -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>024 2#</strong> — Otros identificadores
-                                normalizados (ISMN)
-                            </h6>
-                            <div class="row align-items-center mb-2">
-                                <div class="col-md-4">
-                                    <label>$a ISMN</label>
-                                </div>
-                                <div class="col-md-8">{{ form.ismn }}</div>
-                            </div>
-                        </div>
-
-                        <!-- 028 20 Número de editor -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>028 20</strong> — Número de editor o
-                                distribuidor
-                            </h6>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$a Número de editor</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.numero_editor }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>Indicador</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.indicador_028 }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 031 ## Íncipit musical -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>031 ##</strong> — Información del
-                                íncipit musical
-                            </h6>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$a Nº de obra</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.incipit_num_obra }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$b Nº de movimiento</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.incipit_num_movimiento }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$c Nº de pasaje</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.incipit_num_pasaje }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$d Título o encabezamiento</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.incipit_titulo }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$m Voz/instrumento</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.incipit_voz_instrumento }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$p Notación musical</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.incipit_notacion }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$u URL (íncipit externo)</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.incipit_url }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 040 ## Fuente de catalogación -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>040 ##</strong> — Fuente de catalogación
-                            </h6>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$a Centro catalogador</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.centro_catalogador }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 041 0# Código de lengua -->
-                        <div class="marc-block mb-4">
-                            <h6><strong>041 0#</strong> — Código de lengua</h6>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$a Idioma</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.codigo_lengua }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 044 ## Código del país -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>044 ##</strong> — País de la entidad
-                                editora/productora
-                            </h6>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$a País</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.codigo_pais }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 092 ## Clasificación local -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>092 ##</strong> — Clasificación local
-                            </h6>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$a Institución</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.clasif_institucion }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$b Proyecto</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.clasif_proyecto }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$c País</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.clasif_pais }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$d Ms/Imp</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.clasif_ms_imp }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 🟦 BLOQUE 1XX -->
-                        <h5 class="text-primary mt-4" id="bloque-1xx">
-                            🟦 Bloque 1XX – Asientos principales (punto de
-                            acceso)
-                        </h5>
-
-                        <!-- 100 1# Compositor -->
-                        <div class="marc-block mb-4">
-                            <h6><strong>100 1#</strong> — Compositor (NR)</h6>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_compositor_select">$a Apellidos, Nombres</label></div>
-                                <div class="col-md-8">
-                                    {{ form.compositor_select }}
-                                    {% if form.compositor_select.errors %}
-                                    <div class="text-danger">{{ form.compositor_select.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_compositor_fechas">$d Coordenadas biográficas</label></div>
-                                <div class="col-md-8">
-                                    {{ form.compositor_fechas }}
-                                    {% if form.compositor_fechas.errors %}
-                                    <div class="text-danger">{{ form.compositor_fechas.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_compositor_funcion">$e Función</label></div>
-                                <div class="col-md-8">{{ form.compositor_funcion }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4"><label for="id_compositor_autoria">$j Autoría</label></div>
-                                <div class="col-md-8">{{ form.compositor_autoria }}</div>
-                            </div>
-                        </div>
-
-                                                <!-- 130 0# Título uniforme -->
-                        <div class="marc-block mb-4">
-                            <h6><strong>130 0#</strong> — Título uniforme (punto de acceso principal) (NR)</h6>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_titulo_uniforme_130">$a Título uniforme</label></div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_uniforme_130 }}
-                                    {% if form.titulo_uniforme_130.errors %}
-                                    <div class="text-danger">{{ form.titulo_uniforme_130.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_titulo_uniforme_130_forma">$k Subencabezamiento de forma</label></div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_uniforme_130_forma }}
-                                    {% if form.titulo_uniforme_130_forma.errors %}
-                                    <div class="text-danger">{{ form.titulo_uniforme_130_forma.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_titulo_uniforme_medio_interpretacion">$m Medio de interpretación</label></div>
-                                <div class="col-md-8">{{ form.titulo_uniforme_medio_interpretacion }}</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_titulo_uniforme_num_parte">$n Número de parte/sección</label></div>
-                                <div class="col-md-8">{{ form.titulo_uniforme_num_parte }}</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_titulo_uniforme_arreglo">$o Arreglo</label></div>
-                                <div class="col-md-8">{{ form.titulo_uniforme_arreglo }}</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_titulo_uniforme_nombre_parte">$p Nombre de parte/sección</label></div>
-                                <div class="col-md-8">{{ form.titulo_uniforme_nombre_parte }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4"><label for="id_titulo_uniforme_tonalidad">$r Tonalidad</label></div>
-                                <div class="col-md-8">{{ form.titulo_uniforme_tonalidad }}</div>
-                            </div>
-                        </div>
-
-                        <!-- 🟩 BLOQUE 2XX -->
-                        <h5 class="text-primary mt-4" id="bloque-2xx">
-                            🟩 Bloque 2XX – Títulos y mención de responsabilidad
-                        </h5>
-
-                        <!-- 240 10 Título uniforme -->
-                        <div class="marc-block mb-4">
-                            <h6><strong>240 10</strong> — Título uniforme (NR)</h6>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_titulo_240_select">$a Título uniforme</label></div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_240_select }}
-                                    {% if form.titulo_240_select.errors %}
-                                    <div class="text-danger">{{ form.titulo_240_select.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_titulo_240_forma_select">$k Subencabezamiento de forma</label></div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_240_forma_select }}
-                                    {% if form.titulo_240_forma_select.errors %}
-                                    <div class="text-danger">{{ form.titulo_240_forma_select.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_titulo_240_medio_interpretacion">$m Medio de interpretación</label></div>
-                                <div class="col-md-8">{{ form.titulo_240_medio_interpretacion }}</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_titulo_240_num_parte">$n Número de parte/sección</label></div>
-                                <div class="col-md-8">{{ form.titulo_240_num_parte }}</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_titulo_240_arreglo">$o Arreglo</label></div>
-                                <div class="col-md-8">{{ form.titulo_240_arreglo }}</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4"><label for="id_titulo_240_nombre_parte">$p Nombre de parte/sección</label></div>
-                                <div class="col-md-8">{{ form.titulo_240_nombre_parte }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4"><label for="id_titulo_240_tonalidad">$r Tonalidad</label></div>
-                                <div class="col-md-8">{{ form.titulo_240_tonalidad }}</div>
-                            </div>
-                        </div>
-
-                        <!-- 245 10 Título principal -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>245 10</strong> — Mención de título (NR)
-                            </h6>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$a Título principal *</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.titulo_principal }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$b Subtítulo</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.subtitulo }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$c Mención de responsabilidad</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.mencion_responsabilidad }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 246 ## Variante de título (Repetible) -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>246 ##</strong> — Forma variante del título (R)
-                            </h6>
-                            <p class="text-muted small">
-                                ℹ️ Este campo es repetible. Puede agregar múltiples títulos alternativos.
-                            </p>
-                            
-                            {{ formset_246.management_form }}
-                            
-                            <div id="formset-246-container">
-                                {% for form_246 in formset_246 %}
-                                <div class="formset-form-246 border-start border-3 border-info ps-3 mb-3">
-                                    {{ form_246.id }}
-                                    {% if form_246.DELETE %}
-                                        <div class="form-check mb-2">
-                                            {{ form_246.DELETE }}
-                                            <label class="form-check-label text-danger">
-                                                🗑️ Eliminar este título alternativo
-                                            </label>
-                                        </div>
-                                    {% endif %}
-                                    
-                                    <div class="row mb-2">
-                                        <div class="col-md-4">
-                                            <label>$a Título alternativo</label>
-                                        </div>
-                                        <div class="col-md-8">
-                                            {{ form_246.titulo }}
-                                            {% if form_246.titulo.errors %}
-                                                <div class="text-danger mt-1">{{ form_246.titulo.errors }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label>$b Resto del título variante</label>
-                                        </div>
-                                        <div class="col-md-8">
-                                            {{ form_246.resto_titulo }}
-                                            {% if form_246.resto_titulo.errors %}
-                                                <div class="text-danger mt-1">{{ form_246.resto_titulo.errors }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                            
-                            <button type="button" class="btn btn-sm btn-outline-primary" id="add-form-246">
-                                ➕ Agregar otro título alternativo
-                            </button>
-                        </div>
-
-                        <!-- 250 ## Edición (Repetible) -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>250 ##</strong> — Edición (R)
-                            </h6>
-                            <p class="text-muted small">
-                                ℹ️ Este campo es repetible. Puede agregar múltiples ediciones.
-                            </p>
-                            
-                            {{ formset_250.management_form }}
-                            
-                            <div id="formset-250-container">
-                                {% for form_250 in formset_250 %}
-                                <div class="formset-form-250 border-start border-3 border-success ps-3 mb-3">
-                                    {{ form_250.id }}
-                                    {% if form_250.DELETE %}
-                                        <div class="form-check mb-2">
-                                            {{ form_250.DELETE }}
-                                            <label class="form-check-label text-danger">
-                                                🗑️ Eliminar esta edición
-                                            </label>
-                                        </div>
-                                    {% endif %}
-                                    
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label>$a Edición</label>
-                                        </div>
-                                        <div class="col-md-8">
-                                            {{ form_250.edicion }}
-                                            {% if form_250.edicion.errors %}
-                                                <div class="text-danger mt-1">{{ form_250.edicion.errors }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                            
-                            <button type="button" class="btn btn-sm btn-outline-success" id="add-form-250">
-                                ➕ Agregar otra edición
-                            </button>
-                        </div>
-
-                        <!-- 264 ## Producción, publicación, distribución (Repetible) -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>264 ##</strong> — Producción, publicación, distribución, manufactura y copyright (R)
-                            </h6>
-                            <p class="text-muted small">
-                                ℹ️ Este campo es repetible. Use el segundo indicador para distinguir:
-                                0=Producción, 1=Publicación, 2=Distribución, 3=Fabricación, 4=Copyright
-                            </p>
-                            
-                            {{ formset_264.management_form }}
-                            
-                            <div id="formset-264-container">
-                                {% for form_264 in formset_264 %}
-                                <div class="formset-form-264 border-start border-4 border-warning ps-3 mb-3">
-                                    {{ form_264.id }}
-                                    {% if form_264.DELETE %}
-                                        <div class="form-check mb-2">
-                                            {{ form_264.DELETE }}
-                                            <label class="form-check-label text-danger">
-                                                🗑️ Eliminar este registro 264
-                                            </label>
-                                        </div>
-                                    {% endif %}
-                                    
-                                    <div class="row mb-2">
-                                        <div class="col-md-4">
-                                            <label>Función (2º indicador)</label>
-                                        </div>
-                                        <div class="col-md-8">
-                                            {{ form_264.funcion }}
-                                            {% if form_264.funcion.errors %}
-                                                <div class="text-danger mt-1">{{ form_264.funcion.errors }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mb-2">
-                                        <div class="col-md-4">
-                                            <label>$a Lugar</label>
-                                        </div>
-                                        <div class="col-md-8">
-                                            {{ form_264.lugar }}
-                                            {% if form_264.lugar.errors %}
-                                                <div class="text-danger mt-1">{{ form_264.lugar.errors }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mb-2">
-                                        <div class="col-md-4">
-                                            <label>$b Nombre entidad</label>
-                                        </div>
-                                        <div class="col-md-8">
-                                            {{ form_264.nombre_entidad }}
-                                            {% if form_264.nombre_entidad.errors %}
-                                                <div class="text-danger mt-1">{{ form_264.nombre_entidad.errors }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mb-2">
-                                        <div class="col-md-4">
-                                            <label>$c Fecha</label>
-                                        </div>
-                                        <div class="col-md-8">
-                                            {{ form_264.fecha }}
-                                            {% if form_264.fecha.errors %}
-                                                <div class="text-danger mt-1">{{ form_264.fecha.errors }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label>Orden</label>
-                                        </div>
-                                        <div class="col-md-8">
-                                            {{ form_264.orden }}
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                            
-                            <button type="button" class="btn btn-sm btn-outline-warning" id="add-form-264">
-                                ➕ Agregar otro registro 264
-                            </button>
-                        </div>
-
-                        <!-- 300 ## Descripción física -->
-                        <div class="marc-block mb-4">
-                            <h6>
-                                <strong>300 ##</strong> — Descripción física (R)
-                            </h6>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$a Extensión</label>
-                                </div>
-                                <div class="col-md-8">{{ form.extension }}</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$b Otros detalles físicos</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.otros_detalles_fisicos }}
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <label>$c Dimensiones</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.dimensiones }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>$e Material acompañante</label>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ form.material_acompanante }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Botones -->
-                        <div class="d-flex gap-3 mt-4">
-                            <button
-                                type="submit"
-                                name="guardar_continuar"
-                                class="btn btn-success"
-                            >
-                                💾 Guardar y continuar editando
-                            </button>
-                            <button
-                                type="submit"
-                                name="guardar_cerrar"
-                                class="btn btn-primary"
-                            >
-                                ✅ Guardar y cerrar
-                            </button>
-                            <a
-                                href"#"
-                                class="btn btn-secondary"
-                            >
-                                ❌ Cancelar
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- 🟦 TABLA DE OBRAS -->
-            <div class="card shadow-sm mt-3">
-                <div class="card-header bg-secondary text-white">
-                    <h6 class="mb-0">📋 Obras registradas</h6>
-                </div>
-                <div class="card-body">
-                    <table class="table table-bordered table-striped mt-2">
-                        <thead class="table-success">
-                            <tr>
-                                <th>001 Nº Control</th>
-                                <th>100 Compositor</th>
-                                <th>130 Título uniforme</th>
-                                <th>020 ISBN</th>
-                                <th>024 ISMN</th>
-                                <th>044 País</th>
-                                <th>041 Idioma</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for obra in obras %}
-                            <tr>
-                                <td>{{ obra.num_control }}</td>
-                                <td>
-                                    {{
-                                    obra.compositor.apellidos_nombres|default:"-"
-                                    }}
-                                </td>
-                                <td>
-                                    {{ obra.titulo_uniforme.titulo|default:"-"
-                                    }}
-                                </td>
-                                <td>{{ obra.isbn|default:"-" }}</td>
-                                <td>{{ obra.ismn|default:"-" }}</td>
-                                <td>{{ obra.get_codigo_pais_display }}</td>
-                                <td>{{ obra.get_codigo_lengua_display }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="7" class="text-center">
-                                    No hay registros aún.
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+<div class="container py-4">
+    <div class="obra-container">
+        <!-- Header -->
+        <div class="mb-4">
+            <h1 class="h3 mb-1">Registrar Obra General</h1>
+            <p class="text-muted mb-0">
+                Catalogación MARC21 - Formato bibliográfico
+            </p>
         </div>
 
-        <!-- 🔹 COLUMNA DERECHA -->
-        <div class="col-md-3">
-            <div class="sidebar rounded shadow-sm p-3 bg-white">
-                <h6 class="fw-bold mb-3">📋 Navegación MARC21</h6>
-                <a href="#cabecera" class="d-block mb-2 text-decoration-none"
-                    >🟩 Cabecera o Líder</a
-                >
-                <a href="#bloque-0xx" class="d-block mb-2 text-decoration-none"
-                    >🟨 Bloque 0XX - Campos variables</a
-                >
-                <a href="#bloque-1xx" class="d-block mb-2 text-decoration-none"
-                    >🟦 Bloque 1XX - Asientos principales</a
-                >
-                <a href="#bloque-2xx" class="d-block mb-2 text-decoration-none"
-                    >🟩 Bloque 2XX - Títulos</a
-                >
-                <hr />
-                <h6 class="fw-bold mb-3">🎯 Acciones</h6>
-                <a
-                    href="#"
-                    class="d-block mb-2 text-decoration-none"
-                    onclick="document.querySelector('form').submit(); return false;"
-                    >💾 Guardar borrador</a
-                >
-                <a href="#" class="d-block mb-2 text-decoration-none"
-                    >🔍 Vista preliminar</a
-                >
+        <form method="post" id="obraForm">
+            {% csrf_token %}
+
+            <!-- Cabecera -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="section-title">Cabecera</h2>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small"
+                                >Tipo de Registro
+                                <span class="text-muted"
+                                    >(Líder/06)</span
+                                ></label
+                            >
+                            <select
+                                name="tipo_registro"
+                                class="form-select"
+                                required
+                            >
+                                <option value="">Seleccionar...</option>
+                                <option value="c">
+                                    c - Música notada manuscrita
+                                </option>
+                                <option value="d">
+                                    d - Música notada impresa
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small"
+                                >Nivel Bibliográfico
+                                <span class="text-muted"
+                                    >(Líder/07)</span
+                                ></label
+                            >
+                            <select
+                                name="nivel_bibliografico"
+                                class="form-select"
+                                required
+                            >
+                                <option value="">Seleccionar...</option>
+                                <option value="m">m - Monografía</option>
+                                <option value="c">c - Colección</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small"
+                                >Número de Control
+                                <span class="text-muted">(001)</span></label
+                            >
+                            <input
+                                type="text"
+                                name="num_control"
+                                class="form-control"
+                                placeholder="Ej: 001234"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+
+            <!-- 020 - ISBN (Repetible) -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="section-title">020 - ISBN</h2>
+
+                    <div id="isbn-container">
+                        <div class="campo-repetible" data-campo="isbn-0">
+                            <div class="campo-header">
+                                <span class="campo-label">ISBN #1</span>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger btn-remove"
+                                    onclick="eliminarCampo('isbn-0')"
+                                >
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="subcampo-label"
+                                        >$a ISBN</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="isbn_a_0"
+                                        class="form-control"
+                                        placeholder="978-0-123456-78-9"
+                                    />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="subcampo-label"
+                                        >$q Calificador</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="isbn_q_0"
+                                        class="form-control"
+                                        placeholder="Ej: rústica"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary btn-add-field"
+                        onclick="agregarISBN()"
+                    >
+                        <i class="bi bi-plus-circle"></i> Agregar ISBN
+                    </button>
+                </div>
+            </div>
+
+            <!-- 024 - ISMN (Repetible) -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="section-title">
+                        024 - ISMN (Número Internacional Normalizado de Música)
+                    </h2>
+
+                    <div id="ismn-container">
+                        <div class="campo-repetible" data-campo="ismn-0">
+                            <div class="campo-header">
+                                <span class="campo-label">ISMN #1</span>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger btn-remove"
+                                    onclick="eliminarCampo('ismn-0')"
+                                >
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-12">
+                                    <label class="subcampo-label"
+                                        >$a ISMN</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="ismn_a_0"
+                                        class="form-control"
+                                        placeholder="M-001-12345-6-7"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary btn-add-field"
+                        onclick="agregarISMN()"
+                    >
+                        <i class="bi bi-plus-circle"></i> Agregar ISMN
+                    </button>
+                </div>
+            </div>
+
+            <!-- 028 - Número de Editor (Repetible) -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="section-title">
+                        028 - Número de Editor de Música
+                    </h2>
+
+                    <div id="numero-editor-container">
+                        <div
+                            class="campo-repetible"
+                            data-campo="numero-editor-0"
+                        >
+                            <div class="campo-header">
+                                <span class="campo-label"
+                                    >Número de Editor #1</span
+                                >
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger btn-remove"
+                                    onclick="eliminarCampo('numero-editor-0')"
+                                >
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-12">
+                                    <label class="subcampo-label"
+                                        >$a Número de Editor</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="numero_editor_a_0"
+                                        class="form-control"
+                                        placeholder="Ej: B. & H. 8797"
+                                    />
+                                </div>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="subcampo-label"
+                                        >Indicador 1 - Tipo de Número</label
+                                    >
+                                    <select
+                                        name="numero_editor_tipo_0"
+                                        class="form-select"
+                                    >
+                                        <option value="0">
+                                            0 - Número de publicación
+                                        </option>
+                                        <option value="1">
+                                            1 - Número de matriz
+                                        </option>
+                                        <option value="2" selected>
+                                            2 - Número de plancha
+                                        </option>
+                                        <option value="3">
+                                            3 - Otro número de música
+                                        </option>
+                                        <option value="4">
+                                            4 - Número de videograbación
+                                        </option>
+                                        <option value="5">
+                                            5 - Otro número de editor
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="subcampo-label"
+                                        >Indicador 2 - Control de Nota</label
+                                    >
+                                    <select
+                                        name="numero_editor_control_0"
+                                        class="form-select"
+                                    >
+                                        <option value="0" selected>
+                                            0 - No hay nota ni punto de acceso
+                                            adicional
+                                        </option>
+                                        <option value="1">
+                                            1 - Nota, hay punto de acceso
+                                            adicional
+                                        </option>
+                                        <option value="2">
+                                            2 - Nota, no hay punto de acceso
+                                            adicional
+                                        </option>
+                                        <option value="3">
+                                            3 - No hay nota, hay punto de acceso
+                                            adicional
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary btn-add-field"
+                        onclick="agregarNumeroEditor()"
+                    >
+                        <i class="bi bi-plus-circle"></i> Agregar Número de
+                        Editor
+                    </button>
+                </div>
+            </div>
+
+            <!-- 031 - Incipit Musical (Repetible con URLs repetibles) -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="section-title">031 - Incipit Musical</h2>
+
+                    <div id="incipit-container">
+                        <div class="campo-repetible" data-campo="incipit-0">
+                            <div class="campo-header">
+                                <span class="campo-label">Incipit #1</span>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger btn-remove"
+                                    onclick="eliminarCampo('incipit-0')"
+                                >
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-4">
+                                    <label class="subcampo-label"
+                                        >$a Número de Obra</label
+                                    >
+                                    <input
+                                        type="number"
+                                        name="incipit_a_0"
+                                        class="form-control"
+                                        placeholder="1"
+                                        value="1"
+                                        min="1"
+                                    />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="subcampo-label"
+                                        >$b Número de Movimiento</label
+                                    >
+                                    <input
+                                        type="number"
+                                        name="incipit_b_0"
+                                        class="form-control"
+                                        placeholder="1"
+                                        value="1"
+                                        min="1"
+                                    />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="subcampo-label"
+                                        >$c Número de Pasaje</label
+                                    >
+                                    <input
+                                        type="number"
+                                        name="incipit_c_0"
+                                        class="form-control"
+                                        placeholder="1"
+                                        value="1"
+                                        min="1"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-6">
+                                    <label class="subcampo-label"
+                                        >$d Título o Encabezamiento
+                                        (opcional)</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="incipit_d_0"
+                                        class="form-control"
+                                        placeholder="Ej: Aria, Allegro, Andante"
+                                    />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="subcampo-label"
+                                        >$m Voz/Instrumento (opcional)</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="incipit_m_0"
+                                        class="form-control"
+                                        placeholder="Ej: V (solo si NO es piano)"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-12">
+                                    <label class="subcampo-label"
+                                        >$p Notación Musical (opcional)</label
+                                    >
+                                    <textarea
+                                        name="incipit_p_0"
+                                        class="form-control"
+                                        rows="2"
+                                        placeholder="Código de incipit musical (Plaine & Easie, MusicXML, ABC)"
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                            <!-- URLs repetibles para este incipit -->
+                            <div class="subcampo-group">
+                                <div
+                                    class="d-flex justify-content-between align-items-center mb-2"
+                                >
+                                    <label class="subcampo-label mb-0"
+                                        >$u URL Uniforme de Recursos</label
+                                    >
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-primary btn-sm"
+                                        onclick="agregarURLIncipit(0)"
+                                    >
+                                        <i class="bi bi-plus"></i> URL
+                                    </button>
+                                </div>
+                                <div id="incipit-0-urls">
+                                    <div class="mb-2" data-subcampo="url-0-0">
+                                        <div class="input-group input-group-sm">
+                                            <input
+                                                type="url"
+                                                name="incipit_u_0_0"
+                                                class="form-control"
+                                                placeholder="https://..."
+                                            />
+                                            <button
+                                                type="button"
+                                                class="btn btn-outline-danger"
+                                                onclick="eliminarSubcampo('url-0-0')"
+                                            >
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary btn-add-field"
+                        onclick="agregarIncipit()"
+                    >
+                        <i class="bi bi-plus-circle"></i> Agregar Incipit
+                    </button>
+                </div>
+            </div>
+
+            <!-- 040 - Fuente de Catalogación -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="section-title">040 - Fuente de Catalogación</h2>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small"
+                                >$a Centro Catalogador</label
+                            >
+                            <input
+                                type="text"
+                                name="centro_catalogador"
+                                class="form-control"
+                                value="UNL"
+                                placeholder="UNL"
+                                maxlength="10"
+                            />
+                            <small class="text-muted"
+                                >Predeterminado: UNL</small
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 041 - Código de Lengua (Repetible con idiomas repetibles) -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="section-title">041 - Código de Lengua</h2>
+
+                    <div id="codigo-lengua-container">
+                        <div
+                            class="campo-repetible"
+                            data-campo="codigo-lengua-0"
+                        >
+                            <div class="campo-header">
+                                <span class="campo-label"
+                                    >Código de Lengua #1</span
+                                >
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger btn-remove"
+                                    onclick="eliminarCampo('codigo-lengua-0')"
+                                >
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-6">
+                                    <label class="subcampo-label"
+                                        >Indicador 1 - Código de
+                                        Traducción</label
+                                    >
+                                    <select
+                                        name="codigo_lengua_ind1_0"
+                                        class="form-select"
+                                    >
+                                        <option value="#">
+                                            # - No se proporciona información
+                                        </option>
+                                        <option value="0" selected>
+                                            0 - No es traducción
+                                        </option>
+                                        <option value="1">
+                                            1 - Es traducción
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="subcampo-label"
+                                        >Indicador 2 - Código de Fuente</label
+                                    >
+                                    <select
+                                        name="codigo_lengua_ind2_0"
+                                        class="form-select"
+                                    >
+                                        <option value="#" selected>
+                                            # - Código MARC de lengua
+                                        </option>
+                                        <option value="7">
+                                            7 - Fuente especificada en $2
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Idiomas repetibles -->
+                            <div class="subcampo-group">
+                                <div
+                                    class="d-flex justify-content-between align-items-center mb-2"
+                                >
+                                    <label class="subcampo-label mb-0"
+                                        >$a Código de Lengua del Texto/Banda
+                                        Sonora</label
+                                    >
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-primary btn-sm"
+                                        onclick="agregarIdiomaObra(0)"
+                                    >
+                                        <i class="bi bi-plus"></i> Idioma
+                                    </button>
+                                </div>
+                                <div id="codigo-lengua-0-idiomas">
+                                    <div
+                                        class="mb-2"
+                                        data-subcampo="idioma-0-0"
+                                    >
+                                        <div class="input-group input-group-sm">
+                                            <select
+                                                name="codigo_lengua_a_0_0"
+                                                class="form-select form-select-sm"
+                                            >
+                                                <option value="ger">
+                                                    Alemán
+                                                </option>
+                                                <option value="spa" selected>
+                                                    Español
+                                                </option>
+                                                <option value="fre">
+                                                    Francés
+                                                </option>
+                                                <option value="eng">
+                                                    Inglés
+                                                </option>
+                                                <option value="ita">
+                                                    Italiano
+                                                </option>
+                                                <option value="por">
+                                                    Portugués
+                                                </option>
+                                            </select>
+                                            <button
+                                                type="button"
+                                                class="btn btn-outline-danger"
+                                                onclick="eliminarSubcampo('idioma-0-0')"
+                                            >
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary btn-add-field"
+                        onclick="agregarCodigoLengua()"
+                    >
+                        <i class="bi bi-plus-circle"></i> Agregar Código de
+                        Lengua
+                    </button>
+                </div>
+            </div>
+
+            <!-- 044 - Código de País (Repetible) -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="section-title">
+                        044 - Código de País de Entidad Productora/Editora
+                    </h2>
+
+                    <div id="codigo-pais-container">
+                        <div class="campo-repetible" data-campo="codigo-pais-0">
+                            <div class="campo-header">
+                                <span class="campo-label"
+                                    >Código de País #1</span
+                                >
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger btn-remove"
+                                    onclick="eliminarCampo('codigo-pais-0')"
+                                >
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-12">
+                                    <label class="subcampo-label"
+                                        >$a Código de País</label
+                                    >
+                                    <select
+                                        name="codigo_pais_a_0"
+                                        class="form-select"
+                                    >
+                                        <option value="ar">Argentina</option>
+                                        <option value="bo">Bolivia</option>
+                                        <option value="br">Brasil</option>
+                                        <option value="cl">Chile</option>
+                                        <option value="co">Colombia</option>
+                                        <option value="cr">Costa Rica</option>
+                                        <option value="cu">Cuba</option>
+                                        <option value="ec" selected>
+                                            Ecuador
+                                        </option>
+                                        <option value="sv">El Salvador</option>
+                                        <option value="gt">Guatemala</option>
+                                        <option value="ho">Honduras</option>
+                                        <option value="mx">México</option>
+                                        <option value="nq">Nicaragua</option>
+                                        <option value="pa">Panamá</option>
+                                        <option value="pe">Perú</option>
+                                        <option value="pr">Puerto Rico</option>
+                                        <option value="dr">
+                                            República Dominicana
+                                        </option>
+                                        <option value="uy">Uruguay</option>
+                                        <option value="ve">Venezuela</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary btn-add-field"
+                        onclick="agregarCodigoPais()"
+                    >
+                        <i class="bi bi-plus-circle"></i> Agregar Código de País
+                    </button>
+                </div>
+            </div>
+
+            <!-- 092 - Clasificación Local -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="section-title">092 - Clasificación Local</h2>
+
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle"></i>
+                        <small>
+                            Los campos de este bloque se generan automáticamente
+                            a partir de otros campos. Se completan al guardar la
+                            obra.
+                        </small>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small"
+                                >$a Institución</label
+                            >
+                            <input
+                                type="text"
+                                name="clasif_institucion"
+                                class="form-control"
+                                value="UNL"
+                                readonly
+                                disabled
+                            />
+                            <small class="text-muted"
+                                >Copia del campo 040 $a</small
+                            >
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small">$b Proyecto</label>
+                            <input
+                                type="text"
+                                name="clasif_proyecto"
+                                class="form-control"
+                                value="BLMP"
+                                readonly
+                                disabled
+                            />
+                            <small class="text-muted"
+                                >Predeterminado: BLMP</small
+                            >
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-4">
+                            <label class="form-label small">$c País</label>
+                            <input
+                                type="text"
+                                name="clasif_pais"
+                                class="form-control"
+                                readonly
+                                disabled
+                                placeholder="Del campo 044 $a"
+                            />
+                            <small class="text-muted"
+                                >Copia del primer país (044 $a)</small
+                            >
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small">$d Ms/Imp</label>
+                            <input
+                                type="text"
+                                name="clasif_ms_imp"
+                                class="form-control"
+                                readonly
+                                disabled
+                                placeholder="Ms o Imp"
+                            />
+                            <small class="text-muted"
+                                >Según tipo de registro (Líder/06)</small
+                            >
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small"
+                                >$0 Número de Control</label
+                            >
+                            <input
+                                type="text"
+                                name="clasif_num_control"
+                                class="form-control"
+                                readonly
+                                disabled
+                                placeholder="Del campo 001"
+                            />
+                            <small class="text-muted"
+                                >Copia del campo 001</small
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex gap-2 justify-content-end">
+                <a href="{% url 'index' %}" class="btn btn-outline-secondary"
+                    >Cancelar</a
+                >
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Guardar Obra
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %} {% block extra_js %}
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- Select2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-<!-- Tabs.js (tu archivo personalizado) -->
-<script src="{% static 'js/tabs.js' %}"></script>
-
-<!-- Configuración Select2 con Autoridades -->
 <script>
-    $(document).ready(function () {
-        // Cargar todas las autoridades al inicio
-        var autoridadesCache = {
-            compositor: [],
-            titulo_uniforme: [],
-            forma_musical: [],
-        };
+    // Contadores globales para campos repetibles
+    let isbnCount = 1;
+    let ismnCount = 1;
+    let numeroEditorCount = 1;
+    let incipitCount = 1;
+    let codigoLenguaCount = 1;
+    let codigoPaisCount = 1;
 
-        // Precargar autoridades
-        function preloadAutoridades(modelType) {
-            $.ajax({
-                url: '{% url "get_autoridades_json" %}',
-                data: { model: modelType, q: "" },
-                dataType: "json",
-                async: false,
-                success: function (data) {
-                    autoridadesCache[modelType] = data.results;
-                },
-            });
+    // Contadores para subcampos repetibles (estructura: {incipitIndex: urlCount})
+    const incipitURLCounts = { 0: 1 };
+    const codigoLenguaIdiomaCounts = { 0: 1 };
+
+    // Función genérica para eliminar campos
+    function eliminarCampo(campoId) {
+        const campo = document.querySelector(`[data-campo="${campoId}"]`);
+        if (campo) {
+            campo.remove();
         }
+    }
 
-        // Precargar todas las autoridades
-        preloadAutoridades("compositor");
-        preloadAutoridades("titulo_uniforme");
-        preloadAutoridades("forma_musical");
-
-        // Configuración para cada campo con Select2
-        function initializeSelect2Tagging(fieldId, modelType) {
-            var $field = $("#" + fieldId);
-            var initialValue = $field.val();
-
-            // Construir opciones iniciales
-            var data = autoridadesCache[modelType].map(function (item) {
-                return {
-                    id: item.id,
-                    text: item.text,
-                    fechas: item.fechas,
-                };
-            });
-
-            $field.select2({
-                theme: "bootstrap-5",
-                tags: true,
-                data: data,
-                placeholder: $field.attr("placeholder"),
-                allowClear: true,
-                width: "100%",
-                createTag: function (params) {
-                    var term = $.trim(params.term);
-
-                    if (term === "") {
-                        return null;
-                    }
-
-                    // Verificar si ya existe
-                    var exists = false;
-                    data.forEach(function (item) {
-                        if (item.id.toLowerCase() === term.toLowerCase()) {
-                            exists = true;
-                        }
-                    });
-
-                    if (exists) {
-                        return null;
-                    }
-
-                    return {
-                        id: term,
-                        text: term,
-                        newTag: true,
-                    };
-                },
-                templateResult: function (data) {
-                    if (data.loading) {
-                        return "Buscando...";
-                    }
-
-                    var $result = $("<span></span>");
-
-                    if (data.newTag) {
-                        $result.html(
-                            '<strong style="color: #198754;">✨ Crear nuevo:</strong> ' +
-                                data.text
-                        );
-                    } else {
-                        $result.text(data.text);
-                    }
-
-                    return $result;
-                },
-                templateSelection: function (data) {
-                    return data.text || data.id;
-                },
-            });
-
-            // Si hay valor inicial, seleccionarlo
-            if (initialValue && initialValue.trim() !== "") {
-                var found = false;
-                data.forEach(function (item) {
-                    if (item.id === initialValue) {
-                        $field.val(item.id).trigger("change");
-                        found = true;
-                    }
-                });
-
-                if (!found) {
-                    var newOption = new Option(
-                        initialValue,
-                        initialValue,
-                        true,
-                        true
-                    );
-                    $field.append(newOption).trigger("change");
-                }
-            }
-
-            // Manejar el evento de selección para forzar actualización
-            $field.on("select2:select", function (e) {
-                var data = e.params.data;
-
-                if (data.newTag) {
-                    $field.find("option").each(function () {
-                        if ($(this).val() === data.id && $(this).data("temp")) {
-                            $(this).remove();
-                        }
-                    });
-
-                    var newOption = new Option(data.id, data.id, true, true);
-                    $field.append(newOption);
-                    $field.val(data.id).trigger("change.select2");
-                    $field.select2("close");
-                }
-            });
+    // Función genérica para eliminar subcampos
+    function eliminarSubcampo(subcampoId) {
+        const subcampo = document.querySelector(
+            `[data-subcampo="${subcampoId}"]`
+        );
+        if (subcampo) {
+            subcampo.remove();
         }
+    }
 
-        // Inicializar todos los campos
-        initializeSelect2Tagging("id_compositor_select", "compositor");
-        initializeSelect2Tagging("id_titulo_uniforme_130", "titulo_uniforme");
-        initializeSelect2Tagging(
-            "id_titulo_uniforme_130_forma",
-            "forma_musical"
-        );
-        initializeSelect2Tagging("id_titulo_240_select", "titulo_uniforme");
-        initializeSelect2Tagging("id_titulo_240_forma_select", "forma_musical");
+    // 020 - ISBN
+    function agregarISBN() {
+        const container = document.getElementById("isbn-container");
+        const campoId = `isbn-${isbnCount}`;
 
-        // Sincronizar fechas del compositor
-        $("#id_compositor_select").on("select2:select", function (e) {
-            var data = e.params.data;
-            console.log("Compositor seleccionado:", data);
+        const html = `
+            <div class="campo-repetible" data-campo="${campoId}">
+                <div class="campo-header">
+                    <span class="campo-label">ISBN #${isbnCount + 1}</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('${campoId}')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label class="subcampo-label">$a ISBN</label>
+                        <input type="text" name="isbn_a_${isbnCount}" class="form-control" placeholder="978-0-123456-78-9">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="subcampo-label">$q Calificador</label>
+                        <input type="text" name="isbn_q_${isbnCount}" class="form-control" placeholder="Ej: rústica">
+                    </div>
+                </div>
+            </div>
+        `;
 
-            if (data.fechas) {
-                $("#id_compositor_fechas").val(data.fechas);
-            } else if (data.newTag) {
-                $("#id_compositor_fechas").val("").focus();
-            }
-        });
+        container.insertAdjacentHTML("beforeend", html);
+        isbnCount++;
+    }
 
-        $("#id_compositor_select").on(
-            "select2:unselect select2:clear",
-            function (e) {
-                console.log("Compositor removido");
-                $(this).val(null).trigger("change");
-                $("#id_compositor_fechas").val("");
-            }
-        );
+    // 024 - ISMN
+    function agregarISMN() {
+        const container = document.getElementById("ismn-container");
+        const campoId = `ismn-${ismnCount}`;
 
-        $(".form-control[data-model]").on("select2:clear", function (e) {
-            console.log("Campo limpiado:", this.id);
-            $(this).val(null).trigger("change");
-        });
+        const html = `
+            <div class="campo-repetible" data-campo="${campoId}">
+                <div class="campo-header">
+                    <span class="campo-label">ISMN #${ismnCount + 1}</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('${campoId}')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-12">
+                        <label class="subcampo-label">$a ISMN</label>
+                        <input type="text" name="ismn_a_${ismnCount}" class="form-control" placeholder="M-001-12345-6-7">
+                    </div>
+                </div>
+            </div>
+        `;
 
-        // ================================================
-        // GESTIÓN DE FORMSETS DINÁMICOS
-        // ================================================
+        container.insertAdjacentHTML("beforeend", html);
+        ismnCount++;
+    }
 
-        // Función genérica para agregar formularios a un formset
-        function setupFormsetAdd(prefix, containerSelector, addButtonSelector) {
-            const container = document.querySelector(containerSelector);
-            const addButton = document.querySelector(addButtonSelector);
-            const totalFormsInput = document.querySelector(`[name="${prefix}-TOTAL_FORMS"]`);
+    // 028 - Número de Editor
+    function agregarNumeroEditor() {
+        const container = document.getElementById("numero-editor-container");
+        const campoId = `numero-editor-${numeroEditorCount}`;
 
-            if (!container || !addButton || !totalFormsInput) {
-                console.warn(`Formset ${prefix} no encontrado, saltando...`);
-                return;
-            }
+        const html = `
+            <div class="campo-repetible" data-campo="${campoId}">
+                <div class="campo-header">
+                    <span class="campo-label">Número de Editor #${
+                        numeroEditorCount + 1
+                    }</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('${campoId}')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-md-12">
+                        <label class="subcampo-label">$a Número de Editor</label>
+                        <input type="text" name="numero_editor_a_${numeroEditorCount}" class="form-control" placeholder="Ej: B. & H. 8797">
+                    </div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label class="subcampo-label">Indicador 1 - Tipo de Número</label>
+                        <select name="numero_editor_tipo_${numeroEditorCount}" class="form-select">
+                            <option value="0">0 - Número de publicación</option>
+                            <option value="1">1 - Número de matriz</option>
+                            <option value="2" selected>2 - Número de plancha</option>
+                            <option value="3">3 - Otro número de música</option>
+                            <option value="4">4 - Número de videograbación</option>
+                            <option value="5">5 - Otro número de editor</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="subcampo-label">Indicador 2 - Control de Nota</label>
+                        <select name="numero_editor_control_${numeroEditorCount}" class="form-select">
+                            <option value="0" selected>0 - No hay nota ni punto de acceso adicional</option>
+                            <option value="1">1 - Nota, hay punto de acceso adicional</option>
+                            <option value="2">2 - Nota, no hay punto de acceso adicional</option>
+                            <option value="3">3 - No hay nota, hay punto de acceso adicional</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `;
 
-            addButton.addEventListener('click', function() {
-                const formCount = parseInt(totalFormsInput.value);
-                const firstForm = container.querySelector(`.formset-form-${prefix.split('-')[1]}`);
+        container.insertAdjacentHTML("beforeend", html);
+        numeroEditorCount++;
+    }
+
+    // 031 - Incipit Musical (con URLs repetibles)
+    function agregarIncipit() {
+        const container = document.getElementById("incipit-container");
+        const campoId = `incipit-${incipitCount}`;
+
+        // Inicializar contador de URLs para este incipit
+        incipitURLCounts[incipitCount] = 1;
+
+        const html = `
+            <div class="campo-repetible" data-campo="${campoId}">
+                <div class="campo-header">
+                    <span class="campo-label">Incipit #${
+                        incipitCount + 1
+                    }</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('${campoId}')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
                 
-                if (!firstForm) {
-                    console.warn(`No se encontró el primer formulario para ${prefix}`);
-                    return;
-                }
+                <div class="row g-2 mb-2">
+                    <div class="col-md-4">
+                        <label class="subcampo-label">$a Número de Obra</label>
+                        <input type="number" name="incipit_a_${incipitCount}" class="form-control" placeholder="1" value="1" min="1">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="subcampo-label">$b Número de Movimiento</label>
+                        <input type="number" name="incipit_b_${incipitCount}" class="form-control" placeholder="1" value="1" min="1">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="subcampo-label">$c Número de Pasaje</label>
+                        <input type="number" name="incipit_c_${incipitCount}" class="form-control" placeholder="1" value="1" min="1">
+                    </div>
+                </div>
+                
+                <div class="row g-2 mb-2">
+                    <div class="col-md-6">
+                        <label class="subcampo-label">$d Título o Encabezamiento (opcional)</label>
+                        <input type="text" name="incipit_d_${incipitCount}" class="form-control" placeholder="Ej: Aria, Allegro, Andante">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="subcampo-label">$m Voz/Instrumento (opcional)</label>
+                        <input type="text" name="incipit_m_${incipitCount}" class="form-control" placeholder="Ej: V (solo si NO es piano)">
+                    </div>
+                </div>
+                
+                <div class="row g-2 mb-3">
+                    <div class="col-md-12">
+                        <label class="subcampo-label">$p Notación Musical (opcional)</label>
+                        <textarea name="incipit_p_${incipitCount}" class="form-control" rows="2" placeholder="Código de incipit musical (Plaine & Easie, MusicXML, ABC)"></textarea>
+                    </div>
+                </div>
 
-                const newForm = firstForm.cloneNode(true);
+                <div class="subcampo-group">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="subcampo-label mb-0">$u URL Uniforme de Recursos</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarURLIncipit(${incipitCount})">
+                            <i class="bi bi-plus"></i> URL
+                        </button>
+                    </div>
+                    <div id="incipit-${incipitCount}-urls">
+                        <div class="mb-2" data-subcampo="url-${incipitCount}-0">
+                            <div class="input-group input-group-sm">
+                                <input type="url" name="incipit_u_${incipitCount}_0" class="form-control" placeholder="https://...">
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('url-${incipitCount}-0')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
 
-                // Actualizar IDs, nombres y valores
-                newForm.querySelectorAll('input, select, textarea').forEach(input => {
-                    const name = input.getAttribute('name');
-                    const id = input.getAttribute('id');
+        container.insertAdjacentHTML("beforeend", html);
+        incipitCount++;
+    }
 
-                    if (name) {
-                        const newName = name.replace(/-\d+-/, `-${formCount}-`);
-                        input.setAttribute('name', newName);
-                        
-                        if (id) {
-                            const newId = id.replace(/-\d+-/, `-${formCount}-`);
-                            input.setAttribute('id', newId);
-                        }
+    // Agregar URL a un incipit específico
+    function agregarURLIncipit(incipitIndex) {
+        const container = document.getElementById(
+            `incipit-${incipitIndex}-urls`
+        );
+        const urlIndex = incipitURLCounts[incipitIndex];
+        const subcampoId = `url-${incipitIndex}-${urlIndex}`;
 
-                        // Limpiar valor (excepto checkboxes de DELETE)
-                        if (!name.includes('DELETE') && !name.includes('id')) {
-                            if (input.type === 'checkbox') {
-                                input.checked = false;
-                            } else {
-                                input.value = '';
-                            }
-                        }
-                    }
-                });
+        const html = `
+            <div class="mb-2" data-subcampo="${subcampoId}">
+                <div class="input-group input-group-sm">
+                    <input type="url" name="incipit_u_${incipitIndex}_${urlIndex}" class="form-control" placeholder="https://...">
+                    <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('${subcampoId}')">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            </div>
+        `;
 
-                // Limpiar mensajes de error
-                newForm.querySelectorAll('.text-danger').forEach(el => el.remove());
+        container.insertAdjacentHTML("beforeend", html);
+        incipitURLCounts[incipitIndex]++;
+    }
 
-                container.appendChild(newForm);
-                totalFormsInput.value = formCount + 1;
-            });
-        }
+    // 041 - Código de Lengua (con idiomas repetibles)
+    function agregarCodigoLengua() {
+        const container = document.getElementById("codigo-lengua-container");
+        const campoId = `codigo-lengua-${codigoLenguaCount}`;
 
-        // Configurar formsets
-        setupFormsetAdd('titulo_alt', '#formset-246-container', '#add-form-246');
-        setupFormsetAdd('edicion', '#formset-250-container', '#add-form-250');
-        setupFormsetAdd('prod_pub', '#formset-264-container', '#add-form-264');
-    });
+        // Inicializar contador de idiomas para este código
+        codigoLenguaIdiomaCounts[codigoLenguaCount] = 1;
+
+        const html = `
+            <div class="campo-repetible" data-campo="${campoId}">
+                <div class="campo-header">
+                    <span class="campo-label">Código de Lengua #${
+                        codigoLenguaCount + 1
+                    }</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('${campoId}')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="subcampo-label">Indicador 1 - Código de Traducción</label>
+                        <select name="codigo_lengua_ind1_${codigoLenguaCount}" class="form-select">
+                            <option value="#"># - No se proporciona información</option>
+                            <option value="0" selected>0 - No es traducción</option>
+                            <option value="1">1 - Es traducción</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="subcampo-label">Indicador 2 - Código de Fuente</label>
+                        <select name="codigo_lengua_ind2_${codigoLenguaCount}" class="form-select">
+                            <option value="#" selected># - Código MARC de lengua</option>
+                            <option value="7">7 - Fuente especificada en $2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="subcampo-group">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="subcampo-label mb-0">$a Código de Lengua del Texto/Banda Sonora</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarIdiomaObra(${codigoLenguaCount})">
+                            <i class="bi bi-plus"></i> Idioma
+                        </button>
+                    </div>
+                    <div id="codigo-lengua-${codigoLenguaCount}-idiomas">
+                        <div class="mb-2" data-subcampo="idioma-${codigoLenguaCount}-0">
+                            <div class="input-group input-group-sm">
+                                <select name="codigo_lengua_a_${codigoLenguaCount}_0" class="form-select form-select-sm">
+                                    <option value="ger">Alemán</option>
+                                    <option value="spa" selected>Español</option>
+                                    <option value="fre">Francés</option>
+                                    <option value="eng">Inglés</option>
+                                    <option value="ita">Italiano</option>
+                                    <option value="por">Portugués</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('idioma-${codigoLenguaCount}-0')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.insertAdjacentHTML("beforeend", html);
+        codigoLenguaCount++;
+    }
+
+    // Agregar idioma a un código de lengua específico
+    function agregarIdiomaObra(codigoIndex) {
+        const container = document.getElementById(
+            `codigo-lengua-${codigoIndex}-idiomas`
+        );
+        const idiomaIndex = codigoLenguaIdiomaCounts[codigoIndex];
+        const subcampoId = `idioma-${codigoIndex}-${idiomaIndex}`;
+
+        const html = `
+            <div class="mb-2" data-subcampo="${subcampoId}">
+                <div class="input-group input-group-sm">
+                    <select name="codigo_lengua_a_${codigoIndex}_${idiomaIndex}" class="form-select form-select-sm">
+                        <option value="ger">Alemán</option>
+                        <option value="spa" selected>Español</option>
+                        <option value="fre">Francés</option>
+                        <option value="eng">Inglés</option>
+                        <option value="ita">Italiano</option>
+                        <option value="por">Portugués</option>
+                    </select>
+                    <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('${subcampoId}')">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        container.insertAdjacentHTML("beforeend", html);
+        codigoLenguaIdiomaCounts[codigoIndex]++;
+    }
+
+    // 044 - Código de País
+    function agregarCodigoPais() {
+        const container = document.getElementById("codigo-pais-container");
+        const campoId = `codigo-pais-${codigoPaisCount}`;
+
+        const html = `
+            <div class="campo-repetible" data-campo="${campoId}">
+                <div class="campo-header">
+                    <span class="campo-label">Código de País #${
+                        codigoPaisCount + 1
+                    }</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('${campoId}')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-12">
+                        <label class="subcampo-label">$a Código de País</label>
+                        <select name="codigo_pais_a_${codigoPaisCount}" class="form-select">
+                            <option value="ar">Argentina</option>
+                            <option value="bo">Bolivia</option>
+                            <option value="br">Brasil</option>
+                            <option value="cl">Chile</option>
+                            <option value="co">Colombia</option>
+                            <option value="cr">Costa Rica</option>
+                            <option value="cu">Cuba</option>
+                            <option value="ec" selected>Ecuador</option>
+                            <option value="sv">El Salvador</option>
+                            <option value="gt">Guatemala</option>
+                            <option value="ho">Honduras</option>
+                            <option value="mx">México</option>
+                            <option value="nq">Nicaragua</option>
+                            <option value="pa">Panamá</option>
+                            <option value="pe">Perú</option>
+                            <option value="pr">Puerto Rico</option>
+                            <option value="dr">República Dominicana</option>
+                            <option value="uy">Uruguay</option>
+                            <option value="ve">Venezuela</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.insertAdjacentHTML("beforeend", html);
+        codigoPaisCount++;
+    }
 </script>
 {% endblock %}

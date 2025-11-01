@@ -222,8 +222,9 @@ class IncipitMusical(models.Model):
     voz_instrumento = models.CharField(
         max_length=100,
         blank=True,
+        default='piano',
         null=True,
-        help_text="031 $m – Voz/instrumento (usar solo si NO es para piano)"
+        help_text="031 $m – Voz/instrumento"
     )
     
     # Subcampo $p - Notación musical (NR)
