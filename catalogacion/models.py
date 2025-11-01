@@ -9,7 +9,7 @@ __all__ = [
     'AutoridadTituloUniforme',
     'AutoridadFormaMusical',
     'AutoridadMateria',
-    # Modelos repetibles (importados desde models_repetibles.py)
+    # Modelos repetibles 
     'TituloAlternativo',
     'Edicion',
     'ProduccionPublicacion',
@@ -20,6 +20,13 @@ __all__ = [
     'IncipitMusical',
     'CodigoLengua',
     'CodigoPaisEntidad',
+    'FuncionCompositor',
+    'AtribucionCompositor',
+    'Forma130',
+    'MedioInterpretacion130',
+    'NumeroParteSección130',
+    'NombreParteSección130',
+    'ObraGeneral',
     
     # Modelo principal
     'ObraGeneral',
@@ -122,37 +129,40 @@ class AutoridadMateria(models.Model):
 
 
 # ================================================
-# 🎵 CONSTANTES Y OPCIONES
+# CONSTANTES 
 # ================================================
 
 TONALIDADES = [
+    # Mayores
     ('Do mayor', 'Do mayor'),
-    ('Do menor', 'Do menor'),
     ('Do# mayor', 'Do# mayor'),
-    ('Do# menor', 'Do# menor'),
-    ('Reb mayor', 'Reb mayor'),
-    ('Reb menor', 'Reb menor'),
+    ('Reb mayor', 'Re♭ mayor'),
     ('Re mayor', 'Re mayor'),
-    ('Re menor', 'Re menor'),
-    ('Mib mayor', 'Mib mayor'),
-    ('Mib menor', 'Mib menor'),
+    ('Mib mayor', 'Mi♭ mayor'),
     ('Mi mayor', 'Mi mayor'),
-    ('Mi menor', 'Mi menor'),
     ('Fa mayor', 'Fa mayor'),
-    ('Fa menor', 'Fa menor'),
     ('Fa# mayor', 'Fa# mayor'),
-    ('Fa# menor', 'Fa# menor'),
     ('Sol mayor', 'Sol mayor'),
-    ('Sol menor', 'Sol menor'),
     ('Sol# mayor', 'Sol# mayor'),
-    ('Sol# menor', 'Sol# menor'),
-    ('Lab mayor', 'Lab mayor'),
-    ('Lab menor', 'Lab menor'),
+    ('Lab mayor', 'La♭ mayor'),
     ('La mayor', 'La mayor'),
-    ('La menor', 'La menor'),
-    ('Sib mayor', 'Sib mayor'),
-    ('Sib menor', 'Sib menor'),
+    ('Sib mayor', 'Si♭ mayor'),
     ('Si mayor', 'Si mayor'),
+    
+    # Menores
+    ('Do menor', 'Do menor'),
+    ('Do# menor', 'Do# menor'),
+    ('Reb menor', 'Re♭ menor'),
+    ('Re menor', 'Re menor'),
+    ('Mib menor', 'Mi♭ menor'),
+    ('Mi menor', 'Mi menor'),
+    ('Fa menor', 'Fa menor'),
+    ('Fa# menor', 'Fa# menor'),
+    ('Sol menor', 'Sol menor'),
+    ('Sol# menor', 'Sol# menor'),
+    ('Lab menor', 'La♭ menor'),
+    ('La menor', 'La menor'),
+    ('Sib menor', 'Si♭ menor'),
     ('Si menor', 'Si menor'),
 ]
 
@@ -313,35 +323,15 @@ class ObraGeneral(models.Model):
         blank=True,
         null=True,
         related_name='obras_130',
-        help_text="130 $a – Título uniforme (cruzar con 240)"
+        help_text="130 $a – Título uniforme normalizado (cruzar con campo 240)"
     )
     
-    # TODO: Repetible
-    titulo_uniforme_forma = models.ForeignKey(
-        AutoridadFormaMusical,
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True,
-        related_name='obras_130_forma',
-        help_text="130 $k – Forma (cruzar con 240 $k y 655)"
-    )
     
-    # TODO: Repetible
-    titulo_uniforme_medio_interpretacion = models.CharField(
-        max_length=100, 
-        blank=True, 
-        null=True,
-        default='piano',
-        help_text="130 $m – Medio de interpretación"
-    )
-    
-    titulo_uniforme_num_parte = models.CharField(
-        max_length=50, 
-        blank=True, 
-        null=True,
-        help_text="130 $n – Número de parte/sección"
-    )
-    
+    #* - 130 $k → Forma130 como modelo repetible en models_repetibles.py
+    #* - 130 $m → MedioInterpretacion130 como modelo repetible en models_repetibles.py
+    #* - 130 $n → NumeroParteSección130 como modelo repetible en models_repetibles.py
+    #* - 130 $p → NombreParteSección130 como modelo repetible en models_repetibles.py
+
     titulo_uniforme_arreglo = models.CharField(
         max_length=10, 
         blank=True, 
@@ -350,20 +340,12 @@ class ObraGeneral(models.Model):
         help_text="130 $o – Arreglo"
     )
     
-    # TODO: Repetible
-    titulo_uniforme_nombre_parte = models.CharField(
-        max_length=100, 
-        blank=True, 
-        null=True,
-        help_text="130 $p – Nombre de parte/sección"
-    )
-    
     titulo_uniforme_tonalidad = models.CharField(
-        max_length=15, 
-        blank=True, 
+        max_length=20,
+        blank=True,
         null=True,
         choices=TONALIDADES,
-        help_text="130 $r – Tonalidad"
+        help_text="130 $r – Tonalidad (NR - No repetible)"
     )
     
     # ------------------------------------------------

@@ -597,6 +597,143 @@ class AtribucionCompositor(models.Model):
 
 
 # ================================================
+# 📌 CAMPO 130 - SUBCAMPOS REPETIBLES (R)
+# ================================================
+
+class Forma130(models.Model):
+    """
+    Campo 130 - Subcampo $k (R)
+    Subencabezamiento de forma
+    Permite múltiples formas para un título uniforme
+    """
+    
+    # Opciones de formas según tu Excel
+    FORMAS = [
+        ('adaptación', 'Adaptación'),
+        ('boceto', 'Boceto'),
+        ('fragmento', 'Fragmento'),
+        ('selección', 'Selección'),
+        ('tema con variaciones', 'Tema con variaciones'),
+    ]
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='formas_130',
+        help_text="Obra a la que pertenece"
+    )
+    
+    forma = models.ForeignKey(
+        'AutoridadFormaMusical',
+        on_delete=models.PROTECT,
+        help_text="130 $k – Forma normalizada"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Forma (130 $k)"
+        verbose_name_plural = "Formas (130 $k - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        return self.forma if isinstance(self.forma, str) else self.forma.forma
+
+
+class MedioInterpretacion130(models.Model):
+    """
+    Campo 130 - Subcampo $m (R)
+    Medio de interpretación para música
+    Permite múltiples medios de interpretación
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='medios_interpretacion_130',
+        help_text="Obra a la que pertenece"
+    )
+    
+    # Subcampo $m - Medio de interpretación (R)
+    medio = models.CharField(
+        max_length=100,
+        default='piano',
+        help_text="130 $m – Medio de interpretación (predeterminado: piano)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Medio de Interpretación (130 $m)"
+        verbose_name_plural = "Medios de Interpretación (130 $m - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        return self.medio
+
+
+class NumeroParteSección130(models.Model):
+    """
+    Campo 130 - Subcampo $n (R)
+    Número de parte o sección de la obra
+    Permite múltiples números (ej: obra con varias partes)
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='numeros_parte_130',
+        help_text="Obra a la que pertenece"
+    )
+    
+    # Subcampo $n - Número de parte (R)
+    numero = models.CharField(
+        max_length=50,
+        help_text="130 $n – Número de parte/sección (ej: I, II, III o 1, 2, 3)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Número de Parte/Sección (130 $n)"
+        verbose_name_plural = "Números de Parte/Sección (130 $n - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        return self.numero
+
+
+class NombreParteSección130(models.Model):
+    """
+    Campo 130 - Subcampo $p (R)
+    Nombre de parte o sección de la obra
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='nombres_parte_130',
+        help_text="Obra a la que pertenece"
+    )
+    
+    # Subcampo $p - Nombre de parte (R)
+    nombre = models.CharField(
+        max_length=200,
+        help_text="130 $p – Nombre de parte/sección (ej: Allegro, Andante, Finale)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Nombre de Parte/Sección (130 $p)"
+        verbose_name_plural = "Nombres de Parte/Sección (130 $p - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        return self.nombre
+
+
+# ================================================
 #? 📌 CAMPO 246: TÍTULO ALTERNATIVO (R)
 # ================================================
 
