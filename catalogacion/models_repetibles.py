@@ -978,7 +978,6 @@ class ProduccionPublicacion(models.Model):
         help_text="264 segundo indicador – Función de la entidad"
     )
     
-    # Subcampos TODOS REPETIBLES (R)
     
     # Subcampo $a - Lugar (R)
     lugar = models.CharField(
@@ -1054,61 +1053,139 @@ class ProduccionPublicacion(models.Model):
         return str(self)
 
 
-#===============================================
-# 📌 CAMPO 300: DESCRIPCIÓN FÍSICA 
 # ================================================
-# TODO: Revisar subcampos repetibles
+# 📌 CAMPO 300: DESCRIPCIÓN FÍSICA (R)
+# ================================================
+
 class DescripcionFisica(models.Model):
     """
-    Campo 300 - Descripción física (R)
+    Campo 300 (R) - Descripción física
     
-    Permite múltiples descripciones físicas para una obra.
-    Ejemplos: diferentes formatos o características físicas de la obra.
+    Instancia completa de 300 con subcampos NR ($b, $e) integrados
+    y subcampos R ($a, $c) en modelos separados (Extension300, Dimension300).
+    
     """
     
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
         related_name='descripciones_fisicas',
-        help_text="Obra a la que pertenece esta descripción física"
+        help_text="Obra a la que pertenece"
     )
     
-    # Subcampo $a - Extensión
-    extension = models.CharField(
-        max_length=200,
-        help_text="300 $a – Extensión (ej: 1 partitura (24 p.))"
-    )
-    
-    # Subcampo $b - Otras características físicas
+    # Subcampo $b - Características (NR)
     otras_caracteristicas_fisicas = models.CharField(
-        max_length=200,
+        max_length=300,
         blank=True,
         null=True,
-        help_text="300 $b – Otras características físicas (ej: ilustraciones, notas)"
+        help_text="300 $b – Otras características físicas (NR)"
     )
     
-    # Subcampo $c - Dimensiones
-    dimensiones = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        help_text="300 $c – Dimensiones (ej: 30 cm)"
-    )
-    
-    # Subcampo $e - Material acompañante
+    # Subcampo $e - Material acompañante (NR)
     material_acompanante = models.CharField(
-        max_length=200,
+        max_length=300,
         blank=True,
         null=True,
-        help_text="300 $e – Material acompañante (ej: 1 CD)"
+        help_text="300 $e – Material acompañante (NR)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Descripción Física (300)"
+        verbose_name_plural = "Descripciones Físicas (300 - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        extensiones = ", ".join([e.extension for e in self.extensiones.all()])
+        if self.otras_caracteristicas_fisicas:
+            extensiones += f" ; {self.otras_caracteristicas_fisicas}"
+        if self.dimensiones_set.exists():
+            dims = ", ".join([d.dimension for d in self.dimensiones_set.all()])
+            extensiones += f" ; {dims}"
+        return extensiones or "Sin descripción"
+    
+    def get_marc_format(self):
+        """Retorna el campo completo en formato MARC21"""
+        marc = ""
+        
+        # Agregar todas las extensiones ($a - R)
+        for ext in self.extensiones.all():
+            marc += f" $a{ext.extension}"
+        
+        # Agregar características ($b - NR)
+        if self.otras_caracteristicas_fisicas:
+            marc += f" $b{self.otras_caracteristicas_fisicas}"
+        
+        # Agregar todas las dimensiones ($c - R)
+        for dim in self.dimensiones_set.all():
+            marc += f" $c{dim.dimension}"
+        
+        # Agregar material acompañante ($e - NR)
+        if self.material_acompanante:
+            marc += f" $e{self.material_acompanante}"
+        
+        return f"300 ##" + marc if marc else ""
+
+
+class Extension300(models.Model):
+    """
+    Subcampo $a de 300 (R)
+    Extensión - REPETIBLE dentro de cada 300
+    
+    Ejemplos: "1 partitura (24 p.)", "32 páginas", "1 cuadernillo (12 p.)"
+    """
+    
+    descripcion_fisica = models.ForeignKey(
+        DescripcionFisica,
+        on_delete=models.CASCADE,
+        related_name='extensiones',
+        help_text="Descripción física a la que pertenece"
+    )
+    
+    extension = models.CharField(
+        max_length=500,
+        help_text="300 $a – Extensión (ej: '1 partitura (24 p.)')"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name = "Descripción Física (300)"
-        verbose_name_plural = "Descripciones Físicas (300)"
-        ordering = ['obra', 'id']
-        
+        verbose_name = "Extensión (300 $a)"
+        verbose_name_plural = "Extensiones (300 $a - R)"
+        ordering = ['descripcion_fisica', 'id']
+    
     def __str__(self):
         return self.extension
+
+
+class Dimension300(models.Model):
+    """
+    Subcampo $c de 300 (R)
+    Dimensiones - REPETIBLE dentro de cada 300
+    
+    Ejemplos: "30 cm", "23 cm", "2.5 MB", "25 x 30 cm"
+    """
+    
+    descripcion_fisica = models.ForeignKey(
+        DescripcionFisica,
+        on_delete=models.CASCADE,
+        related_name='dimensiones_set',
+        help_text="Descripción física a la que pertenece"
+    )
+    
+    dimension = models.CharField(
+        max_length=200,
+        help_text="300 $c – Dimensión (ej: '30 cm', '2.5 MB')"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Dimensión (300 $c)"
+        verbose_name_plural = "Dimensiones (300 $c - R)"
+        ordering = ['descripcion_fisica', 'id']
+    
+    def __str__(self):
+        return self.dimension

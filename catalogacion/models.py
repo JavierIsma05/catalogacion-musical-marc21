@@ -412,7 +412,7 @@ class ObraGeneral(models.Model):
     # ------------------------------------------------
 
 
-    #? 🟦 BLOQUE 3XX – Descripción física
+    #? 🟦 BLOQUE 3XX 
 
     #* Campo 300 implementado como modelo separado: DescripcionFisica
 
