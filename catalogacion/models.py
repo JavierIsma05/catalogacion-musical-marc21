@@ -452,6 +452,8 @@ class ObraGeneral(models.Model):
     
     #? 🟦 BLOQUE 4XX 
     
+    #* Campo 490 implementado como modelo repetible: MencionSerie490, TituloSerie490, VolumenSerie490
+    
     #? 🟦 BLOQUE 5XX 
     
     #? 🟦 BLOQUE 6XX 
