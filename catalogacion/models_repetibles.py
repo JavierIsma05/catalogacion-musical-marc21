@@ -904,7 +904,7 @@ class TituloAlternativo(models.Model):
 
 
 # ================================================
-# 📌 CAMPO 250: EDICIÓN (R)
+#? 📌 CAMPO 250: EDICIÓN (R)
 # ================================================
 
 class Edicion(models.Model):
@@ -912,7 +912,6 @@ class Edicion(models.Model):
     Campo 250 - Edición (R)
     
     Permite múltiples ediciones para una obra.
-    Ejemplos: "2a ed.", "Primera edición revisada", "Ed. crítica"
     """
     
     obra = models.ForeignKey(
@@ -924,40 +923,39 @@ class Edicion(models.Model):
     
     # Subcampo $a - Enunciado de edición
     edicion = models.CharField(
-        max_length=200,
+        max_length=500,
         help_text="250 $a – Edición"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = "Edición (250)"
-        verbose_name_plural = "Ediciones (250)"
+        verbose_name_plural = "Ediciones (250 - R)"
         ordering = ['obra', 'id']
-        
+    
     def __str__(self):
         return self.edicion
-
+    
+    def get_marc_format(self):
+        """Retorna el campo en formato MARC21"""
+        return f"250 ## $a{self.edicion}"
 
 # ================================================
-# 📌 CAMPO 264: PRODUCCIÓN/PUBLICACIÓN (R)
+#? 📌 CAMPO 264: PRODUCCIÓN/PUBLICACIÓN (R)
 # ================================================
 
 class ProduccionPublicacion(models.Model):
     """
-    Campo 264 - Producción, publicación, distribución, fabricación y copyright (R)
+    Campo 264 (R) - Producción, publicación, distribución, fabricación, copyright
     
-    Permite múltiples entradas para distinguir entre productor, editor, distribuidor, etc.
-    El segundo indicador identifica la función de la entidad:
-    - 0: Producción (manuscritos)
-    - 1: Publicación (material impreso)
-    - 2: Distribución
-    - 3: Fabricación
-    - 4: Copyright
+    Campo completo repetible que permite múltiples instancias
+    para distinguir entre diferentes funciones de entidades.
     """
     
-    # Opciones para el segundo indicador (función de la entidad)
-    FUNCIONES_264 = [
+    # Función de la entidad (segundo indicador)
+    FUNCIONES = [
         ('0', 'Producción'),
         ('1', 'Publicación'),
         ('2', 'Distribución'),
@@ -965,54 +963,58 @@ class ProduccionPublicacion(models.Model):
         ('4', 'Copyright'),
     ]
     
-    # Relación con la obra principal
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
-        related_name='produccion_publicacion',
-        help_text="Obra a la que pertenece este registro 264"
+        related_name='producciones_publicaciones',
+        help_text="Obra a la que pertenece"
     )
     
-    # Subcampo $a - Lugar
+    # Segundo indicador: Función de entidad
+    funcion = models.CharField(
+        max_length=1,
+        choices=FUNCIONES,
+        default='0',  # Predeterminado: Producción
+        help_text="264 segundo indicador – Función de la entidad"
+    )
+    
+    # Subcampos TODOS REPETIBLES (R)
+    
+    # Subcampo $a - Lugar (R)
     lugar = models.CharField(
         max_length=200,
         blank=True,
         null=True,
-        help_text="264 $a – Lugar de producción, publicación, distribución o fabricación"
+        help_text="264 $a – Lugar de producción/publicación (R)"
     )
     
-    # Subcampo $b - Nombre del productor/editor/distribuidor/fabricante
+    # Subcampo $b - Nombre (R)
     nombre_entidad = models.CharField(
-        max_length=200,
+        max_length=300,
         blank=True,
         null=True,
-        help_text="264 $b – Nombre del productor, editor, distribuidor o fabricante"
+        help_text="264 $b – Nombre del productor/editor/distribuidor (R)"
     )
     
-    # Subcampo $c - Fecha
+    # Subcampo $c - Fecha (R)
     fecha = models.CharField(
         max_length=100,
         blank=True,
         null=True,
-        help_text="264 $c – Fecha de producción, publicación, distribución, fabricación o copyright"
+        help_text="264 $c – Fecha de producción/publicación (R)"
     )
     
-    # Segundo indicador - Función de la entidad
-    funcion = models.CharField(
-        max_length=1,
-        choices=FUNCIONES_264,
-        default='0',
-        help_text="Segundo indicador: función de la entidad (0=Producción para manuscritos)"
-    )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = "Producción/Publicación (264)"
-        verbose_name_plural = "Producciones/Publicaciones (264)"
+        verbose_name_plural = "Producciones/Publicaciones (264 - R)"
         ordering = ['obra', 'id']
-        
+    
     def __str__(self):
+        funcion_display = self.get_funcion_display()
         partes = []
         if self.lugar:
             partes.append(self.lugar)
@@ -1020,11 +1022,37 @@ class ProduccionPublicacion(models.Model):
             partes.append(self.nombre_entidad)
         if self.fecha:
             partes.append(self.fecha)
-        
-        funcion_display = self.get_funcion_display()
         info = " : ".join(partes) if partes else "Sin datos"
-        
         return f"[{funcion_display}] {info}"
+    
+    def get_marc_format(self):
+        """Retorna el campo en formato MARC21"""
+        marc = f"264 #{self.funcion}"
+        if self.lugar:
+            marc += f" $a{self.lugar}"
+        if self.nombre_entidad:
+            marc += f" $b{self.nombre_entidad}"
+        if self.fecha:
+            marc += f" $c{self.fecha}"
+        return marc
+    
+    def get_vista_usuario(self):
+        """Retorna vista legible para el usuario"""
+        funcion_display = self.get_funcion_display()
+        
+        if funcion_display == 'Producción':
+            return f"Producido en {self.lugar} por {self.nombre_entidad} ({self.fecha})"
+        elif funcion_display == 'Publicación':
+            return f"Publicado en {self.lugar} por {self.nombre_entidad} ({self.fecha})"
+        elif funcion_display == 'Distribución':
+            return f"Distribuido en {self.lugar} por {self.nombre_entidad} ({self.fecha})"
+        elif funcion_display == 'Fabricación':
+            return f"Fabricado en {self.lugar} por {self.nombre_entidad} ({self.fecha})"
+        elif funcion_display == 'Copyright':
+            return f"Copyright en {self.lugar} ({self.fecha})"
+        
+        return str(self)
+
 
 #===============================================
 # 📌 CAMPO 300: DESCRIPCIÓN FÍSICA 
