@@ -1189,3 +1189,88 @@ class Dimension300(models.Model):
     
     def __str__(self):
         return self.dimension
+
+# ================================================
+#? 📌 CAMPO 340: MEDIO FÍSICO (R)
+# ================================================
+
+class MedioFisico(models.Model):
+    """
+    Campo 340 (R) - Instancia de 340
+    
+    Contenedor para técnicas de registro (340 $d).
+    El campo 340 puede repetirse múltiples veces.
+    Dentro de cada 340, el subcampo $d es también REPETIBLE.
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='medios_fisicos',
+        help_text="Obra a la que pertenece"
+    )
+    
+    # Por por ahora solo $d, que es repetible y tiene su propio modelo
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Medio Físico (340)"
+        verbose_name_plural = "Medios Físicos (340 - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        tecnicas = ", ".join([t.tecnica for t in self.tecnicas.all()])
+        return tecnicas or "Sin técnicas"
+    
+    def get_marc_format(self):
+        """Retorna el campo completo en formato MARC21"""
+        marc = ""
+        for tecnica in self.tecnicas.all():
+            marc += f" $d{tecnica.tecnica}"
+        return f"340 ##" + marc if marc else ""
+
+
+class Tecnica340(models.Model):
+    """
+    Subcampo $d de 340 (R)
+    Técnica en que se registra la información - REPETIBLE dentro de cada 340
+    
+    Ejemplos:
+    - Una obra puede ser: "manuscrito" + "autógrafo"
+    - Una obra puede ser: "impreso" + "fotocopia de impreso"
+    """
+    
+    TECNICAS = [
+        ('autógrafo', 'Autógrafo'),
+        ('posible autógrafo', 'Posible autógrafo'),
+        ('manuscrito', 'Manuscrito'),
+        ('manuscrito de copista no identificado', 'Manuscrito de copista no identificado'),
+        ('impreso', 'Impreso'),
+        ('fotocopia de manuscrito', 'Fotocopia de manuscrito'),
+        ('fotocopia de impreso', 'Fotocopia de impreso'),
+    ]
+    
+    medio_fisico = models.ForeignKey(
+        MedioFisico,
+        on_delete=models.CASCADE,
+        related_name='tecnicas',
+        help_text="Medio físico al que pertenece"
+    )
+    
+    # Subcampo $d - Técnica (R)
+    tecnica = models.CharField(
+        max_length=50,
+        choices=TECNICAS,
+        help_text="340 $d – Técnica de registro (repetible dentro de cada 340)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Técnica (340 $d)"
+        verbose_name_plural = "Técnicas (340 $d - R)"
+        ordering = ['medio_fisico', 'id']
+    
+    def __str__(self):
+        return self.get_tecnica_display()

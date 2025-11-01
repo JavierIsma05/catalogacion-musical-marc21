@@ -13,7 +13,6 @@ __all__ = [
     'TituloAlternativo',
     'Edicion',
     'ProduccionPublicacion',
-    'DescripcionFisica',
     'ISBN',
     'ISMN',
     'NumeroEditor',
@@ -26,7 +25,18 @@ __all__ = [
     'MedioInterpretacion130',
     'NumeroParteSección130',
     'NombreParteSección130',
-    'ObraGeneral',
+    'Forma240',
+    'MedioInterpretacion240',
+    'NumeroParteSección240',
+    'NombreParteSección240',
+    'TituloAlternativo',
+    'Edicion',
+    'ProduccionPublicacion',
+    'DescripcionFisica',
+    'Extension300',
+    'Dimension300',
+    'MedioFisico',
+    'Tecnica340',
     
     # Modelo principal
     'ObraGeneral',
@@ -411,14 +421,15 @@ class ObraGeneral(models.Model):
     #* Campo 264 implementado como modelo separado: ProduccionPublicacion
     # ------------------------------------------------
 
-
     #? 🟦 BLOQUE 3XX 
 
     #* Campo 300 implementado como modelo separado: DescripcionFisica
 
+
+
     
     # ------------------------------------------------
-    # Metadatos del sistema
+    #? Metadatos del sistema
     # ------------------------------------------------
     fecha_creacion_sistema = models.DateTimeField(auto_now_add=True)
     fecha_modificacion_sistema = models.DateTimeField(auto_now=True)
@@ -482,6 +493,32 @@ class ObraGeneral(models.Model):
             f"$d{self.clasif_ms_imp} "
             f"$0{self.clasif_num_control}"
         )
+        
+    def generar_medio_fisico_automatico(self):
+        """
+        Autogenera MedioFisico con Tecnica340 basado en tipo_registro
+        """
+        # Solo generar si no existen medios físicos aún
+        if self.medios_fisicos.exists():
+            return
+        
+        # Crear MedioFisico contenedor
+        medio = MedioFisico.objects.create(obra=self)
+        
+        # Agregar técnica automática según tipo_registro
+        if self.tipo_registro == 'd':  # Manuscrito
+            tecnica_automatica = 'manuscrito'
+        elif self.tipo_registro == 'c':  # Impreso
+            tecnica_automatica = 'impreso'
+        else:
+            return
+        
+        # Crear técnica dentro del MedioFisico
+        Tecnica340.objects.create(
+            medio_fisico=medio,
+            tecnica=tecnica_automatica
+        )
+
 
     def save(self, *args, **kwargs):
         """
@@ -508,10 +545,14 @@ class ObraGeneral(models.Model):
         if not self.estado_registro:
             self.estado_registro = 'n'  # n = nuevo registro
         
+        # Generar clasificación 092
+        self.generar_clasificacion_092()
+        
+        # Generar medio físico automático (340)
+        self.generar_medio_fisico_automatico()
 
         super().save(*args, **kwargs)
         
-        self.generar_clasificacion_092()
 
         ObraGeneral.objects.filter(pk=self.pk).update(
             clasif_institucion=self.clasif_institucion,
