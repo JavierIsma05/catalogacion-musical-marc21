@@ -1,6 +1,6 @@
 from django.db import models
 from datetime import datetime
-from .models_repetibles import TituloAlternativo, Edicion, ProduccionPublicacion, DescripcionFisica
+from .models_repetibles import *
 
 # Exportar todos los modelos para que estén disponibles con "from .models import ..."
 __all__ = [
@@ -14,6 +14,13 @@ __all__ = [
     'Edicion',
     'ProduccionPublicacion',
     'DescripcionFisica',
+    'ISBN',
+    'ISMN',
+    'NumeroEditor',
+    'IncipitMusical',
+    'CodigoLengua',
+    'CodigoPaisEntidad',
+    
     # Modelo principal
     'ObraGeneral',
 ]
@@ -248,66 +255,60 @@ class ObraGeneral(models.Model):
     )
     
     # 041 0# Código de lengua
-    codigo_lengua = models.CharField(
-        max_length=3, 
-        default='spa',
-        choices=[
-            ('spa', 'Español'),
-            ('eng', 'Inglés'),
-            ('fra', 'Francés'),
-            ('ger', 'Alemán'),
-            ('ita', 'Italiano'),
-            ('lat', 'Latín'),
-            ('por', 'Portugués'),
-            ('que', 'Quechua'),
-        ],
-        help_text="041 $a – Código de lengua MARC21 (predeterminado: spa)"
-    )
+    #* Campo 041 implementado como modelo repetible: CodigoLengua en models_repetibles.py 
     
     # 044 ## Código del país
-    codigo_pais = models.CharField(
-        max_length=3, 
-        default='ec',
-        choices=[
-            ('ec', 'Ecuador'),
-            ('us', 'Estados Unidos'),
-            ('es', 'España'),
-            ('fr', 'Francia'),
-            ('it', 'Italia'),
-            ('de', 'Alemania'),
-            ('ar', 'Argentina'),
-            ('co', 'Colombia'),
-            ('pe', 'Perú'),
-        ],
-        help_text="044 $a – Código del país (predeterminado: ec)"
+    #* Campo 044 implementado como modelo repetible: CodigoPaisEntidad en models_repetibles.py
+    
+    #* 092 ## Clasificación local
+    # 092 $a - Institución (NR)
+    clasif_institucion = models.CharField(
+        max_length=10,
+        default='UNL',
+        editable=False,
+        help_text="092 $a – Institución (duplica campo 040 $a)"
     )
     
-    # 092 ## Clasificación local
-    clasif_institucion = models.CharField(
-        max_length=50, 
-        default='UNL', 
-        help_text="092 $a – Institución (UNL)"
-    )
+    # 092 $b - Proyecto (NR)
     clasif_proyecto = models.CharField(
-        max_length=50, 
-        default='BLMP', 
-        help_text="092 $b – Proyecto (BLMP)"
+        max_length=50,
+        default='BLMP',
+        editable=False,
+        help_text="092 $b – Proyecto"
     )
+    
+    # 092 $c - País (NR)
+    # Se genera automáticamente del campo 044 $a
     clasif_pais = models.CharField(
-        max_length=50, 
-        default='EC', 
-        help_text="092 $c – País (EC)"
+        max_length=10,
+        blank=True,
+        null=True,
+        editable=False,
+        help_text="092 $c – País (duplica campo 044 $a)"
     )
+    
+    # 092 $d - Ms/Imp (NR)
+    # Se genera automáticamente de la posición 06 de cabecera (tipo_registro)
     clasif_ms_imp = models.CharField(
         max_length=3,
-        choices=[('Ms', 'Manuscrito'), ('Imp', 'Impreso')],
-        default='Ms',
-        help_text="092 $d – Tipo de material (Ms/Imp)"
+        choices=[
+            ('Ms', 'Manuscrito'),
+            ('Imp', 'Impreso'),
+        ],
+        blank=True,
+        null=True,
+        editable=False,
+        help_text="092 $d – Ms (Manuscrito) o Imp (Impreso) - Cruza con posición 06 de cabecera"
     )
+    
+    # 092 $0 - Número de control (NR)
+    # Se genera automáticamente del campo 001
     clasif_num_control = models.CharField(
-        max_length=6, 
-        editable=False, 
-        help_text="092 $0 – Duplica 001"
+        max_length=50,
+        blank=True,
+        null=True,
+        editable=False,
+        help_text="092 $0 – Número de control (duplica campo 001)"
     )
     
     # ------------------------------------------------
@@ -511,59 +512,176 @@ class ObraGeneral(models.Model):
     # ------------------------------------------------
     # Métodos
     # ------------------------------------------------
-    
-    def save(self, *args, **kwargs):
-        """Autogenerar campos automáticos"""
-        if not self.num_control:
-            last = ObraGeneral.objects.order_by('-id').first()
-            next_id = 1 if not last else last.id + 1
-            self.num_control = str(next_id).zfill(6)
+
+    def generar_clasificacion_092(self):
+        """
+        Genera automáticamente el campo 092 completo (Clasificación local)
+        Toma información de otros campos según especificaciones MARC21
+        """
+        self.clasif_institucion = self.centro_catalogador or 'UNL'
+        self.clasif_proyecto = 'BLMP'
         
-        # Actualizar fecha/hora de transacción
-        self.fecha_hora_ultima_transaccion = datetime.now().strftime("%d%m%Y%H%M%S")
+        try:
+            primer_pais = self.codigos_pais_entidad.order_by('orden').first()
+            if primer_pais:
+                self.clasif_pais = primer_pais.codigo_pais.upper()
+            else:
+                self.clasif_pais = getattr(self, 'codigo_pais_simple', 'EC').upper()
+        except:
+            self.clasif_pais = 'EC'
         
-        # Generar código de información (008)
-        if not self.codigo_informacion:
-            fecha_creacion = datetime.now().strftime("%d%m%y")
-            self.codigo_informacion = fecha_creacion + ("|" * (40 - 6))
-        
-        # Sincronizar clasificación con número de control
-        self.clasif_num_control = self.num_control
-        
-        # Sincronizar 092 $d con tipo de registro
-        if self.tipo_registro == 'd':
+        if self.tipo_registro == 'd':  # Música manuscrita
             self.clasif_ms_imp = 'Ms'
-        elif self.tipo_registro == 'c':
+        elif self.tipo_registro == 'c':  # Música impresa
             self.clasif_ms_imp = 'Imp'
+        else:
+            self.clasif_ms_imp = 'Imp'  # Por defecto: Impreso
         
+        self.clasif_num_control = self.num_control
+
+    def get_signatura_completa(self):
+        """
+        Retorna la signatura completa en formato legible
+        Formato: UNL-BLMP-EC-Ms-000001
+        """
+        if not all([self.clasif_institucion, self.clasif_proyecto, 
+                    self.clasif_pais, self.clasif_ms_imp, self.clasif_num_control]):
+            return "Pendiente de generar"
+        
+        return (
+            f"{self.clasif_institucion}-"
+            f"{self.clasif_proyecto}-"
+            f"{self.clasif_pais}-"
+            f"{self.clasif_ms_imp}-"
+            f"{self.clasif_num_control}"
+        )
+
+    def get_campo_092_marc(self):
+        """
+        Retorna el campo 092 completo en formato MARC21
+        """
+        return (
+            f"092 ## "
+            f"$a{self.clasif_institucion} "
+            f"$b{self.clasif_proyecto} "
+            f"$c{self.clasif_pais} "
+            f"$d{self.clasif_ms_imp} "
+            f"$0{self.clasif_num_control}"
+        )
+
+    def save(self, *args, **kwargs):
+        """
+        Override del método save para autogenerar campos automáticos
+        según especificaciones MARC21
+        """
+
+        if not self.num_control:
+            try:
+                ultima_obra = ObraGeneral.objects.order_by('-id').first()
+                siguiente_id = 1 if not ultima_obra else ultima_obra.id + 1
+            except:
+                siguiente_id = 1
+            
+            tipo_abrev = 'M' if self.tipo_registro == 'd' else 'I'
+            self.num_control = f"{tipo_abrev}{str(siguiente_id).zfill(6)}"
+        
+
+        if not self.codigo_informacion:
+            fecha_creacion = datetime.now().strftime("%y%m%d")  
+            self.codigo_informacion = fecha_creacion + (" " * (40 - len(fecha_creacion)))
+        
+
+        if not self.estado_registro:
+            self.estado_registro = 'n'  # n = nuevo registro
+        
+
         super().save(*args, **kwargs)
-    
+        
+        self.generar_clasificacion_092()
+
+        ObraGeneral.objects.filter(pk=self.pk).update(
+            clasif_institucion=self.clasif_institucion,
+            clasif_proyecto=self.clasif_proyecto,
+            clasif_pais=self.clasif_pais,
+            clasif_ms_imp=self.clasif_ms_imp,
+            clasif_num_control=self.clasif_num_control
+        )
+
     def clean(self):
-        """Validaciones"""
+        """
+        Validaciones de negocio según reglas MARC21
+        Se ejecuta antes de save() cuando se usa full_clean()
+        """
         from django.core.exceptions import ValidationError
+        
+        errores = {}
+        
         
         # Regla: Si hay compositor (100), NO debe haber 130
         if self.compositor and self.titulo_uniforme:
-            raise ValidationError(
-                "Si hay compositor (campo 100), debe usar campo 240, no 130"
+            errores['compositor'] = (
+                "Si hay compositor (campo 100), debe usar campo 240 para el título uniforme, "
+                "no campo 130. El campo 130 es solo para obras anónimas."
+            )
+            errores['titulo_uniforme'] = (
+                "No puede usar campo 130 cuando hay compositor. Use campo 240 en su lugar."
             )
         
         # Regla: Si NO hay compositor, NO debe haber 240
         if not self.compositor and self.titulo_240:
-            raise ValidationError(
-                "Si no hay compositor, debe usar campo 130, no 240"
+            errores['titulo_240'] = (
+                "El campo 240 solo se usa cuando hay compositor (campo 100). "
+                "Si no hay compositor, use campo 130 para el título uniforme."
             )
         
-        # Debe haber al menos uno: 100 o 130
+        # Regla: Debe haber al menos uno: 100 o 130
         if not self.compositor and not self.titulo_uniforme:
-            raise ValidationError(
-                "Debe haber un punto de acceso principal: compositor (100) o título uniforme (130)"
+            errores['compositor'] = (
+                "Debe haber un punto de acceso principal. Complete el campo 100 (compositor) "
+                "o el campo 130 (título uniforme para obras anónimas)."
             )
-    
+            errores['titulo_uniforme'] = (
+                "Debe haber un punto de acceso principal. Complete el campo 130 (título uniforme) "
+                "o el campo 100 (compositor)."
+            )
+
+        
+        if not self.titulo_principal or not self.titulo_principal.strip():
+            errores['titulo_principal'] = (
+                "El título principal (campo 245 $a) es obligatorio."
+            )
+        
+        
+        if self.tipo_registro not in ['c', 'd']:
+            errores['tipo_registro'] = (
+                "El tipo de registro debe ser 'c' (música impresa) o 'd' (música manuscrita)."
+            )
+        
+        
+        if self.nivel_bibliografico not in ['a', 'c', 'm']:
+            errores['nivel_bibliografico'] = (
+                "El nivel bibliográfico debe ser 'a' (parte componente), "
+                "'c' (colección) o 'm' (obra independiente)."
+            )
+
+        if errores:
+            raise ValidationError(errores)
+
     def __str__(self):
-        return f"Obra {self.num_control} ({self.get_tipo_registro_display()})"
-    
+        """Representación en string del objeto"""
+        if self.compositor:
+            return f"{self.num_control or 'Sin N°'}: {self.titulo_principal} - {self.compositor}"
+        elif self.titulo_uniforme:
+            return f"{self.num_control or 'Sin N°'}: {self.titulo_uniforme}"
+        return f"{self.num_control or 'Sin N°'}: {self.titulo_principal}"
+
     class Meta:
-        verbose_name = "Obra Musical"
-        verbose_name_plural = "Obras Musicales"
+        verbose_name = "Obra Musical MARC21"
+        verbose_name_plural = "Obras Musicales MARC21"
         ordering = ['-num_control']
+        indexes = [
+            models.Index(fields=['num_control']),
+            models.Index(fields=['tipo_registro']),
+            models.Index(fields=['nivel_bibliografico']),
+            models.Index(fields=['-fecha_creacion_sistema']),
+        ]

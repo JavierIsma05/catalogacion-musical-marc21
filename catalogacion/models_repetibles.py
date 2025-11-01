@@ -13,6 +13,18 @@ Campos incluidos:
 
 from django.db import models
 
+CODIGOS_LENGUAJE = [
+        ('ger', 'Alemán'),
+        ('spa', 'Español'),
+        ('fre', 'Francés'),
+        ('eng', 'Inglés'),
+        ('ita', 'Italiano'),
+        ('por', 'Portugués'),
+        # ('mul', 'Múltiples idiomas'),
+        # ('und', 'Indeterminado'),
+        # ('zxx', 'Sin contenido lingüístico'),
+    ]
+
 # ================================================
 #* 📌 CAMPO 020: ## ISBN (R)
 # ================================================
@@ -48,7 +60,7 @@ class ISBN(models.Model):
         return self.isbn
 
 # ================================================
-#* 📌 CAMPO 024: ## ISMN (R)
+#? 📌 CAMPO 024: ## ISMN (R)
 # ================================================
 
 class ISMN(models.Model):
@@ -145,7 +157,7 @@ class NumeroEditor(models.Model):
     class Meta:
         verbose_name = "Número de Editor (028)"
         verbose_name_plural = "Números de Editor (028 - R)"
-        ordering = ['obra', 'orden']
+        ordering = ['obra', 'id']
     
     def __str__(self):
         tipo_display = self.get_tipo_numero_display()
@@ -162,10 +174,6 @@ class NumeroEditor(models.Model):
 
 # ================================================
 #? 📌 CAMPO 031: ÍNCIPIT MUSICAL (R)
-# ================================================
-
-# ================================================
-# 📌 CAMPO 031 - ÍNCIPIT MUSICAL (R)
 # ================================================
 
 class IncipitMusical(models.Model):
@@ -296,12 +304,210 @@ class IncipitURL(models.Model):
     class Meta:
         verbose_name = "URL de Íncipit (031 $u)"
         verbose_name_plural = "URLs de Íncipit (031 $u - R)"
-        ordering = ['incipit', 'orden']
+        ordering = ['incipit', 'id']
     
     def __str__(self):
         if self.descripcion:
             return f"{self.descripcion}: {self.url}"
         return self.url
+
+
+# ================================================
+#? 📌 CAMPO 041 - CÓDIGO DE LENGUA (R)
+# ================================================
+
+class CodigoLengua(models.Model):
+    """
+    Campo 041 (R) - Código de lengua
+    Permite múltiples registros de idioma para una obra
+    """
+    
+    # Primer indicador: Indicación de traducción
+    INDICACION_TRADUCCION = [
+        ('#', 'No se proporciona información'),
+        ('0', 'El documento no es ni incluye una traducción'),
+        ('1', 'El documento es o incluye una traducción'),
+    ]
+    
+    # Segundo indicador: Fuente del código
+    FUENTE_CODIGO = [
+        ('#', 'Código MARC de lengua'),
+        ('7', 'Fuente especificada en el subcampo $2'),
+    ]
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='codigos_lengua',
+        help_text="Obra a la que pertenece este código de lengua"
+    )
+
+    # Primer indicador
+    indicacion_traduccion = models.CharField(
+        max_length=1,
+        choices=INDICACION_TRADUCCION,
+        default='0',
+        help_text="Primer indicador: ¿Es traducción?"
+    )
+    
+    # Segundo indicador
+    fuente_codigo = models.CharField(
+        max_length=1,
+        choices=FUENTE_CODIGO,
+        default='#',
+        help_text="Segundo indicador: Fuente del código"
+    )
+    
+    #* 📌 Subcampo $a (R) - Código de lengua
+    #* Este subcampo ES REPETIBLE, por lo que necesita su propio modelo intermedio
+    
+    # Subcampo $2 - Fuente del código (solo si segundo indicador = 7)
+    fuente_especificada = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="041 $2 – Fuente del código (solo si segundo indicador es 7)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Código de Lengua (041)"
+        verbose_name_plural = "Códigos de Lengua (041 - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        indicadores = f"{self.indicacion_traduccion}{self.fuente_codigo}"
+        idiomas = ", ".join([idioma.get_codigo_display() for idioma in self.idiomas.all()])
+        return f"041 {indicadores} - {idiomas if idiomas else 'Sin idiomas'}"
+    
+    def get_indicadores(self):
+        """Retorna los indicadores en formato MARC"""
+        return f"{self.indicacion_traduccion}{self.fuente_codigo}"
+    
+    def es_traduccion(self):
+        """Verifica si el documento es o incluye traducción"""
+        return self.indicacion_traduccion == '1'
+
+
+class IdiomaObra(models.Model):
+    """
+    Campo 041 - Subcampo $a (R)
+    Códigos de idioma asociados a un registro 041
+    Permite múltiples idiomas por registro
+    
+    """
+    
+    CODIGOS_IDIOMA = CODIGOS_LENGUAJE
+    
+    codigo_lengua = models.ForeignKey(
+        CodigoLengua,
+        on_delete=models.CASCADE,
+        related_name='idiomas',
+        help_text="Registro 041 al que pertenece este idioma"
+    )
+    
+    # Subcampo $a - Código de lengua (R)
+    codigo = models.CharField(
+        max_length=3,
+        choices=CODIGOS_IDIOMA,
+        default='spa',
+        help_text="041 $a – Código ISO 639-2/B del idioma"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Idioma (041 $a)"
+        verbose_name_plural = "Idiomas (041 $a - R)"
+        ordering = ['codigo_lengua', 'id']
+    
+    def __str__(self):
+        idioma_display = self.get_codigo_display()
+        if self.nota_uso:
+            return f"{idioma_display} ({self.nota_uso})"
+        return idioma_display
+    
+    def get_nombre_completo(self):
+        """Retorna el nombre completo del idioma"""
+        return self.get_codigo_display()
+
+
+# ================================================
+# 📌 CAMPO 044 - CÓDIGO DEL PAÍS (Subcampo $a R)
+# ================================================
+
+class CodigoPaisEntidad(models.Model):
+    """
+    Campo 044 - Subcampo $a (R)
+    Códigos de países asociados a la entidad editora/productora
+    
+    El campo 044 es NO REPETIBLE, pero el subcampo $a SÍ es repetible.
+    Esto permite indicar múltiples países cuando una obra es coeditada
+    o publicada en varios países simultáneamente.
+    
+    Nota: MARC usa códigos ISO 3166-1 alfa-2 (2 letras)
+    """
+    
+    CODIGOS_PAIS = [
+        ('ar', 'Argentina'),
+        ('bo', 'Bolivia'),
+        ('br', 'Brasil'),
+        ('cl', 'Chile'),
+        ('co', 'Colombia'),
+        ('cr', 'Costa Rica'),
+        ('cu', 'Cuba'),
+        ('ec', 'Ecuador'),
+        ('sv', 'El Salvador'),
+        ('gt', 'Guatemala'),
+        ('ho', 'Honduras'),
+        ('mx', 'México'),
+        ('nq', 'Nicaragua'),
+        ('pa', 'Panamá'),
+        ('pe', 'Perú'),
+        ('pr', 'Puerto Rico'),
+        ('dr', 'República Dominicana'),
+        ('uy', 'Uruguay'),
+        ('ve', 'Venezuela'),
+    ]
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='codigos_pais_entidad',
+        help_text="Obra a la que pertenece este código de país"
+    )
+    
+    # Subcampo $a - Código MARC del país (R)
+    codigo_pais = models.CharField(
+        max_length=2,
+        choices=CODIGOS_PAIS,
+        default='ec',
+        help_text="044 $a – Código ISO 3166-1 alfa-2 del país"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "País Editor/Productor (044 $a)"
+        verbose_name_plural = "Países Editor/Productor (044 $a - R)"
+        ordering = ['obra', 'id']
+        unique_together = [['obra', 'codigo_pais']]  
+    
+    def __str__(self):
+        pais_display = self.get_codigo_pais_display()
+        if self.nota_rol:
+            return f"{pais_display} ({self.nota_rol})"
+        return pais_display
+    
+    def get_nombre_completo(self):
+        """Retorna el nombre completo del país"""
+        return self.get_codigo_pais_display()
+    
+    def get_marc_format(self):
+        """Retorna el subcampo en formato MARC"""
+        return f"$a{self.codigo_pais}"
+
 
 
 # ================================================
