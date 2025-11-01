@@ -391,6 +391,81 @@
                         </div>
                     </div>
 
+                    <!-- ============================================ -->
+                    <!--? BLOQUE 1XX - ENTRADAS PRINCIPALES -->
+                    <!-- ============================================ -->
+
+                    <div class="card border-0 shadow-sm mb-4" id="bloque-1xx">
+                        <div class="card-body">
+                            <h2 class="section-title">Campos 1XX - Entradas Principales</h2>
+                            
+                            <!-- 100 - Autor Personal -->
+                            <div class="mb-4">
+                                <h3 class="h6 mb-3">100 - Autor Personal (Entrada Principal)</h3>
+                                <div id="autor-personal-container">
+                                    <!-- Primer campo se genera aquí -->
+                                    <div class="campo-repetible" data-campo="autor-personal-0">
+                                        <div class="campo-header">
+                                            <span class="campo-label">Autor Personal #1</span>
+                                            <button type="button" class="btn btn-outline-danger btn-remove" 
+                                                    onclick="eliminarCampo('autor-personal-0')">
+                                                <i class="bi bi-trash"></i> Eliminar
+                                            </button>
+                                        </div>
+                                        <div class="row g-2 mb-2">
+                                            <div class="col-md-12">
+                                                <label class="subcampo-label">$a Nombre Personal</label>
+                                                <input type="text" name="autor_personal_a_0" 
+                                                    class="form-control" placeholder="Apellido, Nombre" required>
+                                            </div>
+                                        </div>
+                                        <div class="row g-2 mb-2">
+                                            <div class="col-md-6">
+                                                <label class="subcampo-label">$d Fechas</label>
+                                                <input type="text" name="autor_personal_d_0" 
+                                                    class="form-control" placeholder="Ej: 1920-1990">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="subcampo-label">$e Término de la relación</label>
+                                                <input type="text" name="autor_personal_e_0" 
+                                                    class="form-control" placeholder="Ej: compositor">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-add-field" 
+                                        onclick="agregarAutorPersonal()">
+                                    <i class="bi bi-plus-circle"></i> Agregar Autor Personal
+                                </button>
+                            </div>
+
+                            <!-- 110 - Autor Corporativo -->
+                            <div class="mb-4">
+                                <h3 class="h6 mb-3">110 - Autor Corporativo (Entrada Principal)</h3>
+                                <div id="autor-corporativo-container">
+                                    <!-- Primer campo aquí -->
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-add-field" 
+                                        onclick="agregarAutorCorporativo()">
+                                    <i class="bi bi-plus-circle"></i> Agregar Autor Corporativo
+                                </button>
+                            </div>
+
+                            <!-- 130 - Título Uniforme -->
+                            <div class="mb-4">
+                                <h3 class="h6 mb-3">130 - Título Uniforme (Entrada Principal)</h3>
+                                <div id="entrada-uniforme-container">
+                                    <!-- Primer campo aquí -->
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-add-field" 
+                                        onclick="agregarEntradaUniforme()">
+                                    <i class="bi bi-plus-circle"></i> Agregar Título Uniforme
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    
                     <!-- Botones -->
                     <div class="d-flex gap-2 justify-content-end">
                         <a href="{% url 'index' %}" class="btn btn-outline-secondary">Cancelar</a>
@@ -417,7 +492,21 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- SOLO cargar campos-repetibles.js - contiene todas las funciones necesarias -->
-<script src="{% static 'catalogacion/js/campos-repetibles.js' %}"></script>
-<script src="{% static 'catalogacion/js/obra-general.js' %}"></script>
+<!-- 1. NÚCLEO -->
+<script src="{% static 'catalogacion/js/campos-core.js' %}"></script>
+
+<!-- 2. BLOQUES ESPECÍFICOS -->
+<script src="{% static 'catalogacion/js/campos-0xx-repetibles.js' %}"></script>
+<script src="{% static 'catalogacion/js/campos-1xx-repetibles.js' %}"></script>
+<!-- 
+<script src="{% static 'catalogacion/js/campos-2xx-repetibles.js' %}"></script>
+<script src="{% static 'catalogacion/js/campos-3xx-repetibles.js' %}"></script>
+<script src="{% static 'catalogacion/js/campos-5xx-repetibles.js' %}"></script>
+<script src="{% static 'catalogacion/js/campos-6xx-repetibles.js' %}"></script>
+<script src="{% static 'catalogacion/js/campos-7xx-repetibles.js' %}"></script>
+<script src="{% static 'catalogacion/js/campos-8xx-repetibles.js' %}"></script>
+-->
+
+<!-- 3. INICIALIZACIÓN -->
+<script src="{% static 'catalogacion/js/obra-general-init.js' %}"></script>
 {% endblock %}
