@@ -234,73 +234,11 @@ class ObraGeneral(models.Model):
     # ------------------------------------------------
     # ?🟦 BLOQUE 0XX – Campos de longitud variable
     # ------------------------------------------------
-    
-    # 020 ## ISBN
-    isbn = models.CharField(
-        max_length=20, 
-        blank=True, 
-        null=True,
-        help_text="020 $a – ISBN tomado tal como aparece en la fuente"
-    )
-    
-    # 024 2# ISMN
-    ismn = models.CharField(
-        max_length=20, 
-        blank=True, 
-        null=True,
-        help_text="024 $a – ISMN (para obras impresas desde 1993 aprox.)"
-    )
-    # 028 20 Número de editor
-    numero_editor = models.CharField(
-        max_length=50, 
-        blank=True, 
-        null=True,
-        help_text="028 $a – Número de plancha, placa o código del editor"
-    )
-    
-    # TODO: Cambiar a campo repetible
-    indicador_028 = models.CharField(
-        max_length=2, 
-        default='20',
-        help_text="028 Indicador (predeterminado '20')"
-    )
-    
-    # TODO: Cambiar a campo repetible
-    # 031 ## Íncipit musical
-    incipit_num_obra = models.PositiveIntegerField(
-        default=1, 
-        help_text="031 $a – Número de la obra"
-    )
-    incipit_num_movimiento = models.PositiveIntegerField(
-        default=1, 
-        help_text="031 $b – Número del movimiento"
-    )
-    incipit_num_pasaje = models.PositiveIntegerField(
-        default=1, 
-        help_text="031 $c – Número de pasaje"
-    )
-    incipit_titulo = models.CharField(
-        max_length=100, 
-        blank=True, 
-        null=True, 
-        help_text="031 $d – Título del íncipit"
-    )
-    incipit_voz_instrumento = models.CharField(
-        max_length=100, 
-        blank=True, 
-        null=True, 
-        help_text="031 $m – Voz o instrumento"
-    )
-    incipit_notacion = models.TextField(
-        blank=True, 
-        null=True, 
-        help_text="031 $p – Íncipit musical codificado"
-    )
-    incipit_url = models.URLField(
-        blank=True, 
-        null=True, 
-        help_text="031 $u – URL del íncipit"
-    )
+
+    #* Campo 020 implementado como modelo separado: ISBN
+    #* Campo 024 implementado como modelo separado: ISMN    
+    #* Campo 028 implementado como modelo separado: NumeroEditor
+    #* Campo 031 implementado como modelo separado: IncipitMusical
     
     # 040 ## Fuente de catalogación
     centro_catalogador = models.CharField(

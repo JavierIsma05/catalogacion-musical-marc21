@@ -13,9 +13,299 @@ Campos incluidos:
 
 from django.db import models
 
+# ================================================
+#* 📌 CAMPO 020: ## ISBN (R)
+# ================================================
+
+class ISBN(models.Model):
+    """
+    Campo 020 - ISBN (R)
+    
+    Permite múltiples ISBN para una obra.
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='isbns',
+        help_text="Obra a la que pertenece este ISBN"
+    )
+    
+    # Subcampo $a - ISBN
+    isbn = models.CharField(
+        max_length=20,
+        help_text="020 $a – ISBN"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "ISBN (020)"
+        verbose_name_plural = "ISBN (020)"
+        ordering = ['obra', 'id']
+        
+    def __str__(self):
+        return self.isbn
 
 # ================================================
-# 📌 CAMPO 246: TÍTULO ALTERNATIVO (R)
+#* 📌 CAMPO 024: ## ISMN (R)
+# ================================================
+
+class ISMN(models.Model):
+    """
+    Campo 024 - ISMN (R)
+
+    Permite múltiples ISMN para una obra.
+    """
+
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='ismns',
+        help_text="Obra a la que pertenece este ISMN"
+    )
+
+    # Subcampo $a - ISMN
+    ismn = models.CharField(
+        max_length=20,
+        help_text="024 $a – ISMN"
+    )
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "ISMN (024)"
+        verbose_name_plural = "ISMN (024)"
+        ordering = ['obra', 'id']
+
+    def __str__(self):
+        return self.ismn
+
+
+# ================================================
+#? 📌 CAMPO 028: 20 número de editor (R)
+# ================================================
+
+class NumeroEditor(models.Model):
+    """
+    Campo 028 (R) - Número de editor, distribuidor, matriz, plancha, etc.
+    Permite múltiples números para distinguir entre diferentes tipos
+    (publicación, matriz, plancha, videograbación, etc.)
+    """
+    
+    # Primer indicador: Tipo de número de editor
+    TIPO_NUMERO = [
+        ('0', 'Número de publicación'),
+        ('1', 'Número de matriz'),
+        ('2', 'Número de plancha'),
+        ('3', 'Otro número de música'),
+        ('4', 'Número de videograbación'),
+        ('5', 'Otro número de editor'),
+    ]
+    
+    # Segundo indicador: Control de nota/punto de acceso adicional
+    CONTROL_NOTA = [
+        ('0', 'No hay nota ni punto de acceso adicional'),
+        ('1', 'Nota, hay punto de acceso adicional'),
+        ('2', 'Nota, no hay punto de acceso adicional'),
+        ('3', 'No hay nota, hay punto de acceso adicional'),
+    ]
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='numeros_editor',
+        help_text="Obra a la que pertenece este número de editor"
+    )
+    
+    # Subcampo $a - Número de editor o distribuidor (NR dentro de cada instancia)
+    numero = models.CharField(
+        max_length=100,
+        help_text="028 $a – Número de editor, plancha, placa o código distintivo"
+    )
+    
+    # Primer indicador
+    tipo_numero = models.CharField(
+        max_length=1,
+        choices=TIPO_NUMERO,
+        default='2',  # Predeterminado: Número de plancha
+        help_text="Primer indicador: Tipo de número de editor"
+    )
+    
+    # Segundo indicador
+    control_nota = models.CharField(
+        max_length=1,
+        choices=CONTROL_NOTA,
+        default='0',  # Predeterminado: Sin nota ni punto de acceso
+        help_text="Segundo indicador: Control de nota/punto de acceso adicional"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Número de Editor (028)"
+        verbose_name_plural = "Números de Editor (028 - R)"
+        ordering = ['obra', 'orden']
+    
+    def __str__(self):
+        tipo_display = self.get_tipo_numero_display()
+        return f"{tipo_display}: {self.numero}"
+    
+    def get_indicadores(self):
+        """Retorna los indicadores en formato MARC"""
+        return f"{self.tipo_numero}{self.control_nota}"
+    
+    def get_marc_format(self):
+        """Retorna el campo completo en formato MARC"""
+        return f"028 {self.get_indicadores()} $a{self.numero}"
+
+
+# ================================================
+#? 📌 CAMPO 031: ÍNCIPIT MUSICAL (R)
+# ================================================
+
+# ================================================
+# 📌 CAMPO 031 - ÍNCIPIT MUSICAL (R)
+# ================================================
+
+class IncipitMusical(models.Model):
+    """
+    Campo 031 (R) - Información del íncipit musical
+    Permite múltiples íncipits para una obra (diferentes movimientos, pasajes, etc.)
+    
+    Un íncipit es una pequeña muestra musical del inicio de una obra,
+    útil para identificación y catalogación.
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='incipits_musicales',
+        help_text="Obra a la que pertenece este íncipit"
+    )
+    
+    # Subcampo $a - Número de la obra (NR)
+    numero_obra = models.PositiveIntegerField(
+        default=1,
+        help_text="031 $a – Número de la obra (predeterminado: 1)"
+    )
+    
+    # Subcampo $b - Número del movimiento (NR)
+    numero_movimiento = models.PositiveIntegerField(
+        default=1,
+        help_text="031 $b – Número del movimiento (predeterminado: 1)"
+    )
+    
+    # Subcampo $c - Número de pasaje/sistema (NR)
+    numero_pasaje = models.PositiveIntegerField(
+        default=1,
+        help_text="031 $c – Número de pasaje o sistema (predeterminado: 1)"
+    )
+    
+    # Subcampo $d - Título o encabezamiento (NR)
+    titulo_encabezamiento = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="031 $d – Nombre del tempo o movimiento (ej: Aria, Allegro, Andante)"
+    )
+    
+    # Subcampo $m - Voz/instrumento (NR)
+    voz_instrumento = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="031 $m – Voz/instrumento (usar solo si NO es para piano)"
+    )
+    
+    # Subcampo $p - Notación musical (NR)
+    notacion_musical = models.TextField(
+        blank=True,
+        null=True,
+        help_text="031 $p – Íncipit musical codificado (ej: Plaine & Easie, MusicXML, ABC)"
+    )
+    
+    #* Subcampo $u (R) - URL
+    #* Este subcampo ES REPETIBLE, por lo que necesita su propio modelo intermedio
+    #* Ver modelo: IncipitURL más abajo
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Íncipit Musical (031)"
+        verbose_name_plural = "Íncipits Musicales (031 - R)"
+        ordering = ['obra', 'numero_obra', 'numero_movimiento', 'numero_pasaje']
+        unique_together = [
+            ['obra', 'numero_obra', 'numero_movimiento', 'numero_pasaje']
+        ]
+    
+    def __str__(self):
+        partes = [
+            f"Obra {self.numero_obra}",
+            f"Mov. {self.numero_movimiento}",
+            f"Pas. {self.numero_pasaje}"
+        ]
+        if self.titulo_encabezamiento:
+            partes.append(f"- {self.titulo_encabezamiento}")
+        return " ".join(partes)
+    
+    def get_identificador_completo(self):
+        """Retorna el identificador completo del íncipit"""
+        return f"{self.numero_obra}.{self.numero_movimiento}.{self.numero_pasaje}"
+    
+    def get_marc_format(self):
+        """Retorna el campo completo en formato MARC (sin URLs)"""
+        marc = f"031 ## $a{self.numero_obra} $b{self.numero_movimiento} $c{self.numero_pasaje}"
+        
+        if self.titulo_encabezamiento:
+            marc += f" $d{self.titulo_encabezamiento}"
+        
+        if self.voz_instrumento:
+            marc += f" $m{self.voz_instrumento}"
+        
+        if self.notacion_musical:
+            # Truncar si es muy largo para el ejemplo
+            notacion_preview = self.notacion_musical[:50] + "..." if len(self.notacion_musical) > 50 else self.notacion_musical
+            marc += f" $p{notacion_preview}"
+        
+        return marc
+
+
+class IncipitURL(models.Model):
+    """
+    Campo 031 - Subcampo $u (R)
+    URLs asociadas a un íncipit musical
+    Permite múltiples URLs por íncipit
+    """
+    
+    incipit = models.ForeignKey(
+        IncipitMusical,
+        on_delete=models.CASCADE,
+        related_name='urls',
+        help_text="Íncipit al que pertenece esta URL"
+    )
+    
+    # Subcampo $u - URL (R)
+    url = models.URLField(
+        max_length=500,
+        help_text="031 $u – URL del íncipit codificado en base de datos externa"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "URL de Íncipit (031 $u)"
+        verbose_name_plural = "URLs de Íncipit (031 $u - R)"
+        ordering = ['incipit', 'orden']
+    
+    def __str__(self):
+        if self.descripcion:
+            return f"{self.descripcion}: {self.url}"
+        return self.url
+
+
+# ================================================
+#? 📌 CAMPO 246: TÍTULO ALTERNATIVO (R)
 # ================================================
 
 class TituloAlternativo(models.Model):
