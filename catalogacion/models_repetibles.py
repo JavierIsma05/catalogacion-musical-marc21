@@ -1274,3 +1274,86 @@ class Tecnica340(models.Model):
     
     def __str__(self):
         return self.get_tecnica_display()
+
+# ================================================
+# 📌 CAMPO 348: CARACTERÍSTICAS MÚSICA NOTADA (R)
+# ================================================
+
+class CaracteristicaMusicaNotada(models.Model):
+    """
+    Campo 348 (R) - Instancia de 348
+    
+    Contenedor para formatos de presentación de música notada (348 $a).
+    El campo 348 puede repetirse múltiples veces.
+    Dentro de cada 348, el subcampo $a es también REPETIBLE.
+    
+    NOTA IMPORTANTE: No se usa este campo si la música es para piano
+    en doble pauta tradicional (es el formato estándar y no necesita especificarse).
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='caracteristicas_musica_notada',
+        help_text="Obra a la que pertenece"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Característica Música Notada (348)"
+        verbose_name_plural = "Características Música Notada (348 - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        formatos = ", ".join([f.formato for f in self.formatos.all()])
+        return formatos or "Sin formatos especificados"
+    
+    def get_marc_format(self):
+        """Retorna el campo completo en formato MARC21"""
+        marc = ""
+        for formato in self.formatos.all():
+            marc += f" $a{formato.formato}"
+        return f"348 ##" + marc if marc else ""
+
+
+class Formato348(models.Model):
+    """
+    Subcampo $a de 348 (R)
+    Término del formato de música notada - REPETIBLE dentro de cada 348
+
+    NOTA: No usar este campo si es piano en doble pauta tradicional
+    """
+    
+    FORMATOS = [
+        ('parte', 'Parte'),
+        ('partitura', 'Partitura'),
+        ('partitura de coro', 'Partitura de coro'),
+        ('partitura piano vocal', 'Partitura piano-vocal')
+    ]
+    
+    caracteristica = models.ForeignKey(
+        CaracteristicaMusicaNotada,
+        on_delete=models.CASCADE,
+        related_name='formatos',
+        help_text="Característica a la que pertenece"
+    )
+    
+    # Subcampo $a - Formato (R)
+    formato = models.CharField(
+        max_length=50,
+        choices=FORMATOS,
+        help_text="348 $a – Formato de presentación (repetible dentro de cada 348)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Formato (348 $a)"
+        verbose_name_plural = "Formatos (348 $a - R)"
+        ordering = ['caracteristica', 'id']
+        # Evitar duplicados: mismo 348 no puede tener dos veces el mismo formato
+        unique_together = [['caracteristica', 'formato']]
+    
+    def __str__(self):
+        return self.get_formato_display()

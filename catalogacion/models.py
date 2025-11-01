@@ -37,6 +37,8 @@ __all__ = [
     'Dimension300',
     'MedioFisico',
     'Tecnica340',
+    'CaracteristicaMusicaNotada',
+    'Formato348',
     
     # Modelo principal
     'ObraGeneral',
@@ -424,6 +426,10 @@ class ObraGeneral(models.Model):
     #? 🟦 BLOQUE 3XX 
 
     #* Campo 300 implementado como modelo separado: DescripcionFisica
+    #* Campo 340 implementado como modelo separado: MedioFisico y Tecnica340
+    #* Campo 348 implementado como modelo repetible: CaracteristicaMusicaNotada
+    
+    
 
 
 
@@ -502,7 +508,6 @@ class ObraGeneral(models.Model):
         if self.medios_fisicos.exists():
             return
         
-        # Crear MedioFisico contenedor
         medio = MedioFisico.objects.create(obra=self)
         
         # Agregar técnica automática según tipo_registro
