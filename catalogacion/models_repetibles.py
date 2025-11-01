@@ -1357,3 +1357,284 @@ class Formato348(models.Model):
     
     def __str__(self):
         return self.get_formato_display()
+
+# ================================================
+#? 📌 CAMPO 382: MEDIO DE INTERPRETACIÓN (R)
+# ================================================
+
+class MedioInterpretacion382(models.Model):
+    """
+    Campo 382 (R) - Medio de interpretación
+    
+    Instancia de 382 que agrupa subcampos $a, $b, $n que describen
+    los instrumentos/voces y solistas de una obra.
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='medios_interpretacion_382',
+        help_text="Obra a la que pertenece"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Medio de Interpretación (382)"
+        verbose_name_plural = "Medios de Interpretación (382 - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        partes = []
+        medios = ", ".join([m.medio for m in self.medios.all()])
+        if medios:
+            partes.append(f"Medios: {medios}")
+        
+        solistas = ", ".join([s.solista for s in self.solistas.all()])
+        if solistas:
+            partes.append(f"Solistas: {solistas}")
+        
+        numeros = ", ".join([str(n.numero) for n in self.numeros_interpretes.all()])
+        if numeros:
+            partes.append(f"Cantidad: {numeros}")
+        
+        return " | ".join(partes) or "Sin especificar"
+    
+    def get_marc_format(self):
+        """Retorna el campo completo en formato MARC21"""
+        marc = ""
+        
+        # $a - Medios
+        for medio in self.medios.all():
+            marc += f" $a{medio.medio}"
+        
+        # $b - Solistas
+        for solista in self.solistas.all():
+            marc += f" $b{solista.solista}"
+        
+        # $n - Números
+        for numero in self.numeros_interpretes.all():
+            marc += f" $n{numero.numero}"
+        
+        return f"382 ##" + marc if marc else ""
+
+
+class MedioInterpretacion382_a(models.Model):
+    """
+    Subcampo $a de 382 (R)
+    Medio de interpretación - instrumento, voz o conjunto
+    """
+    
+    MEDIOS = [
+        # Instrumentos de teclado
+        ('piano', 'Piano'),
+        ('dos pianos', 'Dos pianos'),
+        ('piano a cuatro manos', 'Piano a cuatro manos'),
+        ('piano con acompañamiento', 'Piano con acompañamiento'),
+    ]
+    
+    medio_interpretacion = models.ForeignKey(
+        MedioInterpretacion382,
+        on_delete=models.CASCADE,
+        related_name='medios',
+        help_text="Medio de interpretación al que pertenece"
+    )
+    
+    # Subcampo $a
+    medio = models.CharField(
+        max_length=50,
+        choices=MEDIOS,
+        default='piano',
+        help_text="382 $a – Medio de interpretación (predeterminado: piano)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Medio (382 $a)"
+        verbose_name_plural = "Medios (382 $a - R)"
+        ordering = ['medio_interpretacion', 'id']
+    
+    def __str__(self):
+        return self.get_medio_display()
+
+
+class Solista382(models.Model):
+    """
+    Subcampo $b de 382 (R)
+    Solista - voz o instrumento solista específico
+    """
+    
+    SOLISTAS = [
+        ('piano', 'Piano'),
+    ]
+    
+    medio_interpretacion = models.ForeignKey(
+        MedioInterpretacion382,
+        on_delete=models.CASCADE,
+        related_name='solistas',
+        help_text="Medio de interpretación al que pertenece"
+    )
+    
+    # Subcampo $b
+    solista = models.CharField(
+        max_length=50,
+        choices=SOLISTAS,
+        default='piano',
+        help_text="382 $b – Solista (predeterminado: piano)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Solista (382 $b)"
+        verbose_name_plural = "Solistas (382 $b - R)"
+        ordering = ['medio_interpretacion', 'id']
+    
+    def __str__(self):
+        return self.get_solista_display()
+
+
+class NumeroInterpretes382(models.Model):
+    """
+    Subcampo $n de 382 (R)
+    Número de intérpretes de un mismo medio
+    """
+    
+    medio_interpretacion = models.ForeignKey(
+        MedioInterpretacion382,
+        on_delete=models.CASCADE,
+        related_name='numeros_interpretes',
+        help_text="Medio de interpretación al que pertenece"
+    )
+    
+    # Subcampo $n
+    numero = models.PositiveIntegerField(
+        help_text="382 $n – Número de intérpretes de un mismo medio (ej: 2, 4, 8)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Número Intérpretes (382 $n)"
+        verbose_name_plural = "Números Intérpretes (382 $n - R)"
+        ordering = ['medio_interpretacion', 'id']
+    
+    def __str__(self):
+        return f"{self.numero} intérpretes"
+
+# ================================================
+# 📌 CAMPO 383: DESIGNACIÓN NUMÉRICA OBRA MUSICAL (R)
+# ================================================
+
+class DesignacionNumericaObra(models.Model):
+    """
+    Campo 383 (R) - Designación numérica de obra musical
+    Instancia de 383 que agrupa subcampos $a (número de obra) y
+    $b (opus) que identifican numéricamente una composición musical.
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='designaciones_numericas',
+        help_text="Obra a la que pertenece"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Designación Numérica (383)"
+        verbose_name_plural = "Designaciones Numéricas (383 - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        partes = []
+        
+        numeros = self.numeros_obra.all()
+        if numeros.exists():
+            nums = ", ".join([n.numero_obra for n in numeros])
+            partes.append(f"Número: {nums}")
+        
+        opus = self.opus.all()
+        if opus.exists():
+            opus_vals = ", ".join([o.opus for o in opus])
+            partes.append(f"Opus: {opus_vals}")
+        
+        return " | ".join(partes) or "Sin designación"
+    
+    def get_marc_format(self):
+        """Retorna el campo completo en formato MARC21"""
+        marc = ""
+        
+        # $a - Números de obra
+        for numero in self.numeros_obra.all():
+            marc += f" $a{numero.numero_obra}"
+        
+        # $b - Opus
+        for opus_obj in self.opus.all():
+            marc += f" $b{opus_obj.opus}"
+        
+        return f"383 ##" + marc if marc else ""
+
+
+class NumeroObra383(models.Model):
+    """
+    Subcampo $a de 383 (R)
+    Número de obra o serie - identificador numérico
+    """
+    
+    designacion_numerica = models.ForeignKey(
+        DesignacionNumericaObra,
+        on_delete=models.CASCADE,
+        related_name='numeros_obra',
+        help_text="Designación a la que pertenece"
+    )
+    
+    # Subcampo $a
+    numero_obra = models.CharField(
+        max_length=100,
+        help_text=(
+            "383 $a – Número de obra (ej: '1', '2', 'K. 545', 'BWV 1001', "
+        )
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Número de Obra (383 $a)"
+        verbose_name_plural = "Números de Obra (383 $a - R)"
+        ordering = ['designacion_numerica', 'id']
+    
+    def __str__(self):
+        return self.numero_obra
+
+
+class Opus383(models.Model):
+    """
+    Subcampo $b de 383 (R)
+    Número de Opus - designación opus estándar
+    """
+    
+    designacion_numerica = models.ForeignKey(
+        DesignacionNumericaObra,
+        on_delete=models.CASCADE,
+        related_name='opus',
+        help_text="Designación a la que pertenece"
+    )
+    
+    # Subcampo $b
+    opus = models.CharField(
+        max_length=100,
+        help_text="383 $b – Número de Opus (ej: 'Op. 27, No. 2', 'Op. 131')"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Opus (383 $b)"
+        verbose_name_plural = "Opus (383 $b - R)"
+        ordering = ['designacion_numerica', 'id']
+    
+    def __str__(self):
+        return self.opus

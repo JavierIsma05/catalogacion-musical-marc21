@@ -39,6 +39,13 @@ __all__ = [
     'Tecnica340',
     'CaracteristicaMusicaNotada',
     'Formato348',
+    'MedioInterpretacion382',
+    'MedioInterpretacion382_a',
+    'Solista382',
+    'NumeroInterpretes382',
+    'DesignacionNumericaObra',
+    'NumeroObra383',
+    'Opus383',
     
     # Modelo principal
     'ObraGeneral',
@@ -428,12 +435,28 @@ class ObraGeneral(models.Model):
     #* Campo 300 implementado como modelo separado: DescripcionFisica
     #* Campo 340 implementado como modelo separado: MedioFisico y Tecnica340
     #* Campo 348 implementado como modelo repetible: CaracteristicaMusicaNotada
+    #* Campo 382 implementado como modelo repetible: MedioInterpretacion382
+    #* Campo 383 implementado como modelo repetible: DesignacionNumericaObra, NumeroObra383, Opus383
+    
+    tonalidad_384 = models.CharField(
+        max_length=20,
+        choices=TONALIDADES,
+        blank=True,
+        null=True,
+        help_text="384 $a – Tonalidad (NR)"
+    )
     
     
-
-
-
+    #? 🟦 BLOQUE 4XX 
     
+    #? 🟦 BLOQUE 5XX 
+    
+    #? 🟦 BLOQUE 6XX 
+    
+    #? 🟦 BLOQUE 7XX
+     
+    #? 🟦 BLOQUE 8XX 
+  
     # ------------------------------------------------
     #? Metadatos del sistema
     # ------------------------------------------------
