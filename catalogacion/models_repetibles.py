@@ -25,8 +25,16 @@ CODIGOS_LENGUAJE = [
         # ('zxx', 'Sin contenido lingüístico'),
     ]
 
+FORMAS_MUSICALES = [
+        ('adaptación', 'Adaptación'),
+        ('boceto', 'Boceto'),
+        ('fragmento', 'Fragmento'),
+        ('selección', 'Selección'),
+        ('tema con variaciones', 'Tema con variaciones'),
+    ]
+
 # ================================================
-#* 📌 CAMPO 020: ## ISBN (R)
+#? 📌 CAMPO 020: ## ISBN (R)
 # ================================================
 
 class ISBN(models.Model):
@@ -361,7 +369,6 @@ class CodigoLengua(models.Model):
     #* 📌 Subcampo $a (R) - Código de lengua
     #* Este subcampo ES REPETIBLE, por lo que necesita su propio modelo intermedio
     
-    # Subcampo $2 - Fuente del código (solo si segundo indicador = 7)
     fuente_especificada = models.CharField(
         max_length=50,
         blank=True,
@@ -434,7 +441,7 @@ class IdiomaObra(models.Model):
 
 
 # ================================================
-# 📌 CAMPO 044 - CÓDIGO DEL PAÍS (Subcampo $a R)
+#? 📌 CAMPO 044 - CÓDIGO DEL PAÍS (Subcampo $a R)
 # ================================================
 
 class CodigoPaisEntidad(models.Model):
@@ -510,7 +517,7 @@ class CodigoPaisEntidad(models.Model):
 
 
 # ================================================
-# 📌 CAMPO 100 - SUBCAMPOS REPETIBLES (R)
+#? 📌 CAMPO 100 - SUBCAMPOS REPETIBLES (R)
 # ================================================
 
 class FuncionCompositor(models.Model):
@@ -597,7 +604,7 @@ class AtribucionCompositor(models.Model):
 
 
 # ================================================
-# 📌 CAMPO 130 - SUBCAMPOS REPETIBLES (R)
+#? 📌 CAMPO 130 - SUBCAMPOS REPETIBLES (R)
 # ================================================
 
 class Forma130(models.Model):
@@ -607,14 +614,7 @@ class Forma130(models.Model):
     Permite múltiples formas para un título uniforme
     """
     
-    # Opciones de formas según tu Excel
-    FORMAS = [
-        ('adaptación', 'Adaptación'),
-        ('boceto', 'Boceto'),
-        ('fragmento', 'Fragmento'),
-        ('selección', 'Selección'),
-        ('tema con variaciones', 'Tema con variaciones'),
-    ]
+    FORMAS = FORMAS_MUSICALES
     
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -727,6 +727,130 @@ class NombreParteSección130(models.Model):
     class Meta:
         verbose_name = "Nombre de Parte/Sección (130 $p)"
         verbose_name_plural = "Nombres de Parte/Sección (130 $p - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        return self.nombre
+
+# ================================================
+#? 📌 CAMPO 240 - SUBCAMPOS REPETIBLES (R)
+# ================================================
+
+class Forma240(models.Model):
+    """
+    Campo 240 - Subcampo $k (R)
+    Subencabezamiento de forma (cuando hay compositor)
+    """
+    
+    FORMAS = FORMAS_MUSICALES
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='formas_240',
+        help_text="Obra a la que pertenece"
+    )
+    
+    forma = models.CharField(
+        max_length=50,
+        choices=FORMAS,
+        help_text="240 $k – Forma (cruzar con campo 655)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Forma (240 $k)"
+        verbose_name_plural = "Formas (240 $k - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        return self.forma if isinstance(self.forma, str) else self.forma.forma
+
+
+class MedioInterpretacion240(models.Model):
+    """
+    Campo 240 - Subcampo $m (R)
+    Medio de interpretación para música (cuando hay compositor)
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='medios_interpretacion_240',
+        help_text="Obra a la que pertenece"
+    )
+    
+    medio = models.CharField(
+        max_length=100,
+        default='piano',
+        help_text="240 $m – Medio de interpretación (predeterminado: piano)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Medio de Interpretación (240 $m)"
+        verbose_name_plural = "Medios de Interpretación (240 $m - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        return self.medio
+
+
+class NumeroParteSección240(models.Model):
+    """
+    Campo 240 - Subcampo $n (R)
+    Número de parte o sección de la obra (cuando hay compositor)
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='numeros_parte_240',
+        help_text="Obra a la que pertenece"
+    )
+    
+    numero = models.CharField(
+        max_length=50,
+        help_text="240 $n – Número de parte/sección (ej: I, II, III o 1, 2, 3)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Número de Parte/Sección (240 $n)"
+        verbose_name_plural = "Números de Parte/Sección (240 $n - R)"
+        ordering = ['obra', 'id']
+    
+    def __str__(self):
+        return self.numero
+
+
+class NombreParteSección240(models.Model):
+    """
+    Campo 240 - Subcampo $p (R)
+    Nombre de parte o sección de la obra (cuando hay compositor)
+    Paralelo a NombreParteSección130 pero para campo 240
+    """
+    
+    obra = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.CASCADE,
+        related_name='nombres_parte_240',
+        help_text="Obra a la que pertenece"
+    )
+    
+    nombre = models.CharField(
+        max_length=200,
+        help_text="240 $p – Nombre de parte/sección (ej: Allegro, Andante, Finale)"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Nombre de Parte/Sección (240 $p)"
+        verbose_name_plural = "Nombres de Parte/Sección (240 $p - R)"
         ordering = ['obra', 'id']
     
     def __str__(self):

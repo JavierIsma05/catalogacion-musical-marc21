@@ -352,66 +352,38 @@ class ObraGeneral(models.Model):
     #? 🟦 BLOQUE 2XX – Títulos y mención de responsabilidad
     # ------------------------------------------------
     
-    # ⚠️ Usa LA MISMA tabla de autoridades que 130
+    #* 240 10 Título uniforme con compositor (NR)
     titulo_240 = models.ForeignKey(
         AutoridadTituloUniforme,
         on_delete=models.PROTECT,
         blank=True,
         null=True,
         related_name='obras_240',
-        help_text="240 $a – Título uniforme (cruzar con 130)"
+        help_text="240 $a – Título uniforme normalizado (cruzar con campo 130)"
     )
     
-    # TODO: Repetible
-    titulo_240_forma = models.ForeignKey(
-        AutoridadFormaMusical,
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True,
-        related_name='obras_240_forma',
-        help_text="240 $k – Forma (cruzar con 130 $k y 655)"
-    )
-    
-    # TODO: Repetible
-    titulo_240_medio_interpretacion = models.CharField(
-        max_length=100, 
-        blank=True, 
-        null=True,
-        help_text="240 $m – Medio de interpretación"
-    )
-    
-    # TODO: Repetible
-    titulo_240_num_parte = models.CharField(
-        max_length=50, 
-        blank=True, 
-        null=True,
-        help_text="240 $n – Número de parte/sección"
-    )
+    #* - 240 $k → Forma240 como modelo repetible en models_repetibles.py
+    #* - 240 $m → MedioInterpretacion240 como modelo repetible en models_repetibles.py
+    #* - 240 $n → NumeroParteSección240 como modelo repetible en models_repetibles.py
+    #* - 240 $p → NombreParteSección240 como modelo repetible en models_repetibles.py
     
     titulo_240_arreglo = models.CharField(
-        max_length=10, 
-        blank=True, 
+        max_length=10,
+        blank=True,
         null=True,
-        help_text="240 $o – Arreglo"
-    )
-    
-    # TODO: Repetible
-    titulo_240_nombre_parte = models.CharField(
-        max_length=100, 
-        blank=True, 
-        null=True,
-        help_text="240 $p – Nombre de parte/sección"
+        default='arreglo',
+        help_text="240 $o – Arreglo (NR - No repetible, predeterminado: arreglo)"
     )
     
     titulo_240_tonalidad = models.CharField(
-        max_length=15, 
-        blank=True, 
+        max_length=20,
+        blank=True,
         null=True,
         choices=TONALIDADES,
-        help_text="240 $r – Tonalidad"
+        help_text="240 $r – Tonalidad (NR - No repetible)"
     )
     
-    # 245 10 Mención de título (NR)
+    #* 245 10 Mención de título (NR)
     titulo_principal = models.CharField(
         max_length=500, 
         blank=True, 
