@@ -46,6 +46,9 @@ __all__ = [
     'DesignacionNumericaObra',
     'NumeroObra383',
     'Opus383',
+    'MencionSerie490',
+    'TituloSerie490',
+    'VolumenSerie490',
     
     # Modelo principal
     'ObraGeneral',
