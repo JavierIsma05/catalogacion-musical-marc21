@@ -1,15 +1,3 @@
-/**
- * ============================================
- * CAMPOS-0XX-REPETIBLES.JS
- * ============================================
- * Contiene todos los campos REPETIBLES del bloque 0XX
- * (Números de Control, Identificadores, Códigos)
- */
-
-// ============================================
-// REGISTRO DE CONTADORES
-// ============================================
-
 contadores.registrar("isbn", 1);
 contadores.registrar("ismn", 1);
 contadores.registrar("numeroEditor", 1);

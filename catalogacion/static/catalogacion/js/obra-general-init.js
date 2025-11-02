@@ -329,3 +329,49 @@ window.limpiarBorrador = function () {
 window.mostrarEstadisticas = mostrarEstadisticas;
 
 console.log("✅ obra-general-init.js cargado correctamente");
+
+// ============================================
+// VERIFICACIÓN DE FUNCIONES DEL BLOQUE 1XX
+// ============================================
+
+// Verificar que todas las funciones del bloque 1XX estén disponibles
+window.addEventListener("DOMContentLoaded", function () {
+    console.log("\n🔍 Verificando funciones del bloque 1XX...");
+
+    const funciones1xx = [
+        "agregarFuncionCompositor",
+        "agregarAtribucionCompositor",
+        "agregarForma130",
+        "agregarMedioInterpretacion130",
+        "agregarNumeroParteSeccion130",
+        "agregarNombreParteSeccion130",
+        "agregarForma240",
+        "agregarMedioInterpretacion240",
+        "agregarNumeroParteSeccion240",
+        "agregarNombreParteSeccion240",
+    ];
+
+    let faltantes = [];
+    funciones1xx.forEach((fn) => {
+        if (typeof window[fn] === "function") {
+            console.log(`   ✅ ${fn}`);
+        } else {
+            console.error(`   ❌ ${fn} NO ENCONTRADA`);
+            faltantes.push(fn);
+        }
+    });
+
+    if (faltantes.length === 0) {
+        console.log(
+            "✅ Todas las funciones del bloque 1XX están disponibles\n"
+        );
+    } else {
+        console.error(
+            `❌ Faltan ${faltantes.length} funciones del bloque 1XX:`,
+            faltantes
+        );
+        console.error(
+            "⚠️ Verifica que el archivo campos-1xx-repetibles.js se esté cargando correctamente"
+        );
+    }
+});
