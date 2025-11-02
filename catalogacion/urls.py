@@ -10,9 +10,6 @@ from .views import (
     obra_individual_impresa,
     # Autoridades
     get_autoridades_json,
-    # Pruebas
-    prueba_campo_300,
-    limpiar_prueba_300,
 )
 
 urlpatterns = [
@@ -30,8 +27,4 @@ urlpatterns = [
     # API - Autoridades
     path('api/autoridades/', get_autoridades_json, name='get_autoridades_json'),
     
-    # Rutas de prueba para campo 300
-    path('prueba/campo-300/', prueba_campo_300, name='prueba_campo_300'),
-    path('prueba/campo-300/<int:obra_id>/', prueba_campo_300, name='prueba_campo_300_obra'),
-    path('prueba/limpiar-300/', limpiar_prueba_300, name='limpiar_prueba_300'),
 ]

@@ -31,12 +31,6 @@ from .views_autoridades import (
     get_autoridades_json,
 )
 
-# Importar vistas de pruebas
-from .views_pruebas import (
-    prueba_campo_300,
-    limpiar_prueba_300,
-)
-
 # Exportar todas las vistas
 __all__ = [
     # Vistas base
