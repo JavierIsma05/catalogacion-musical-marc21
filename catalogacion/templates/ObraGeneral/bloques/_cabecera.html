@@ -1,0 +1,31 @@
+{# ============================================ #}
+{# CABECERA - Líder y Número de Control (001) #}
+{# ============================================ #}
+
+<div class="card border-0 shadow-sm mb-4" id="cabecera">
+    <div class="card-body">
+        <h2 class="section-title">Cabecera</h2>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label small">Tipo de Registro <span class="text-muted">(Líder/06)</span></label>
+                <select name="tipo_registro" class="form-select" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="c">c - Música notada manuscrita</option>
+                    <option value="d">d - Música notada impresa</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small">Nivel Bibliográfico <span class="text-muted">(Líder/07)</span></label>
+                <select name="nivel_bibliografico" class="form-select" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="m">m - Monografía</option>
+                    <option value="c">c - Colección</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small">Número de Control <span class="text-muted">(001)</span></label>
+                <input type="text" name="num_control" class="form-control" placeholder="Ej: 001234">
+            </div>
+        </div>
+    </div>
+</div>

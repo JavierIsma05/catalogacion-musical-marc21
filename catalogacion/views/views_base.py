@@ -41,8 +41,8 @@ def crear_obra(request):
         # Por ahora solo mostramos el template
         messages.success(request, 'Funcionalidad de guardado en desarrollo')
         return redirect('crear_obra')
-    
-    return render(request, 'ObraGeneral/obra_general.html')
+
+    return render(request, 'ObraGeneral/obra_general_modular.html')
 
 
 def coleccion_manuscrita(request):
