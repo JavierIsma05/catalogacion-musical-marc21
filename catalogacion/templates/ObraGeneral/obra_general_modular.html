@@ -20,42 +20,16 @@
                 <form method="post" id="obraForm">
                     {% csrf_token %}
 
-                    {# ============================================ #}
-                    {# CABECERA - Líder y campos de control #}
-                    {# ============================================ #}
+                    {# CABECERA #}
                     {% include "ObraGeneral/bloques/_cabecera.html" %}
 
-                    {# ============================================ #}
-                    {# BLOQUE 0XX - Campos de Control #}
-                    {# ============================================ #}
+                    {# BLOQUE 0XX #}
                     {% include "ObraGeneral/bloques/_bloque_0xx.html" %}
 
-                    {# ============================================ #}
-                    {# BLOQUE 1XX - Entradas Principales #}
-                    {# ============================================ #}
+                    {# BLOQUE 1XX #}
                     {% include "ObraGeneral/bloques/_bloque_1xx.html" %}
 
-                    {# ============================================ #}
-                    {# BLOQUE 2XX - Títulos y Publicación #}
-                    {# ============================================ #}
-                    {# Descomentar cuando esté listo: #}
-                    {# {% include "ObraGeneral/bloques/_bloque_2xx.html" %} #}
-
-                    {# ============================================ #}
-                    {# BLOQUE 3XX - Descripción Física #}
-                    {# ============================================ #}
-                    {# Descomentar cuando esté listo: #}
-                    {# {% include "ObraGeneral/bloques/_bloque_3xx.html" %} #}
-
-                    {# ============================================ #}
-                    {# BLOQUE 4XX - Series #}
-                    {# ============================================ #}
-                    {# Descomentar cuando esté listo: #}
-                    {# {% include "ObraGeneral/bloques/_bloque_4xx.html" %} #}
-
-                    {# ============================================ #}
-                    {# BOTONES DE ACCIÓN #}
-                    {# ============================================ #}
+                    {# Botones #}
                     {% include "ObraGeneral/bloques/_botones.html" %}
                 </form>
             </div>
