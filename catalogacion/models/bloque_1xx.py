@@ -4,18 +4,18 @@ Modelos MARC21 - Bloque 1XX
 
 Puntos de acceso principales (asientos principales):
 - Campo 100: Compositor (subcampos $e, $j)
-- Campo 130: Título uniforme (subcampos $k, $m, $n, $p)
-- Campo 240: Título uniforme con compositor (subcampos $k, $m, $n, $p)
+- Campo 130: Titulo uniforme (subcampos $k, $m, $n, $p)
+- Campo 240: Titulo uniforme con compositor (subcampos $k, $m, $n, $p)
 """
 
 from django.db import models
 
 
 FORMAS_MUSICALES = [
-    ('adaptación', 'Adaptación'),
+    ('adaptacion', 'Adaptacion'),
     ('boceto', 'Boceto'),
     ('fragmento', 'Fragmento'),
-    ('selección', 'Selección'),
+    ('seleccion', 'Seleccion'),
     ('tema con variaciones', 'Tema con variaciones'),
 ]
 
@@ -27,7 +27,7 @@ FORMAS_MUSICALES = [
 class FuncionCompositor(models.Model):
     """
     Campo 100 - Subcampo $e (R)
-    Término indicativo de función del compositor
+    Termino indicativo de funcion del compositor
     Permite múltiples funciones para un compositor en una obra
     """
     
@@ -46,21 +46,21 @@ class FuncionCompositor(models.Model):
         'ObraGeneral',
         on_delete=models.CASCADE,
         related_name='funciones_compositor',
-        help_text="Obra a la que pertenece esta función"
+        help_text="Obra a la que pertenece esta funcion"
     )
     
-    # Subcampo $e - Función (R)
+    # Subcampo $e - Funcion (R)
     funcion = models.CharField(
         max_length=20,
         choices=FUNCIONES,
         default='compositor',
-        help_text="100 $e – Función del compositor (predeterminado: compositor)"
+        help_text="100 $e – Funcion del compositor (predeterminado: compositor)"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name = "Función Compositor (100 $e)"
+        verbose_name = "Funcion Compositor (100 $e)"
         verbose_name_plural = "Funciones Compositor (100 $e - R)"
         ordering = ['obra', 'id']
     
@@ -71,8 +71,8 @@ class FuncionCompositor(models.Model):
 class AtribucionCompositor(models.Model):
     """
     Campo 100 - Subcampo $j (R)
-    Calificador de atribución de autoría
-    Permite múltiples calificadores de autoría
+    Calificador de atribucion de autoria
+    Permite múltiples calificadores de autoria
     """
     
     ATRIBUCIONES = [
@@ -85,21 +85,21 @@ class AtribucionCompositor(models.Model):
         'ObraGeneral',
         on_delete=models.CASCADE,
         related_name='atribuciones_compositor',
-        help_text="Obra a la que pertenece esta atribución"
+        help_text="Obra a la que pertenece esta atribucion"
     )
     
-    # Subcampo $j - Atribución (R)
+    # Subcampo $j - Atribucion (R)
     atribucion = models.CharField(
         max_length=15,
         choices=ATRIBUCIONES,
         default='certificada',
-        help_text="100 $j – Calificador de atribución (predeterminado: certificada)"
+        help_text="100 $j – Calificador de atribucion (predeterminado: certificada)"
     )
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name = "Atribución Compositor (100 $j)"
+        verbose_name = "Atribucion Compositor (100 $j)"
         verbose_name_plural = "Atribuciones Compositor (100 $j - R)"
         ordering = ['obra', 'id']
     
@@ -115,7 +115,7 @@ class Forma130(models.Model):
     """
     Campo 130 - Subcampo $k (R)
     Subencabezamiento de forma
-    Permite múltiples formas para un título uniforme
+    Permite múltiples formas para un titulo uniforme
     """
     
     obra = models.ForeignKey(
@@ -145,8 +145,8 @@ class Forma130(models.Model):
 class MedioInterpretacion130(models.Model):
     """
     Campo 130 - Subcampo $m (R)
-    Medio de interpretación para música
-    Permite múltiples medios de interpretación
+    Medio de interpretacion para música
+    Permite múltiples medios de interpretacion
     """
     
     obra = models.ForeignKey(
@@ -156,28 +156,28 @@ class MedioInterpretacion130(models.Model):
         help_text="Obra a la que pertenece"
     )
     
-    # Subcampo $m - Medio de interpretación (R)
+    # Subcampo $m - Medio de interpretacion (R)
     medio = models.CharField(
         max_length=100,
         default='piano',
-        help_text="130 $m – Medio de interpretación (predeterminado: piano)"
+        help_text="130 $m – Medio de interpretacion (predeterminado: piano)"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name = "Medio de Interpretación (130 $m)"
-        verbose_name_plural = "Medios de Interpretación (130 $m - R)"
+        verbose_name = "Medio de Interpretacion (130 $m)"
+        verbose_name_plural = "Medios de Interpretacion (130 $m - R)"
         ordering = ['obra', 'id']
     
     def __str__(self):
         return self.medio
 
 
-class NumeroParteSección130(models.Model):
+class NumeroParteSeccion130(models.Model):
     """
     Campo 130 - Subcampo $n (R)
-    Número de parte o sección de la obra
+    Número de parte o seccion de la obra
     Permite múltiples números (ej: obra con varias partes)
     """
     
@@ -191,24 +191,24 @@ class NumeroParteSección130(models.Model):
     # Subcampo $n - Número de parte (R)
     numero = models.CharField(
         max_length=50,
-        help_text="130 $n – Número de parte/sección (ej: I, II, III o 1, 2, 3)"
+        help_text="130 $n – Número de parte/seccion (ej: I, II, III o 1, 2, 3)"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name = "Número de Parte/Sección (130 $n)"
-        verbose_name_plural = "Números de Parte/Sección (130 $n - R)"
+        verbose_name = "Número de Parte/Seccion (130 $n)"
+        verbose_name_plural = "Números de Parte/Seccion (130 $n - R)"
         ordering = ['obra', 'id']
     
     def __str__(self):
         return self.numero
 
 
-class NombreParteSección130(models.Model):
+class NombreParteSeccion130(models.Model):
     """
     Campo 130 - Subcampo $p (R)
-    Nombre de parte o sección de la obra
+    Nombre de parte o seccion de la obra
     """
     
     obra = models.ForeignKey(
@@ -221,14 +221,14 @@ class NombreParteSección130(models.Model):
     # Subcampo $p - Nombre de parte (R)
     nombre = models.CharField(
         max_length=200,
-        help_text="130 $p – Nombre de parte/sección (ej: Allegro, Andante, Finale)"
+        help_text="130 $p – Nombre de parte/seccion (ej: Allegro, Andante, Finale)"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name = "Nombre de Parte/Sección (130 $p)"
-        verbose_name_plural = "Nombres de Parte/Sección (130 $p - R)"
+        verbose_name = "Nombre de Parte/Seccion (130 $p)"
+        verbose_name_plural = "Nombres de Parte/Seccion (130 $p - R)"
         ordering = ['obra', 'id']
     
     def __str__(self):
@@ -245,8 +245,6 @@ class Forma240(models.Model):
     Subencabezamiento de forma (cuando hay compositor)
     """
     
-    FORMAS = FORMAS_MUSICALES
-    
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
@@ -254,10 +252,11 @@ class Forma240(models.Model):
         help_text="Obra a la que pertenece"
     )
     
-    forma = models.CharField(
-        max_length=50,
-        choices=FORMAS,
-        help_text="240 $k – Forma (cruzar con campo 655)"
+    # Usa clave foranea a AutoridadFormaMusical 
+    forma = models.ForeignKey(
+        'AutoridadFormaMusical',
+        on_delete=models.PROTECT,
+        help_text="240 $k – Forma normalizada (igual que 130 $k)"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -268,13 +267,13 @@ class Forma240(models.Model):
         ordering = ['obra', 'id']
     
     def __str__(self):
-        return self.get_forma_display()
+        return self.forma.forma if self.forma else ""
 
 
 class MedioInterpretacion240(models.Model):
     """
     Campo 240 - Subcampo $m (R)
-    Medio de interpretación para música (cuando hay compositor)
+    Medio de interpretacion para música (cuando hay compositor)
     """
     
     obra = models.ForeignKey(
@@ -287,24 +286,24 @@ class MedioInterpretacion240(models.Model):
     medio = models.CharField(
         max_length=100,
         default='piano',
-        help_text="240 $m – Medio de interpretación (predeterminado: piano)"
+        help_text="240 $m – Medio de interpretacion (predeterminado: piano)"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name = "Medio de Interpretación (240 $m)"
-        verbose_name_plural = "Medios de Interpretación (240 $m - R)"
+        verbose_name = "Medio de Interpretacion (240 $m)"
+        verbose_name_plural = "Medios de Interpretacion (240 $m - R)"
         ordering = ['obra', 'id']
     
     def __str__(self):
         return self.medio
 
 
-class NumeroParteSección240(models.Model):
+class NumeroParteSeccion240(models.Model):
     """
     Campo 240 - Subcampo $n (R)
-    Número de parte o sección de la obra (cuando hay compositor)
+    Número de parte o seccion de la obra (cuando hay compositor)
     """
     
     obra = models.ForeignKey(
@@ -316,25 +315,25 @@ class NumeroParteSección240(models.Model):
     
     numero = models.CharField(
         max_length=50,
-        help_text="240 $n – Número de parte/sección (ej: I, II, III o 1, 2, 3)"
+        help_text="240 $n – Número de parte/seccion (ej: I, II, III o 1, 2, 3)"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name = "Número de Parte/Sección (240 $n)"
-        verbose_name_plural = "Números de Parte/Sección (240 $n - R)"
+        verbose_name = "Número de Parte/Seccion (240 $n)"
+        verbose_name_plural = "Números de Parte/Seccion (240 $n - R)"
         ordering = ['obra', 'id']
     
     def __str__(self):
         return self.numero
 
 
-class NombreParteSección240(models.Model):
+class NombreParteSeccion240(models.Model):
     """
     Campo 240 - Subcampo $p (R)
-    Nombre de parte o sección de la obra (cuando hay compositor)
-    Paralelo a NombreParteSección130 pero para campo 240
+    Nombre de parte o seccion de la obra (cuando hay compositor)
+    Paralelo a NombreParteSeccion130 pero para campo 240
     """
     
     obra = models.ForeignKey(
@@ -346,14 +345,14 @@ class NombreParteSección240(models.Model):
     
     nombre = models.CharField(
         max_length=200,
-        help_text="240 $p – Nombre de parte/sección (ej: Allegro, Andante, Finale)"
+        help_text="240 $p – Nombre de parte/seccion (ej: Allegro, Andante, Finale)"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name = "Nombre de Parte/Sección (240 $p)"
-        verbose_name_plural = "Nombres de Parte/Sección (240 $p - R)"
+        verbose_name = "Nombre de Parte/Seccion (240 $p)"
+        verbose_name_plural = "Nombres de Parte/Seccion (240 $p - R)"
         ordering = ['obra', 'id']
     
     def __str__(self):

@@ -95,7 +95,7 @@
             </div>
             
             <div class="row g-3 mb-3">
-                <div class="col-md-4">
+                <div class="col-md-4 position-relative">
                     <label class="form-label small">$a Título Uniforme</label>
                     <input type="text" 
                            id="titulo_uniforme_130" 
@@ -255,15 +255,15 @@
                 </div>
                 <div id="formas-240">
                     <div class="mb-2" data-subcampo="forma-240-0">
-                        <div class="input-group input-group-sm">
+                        <div class="input-group input-group-sm position-relative">
                             <span class="input-group-text">$k</span>
-                            <select name="forma_240_k_0" class="form-select form-select-sm">
-                                <option value="adaptación">Adaptación</option>
-                                <option value="boceto">Boceto</option>
-                                <option value="fragmento">Fragmento</option>
-                                <option value="selección">Selección</option>
-                                <option value="tema con variaciones">Tema con variaciones</option>
-                            </select>
+                            <input type="text" 
+                                   name="forma_240_k_0" 
+                                   class="form-control forma-240-input" 
+                                   placeholder="Ej: Selección, Fragmento"
+                                   autocomplete="off"
+                                   data-index="0">
+                            <div class="forma-240-autocomplete autocomplete-dropdown" data-index="0"></div>
                             <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('forma-240-0')">
                                 <i class="bi bi-x"></i>
                             </button>

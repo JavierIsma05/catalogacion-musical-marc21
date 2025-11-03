@@ -233,15 +233,31 @@
     color: var(--text-muted);
 }
 
-/* Para los inputs con autocompletado */
+/* Para los inputs con autocompletado - IMPORTANTE */
 .position-relative {
-    position: relative;
+    position: relative !important;
 }
 
 /* Para inputs dentro de input-group con autocompletado */
+.input-group.position-relative {
+    position: relative !important;
+}
+
 .input-group.position-relative .autocomplete-dropdown {
     left: 0;
     right: 38px; /* Espacio para el botón de eliminar */
+}
+
+/* Para columnas con autocompletado */
+.col-md-4.position-relative,
+.col-md-8.position-relative {
+    position: relative !important;
+}
+
+.col-md-4.position-relative .autocomplete-dropdown,
+.col-md-8.position-relative .autocomplete-dropdown {
+    left: 0;
+    right: 0;
 }
 
 /* Scroll suave para el dropdown */
@@ -256,11 +272,6 @@
 
 .autocomplete-dropdown::-webkit-scrollbar-track {
     background: transparent;
-}
-
-/* Contenedor de input con autocompletado */
-.col-md-8 {
-    position: relative;
 }
 
 /* ============================================ */

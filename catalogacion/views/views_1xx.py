@@ -2,20 +2,20 @@
 Vistas Bloque 1XX - Puntos de Acceso Principal
 ==============================================
 
-Gestión de campos MARC21 del bloque 1XX (Puntos de acceso principal).
+Gestion de campos MARC21 del bloque 1XX (Puntos de acceso principal).
 
 Campos incluidos:
 - 100: Punto de acceso principal - Nombre de persona (Compositor)
-- 130: Punto de acceso principal - Título uniforme
-- 240: Título uniforme
+- 130: Punto de acceso principal - Titulo uniforme
+- 240: Titulo uniforme
 
 Subcampos relacionados:
 - Funciones del compositor
 - Atribuciones del compositor
 - Formas musicales (130/240)
-- Medio de interpretación (130/240)
-- Número de parte/sección (130/240)
-- Nombre de parte/sección (130/240)
+- Medio de interpretacion (130/240)
+- Numero de parte/seccion (130/240)
+- Nombre de parte/seccion (130/240)
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -28,12 +28,12 @@ from ..models import (
     AtribucionCompositor,
     Forma130,
     MedioInterpretacion130,
-    NumeroParteSección130,
-    NombreParteSección130,
+    NumeroParteSeccion130,
+    NombreParteSeccion130,
     Forma240,
     MedioInterpretacion240,
-    NumeroParteSección240,
-    NombreParteSección240,
+    NumeroParteSeccion240,
+    NombreParteSeccion240,
     AutoridadPersona,
     AutoridadTituloUniforme,
     AutoridadFormaMusical,
@@ -45,12 +45,12 @@ from ..forms import (
     AtribucionCompositorFormSet,
     Forma130FormSet,
     MedioInterpretacion130FormSet,
-    NumeroParteSección130FormSet,
-    NombreParteSección130FormSet,
+    NumeroParteSeccion130FormSet,
+    NombreParteSeccion130FormSet,
     Forma240FormSet,
     MedioInterpretacion240FormSet,
-    NumeroParteSección240FormSet,
-    NombreParteSección240FormSet,
+    NumeroParteSeccion240FormSet,
+    NombreParteSeccion240FormSet,
 )
 
 
@@ -58,14 +58,14 @@ def gestionar_funciones_compositor(request, obra_id):
     """
     Gestionar Funciones del Compositor (100 $e)
     
-    Campo 100 $e - Término de función (Repetible)
+    Campo 100 $e - Termino de funcion (Repetible)
     Especifica el rol del compositor (compositor, arreglista, etc.)
     
     Args:
         obra_id: ID de la obra
     
     Returns:
-        Render del formulario o redirect después de guardar
+        Render del formulario o redirect despues de guardar
     """
     obra = get_object_or_404(ObraGeneral, pk=obra_id)
     
@@ -93,14 +93,14 @@ def gestionar_atribuciones_compositor(request, obra_id):
     """
     Gestionar Atribuciones del Compositor (100 $j)
     
-    Campo 100 $j - Término de atribución (Repetible)
+    Campo 100 $j - Termino de atribucion (Repetible)
     Indica atribuciones o calificativos del compositor.
     
     Args:
         obra_id: ID de la obra
     
     Returns:
-        Render del formulario o redirect después de guardar
+        Render del formulario o redirect despues de guardar
     """
     obra = get_object_or_404(ObraGeneral, pk=obra_id)
     
@@ -126,22 +126,22 @@ def gestionar_atribuciones_compositor(request, obra_id):
 
 def gestionar_titulo_uniforme_130(request, obra_id):
     """
-    Gestionar Título Uniforme - Campo 130
+    Gestionar Titulo Uniforme - Campo 130
     
-    Campo 130 - Punto de acceso principal - Título uniforme
+    Campo 130 - Punto de acceso principal - Titulo uniforme
     Incluye subcampos repetibles:
     - $r: Forma musical (R)
-    - $m: Medio de interpretación (R)
-    - $n: Número de parte/sección (R)
-    - $p: Nombre de parte/sección (R)
+    - $m: Medio de interpretacion (R)
+    - $n: Numero de parte/seccion (R)
+    - $p: Nombre de parte/seccion (R)
     
-    Patrón de campos repetibles anidados.
+    Patron de campos repetibles anidados.
     
     Args:
         obra_id: ID de la obra
     
     Returns:
-        Render del formulario o redirect después de guardar
+        Render del formulario o redirect despues de guardar
     """
     obra = get_object_or_404(ObraGeneral, pk=obra_id)
     
@@ -153,30 +153,30 @@ def gestionar_titulo_uniforme_130(request, obra_id):
                 if formset_formas.is_valid():
                     formset_formas.save()
                 
-                # Guardar medios de interpretación
+                # Guardar medios de interpretacion
                 formset_medios = MedioInterpretacion130FormSet(request.POST, instance=obra, prefix='medios')
                 if formset_medios.is_valid():
                     formset_medios.save()
                 
-                # Guardar números de parte/sección
-                formset_numeros = NumeroParteSección130FormSet(request.POST, instance=obra, prefix='numeros')
+                # Guardar numeros de parte/seccion
+                formset_numeros = NumeroParteSeccion130FormSet(request.POST, instance=obra, prefix='numeros')
                 if formset_numeros.is_valid():
                     formset_numeros.save()
                 
-                # Guardar nombres de parte/sección
-                formset_nombres = NombreParteSección130FormSet(request.POST, instance=obra, prefix='nombres')
+                # Guardar nombres de parte/seccion
+                formset_nombres = NombreParteSeccion130FormSet(request.POST, instance=obra, prefix='nombres')
                 if formset_nombres.is_valid():
                     formset_nombres.save()
                 
-                messages.success(request, '✅ Título uniforme 130 guardado correctamente')
+                messages.success(request, '✅ Titulo uniforme 130 guardado correctamente')
                 return redirect('detalle_obra', obra_id=obra_id)
         except Exception as e:
-            messages.error(request, f'❌ Error al guardar título uniforme: {str(e)}')
+            messages.error(request, f'❌ Error al guardar titulo uniforme: {str(e)}')
     else:
         formset_formas = Forma130FormSet(instance=obra, prefix='formas')
         formset_medios = MedioInterpretacion130FormSet(instance=obra, prefix='medios')
-        formset_numeros = NumeroParteSección130FormSet(instance=obra, prefix='numeros')
-        formset_nombres = NombreParteSección130FormSet(instance=obra, prefix='nombres')
+        formset_numeros = NumeroParteSeccion130FormSet(instance=obra, prefix='numeros')
+        formset_nombres = NombreParteSeccion130FormSet(instance=obra, prefix='nombres')
     
     contexto = {
         'obra': obra,
@@ -190,22 +190,22 @@ def gestionar_titulo_uniforme_130(request, obra_id):
 
 def gestionar_titulo_uniforme_240(request, obra_id):
     """
-    Gestionar Título Uniforme - Campo 240
+    Gestionar Titulo Uniforme - Campo 240
     
-    Campo 240 - Título uniforme
+    Campo 240 - Titulo uniforme
     Incluye subcampos repetibles:
     - $r: Forma musical (R)
-    - $m: Medio de interpretación (R)
-    - $n: Número de parte/sección (R)
-    - $p: Nombre de parte/sección (R)
+    - $m: Medio de interpretacion (R)
+    - $n: Numero de parte/seccion (R)
+    - $p: Nombre de parte/seccion (R)
     
-    Patrón de campos repetibles anidados.
+    Patron de campos repetibles anidados.
     
     Args:
         obra_id: ID de la obra
     
     Returns:
-        Render del formulario o redirect después de guardar
+        Render del formulario o redirect despues de guardar
     """
     obra = get_object_or_404(ObraGeneral, pk=obra_id)
     
@@ -217,30 +217,30 @@ def gestionar_titulo_uniforme_240(request, obra_id):
                 if formset_formas.is_valid():
                     formset_formas.save()
                 
-                # Guardar medios de interpretación
+                # Guardar medios de interpretacion
                 formset_medios = MedioInterpretacion240FormSet(request.POST, instance=obra, prefix='medios')
                 if formset_medios.is_valid():
                     formset_medios.save()
                 
-                # Guardar números de parte/sección
-                formset_numeros = NumeroParteSección240FormSet(request.POST, instance=obra, prefix='numeros')
+                # Guardar numeros de parte/seccion
+                formset_numeros = NumeroParteSeccion240FormSet(request.POST, instance=obra, prefix='numeros')
                 if formset_numeros.is_valid():
                     formset_numeros.save()
                 
-                # Guardar nombres de parte/sección
-                formset_nombres = NombreParteSección240FormSet(request.POST, instance=obra, prefix='nombres')
+                # Guardar nombres de parte/seccion
+                formset_nombres = NombreParteSeccion240FormSet(request.POST, instance=obra, prefix='nombres')
                 if formset_nombres.is_valid():
                     formset_nombres.save()
                 
-                messages.success(request, '✅ Título uniforme 240 guardado correctamente')
+                messages.success(request, '✅ Titulo uniforme 240 guardado correctamente')
                 return redirect('detalle_obra', obra_id=obra_id)
         except Exception as e:
-            messages.error(request, f'❌ Error al guardar título uniforme: {str(e)}')
+            messages.error(request, f'❌ Error al guardar titulo uniforme: {str(e)}')
     else:
         formset_formas = Forma240FormSet(instance=obra, prefix='formas')
         formset_medios = MedioInterpretacion240FormSet(instance=obra, prefix='medios')
-        formset_numeros = NumeroParteSección240FormSet(instance=obra, prefix='numeros')
-        formset_nombres = NombreParteSección240FormSet(instance=obra, prefix='nombres')
+        formset_numeros = NumeroParteSeccion240FormSet(instance=obra, prefix='numeros')
+        formset_nombres = NombreParteSeccion240FormSet(instance=obra, prefix='nombres')
     
     contexto = {
         'obra': obra,
@@ -285,69 +285,6 @@ def listar_campos_1xx(request, obra_id):
 # =============================================================================
 # FUNCIONES DE PROCESAMIENTO MASIVO (para formulario principal de obra_general)
 # =============================================================================
-
-def procesar_compositor(request, obra):
-    """
-    Procesa todos los campos 100 - Compositor desde el formulario principal
-    
-    Maneja:
-    - Compositor con AutoridadPersona ($a y $d)
-    - Funciones de compositor ($e) - repetibles
-    - Atribuciones ($j) - repetibles
-    
-    Args:
-        request: HttpRequest con datos POST
-        obra: Instancia de ObraGeneral
-    """
-    from ..models.autoridades import AutoridadPersona
-    
-    # Obtener datos del compositor
-    apellidos_nombres = request.POST.get('compositor_apellidos_nombres', '').strip()
-    fechas = request.POST.get('compositor_fechas', '').strip()
-    
-    if apellidos_nombres:
-        # Crear o recuperar la autoridad de persona
-        persona, created = AutoridadPersona.objects.get_or_create(
-            apellidos_nombres=apellidos_nombres,
-            defaults={'fechas': fechas}
-        )
-        
-        # Si ya existe pero tiene fechas diferentes, actualizar
-        if not created and fechas and persona.fechas != fechas:
-            persona.fechas = fechas
-            persona.save()
-        
-        # Asignar compositor a la obra
-        obra.compositor = persona
-        obra.save()
-        
-        # Procesar funciones del compositor ($e) - repetibles
-        idx = 0
-        while True:
-            funcion = request.POST.get(f'funcion_compositor_e_{idx}')
-            if funcion is None:
-                break
-            if funcion.strip():
-                FuncionCompositor.objects.create(
-                    obra=obra,
-                    funcion=funcion.strip()
-                )
-            idx += 1
-        
-        # Procesar atribuciones ($j) - repetibles
-        idx = 0
-        while True:
-            atribucion = request.POST.get(f'atribucion_compositor_j_{idx}')
-            if atribucion is None:
-                break
-            if atribucion.strip():
-                AtribucionCompositor.objects.create(
-                    obra=obra,
-                    atribucion=atribucion.strip()
-                )
-            idx += 1
-
-
 def procesar_compositor(request, obra):
     """
     Procesa todos los campos 100 - Compositor desde el formulario principal
@@ -411,10 +348,10 @@ def procesar_compositor(request, obra):
 
 def procesar_titulo_uniforme_130(request, obra):
     """
-    Procesa el campo 130 - Título Uniforme Musical (solo si NO hay compositor)
+    Procesa el campo 130 - Titulo Uniforme Musical (solo si NO hay compositor)
     
     Maneja:
-    - Título uniforme base ($a)
+    - Titulo uniforme base ($a)
     - Arreglo ($o)
     - Tonalidad ($r)
     - Subcampos $k, $m, $n, $p (procesados por procesar_subcampos_130)
@@ -428,7 +365,7 @@ def procesar_titulo_uniforme_130(request, obra):
     tonalidad_130 = request.POST.get('titulo_uniforme_tonalidad', '').strip()
     
     if titulo_130:
-        # Crear o recuperar autoridad de título uniforme
+        # Crear o recuperar autoridad de titulo uniforme
         titulo_autoridad, created = AutoridadTituloUniforme.objects.get_or_create(
             titulo=titulo_130
         )
@@ -452,13 +389,13 @@ def procesar_titulo_uniforme_130(request, obra):
 
 def procesar_subcampos_130(request, obra):
     """
-    Procesa los subcampos del campo 130 - Título Uniforme
+    Procesa los subcampos del campo 130 - Titulo Uniforme
     
     Maneja:
     - $k Forma musical (ForeignKey a AutoridadFormaMusical) - repetible
-    - $m Medio de interpretación - repetible
-    - $n Número de parte/sección - repetible
-    - $p Nombre de parte/sección - repetible
+    - $m Medio de interpretacion - repetible
+    - $n Numero de parte/seccion - repetible
+    - $p Nombre de parte/seccion - repetible
     
     Args:
         request: HttpRequest con datos POST
@@ -481,7 +418,7 @@ def procesar_subcampos_130(request, obra):
             )
         idx += 1
     
-    # Procesar $m - Medio de interpretación (repetible)
+    # Procesar $m - Medio de interpretacion (repetible)
     idx = 0
     while True:
         medio = request.POST.get(f'medio_interpretacion_130_m_{idx}')
@@ -494,27 +431,27 @@ def procesar_subcampos_130(request, obra):
             )
         idx += 1
     
-    # Procesar $n - Número de parte/sección (repetible)
+    # Procesar $n - Numero de parte/seccion (repetible)
     idx = 0
     while True:
         numero = request.POST.get(f'numero_parte_130_n_{idx}')
         if numero is None:
             break
         if numero.strip():
-            NumeroParteSección130.objects.create(
+            NumeroParteSeccion130.objects.create(
                 obra=obra,
                 numero=numero.strip()
             )
         idx += 1
     
-    # Procesar $p - Nombre de parte/sección (repetible)
+    # Procesar $p - Nombre de parte/seccion (repetible)
     idx = 0
     while True:
         nombre = request.POST.get(f'nombre_parte_130_p_{idx}')
         if nombre is None:
             break
         if nombre.strip():
-            NombreParteSección130.objects.create(
+            NombreParteSeccion130.objects.create(
                 obra=obra,
                 nombre=nombre.strip()
             )
@@ -523,10 +460,10 @@ def procesar_subcampos_130(request, obra):
 
 def procesar_titulo_uniforme_240(request, obra):
     """
-    Procesa el campo 240 - Título Uniforme con Compositor (solo si HAY compositor)
+    Procesa el campo 240 - Titulo Uniforme con Compositor (solo si HAY compositor)
     
     Maneja:
-    - Título uniforme base ($a)
+    - Titulo uniforme base ($a)
     - Arreglo ($o)
     - Tonalidad ($r)
     - Subcampos $k, $m, $n, $p (procesados por procesar_subcampos_240)
@@ -540,7 +477,7 @@ def procesar_titulo_uniforme_240(request, obra):
     tonalidad_240 = request.POST.get('titulo_240_tonalidad', '').strip()
     
     if titulo_240:
-        # Crear o recuperar autoridad de título uniforme
+        # Crear o recuperar autoridad de titulo uniforme
         titulo_autoridad, created = AutoridadTituloUniforme.objects.get_or_create(
             titulo=titulo_240
         )
@@ -564,32 +501,36 @@ def procesar_titulo_uniforme_240(request, obra):
 
 def procesar_subcampos_240(request, obra):
     """
-    Procesa los subcampos del campo 240 - Título Uniforme con Compositor
+    Procesa los subcampos del campo 240 - Titulo Uniforme con Compositor
     
     Maneja:
-    - $k Forma musical (CharField con choices) - repetible
-    - $m Medio de interpretación - repetible
-    - $n Número de parte/sección - repetible
-    - $p Nombre de parte/sección - repetible
+    - $k Forma musical (ForeignKey a AutoridadFormaMusical) - repetible
+    - $m Medio de interpretacion - repetible
+    - $n Numero de parte/seccion - repetible
+    - $p Nombre de parte/seccion - repetible
     
     Args:
         request: HttpRequest con datos POST
         obra: Instancia de ObraGeneral
     """
-    # Procesar $k - Forma musical (repetible, choices directas)
+    # Procesar $k - Forma musical (repetible, con autoridad - igual que 130)
     idx = 0
     while True:
-        forma_valor = request.POST.get(f'forma_240_k_{idx}')
-        if forma_valor is None:
+        forma_nombre = request.POST.get(f'forma_240_k_{idx}')
+        if forma_nombre is None:
             break
-        if forma_valor.strip():
+        if forma_nombre.strip():
+            # Crear o recuperar autoridad de forma musical
+            forma_autoridad, created = AutoridadFormaMusical.objects.get_or_create(
+                forma=forma_nombre.strip()
+            )
             Forma240.objects.create(
                 obra=obra,
-                forma=forma_valor.strip()
+                forma=forma_autoridad
             )
         idx += 1
     
-    # Procesar $m - Medio de interpretación (repetible)
+    # Procesar $m - Medio de interpretacion (repetible)
     idx = 0
     while True:
         medio = request.POST.get(f'medio_interpretacion_240_m_{idx}')
@@ -602,27 +543,27 @@ def procesar_subcampos_240(request, obra):
             )
         idx += 1
     
-    # Procesar $n - Número de parte/sección (repetible)
+    # Procesar $n - Numero de parte/seccion (repetible)
     idx = 0
     while True:
         numero = request.POST.get(f'numero_parte_240_n_{idx}')
         if numero is None:
             break
         if numero.strip():
-            NumeroParteSección240.objects.create(
+            NumeroParteSeccion240.objects.create(
                 obra=obra,
                 numero=numero.strip()
             )
         idx += 1
     
-    # Procesar $p - Nombre de parte/sección (repetible)
+    # Procesar $p - Nombre de parte/seccion (repetible)
     idx = 0
     while True:
         nombre = request.POST.get(f'nombre_parte_240_p_{idx}')
         if nombre is None:
             break
         if nombre.strip():
-            NombreParteSección240.objects.create(
+            NombreParteSeccion240.objects.create(
                 obra=obra,
                 nombre=nombre.strip()
             )

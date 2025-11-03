@@ -155,6 +155,50 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("titulo_240").value = id;
         }
     );
+
+    // Configurar autocompletado para el primer campo 240 $k que ya existe
+    const primeraForma240 = document.querySelector(
+        'input.forma-240-input[data-index="0"]'
+    );
+    const dropdownForma240 = document.querySelector(
+        '.forma-240-autocomplete[data-index="0"]'
+    );
+
+    if (primeraForma240 && dropdownForma240) {
+        let debounceTimer;
+        primeraForma240.addEventListener("input", function () {
+            clearTimeout(debounceTimer);
+            const query = this.value.trim();
+
+            if (query.length < 2) {
+                dropdownForma240.innerHTML = "";
+                dropdownForma240.style.display = "none";
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                buscarAutoridades(
+                    query,
+                    "forma_musical",
+                    dropdownForma240,
+                    (id, text) => {
+                        primeraForma240.value = id;
+                        dropdownForma240.style.display = "none";
+                    }
+                );
+            }, 300);
+        });
+
+        // Cerrar dropdown al hacer clic fuera
+        document.addEventListener("click", function (e) {
+            if (
+                e.target !== primeraForma240 &&
+                !dropdownForma240.contains(e.target)
+            ) {
+                dropdownForma240.style.display = "none";
+            }
+        });
+    }
 });
 
 // ============================================
@@ -386,20 +430,20 @@ window.agregarNombreParteSeccion130 = function () {
 // 240 - SUBCAMPOS REPETIBLES
 // ============================================
 
-// ============ 240 $k - FORMA (Repetible - choices) ============
+// ============ 240 $k - FORMA (Repetible con autocompletado) ============
 
 function generarHTMLForma240(index) {
     return `
         <div class="mb-2" data-subcampo="forma-240-${index}">
-            <div class="input-group input-group-sm">
+            <div class="input-group input-group-sm position-relative">
                 <span class="input-group-text">$k</span>
-                <select name="forma_240_k_${index}" class="form-select form-select-sm">
-                    <option value="adaptación">Adaptación</option>
-                    <option value="boceto">Boceto</option>
-                    <option value="fragmento">Fragmento</option>
-                    <option value="selección">Selección</option>
-                    <option value="tema con variaciones">Tema con variaciones</option>
-                </select>
+                <input type="text" 
+                       name="forma_240_k_${index}" 
+                       class="form-control forma-240-input" 
+                       placeholder="Ej: Selección, Fragmento"
+                       autocomplete="off"
+                       data-index="${index}">
+                <div class="forma-240-autocomplete autocomplete-dropdown" data-index="${index}"></div>
                 <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('forma-240-${index}')">
                     <i class="bi bi-x"></i>
                 </button>
@@ -413,6 +457,50 @@ window.agregarForma240 = function () {
 
     const index = contadores.obtener("forma240");
     insertarHTML("formas-240", generarHTMLForma240(index));
+
+    // Configurar autocompletado para el nuevo input
+    setTimeout(() => {
+        const input = document.querySelector(
+            `input.forma-240-input[data-index="${index}"]`
+        );
+        const dropdown = document.querySelector(
+            `.forma-240-autocomplete[data-index="${index}"]`
+        );
+
+        if (input && dropdown) {
+            let debounceTimer;
+            input.addEventListener("input", function () {
+                clearTimeout(debounceTimer);
+                const query = this.value.trim();
+
+                if (query.length < 2) {
+                    dropdown.innerHTML = "";
+                    dropdown.style.display = "none";
+                    return;
+                }
+
+                debounceTimer = setTimeout(() => {
+                    buscarAutoridades(
+                        query,
+                        "forma_musical",
+                        dropdown,
+                        (id, text) => {
+                            input.value = id;
+                            dropdown.style.display = "none";
+                        }
+                    );
+                }, 300);
+            });
+
+            // Cerrar dropdown al hacer clic fuera
+            document.addEventListener("click", function (e) {
+                if (e.target !== input && !dropdown.contains(e.target)) {
+                    dropdown.style.display = "none";
+                }
+            });
+        }
+    }, 100);
+
     contadores.incrementar("forma240");
     console.log(`📋 Forma 240 agregada (total: ${index + 1})`);
 };

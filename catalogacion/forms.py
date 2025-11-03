@@ -18,12 +18,12 @@ from .models import (
     AtribucionCompositor,
     Forma130,
     MedioInterpretacion130,
-    NumeroParteSección130,
-    NombreParteSección130,
+    NumeroParteSeccion130,
+    NombreParteSeccion130,
     Forma240,
     MedioInterpretacion240,
-    NumeroParteSección240,
-    NombreParteSección240,
+    NumeroParteSeccion240,
+    NombreParteSeccion240,
     # Bloque 2XX
     TituloAlternativo,
     Edicion,
@@ -67,7 +67,7 @@ class ISBNForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': '020 $a - ISBN (ej: 978-3-16-148410-0)',
                 'pattern': '[0-9\-]{10,}',
-                'title': 'Ingrese un ISBN válido'
+                'title': 'Ingrese un ISBN valido'
             })
         }
 
@@ -91,14 +91,14 @@ ISMNFormSet = forms.inlineformset_factory(
 
 
 class NumeroEditorForm(forms.ModelForm):
-    """Formulario para Número de Editor (028) - Repetible"""
+    """Formulario para Numero de Editor (028) - Repetible"""
     class Meta:
         model = NumeroEditor
         fields = ['numero', 'tipo_numero', 'control_nota']
         widgets = {
             'numero': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '028 $a - Número de editor'
+                'placeholder': '028 $a - Numero de editor'
             }),
             'tipo_numero': forms.RadioSelect(attrs={
                 'class': 'form-check-input'
@@ -110,7 +110,7 @@ class NumeroEditorForm(forms.ModelForm):
 
 
 class IncipitMusicalForm(forms.ModelForm):
-    """Formulario para Íncipit Musical (031) - Repetible"""
+    """Formulario para incipit Musical (031) - Repetible"""
     class Meta:
         model = IncipitMusical
         fields = [
@@ -120,19 +120,19 @@ class IncipitMusicalForm(forms.ModelForm):
         widgets = {
             'numero_obra': forms.NumberInput(attrs={
                 'class': 'form-control form-control-sm',
-                'placeholder': '031 $a - Número de obra'
+                'placeholder': '031 $a - Numero de obra'
             }),
             'numero_movimiento': forms.NumberInput(attrs={
                 'class': 'form-control form-control-sm',
-                'placeholder': '031 $b - Número de movimiento'
+                'placeholder': '031 $b - Numero de movimiento'
             }),
             'numero_pasaje': forms.NumberInput(attrs={
                 'class': 'form-control form-control-sm',
-                'placeholder': '031 $c - Número de pasaje'
+                'placeholder': '031 $c - Numero de pasaje'
             }),
             'titulo_encabezamiento': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '031 $d - Título/encabezamiento (ej: Aria, Allegro)'
+                'placeholder': '031 $d - Titulo/encabezamiento (ej: Aria, Allegro)'
             }),
             'voz_instrumento': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -141,20 +141,20 @@ class IncipitMusicalForm(forms.ModelForm):
             'notacion_musical': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': '031 $p - Notación musical codificada'
+                'placeholder': '031 $p - Notacion musical codificada'
             })
         }
 
 
 class IncipitURLForm(forms.ModelForm):
-    """Formulario para URL de Íncipit (031 $u) - Repetible"""
+    """Formulario para URL de incipit (031 $u) - Repetible"""
     class Meta:
         model = IncipitURL
         fields = ['url']
         widgets = {
             'url': forms.URLInput(attrs={
                 'class': 'form-control form-control-sm',
-                'placeholder': '031 $u - URL del íncipit'
+                'placeholder': '031 $u - URL del incipit'
             })
         }
 
@@ -194,7 +194,7 @@ IdiomaObraFormSet = forms.inlineformset_factory(
 
 
 class CodigoLenguaForm(forms.ModelForm):
-    """Formulario para Código de Lengua (041) - Principal"""
+    """Formulario para Codigo de Lengua (041) - Principal"""
     class Meta:
         model = CodigoLengua
         fields = ['indicacion_traduccion', 'fuente_codigo', 'fuente_especificada']
@@ -207,7 +207,7 @@ class CodigoLenguaForm(forms.ModelForm):
             }),
             'fuente_especificada': forms.TextInput(attrs={
                 'class': 'form-control form-control-sm',
-                'placeholder': '041 $2 - Fuente del código'
+                'placeholder': '041 $2 - Fuente del codigo'
             })
         }
 
@@ -232,7 +232,7 @@ CodigoPaisEntidadFormSet = forms.inlineformset_factory(
 # ============================================================
 
 class FuncionCompositorForm(forms.ModelForm):
-    """100 $e - Función del compositor (R)"""
+    """100 $e - Funcion del compositor (R)"""
     class Meta:
         model = FuncionCompositor
         fields = ['funcion']
@@ -255,7 +255,7 @@ FuncionCompositorFormSet = forms.inlineformset_factory(
 
 
 class AtribucionCompositorForm(forms.ModelForm):
-    """100 $j - Atribución del compositor (R)"""
+    """100 $j - Atribucion del compositor (R)"""
     class Meta:
         model = AtribucionCompositor
         fields = ['atribucion']
@@ -301,14 +301,14 @@ Forma130FormSet = forms.inlineformset_factory(
 
 
 class MedioInterpretacion130Form(forms.ModelForm):
-    """130 $m - Medio de interpretación (R)"""
+    """130 $m - Medio de interpretacion (R)"""
     class Meta:
         model = MedioInterpretacion130
         fields = ['medio']
         widgets = {
             'medio': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '130 $m - Ej: piano, violín, orquesta'
+                'placeholder': '130 $m - Ej: piano, violin, orquesta'
             })
         }
 
@@ -324,10 +324,10 @@ MedioInterpretacion130FormSet = forms.inlineformset_factory(
 )
 
 
-class NumeroParteSección130Form(forms.ModelForm):
-    """130 $n - Número de parte (R)"""
+class NumeroParteSeccion130Form(forms.ModelForm):
+    """130 $n - Numero de parte (R)"""
     class Meta:
-        model = NumeroParteSección130
+        model = NumeroParteSeccion130
         fields = ['numero']
         widgets = {
             'numero': forms.TextInput(attrs={
@@ -337,10 +337,10 @@ class NumeroParteSección130Form(forms.ModelForm):
         }
 
 
-NumeroParteSección130FormSet = forms.inlineformset_factory(
+NumeroParteSeccion130FormSet = forms.inlineformset_factory(
     ObraGeneral,
-    NumeroParteSección130,
-    form=NumeroParteSección130Form,
+    NumeroParteSeccion130,
+    form=NumeroParteSeccion130Form,
     extra=1,
     min_num=0,
     max_num=10,
@@ -348,10 +348,10 @@ NumeroParteSección130FormSet = forms.inlineformset_factory(
 )
 
 
-class NombreParteSección130Form(forms.ModelForm):
+class NombreParteSeccion130Form(forms.ModelForm):
     """130 $p - Nombre de parte (R)"""
     class Meta:
-        model = NombreParteSección130
+        model = NombreParteSeccion130
         fields = ['nombre']
         widgets = {
             'nombre': forms.TextInput(attrs={
@@ -361,10 +361,10 @@ class NombreParteSección130Form(forms.ModelForm):
         }
 
 
-NombreParteSección130FormSet = forms.inlineformset_factory(
+NombreParteSeccion130FormSet = forms.inlineformset_factory(
     ObraGeneral,
-    NombreParteSección130,
-    form=NombreParteSección130Form,
+    NombreParteSeccion130,
+    form=NombreParteSeccion130Form,
     extra=1,
     min_num=0,
     max_num=10,
@@ -372,7 +372,7 @@ NombreParteSección130FormSet = forms.inlineformset_factory(
 )
 
 
-# Formularios 240 (idéntico patrón a 130)
+# Formularios 240 (identico patron a 130)
 
 class Forma240Form(forms.ModelForm):
     """240 $k - Forma (R)"""
@@ -399,14 +399,14 @@ Forma240FormSet = forms.inlineformset_factory(
 
 
 class MedioInterpretacion240Form(forms.ModelForm):
-    """240 $m - Medio de interpretación (R)"""
+    """240 $m - Medio de interpretacion (R)"""
     class Meta:
         model = MedioInterpretacion240
         fields = ['medio']
         widgets = {
             'medio': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '240 $m - Medio de interpretación'
+                'placeholder': '240 $m - Medio de interpretacion'
             })
         }
 
@@ -422,23 +422,23 @@ MedioInterpretacion240FormSet = forms.inlineformset_factory(
 )
 
 
-class NumeroParteSección240Form(forms.ModelForm):
-    """240 $n - Número de parte (R)"""
+class NumeroParteSeccion240Form(forms.ModelForm):
+    """240 $n - Numero de parte (R)"""
     class Meta:
-        model = NumeroParteSección240
+        model = NumeroParteSeccion240
         fields = ['numero']
         widgets = {
             'numero': forms.TextInput(attrs={
                 'class': 'form-control form-control-sm',
-                'placeholder': '240 $n - Número'
+                'placeholder': '240 $n - Numero'
             })
         }
 
 
-NumeroParteSección240FormSet = forms.inlineformset_factory(
+NumeroParteSeccion240FormSet = forms.inlineformset_factory(
     ObraGeneral,
-    NumeroParteSección240,
-    form=NumeroParteSección240Form,
+    NumeroParteSeccion240,
+    form=NumeroParteSeccion240Form,
     extra=1,
     min_num=0,
     max_num=10,
@@ -446,10 +446,10 @@ NumeroParteSección240FormSet = forms.inlineformset_factory(
 )
 
 
-class NombreParteSección240Form(forms.ModelForm):
+class NombreParteSeccion240Form(forms.ModelForm):
     """240 $p - Nombre de parte (R)"""
     class Meta:
-        model = NombreParteSección240
+        model = NombreParteSeccion240
         fields = ['nombre']
         widgets = {
             'nombre': forms.TextInput(attrs={
@@ -459,10 +459,10 @@ class NombreParteSección240Form(forms.ModelForm):
         }
 
 
-NombreParteSección240FormSet = forms.inlineformset_factory(
+NombreParteSeccion240FormSet = forms.inlineformset_factory(
     ObraGeneral,
-    NombreParteSección240,
-    form=NombreParteSección240Form,
+    NombreParteSeccion240,
+    form=NombreParteSeccion240Form,
     extra=1,
     min_num=0,
     max_num=10,
@@ -470,22 +470,22 @@ NombreParteSección240FormSet = forms.inlineformset_factory(
 )
 
 # ============================================================
-# 📋 BLOQUE 2XX - TÍTULOS Y PUBLICACIÓN
+# 📋 BLOQUE 2XX - TiTULOS Y PUBLICACIoN
 # ============================================================
 
 class TituloAlternativoForm(forms.ModelForm):
-    """246 - Título alternativo (R)"""
+    """246 - Titulo alternativo (R)"""
     class Meta:
         model = TituloAlternativo
         fields = ['titulo', 'resto_titulo']
         widgets = {
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '246 $a - Título alternativo'
+                'placeholder': '246 $a - Titulo alternativo'
             }),
             'resto_titulo': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '246 $b - Resto del título'
+                'placeholder': '246 $b - Resto del titulo'
             })
         }
 
@@ -502,14 +502,14 @@ TituloAlternativoFormSet = forms.inlineformset_factory(
 
 
 class EdicionForm(forms.ModelForm):
-    """250 - Edición (R)"""
+    """250 - Edicion (R)"""
     class Meta:
         model = Edicion
         fields = ['edicion']
         widgets = {
             'edicion': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '250 $a - Edición (ej: 2a ed., Primera edición)'
+                'placeholder': '250 $a - Edicion (ej: 2a ed., Primera edicion)'
             })
         }
 
@@ -526,7 +526,7 @@ EdicionFormSet = forms.inlineformset_factory(
 
 
 class ProduccionPublicacionForm(forms.ModelForm):
-    """264 - Producción/Publicación (R) - LIGADOS"""
+    """264 - Produccion/Publicacion (R) - LIGADOS"""
     class Meta:
         model = ProduccionPublicacion
         fields = ['funcion', 'lugar', 'nombre_entidad', 'fecha']
@@ -560,11 +560,11 @@ ProduccionPublicacionFormSet = forms.inlineformset_factory(
 )
 
 # ============================================================
-# 📋 BLOQUE 3XX - DESCRIPCIÓN FÍSICA
+# 📋 BLOQUE 3XX - DESCRIPCIoN FiSICA
 # ============================================================
 
 class Extension300Form(forms.ModelForm):
-    """300 $a - Extensión (R)"""
+    """300 $a - Extension (R)"""
     class Meta:
         model = Extension300
         fields = ['extension']
@@ -588,7 +588,7 @@ Extension300FormSet = forms.inlineformset_factory(
 
 
 class Dimension300Form(forms.ModelForm):
-    """300 $c - Dimensión (R)"""
+    """300 $c - Dimension (R)"""
     class Meta:
         model = Dimension300
         fields = ['dimension']
@@ -612,14 +612,14 @@ Dimension300FormSet = forms.inlineformset_factory(
 
 
 class DescripcionFisicaForm(forms.ModelForm):
-    """300 - Descripción Física (R)"""
+    """300 - Descripcion Fisica (R)"""
     class Meta:
         model = DescripcionFisica
         fields = ['otras_caracteristicas_fisicas', 'material_acompanante']
         widgets = {
             'otras_caracteristicas_fisicas': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '300 $b - Características'
+                'placeholder': '300 $b - Caracteristicas'
             }),
             'material_acompanante': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -639,10 +639,10 @@ DescripcionFisicaFormSet = forms.inlineformset_factory(
 )
 
 
-# ============ 340 - MEDIO FÍSICO ============
+# ============ 340 - MEDIO FiSICO ============
 
 class Tecnica340Form(forms.ModelForm):
-    """340 $d - Técnica (R)"""
+    """340 $d - Tecnica (R)"""
     class Meta:
         model = Tecnica340
         fields = ['tecnica']
@@ -665,7 +665,7 @@ Tecnica340FormSet = forms.inlineformset_factory(
 
 
 class MedioFisicoForm(forms.ModelForm):
-    """340 - Medio Físico (R)"""
+    """340 - Medio Fisico (R)"""
     class Meta:
         model = MedioFisico
         fields = []
@@ -682,7 +682,7 @@ MedioFisicoFormSet = forms.inlineformset_factory(
     can_delete=True
 )
 
-# ============ 348 - CARACTERÍSTICAS MÚSICA NOTADA ============
+# ============ 348 - CARACTERiSTICAS MuSICA NOTADA ============
 
 class Formato348Form(forms.ModelForm):
     """348 $a - Formato (R)"""
@@ -708,7 +708,7 @@ Formato348FormSet = forms.inlineformset_factory(
 
 
 class CaracteristicaMusicaNotadaForm(forms.ModelForm):
-    """348 - Características Música Notada (R)"""
+    """348 - Caracteristicas Musica Notada (R)"""
     class Meta:
         model = CaracteristicaMusicaNotada
         fields = []
@@ -725,7 +725,7 @@ CaracteristicaMusicaNotadaFormSet = forms.inlineformset_factory(
     can_delete=True
 )
 
-# ============ 382 - MEDIO DE INTERPRETACIÓN ============
+# ============ 382 - MEDIO DE INTERPRETACIoN ============
 
 class MedioInterpretacion382_aForm(forms.ModelForm):
     """382 $a - Medio (R)"""
@@ -774,7 +774,7 @@ Solista382FormSet = forms.inlineformset_factory(
 
 
 class NumeroInterpretes382Form(forms.ModelForm):
-    """382 $n - Número (R)"""
+    """382 $n - Numero (R)"""
     class Meta:
         model = NumeroInterpretes382
         fields = ['numero']
@@ -798,7 +798,7 @@ NumeroInterpretes382FormSet = forms.inlineformset_factory(
 
 
 class MedioInterpretacion382Form(forms.ModelForm):
-    """382 - Medio de Interpretación (R)"""
+    """382 - Medio de Interpretacion (R)"""
     class Meta:
         model = MedioInterpretacion382
         fields = []
@@ -815,10 +815,10 @@ MedioInterpretacion382FormSet = forms.inlineformset_factory(
     can_delete=True
 )
 
-# ============ 383 - DESIGNACIÓN NUMÉRICA ============
+# ============ 383 - DESIGNACIoN NUMeRICA ============
 
 class NumeroObra383Form(forms.ModelForm):
-    """383 $a - Número de obra (R)"""
+    """383 $a - Numero de obra (R)"""
     class Meta:
         model = NumeroObra383
         fields = ['numero_obra']
@@ -866,7 +866,7 @@ Opus383FormSet = forms.inlineformset_factory(
 
 
 class DesignacionNumericaObraForm(forms.ModelForm):
-    """383 - Designación Numérica (R)"""
+    """383 - Designacion Numerica (R)"""
     class Meta:
         model = DesignacionNumericaObra
         fields = []
@@ -888,14 +888,14 @@ DesignacionNumericaObraFormSet = forms.inlineformset_factory(
 # ============================================================
 
 class TituloSerie490Form(forms.ModelForm):
-    """490 $a - Título de serie (R)"""
+    """490 $a - Titulo de serie (R)"""
     class Meta:
         model = TituloSerie490
         fields = ['titulo_serie']
         widgets = {
             'titulo_serie': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '490 $a - Título de serie'
+                'placeholder': '490 $a - Titulo de serie'
             })
         }
 
@@ -936,7 +936,7 @@ VolumenSerie490FormSet = forms.inlineformset_factory(
 
 
 class MencionSerie490Form(forms.ModelForm):
-    """490 - Mención de Serie (R)"""
+    """490 - Mencion de Serie (R)"""
     class Meta:
         model = MencionSerie490
         fields = ['relacion']
@@ -962,7 +962,7 @@ MencionSerie490FormSet = forms.inlineformset_factory(
 # ============================================================
 
 class ObraGeneralForm(forms.ModelForm):
-    """Formulario principal para catalogación MARC21"""
+    """Formulario principal para catalogacion MARC21"""
     
     class Meta:
         model = ObraGeneral
@@ -985,17 +985,17 @@ class ObraGeneralForm(forms.ModelForm):
             }),
             'titulo_principal': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '245 $a - Título principal (obligatorio)',
+                'placeholder': '245 $a - Titulo principal (obligatorio)',
                 'required': True
             }),
             'subtitulo': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '245 $b - Subtítulo'
+                'placeholder': '245 $b - Subtitulo'
             }),
             'mencion_responsabilidad': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 2,
-                'placeholder': '245 $c - Mención de responsabilidad'
+                'placeholder': '245 $c - Mencion de responsabilidad'
             }),
             'tonalidad_384': forms.Select(attrs={
                 'class': 'form-select'
@@ -1028,12 +1028,12 @@ __all__ = [
     'AtribucionCompositorFormSet',
     'Forma130FormSet',
     'MedioInterpretacion130FormSet',
-    'NumeroParteSección130FormSet',
-    'NombreParteSección130FormSet',
+    'NumeroParteSeccion130FormSet',
+    'NombreParteSeccion130FormSet',
     'Forma240FormSet',
     'MedioInterpretacion240FormSet',
-    'NumeroParteSección240FormSet',
-    'NombreParteSección240FormSet',
+    'NumeroParteSeccion240FormSet',
+    'NombreParteSeccion240FormSet',
     # Bloque 2XX
     'TituloAlternativoFormSet',
     'EdicionFormSet',
