@@ -1,22 +1,3 @@
-/**
- * ============================================
- * CAMPOS-1XX-REPETIBLES.JS
- * ============================================
- * Contiene todos los campos REPETIBLES del bloque 1XX
- * (Entradas Principales y Títulos Uniformes)
- *
- * Campos implementados:
- * - 100: Compositor (con subcampos repetibles $e, $j)
- * - 130: Título Uniforme (con subcampos repetibles $k, $m, $n, $p)
- * - 240: Título Uniforme con Compositor (con subcampos repetibles $k, $m, $n, $p)
- */
-
-console.log("🎼 Cargando campos-1xx-repetibles.js...");
-
-// ============================================
-// REGISTRO DE CONTADORES
-// ============================================
-
 contadores.registrar("funcionCompositor", 1);
 contadores.registrar("atribucionCompositor", 1);
 contadores.registrar("forma130", 1);

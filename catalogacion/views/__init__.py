@@ -24,11 +24,31 @@ from .views_base import (
     obra_individual_manuscrita,
     coleccion_impresa,
     obra_individual_impresa,
+    listar_obras,
 )
 
 # Importar vistas de autoridades
 from .views_autoridades import (
     get_autoridades_json,
+)
+
+# Importar funciones de procesamiento del bloque 0XX
+from .views_0xx import (
+    procesar_isbn,
+    procesar_ismn,
+    procesar_numero_editor,
+    procesar_incipit,
+    procesar_codigo_lengua,
+    procesar_codigo_pais,
+)
+
+# Importar funciones de procesamiento del bloque 1XX
+from .views_1xx import (
+    procesar_compositor,
+    procesar_titulo_uniforme_130,
+    procesar_subcampos_130,
+    procesar_titulo_uniforme_240,
+    procesar_subcampos_240,
 )
 
 # Exportar todas las vistas
@@ -41,9 +61,25 @@ __all__ = [
     'obra_individual_manuscrita',
     'coleccion_impresa',
     'obra_individual_impresa',
+    'listar_obras',
     
     # Autoridades
     'get_autoridades_json',
+    
+    # Funciones de procesamiento 0XX
+    'procesar_isbn',
+    'procesar_ismn',
+    'procesar_numero_editor',
+    'procesar_incipit',
+    'procesar_codigo_lengua',
+    'procesar_codigo_pais',
+    
+    # Funciones de procesamiento 1XX
+    'procesar_compositor',
+    'procesar_titulo_uniforme_130',
+    'procesar_subcampos_130',
+    'procesar_titulo_uniforme_240',
+    'procesar_subcampos_240',
     
     # Pruebas
     'prueba_campo_300',

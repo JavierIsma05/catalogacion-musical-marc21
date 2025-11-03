@@ -1,4 +1,4 @@
-# 📁 Organización de Vistas - Sistema MARC21
+# 📁 Organización de Vistas - Sistema MARC21 Musical
 
 ## 🎯 Estructura de Carpeta `views/`
 
@@ -8,62 +8,132 @@ Las vistas se han reorganizado por **bloques MARC21 bibliográficos** para mejor
 catalogacion/
 ├── views/
 │   ├── __init__.py                  # Exporta todas las vistas
+│   ├── README.md                    # Este archivo (documentación)
 │   ├── views_base.py                # Vistas generales de navegación
-│   ├── views_autoridades.py         # Endpoints JSON para Select2
-│   ├── views_0xx.py                 # Campos de control (ISBN, ISMN, etc.)
-│   ├── views_1xx.py                 # Puntos de acceso (Compositor, Títulos)
-│   ├── views_2xx.py                 # Títulos y publicación
-│   ├── views_3xx.py                 # Descripción física ⭐
-│   ├── views_4xx.py                 # Series
+│   ├── views_autoridades.py         # Endpoints JSON para autocompletado
+│   ├── views_0xx.py                 # Bloque 0XX - Campos de control
+│   ├── views_1xx.py                 # Bloque 1XX - Puntos de acceso principal
+│   ├── views_2xx.py                 # Bloque 2XX - Títulos y publicación
+│   ├── views_3xx.py                 # Bloque 3XX - Descripción física
+│   ├── views_4xx.py                 # Bloque 4XX - Series
 │   └── views_pruebas.py             # Testing y desarrollo
 ├── urls.py                          # Rutas URL
 ├── models/                          # Modelos organizados por bloques
 └── forms.py                         # Formularios
 ```
 
-## 📋 Descripción de Archivos
+## � Reorganización Reciente
+
+### **Cambio principal:** Separación de responsabilidades por bloques
+
+**Antes:**
+
+-   ❌ Todas las funciones de procesamiento en `views_base.py` (608 líneas)
+-   ❌ Difícil mantenimiento y escalabilidad
+-   ❌ Violación del principio de responsabilidad única
+
+**Después:**
+
+-   ✅ `views_base.py`: Solo navegación general (158 líneas, 74% reducción)
+-   ✅ `views_0xx.py`: Procesamiento completo del bloque 0XX (~490 líneas)
+-   ✅ `views_1xx.py`: Procesamiento completo del bloque 1XX (~490 líneas)
+-   ✅ Patrón claro para agregar bloques 2XX, 3XX, 4XX
+
+## �📋 Descripción de Archivos
 
 ### `__init__.py`
 
-**Propósito**: Exportar todas las vistas para uso en `urls.py`
+**Propósito:** Exportar todas las vistas públicas
 
-**Permite**:
+**Exporta:**
 
 ```python
-from catalogacion.views import index, prueba_campo_300
+# Vistas de navegación
+from .views_base import index, plantillas, crear_obra, listar_obras
+
+# Funciones de procesamiento 0XX
+from .views_0xx import (
+    procesar_isbn,
+    procesar_ismn,
+    procesar_numero_editor,
+    procesar_incipit,
+    procesar_codigo_lengua,
+    procesar_codigo_pais,
+)
+
+# Funciones de procesamiento 1XX
+from .views_1xx import (
+    procesar_compositor,
+    procesar_titulo_uniforme_130,
+    procesar_subcampos_130,
+    procesar_titulo_uniforme_240,
+    procesar_subcampos_240,
+)
 ```
 
 ### `views_base.py`
 
-**Bloque**: No MARC (navegación general)
+**Responsabilidad:** Navegación general del sistema
 
-**Vistas**:
+**Vistas principales:**
 
 -   `index()` - Página principal
--   `plantillas()` - Lista de plantillas
--   `crear_obra()` - Inicio de creación
--   `coleccion_manuscrita()` - Lista manuscritas
--   `obra_individual_manuscrita()` - Detalle manuscrita
--   `coleccion_impresa()` - Lista impresas
--   `obra_individual_impresa()` - Detalle impresa
+-   `plantillas()` - Plantillas de catalogación
+-   `crear_obra()` - Formulario principal (orquesta el guardado)
+-   `listar_obras()` - Listado de obras catalogadas
+-   `coleccion_manuscrita()`, `coleccion_impresa()` - Gestión de colecciones
+
+**Flujo de crear_obra():**
+
+```python
+def crear_obra(request):
+    with transaction.atomic():
+        # 1. Crear obra con cabecera
+        obra = ObraGeneral()
+        obra.save()
+
+        # 2. Procesar bloque 0XX
+        procesar_isbn(request, obra)
+        procesar_ismn(request, obra)
+        procesar_numero_editor(request, obra)
+        procesar_incipit(request, obra)
+        procesar_codigo_lengua(request, obra)
+        procesar_codigo_pais(request, obra)
+
+        # 3. Procesar bloque 1XX
+        procesar_compositor(request, obra)
+        procesar_titulo_uniforme_130(request, obra)
+        procesar_titulo_uniforme_240(request, obra)
+
+        # 4. Generar clasificación automática
+        obra.generar_clasificacion_092()
+        obra.save()
+```
 
 ### `views_autoridades.py`
 
-**Bloque**: API/Utilidades
+**Responsabilidad:** Endpoints JSON para autocompletado
 
-**Vistas**:
+**Función principal:**
 
--   `get_autoridades_json()` - Endpoint para Select2
-    -   Compositores
-    -   Títulos uniformes
-    -   Formas musicales
+```python
+def get_autoridades_json(request, tipo):
+    """
+    Endpoint para Select2/autocompletado
 
-**Ejemplo de uso**:
+    Tipos soportados:
+    - 'compositor' -> AutoridadPersona
+    - 'titulo' -> AutoridadTituloUniforme
+    - 'forma' -> AutoridadFormaMusical
+    """
+```
+
+**Uso en JavaScript:**
 
 ```javascript
 $("#compositor").select2({
     ajax: {
-        url: "/api/autoridades/?model=compositor",
+        url: "/api/autoridades/?tipo=compositor",
         dataType: "json",
     },
 });
@@ -71,27 +141,149 @@ $("#compositor").select2({
 
 ### `views_0xx.py`
 
-**Bloque MARC**: 0XX - Campos de Control
+**Responsabilidad:** Bloque 0XX - Campos de Control
 
-**Campos manejados**:
+**Campos manejados:**
 
--   `020` - ISBN
--   `024` - ISMN
--   `028` - Número de editor
--   `031` - Íncipit musical (con URLs anidadas)
--   `041` - Código de lengua (con idiomas anidados)
--   `044` - Código de país
+-   020 - ISBN (repetible)
+-   024 - ISMN (repetible)
+-   028 - Número de Editor (repetible, con indicadores)
+-   031 - Incipit Musical (repetible, con URLs anidadas)
+-   040 - Fuente de Catalogación (no repetible)
+-   041 - Código de Lengua (repetible, con idiomas anidados)
+-   044 - Código de País (repetible)
+-   092 - Clasificación Local (autogenerada)
 
-**Vistas**:
+**Funciones de procesamiento masivo (6):**
 
--   `crear_isbn(request, obra_id)`
--   `crear_ismn(request, obra_id)`
--   `crear_numero_editor(request, obra_id)`
--   `crear_incipit_musical(request, obra_id)`
--   `crear_codigo_lengua(request, obra_id)`
--   `listar_campos_0xx(request, obra_id)` - Vista resumen
+```python
+def procesar_isbn(request, obra):
+    """Procesa múltiples ISBN desde formulario principal"""
 
-**Patrón**: Campos repetibles, algunos con subcampos anidados
+def procesar_ismn(request, obra):
+    """Procesa múltiples ISMN desde formulario principal"""
+
+def procesar_numero_editor(request, obra):
+    """Procesa múltiples números de editor con indicadores"""
+
+def procesar_incipit(request, obra):
+    """Procesa incipits musicales con URLs anidadas
+    Estructura: incipit_a_0, incipit_b_0, incipit_u_0_0, incipit_u_0_1"""
+
+def procesar_codigo_lengua(request, obra):
+    """Procesa códigos de lengua con idiomas anidados
+    Estructura: codigo_lengua_ind1_0, codigo_lengua_a_0_0, codigo_lengua_a_0_1"""
+
+def procesar_codigo_pais(request, obra):
+    """Procesa múltiples códigos de país"""
+```
+
+**Vistas individuales:**
+
+-   `crear_isbn(request, obra_id)` - Crear un ISBN individual
+-   `crear_ismn(request, obra_id)` - Crear un ISMN individual
+-   `crear_numero_editor(request, obra_id)` - Crear número de editor
+-   `crear_incipit_musical(request, obra_id)` - Crear incipit con URLs
+-   `crear_codigo_lengua(request, obra_id)` - Crear código de lengua con idiomas
+-   `listar_campos_0xx(request, obra_id)` - Vista resumen del bloque
+
+**Modelos procesados:**
+
+-   `ISBN`, `ISMN`, `NumeroEditor`
+-   `IncipitMusical`, `IncipitURL` (relación 1-N)
+-   `CodigoLengua`, `IdiomaObra` (relación 1-N)
+-   `CodigoPaisEntidad`
+
+### `views_1xx.py`
+
+**Responsabilidad:** Bloque 1XX - Puntos de Acceso Principal
+
+**Campos manejados:**
+
+-   100 - Compositor ($e funciones, $j atribuciones) - repetibles
+-   130 - Título Uniforme ($k forma, $m medio, $n número, $p nombre) - solo si NO hay compositor
+-   240 - Título Uniforme con Compositor (mismos subcampos que 130) - solo si HAY compositor
+
+**Funciones de procesamiento masivo (5):**
+
+```python
+def procesar_compositor(request, obra):
+    """
+    Procesa compositor (100) con funciones y atribuciones
+
+    Maneja:
+    - AutoridadPersona (get_or_create)
+    - FuncionCompositor (repetible)
+    - AtribucionCompositor (repetible)
+    """
+
+def procesar_titulo_uniforme_130(request, obra):
+    """
+    Procesa título uniforme 130 (solo si NO hay compositor)
+
+    Maneja:
+    - AutoridadTituloUniforme (get_or_create)
+    - Llamada a procesar_subcampos_130()
+    """
+
+def procesar_subcampos_130(request, obra):
+    """
+    Procesa subcampos repetibles del 130
+
+    Maneja:
+    - $k Forma130 -> ForeignKey a AutoridadFormaMusical
+    - $m MedioInterpretacion130
+    - $n NumeroParteSección130
+    - $p NombreParteSección130
+    """
+
+def procesar_titulo_uniforme_240(request, obra):
+    """
+    Procesa título uniforme 240 (solo si HAY compositor)
+
+    Maneja:
+    - AutoridadTituloUniforme (get_or_create)
+    - Llamada a procesar_subcampos_240()
+    """
+
+def procesar_subcampos_240(request, obra):
+    """
+    Procesa subcampos repetibles del 240
+
+    Maneja:
+    - $k Forma240 -> CharField con choices (FORMAS_MUSICALES)
+    - $m MedioInterpretacion240
+    - $n NumeroParteSección240
+    - $p NombreParteSección240
+    """
+```
+
+**Vistas individuales:**
+
+-   `crear_compositor(request, obra_id)` - Crear compositor con funciones
+-   `crear_titulo_uniforme_130(request, obra_id)` - Crear título uniforme 130
+-   `crear_titulo_uniforme_240(request, obra_id)` - Crear título uniforme 240
+-   `listar_campos_1xx(request, obra_id)` - Vista resumen del bloque
+
+**Modelos procesados:**
+
+-   `FuncionCompositor`, `AtribucionCompositor`
+-   `Forma130`, `MedioInterpretacion130`, `NumeroParteSección130`, `NombreParteSección130`
+-   `Forma240`, `MedioInterpretacion240`, `NumeroParteSección240`, `NombreParteSección240`
+
+**Autoridades utilizadas:**
+
+-   `AutoridadPersona` (compositor)
+-   `AutoridadTituloUniforme` (títulos uniformes 130/240)
+-   `AutoridadFormaMusical` (formas musicales en 130)
+
+**Diferencia 130 vs 240:**
+
+-   **130:** Se usa cuando NO hay compositor (punto de acceso principal)
+-   **240:** Se usa cuando HAY compositor (punto de acceso secundario)
+-   **Forma $k:** En 130 usa AutoridadFormaMusical (FK), en 240 usa choices directas
+
+**Patrón**: Campos no repetibles con subcampos repetibles
 
 ### `views_1xx.py`
 
