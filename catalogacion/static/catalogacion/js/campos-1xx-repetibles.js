@@ -10,7 +10,155 @@ contadores.registrar("numeroParteSeccion240", 1);
 contadores.registrar("nombreParteSeccion240", 1);
 
 // ============================================
-// 100 - COMPOSITOR (Campo NO repetible, pero con subcampos repetibles)
+// SISTEMA DE AUTOCOMPLETADO
+// ============================================
+
+/**
+ * Configura el autocompletado para un input
+ * @param {string} inputId - ID del input
+ * @param {string} dropdownId - ID del dropdown de sugerencias
+ * @param {string} modelType - Tipo de modelo ('compositor', 'titulo_uniforme', 'forma_musical')
+ * @param {function} onSelect - Callback cuando se selecciona una opción
+ */
+function configurarAutocompletado(inputId, dropdownId, modelType, onSelect) {
+    const input = document.getElementById(inputId);
+    const dropdown = document.getElementById(dropdownId);
+
+    if (!input || !dropdown) {
+        console.warn(
+            `⚠️ No se encontró input (${inputId}) o dropdown (${dropdownId})`
+        );
+        return;
+    }
+
+    let debounceTimer;
+
+    input.addEventListener("input", function () {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+
+        if (query.length < 2) {
+            dropdown.innerHTML = "";
+            dropdown.style.display = "none";
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            buscarAutoridades(query, modelType, dropdown, onSelect);
+        }, 300);
+    });
+
+    // Cerrar dropdown al hacer clic fuera
+    document.addEventListener("click", function (e) {
+        if (e.target !== input && !dropdown.contains(e.target)) {
+            dropdown.style.display = "none";
+        }
+    });
+}
+
+/**
+ * Busca autoridades en el servidor
+ */
+async function buscarAutoridades(query, modelType, dropdown, onSelect) {
+    try {
+        const response = await fetch(
+            `/api/autoridades/?model=${modelType}&q=${encodeURIComponent(
+                query
+            )}`
+        );
+        const data = await response.json();
+
+        if (data.results && data.results.length > 0) {
+            mostrarSugerencias(data.results, dropdown, onSelect);
+        } else {
+            dropdown.innerHTML =
+                '<div class="autocomplete-item no-results">No se encontraron resultados</div>';
+            dropdown.style.display = "block";
+        }
+    } catch (error) {
+        console.error("Error al buscar autoridades:", error);
+        dropdown.style.display = "none";
+    }
+}
+
+/**
+ * Muestra las sugerencias en el dropdown
+ */
+function mostrarSugerencias(results, dropdown, onSelect) {
+    dropdown.innerHTML = results
+        .map((item) => {
+            return `<div class="autocomplete-item" data-id="${
+                item.id
+            }" data-text="${item.text}" data-fechas="${item.fechas || ""}">
+            ${item.text}
+        </div>`;
+        })
+        .join("");
+
+    dropdown.style.display = "block";
+
+    // Agregar eventos click a cada item
+    dropdown.querySelectorAll(".autocomplete-item").forEach((item) => {
+        item.addEventListener("click", function () {
+            const id = this.getAttribute("data-id");
+            const text = this.getAttribute("data-text");
+            const fechas = this.getAttribute("data-fechas");
+
+            if (onSelect) {
+                onSelect(id, text, fechas);
+            }
+
+            dropdown.style.display = "none";
+        });
+    });
+}
+
+// ============================================
+// 100 - COMPOSITOR (Autocompletado con autoridades)
+// ============================================
+
+// Inicializar autocompletado para compositor cuando el DOM esté listo
+document.addEventListener("DOMContentLoaded", function () {
+    configurarAutocompletado(
+        "compositor_apellidos_nombres",
+        "compositor-autocomplete",
+        "compositor",
+        function (id, text, fechas) {
+            // Separar apellidos_nombres del texto completo
+            const apellidosNombres = id; // El id ES el apellidos_nombres
+            document.getElementById("compositor_apellidos_nombres").value =
+                apellidosNombres;
+
+            // Llenar el campo de fechas si existe
+            if (fechas) {
+                document.getElementById("compositor_fechas").value = fechas;
+            }
+        }
+    );
+
+    // Autocompletado para Título Uniforme 130
+    configurarAutocompletado(
+        "titulo_uniforme_130",
+        "titulo-130-autocomplete",
+        "titulo_uniforme",
+        function (id, text, fechas) {
+            document.getElementById("titulo_uniforme_130").value = id;
+        }
+    );
+
+    // Autocompletado para Título 240
+    configurarAutocompletado(
+        "titulo_240",
+        "titulo-240-autocomplete",
+        "titulo_uniforme",
+        function (id, text, fechas) {
+            document.getElementById("titulo_240").value = id;
+        }
+    );
+});
+
+// ============================================
+// 100 - SUBCAMPOS REPETIBLES
 // ============================================
 
 // ============ 100 $e - FUNCIÓN COMPOSITOR (Repetible) ============
@@ -80,18 +228,23 @@ window.agregarAtribucionCompositor = function () {
 };
 
 // ============================================
-// 130 - TÍTULO UNIFORME (Campo NO repetible, pero con subcampos repetibles)
+// 130 - SUBCAMPOS REPETIBLES
 // ============================================
 
-// ============ 130 $k - FORMA (Repetible) ============
+// ============ 130 $k - FORMA (Repetible con autocompletado) ============
 
 function generarHTMLForma130(index) {
     return `
         <div class="mb-2" data-subcampo="forma-130-${index}">
-            <div class="input-group input-group-sm">
+            <div class="input-group input-group-sm position-relative">
                 <span class="input-group-text">$k</span>
-                <input type="text" name="forma_130_k_${index}" class="form-control" 
-                       placeholder="Ej: Selección, Fragmento, Adaptación">
+                <input type="text" 
+                       name="forma_130_k_${index}" 
+                       class="form-control forma-130-input" 
+                       placeholder="Ej: Selección, Fragmento"
+                       autocomplete="off"
+                       data-index="${index}">
+                <div class="forma-130-autocomplete autocomplete-dropdown" data-index="${index}"></div>
                 <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('forma-130-${index}')">
                     <i class="bi bi-x"></i>
                 </button>
@@ -105,8 +258,45 @@ window.agregarForma130 = function () {
 
     const index = contadores.obtener("forma130");
     insertarHTML("formas-130", generarHTMLForma130(index));
+
+    // Configurar autocompletado para el nuevo input
+    setTimeout(() => {
+        const input = document.querySelector(
+            `input.forma-130-input[data-index="${index}"]`
+        );
+        const dropdown = document.querySelector(
+            `.forma-130-autocomplete[data-index="${index}"]`
+        );
+
+        if (input && dropdown) {
+            let debounceTimer;
+            input.addEventListener("input", function () {
+                clearTimeout(debounceTimer);
+                const query = this.value.trim();
+
+                if (query.length < 2) {
+                    dropdown.innerHTML = "";
+                    dropdown.style.display = "none";
+                    return;
+                }
+
+                debounceTimer = setTimeout(() => {
+                    buscarAutoridades(
+                        query,
+                        "forma_musical",
+                        dropdown,
+                        (id, text) => {
+                            input.value = id;
+                            dropdown.style.display = "none";
+                        }
+                    );
+                }, 300);
+            });
+        }
+    }, 100);
+
     contadores.incrementar("forma130");
-    console.log(`📝 Forma 130 agregada (total: ${index + 1})`);
+    console.log(`📋 Forma 130 agregada (total: ${index + 1})`);
 };
 
 // ============ 130 $m - MEDIO DE INTERPRETACIÓN (Repetible) ============
@@ -193,10 +383,10 @@ window.agregarNombreParteSeccion130 = function () {
 };
 
 // ============================================
-// 240 - TÍTULO UNIFORME CON COMPOSITOR (Campo NO repetible, pero con subcampos repetibles)
+// 240 - SUBCAMPOS REPETIBLES
 // ============================================
 
-// ============ 240 $k - FORMA (Repetible) ============
+// ============ 240 $k - FORMA (Repetible - choices) ============
 
 function generarHTMLForma240(index) {
     return `
@@ -207,7 +397,7 @@ function generarHTMLForma240(index) {
                     <option value="adaptación">Adaptación</option>
                     <option value="boceto">Boceto</option>
                     <option value="fragmento">Fragmento</option>
-                    <option value="selección" selected>Selección</option>
+                    <option value="selección">Selección</option>
                     <option value="tema con variaciones">Tema con variaciones</option>
                 </select>
                 <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('forma-240-${index}')">
@@ -224,7 +414,7 @@ window.agregarForma240 = function () {
     const index = contadores.obtener("forma240");
     insertarHTML("formas-240", generarHTMLForma240(index));
     contadores.incrementar("forma240");
-    console.log(`📝 Forma 240 agregada (total: ${index + 1})`);
+    console.log(`📋 Forma 240 agregada (total: ${index + 1})`);
 };
 
 // ============ 240 $m - MEDIO DE INTERPRETACIÓN (Repetible) ============
@@ -314,11 +504,13 @@ window.agregarNombreParteSeccion240 = function () {
 // CONFIRMACIÓN DE CARGA
 // ============================================
 
-console.log("✅ campos-1xx-repetibles.js cargado correctamente");
+console.log(
+    "✅ campos-1xx-repetibles.js cargado correctamente (con autocompletado)"
+);
 console.log("📦 Funciones 1XX disponibles:");
 console.log("   - agregarFuncionCompositor()");
 console.log("   - agregarAtribucionCompositor()");
-console.log("   - agregarForma130()");
+console.log("   - agregarForma130() [con autocompletado]");
 console.log("   - agregarMedioInterpretacion130()");
 console.log("   - agregarNumeroParteSeccion130()");
 console.log("   - agregarNombreParteSeccion130()");

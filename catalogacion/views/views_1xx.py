@@ -20,8 +20,8 @@ Subcampos relacionados:
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.db import transaction
 
+from django.db import transaction
 from ..models import (
     ObraGeneral,
     FuncionCompositor,
@@ -34,7 +34,11 @@ from ..models import (
     MedioInterpretacion240,
     NumeroParteSección240,
     NombreParteSección240,
+    AutoridadPersona,
+    AutoridadTituloUniforme,
+    AutoridadFormaMusical,
 )
+
 
 from ..forms import (
     FuncionCompositorFormSet,
@@ -344,12 +348,74 @@ def procesar_compositor(request, obra):
             idx += 1
 
 
+def procesar_compositor(request, obra):
+    """
+    Procesa todos los campos 100 - Compositor desde el formulario principal
+    
+    Maneja:
+    - Compositor con AutoridadPersona ($a y $d)
+    - Funciones de compositor ($e) - repetibles
+    - Atribuciones ($j) - repetibles
+    
+    Args:
+        request: HttpRequest con datos POST
+        obra: Instancia de ObraGeneral
+    """
+    # Obtener datos del compositor
+    apellidos_nombres = request.POST.get('compositor_apellidos_nombres', '').strip()
+    fechas = request.POST.get('compositor_fechas', '').strip()
+    
+    if apellidos_nombres:
+        # Crear o recuperar la autoridad de persona
+        # Si existe con el mismo nombre, actualiza las fechas si son diferentes
+        persona, created = AutoridadPersona.objects.get_or_create(
+            apellidos_nombres=apellidos_nombres,
+            defaults={'fechas': fechas}
+        )
+        
+        # Si ya existe pero tiene fechas diferentes, actualizar
+        if not created and fechas and persona.fechas != fechas:
+            persona.fechas = fechas
+            persona.save()
+        
+        # Asignar compositor a la obra
+        obra.compositor = persona
+        obra.save()
+        
+        # Procesar funciones del compositor ($e) - repetibles
+        idx = 0
+        while True:
+            funcion = request.POST.get(f'funcion_compositor_e_{idx}')
+            if funcion is None:
+                break
+            if funcion.strip():
+                FuncionCompositor.objects.create(
+                    obra=obra,
+                    funcion=funcion.strip()
+                )
+            idx += 1
+        
+        # Procesar atribuciones ($j) - repetibles
+        idx = 0
+        while True:
+            atribucion = request.POST.get(f'atribucion_compositor_j_{idx}')
+            if atribucion is None:
+                break
+            if atribucion.strip():
+                AtribucionCompositor.objects.create(
+                    obra=obra,
+                    atribucion=atribucion.strip()
+                )
+            idx += 1
+
+
 def procesar_titulo_uniforme_130(request, obra):
     """
     Procesa el campo 130 - Título Uniforme Musical (solo si NO hay compositor)
     
     Maneja:
-    - Título uniforme base
+    - Título uniforme base ($a)
+    - Arreglo ($o)
     - Tonalidad ($r)
     - Subcampos $k, $m, $n, $p (procesados por procesar_subcampos_130)
     
@@ -357,19 +423,22 @@ def procesar_titulo_uniforme_130(request, obra):
         request: HttpRequest con datos POST
         obra: Instancia de ObraGeneral
     """
-    from ..models.autoridades import AutoridadTituloUniforme
+    titulo_130 = request.POST.get('titulo_uniforme_130', '').strip()
+    arreglo_130 = request.POST.get('titulo_uniforme_arreglo', '').strip()
+    tonalidad_130 = request.POST.get('titulo_uniforme_tonalidad', '').strip()
     
-    titulo_130 = request.POST.get('titulo_uniforme_130')
-    tonalidad_130 = request.POST.get('titulo_uniforme_tonalidad')
-    
-    if titulo_130 and titulo_130.strip():
+    if titulo_130:
         # Crear o recuperar autoridad de título uniforme
         titulo_autoridad, created = AutoridadTituloUniforme.objects.get_or_create(
-            titulo=titulo_130.strip()
+            titulo=titulo_130
         )
         
         # Asignar a la obra
         obra.titulo_uniforme = titulo_autoridad
+        
+        # Asignar arreglo si existe
+        if arreglo_130:
+            obra.titulo_uniforme_arreglo = arreglo_130
         
         # Asignar tonalidad si existe
         if tonalidad_130:
@@ -395,47 +464,61 @@ def procesar_subcampos_130(request, obra):
         request: HttpRequest con datos POST
         obra: Instancia de ObraGeneral
     """
-    from ..models.autoridades import AutoridadFormaMusical
-    
     # Procesar $k - Forma musical (repetible, con autoridad)
-    formas_130 = request.POST.getlist('forma_130')
-    for forma_nombre in formas_130:
+    idx = 0
+    while True:
+        forma_nombre = request.POST.get(f'forma_130_k_{idx}')
+        if forma_nombre is None:
+            break
         if forma_nombre.strip():
             # Crear o recuperar autoridad de forma musical
             forma_autoridad, created = AutoridadFormaMusical.objects.get_or_create(
-                nombre=forma_nombre.strip()
+                forma=forma_nombre.strip()
             )
             Forma130.objects.create(
                 obra=obra,
                 forma=forma_autoridad
             )
+        idx += 1
     
     # Procesar $m - Medio de interpretación (repetible)
-    medios_130 = request.POST.getlist('medio_130')
-    for medio in medios_130:
+    idx = 0
+    while True:
+        medio = request.POST.get(f'medio_interpretacion_130_m_{idx}')
+        if medio is None:
+            break
         if medio.strip():
             MedioInterpretacion130.objects.create(
                 obra=obra,
                 medio=medio.strip()
             )
+        idx += 1
     
     # Procesar $n - Número de parte/sección (repetible)
-    numeros_130 = request.POST.getlist('numero_130')
-    for numero in numeros_130:
+    idx = 0
+    while True:
+        numero = request.POST.get(f'numero_parte_130_n_{idx}')
+        if numero is None:
+            break
         if numero.strip():
             NumeroParteSección130.objects.create(
                 obra=obra,
                 numero=numero.strip()
             )
+        idx += 1
     
     # Procesar $p - Nombre de parte/sección (repetible)
-    nombres_130 = request.POST.getlist('nombre_130')
-    for nombre in nombres_130:
+    idx = 0
+    while True:
+        nombre = request.POST.get(f'nombre_parte_130_p_{idx}')
+        if nombre is None:
+            break
         if nombre.strip():
             NombreParteSección130.objects.create(
                 obra=obra,
                 nombre=nombre.strip()
             )
+        idx += 1
 
 
 def procesar_titulo_uniforme_240(request, obra):
@@ -443,7 +526,8 @@ def procesar_titulo_uniforme_240(request, obra):
     Procesa el campo 240 - Título Uniforme con Compositor (solo si HAY compositor)
     
     Maneja:
-    - Título uniforme base
+    - Título uniforme base ($a)
+    - Arreglo ($o)
     - Tonalidad ($r)
     - Subcampos $k, $m, $n, $p (procesados por procesar_subcampos_240)
     
@@ -451,19 +535,22 @@ def procesar_titulo_uniforme_240(request, obra):
         request: HttpRequest con datos POST
         obra: Instancia de ObraGeneral
     """
-    from ..models.autoridades import AutoridadTituloUniforme
+    titulo_240 = request.POST.get('titulo_240', '').strip()
+    arreglo_240 = request.POST.get('titulo_240_arreglo', '').strip()
+    tonalidad_240 = request.POST.get('titulo_240_tonalidad', '').strip()
     
-    titulo_240 = request.POST.get('titulo_240')
-    tonalidad_240 = request.POST.get('titulo_240_tonalidad')
-    
-    if titulo_240 and titulo_240.strip():
+    if titulo_240:
         # Crear o recuperar autoridad de título uniforme
         titulo_autoridad, created = AutoridadTituloUniforme.objects.get_or_create(
-            titulo=titulo_240.strip()
+            titulo=titulo_240
         )
         
         # Asignar a la obra
         obra.titulo_240 = titulo_autoridad
+        
+        # Asignar arreglo si existe
+        if arreglo_240:
+            obra.titulo_240_arreglo = arreglo_240
         
         # Asignar tonalidad si existe
         if tonalidad_240:
@@ -490,37 +577,53 @@ def procesar_subcampos_240(request, obra):
         obra: Instancia de ObraGeneral
     """
     # Procesar $k - Forma musical (repetible, choices directas)
-    formas_240 = request.POST.getlist('forma_240')
-    for forma_valor in formas_240:
+    idx = 0
+    while True:
+        forma_valor = request.POST.get(f'forma_240_k_{idx}')
+        if forma_valor is None:
+            break
         if forma_valor.strip():
             Forma240.objects.create(
                 obra=obra,
                 forma=forma_valor.strip()
             )
+        idx += 1
     
     # Procesar $m - Medio de interpretación (repetible)
-    medios_240 = request.POST.getlist('medio_240')
-    for medio in medios_240:
+    idx = 0
+    while True:
+        medio = request.POST.get(f'medio_interpretacion_240_m_{idx}')
+        if medio is None:
+            break
         if medio.strip():
             MedioInterpretacion240.objects.create(
                 obra=obra,
                 medio=medio.strip()
             )
+        idx += 1
     
     # Procesar $n - Número de parte/sección (repetible)
-    numeros_240 = request.POST.getlist('numero_240')
-    for numero in numeros_240:
+    idx = 0
+    while True:
+        numero = request.POST.get(f'numero_parte_240_n_{idx}')
+        if numero is None:
+            break
         if numero.strip():
             NumeroParteSección240.objects.create(
                 obra=obra,
                 numero=numero.strip()
             )
+        idx += 1
     
     # Procesar $p - Nombre de parte/sección (repetible)
-    nombres_240 = request.POST.getlist('nombre_240')
-    for nombre in nombres_240:
+    idx = 0
+    while True:
+        nombre = request.POST.get(f'nombre_parte_240_p_{idx}')
+        if nombre is None:
+            break
         if nombre.strip():
             NombreParteSección240.objects.create(
                 obra=obra,
                 nombre=nombre.strip()
             )
+        idx += 1
