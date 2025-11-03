@@ -317,7 +317,8 @@ window.agregarIdiomaObra = function (codigoIndex) {
 // ============================================
 
 function generarHTMLCodigoPais(index) {
-    const paises = [
+    // Usar lista de países desde variable global (definida en el template)
+    const paises = window.CODIGOS_PAIS || [
         { value: "ar", text: "Argentina" },
         { value: "bo", text: "Bolivia" },
         { value: "br", text: "Brasil" },

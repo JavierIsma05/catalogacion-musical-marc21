@@ -44,6 +44,12 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Variables globales desde Django -->
+<script>
+    // Lista de países para campo 044
+    window.CODIGOS_PAIS = {{ codigos_pais_json|safe }};
+</script>
+
 <script src="{% static 'catalogacion/js/campos-core.js' %}"></script>
 
 <!-- BLOQUES  -->

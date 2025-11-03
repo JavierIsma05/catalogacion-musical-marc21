@@ -10,9 +10,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import transaction
 from django.http import JsonResponse
+import json
 
 from ..models import ObraGeneral
 from ..models.obra_general import TONALIDADES
+from ..models.bloque_0xx import CodigoPaisEntidad
 
 # Importar funciones de procesamiento desde sus módulos específicos
 from .views_0xx import (
@@ -132,8 +134,16 @@ def crear_obra(request):
             return redirect('crear_obra')
     
     # GET - Mostrar formulario vacío
+    # Convertir lista de tuplas a formato JSON para JavaScript
+    codigos_pais_json = json.dumps([
+        {'value': codigo, 'text': nombre, 'selected': codigo == 'ec'}
+        for codigo, nombre in CodigoPaisEntidad.CODIGOS_PAIS
+    ])
+    
     context = {
-        'tonalidades': TONALIDADES
+        'tonalidades': TONALIDADES,
+        'codigos_pais': CodigoPaisEntidad.CODIGOS_PAIS,  # Para template HTML
+        'codigos_pais_json': codigos_pais_json  # Para JavaScript
     }
     return render(request, 'ObraGeneral/obra_general_modular.html', context)
 

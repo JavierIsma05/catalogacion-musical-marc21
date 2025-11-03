@@ -15,7 +15,6 @@ class ContadoresCampos {
     registrar(tipo, valorInicial = 1) {
         if (!this.contadores[tipo]) {
             this.contadores[tipo] = valorInicial;
-            console.log(`📊 Contador registrado: ${tipo} = ${valorInicial}`);
         }
     }
 
@@ -80,8 +79,6 @@ class ContadoresCampos {
      * Muestra todos los contadores actuales (útil para debugging)
      */
     mostrarEstado() {
-        console.log("📊 Estado de contadores:", this.contadores);
-        console.log("📊 Estado de subcontadores:", this.subcontadores);
     }
 }
 
@@ -102,7 +99,6 @@ window.eliminarCampo = function (campoId) {
         campo.style.transition = "opacity 0.3s";
         campo.style.opacity = "0";
         setTimeout(() => campo.remove(), 300);
-        console.log(`🗑️ Campo eliminado: ${campoId}`);
     } else {
         console.warn(`⚠️ Campo no encontrado: ${campoId}`);
     }
@@ -118,7 +114,6 @@ window.eliminarSubcampo = function (subcampoId) {
         subcampo.style.transition = "opacity 0.3s";
         subcampo.style.opacity = "0";
         setTimeout(() => subcampo.remove(), 300);
-        console.log(`🗑️ Subcampo eliminado: ${subcampoId}`);
     } else {
         console.warn(`⚠️ Subcampo no encontrado: ${subcampoId}`);
     }
@@ -142,7 +137,6 @@ window.insertarHTML = function (containerId, html) {
             setTimeout(() => (nuevoElemento.style.opacity = "1"), 10);
         }
 
-        console.log(`✅ HTML insertado en: ${containerId}`);
     } else {
         console.error(`❌ Contenedor no encontrado: ${containerId}`);
     }
@@ -208,11 +202,3 @@ window.scrollSuaveA = function (elementoId) {
 // INICIALIZACIÓN
 // ============================================
 
-console.log("✅ campos-core.js cargado correctamente");
-console.log("📦 Funciones disponibles:");
-console.log("   - window.contadores (gestor de contadores)");
-console.log("   - window.eliminarCampo(campoId)");
-console.log("   - window.eliminarSubcampo(subcampoId)");
-console.log("   - window.insertarHTML(containerId, html)");
-console.log("   - window.generarOpciones(opciones)");
-console.log("   - window.validarContenedor(containerId)");

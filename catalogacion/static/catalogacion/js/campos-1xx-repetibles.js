@@ -156,6 +156,50 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     );
 
+    // Configurar autocompletado para el primer campo 130 $k que ya existe
+    const primeraForma130 = document.querySelector(
+        'input.forma-130-input[data-index="0"]'
+    );
+    const dropdownForma130 = document.querySelector(
+        '.forma-130-autocomplete[data-index="0"]'
+    );
+
+    if (primeraForma130 && dropdownForma130) {
+        let debounceTimer130;
+        primeraForma130.addEventListener("input", function () {
+            clearTimeout(debounceTimer130);
+            const query = this.value.trim();
+
+            if (query.length < 2) {
+                dropdownForma130.innerHTML = "";
+                dropdownForma130.style.display = "none";
+                return;
+            }
+
+            debounceTimer130 = setTimeout(() => {
+                buscarAutoridades(
+                    query,
+                    "forma_musical",
+                    dropdownForma130,
+                    (id, text) => {
+                        primeraForma130.value = id;
+                        dropdownForma130.style.display = "none";
+                    }
+                );
+            }, 300);
+        });
+
+        // Cerrar dropdown al hacer clic fuera
+        document.addEventListener("click", function (e) {
+            if (
+                e.target !== primeraForma130 &&
+                !dropdownForma130.contains(e.target)
+            ) {
+                dropdownForma130.style.display = "none";
+            }
+        });
+    }
+
     // Configurar autocompletado para el primer campo 240 $k que ya existe
     const primeraForma240 = document.querySelector(
         'input.forma-240-input[data-index="0"]'
