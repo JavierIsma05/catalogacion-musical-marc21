@@ -153,13 +153,3 @@ window.agregarProduccionPublicacion = function () {
     contadores.incrementar("produccionPublicacion");
     console.log(`🏢 Producción/Publicación agregada (total: ${index + 1})`);
 };
-
-// ============================================
-// CONFIRMACIÓN DE CARGA
-// ============================================
-
-console.log("✅ campos-2xx-repetibles.js cargado correctamente");
-console.log("📦 Funciones 2XX disponibles:");
-console.log("   - agregarTituloAlternativo()");
-console.log("   - agregarEdicion()");
-console.log("   - agregarProduccionPublicacion()");

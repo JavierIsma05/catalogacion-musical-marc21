@@ -25,7 +25,9 @@ function generarHTMLDescripcionFisica(index) {
     return `
         <div class="campo-repetible" data-campo="descripcion-fisica-${index}">
             <div class="campo-header">
-                <span class="campo-label">Descripción Física #${index + 1}</span>
+                <span class="campo-label">Descripción Física #${
+                    index + 1
+                }</span>
                 <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('descripcion-fisica-${index}')">
                     <i class="bi bi-trash"></i> Eliminar
                 </button>
@@ -91,12 +93,17 @@ window.agregarDescripcionFisica = function () {
     if (!validarContenedor("descripciones-fisicas-container")) return;
 
     const index = contadores.obtener("descripcionFisica");
-    insertarHTML("descripciones-fisicas-container", generarHTMLDescripcionFisica(index));
+    insertarHTML(
+        "descripciones-fisicas-container",
+        generarHTMLDescripcionFisica(index)
+    );
     contadores.incrementar("descripcionFisica");
 };
 
 window.agregarExtension300 = function (parentIndex) {
-    const contenedor = document.getElementById(`extensiones-300-${parentIndex}`);
+    const contenedor = document.getElementById(
+        `extensiones-300-${parentIndex}`
+    );
     if (!contenedor) return;
 
     const index = contadores.obtener("extension300");
@@ -111,12 +118,14 @@ window.agregarExtension300 = function (parentIndex) {
             </div>
         </div>
     `;
-    contenedor.insertAdjacentHTML('beforeend', html);
+    contenedor.insertAdjacentHTML("beforeend", html);
     contadores.incrementar("extension300");
 };
 
 window.agregarDimension300 = function (parentIndex) {
-    const contenedor = document.getElementById(`dimensiones-300-${parentIndex}`);
+    const contenedor = document.getElementById(
+        `dimensiones-300-${parentIndex}`
+    );
     if (!contenedor) return;
 
     const index = contadores.obtener("dimension300");
@@ -131,7 +140,7 @@ window.agregarDimension300 = function (parentIndex) {
             </div>
         </div>
     `;
-    contenedor.insertAdjacentHTML('beforeend', html);
+    contenedor.insertAdjacentHTML("beforeend", html);
     contadores.incrementar("dimension300");
 };
 
@@ -213,7 +222,7 @@ window.agregarTecnica340 = function (parentIndex) {
             </div>
         </div>
     `;
-    contenedor.insertAdjacentHTML('beforeend', html);
+    contenedor.insertAdjacentHTML("beforeend", html);
     contadores.incrementar("tecnica340");
 };
 
@@ -225,7 +234,9 @@ function generarHTMLCaracteristicaMusica(index) {
     return `
         <div class="campo-repetible" data-campo="caracteristica-musica-${index}">
             <div class="campo-header">
-                <span class="campo-label">Característica Música Notada #${index + 1}</span>
+                <span class="campo-label">Característica Música Notada #${
+                    index + 1
+                }</span>
                 <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('caracteristica-musica-${index}')">
                     <i class="bi bi-trash"></i> Eliminar
                 </button>
@@ -269,7 +280,10 @@ window.agregarCaracteristicaMusica = function () {
     if (!validarContenedor("caracteristicas-musica-container")) return;
 
     const index = contadores.obtener("caracteristicaMusica");
-    insertarHTML("caracteristicas-musica-container", generarHTMLCaracteristicaMusica(index));
+    insertarHTML(
+        "caracteristicas-musica-container",
+        generarHTMLCaracteristicaMusica(index)
+    );
     contadores.incrementar("caracteristicaMusica");
 };
 
@@ -294,7 +308,7 @@ window.agregarFormato348 = function (parentIndex) {
             </div>
         </div>
     `;
-    contenedor.insertAdjacentHTML('beforeend', html);
+    contenedor.insertAdjacentHTML("beforeend", html);
     contadores.incrementar("formato348");
 };
 
@@ -306,7 +320,9 @@ function generarHTMLMedioInterpretacion382(index) {
     return `
         <div class="campo-repetible" data-campo="medio-interpretacion-382-${index}">
             <div class="campo-header">
-                <span class="campo-label">Medio de Interpretación #${index + 1}</span>
+                <span class="campo-label">Medio de Interpretación #${
+                    index + 1
+                }</span>
                 <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('medio-interpretacion-382-${index}')">
                     <i class="bi bi-trash"></i> Eliminar
                 </button>
@@ -389,7 +405,10 @@ window.agregarMedioInterpretacion382 = function () {
     if (!validarContenedor("medios-interpretacion-382-container")) return;
 
     const index = contadores.obtener("medioInterpretacion382");
-    insertarHTML("medios-interpretacion-382-container", generarHTMLMedioInterpretacion382(index));
+    insertarHTML(
+        "medios-interpretacion-382-container",
+        generarHTMLMedioInterpretacion382(index)
+    );
     contadores.incrementar("medioInterpretacion382");
 };
 
@@ -414,7 +433,7 @@ window.agregarMedio382a = function (parentIndex) {
             </div>
         </div>
     `;
-    contenedor.insertAdjacentHTML('beforeend', html);
+    contenedor.insertAdjacentHTML("beforeend", html);
     contadores.incrementar("medio382a");
 };
 
@@ -436,12 +455,14 @@ window.agregarSolista382 = function (parentIndex) {
             </div>
         </div>
     `;
-    contenedor.insertAdjacentHTML('beforeend', html);
+    contenedor.insertAdjacentHTML("beforeend", html);
     contadores.incrementar("solista382");
 };
 
 window.agregarNumeroInterpretes382 = function (parentIndex) {
-    const contenedor = document.getElementById(`numeros-interpretes-382-${parentIndex}`);
+    const contenedor = document.getElementById(
+        `numeros-interpretes-382-${parentIndex}`
+    );
     if (!contenedor) return;
 
     const index = contadores.obtener("numeroInterpretes382");
@@ -456,7 +477,7 @@ window.agregarNumeroInterpretes382 = function (parentIndex) {
             </div>
         </div>
     `;
-    contenedor.insertAdjacentHTML('beforeend', html);
+    contenedor.insertAdjacentHTML("beforeend", html);
     contadores.incrementar("numeroInterpretes382");
 };
 
@@ -468,7 +489,9 @@ function generarHTMLDesignacionNumerica(index) {
     return `
         <div class="campo-repetible" data-campo="designacion-numerica-${index}">
             <div class="campo-header">
-                <span class="campo-label">Designación Numérica #${index + 1}</span>
+                <span class="campo-label">Designación Numérica #${
+                    index + 1
+                }</span>
                 <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('designacion-numerica-${index}')">
                     <i class="bi bi-trash"></i> Eliminar
                 </button>
@@ -523,12 +546,17 @@ window.agregarDesignacionNumerica = function () {
     if (!validarContenedor("designaciones-numericas-container")) return;
 
     const index = contadores.obtener("designacionNumerica");
-    insertarHTML("designaciones-numericas-container", generarHTMLDesignacionNumerica(index));
+    insertarHTML(
+        "designaciones-numericas-container",
+        generarHTMLDesignacionNumerica(index)
+    );
     contadores.incrementar("designacionNumerica");
 };
 
 window.agregarNumeroObra383 = function (parentIndex) {
-    const contenedor = document.getElementById(`numeros-obra-383-${parentIndex}`);
+    const contenedor = document.getElementById(
+        `numeros-obra-383-${parentIndex}`
+    );
     if (!contenedor) return;
 
     const index = contadores.obtener("numeroObra383");
@@ -543,7 +571,7 @@ window.agregarNumeroObra383 = function (parentIndex) {
             </div>
         </div>
     `;
-    contenedor.insertAdjacentHTML('beforeend', html);
+    contenedor.insertAdjacentHTML("beforeend", html);
     contadores.incrementar("numeroObra383");
 };
 
@@ -563,18 +591,6 @@ window.agregarOpus383 = function (parentIndex) {
             </div>
         </div>
     `;
-    contenedor.insertAdjacentHTML('beforeend', html);
+    contenedor.insertAdjacentHTML("beforeend", html);
     contadores.incrementar("opus383");
 };
-
-// ============================================
-// CONFIRMACIÓN DE CARGA
-// ============================================
-
-console.log("✅ campos-3xx-repetibles.js cargado correctamente");
-console.log("📦 Funciones 3XX disponibles:");
-console.log("   - agregarDescripcionFisica()");
-console.log("   - agregarMedioFisico()");
-console.log("   - agregarCaracteristicaMusica()");
-console.log("   - agregarMedioInterpretacion382()");
-console.log("   - agregarDesignacionNumerica()");
