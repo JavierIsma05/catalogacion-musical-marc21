@@ -631,22 +631,3 @@ window.agregarNombreParteSeccion240 = function () {
     contadores.incrementar("nombreParteSeccion240");
     console.log(`📄 Nombre de Parte 240 agregado (total: ${index + 1})`);
 };
-
-// ============================================
-// CONFIRMACIÓN DE CARGA
-// ============================================
-
-console.log(
-    "✅ campos-1xx-repetibles.js cargado correctamente (con autocompletado)"
-);
-console.log("📦 Funciones 1XX disponibles:");
-console.log("   - agregarFuncionCompositor()");
-console.log("   - agregarAtribucionCompositor()");
-console.log("   - agregarForma130() [con autocompletado]");
-console.log("   - agregarMedioInterpretacion130()");
-console.log("   - agregarNumeroParteSeccion130()");
-console.log("   - agregarNombreParteSeccion130()");
-console.log("   - agregarForma240()");
-console.log("   - agregarMedioInterpretacion240()");
-console.log("   - agregarNumeroParteSeccion240()");
-console.log("   - agregarNombreParteSeccion240()");

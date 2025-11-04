@@ -78,8 +78,7 @@ class ContadoresCampos {
     /**
      * Muestra todos los contadores actuales (útil para debugging)
      */
-    mostrarEstado() {
-    }
+    mostrarEstado() {}
 }
 
 window.contadores = new ContadoresCampos();
@@ -136,7 +135,6 @@ window.insertarHTML = function (containerId, html) {
             nuevoElemento.style.transition = "opacity 0.3s";
             setTimeout(() => (nuevoElemento.style.opacity = "1"), 10);
         }
-
     } else {
         console.error(`❌ Contenedor no encontrado: ${containerId}`);
     }
@@ -201,4 +199,3 @@ window.scrollSuaveA = function (elementoId) {
 // ============================================
 // INICIALIZACIÓN
 // ============================================
-

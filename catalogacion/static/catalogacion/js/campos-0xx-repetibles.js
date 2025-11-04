@@ -372,12 +372,3 @@ window.agregarCodigoPais = function () {
 // ============================================
 // CONFIRMACIÓN DE CARGA
 // ============================================
-
-console.log("✅ campos-0xx-repetibles.js cargado correctamente");
-console.log("📋 Campos disponibles:");
-console.log("   - 020 ISBN");
-console.log("   - 024 ISMN");
-console.log("   - 028 Número de Editor");
-console.log("   - 031 Incipit Musical");
-console.log("   - 041 Código de Lengua");
-console.log("   - 044 Código de País");

@@ -1,15 +1,3 @@
-/**
- * ============================================
- * OBRA-GENERAL-INIT.JS
- * ============================================
- * Inicialización y funciones generales del formulario
- * Este archivo se carga AL FINAL, después de todos los demás
- */
-
-// ============================================
-// SCROLL-SPY PARA SIDEBAR
-// ============================================
-
 function inicializarScrollSpy() {
     const sections = document.querySelectorAll("[id]");
     const navLinks = document.querySelectorAll(".sidebar-nav .nav-link");
@@ -52,8 +40,6 @@ function inicializarScrollSpy() {
             }
         });
     });
-
-    console.log("✅ Scroll-spy inicializado");
 }
 
 // ============================================
@@ -69,11 +55,7 @@ function validarFormulario() {
     }
 
     form.addEventListener("submit", function (e) {
-        // Validaciones personalizadas antes de enviar
-        console.log("📝 Enviando formulario...");
-
-        // Aquí puedes agregar validaciones adicionales si las necesitas
-        // Por ejemplo:
+        // Validaciones para el formulario
         /*
         const tipoRegistro = form.querySelector('[name="tipo_registro"]').value;
         if (!tipoRegistro) {
@@ -83,8 +65,6 @@ function validarFormulario() {
         }
         */
     });
-
-    console.log("✅ Validación de formulario configurada");
 }
 
 // ============================================
@@ -98,7 +78,6 @@ function inicializarAtajosTeclado() {
             e.preventDefault();
             const form = document.getElementById("obraForm");
             if (form) {
-                console.log("💾 Guardando con Ctrl+S...");
                 form.submit();
             }
         }
@@ -109,10 +88,6 @@ function inicializarAtajosTeclado() {
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
     });
-
-    console.log("⌨️ Atajos de teclado activados:");
-    console.log("   - Ctrl+S: Guardar formulario");
-    console.log("   - Ctrl+B: Ir al inicio");
 }
 
 // ============================================
@@ -120,10 +95,6 @@ function inicializarAtajosTeclado() {
 // ============================================
 
 function mostrarEstadisticas() {
-    // Solo para debugging/desarrollo
-    console.log("📊 ESTADÍSTICAS DEL FORMULARIO");
-    console.log("═".repeat(50));
-
     const stats = {
         campos0xx: [
             { nombre: "ISBN", count: contadores.obtener("isbn") - 1 },
@@ -172,8 +143,6 @@ function mostrarEstadisticas() {
             );
         }
     });
-
-    console.log("═".repeat(50));
 }
 
 // ============================================
@@ -240,8 +209,6 @@ function crearBotonVolverArriba() {
             button.style.display = "none";
         }
     });
-
-    console.log('⬆️ Botón "Volver arriba" creado');
 }
 
 // ============================================
@@ -272,8 +239,6 @@ function prevenirPerdidaDatos() {
     form.addEventListener("submit", () => {
         formModificado = false;
     });
-
-    console.log("🛡️ Protección contra pérdida de datos activada");
 }
 
 // ============================================
@@ -281,33 +246,16 @@ function prevenirPerdidaDatos() {
 // ============================================
 
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("");
-    console.log("INICIALIZANDO FORMULARIO OBRA GENERAL");
-    console.log("═".repeat(50));
-
     // Funciones principales
     inicializarScrollSpy();
     validarFormulario();
 
-    // Funciones opcionales (puedes comentar las que no necesites)
+    // Funciones opcionales
     inicializarAtajosTeclado();
     crearBotonVolverArriba();
     prevenirPerdidaDatos();
-    // inicializarAutoGuardado(); // Descomenta si quieres auto-guardado
-
-    // Mostrar estadísticas (solo para desarrollo)
-    // mostrarEstadisticas(); // Descomenta para ver estadísticas
-
-    console.log("═".repeat(50));
-    console.log("✅ Formulario inicializado correctamente");
-    console.log("");
-    console.log("💡 TIP: Abre la consola para ver los logs detallados");
-    console.log("");
+    // inicializarAutoGuardado(); // Descomentar para autoguardado
 });
-
-// ============================================
-// FUNCIONES DE UTILIDAD GLOBAL
-// ============================================
 
 /**
  * Función para debugging - Ver estado completo del formulario
@@ -322,22 +270,16 @@ window.verEstadoFormulario = function () {
  */
 window.limpiarBorrador = function () {
     localStorage.removeItem("obra_general_draft");
-    console.log("🗑️ Borrador eliminado");
 };
 
 // Exponer función de estadísticas
 window.mostrarEstadisticas = mostrarEstadisticas;
 
-console.log("✅ obra-general-init.js cargado correctamente");
-
 // ============================================
 // VERIFICACIÓN DE FUNCIONES DEL BLOQUE 1XX
 // ============================================
 
-// Verificar que todas las funciones del bloque 1XX estén disponibles
 window.addEventListener("DOMContentLoaded", function () {
-    console.log("\n🔍 Verificando funciones del bloque 1XX...");
-
     const funciones1xx = [
         "agregarFuncionCompositor",
         "agregarAtribucionCompositor",
@@ -354,7 +296,7 @@ window.addEventListener("DOMContentLoaded", function () {
     let faltantes = [];
     funciones1xx.forEach((fn) => {
         if (typeof window[fn] === "function") {
-            console.log(`   ✅ ${fn}`);
+            // console.log(`   ✅ ${fn}`);
         } else {
             console.error(`   ❌ ${fn} NO ENCONTRADA`);
             faltantes.push(fn);
@@ -362,9 +304,9 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     if (faltantes.length === 0) {
-        console.log(
-            "✅ Todas las funciones del bloque 1XX están disponibles\n"
-        );
+        // console.log(
+        //     "✅ Todas las funciones del bloque 1XX están disponibles\n"
+        // );
     } else {
         console.error(
             `❌ Faltan ${faltantes.length} funciones del bloque 1XX:`,
