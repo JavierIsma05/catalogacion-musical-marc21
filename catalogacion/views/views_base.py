@@ -12,11 +12,13 @@ from django.db import transaction
 from django.http import JsonResponse
 import json
 
+from .debug_datos import debug_obra_datos
+
+
 from ..models import ObraGeneral
 from ..models.obra_general import TONALIDADES
 from ..models.bloque_0xx import CodigoPaisEntidad
 
-# Importar funciones de procesamiento desde sus módulos específicos
 from .views_0xx import (
     procesar_isbn,
     procesar_ismn,
@@ -30,6 +32,24 @@ from .views_1xx import (
     procesar_compositor,
     procesar_titulo_uniforme_130,
     procesar_titulo_uniforme_240,
+)
+
+from .views_2xx import (
+    procesar_titulo_alternativo,
+    procesar_edicion,
+    procesar_produccion_publicacion,
+)
+
+from .views_3xx import (
+    procesar_descripcion_fisica_300,
+    procesar_medio_fisico_340,
+    procesar_caracteristica_musica_348,
+    procesar_medio_interpretacion_382,
+    procesar_designacion_numerica_383,
+)
+
+from .views_4xx import (
+    procesar_mencion_serie_490,
 )
 
 
@@ -56,37 +76,24 @@ def crear_obra(request):
     Vista para crear una nueva obra general
     
     Renderiza el formulario completo para catalogar una obra musical
-    incluyendo cabecera, campos 0XX y 1XX con sus subcampos repetibles.
-    
     Maneja tanto GET (mostrar formulario) como POST (guardar datos).
     """
     if request.method == 'POST':
+        debug_obra_datos(request)
         try:
-            # Usar transacción atómica para garantizar integridad
             with transaction.atomic():
-                # ========================================
-                # PASO 1: Crear ObraGeneral (Cabecera)
-                # ========================================
                 obra = ObraGeneral()
                 
-                # Cabecera - Líder
+                #* Cabecera
                 obra.tipo_registro = request.POST.get('tipo_registro', 'd')
                 obra.nivel_bibliografico = request.POST.get('nivel_bibliografico', 'm')
-                # num_control se autogenera en el save()
                 
-                # ========================================
-                # PASO 2: Bloque 0XX - Campos no repetibles
-                # ========================================
-                
+                #* Bloque 0XX - Campos fijos no repetibles
                 # 040 - Fuente de catalogación
                 obra.centro_catalogador = request.POST.get('centro_catalogador', 'UNL')
                 
                 # Guardar obra primero para tener el ID
                 obra.save()
-                
-                # ========================================
-                # PASO 3: Bloque 0XX - Campos repetibles
-                # ========================================
                 
                 # 020 - ISBN (Repetible)
                 procesar_isbn(request, obra)
@@ -106,10 +113,6 @@ def crear_obra(request):
                 # 044 - Código de País (Repetible)
                 procesar_codigo_pais(request, obra)
                 
-                # ========================================
-                # PASO 4: Bloque 1XX - Compositor y Título Uniforme
-                # ========================================
-                
                 # 100 - Compositor
                 procesar_compositor(request, obra)
                 
@@ -118,6 +121,41 @@ def crear_obra(request):
                 
                 # 240 - Título Uniforme con Compositor
                 procesar_titulo_uniforme_240(request, obra)
+                
+                # 245 - Título principal (Ya está en ObraGeneral como campos no repetibles)
+                obra.titulo_principal = request.POST.get('titulo_principal', '')
+                obra.subtitulo = request.POST.get('subtitulo', '')
+                obra.mencion_responsabilidad = request.POST.get('mencion_responsabilidad', '')
+
+                # 246 - Título Alternativo (Repetible)
+                procesar_titulo_alternativo(request, obra)
+
+                # 250 - Edición (Repetible)
+                procesar_edicion(request, obra)
+
+                # 264 - Producción/Publicación (Repetible)
+                procesar_produccion_publicacion(request, obra)
+
+                # 300 - Descripción Física (Repetible con subcampos anidados)
+                procesar_descripcion_fisica_300(request, obra)
+
+                # 340 - Medio Físico (Repetible con técnicas anidadas)
+                procesar_medio_fisico_340(request, obra)
+
+                # 348 - Características Música Notada (Repetible)
+                procesar_caracteristica_musica_348(request, obra)
+
+                # 382 - Medio de Interpretación (Repetible con subcampos anidados)
+                procesar_medio_interpretacion_382(request, obra)
+
+                # 383 - Designación Numérica (Repetible con subcampos anidados)
+                procesar_designacion_numerica_383(request, obra)
+
+                # 384 - Tonalidad (NR - campo simple en ObraGeneral)
+                obra.tonalidad_384 = request.POST.get('tonalidad_384', '')
+
+                # 490 - Mención de Serie (Repetible con subcampos anidados)
+                procesar_mencion_serie_490(request, obra)
                 
                 # Regenerar clasificación 092 con los datos completos
                 obra.generar_clasificacion_092()

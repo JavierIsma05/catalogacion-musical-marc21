@@ -432,8 +432,8 @@ def procesar_codigo_lengua(request, obra):
         
         codigo_lengua = CodigoLengua.objects.create(
             obra=obra,
-            indicador_traduccion=ind1,
-            indicador_fuente=ind2
+            indicacion_traduccion=ind1,
+            fuente_codigo=ind2
         )
         
         # Procesar idiomas para este código de lengua

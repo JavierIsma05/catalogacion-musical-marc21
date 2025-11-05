@@ -2,9 +2,82 @@
 {# BOTONES DE ACCIÓN #}
 {# ============================================ #}
 
-<div class="d-flex gap-2 justify-content-end">
-    <a href="{% url 'index' %}" class="btn btn-outline-secondary">Cancelar</a>
-    <button type="submit" class="btn btn-primary">
-        <i class="bi bi-save"></i> Guardar Obra
-    </button>
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-body">
+        <div class="d-flex gap-2 justify-content-between align-items-center flex-wrap">
+            <!-- Herramientas de Debug -->
+            <div class="d-flex gap-2 flex-wrap">
+                <div class="dropdown">
+                    <button class="btn btn-outline-info btn-sm dropdown-toggle" type="button" id="debugDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-tools"></i> Herramientas de Debug
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="debugDropdown">
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); window.previewFormData();">
+                                <i class="bi bi-eye"></i> Ver Datos en Consola
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); window.obtenerDatosJSON();">
+                                <i class="bi bi-file-earmark-code"></i> Ver JSON
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); window.copiarDatosJSON();">
+                                <i class="bi bi-clipboard"></i> Copiar JSON
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); window.descargarDatosJSON();">
+                                <i class="bi bi-download"></i> Descargar JSON
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); window.mostrarEstadisticas();">
+                                <i class="bi bi-bar-chart"></i> Ver Estadísticas
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <small class="text-muted align-self-center">
+                    <i class="bi bi-info-circle"></i> Abre la consola del navegador (F12) para ver los datos
+                </small>
+            </div>
+            
+            <!-- Botones principales -->
+            <div class="d-flex gap-2">
+                <a href="{% url 'index' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Guardar Obra
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+// Función para previsualizar datos sin enviar el formulario
+window.previewFormData = function() {
+    const form = document.getElementById('obraForm');
+    if (form && typeof window.logearDatosFormulario === 'function') {
+        console.log('\n' + '='.repeat(80));
+        console.log('%c🔍 VISTA PREVIA DE DATOS DEL FORMULARIO', 'background: #0d6efd; color: white; padding: 10px 20px; font-size: 16px; font-weight: bold; border-radius: 4px;');
+        console.log('%cGenerado el: ' + new Date().toLocaleString('es-ES'), 'color: #6c757d; font-style: italic;');
+        console.log('='.repeat(80) + '\n');
+        
+        window.logearDatosFormulario(form);
+        
+        // Mensaje adicional
+        console.log('\n💡 TIPS:');
+        console.log('   • Usa window.copiarDatosJSON() para copiar los datos al portapapeles');
+        console.log('   • Usa window.descargarDatosJSON() para descargar como archivo');
+        console.log('   • Usa window.mostrarEstadisticas() para ver estadísticas detalladas');
+    } else {
+        console.error('❌ No se pudo acceder a la función de logging');
+        console.error('   Verifica que el archivo obra-general-init.js esté cargado correctamente');
+    }
+};
+</script>

@@ -164,3 +164,95 @@ def listar_campos_2xx(request, obra_id):
         'producciones_publicaciones': obra.producciones_publicaciones.all(),
     }
     return render(request, 'catalogacion/2xx/lista_campos_2xx.html', contexto)
+
+
+def procesar_titulo_alternativo(request, obra):
+    """
+    Procesar Títulos Alternativos (246) desde el formulario
+    Campo repetible: titulo_alternativo_<indice>_<campo>
+    """
+    from ..models.bloque_2xx import TituloAlternativo
+    
+    indice = 0
+    while True:
+        titulo = request.POST.get(f'titulo_alternativo_{indice}_titulo', '').strip()
+        
+        if not titulo:
+            indice += 1
+            if indice > 50:  # Límite de seguridad
+                break
+            continue
+        
+        resto_titulo = request.POST.get(f'titulo_alternativo_{indice}_resto_titulo', '').strip()
+        
+        TituloAlternativo.objects.create(
+            obra=obra,
+            titulo=titulo,
+            resto_titulo=resto_titulo
+        )
+        
+        indice += 1
+        if indice > 50:
+            break
+
+def procesar_edicion(request, obra):
+    """
+    Procesar Ediciones (250) desde el formulario
+    Campo repetible: edicion_<indice>_<campo>
+    """
+    from ..models.bloque_2xx import Edicion
+    
+    indice = 0
+    while True:
+        edicion_texto = request.POST.get(f'edicion_{indice}_edicion', '').strip()
+        
+        if not edicion_texto:
+            indice += 1
+            if indice > 50:
+                break
+            continue
+        
+        mencion_resp = request.POST.get(f'edicion_{indice}_mencion_responsabilidad_edicion', '').strip()
+        
+        Edicion.objects.create(
+            obra=obra,
+            edicion=edicion_texto,
+            mencion_responsabilidad_edicion=mencion_resp
+        )
+        
+        indice += 1
+        if indice > 50:
+            break
+
+def procesar_produccion_publicacion(request, obra):
+    """
+    Procesar Producción/Publicación (264) desde el formulario
+    Campo repetible: produccion_publicacion_<indice>_<campo>
+    """
+    from ..models.bloque_2xx import ProduccionPublicacion
+    
+    indice = 0
+    while True:
+        funcion = request.POST.get(f'produccion_publicacion_{indice}_funcion', '').strip()
+        
+        if not funcion:
+            indice += 1
+            if indice > 50:
+                break
+            continue
+        
+        lugar = request.POST.get(f'produccion_publicacion_{indice}_lugar_produccion', '').strip()
+        nombre = request.POST.get(f'produccion_publicacion_{indice}_nombre_productor', '').strip()
+        fecha = request.POST.get(f'produccion_publicacion_{indice}_fecha_produccion', '').strip()
+        
+        ProduccionPublicacion.objects.create(
+            obra=obra,
+            funcion=funcion,
+            lugar_produccion=lugar,
+            nombre_productor=nombre,
+            fecha_produccion=fecha
+        )
+        
+        indice += 1
+        if indice > 50:
+            break
