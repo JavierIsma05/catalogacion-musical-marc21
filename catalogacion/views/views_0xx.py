@@ -464,7 +464,6 @@ def procesar_codigo_pais(request, obra):
         obra: Instancia de ObraGeneral
     """
     index = 0
-    orden = 1
     while True:
         codigo = request.POST.get(f'codigo_pais_a_{index}')
         if not codigo:
@@ -473,8 +472,6 @@ def procesar_codigo_pais(request, obra):
         if codigo.strip():
             CodigoPaisEntidad.objects.create(
                 obra=obra,
-                codigo_pais=codigo.strip(),
-                orden=orden
+                codigo_pais=codigo.strip()
             )
-            orden += 1
         index += 1

@@ -94,9 +94,9 @@ class NumeroEditorForm(forms.ModelForm):
     """Formulario para Numero de Editor (028) - Repetible"""
     class Meta:
         model = NumeroEditor
-        fields = ['numero', 'tipo_numero', 'control_nota']
+        fields = ['numero_editor', 'tipo_numero', 'control_nota']
         widgets = {
-            'numero': forms.TextInput(attrs={
+            'numero_editor': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': '028 $a - Numero de editor'
             }),
@@ -174,9 +174,9 @@ class IdiomaObraForm(forms.ModelForm):
     """Formulario para Idioma de Obra (041 $a) - Repetible"""
     class Meta:
         model = IdiomaObra
-        fields = ['codigo']
+        fields = ['codigo_idioma']
         widgets = {
-            'codigo': forms.Select(attrs={
+            'codigo_idioma': forms.Select(attrs={
                 'class': 'form-select form-select-sm'
             })
         }

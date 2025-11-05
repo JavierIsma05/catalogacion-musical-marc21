@@ -15,7 +15,7 @@
                     </button>
                 </div>
                 <div class="row g-2">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label class="subcampo-label">$a ISBN</label>
                         <input type="text" name="isbn_a_0" class="form-control" placeholder="978-0-123456-78-9">
                     </div>
@@ -76,21 +76,17 @@
                     <div class="col-md-6">
                         <label class="subcampo-label">Indicador 1 - Tipo de Número</label>
                         <select name="numero_editor_tipo_0" class="form-select">
-                            <option value="0">0 - Número de publicación</option>
-                            <option value="1">1 - Número de matriz</option>
-                            <option value="2" selected>2 - Número de plancha</option>
-                            <option value="3">3 - Otro número de música</option>
-                            <option value="4">4 - Número de videograbación</option>
-                            <option value="5">5 - Otro número de editor</option>
+                            {% for value, label in tipo_numero_editor %}
+                            <option value="{{ value }}" {% if value == '2' %}selected{% endif %}>{{ value }} - {{ label }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="col-md-6">
                         <label class="subcampo-label">Indicador 2 - Control de Nota</label>
                         <select name="numero_editor_control_0" class="form-select">
-                            <option value="0" selected>0 - No hay nota ni punto de acceso adicional</option>
-                            <option value="1">1 - Nota, hay punto de acceso adicional</option>
-                            <option value="2">2 - Nota, no hay punto de acceso adicional</option>
-                            <option value="3">3 - No hay nota, hay punto de acceso adicional</option>
+                            {% for value, label in control_nota_editor %}
+                            <option value="{{ value }}" {% if value == '0' %}selected{% endif %}>{{ value }} - {{ label }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
@@ -118,15 +114,15 @@
                 <div class="row g-2 mb-2">
                     <div class="col-md-4">
                         <label class="subcampo-label">$a Número de Obra</label>
-                        <input type="number" name="incipit_a_0" class="form-control" placeholder="1" value="1" min="1">
+                        <input type="number" name="incipit_a_0" class="form-control" placeholder="{{ incipit_defaults.numero_obra }}" value="{{ incipit_defaults.numero_obra }}" min="1">
                     </div>
                     <div class="col-md-4">
                         <label class="subcampo-label">$b Número de Movimiento</label>
-                        <input type="number" name="incipit_b_0" class="form-control" placeholder="1" value="1" min="1">
+                        <input type="number" name="incipit_b_0" class="form-control" placeholder="{{ incipit_defaults.numero_movimiento }}" value="{{ incipit_defaults.numero_movimiento }}" min="1">
                     </div>
                     <div class="col-md-4">
                         <label class="subcampo-label">$c Número de Pasaje</label>
-                        <input type="number" name="incipit_c_0" class="form-control" placeholder="1" value="1" min="1">
+                        <input type="number" name="incipit_c_0" class="form-control" placeholder="{{ incipit_defaults.numero_pasaje }}" value="{{ incipit_defaults.numero_pasaje }}" min="1">
                     </div>
                 </div>
 
@@ -136,8 +132,9 @@
                         <input type="text" name="incipit_d_0" class="form-control" placeholder="Ej: Aria, Allegro, Andante">
                     </div>
                     <div class="col-md-6">
-                        <label class="subcampo-label">$m Voz/Instrumento (opcional)</label>
-                        <input type="text" name="incipit_m_0" class="form-control" placeholder="Ej: V (solo si NO es piano)">
+                        <label class="subcampo-label">$m Voz/Instrumento</label>
+                        <input type="text" name="incipit_m_0" class="form-control" placeholder="{{ incipit_defaults.voz_instrumento }}" value="{{ incipit_defaults.voz_instrumento }}">
+                        <small class="text-muted">Predeterminado: {{ incipit_defaults.voz_instrumento }}</small>
                     </div>
                 </div>
 
@@ -206,16 +203,17 @@
                     <div class="col-md-6">
                         <label class="subcampo-label">Indicador 1 - Código de Traducción</label>
                         <select name="codigo_lengua_ind1_0" class="form-select">
-                            <option value="#"># - No se proporciona información</option>
-                            <option value="0" selected>0 - No es traducción</option>
-                            <option value="1">1 - Es traducción</option>
+                            {% for value, label in indicacion_traduccion %}
+                            <option value="{{ value }}" {% if value == '0' %}selected{% endif %}>{{ value }} - {{ label }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="col-md-6">
                         <label class="subcampo-label">Indicador 2 - Código de Fuente</label>
                         <select name="codigo_lengua_ind2_0" class="form-select">
-                            <option value="#" selected># - Código MARC de lengua</option>
-                            <option value="7">7 - Fuente especificada en $2</option>
+                            {% for value, label in fuente_codigo %}
+                            <option value="{{ value }}" {% if value == '#' %}selected{% endif %}>{{ value }} - {{ label }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
@@ -232,12 +230,9 @@
                         <div class="mb-2" data-subcampo="idioma-0-0">
                             <div class="input-group input-group-sm">
                                 <select name="codigo_lengua_a_0_0" class="form-select form-select-sm">
-                                    <option value="ger">Alemán</option>
-                                    <option value="spa" selected>Español</option>
-                                    <option value="fre">Francés</option>
-                                    <option value="eng">Inglés</option>
-                                    <option value="ita">Italiano</option>
-                                    <option value="por">Portugués</option>
+                                    {% for value, label in codigos_idioma %}
+                                    <option value="{{ value }}" {% if value == 'spa' %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
                                 </select>
                                 <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('idioma-0-0')">
                                     <i class="bi bi-x"></i>

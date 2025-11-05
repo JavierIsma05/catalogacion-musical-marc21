@@ -19,13 +19,9 @@ function generarHTMLISBN(index) {
                 </button>
             </div>
             <div class="row g-2">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <label class="subcampo-label">$a ISBN</label>
                     <input type="text" name="isbn_a_${index}" class="form-control" placeholder="978-0-123456-78-9">
-                </div>
-                <div class="col-md-6">
-                    <label class="subcampo-label">$q Calificador</label>
-                    <input type="text" name="isbn_q_${index}" class="form-control" placeholder="Ej: rústica">
                 </div>
             </div>
         </div>
@@ -78,6 +74,26 @@ window.agregarISMN = function () {
 // ============================================
 
 function generarHTMLNumeroEditor(index) {
+    const tiposNumero = window.TIPO_NUMERO_EDITOR || [
+        { value: "0", text: "Número de publicación" },
+        { value: "1", text: "Número de matriz" },
+        { value: "2", text: "Número de plancha", selected: true },
+        { value: "3", text: "Otro número de música" },
+        { value: "4", text: "Número de videograbación" },
+        { value: "5", text: "Otro número de editor" },
+    ];
+
+    const controlesNota = window.CONTROL_NOTA_EDITOR || [
+        {
+            value: "0",
+            text: "No hay nota ni punto de acceso adicional",
+            selected: true,
+        },
+        { value: "1", text: "Nota, hay punto de acceso adicional" },
+        { value: "2", text: "Nota, no hay punto de acceso adicional" },
+        { value: "3", text: "No hay nota, hay punto de acceso adicional" },
+    ];
+
     return `
         <div class="campo-repetible" data-campo="numero-editor-${index}">
             <div class="campo-header">
@@ -96,21 +112,13 @@ function generarHTMLNumeroEditor(index) {
                 <div class="col-md-6">
                     <label class="subcampo-label">Indicador 1 - Tipo de Número</label>
                     <select name="numero_editor_tipo_${index}" class="form-select">
-                        <option value="0">0 - Número de publicación</option>
-                        <option value="1">1 - Número de matriz</option>
-                        <option value="2" selected>2 - Número de plancha</option>
-                        <option value="3">3 - Otro número de música</option>
-                        <option value="4">4 - Número de videograbación</option>
-                        <option value="5">5 - Otro número de editor</option>
+                        ${generarOpciones(tiposNumero)}
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label class="subcampo-label">Indicador 2 - Control de Nota</label>
                     <select name="numero_editor_control_${index}" class="form-select">
-                        <option value="0" selected>0 - No hay nota ni punto de acceso adicional</option>
-                        <option value="1">1 - Nota, hay punto de acceso adicional</option>
-                        <option value="2">2 - Nota, no hay punto de acceso adicional</option>
-                        <option value="3">3 - No hay nota, hay punto de acceso adicional</option>
+                        ${generarOpciones(controlesNota)}
                     </select>
                 </div>
             </div>
@@ -145,6 +153,14 @@ function generarHTMLURLIncipit(incipitIndex, urlIndex) {
 }
 
 function generarHTMLIncipit(index) {
+    // Obtener valores predeterminados desde variable global o usar fallback
+    const defaults = window.INCIPIT_DEFAULTS || {
+        numero_obra: 1,
+        numero_movimiento: 1,
+        numero_pasaje: 1,
+        voz_instrumento: "piano",
+    };
+
     return `
         <div class="campo-repetible" data-campo="incipit-${index}">
             <div class="campo-header">
@@ -157,15 +173,21 @@ function generarHTMLIncipit(index) {
             <div class="row g-2 mb-2">
                 <div class="col-md-4">
                     <label class="subcampo-label">$a Número de Obra</label>
-                    <input type="number" name="incipit_a_${index}" class="form-control" placeholder="1" value="1" min="1">
+                    <input type="number" name="incipit_a_${index}" class="form-control" placeholder="${
+        defaults.numero_obra
+    }" value="${defaults.numero_obra}" min="1">
                 </div>
                 <div class="col-md-4">
                     <label class="subcampo-label">$b Número de Movimiento</label>
-                    <input type="number" name="incipit_b_${index}" class="form-control" placeholder="1" value="1" min="1">
+                    <input type="number" name="incipit_b_${index}" class="form-control" placeholder="${
+        defaults.numero_movimiento
+    }" value="${defaults.numero_movimiento}" min="1">
                 </div>
                 <div class="col-md-4">
                     <label class="subcampo-label">$c Número de Pasaje</label>
-                    <input type="number" name="incipit_c_${index}" class="form-control" placeholder="1" value="1" min="1">
+                    <input type="number" name="incipit_c_${index}" class="form-control" placeholder="${
+        defaults.numero_pasaje
+    }" value="${defaults.numero_pasaje}" min="1">
                 </div>
             </div>
             
@@ -175,8 +197,13 @@ function generarHTMLIncipit(index) {
                     <input type="text" name="incipit_d_${index}" class="form-control" placeholder="Ej: Aria, Allegro, Andante">
                 </div>
                 <div class="col-md-6">
-                    <label class="subcampo-label">$m Voz/Instrumento (opcional)</label>
-                    <input type="text" name="incipit_m_${index}" class="form-control" placeholder="Ej: V (solo si NO es piano)">
+                    <label class="subcampo-label">$m Voz/Instrumento</label>
+                    <input type="text" name="incipit_m_${index}" class="form-control" placeholder="${
+        defaults.voz_instrumento
+    }" value="${defaults.voz_instrumento}">
+                    <small class="text-muted">Predeterminado: ${
+                        defaults.voz_instrumento
+                    }</small>
                 </div>
             </div>
             
@@ -227,16 +254,20 @@ window.agregarURLIncipit = function (incipitIndex) {
 // ============================================
 
 function generarHTMLIdioma(codigoIndex, idiomaIndex) {
+    const idiomas = window.CODIGOS_IDIOMA || [
+        { value: "ger", text: "Alemán" },
+        { value: "spa", text: "Español", selected: true },
+        { value: "fre", text: "Francés" },
+        { value: "eng", text: "Inglés" },
+        { value: "ita", text: "Italiano" },
+        { value: "por", text: "Portugués" },
+    ];
+
     return `
         <div class="mb-2" data-subcampo="idioma-${codigoIndex}-${idiomaIndex}">
             <div class="input-group input-group-sm">
                 <select name="codigo_lengua_a_${codigoIndex}_${idiomaIndex}" class="form-select form-select-sm">
-                    <option value="ger">Alemán</option>
-                    <option value="spa" selected>Español</option>
-                    <option value="fre">Francés</option>
-                    <option value="eng">Inglés</option>
-                    <option value="ita">Italiano</option>
-                    <option value="por">Portugués</option>
+                    ${generarOpciones(idiomas)}
                 </select>
                 <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('idioma-${codigoIndex}-${idiomaIndex}')">
                     <i class="bi bi-x"></i>
@@ -247,6 +278,17 @@ function generarHTMLIdioma(codigoIndex, idiomaIndex) {
 }
 
 function generarHTMLCodigoLengua(index) {
+    const indicacionTraduccion = window.INDICACION_TRADUCCION || [
+        { value: "#", text: "# - No se proporciona información" },
+        { value: "0", text: "0 - No es traducción", selected: true },
+        { value: "1", text: "1 - Es traducción" },
+    ];
+
+    const fuentes = window.FUENTE_CODIGO || [
+        { value: "#", text: "# - Código MARC de lengua", selected: true },
+        { value: "7", text: "7 - Fuente especificada en $2" },
+    ];
+
     return `
         <div class="campo-repetible" data-campo="codigo-lengua-${index}">
             <div class="campo-header">
@@ -260,16 +302,13 @@ function generarHTMLCodigoLengua(index) {
                 <div class="col-md-6">
                     <label class="subcampo-label">Indicador 1 - Código de Traducción</label>
                     <select name="codigo_lengua_ind1_${index}" class="form-select">
-                        <option value="#"># - No se proporciona información</option>
-                        <option value="0" selected>0 - No es traducción</option>
-                        <option value="1">1 - Es traducción</option>
+                        ${generarOpciones(indicacionTraduccion)}
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label class="subcampo-label">Indicador 2 - Código de Fuente</label>
                     <select name="codigo_lengua_ind2_${index}" class="form-select">
-                        <option value="#" selected># - Código MARC de lengua</option>
-                        <option value="7">7 - Fuente especificada en $2</option>
+                        ${generarOpciones(fuentes)}
                     </select>
                 </div>
             </div>

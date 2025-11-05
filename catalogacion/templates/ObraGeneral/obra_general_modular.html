@@ -55,8 +55,21 @@
 {% block extra_js %}
 <!-- Variables globales desde Django -->
 <script>
-    // Lista de países para campo 044
+    // Bloque 0XX - Listas de choices desde modelos
     window.CODIGOS_PAIS = {{ codigos_pais_json|safe }};
+    window.CODIGOS_IDIOMA = {{ codigos_idioma_json|safe }};
+    window.TIPO_NUMERO_EDITOR = {{ tipo_numero_editor_json|safe }};
+    window.CONTROL_NOTA_EDITOR = {{ control_nota_editor_json|safe }};
+    window.INDICACION_TRADUCCION = {{ indicacion_traduccion_json|safe }};
+    window.FUENTE_CODIGO = {{ fuente_codigo_json|safe }};
+    
+    // Valores predeterminados para Incipit Musical (031)
+    window.INCIPIT_DEFAULTS = {
+        numero_obra: {{ incipit_defaults.numero_obra }},
+        numero_movimiento: {{ incipit_defaults.numero_movimiento }},
+        numero_pasaje: {{ incipit_defaults.numero_pasaje }},
+        voz_instrumento: '{{ incipit_defaults.voz_instrumento }}'
+    };
 </script>
 
 <script src="{% static 'catalogacion/js/campos-core.js' %}"></script>
