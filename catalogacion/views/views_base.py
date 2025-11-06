@@ -84,85 +84,6 @@ def plantillas(request):
     return render(request, 'plantillas.html')
 
 
-def _debug_datos_ordenados(request):
-    print("\n" + "="*80)
-    print("📋 DATOS RECIBIDOS DEL FORMULARIO".center(80))
-    print("="*80 + "\n")
-    
-    # Agrupar datos por prefijo
-    grupos = {
-        'CABECERA': ['tipo_registro', 'nivel_bibliografico'],
-        'ISBN (020)': ['isbn_'],
-        'ISMN (024)': ['ismn_'],
-        'NÚMERO EDITOR (028)': ['numero_editor_'],
-        'INCIPIT (031)': ['incipit_'],
-        'FUENTE CAT. (040)': ['centro_catalogador'],
-        'CÓDIGO LENGUA (041)': ['codigo_lengua_'],
-        'CÓDIGO PAÍS (044)': ['codigo_pais_'],
-        'COMPOSITOR (100)': ['compositor_', 'funcion_compositor_', 'atribucion_compositor_'],
-        'TÍTULO UNIFORME 130': ['titulo_uniforme_130', 'forma_130_', 'medio_130_', 'numero_130_', 'nombre_130_'],
-        'TÍTULO UNIFORME 240': ['titulo_uniforme_240', 'forma_240_', 'medio_240_', 'numero_240_', 'nombre_240_'],
-        'TÍTULO PRINCIPAL (245)': ['titulo_principal', 'subtitulo', 'mencion_responsabilidad'],
-        'TÍTULO ALTERNATIVO (246)': ['titulo_alternativo_'],
-        'EDICIÓN (250)': ['edicion_'],
-        'PRODUCCIÓN (264)': ['produccion_'],
-        'DESC. FÍSICA (300)': ['descripcion_fisica_'],
-        'MEDIO FÍSICO (340)': ['medio_fisico_', 'tecnica_340_'],
-        'CARACT. MÚSICA (348)': ['caracteristica_musica_'],
-        'MEDIO INTERP. (382)': ['medio_interpretacion_382_', 'instrumento_382_'],
-        'DESIG. NUMÉRICA (383)': ['designacion_numerica_', 'numero_serial_383_', 'numero_opus_383_'],
-        'TONALIDAD (384)': ['tonalidad_384'],
-        'SERIE (490)': ['mencion_serie_', 'titulo_serie_490_', 'volumen_serie_490_'],
-    }
-    
-    # Contar total de campos
-    total_campos = len(request.POST)
-    campos_mostrados = 0
-    
-    for titulo, prefijos in grupos.items():
-        campos = {}
-        for key, value in request.POST.items():
-            if any(key.startswith(prefijo) if prefijo.endswith('_') else key == prefijo for prefijo in prefijos):
-                # Mostrar TODOS los campos (con o sin valor)
-                campos[key] = value if value.strip() else '(vacío)'
-                campos_mostrados += 1
-        
-        if campos:
-            print(f"\n🔹 {titulo}")
-            print("-" * 80)
-            for key, value in sorted(campos.items()):
-                # Truncar valores muy largos
-                valor_mostrar = value if len(value) <= 60 else value[:57] + "..."
-                # Colorear campos vacíos
-                if value == '(vacío)':
-                    print(f"  {key:40} = {valor_mostrar}")
-                else:
-                    print(f"  {key:40} = {valor_mostrar}")
-    
-    # Mostrar campos no categorizados
-    campos_no_categorizados = {}
-    for key, value in request.POST.items():
-        if key not in ['csrfmiddlewaretoken']:  # Ignorar CSRF
-            categorizado = False
-            for prefijos in grupos.values():
-                if any(key.startswith(prefijo) if prefijo.endswith('_') else key == prefijo for prefijo in prefijos):
-                    categorizado = True
-                    break
-            if not categorizado:
-                campos_no_categorizados[key] = value if value.strip() else '(vacío)'
-    
-    if campos_no_categorizados:
-        print(f"\n🔹 CAMPOS NO CATEGORIZADOS")
-        print("-" * 80)
-        for key, value in sorted(campos_no_categorizados.items()):
-            valor_mostrar = value if len(value) <= 60 else value[:57] + "..."
-            print(f"  {key:40} = {valor_mostrar}")
-    
-    print("\n" + "="*80)
-    print(f"📊 RESUMEN: {total_campos} campos totales | {campos_mostrados} categorizados | {len(campos_no_categorizados)} no categorizados")
-    print("="*80 + "\n")
-
-
 @transaction.atomic
 def crear_obra(request):
     """
@@ -172,16 +93,8 @@ def crear_obra(request):
     Maneja tanto GET (mostrar formulario) como POST (guardar datos).
     """
     if request.method == 'POST':
-        # MOSTRAR DATOS ANTES DE GUARDAR
-        print("\n" + "="*110)
-        print("🚀 INICIANDO GUARDADO DE OBRA")
-        print("="*110)
-        # debug_obra_datos(request)
-        _debug_datos_ordenados(request)
-        
         try:
             with transaction.atomic():
-                print("\n📌 PASO 1: Creando ObraGeneral...")
                 obra = ObraGeneral()
                 
                 #* Cabecera
@@ -193,115 +106,50 @@ def crear_obra(request):
                 obra.centro_catalogador = request.POST.get('centro_catalogador', 'UNL')
                 
                 # Guardar obra primero para tener el ID
-                print("  ✓ Guardando ObraGeneral (para obtener ID)...")
                 obra.save()
-                print(f"  ✓ ObraGeneral guardada con ID: {obra.id}")
-                
                 # ========================================
-                # PASO 2: Bloque 0XX - Campos repetibles
+                # Bloque 0XX - Campos repetibles
                 # ========================================
-                print("\n📌 PASO 2: Procesando Bloque 0XX...")
-                
-                print("  • Procesando ISBN...")
                 procesar_isbn(request, obra)
-                
-                print("  • Procesando ISMN...")
                 procesar_ismn(request, obra)
-                
-                print("  • Procesando Número de Editor...")
                 procesar_numero_editor(request, obra)
-                
-                print("  • Procesando Incipit Musical...")
                 procesar_incipit(request, obra)
-                
-                print("  • Procesando Código de Lengua...")
                 procesar_codigo_lengua(request, obra)
-                
-                print("  • Procesando Código de País...")
                 procesar_codigo_pais(request, obra)
-                
                 # ========================================
-                # PASO 3: Bloque 1XX
+                # Bloque 1XX
                 # ========================================
-                print("\n📌 PASO 3: Procesando Bloque 1XX...")
-                
-                print("  • Procesando Compositor...")
                 procesar_compositor(request, obra)
-                
-                print("  • Procesando Título Uniforme (130)...")
                 procesar_titulo_uniforme_130(request, obra)
-                
-                print("  • Procesando Título Uniforme (240)...")
                 procesar_titulo_uniforme_240(request, obra)
                 
                 # ========================================
-                # PASO 4: Bloque 2XX
+                # Bloque 2XX
                 # ========================================
-                print("\n📌 PASO 4: Procesando Bloque 2XX...")
-                
-                print("  • Asignando Título Principal...")
                 obra.titulo_principal = request.POST.get('titulo_principal', '')
                 obra.subtitulo = request.POST.get('subtitulo', '')
                 obra.mencion_responsabilidad = request.POST.get('mencion_responsabilidad', '')
-                
-                print("  • Procesando Título Alternativo...")
                 procesar_titulo_alternativo(request, obra)
-                
-                print("  • Procesando Edición...")
                 procesar_edicion(request, obra)
-                
-                print("  • Procesando Producción/Publicación...")
                 procesar_produccion_publicacion(request, obra)
-                
                 # ========================================
-                # PASO 5: Bloque 3XX
+                # Bloque 3XX
                 # ========================================
-                print("\n📌 PASO 5: Procesando Bloque 3XX...")
-                
-                print("  • Procesando Descripción Física...")
                 procesar_descripcion_fisica_300(request, obra)
-                
-                print("  • Procesando Medio Físico...")
                 procesar_medio_fisico_340(request, obra)
-                
-                print("  • Procesando Características de Música Notada...")
                 procesar_caracteristica_musica_348(request, obra)
-                
-                print("  • Procesando Medio de Interpretación...")
                 procesar_medio_interpretacion_382(request, obra)
-                
-                print("  • Procesando Designación Numérica...")
                 procesar_designacion_numerica_383(request, obra)
-                
-                print("  • Asignando Tonalidad...")
                 obra.tonalidad_384 = request.POST.get('tonalidad_384', '')
-                
                 # ========================================
-                # PASO 6: Bloque 4XX
+                # Bloque 4XX
                 # ========================================
-                print("\n📌 PASO 6: Procesando Bloque 4XX...")
-                
-                print("  • Procesando Mención de Serie...")
                 procesar_mencion_serie_490(request, obra)
-                
                 # ========================================
-                # PASO 7: Generación de datos automáticos
+                # Generación de datos automáticos
                 # ========================================
-                print("\n📌 PASO 7: Generando datos automáticos...")
-                
-                print("  • Generando clasificación 092...")
                 obra.generar_clasificacion_092()
-                
-                print("  • Guardando obra completa...")
                 obra.save()
-                
-                print("\n" + "="*110)
-                print("✅ ÉXITO: Obra guardada exitosamente")
-                print("="*110)
-                print(f"  📄 Número de control: {obra.num_control}")
-                print(f"  🆔 ID: {obra.id}")
-                print(f"  📅 Fecha creación: {obra.fecha_creacion_sistema}")
-                print("="*110 + "\n")
                 
                 messages.success(
                     request, 
@@ -379,7 +227,6 @@ def crear_obra(request):
             print(traceback.format_exc())
             print("❌"*55 + "\n")
             
-            # Log para archivo
             logger.exception("Error al guardar obra")
             
             messages.error(request, f'❌ Error al guardar la obra: {str(e)}')
@@ -388,7 +235,6 @@ def crear_obra(request):
     # ========================================
     # GET - Mostrar formulario vacío
     # ========================================
-    print("\n📝 Mostrando formulario para crear nueva obra\n")
     
     # Convertir listas a JSON para JavaScript
     codigos_pais_json = json.dumps([
