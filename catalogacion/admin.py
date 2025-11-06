@@ -15,6 +15,8 @@ from django.utils.html import format_html
 from django.urls import reverse
 from django.db.models import Count
 
+from catalogacion.models.autoridades import AutoridadEntidad
+
 # Importar todos los modelos
 from .models import (
     # ObraGeneral
@@ -57,6 +59,31 @@ from .models import (
     MencionSerie490,
     TituloSerie490,
     VolumenSerie490,
+    # Bloque 5XX
+    NotaGeneral500,
+    Contenido505,
+    Sumario520,
+    DatosBiograficos545,
+    # Bloque 6XX
+    Materia650, 
+    SubdivisionMateria650,
+    MateriaGenero655, 
+    SubdivisionGeneral655,
+    # Bloque 7XX
+    NombreRelacionado700, 
+    TerminoAsociado700, 
+    Funcion700,
+    Relacion700, 
+    Autoria700, 
+    EntidadRelacionada710,
+    EnlaceDocumentoFuente773, 
+    EnlaceUnidadConstituyente774, 
+    OtrasRelaciones787,
+    # Bloque 8XX
+    Ubicacion852, 
+    Estanteria852, 
+    Disponible856,
+
 )
 
 # ================================================
@@ -508,6 +535,272 @@ class MencionSerie490Inline(admin.StackedInline):
         )
         return formset
 
+# =====================================================
+# 🗒️ BLOQUE 5XX – Notas y descripciones
+# =====================================================
+
+# -------------------------------
+# 500 ## Nota general (R)
+# -------------------------------
+class NotaGeneral500Inline(admin.StackedInline):
+    """500 ## Nota general (R)"""
+    model = NotaGeneral500
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['nota_general']
+    verbose_name = "Nota general"
+    verbose_name_plural = "🗒️ Notas generales (500 - R)"
+    classes = ['collapse']
+
+
+# -------------------------------
+# 505 00 Contenido (R)
+# -------------------------------
+class Contenido505Inline(admin.StackedInline):
+    """505 00 Contenido (R)"""
+    model = Contenido505
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['contenido']
+    verbose_name = "Contenido"
+    verbose_name_plural = "📄 Contenidos (505 - R)"
+    classes = ['collapse']
+
+
+# -------------------------------
+# 520 ## Sumario (R)
+# -------------------------------
+class Sumario520Inline(admin.StackedInline):
+    """520 ## Sumario (R)"""
+    model = Sumario520
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['sumario']
+    verbose_name = "Sumario"
+    verbose_name_plural = "📘 Sumarios (520 - R)"
+    classes = ['collapse']
+
+
+# -------------------------------
+# 545 0# Datos biográficos del compositor (R)
+# -------------------------------
+class DatosBiograficos545Inline(admin.StackedInline):
+    """545 0# Datos biográficos del compositor (R)"""
+    model = DatosBiograficos545
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['datos_biograficos', 'url']
+    verbose_name = "Datos biográficos del compositor"
+    verbose_name_plural = "🎼 Datos biográficos del compositor (545 - R)"
+    classes = ['collapse']
+
+# ============================================================
+# BLOQUE 6XX - MATERIAS
+# ============================================================
+
+# 650 – Materia (Temas)
+class SubdivisionMateria650Inline(admin.TabularInline):
+    model = SubdivisionMateria650
+    extra = 1
+    verbose_name = "Subdivisión de materia"
+    verbose_name_plural = "Subdivisiones ($x)"
+
+
+class Materia650Inline(admin.StackedInline):
+    model = Materia650
+    extra = 1
+    verbose_name = "Materia (Tema)"
+    verbose_name_plural = "Materias (650)"
+    inlines = [SubdivisionMateria650Inline]
+
+
+# 655 – Materia (Género/Forma)
+class SubdivisionGeneral655Inline(admin.TabularInline):
+    model = SubdivisionGeneral655
+    extra = 1
+    verbose_name = "Subdivisión general"
+    verbose_name_plural = "Subdivisiones ($x)"
+
+
+class MateriaGenero655Inline(admin.StackedInline):
+    model = MateriaGenero655
+    extra = 1
+    verbose_name = "Materia (Género/Forma)"
+    verbose_name_plural = "Materias (655)"
+    inlines = [SubdivisionGeneral655Inline]
+
+
+# =====================================================
+# 🟣 BLOQUE 7XX – Accesos adicionales y relaciones
+# =====================================================
+
+# --- Subcampos del 700 ---
+class TerminoAsociado700Inline(admin.TabularInline):
+    """700 $c – Término asociado al nombre (R)"""
+    model = TerminoAsociado700
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['termino']
+    verbose_name = "Término asociado"
+    verbose_name_plural = "🧩 Términos asociados (700 $c - R)"
+
+
+class Funcion700Inline(admin.TabularInline):
+    """700 $e – Función (R)"""
+    model = Funcion700
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['funcion']
+    verbose_name = "Función"
+    verbose_name_plural = "🎶 Funciones (700 $e - R)"
+
+
+class Relacion700Inline(admin.TabularInline):
+    """700 $i – Relación (R)"""
+    model = Relacion700
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['descripcion']
+    verbose_name = "Relación"
+    verbose_name_plural = "🔗 Relaciones (700 $i - R)"
+
+
+class Autoria700Inline(admin.TabularInline):
+    """700 $j – Autoría (R)"""
+    model = Autoria700
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['autoria']
+    verbose_name = "Autoría"
+    verbose_name_plural = "📜 Autorías (700 $j - R)"
+
+
+class NombreRelacionado700Inline(admin.StackedInline):
+    """700 1# – Nombre relacionado (R)"""
+    model = NombreRelacionado700
+    autocomplete_fields = ['persona']
+    extra = 1
+    min_num = 0
+    max_num = 10
+
+    # ✅ $d se rellena automáticamente desde AutoridadPersona
+    readonly_fields = ['fechas']  
+    fields = ['persona', 'fechas', 'titulo_obra']
+
+    verbose_name = "Nombre relacionado"
+    verbose_name_plural = "🧑‍🎤 Nombres relacionados (700 - R)"
+
+    inlines = [
+        TerminoAsociado700Inline,
+        Funcion700Inline,
+        Relacion700Inline,
+        Autoria700Inline,
+    ]
+
+    class Media:
+        # ✅ Asegúrate de que esta ruta coincida con tu carpeta "static/catalogacion/js/"
+        js = ('catalogacion/js/auto_fecha_persona.js',)
+
+
+# --- Subcampos del 710 ---
+class EntidadRelacionada710Inline(admin.StackedInline):
+    """710 2# – Entidad relacionada (R)"""
+    model = EntidadRelacionada710
+    autocomplete_fields = ['entidad']
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['entidad', 'funcion']
+    verbose_name = "Entidad relacionada"
+    verbose_name_plural = "🏛️ Entidades relacionadas (710 - R)"
+
+
+# --- Enlaces entre obras ---
+class EnlaceDocumentoFuente773Inline(admin.StackedInline):
+    """773 1# – Enlace a documento fuente (R)"""
+    model = EnlaceDocumentoFuente773
+    autocomplete_fields = ['encabezamiento_principal']
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['encabezamiento_principal', 'titulo', 'numero_obra_relacionada']
+    verbose_name = "Documento fuente"
+    verbose_name_plural = "📘 Documentos fuente (773 - R)"
+
+
+class EnlaceUnidadConstituyente774Inline(admin.StackedInline):
+    """774 1# – Enlace a unidad constituyente (R)"""
+    model = EnlaceUnidadConstituyente774
+    autocomplete_fields = ['encabezamiento_principal']
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['encabezamiento_principal', 'titulo', 'numero_obra_relacionada']
+    verbose_name = "Unidad constituyente"
+    verbose_name_plural = "📚 Unidades constituyentes (774 - R)"
+
+
+class OtrasRelaciones787Inline(admin.StackedInline):
+    """787 1# – Otras relaciones (R)"""
+    model = OtrasRelaciones787
+    autocomplete_fields = ['encabezamiento_principal']
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['encabezamiento_principal', 'titulo', 'numero_obra_relacionada']
+    verbose_name = "Otra relación"
+    verbose_name_plural = "🔗 Otras relaciones (787 - R)"
+
+
+# ============================================================
+# 📦 BLOQUE 8XX – ADMIN COMPLETO Y CORREGIDO
+# ============================================================
+
+class Estanteria852Inline(admin.TabularInline):
+    """Subcampo repetible $c – Estantería"""
+    model = Estanteria852
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['estanteria']
+    verbose_name = "Estantería ($c)"
+    verbose_name_plural = "📚 Estanterías ($c)"
+
+
+class Ubicacion852Inline(admin.StackedInline):
+    """Bloque 852 ## – Ubicación (R)"""
+    model = Ubicacion852
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['institucion_persona', 'signatura_original']
+    inlines = [Estanteria852Inline]  # 👈 Aquí se anidan las estanterías
+    verbose_name = "Ubicación (852)"
+    verbose_name_plural = "📍 Ubicaciones (852)"
+    show_change_link = True
+
+
+class Disponible856Inline(admin.StackedInline):
+    """Bloque 856 4# – Disponible (R)"""
+    model = Disponible856
+    extra = 1
+    min_num = 0
+    max_num = 10
+    fields = ['url', 'texto_enlace']
+    verbose_name = "Recurso disponible (856)"
+    verbose_name_plural = "🌐 Recursos disponibles (856)"
+    show_change_link = True
+
+
+
 
 # ================================================
 # 🎯 ADMIN PRINCIPAL - ObraGeneral
@@ -653,7 +946,28 @@ class ObraGeneralAdmin(admin.ModelAdmin):
         
         # Bloque 4XX
         MencionSerie490Inline,
+        # Bloque 5XX
+        NotaGeneral500Inline,
+        Contenido505Inline,
+        Sumario520Inline,
+        DatosBiograficos545Inline,
+        # Bloque 6XX
+        Materia650Inline,
+        MateriaGenero655Inline,
+        # Bloque 7XX
+        NombreRelacionado700Inline,
+        EntidadRelacionada710Inline,
+        EnlaceDocumentoFuente773Inline,
+        EnlaceUnidadConstituyente774Inline,
+        OtrasRelaciones787Inline,
+        # Bloque 8XX
+        Ubicacion852Inline,     # 852 completo (con estanterías)
+        Disponible856Inline,    # 856 URLs
+
+        
+        
     ]
+    list_display = ('titulo_principal', 'nivel_bibliografico')
     
     # Métodos de visualización
     def titulo_principal_corto(self, obj):
@@ -749,3 +1063,8 @@ class AutoridadFormaMusicalAdmin(admin.ModelAdmin):
     """Admin para formas musicales"""
     list_display = ['forma']
     search_fields = ['forma']
+
+@admin.register(AutoridadEntidad)
+class AutoridadEntidadAdmin(admin.ModelAdmin):
+    search_fields = ['nombre', 'pais', 'descripcion']
+    list_display = ['nombre', 'pais']

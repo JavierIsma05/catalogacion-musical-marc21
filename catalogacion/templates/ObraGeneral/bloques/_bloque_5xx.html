@@ -1,0 +1,106 @@
+{# ============================================ #}
+{# BLOQUE 5XX - NOTAS Y DESCRIPCIONES #}
+{# ============================================ #}
+
+<!-- 500 - Nota general (Repetible) -->
+<div class="card border-0 shadow-sm mb-4" id="bloque-5xx">
+    <div class="card-body">
+        <h2 class="section-title">500 - Nota general</h2>
+        <div id="nota-general-container">
+            <div class="campo-repetible" data-campo="nota-general-0">
+                <div class="campo-header">
+                    <span class="campo-label">Nota general #1</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('nota-general-0')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-12">
+                        <label class="subcampo-label">$a Nota general</label>
+                        <textarea name="nota_general_a_0" class="form-control" rows="2"
+                                  placeholder="Ej: Obra inédita conservada en el archivo del compositor."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-outline-primary btn-add-field" onclick="agregarNotaGeneral()">
+            <i class="bi bi-plus-circle"></i> Agregar Nota general
+        </button>
+    </div>
+</div>
+
+<!-- 505 - Contenido (Repetible) -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="section-title">505 - Contenido</h2>
+        <div id="contenido-container">
+            <div class="campo-repetible" data-campo="contenido-0">
+                <div class="campo-header">
+                    <span class="campo-label">Contenido #1</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('contenido-0')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-12">
+                        <label class="subcampo-label">$a Contenido</label>
+                        <textarea name="contenido_a_0" class="form-control" rows="2"
+                                  placeholder="Ej: 1. Allegro – 2. Andante – 3. Finale"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-outline-primary btn-add-field" onclick="agregarContenido()">
+            <i class="bi bi-plus-circle"></i> Agregar Contenido
+        </button>
+    </div>
+</div>
+
+<!-- 520 - Sumario (No Repetible) -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="section-title">520 - Sumario</h2>
+        <div class="row g-3">
+            <div class="col-md-12">
+                <label class="subcampo-label">$a Sumario</label>
+                <textarea name="sumario_a" class="form-control" rows="2"
+                          placeholder="Breve descripción del contenido de la obra."></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 545 - Datos biográficos del compositor (Repetible) -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="section-title">545 - Datos biográficos del compositor</h2>
+        <div id="biografia-container">
+            <div class="campo-repetible" data-campo="biografia-0">
+                <div class="campo-header">
+                    <span class="campo-label">Biografía #1</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('biografia-0')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-md-12">
+                        <label class="subcampo-label">$a Datos biográficos del compositor</label>
+                        <textarea name="biografia_a_0" class="form-control" rows="3"
+                                  placeholder="Ej: Compositor ecuatoriano del siglo XX, autor de obras sinfónicas y corales."></textarea>
+                    </div>
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-md-12">
+                        <label class="subcampo-label">$u URL relacionada</label>
+                        <input type="url" name="biografia_u_0" class="form-control"
+                               placeholder="https://sitio-web-del-compositor.com">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-outline-primary btn-add-field" onclick="agregarBiografia()">
+            <i class="bi bi-plus-circle"></i> Agregar Biografía
+        </button>
+    </div>
+</div>

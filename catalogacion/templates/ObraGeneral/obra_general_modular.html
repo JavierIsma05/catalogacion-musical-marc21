@@ -29,6 +29,16 @@
                     {# BLOQUE 1XX #}
                     {% include "ObraGeneral/bloques/_bloque_1xx.html" %}
 
+                    {# BLOQUE 5XX #}
+                    {% include "ObraGeneral/bloques/_bloque_5xx.html" %}
+
+                    {# BLOQUE 6XX #}
+                    {% include "ObraGeneral/bloques/_bloque_6xx.html" %}
+
+                    {# BLOQUE 8XX #}
+                    {% include "ObraGeneral/bloques/_bloque_8xx.html" %}
+                    
+
                     {# Botones #}
                     {% include "ObraGeneral/bloques/_botones.html" %}
                 </form>
@@ -49,13 +59,13 @@
 <!-- BLOQUES  -->
 <script src="{% static 'catalogacion/js/campos-0xx-repetibles.js' %}"></script>
 <script src="{% static 'catalogacion/js/campos-1xx-repetibles.js' %}?v=2.0"></script>
+<script src="{% static 'catalogacion/js/campos-5xx-repetibles.js' %}"></script>
+<script src="{% static 'catalogacion/js/campos-6xx-repetibles.js' %}"></script>
+<script src="{% static 'catalogacion/js/campos-8xx-repetibles.js' %}"></script>
 <!-- 
 <script src="{% static 'catalogacion/js/campos-2xx-repetibles.js' %}"></script>
 <script src="{% static 'catalogacion/js/campos-3xx-repetibles.js' %}"></script>
-<script src="{% static 'catalogacion/js/campos-5xx-repetibles.js' %}"></script>
-<script src="{% static 'catalogacion/js/campos-6xx-repetibles.js' %}"></script>
 <script src="{% static 'catalogacion/js/campos-7xx-repetibles.js' %}"></script>
-<script src="{% static 'catalogacion/js/campos-8xx-repetibles.js' %}"></script>
 -->
 
 <!-- 3. INICIALIZACIÓN -->

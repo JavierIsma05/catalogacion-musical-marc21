@@ -47,6 +47,16 @@ from .models import (
     MencionSerie490,
     TituloSerie490,
     VolumenSerie490,
+    # Bloque 5XX
+    NotaGeneral500,
+    Contenido505,
+    Sumario520,
+    DatosBiograficos545,
+    # Bloque 6XX
+    Materia650,
+    SubdivisionMateria650,
+    MateriaGenero655,
+    SubdivisionGeneral655,
     # Principal
     ObraGeneral,
     AutoridadPersona,
@@ -958,6 +968,216 @@ MencionSerie490FormSet = forms.inlineformset_factory(
 )
 
 # ============================================================
+# 📋 BLOQUE 5XX - NOTAS Y DESCRIPCIONES
+# ============================================================
+
+class NotaGeneral500Form(forms.ModelForm):
+    """500 $a - Nota general (R)"""
+    class Meta:
+        model = NotaGeneral500
+        fields = ['nota_general']
+        widgets = {
+            'nota_general': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': '500 $a - Nota general (ej: Obra inédita conservada en el archivo X)',
+            })
+        }
+
+NotaGeneral500FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    NotaGeneral500,
+    form=NotaGeneral500Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class Contenido505Form(forms.ModelForm):
+    """505 $a - Contenido (R)"""
+    class Meta:
+        model = Contenido505
+        fields = ['contenido']
+        widgets = {
+            'contenido': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': '505 $a - Contenido (ej: 1. Allegro – 2. Andante – 3. Finale)',
+            })
+        }
+
+Contenido505FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Contenido505,
+    form=Contenido505Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+class Sumario520Form(forms.ModelForm):
+    """520 $a - Sumario (NR)"""
+    class Meta:
+        model = Sumario520
+        fields = ['sumario']
+        widgets = {
+            'sumario': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 2,
+                'placeholder': '520 $a - Breve resumen o descripción general de la obra',
+            })
+        }
+
+Sumario520FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Sumario520,
+    form=Sumario520Form,
+    extra=1,
+    min_num=0,
+    max_num=5,
+    can_delete=True
+)
+
+
+class DatosBiograficos545Form(forms.ModelForm):
+    """545 $a, $u - Datos biográficos del compositor (R)"""
+    class Meta:
+        model = DatosBiograficos545
+        fields = ['datos_biograficos', 'url']
+        widgets = {
+            'datos_biograficos': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': '545 $a - Ej: Compositor austríaco del periodo clásico...',
+            }),
+            'url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': '545 $u - URL relacionada (opcional)',
+            }),
+        }
+
+DatosBiograficos545FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    DatosBiograficos545,
+    form=DatosBiograficos545Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+# ============================================================
+# 📚 BLOQUE 6XX - MATERIAS Y GÉNERO/FORMA
+# ============================================================
+
+# ---------- 650 ## Materia (Temas) ----------
+
+class Materia650Form(forms.ModelForm):
+    """650 $a - Materia (NR)"""
+    class Meta:
+        model = Materia650
+        fields = ['materia']
+        widgets = {
+            'materia': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '650 $a - Materia (ej: Música barroca)',
+                'maxlength': 255
+            })
+        }
+
+
+class SubdivisionMateria650Form(forms.ModelForm):
+    """650 $x - Subdivisión de materia (R)"""
+    class Meta:
+        model = SubdivisionMateria650
+        fields = ['subdivision']
+        widgets = {
+            'subdivision': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '650 $x - Subdivisión de materia (ej: Historia y crítica)',
+                'maxlength': 255
+            })
+        }
+
+
+# --- Formsets (para gestión repetible) ---
+SubdivisionMateria650FormSet = forms.inlineformset_factory(
+    Materia650,
+    SubdivisionMateria650,
+    form=SubdivisionMateria650Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+Materia650FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Materia650,
+    form=Materia650Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+# ---------- 655 #4 Materia (Género/Forma) ----------
+
+class MateriaGenero655Form(forms.ModelForm):
+    """655 $a - Materia (Género/Forma) (NR)"""
+    class Meta:
+        model = MateriaGenero655
+        fields = ['materia_genero']
+        widgets = {
+            'materia_genero': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '655 $a - Materia (Género/Forma) (ej: Sinfonías, Sonatas, etc.)',
+                'maxlength': 255
+            })
+        }
+
+
+class SubdivisionGeneral655Form(forms.ModelForm):
+    """655 $x - Subdivisión general (R)"""
+    class Meta:
+        model = SubdivisionGeneral655
+        fields = ['subdivision_general']
+        widgets = {
+            'subdivision_general': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': '655 $x - Subdivisión general (ej: Crítica e interpretación)',
+                'maxlength': 255
+            })
+        }
+
+
+# --- Formsets (para gestión repetible) ---
+SubdivisionGeneral655FormSet = forms.inlineformset_factory(
+    MateriaGenero655,
+    SubdivisionGeneral655,
+    form=SubdivisionGeneral655Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+MateriaGenero655FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    MateriaGenero655,
+    form=MateriaGenero655Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+
+# ============================================================
 # 🎯 FORMULARIO PRINCIPAL - ObraGeneral
 # ============================================================
 
@@ -1057,6 +1277,17 @@ __all__ = [
     'TituloSerie490FormSet',
     'VolumenSerie490FormSet',
     'MencionSerie490FormSet',
+    # Bloque 5XX
+    'NotaGeneral500FormSet',
+    'Contenido505FormSet',
+    'Sumario520FormSet',
+    'DatosBiograficos545FormSet',
+    # Bloque 6XX
+    'Materia650FormSet',
+    'SubdivisionMateria650FormSet',
+    'MateriaGenero655FormSet',
+    'SubdivisionGeneral655FormSet',
+
     # Principal
     'ObraGeneralForm',
 ]
