@@ -55,7 +55,6 @@ from .models import (
     # Bloque 6XX
     Materia650,
     SubdivisionMateria650,
-    MateriaGenero655,
     SubdivisionGeneral655,
     # Principal
     ObraGeneral,
@@ -1127,54 +1126,7 @@ Materia650FormSet = forms.inlineformset_factory(
 
 # ---------- 655 #4 Materia (Género/Forma) ----------
 
-class MateriaGenero655Form(forms.ModelForm):
-    """655 $a - Materia (Género/Forma) (NR)"""
-    class Meta:
-        model = MateriaGenero655
-        fields = ['materia_genero']
-        widgets = {
-            'materia_genero': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '655 $a - Materia (Género/Forma) (ej: Sinfonías, Sonatas, etc.)',
-                'maxlength': 255
-            })
-        }
 
-
-class SubdivisionGeneral655Form(forms.ModelForm):
-    """655 $x - Subdivisión general (R)"""
-    class Meta:
-        model = SubdivisionGeneral655
-        fields = ['subdivision_general']
-        widgets = {
-            'subdivision_general': forms.TextInput(attrs={
-                'class': 'form-control form-control-sm',
-                'placeholder': '655 $x - Subdivisión general (ej: Crítica e interpretación)',
-                'maxlength': 255
-            })
-        }
-
-
-# --- Formsets (para gestión repetible) ---
-SubdivisionGeneral655FormSet = forms.inlineformset_factory(
-    MateriaGenero655,
-    SubdivisionGeneral655,
-    form=SubdivisionGeneral655Form,
-    extra=1,
-    min_num=0,
-    max_num=10,
-    can_delete=True
-)
-
-MateriaGenero655FormSet = forms.inlineformset_factory(
-    ObraGeneral,
-    MateriaGenero655,
-    form=MateriaGenero655Form,
-    extra=1,
-    min_num=0,
-    max_num=10,
-    can_delete=True
-)
 
 
 # ============================================================
@@ -1283,10 +1235,7 @@ __all__ = [
     'Sumario520FormSet',
     'DatosBiograficos545FormSet',
     # Bloque 6XX
-    'Materia650FormSet',
-    'SubdivisionMateria650FormSet',
-    'MateriaGenero655FormSet',
-    'SubdivisionGeneral655FormSet',
+   
 
     # Principal
     'ObraGeneralForm',
