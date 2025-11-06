@@ -7,22 +7,39 @@
         <h2 class="section-title">Campos 1XX - Entradas Principales</h2>
         
         <!-- 100 - COMPOSITOR (con subcampos repetibles) -->
-        <div class="mb-4">
-            <h3 class="h6 mb-3">100 - Compositor</h3>
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">100 - Compositor</h3>
+            </div>
             <div class="row g-3 mb-3">
-                <div class="col-md-12">
-                    <label class="form-label small">$a Nombre del Compositor</label>
-                    <input type="text" name="compositor_a" class="form-control" 
-                           placeholder="Apellido, Nombre">
+                <div class="col-md-8">
+                    <label class="form-label small">$a Apellidos, Nombres</label>
+                    <div class="position-relative">
+                        <input type="text" 
+                               id="compositor_apellidos_nombres" 
+                               name="compositor_apellidos_nombres" 
+                               class="form-control" 
+                               placeholder="Ej: Beethoven, Ludwig van"
+                               autocomplete="off">
+                        <div id="compositor-autocomplete" class="autocomplete-dropdown"></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">$d Fechas Asociadas</label>
+                    <input type="text" 
+                           id="compositor_fechas" 
+                           name="compositor_fechas" 
+                           class="form-control" 
+                           placeholder="Ej: 1770-1827">
                 </div>
             </div>
 
             <!-- Subcampo $e - Función (Repetible) -->
             <div class="subcampo-group">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="subcampo-label mb-0">$e Término de la Función</label>
+                    <label class="subcampo-label mb-0">$e Función del Compositor</label>
                     <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarFuncionCompositor()">
-                        <i class="bi bi-plus"></i> Función
+                        <i class="bi bi-plus"></i> 
                     </button>
                 </div>
                 <div id="funciones-compositor">
@@ -52,7 +69,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <label class="subcampo-label mb-0">$j Calificador de Atribución</label>
                     <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarAtribucionCompositor()">
-                        <i class="bi bi-plus"></i> Atribución
+                        <i class="bi bi-plus"></i> 
                     </button>
                 </div>
                 <div id="atribuciones-compositor">
@@ -74,237 +91,292 @@
         </div>
 
         <!-- 130 - TÍTULO UNIFORME (con subcampos repetibles) -->
-        <div class="mb-4">
-            <h3 class="h6 mb-3">130 - Título Uniforme</h3>
-            <div class="row g-3 mb-3">
-                <div class="col-md-12">
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">130 - Título Uniforme</h3>
+            </div>
+            
+            <div class="alert alert-warning" role="alert">
+                <i class="bi bi-exclamation-triangle"></i>
+                <small>Usar solo cuando NO se haya ingresado compositor en el campo 100.</small>
+            </div>
+            
+            <!-- Fila 1: $a (ancho completo) -->
+            <div class="row g-3 mb-2">
+                <div class="col-12">
                     <label class="form-label small">$a Título Uniforme</label>
-                    <input type="text" name="titulo_uniforme_130_a" class="form-control" 
-                           placeholder="Ej: Sinfonías">
+                    <div class="position-relative">
+                        <input type="text" 
+                               id="titulo_uniforme_130" 
+                               name="titulo_uniforme_130" 
+                               class="form-control" 
+                               placeholder="Ej: Sinfonías"
+                               autocomplete="off">
+                        <div id="titulo-130-autocomplete" class="autocomplete-dropdown"></div>
+                    </div>
                 </div>
             </div>
 
+            <!-- Fila 2: $k y $o (mismo espacio) -->
+            <div class="row g-3 mb-2">
+                <div class="col-md-6">
+                    <!-- Subcampo $k - Forma (Repetible) -->
+                    <div class="subcampo-group">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="subcampo-label mb-0">$k Subencabezamiento de Forma</label>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarForma130()">
+                                <i class="bi bi-plus"></i> 
+                            </button>
+                        </div>
+                        <div id="formas-130">
+                            <div class="mb-2" data-subcampo="forma-130-0">
+                                <div class="input-group input-group-sm position-relative">
+                                    <span class="input-group-text">$k</span>
+                                    <input type="text" 
+                                           name="forma_130_k_0" 
+                                           class="form-control forma-130-input" 
+                                           placeholder="Ej: Selección, Fragmento"
+                                           autocomplete="off"
+                                           data-index="0">
+                                    <div class="forma-130-autocomplete autocomplete-dropdown" data-index="0"></div>
+                                    <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('forma-130-0')">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small">$o Arreglo</label>
+                    <input type="text" name="titulo_uniforme_arreglo" class="form-control" placeholder="Arreglo" value="arreglo">
+                </div>
+            </div>
+
+            <!-- Fila 3: $m y $r ($m más largo) -->
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <label class="form-label small">$r Clave Musical</label>
-                    <input type="text" name="titulo_uniforme_130_r" class="form-control" 
-                           placeholder="Ej: Do menor">
+                    <!-- Subcampo $m - Medio de Interpretación (Repetible) -->
+                    <div class="subcampo-group">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="subcampo-label mb-0">$m Medio de Interpretación para Música</label>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMedioInterpretacion130()">
+                                <i class="bi bi-plus"></i> 
+                            </button>
+                        </div>
+                        <div id="medios-interpretacion-130">
+                            <div class="mb-2" data-subcampo="medio-interpretacion-130-0">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">$m</span>
+                                    <input type="text" name="medio_interpretacion_130_m_0" class="form-control" placeholder="Ej: piano, orquesta" value="piano">
+                                    <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('medio-interpretacion-130-0')">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label small">Indicador 1 - Caracteres a Ignorar</label>
-                    <input type="number" name="titulo_uniforme_130_ind1" class="form-control" 
-                           min="0" max="9" value="0" placeholder="0-9">
+                    <label class="form-label small">$r Tonalidad</label>
+                    <select name="titulo_uniforme_tonalidad" class="form-select">
+                        <option value="">-- Seleccionar --</option>
+                        {% for key, value in tonalidades %}
+                        <option value="{{ key }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
 
-            <!-- Subcampo $k - Forma (Repetible) -->
-            <div class="subcampo-group">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="subcampo-label mb-0">$k Subencabezamiento de Forma</label>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarForma130()">
-                        <i class="bi bi-plus"></i> Forma
-                    </button>
-                </div>
-                <div id="formas-130">
-                    <div class="mb-2" data-subcampo="forma-130-0">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">$k</span>
-                            <input type="text" name="forma_130_k_0" class="form-control" 
-                                   placeholder="Ej: Selección, Fragmento, Adaptación">
-                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('forma-130-0')">
-                                <i class="bi bi-x"></i>
+            <!-- Fila 4: $n y $p (mismo espacio) -->
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <!-- Subcampo $n - Número de Parte/Sección (Repetible) -->
+                    <div class="subcampo-group">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="subcampo-label mb-0">$n Número de Parte/Sección</label>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNumeroParteSeccion130()">
+                                <i class="bi bi-plus"></i> 
                             </button>
+                        </div>
+                        <div id="numeros-parte-130">
+                            <div class="mb-2" data-subcampo="numero-parte-130-0">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">$n</span>
+                                    <input type="text" name="numero_parte_130_n_0" class="form-control" placeholder="Ej: I, II, III o 1, 2, 3">
+                                    <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('numero-parte-130-0')">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Subcampo $m - Medio de Interpretación (Repetible) -->
-            <div class="subcampo-group mt-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="subcampo-label mb-0">$m Medio de Interpretación</label>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMedioInterpretacion130()">
-                        <i class="bi bi-plus"></i> Medio
-                    </button>
-                </div>
-                <div id="medios-interpretacion-130">
-                    <div class="mb-2" data-subcampo="medio-interpretacion-130-0">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">$m</span>
-                            <input type="text" name="medio_interpretacion_130_m_0" class="form-control" 
-                                   placeholder="Ej: piano, orquesta, cuarteto de cuerdas" value="piano">
-                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('medio-interpretacion-130-0')">
-                                <i class="bi bi-x"></i>
+                <div class="col-md-6">
+                    <!-- Subcampo $p - Nombre de Parte/Sección (Repetible) -->
+                    <div class="subcampo-group">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="subcampo-label mb-0">$p Nombre de Parte/Sección</label>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNombreParteSeccion130()">
+                                <i class="bi bi-plus"></i> 
                             </button>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Subcampo $n - Número de Parte (Repetible) -->
-            <div class="subcampo-group mt-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="subcampo-label mb-0">$n Número de Parte/Sección</label>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNumeroParteSeccion130()">
-                        <i class="bi bi-plus"></i> Número
-                    </button>
-                </div>
-                <div id="numeros-parte-130">
-                    <div class="mb-2" data-subcampo="numero-parte-130-0">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">$n</span>
-                            <input type="text" name="numero_parte_130_n_0" class="form-control" 
-                                   placeholder="Ej: I, II, III o 1, 2, 3">
-                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('numero-parte-130-0')">
-                                <i class="bi bi-x"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Subcampo $p - Nombre de Parte (Repetible) -->
-            <div class="subcampo-group mt-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="subcampo-label mb-0">$p Nombre de Parte/Sección</label>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNombreParteSeccion130()">
-                        <i class="bi bi-plus"></i> Nombre
-                    </button>
-                </div>
-                <div id="nombres-parte-130">
-                    <div class="mb-2" data-subcampo="nombre-parte-130-0">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">$p</span>
-                            <input type="text" name="nombre_parte_130_p_0" class="form-control" 
-                                   placeholder="Ej: Allegro, Andante, Finale">
-                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('nombre-parte-130-0')">
-                                <i class="bi bi-x"></i>
-                            </button>
+                        <div id="nombres-parte-130">
+                            <div class="mb-2" data-subcampo="nombre-parte-130-0">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">$p</span>
+                                    <input type="text" name="nombre_parte_130_p_0" class="form-control" placeholder="Ej: Allegro, Andante, Finale">
+                                    <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('nombre-parte-130-0')">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 240 - TÍTULO UNIFORME CON COMPOSITOR (con subcampos repetibles) -->
-        <div class="mb-4">
-            <h3 class="h6 mb-3">240 - Título Uniforme (con Compositor en 100)</h3>
+        <!-- 240 - TÍTULO UNIFORME CON COMPOSITOR -->
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">240 - Título Uniforme</h3>
+            </div>
             <div class="alert alert-info" role="alert">
                 <i class="bi bi-info-circle"></i>
-                <small>Usar este campo cuando se haya ingresado un compositor en el campo 100.</small>
+                <small>Usar cuando SÍ existe compositor en el campo 100.</small>
             </div>
             
-            <div class="row g-3 mb-3">
-                <div class="col-md-12">
+            <!-- Fila 1: $a (ancho completo) -->
+            <div class="row g-3 mb-2">
+                <div class="col-12">
                     <label class="form-label small">$a Título Uniforme</label>
-                    <input type="text" name="titulo_uniforme_240_a" class="form-control" 
-                           placeholder="Ej: Sonatas">
+                    <div class="position-relative">
+                        <input type="text" 
+                               id="titulo_240" 
+                               name="titulo_240" 
+                               class="form-control" 
+                               placeholder="Ej: Conciertos"
+                               autocomplete="off">
+                        <div id="titulo-240-autocomplete" class="autocomplete-dropdown"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="row g-3 mb-3">
+            <!-- Fila 2: $k y $o (mismo espacio) -->
+            <div class="row g-3 mb-2">
                 <div class="col-md-6">
-                    <label class="form-label small">$r Clave Musical</label>
-                    <input type="text" name="titulo_uniforme_240_r" class="form-control" 
-                           placeholder="Ej: Re mayor">
+                    <!-- Subcampo $k - Forma (Repetible) -->
+                    <div class="subcampo-group">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="subcampo-label mb-0">$k Subencabezamiento de Forma</label>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarForma240()">
+                                <i class="bi bi-plus"></i> 
+                            </button>
+                        </div>
+                        <div id="formas-240">
+                            <div class="mb-2" data-subcampo="forma-240-0">
+                                <div class="input-group input-group-sm position-relative">
+                                    <span class="input-group-text">$k</span>
+                                    <input type="text" 
+                                           name="forma_240_k_0" 
+                                           class="form-control forma-240-input" 
+                                           placeholder="Ej: Selección, Fragmento"
+                                           autocomplete="off"
+                                           data-index="0">
+                                    <div class="forma-240-autocomplete autocomplete-dropdown" data-index="0"></div>
+                                    <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('forma-240-0')">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label small">Indicador 1 - Control de Impresión</label>
-                    <select name="titulo_uniforme_240_ind1" class="form-select">
-                        <option value="0">0 - No imprimir/no mostrar punto de acceso</option>
-                        <option value="1" selected>1 - Imprimir/mostrar punto de acceso</option>
+                    <label class="form-label small">$o Arreglo</label>
+                    <input type="text" name="titulo_240_arreglo" class="form-control" placeholder="Arreglo" value="arreglo">
+                </div>
+            </div>
+
+            <!-- Fila 3: $m y $r ($m más largo) -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-8">
+                    <!-- Subcampo $m - Medio de Interpretación (Repetible) -->
+                    <div class="subcampo-group">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="subcampo-label mb-0">$m Medio de Interpretación para Música</label>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMedioInterpretacion240()">
+                                <i class="bi bi-plus"></i> 
+                            </button>
+                        </div>
+                        <div id="medios-interpretacion-240">
+                            <div class="mb-2" data-subcampo="medio-interpretacion-240-0">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">$m</span>
+                                    <input type="text" name="medio_interpretacion_240_m_0" class="form-control" placeholder="Ej: piano, orquesta" value="piano">
+                                    <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('medio-interpretacion-240-0')">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">$r Tonalidad</label>
+                    <select name="titulo_240_tonalidad" class="form-select">
+                        <option value="">-- Seleccionar --</option>
+                        {% for key, value in tonalidades %}
+                        <option value="{{ key }}">{{ value }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
 
-            <!-- Subcampo $k - Forma (Repetible) -->
-            <div class="subcampo-group">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="subcampo-label mb-0">$k Subencabezamiento de Forma</label>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarForma240()">
-                        <i class="bi bi-plus"></i> Forma
-                    </button>
-                </div>
-                <div id="formas-240">
-                    <div class="mb-2" data-subcampo="forma-240-0">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">$k</span>
-                            <select name="forma_240_k_0" class="form-select form-select-sm">
-                                <option value="adaptación">Adaptación</option>
-                                <option value="boceto">Boceto</option>
-                                <option value="fragmento">Fragmento</option>
-                                <option value="selección" selected>Selección</option>
-                                <option value="tema con variaciones">Tema con variaciones</option>
-                            </select>
-                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('forma-240-0')">
-                                <i class="bi bi-x"></i>
+            <!-- Fila 4: $n y $p (mismo espacio) -->
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <!-- Subcampo $n - Número de Parte/Sección (Repetible) -->
+                    <div class="subcampo-group">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="subcampo-label mb-0">$n Número de Parte/Sección</label>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNumeroParteSeccion240()">
+                                <i class="bi bi-plus"></i> 
                             </button>
+                        </div>
+                        <div id="numeros-parte-240">
+                            <div class="mb-2" data-subcampo="numero-parte-240-0">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">$n</span>
+                                    <input type="text" name="numero_parte_240_n_0" class="form-control" placeholder="Ej: I, II, III o 1, 2, 3">
+                                    <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('numero-parte-240-0')">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Subcampo $m - Medio de Interpretación (Repetible) -->
-            <div class="subcampo-group mt-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="subcampo-label mb-0">$m Medio de Interpretación</label>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMedioInterpretacion240()">
-                        <i class="bi bi-plus"></i> Medio
-                    </button>
-                </div>
-                <div id="medios-interpretacion-240">
-                    <div class="mb-2" data-subcampo="medio-interpretacion-240-0">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">$m</span>
-                            <input type="text" name="medio_interpretacion_240_m_0" class="form-control" 
-                                   placeholder="Ej: piano, orquesta, cuarteto de cuerdas" value="piano">
-                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('medio-interpretacion-240-0')">
-                                <i class="bi bi-x"></i>
+                <div class="col-md-6">
+                    <!-- Subcampo $p - Nombre de Parte/Sección (Repetible) -->
+                    <div class="subcampo-group">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="subcampo-label mb-0">$p Nombre de Parte/Sección</label>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNombreParteSeccion240()">
+                                <i class="bi bi-plus"></i> Nombre
                             </button>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Subcampo $n - Número de Parte (Repetible) -->
-            <div class="subcampo-group mt-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="subcampo-label mb-0">$n Número de Parte/Sección</label>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNumeroParteSeccion240()">
-                        <i class="bi bi-plus"></i> Número
-                    </button>
-                </div>
-                <div id="numeros-parte-240">
-                    <div class="mb-2" data-subcampo="numero-parte-240-0">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">$n</span>
-                            <input type="text" name="numero_parte_240_n_0" class="form-control" 
-                                   placeholder="Ej: I, II, III o 1, 2, 3">
-                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('numero-parte-240-0')">
-                                <i class="bi bi-x"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Subcampo $p - Nombre de Parte (Repetible) -->
-            <div class="subcampo-group mt-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="subcampo-label mb-0">$p Nombre de Parte/Sección</label>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNombreParteSeccion240()">
-                        <i class="bi bi-plus"></i> Nombre
-                    </button>
-                </div>
-                <div id="nombres-parte-240">
-                    <div class="mb-2" data-subcampo="nombre-parte-240-0">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">$p</span>
-                            <input type="text" name="nombre_parte_240_p_0" class="form-control" 
-                                   placeholder="Ej: Allegro, Andante, Finale">
-                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('nombre-parte-240-0')">
-                                <i class="bi bi-x"></i>
-                            </button>
+                        <div id="nombres-parte-240">
+                            <div class="mb-2" data-subcampo="nombre-parte-240-0">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">$p</span>
+                                    <input type="text" name="nombre_parte_240_p_0" class="form-control" placeholder="Ej: Allegro, Andante, Finale">
+                                    <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('nombre-parte-240-0')">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

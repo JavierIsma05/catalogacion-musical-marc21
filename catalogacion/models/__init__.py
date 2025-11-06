@@ -1,15 +1,15 @@
 """
-Módulo de modelos Django para catalogación MARC21
+Modulo de modelos Django para catalogacion MARC21
 ==================================================
 
-Importa todos los modelos organizados por bloques MARC bibliográficos.
+Importa todos los modelos organizados por bloques MARC bibliograficos.
 
 Estructura:
-- autoridades.py: Vocabularios controlados (personas, títulos, formas, materias)
-- bloque_0xx.py: Campos de control y códigos (020, 024, 028, 031, 041, 044)
+- autoridades.py: Vocabularios controlados (personas, titulos, formas, materias)
+- bloque_0xx.py: Campos de control y codigos (020, 024, 028, 031, 041, 044)
 - bloque_1xx.py: Puntos de acceso principales (100, 130, 240)
-- bloque_2xx.py: Títulos y publicación (246, 250, 264)
-- bloque_3xx.py: Descripción física (300, 340, 348, 382, 383)
+- bloque_2xx.py: Titulos y publicacion (246, 250, 264)
+- bloque_3xx.py: Descripcion fisica (300, 340, 348, 382, 383)
 - bloque_4xx.py: Series (490)
 - bloque_5xx.py: Notas y contenido (500, 505, 520, 545)
 - bloque_6xx.py: Materias y género/forma (650, 655)
@@ -57,12 +57,12 @@ from .bloque_1xx import (
     AtribucionCompositor,
     Forma130,
     MedioInterpretacion130,
-    NumeroParteSección130,
-    NombreParteSección130,
+    NumeroParteSeccion130,
+    NombreParteSeccion130,
     Forma240,
     MedioInterpretacion240,
-    NumeroParteSección240,
-    NombreParteSección240,
+    NumeroParteSeccion240,
+    NombreParteSeccion240,
 )
 
 # =====================================================
@@ -169,7 +169,7 @@ __all__ = [
     'AutoridadFormaMusical',
     'AutoridadMateria',
     
-    # Bloque 0XX - Control y códigos
+    # Bloque 0XX - Control y codigos
     'ISBN',
     'ISMN',
     'NumeroEditor',
@@ -184,19 +184,19 @@ __all__ = [
     'AtribucionCompositor',
     'Forma130',
     'MedioInterpretacion130',
-    'NumeroParteSección130',
-    'NombreParteSección130',
+    'NumeroParteSeccion130',
+    'NombreParteSeccion130',
     'Forma240',
     'MedioInterpretacion240',
-    'NumeroParteSección240',
-    'NombreParteSección240',
+    'NumeroParteSeccion240',
+    'NombreParteSeccion240',
     
-    # Bloque 2XX - Títulos y publicación
+    # Bloque 2XX - Titulos y publicacion
     'TituloAlternativo',
     'Edicion',
     'ProduccionPublicacion',
     
-    # Bloque 3XX - Descripción física
+    # Bloque 3XX - Descripcion fisica
     'DescripcionFisica',
     'Extension300',
     'Dimension300',

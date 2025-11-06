@@ -1,0 +1,183 @@
+{# ============================================ #}
+{# BLOQUE 2XX - TÍTULOS Y PUBLICACIÓN #}
+{# ============================================ #}
+
+<div class="card border-0 shadow-sm mb-4" id="bloque-2xx">
+    <div class="card-body">
+        <h2 class="section-title">Campos 2XX - Títulos y Publicación</h2>
+        
+        <!-- 245 - MENCIÓN DE TÍTULO (No Repetible) -->
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">245 - Mención de Título</h3>
+            </div>
+            
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label small">$a Título Principal <span class="text-danger">*</span></label>
+                    <input type="text" 
+                           name="titulo_principal" 
+                           class="form-control" 
+                           placeholder="Ej: Sinfonía No. 5"
+                           required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small">$b Subtítulo</label>
+                    <input type="text" 
+                           name="subtitulo" 
+                           class="form-control" 
+                           placeholder="Complemento del título">
+                </div>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label small">$c Mención de Responsabilidad</label>
+                    <textarea name="mencion_responsabilidad" 
+                              class="form-control" 
+                              rows="2"
+                              placeholder="Ej: / Ludwig van Beethoven ; arreglo de Francisco García"></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 246 - TÍTULO ALTERNATIVO (Repetible) -->
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">246 - Título Alternativo</h3>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarTituloAlternativo()">
+                    <i class="bi bi-plus"></i> Agregar
+                </button>
+            </div>
+            
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i>
+                <small>Títulos variantes: abreviados, en otros idiomas, paralelos.</small>
+            </div>
+            
+            <!-- Primer título alternativo (siempre visible) -->
+            <div class="campo-repetible" data-campo="titulo-alternativo-0">
+                <div class="campo-header">
+                    <span class="campo-label">Título Alternativo #1</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('titulo-alternativo-0')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small">$a Título Alternativo</label>
+                        <input type="text" 
+                               name="titulo_alternativo_a_0" 
+                               class="form-control" 
+                               placeholder="Ej: Título abreviado, en otro idioma">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small">$b Resto del Título Variante</label>
+                        <input type="text" 
+                               name="titulo_alternativo_b_0" 
+                               class="form-control" 
+                               placeholder="Complemento del título">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Container para títulos adicionales -->
+            <div id="titulos-alternativos-container"></div>
+        </div>
+
+        <!-- 250 - EDICIÓN (Repetible) -->
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">250 - Edición</h3>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarEdicion()">
+                    <i class="bi bi-plus"></i> Agregar
+                </button>
+            </div>
+            
+            <!-- Primera edición (siempre visible) -->
+            <div class="campo-repetible" data-campo="edicion-0">
+                <div class="campo-header">
+                    <span class="campo-label">Edición #1</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('edicion-0')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label small">$a Enunciado de Edición</label>
+                        <input type="text" 
+                               name="edicion_a_0" 
+                               class="form-control" 
+                               placeholder="Ej: Primera edición, Segunda edición revisada">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Container para ediciones adicionales -->
+            <div id="ediciones-container"></div>
+        </div>
+
+        <!-- 264 - PRODUCCIÓN/PUBLICACIÓN (Repetible) -->
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">264 - Producción/Publicación</h3>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarProduccionPublicacion()">
+                    <i class="bi bi-plus"></i> Agregar
+                </button>
+            </div>
+            
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i>
+                <small>Datos de producción, publicación, distribución, fabricación o copyright.</small>
+            </div>
+            
+            <!-- Primera producción/publicación (siempre visible) -->
+            <div class="campo-repetible" data-campo="produccion-publicacion-0">
+                <div class="campo-header">
+                    <span class="campo-label">Producción/Publicación #1</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('produccion-publicacion-0')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small">Función</label>
+                        <select name="produccion_publicacion_funcion_0" class="form-select">
+                            <option value="0">Producción</option>
+                            <option value="1" selected>Publicación</option>
+                            <option value="2">Distribución</option>
+                            <option value="3">Fabricación</option>
+                            <option value="4">Copyright</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small">$a Lugar</label>
+                        <input type="text" 
+                               name="produccion_publicacion_a_0" 
+                               class="form-control" 
+                               placeholder="Ej: Quito, Madrid">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small">$b Nombre de la Entidad</label>
+                        <input type="text" 
+                               name="produccion_publicacion_b_0" 
+                               class="form-control" 
+                               placeholder="Ej: Editorial Musical">
+                    </div>
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-4">
+                        <label class="form-label small">$c Fecha</label>
+                        <input type="text" 
+                               name="produccion_publicacion_c_0" 
+                               class="form-control" 
+                               placeholder="Ej: 2023, [2023]">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Container para producciones/publicaciones adicionales -->
+            <div id="producciones-publicaciones-container"></div>
+        </div>
+    </div>
+</div>

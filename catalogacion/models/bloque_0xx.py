@@ -131,7 +131,7 @@ class NumeroEditor(models.Model):
     )
     
     # Subcampo $a - Número de editor o distribuidor (NR dentro de cada instancia)
-    numero = models.CharField(
+    numero_editor = models.CharField(
         max_length=100,
         help_text="028 $a – Número de editor, plancha, placa o código distintivo"
     )
@@ -161,7 +161,7 @@ class NumeroEditor(models.Model):
     
     def __str__(self):
         tipo_display = self.get_tipo_numero_display()
-        return f"{tipo_display}: {self.numero}"
+        return f"{tipo_display}: {self.numero_editor}"
     
     def get_indicadores(self):
         """Retorna los indicadores en formato MARC"""
@@ -169,7 +169,7 @@ class NumeroEditor(models.Model):
     
     def get_marc_format(self):
         """Retorna el campo completo en formato MARC"""
-        return f"028 {self.get_indicadores()} $a{self.numero}"
+        return f"028 {self.get_indicadores()} $a{self.numero_editor}"
 
 
 # ================================================
@@ -368,7 +368,7 @@ class CodigoLengua(models.Model):
     
     def __str__(self):
         indicadores = f"{self.indicacion_traduccion}{self.fuente_codigo}"
-        idiomas = ", ".join([idioma.get_codigo_display() for idioma in self.idiomas.all()])
+        idiomas = ", ".join([idioma.get_codigo_idioma_display() for idioma in self.idiomas.all()])
         return f"041 {indicadores} - {idiomas if idiomas else 'Sin idiomas'}"
     
     def get_indicadores(self):
@@ -397,7 +397,7 @@ class IdiomaObra(models.Model):
     )
     
     # Subcampo $a - Código de lengua (R)
-    codigo = models.CharField(
+    codigo_idioma = models.CharField(
         max_length=3,
         choices=CODIGOS_IDIOMA,
         default='spa',
@@ -412,11 +412,11 @@ class IdiomaObra(models.Model):
         ordering = ['codigo_lengua', 'id']
     
     def __str__(self):
-        return self.get_codigo_display()
+        return self.get_codigo_idioma_display()
     
     def get_nombre_completo(self):
         """Retorna el nombre completo del idioma"""
-        return self.get_codigo_display()
+        return self.get_codigo_idioma_display()
 
 
 # ================================================

@@ -1,16 +1,3 @@
-"""
-Modelos de Autoridades MARC21
-==============================
-
-Vocabularios controlados utilizados en múltiples campos MARC21:
-- Campo 100 (compositor)
-- Campo 130/240 (títulos uniformes)
-- Campo 600 (materia-persona)
-- Campo 650 (materia general)
-- Campo 655 (género/forma)
-- Campo 700 (colaborador)
-"""
-
 from django.db import models
 
 

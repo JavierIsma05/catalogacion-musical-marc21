@@ -29,6 +29,7 @@
                     {# BLOQUE 1XX #}
                     {% include "ObraGeneral/bloques/_bloque_1xx.html" %}
 
+<<<<<<< HEAD
                     {# BLOQUE 5XX #}
                     {% include "ObraGeneral/bloques/_bloque_5xx.html" %}
 
@@ -38,6 +39,16 @@
                     {# BLOQUE 8XX #}
                     {% include "ObraGeneral/bloques/_bloque_8xx.html" %}
                     
+=======
+                    {# BLOQUE 2XX #}
+                    {% include "ObraGeneral/bloques/_bloque_2xx.html" %}
+
+                    {# BLOQUE 3XX #}
+                    {% include "ObraGeneral/bloques/_bloque_3xx.html" %}
+
+                    {# BLOQUE 4XX #}
+                    {% include "ObraGeneral/bloques/_bloque_4xx.html" %}
+>>>>>>> origin/developer
 
                     {# Botones #}
                     {% include "ObraGeneral/bloques/_botones.html" %}
@@ -54,17 +65,45 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Variables globales desde Django -->
+<script>
+    // Bloque 0XX - Listas de choices desde modelos
+    window.CODIGOS_PAIS = {{ codigos_pais_json|safe }};
+    window.CODIGOS_IDIOMA = {{ codigos_idioma_json|safe }};
+    window.TIPO_NUMERO_EDITOR = {{ tipo_numero_editor_json|safe }};
+    window.CONTROL_NOTA_EDITOR = {{ control_nota_editor_json|safe }};
+    window.INDICACION_TRADUCCION = {{ indicacion_traduccion_json|safe }};
+    window.FUENTE_CODIGO = {{ fuente_codigo_json|safe }};
+    
+    // Valores predeterminados para Incipit Musical (031)
+    window.INCIPIT_DEFAULTS = {
+        numero_obra: {{ incipit_defaults.numero_obra }},
+        numero_movimiento: {{ incipit_defaults.numero_movimiento }},
+        numero_pasaje: {{ incipit_defaults.numero_pasaje }},
+        voz_instrumento: '{{ incipit_defaults.voz_instrumento }}'
+    };
+</script>
+
 <script src="{% static 'catalogacion/js/campos-core.js' %}"></script>
 
 <!-- BLOQUES  -->
 <script src="{% static 'catalogacion/js/campos-0xx-repetibles.js' %}"></script>
 <script src="{% static 'catalogacion/js/campos-1xx-repetibles.js' %}?v=2.0"></script>
+<<<<<<< HEAD
 <script src="{% static 'catalogacion/js/campos-5xx-repetibles.js' %}"></script>
 <script src="{% static 'catalogacion/js/campos-6xx-repetibles.js' %}"></script>
 <script src="{% static 'catalogacion/js/campos-8xx-repetibles.js' %}"></script>
 <!-- 
 <script src="{% static 'catalogacion/js/campos-2xx-repetibles.js' %}"></script>
 <script src="{% static 'catalogacion/js/campos-3xx-repetibles.js' %}"></script>
+=======
+<script src="{% static 'catalogacion/js/campos-2xx-repetibles.js' %}"></script>
+<script src="{% static 'catalogacion/js/campos-3xx-repetibles.js' %}"></script>
+<script src="{% static 'catalogacion/js/campos-4xx-repetibles.js' %}"></script>
+<!-- 
+<script src="{% static 'catalogacion/js/campos-5xx-repetibles.js' %}"></script>
+<script src="{% static 'catalogacion/js/campos-6xx-repetibles.js' %}"></script>
+>>>>>>> origin/developer
 <script src="{% static 'catalogacion/js/campos-7xx-repetibles.js' %}"></script>
 -->
 

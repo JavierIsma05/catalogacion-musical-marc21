@@ -1,0 +1,378 @@
+{# ============================================ #}
+{# BLOQUE 3XX - DESCRIPCIÓN FÍSICA #}
+{# ============================================ #}
+
+<div class="card border-0 shadow-sm mb-4" id="bloque-3xx">
+    <div class="card-body">
+        <h2 class="section-title">Campos 3XX - Descripción Física</h2>
+        
+        <!-- 300 - DESCRIPCIÓN FÍSICA (Repetible) -->
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">300 - Descripción Física</h3>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarDescripcionFisica()">
+                    <i class="bi bi-plus"></i> Agregar
+                </button>
+            </div>
+            
+            <!-- Primera descripción física (siempre visible) -->
+            <div class="campo-repetible" data-campo="descripcion-fisica-0">
+                <div class="campo-header">
+                    <span class="campo-label">Descripción Física #1</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('descripcion-fisica-0')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                
+                <!-- Subcampo $a - Extensión (Repetible) -->
+                <div class="subcampo-group mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="subcampo-label mb-0">$a Extensión</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarExtension300(0)">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <div id="extensiones-300-0">
+                        <div class="mb-2" data-subcampo="extension-300-0-0">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">$a</span>
+                                <input type="text" name="extension_300_a_0_0" class="form-control" placeholder="Ej: 1 partitura (24 p.)">
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('extension-300-0-0')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label small">$b Otras Características Físicas</label>
+                        <input type="text" name="otras_caracteristicas_300_b_0" class="form-control" placeholder="Ej: ilustraciones">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small">$e Material Acompañante</label>
+                        <input type="text" name="material_acompanante_300_e_0" class="form-control" placeholder="Ej: + 1 CD">
+                    </div>
+                </div>
+                
+                <!-- Subcampo $c - Dimensiones (Repetible) -->
+                <div class="subcampo-group">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="subcampo-label mb-0">$c Dimensiones</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarDimension300(0)">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <div id="dimensiones-300-0">
+                        <div class="mb-2" data-subcampo="dimension-300-0-0">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">$c</span>
+                                <input type="text" name="dimension_300_c_0_0" class="form-control" placeholder="Ej: 30 cm">
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('dimension-300-0-0')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Container para descripciones físicas adicionales -->
+            <div id="descripciones-fisicas-container"></div>
+        </div>
+
+        <!-- 340 - MEDIO FÍSICO (Repetible) -->
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">340 - Medio Físico</h3>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMedioFisico()">
+                    <i class="bi bi-plus"></i> Agregar
+                </button>
+            </div>
+            
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i>
+                <small>Técnica en que se registra la información (autógrafo, manuscrito, impreso, etc.).</small>
+            </div>
+            
+            <!-- Primer medio físico (siempre visible) -->
+            <div class="campo-repetible" data-campo="medio-fisico-0">
+                <div class="campo-header">
+                    <span class="campo-label">Medio Físico #1</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('medio-fisico-0')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                
+                <!-- Subcampo $d - Técnica (Repetible) -->
+                <div class="subcampo-group">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="subcampo-label mb-0">$d Técnica de Registro</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarTecnica340(0)">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <div id="tecnicas-340-0">
+                        <div class="mb-2" data-subcampo="tecnica-340-0-0">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">$d</span>
+                                <select name="tecnica_340_d_0_0" class="form-select form-select-sm">
+                                    <option value="autógrafo">Autógrafo</option>
+                                    <option value="posible autógrafo">Posible autógrafo</option>
+                                    <option value="manuscrito" selected>Manuscrito</option>
+                                    <option value="manuscrito de copista no identificado">Manuscrito de copista no identificado</option>
+                                    <option value="impreso">Impreso</option>
+                                    <option value="fotocopia de manuscrito">Fotocopia de manuscrito</option>
+                                    <option value="fotocopia de impreso">Fotocopia de impreso</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('tecnica-340-0-0')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Container para medios físicos adicionales -->
+            <div id="medios-fisicos-container"></div>
+        </div>
+
+        <!-- 348 - CARACTERÍSTICAS MÚSICA NOTADA (Repetible) -->
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">348 - Características Música Notada</h3>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarCaracteristicaMusica()">
+                    <i class="bi bi-plus"></i> Agregar
+                </button>
+            </div>
+            
+            <div class="alert alert-warning" role="alert">
+                <i class="bi bi-exclamation-triangle"></i>
+                <small>No usar si es piano en doble pauta tradicional (es el formato estándar).</small>
+            </div>
+            
+            <!-- Primera característica (siempre visible) -->
+            <div class="campo-repetible" data-campo="caracteristica-musica-0">
+                <div class="campo-header">
+                    <span class="campo-label">Característica Música Notada #1</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('caracteristica-musica-0')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                
+                <!-- Subcampo $a - Formato (Repetible) -->
+                <div class="subcampo-group">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="subcampo-label mb-0">$a Formato de Presentación</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarFormato348(0)">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <div id="formatos-348-0">
+                        <div class="mb-2" data-subcampo="formato-348-0-0">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">$a</span>
+                                <select name="formato_348_a_0_0" class="form-select form-select-sm">
+                                    <option value="parte">Parte</option>
+                                    <option value="partitura" selected>Partitura</option>
+                                    <option value="partitura de coro">Partitura de coro</option>
+                                    <option value="partitura piano vocal">Partitura piano-vocal</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('formato-348-0-0')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Container para características adicionales -->
+            <div id="caracteristicas-musica-container"></div>
+        </div>
+
+        <!-- 382 - MEDIO DE INTERPRETACIÓN (Repetible) -->
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">382 - Medio de Interpretación</h3>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMedioInterpretacion382()">
+                    <i class="bi bi-plus"></i> Agregar
+                </button>
+            </div>
+            
+            <!-- Primer medio de interpretación (siempre visible) -->
+            <div class="campo-repetible" data-campo="medio-interpretacion-382-0">
+                <div class="campo-header">
+                    <span class="campo-label">Medio de Interpretación #1</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('medio-interpretacion-382-0')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                
+                <!-- Subcampo $a - Medio (Repetible) -->
+                <div class="subcampo-group mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="subcampo-label mb-0">$a Medio de Interpretación</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMedio382a(0)">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <div id="medios-382a-0">
+                        <div class="mb-2" data-subcampo="medio-382a-0-0">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">$a</span>
+                                <select name="medio_382_a_0_0" class="form-select form-select-sm">
+                                    <option value="piano" selected>Piano</option>
+                                    <option value="dos pianos">Dos pianos</option>
+                                    <option value="piano a cuatro manos">Piano a cuatro manos</option>
+                                    <option value="piano con acompañamiento">Piano con acompañamiento</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('medio-382a-0-0')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Subcampo $b - Solista (Repetible) -->
+                <div class="subcampo-group mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="subcampo-label mb-0">$b Solista</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarSolista382(0)">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <div id="solistas-382-0">
+                        <div class="mb-2" data-subcampo="solista-382-0-0">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">$b</span>
+                                <select name="solista_382_b_0_0" class="form-select form-select-sm">
+                                    <option value="piano" selected>Piano</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('solista-382-0-0')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Subcampo $n - Número de Intérpretes (Repetible) -->
+                <div class="subcampo-group">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="subcampo-label mb-0">$n Número de Intérpretes</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNumeroInterpretes382(0)">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <div id="numeros-interpretes-382-0">
+                        <div class="mb-2" data-subcampo="numero-interpretes-382-0-0">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">$n</span>
+                                <input type="number" min="1" name="numero_interpretes_382_n_0_0" class="form-control" placeholder="Ej: 2, 4, 8">
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('numero-interpretes-382-0-0')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Container para medios de interpretación adicionales -->
+            <div id="medios-interpretacion-382-container"></div>
+        </div>
+
+        <!-- 383 - DESIGNACIÓN NUMÉRICA (Repetible) -->
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">383 - Designación Numérica de Obra Musical</h3>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarDesignacionNumerica()">
+                    <i class="bi bi-plus"></i> Agregar
+                </button>
+            </div>
+            
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i>
+                <small>Número de obra, catálogo temático o número de opus.</small>
+            </div>
+            
+            <!-- Primera designación numérica (siempre visible) -->
+            <div class="campo-repetible" data-campo="designacion-numerica-0">
+                <div class="campo-header">
+                    <span class="campo-label">Designación Numérica #1</span>
+                    <button type="button" class="btn btn-outline-danger btn-remove" onclick="eliminarCampo('designacion-numerica-0')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+                
+                <!-- Subcampo $a - Número de Obra (Repetible) -->
+                <div class="subcampo-group mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="subcampo-label mb-0">$a Número de Obra</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNumeroObra383(0)">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <div id="numeros-obra-383-0">
+                        <div class="mb-2" data-subcampo="numero-obra-383-0-0">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">$a</span>
+                                <input type="text" name="numero_obra_383_a_0_0" class="form-control" placeholder="Ej: K. 545, BWV 1001">
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('numero-obra-383-0-0')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Subcampo $b - Opus (Repetible) -->
+                <div class="subcampo-group">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="subcampo-label mb-0">$b Opus</label>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarOpus383(0)">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <div id="opus-383-0">
+                        <div class="mb-2" data-subcampo="opus-383-0-0">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">$b</span>
+                                <input type="text" name="opus_383_b_0_0" class="form-control" placeholder="Ej: Op. 27, No. 2">
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('opus-383-0-0')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Container para designaciones numéricas adicionales -->
+            <div id="designaciones-numericas-container"></div>
+        </div>
+
+        <!-- 384 - TONALIDAD (No Repetible) -->
+        <div class="campo-repetible">
+            <div class="campo-header">
+                <h3 class="campo-label mb-0">384 - Tonalidad</h3>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label small">$a Tonalidad</label>
+                    <select name="tonalidad_384" class="form-select">
+                        <option value="">-- Seleccionar --</option>
+                        {% for key, value in tonalidades %}
+                        <option value="{{ key }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

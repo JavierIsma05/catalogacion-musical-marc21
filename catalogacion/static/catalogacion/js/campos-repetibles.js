@@ -1,12 +1,3 @@
-/**
- * SISTEMA DE CAMPOS REPETIBLES GENÉRICO - VERSIÓN CORREGIDA
- * Este archivo maneja TODA la lógica de campos repetibles
- */
-
-// ============================================
-// GESTIÓN DE CONTADORES (EXPORTABLE)
-// ============================================
-
 class ContadoresCampos {
     constructor() {
         this.contadores = {
@@ -469,5 +460,3 @@ window.agregarIncipit = agregarIncipit;
 window.agregarURLIncipit = agregarURLIncipit;
 window.agregarCodigoLengua = agregarCodigoLengua;
 window.agregarIdiomaObra = agregarIdiomaObra;
-
-console.log("✅ campos-repetibles.js cargado correctamente");
