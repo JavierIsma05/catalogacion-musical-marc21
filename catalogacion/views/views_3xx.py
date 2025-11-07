@@ -53,14 +53,17 @@ from ..forms import (
 def procesar_descripcion_fisica_300(request, obra):
     """
     Procesar Descripción Física (300) con subcampos anidados
-    Estructura: descripcion_fisica_<idx>_<campo>
-              extension_300_<idx_padre>_<idx>_extension
-              dimension_300_<idx_padre>_<idx>_dimension
+    Estructura HTML/JS: 
+        - otras_caracteristicas_300_b_{idx}
+        - material_acompanante_300_e_{idx}
+        - extension_300_a_{idx_padre}_{idx}
+        - dimension_300_c_{idx_padre}_{idx}
     """
     indice = 0
     while True:
-        otras_caract = request.POST.get(f'descripcion_fisica_{indice}_otras_caracteristicas', '').strip()
-        material_acomp = request.POST.get(f'descripcion_fisica_{indice}_material_acompanante', '').strip()
+        # NOTA: JavaScript genera campos con notación MARC subcampo
+        otras_caract = request.POST.get(f'otras_caracteristicas_300_b_{indice}', '').strip()
+        material_acomp = request.POST.get(f'material_acompanante_300_e_{indice}', '').strip()
         
         # Verificar si hay datos
         tiene_datos = otras_caract or material_acomp
@@ -68,7 +71,7 @@ def procesar_descripcion_fisica_300(request, obra):
         # Verificar si hay extensiones
         ext_idx = 0
         while True:
-            ext = request.POST.get(f'extension_300_{indice}_{ext_idx}_extension', '').strip()
+            ext = request.POST.get(f'extension_300_a_{indice}_{ext_idx}', '').strip()
             if ext:
                 tiene_datos = True
                 break
@@ -80,7 +83,7 @@ def procesar_descripcion_fisica_300(request, obra):
         if not tiene_datos:
             dim_idx = 0
             while True:
-                dim = request.POST.get(f'dimension_300_{indice}_{dim_idx}_dimension', '').strip()
+                dim = request.POST.get(f'dimension_300_c_{indice}_{dim_idx}', '').strip()
                 if dim:
                     tiene_datos = True
                     break
@@ -104,7 +107,7 @@ def procesar_descripcion_fisica_300(request, obra):
         # Procesar extensiones ($a)
         ext_idx = 0
         while True:
-            extension_texto = request.POST.get(f'extension_300_{indice}_{ext_idx}_extension', '').strip()
+            extension_texto = request.POST.get(f'extension_300_a_{indice}_{ext_idx}', '').strip()
             if not extension_texto:
                 ext_idx += 1
                 if ext_idx > 20:
@@ -123,7 +126,7 @@ def procesar_descripcion_fisica_300(request, obra):
         # Procesar dimensiones ($c)
         dim_idx = 0
         while True:
-            dimension_texto = request.POST.get(f'dimension_300_{indice}_{dim_idx}_dimension', '').strip()
+            dimension_texto = request.POST.get(f'dimension_300_c_{indice}_{dim_idx}', '').strip()
             if not dimension_texto:
                 dim_idx += 1
                 if dim_idx > 20:
@@ -147,18 +150,16 @@ def procesar_descripcion_fisica_300(request, obra):
 def procesar_medio_fisico_340(request, obra):
     """
     Procesar Medio Físico (340) con técnicas anidadas
-    Estructura: medio_fisico_<idx>_material_base
-              tecnica_340_<idx_padre>_<idx>_tecnica
+    Estructura HTML/JS: tecnica_340_d_{idx_padre}_{idx}
     """
     indice = 0
     while True:
-        material_base = request.POST.get(f'medio_fisico_{indice}_material_base', '').strip()
-        
         # Verificar si hay técnicas
         tiene_tecnicas = False
         tec_idx = 0
         while True:
-            tec = request.POST.get(f'tecnica_340_{indice}_{tec_idx}_tecnica', '').strip()
+            # JavaScript genera: tecnica_340_d_{indice}_{tec_idx}
+            tec = request.POST.get(f'tecnica_340_d_{indice}_{tec_idx}', '').strip()
             if tec:
                 tiene_tecnicas = True
                 break
@@ -166,7 +167,7 @@ def procesar_medio_fisico_340(request, obra):
             if tec_idx > 20:
                 break
         
-        if not material_base and not tiene_tecnicas:
+        if not tiene_tecnicas:
             indice += 1
             if indice > 50:
                 break
@@ -178,7 +179,7 @@ def procesar_medio_fisico_340(request, obra):
         # Procesar técnicas ($d)
         tec_idx = 0
         while True:
-            tecnica_texto = request.POST.get(f'tecnica_340_{indice}_{tec_idx}_tecnica', '').strip()
+            tecnica_texto = request.POST.get(f'tecnica_340_d_{indice}_{tec_idx}', '').strip()
             if not tecnica_texto:
                 tec_idx += 1
                 if tec_idx > 20:
@@ -202,7 +203,7 @@ def procesar_medio_fisico_340(request, obra):
 def procesar_caracteristica_musica_348(request, obra):
     """
     Procesar Características Música Notada (348) con formatos anidados
-    Estructura: formato_348_<idx_padre>_<idx>_formato
+    Estructura HTML/JS: formato_348_a_{idx_padre}_{idx}
     """
     indice = 0
     while True:
@@ -210,7 +211,8 @@ def procesar_caracteristica_musica_348(request, obra):
         tiene_formatos = False
         fmt_idx = 0
         while True:
-            fmt = request.POST.get(f'formato_348_{indice}_{fmt_idx}_formato', '').strip()
+            # JavaScript genera: formato_348_a_{indice}_{fmt_idx}
+            fmt = request.POST.get(f'formato_348_a_{indice}_{fmt_idx}', '').strip()
             if fmt:
                 tiene_formatos = True
                 break
@@ -230,7 +232,7 @@ def procesar_caracteristica_musica_348(request, obra):
         # Procesar formatos ($a)
         fmt_idx = 0
         while True:
-            formato_texto = request.POST.get(f'formato_348_{indice}_{fmt_idx}_formato', '').strip()
+            formato_texto = request.POST.get(f'formato_348_a_{indice}_{fmt_idx}', '').strip()
             if not formato_texto:
                 fmt_idx += 1
                 if fmt_idx > 20:
@@ -254,35 +256,49 @@ def procesar_caracteristica_musica_348(request, obra):
 def procesar_medio_interpretacion_382(request, obra):
     """
     Procesar Medio de Interpretación (382) con subcampos anidados
-    Estructura: medio_382_<idx>_tipo_agrupacion
-              medio_382_a_<idx_padre>_<idx>_medio
-              solista_382_<idx_padre>_<idx>_solista
-              numero_interpretes_<idx_padre>_<idx>_numero
+    Estructura HTML/JS:
+        - medio_382_a_{idx_padre}_{idx}
+        - solista_382_b_{idx_padre}_{idx}
+        - numero_interpretes_382_n_{idx_padre}_{idx}
     """
     indice = 0
     while True:
-        tipo_agrupacion = request.POST.get(f'medio_382_{indice}_tipo_agrupacion', '').strip()
-        
         # Verificar subcampos
-        tiene_datos = bool(tipo_agrupacion)
+        tiene_datos = False
         
+        # Verificar si hay medios
+        sub_idx = 0
+        while True:
+            val = request.POST.get(f'medio_382_a_{indice}_{sub_idx}', '').strip()
+            if val:
+                tiene_datos = True
+                break
+            sub_idx += 1
+            if sub_idx > 20:
+                break
+        
+        # Verificar si hay solistas
         if not tiene_datos:
-            # Verificar si hay subcampos
-            for subcampo_tipo in ['medio_382_a', 'solista_382', 'numero_interpretes_382']:
-                sub_idx = 0
-                while True:
-                    campo_nombre = f'{subcampo_tipo}_{indice}_{sub_idx}'
-                    # Probar diferentes sufijos
-                    val = (request.POST.get(f'{campo_nombre}_medio', '').strip() or
-                           request.POST.get(f'{campo_nombre}_solista', '').strip() or
-                           request.POST.get(f'{campo_nombre}_numero', '').strip())
-                    if val:
-                        tiene_datos = True
-                        break
-                    sub_idx += 1
-                    if sub_idx > 20:
-                        break
-                if tiene_datos:
+            sub_idx = 0
+            while True:
+                val = request.POST.get(f'solista_382_b_{indice}_{sub_idx}', '').strip()
+                if val:
+                    tiene_datos = True
+                    break
+                sub_idx += 1
+                if sub_idx > 20:
+                    break
+        
+        # Verificar si hay números de intérpretes
+        if not tiene_datos:
+            sub_idx = 0
+            while True:
+                val = request.POST.get(f'numero_interpretes_382_n_{indice}_{sub_idx}', '').strip()
+                if val:
+                    tiene_datos = True
+                    break
+                sub_idx += 1
+                if sub_idx > 20:
                     break
         
         if not tiene_datos:
@@ -297,7 +313,7 @@ def procesar_medio_interpretacion_382(request, obra):
         # Procesar medios ($a)
         sub_idx = 0
         while True:
-            medio_texto = request.POST.get(f'medio_382_a_{indice}_{sub_idx}_medio', '').strip()
+            medio_texto = request.POST.get(f'medio_382_a_{indice}_{sub_idx}', '').strip()
             if not medio_texto:
                 sub_idx += 1
                 if sub_idx > 20:
@@ -316,7 +332,7 @@ def procesar_medio_interpretacion_382(request, obra):
         # Procesar solistas ($b)
         sub_idx = 0
         while True:
-            solista_texto = request.POST.get(f'solista_382_{indice}_{sub_idx}_solista', '').strip()
+            solista_texto = request.POST.get(f'solista_382_b_{indice}_{sub_idx}', '').strip()
             if not solista_texto:
                 sub_idx += 1
                 if sub_idx > 20:
@@ -335,7 +351,7 @@ def procesar_medio_interpretacion_382(request, obra):
         # Procesar número intérpretes ($n)
         sub_idx = 0
         while True:
-            numero_texto = request.POST.get(f'numero_interpretes_382_{indice}_{sub_idx}_numero', '').strip()
+            numero_texto = request.POST.get(f'numero_interpretes_382_n_{indice}_{sub_idx}', '').strip()
             if not numero_texto:
                 sub_idx += 1
                 if sub_idx > 20:
@@ -363,8 +379,9 @@ def procesar_medio_interpretacion_382(request, obra):
 def procesar_designacion_numerica_383(request, obra):
     """
     Procesar Designación Numérica (383) con subcampos anidados
-    Estructura: numero_obra_383_<idx_padre>_<idx>_numero
-              opus_383_<idx_padre>_<idx>_opus
+    Estructura HTML/JS:
+        - numero_obra_383_a_{idx_padre}_{idx}
+        - opus_383_b_{idx_padre}_{idx}
     """
     indice = 0
     while True:
@@ -374,7 +391,7 @@ def procesar_designacion_numerica_383(request, obra):
         # Verificar números de obra
         num_idx = 0
         while True:
-            val = request.POST.get(f'numero_obra_383_{indice}_{num_idx}_numero', '').strip()
+            val = request.POST.get(f'numero_obra_383_a_{indice}_{num_idx}', '').strip()
             if val:
                 tiene_datos = True
                 break
@@ -386,7 +403,7 @@ def procesar_designacion_numerica_383(request, obra):
         if not tiene_datos:
             opus_idx = 0
             while True:
-                val = request.POST.get(f'opus_383_{indice}_{opus_idx}_opus', '').strip()
+                val = request.POST.get(f'opus_383_b_{indice}_{opus_idx}', '').strip()
                 if val:
                     tiene_datos = True
                     break
@@ -406,7 +423,7 @@ def procesar_designacion_numerica_383(request, obra):
         # Procesar números de obra ($a)
         sub_idx = 0
         while True:
-            numero_texto = request.POST.get(f'numero_obra_383_{indice}_{sub_idx}_numero', '').strip()
+            numero_texto = request.POST.get(f'numero_obra_383_a_{indice}_{sub_idx}', '').strip()
             if not numero_texto:
                 sub_idx += 1
                 if sub_idx > 20:
@@ -425,7 +442,7 @@ def procesar_designacion_numerica_383(request, obra):
         # Procesar opus ($b)
         sub_idx = 0
         while True:
-            opus_texto = request.POST.get(f'opus_383_{indice}_{sub_idx}_opus', '').strip()
+            opus_texto = request.POST.get(f'opus_383_b_{indice}_{sub_idx}', '').strip()
             if not opus_texto:
                 sub_idx += 1
                 if sub_idx > 20:
