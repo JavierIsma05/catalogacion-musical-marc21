@@ -349,3 +349,62 @@ def listar_obras(request):
     }
     
     return render(request, 'ObraGeneral/listar_obras.html', context)
+
+
+def detalle_obra(request, obra_id):
+    """
+    Vista de detalle completo de una obra
+    
+    Muestra todos los campos MARC21 de una obra, incluyendo
+    campos repetibles y relaciones con autoridades.
+    """
+    obra = get_object_or_404(
+        ObraGeneral.objects.select_related(
+            'compositor',
+            'titulo_uniforme',
+            'titulo_240'
+        ).prefetch_related(
+            # Bloque 0XX
+            'isbns',
+            'ismns',
+            'numeros_editor',
+            'incipits_musicales',
+            'incipits_musicales__urls',
+            'codigos_lengua',
+            'codigos_pais_entidad',
+            # Bloque 1XX
+            'atribuciones_compositor',
+            'formas_130',
+            'medios_interpretacion_130',
+            'numeros_parte_130',
+            'nombres_parte_130',
+            'formas_240',
+            'medios_interpretacion_240',
+            'numeros_parte_240',
+            'nombres_parte_240',
+            # Bloque 2XX
+            'titulos_alternativos',
+            'ediciones',
+            'producciones_publicaciones',
+            # Bloque 3XX
+            'descripciones_fisicas__extensiones',
+            'descripciones_fisicas__dimensiones_set',
+            'medios_fisicos__tecnicas',
+            'caracteristicas_musica_notada__formatos',
+            'medios_interpretacion_382__medios',
+            'medios_interpretacion_382__solistas',
+            'medios_interpretacion_382__numeros_interpretes',
+            'designaciones_numericas__numeros_obra',
+            'designaciones_numericas__opus',
+            # Bloque 4XX
+            'menciones_serie__titulos',
+            'menciones_serie__volumenes',
+        ),
+        pk=obra_id
+    )
+    
+    context = {
+        'obra': obra,
+    }
+    
+    return render(request, 'ObraGeneral/detalle_obra.html', context)

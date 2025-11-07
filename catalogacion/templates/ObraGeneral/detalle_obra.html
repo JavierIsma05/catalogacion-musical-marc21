@@ -1,0 +1,849 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Detalle de Obra - {{ obra.num_control }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Variables de color minimalistas */
+    :root {
+        --primary-color: #2563eb;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --text-muted: #9ca3af;
+        --border-light: #e5e7eb;
+        --bg-light: #f9fafb;
+        --bg-white: #ffffff;
+    }
+
+    /* Layout principal */
+    body {
+        color: var(--text-primary);
+        background-color: #f3f4f6;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    /* Etiquetas de campo */
+    .field-label {
+        font-weight: 500;
+        color: var(--text-secondary);
+        font-size: 0.813rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .field-value {
+        color: var(--text-primary);
+        padding: 0.75rem 0;
+        margin-bottom: 1.25rem;
+        line-height: 1.6;
+    }
+
+    .field-value.empty {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        font-style: italic;
+    }
+
+    /* Tags MARC minimalistas */
+    .marc-tag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--text-primary);
+        color: var(--bg-white);
+        padding: 0.125rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.05em;
+    }
+
+    .marc-subcampo {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        margin-right: 0.375rem;
+    }
+
+    /* Secciones de bloques */
+    .bloque-section {
+        border-left: 3px solid var(--primary-color);
+        padding-left: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .section-title {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1.125rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* Items repetibles */
+    .repetible-item {
+        background-color: var(--bg-light);
+        border: 1px solid var(--border-light);
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.2s ease;
+    }
+
+    .repetible-item:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .repetible-item:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Badges minimalistas */
+    .badge {
+        font-weight: 500;
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.813rem;
+    }
+
+    .badge.bg-secondary {
+        background-color: var(--text-secondary) !important;
+    }
+
+    .badge.bg-info {
+        background-color: #0ea5e9 !important;
+    }
+
+    .badge.bg-success {
+        background-color: #10b981 !important;
+    }
+
+    .badge.bg-dark {
+        background-color: var(--text-primary) !important;
+    }
+
+    /* Botones minimalistas */
+    .btn {
+        border-radius: 6px;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+
+    .btn-outline-secondary {
+        color: var(--text-secondary);
+        border-color: var(--border-light);
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: var(--bg-light);
+        border-color: var(--text-secondary);
+        color: var(--text-primary);
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
+    }
+
+    /* Títulos de página */
+    .h3 {
+        color: var(--text-primary);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+
+    /* Enlaces */
+    a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    a:hover {
+        color: #1d4ed8;
+    }
+
+    /* Code blocks */
+    code {
+        background-color: var(--bg-light);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875em;
+        color: var(--text-primary);
+        font-family: 'Courier New', monospace;
+        border: 1px solid var(--border-light);
+    }
+
+    /* Divisores */
+    .border-top {
+        border-top-color: var(--border-light) !important;
+    }
+
+    /* Espaciado de filas */
+    .row {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Mejora de legibilidad */
+    strong {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    small {
+        color: var(--text-secondary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .bloque-section {
+            padding-left: 1rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+        }
+
+        .repetible-item {
+            padding: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="max-width: 1400px;">
+    <!-- Encabezado minimalista -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h1 class="h3 mb-3">
+                        Detalle de Obra
+                    </h1>
+                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                        <span class="badge bg-secondary">{{ obra.num_control }}</span>
+                        {% if obra.tipo_registro == 'd' %}
+                            <span class="badge bg-info">Manuscrito</span>
+                        {% else %}
+                            <span class="badge bg-success">Impreso</span>
+                        {% endif %}
+                        <span class="badge bg-dark">{{ obra.get_nivel_bibliografico_display }}</span>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'listar_obras' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                    <button class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Editar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    
+                    <!-- ========================================
+                         BLOQUE 0XX - NÚMEROS DE CONTROL
+                    ========================================= -->
+                    <div class="bloque-section">
+                        <h4 class="section-title">
+                            <span class="marc-tag">0XX</span>
+                            <span>Números de Control e Identificadores</span>
+                        </h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="field-label">
+                                    <span class="marc-tag">020</span> ISBN
+                                </div>
+                                {% if obra.isbns.exists %}
+                                    {% for isbn in obra.isbns.all %}
+                                    <div class="repetible-item">
+                                        <span class="marc-subcampo">$a</span> {{ isbn.isbn }}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin ISBN</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="field-label">
+                                    <span class="marc-tag">024</span> ISMN
+                                </div>
+                                {% if obra.ismns.exists %}
+                                    {% for ismn in obra.ismns.all %}
+                                    <div class="repetible-item">
+                                        <span class="marc-subcampo">$a</span> {{ ismn.ismn }}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin ISMN</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="field-label">
+                                    <span class="marc-tag">028</span> Número de Editor
+                                </div>
+                                {% if obra.numeros_editor.exists %}
+                                    {% for num in obra.numeros_editor.all %}
+                                    <div class="repetible-item">
+                                        <span class="marc-subcampo">$a</span> {{ num.numero_editor }}
+                                        {% if num.nombre_editor %}
+                                            <br><span class="marc-subcampo">$b</span> {{ num.nombre_editor }}
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin número de editor</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="field-label">
+                                    <span class="marc-tag">040</span> Fuente de Catalogación
+                                </div>
+                                <div class="field-value">
+                                    {{ obra.centro_catalogador|default:"No especificado" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="field-label">
+                                    <span class="marc-tag">031</span> Íncipit Musical
+                                </div>
+                                {% if obra.incipits_musicales.exists %}
+                                    {% for inc in obra.incipits_musicales.all %}
+                                    <div class="repetible-item">
+                                        {% if inc.numero_movimiento %}<span class="marc-subcampo">$a</span> Mov. {{ inc.numero_movimiento }}<br>{% endif %}
+                                        {% if inc.numero_orden %}<span class="marc-subcampo">$b</span> Orden: {{ inc.numero_orden }}<br>{% endif %}
+                                        {% if inc.notacion_musical %}<span class="marc-subcampo">$g</span> Clave: {{ inc.notacion_musical }}<br>{% endif %}
+                                        {% if inc.armadura %}<span class="marc-subcampo">$n</span> Armadura: {{ inc.armadura }}<br>{% endif %}
+                                        {% if inc.metrica %}<span class="marc-subcampo">$o</span> Métrica: {{ inc.metrica }}<br>{% endif %}
+                                        {% if inc.texto %}<span class="marc-subcampo">$t</span> "{{ inc.texto }}"<br>{% endif %}
+                                        {% if inc.codigo_incipit %}<span class="marc-subcampo">$p</span> <code>{{ inc.codigo_incipit }}</code><br>{% endif %}
+                                        {% if inc.urls.exists %}
+                                            {% for url in inc.urls.all %}
+                                                <span class="marc-subcampo">$u</span> <a href="{{ url.url }}" target="_blank">{{ url.url }}</a><br>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin íncipit</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="field-label">
+                                    <span class="marc-tag">041</span> Código de Lengua
+                                </div>
+                                {% if obra.codigos_lengua.exists %}
+                                    {% for codigo in obra.codigos_lengua.all %}
+                                    <div class="repetible-item">
+                                        <span class="marc-subcampo">$a</span> {{ codigo.get_codigo_lengua_display }}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin código de lengua</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="field-label">
+                                    <span class="marc-tag">044</span> Código de País/Entidad
+                                </div>
+                                {% if obra.codigos_pais_entidad.exists %}
+                                    {% for codigo in obra.codigos_pais_entidad.all %}
+                                    <div class="repetible-item">
+                                        <span class="marc-subcampo">$a</span> {{ codigo.get_codigo_pais_display }}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin código de país</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========================================
+                         BLOQUE 1XX - PUNTOS DE ACCESO
+                    ========================================= -->
+                    <div class="bloque-section">
+                        <h4 class="section-title">
+                            <span class="marc-tag">1XX</span>
+                            <span>Puntos de Acceso Principal</span>
+                        </h4>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="field-label">
+                                    <span class="marc-tag">100</span> Compositor (Punto de Acceso Principal)
+                                </div>
+                                {% if obra.compositor %}
+                                    <div class="field-value">
+                                        <strong>{{ obra.compositor.nombre_completo }}</strong>
+                                        {% if obra.compositor.fechas %}
+                                            <span class="text-muted">({{ obra.compositor.fechas }})</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% if obra.atribuciones_compositor.exists %}
+                                        <div class="mt-2">
+                                            <small class="text-muted">Atribuciones:</small>
+                                            {% for atrib in obra.atribuciones_compositor.all %}
+                                                <div class="repetible-item">
+                                                    <span class="marc-subcampo">$j</span> {{ atrib.get_atribucion_display }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="field-value empty">Sin compositor asignado</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="field-label">
+                                    <span class="marc-tag">130</span> Título Uniforme (Punto de Acceso Principal)
+                                </div>
+                                {% if obra.titulo_uniforme %}
+                                    <div class="field-value">
+                                        <strong>{{ obra.titulo_uniforme.titulo }}</strong>
+                                    </div>
+
+                                    {% if obra.formas_130.exists %}
+                                        <div class="mt-2">
+                                            <small class="field-label">Forma Musical:</small>
+                                            {% for forma in obra.formas_130.all %}
+                                                <div class="repetible-item">
+                                                    <span class="marc-subcampo">$k</span> {{ forma.forma.nombre }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if obra.medios_interpretacion_130.exists %}
+                                        <div class="mt-2">
+                                            <small class="field-label">Medio de Interpretación:</small>
+                                            {% for medio in obra.medios_interpretacion_130.all %}
+                                                <div class="repetible-item">
+                                                    <span class="marc-subcampo">$m</span> {{ medio.medio }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if obra.numeros_parte_130.exists %}
+                                        <div class="mt-2">
+                                            <small class="field-label">Número de Parte:</small>
+                                            {% for num in obra.numeros_parte_130.all %}
+                                                <div class="repetible-item">
+                                                    <span class="marc-subcampo">$n</span> {{ num.numero }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if obra.nombres_parte_130.exists %}
+                                        <div class="mt-2">
+                                            <small class="field-label">Nombre de Parte:</small>
+                                            {% for nom in obra.nombres_parte_130.all %}
+                                                <div class="repetible-item">
+                                                    <span class="marc-subcampo">$p</span> {{ nom.nombre }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="field-value empty">Sin título uniforme 130</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="field-label">
+                                    <span class="marc-tag">240</span> Título Uniforme (Secundario)
+                                </div>
+                                {% if obra.titulo_240 %}
+                                    <div class="field-value">
+                                        <strong>{{ obra.titulo_240.titulo }}</strong>
+                                    </div>
+
+                                    {% if obra.medios_interpretacion_240.exists %}
+                                        <div class="mt-2">
+                                            <small class="field-label">Medio de Interpretación:</small>
+                                            {% for medio in obra.medios_interpretacion_240.all %}
+                                                <div class="repetible-item">
+                                                    <span class="marc-subcampo">$m</span> {{ medio.medio }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if obra.numeros_parte_240.exists %}
+                                        <div class="mt-2">
+                                            <small class="field-label">Número de Parte:</small>
+                                            {% for num in obra.numeros_parte_240.all %}
+                                                <div class="repetible-item">
+                                                    <span class="marc-subcampo">$n</span> {{ num.numero }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if obra.nombres_parte_240.exists %}
+                                        <div class="mt-2">
+                                            <small class="field-label">Nombre de Parte:</small>
+                                            {% for nom in obra.nombres_parte_240.all %}
+                                                <div class="repetible-item">
+                                                    <span class="marc-subcampo">$p</span> {{ nom.nombre }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="field-value empty">Sin título uniforme 240</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========================================
+                         BLOQUE 2XX - TÍTULOS Y PUBLICACIÓN
+                    ========================================= -->
+                    <div class="bloque-section">
+                        <h4 class="section-title">
+                            <span class="marc-tag">2XX</span>
+                            <span>Títulos y Publicación</span>
+                        </h4>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="field-label">
+                                    <span class="marc-tag">245</span> Título Principal
+                                </div>
+                                <div class="field-value">
+                                    {% if obra.titulo_principal %}
+                                        <strong>{{ obra.titulo_principal }}</strong>
+                                        {% if obra.subtitulo %}
+                                            : {{ obra.subtitulo }}
+                                        {% endif %}
+                                        {% if obra.mencion_responsabilidad %}
+                                            <br><span class="marc-subcampo">$c</span> {{ obra.mencion_responsabilidad }}
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">Sin título principal</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="field-label">
+                                    <span class="marc-tag">246</span> Títulos Alternativos
+                                </div>
+                                {% if obra.titulos_alternativos.exists %}
+                                    {% for titulo in obra.titulos_alternativos.all %}
+                                    <div class="repetible-item">
+                                        <span class="marc-subcampo">$a</span> {{ titulo.titulo }}
+                                        {% if titulo.resto_titulo %}
+                                            <br><span class="marc-subcampo">$b</span> {{ titulo.resto_titulo }}
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin títulos alternativos</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="field-label">
+                                    <span class="marc-tag">250</span> Edición
+                                </div>
+                                {% if obra.ediciones.exists %}
+                                    {% for ed in obra.ediciones.all %}
+                                    <div class="repetible-item">
+                                        <span class="marc-subcampo">$a</span> {{ ed.edicion }}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin mención de edición</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="field-label">
+                                    <span class="marc-tag">264</span> Producción/Publicación
+                                </div>
+                                {% if obra.producciones_publicaciones.exists %}
+                                    {% for prod in obra.producciones_publicaciones.all %}
+                                    <div class="repetible-item">
+                                        <span class="badge bg-secondary mb-2">{{ prod.get_funcion_display }}</span><br>
+                                        {% if prod.lugar %}<span class="marc-subcampo">$a</span> {{ prod.lugar }}<br>{% endif %}
+                                        {% if prod.nombre_entidad %}<span class="marc-subcampo">$b</span> {{ prod.nombre_entidad }}<br>{% endif %}
+                                        {% if prod.fecha %}<span class="marc-subcampo">$c</span> {{ prod.fecha }}{% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin información de publicación</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========================================
+                         BLOQUE 3XX - DESCRIPCIÓN FÍSICA
+                    ========================================= -->
+                    <div class="bloque-section">
+                        <h4 class="section-title">
+                            <span class="marc-tag">3XX</span>
+                            <span>Descripción Física y Características</span>
+                        </h4>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="field-label">
+                                    <span class="marc-tag">300</span> Descripción Física
+                                </div>
+                                {% if obra.descripciones_fisicas.exists %}
+                                    {% for desc in obra.descripciones_fisicas.all %}
+                                    <div class="repetible-item">
+                                        {% if desc.extensiones.exists %}
+                                            <strong>Extensión:</strong><br>
+                                            {% for ext in desc.extensiones.all %}
+                                                <span class="marc-subcampo">$a</span> {{ ext.extension }}<br>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if desc.otras_caracteristicas_fisicas %}
+                                            <span class="marc-subcampo">$b</span> {{ desc.otras_caracteristicas_fisicas }}<br>
+                                        {% endif %}
+                                        {% if desc.dimensiones_set.exists %}
+                                            <strong>Dimensiones:</strong><br>
+                                            {% for dim in desc.dimensiones_set.all %}
+                                                <span class="marc-subcampo">$c</span> {{ dim.dimension }}<br>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if desc.material_acompanante %}
+                                            <span class="marc-subcampo">$e</span> {{ desc.material_acompanante }}
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin descripción física</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="field-label">
+                                    <span class="marc-tag">340</span> Medio Físico
+                                </div>
+                                {% if obra.medios_fisicos.exists %}
+                                    {% for medio in obra.medios_fisicos.all %}
+                                    <div class="repetible-item">
+                                        {% for tecnica in medio.tecnicas.all %}
+                                            <span class="marc-subcampo">$d</span> {{ tecnica.get_tecnica_display }}<br>
+                                        {% endfor %}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin medio físico especificado</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="field-label">
+                                    <span class="marc-tag">348</span> Formato de Música Notada
+                                </div>
+                                {% if obra.caracteristicas_musica_notada.exists %}
+                                    {% for caract in obra.caracteristicas_musica_notada.all %}
+                                    <div class="repetible-item">
+                                        {% for formato in caract.formatos.all %}
+                                            <span class="marc-subcampo">$a</span> {{ formato.get_formato_display }}<br>
+                                        {% endfor %}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin formato especificado</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="field-label">
+                                    <span class="marc-tag">382</span> Medio de Interpretación
+                                </div>
+                                {% if obra.medios_interpretacion_382.exists %}
+                                    {% for medio_382 in obra.medios_interpretacion_382.all %}
+                                    <div class="repetible-item">
+                                        {% if medio_382.medios.exists %}
+                                            <strong>Medios:</strong><br>
+                                            {% for medio in medio_382.medios.all %}
+                                                <span class="marc-subcampo">$a</span> {{ medio.get_medio_display }}<br>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if medio_382.solistas.exists %}
+                                            <strong>Solistas:</strong><br>
+                                            {% for solista in medio_382.solistas.all %}
+                                                <span class="marc-subcampo">$b</span> {{ solista.get_solista_display }}<br>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if medio_382.numeros_interpretes.exists %}
+                                            <strong>Número de Intérpretes:</strong><br>
+                                            {% for num in medio_382.numeros_interpretes.all %}
+                                                <span class="marc-subcampo">$n</span> {{ num.numero }}<br>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin medio de interpretación</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="field-label">
+                                    <span class="marc-tag">383</span> Designación Numérica
+                                </div>
+                                {% if obra.designaciones_numericas.exists %}
+                                    {% for desig in obra.designaciones_numericas.all %}
+                                    <div class="repetible-item">
+                                        {% if desig.numeros_obra.exists %}
+                                            <strong>Números de Obra:</strong><br>
+                                            {% for num in desig.numeros_obra.all %}
+                                                <span class="marc-subcampo">$a</span> {{ num.numero_obra }}<br>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if desig.opus.exists %}
+                                            <strong>Opus:</strong><br>
+                                            {% for opus in desig.opus.all %}
+                                                <span class="marc-subcampo">$b</span> {{ opus.opus }}<br>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin designación numérica</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="field-label">
+                                    <span class="marc-tag">384</span> Tonalidad
+                                </div>
+                                <div class="field-value">
+                                    {{ obra.tonalidad_384|default:"Sin tonalidad especificada" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========================================
+                         BLOQUE 4XX - SERIES
+                    ========================================= -->
+                    <div class="bloque-section">
+                        <h4 class="section-title">
+                            <span class="marc-tag">4XX</span>
+                            <span>Mención de Serie</span>
+                        </h4>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="field-label">
+                                    <span class="marc-tag">490</span> Mención de Serie
+                                </div>
+                                {% if obra.menciones_serie.exists %}
+                                    {% for serie in obra.menciones_serie.all %}
+                                    <div class="repetible-item">
+                                        <span class="badge bg-info mb-2">Relación: {{ serie.get_relacion_display }}</span><br>
+                                        {% if serie.titulos.exists %}
+                                            <strong>Títulos:</strong><br>
+                                            {% for titulo in serie.titulos.all %}
+                                                <span class="marc-subcampo">$a</span> {{ titulo.titulo_serie }}<br>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if serie.volumenes.exists %}
+                                            <strong>Volúmenes:</strong><br>
+                                            {% for vol in serie.volumenes.all %}
+                                                <span class="marc-subcampo">$v</span> {{ vol.volumen }}<br>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="field-value empty">Sin mención de serie</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metadatos del Sistema -->
+                    <div class="row mt-5 pt-4 border-top">
+                        <div class="col-md-6">
+                            <small class="text-muted d-flex align-items-center gap-2">
+                                <i class="bi bi-clock"></i>
+                                <span><strong>Creado:</strong> {{ obra.fecha_creacion_sistema|date:"d/m/Y H:i" }}</span>
+                            </small>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted d-flex align-items-center justify-content-end gap-2">
+                                <i class="bi bi-pencil-square"></i>
+                                <span><strong>Última modificación:</strong> {{ obra.fecha_modificacion_sistema|date:"d/m/Y H:i" }}</span>
+                            </small>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
