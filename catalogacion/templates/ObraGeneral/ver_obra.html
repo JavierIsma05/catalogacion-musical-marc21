@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ver Obra - {{ obra.num_control }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Ficha de Obra</h5>
+      <a href="{% url 'listar_obras' %}" class="btn btn-light btn-sm">
+        <i class="bi bi-arrow-left"></i> Volver
+      </a>
+    </div>
+    <div class="card-body">
+      <h4 class="fw-bold mb-3">{{ obra.titulo_principal|default:"Sin título" }}</h4>
+
+      <table class="table table-sm table-striped">
+        <tr><th>Número de Control</th><td>{{ obra.num_control }}</td></tr>
+        <tr><th>Tipo de Registro</th><td>{{ obra.tipo_registro }}</td></tr>
+        <tr><th>Nivel Bibliográfico</th><td>{{ obra.nivel_bibliografico }}</td></tr>
+        <tr><th>Centro Catalogador</th><td>{{ obra.centro_catalogador }}</td></tr>
+        <tr><th>Tonalidad</th><td>{{ obra.tonalidad_384|default:"No especificada" }}</td></tr>
+        <tr><th>Clasificación</th><td>{{ obra.codigo_clasificacion|default:"Sin clasificación" }}</td></tr>
+      </table>
+
+      <hr>
+      <h5 class="text-primary">Nombres Relacionados (700)</h5>
+      {% if nombres_relacionados %}
+      <ul>
+        {% for n in nombres_relacionados %}
+        <li>{{ n.persona }} – {{ n.titulo_obra|default:"(sin título)" }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p><em>No hay nombres relacionados registrados.</em></p>
+      {% endif %}
+
+      <h5 class="text-primary mt-4">Ubicaciones (852)</h5>
+      {% if ubicaciones %}
+      <ul>
+        {% for u in ubicaciones %}
+        <li>{{ u.institucion_persona }} ({{ u.signatura_original }})</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p><em>No hay ubicaciones registradas.</em></p>
+      {% endif %}
+
+      <h5 class="text-primary mt-4">Recursos Disponibles (856)</h5>
+      {% if recursos %}
+      <ul>
+        {% for r in recursos %}
+        <li><a href="{{ r.url }}" target="_blank">{{ r.texto_enlace|default:r.url }}</a></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p><em>No hay recursos digitales disponibles.</em></p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

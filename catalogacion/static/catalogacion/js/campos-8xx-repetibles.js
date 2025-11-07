@@ -1,115 +1,192 @@
+/* ============================================================
+   📦 BLOQUE 8XX – Ubicación y Recursos Disponibles
+   ============================================================ */
 
-// Estado simple: solo 1 ubicación a la vez
-let ubicacionCreada = true;   // ya arrancamos con 1 en el HTML
-let contadorC852 = 1;
+console.log("🟢 Script bloque_8xx.js cargado correctamente");
 
-function agregarUbicacion852() {
-    if (ubicacionCreada) return;
-    const tpl = document.getElementById('tpl-ubicacion852');
-    const contenedor = document.getElementById('ubicacion852-container');
-    contenedor.appendChild(tpl.content.cloneNode(true));
-    ubicacionCreada = true;
-    document.getElementById('btnAgregarUbicacion852').style.display = 'none';
-    contadorC852 = 1;
-}
+// Contadores globales
+const contadores8xx = {
+  ubicacion852: 1,
+  recurso856: 0,
+  subC852: {},  // subcampos de $c
+  subU856: {},  // subcampos $u
+  subY856: {}   // subcampos $y
+};
 
-function eliminarUbicacion852() {
-    const contenedor = document.getElementById('ubicacion852-container');
-    contenedor.innerHTML = '';
-    ubicacionCreada = false;
-    document.getElementById('btnAgregarUbicacion852').style.display = 'inline-block';
-}
+/* ============================================================
+   🏛️ 852 – UBICACIÓN (INSTITUCIÓN, SIGNATURA, ESTANTERÍA)
+   ============================================================ */
 
-function agregarC852() {
-    const contenedor = document.getElementById('ubicacion852-0-campos');
-    if (!contenedor) return;
-    const id = `c852-${contadorC852}`;
-    const wrap = document.createElement('div');
-    wrap.className = 'mb-2';
-    wrap.dataset.subcampo = id;
-    wrap.innerHTML = `
+// Agregar una nueva ubicación completa (bloque 852)
+// Agregar un nuevo subcampo $c (Estantería)
+window.agregarC852 = function () {
+  // Tomar el índice correcto del último bloque de ubicación
+  const ubicaciones = document.querySelectorAll("[data-campo^='ubicacion852-']");
+  const index = ubicaciones.length - 1; // siempre el último bloque visible
+  if (index < 0) return;
+
+  if (!contadores8xx.subC852[index]) contadores8xx.subC852[index] = 1;
+  const subIndex = contadores8xx.subC852[index]++;
+
+  const contenedor = document.getElementById(`ubicacion852-${index}-campos`);
+  if (!contenedor) return;
+
+  // Clon visual exacto del campo original (mantiene $c y estilos)
+  const div = document.createElement("div");
+  div.classList.add("mb-2");
+  div.setAttribute("data-subcampo", `c852-${index}-${subIndex}`);
+  div.innerHTML = `
       <div class="input-group input-group-sm">
-        <input type="text" name="ubicacion852_c_0_${contadorC852}" class="form-control"
+        <span class="input-group-text">$c</span>
+        <input type="text" name="ubicacion852_c_${index}_${subIndex}" 
+               class="form-control" 
                placeholder="Ej: Sala Música Antigua, Estante 4B">
         <button type="button" class="btn btn-outline-danger"
-                onclick="eliminarSubcampo('${id}')">X</button>
-      </div>`;
-    contenedor.appendChild(wrap);
-    contadorC852++;
-}
-
-function eliminarSubcampo(id) {
-    const nodo = document.querySelector('[data-subcampo="' + id + '"]');
-    if (nodo) nodo.remove();
-}
-
-// =====================================================
-// BLOQUE 856 – RECURSOS DISPONIBLES
-// =====================================================
-
-let recursoCreado856 = false;
-let contadorU856 = 1;
-let contadorY856 = 1;
-
-function agregarRecurso856() {
-    if (recursoCreado856) return;
-
-    const tpl = document.getElementById('tpl-recurso856');
-    const contenedor = document.getElementById('recurso856-container');
-
-    if (tpl && contenedor) {
-        contenedor.appendChild(tpl.content.cloneNode(true));
-        recursoCreado856 = true;
-        document.getElementById('btnAgregarRecurso856').style.display = 'none';
-    }
-}
-
-function eliminarRecurso856() {
-    const contenedor = document.getElementById('recurso856-container');
-    if (contenedor) {
-        contenedor.innerHTML = '';
-        recursoCreado856 = false;
-        document.getElementById('btnAgregarRecurso856').style.display = 'inline-block';
-        contadorU856 = 1;
-        contadorY856 = 1;
-    }
-}
-
-function agregarU856() {
-    const contenedor = document.getElementById('recurso856-0-urls');
-    if (!contenedor) return;
-
-    const id = `u856-${contadorU856}`;
-    const div = document.createElement('div');
-    div.className = 'mb-2';
-    div.dataset.subcampo = id;
-
-    div.innerHTML = `
-      <div class="input-group input-group-sm">
-        <input type="url" name="recurso856_u_0_${contadorU856}" class="form-control" placeholder="https://...">
-        <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('${id}')">X</button>
+                onclick="eliminarSubcampo('c852-${index}-${subIndex}')">
+          X
+        </button>
       </div>
-    `;
-    contenedor.appendChild(div);
-    contadorU856++;
-}
+  `;
+  
+  contenedor.appendChild(div);
+  console.log(`📚 Subcampo $c agregado correctamente a ubicación (852) #${index}`);
+};
 
-function agregarY856() {
-    const contenedor = document.getElementById('recurso856-0-textos');
-    if (!contenedor) return;
 
-    const id = `y856-${contadorY856}`;
-    const div = document.createElement('div');
-    div.className = 'mb-2';
-    div.dataset.subcampo = id;
+// Eliminar una ubicación completa
+window.eliminarUbicacion852 = function (boton) {
+  const campo = boton.closest(".campo-repetible");
+  if (campo) campo.remove();
+  console.log("🗑️ Ubicación (852) eliminada");
+};
 
-    div.innerHTML = `
+// Agregar un nuevo subcampo $c (Estantería)
+window.agregarC852 = function () {
+  const index = contadores8xx.ubicacion852 - 1;
+  if (index < 0) return;
+
+  if (!contadores8xx.subC852[index]) contadores8xx.subC852[index] = 1;
+  const subIndex = contadores8xx.subC852[index]++;
+
+  const contenedor = document.getElementById(`ubicacion852-${index}-campos`);
+  if (!contenedor) return;
+
+  const div = document.createElement("div");
+  div.classList.add("mb-2");
+  div.setAttribute("data-subcampo", `c852-${index}-${subIndex}`);
+  div.innerHTML = `
       <div class="input-group input-group-sm">
-        <input type="text" name="recurso856_y_0_${contadorY856}" class="form-control"
-               placeholder="Ej: Ver partitura, Escuchar audio, etc.">
-        <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('${id}')">X</button>
+        <span class="input-group-text">$c</span>
+        <input type="text" name="ubicacion852_c_${index}_${subIndex}" class="form-control"
+               placeholder="Ej: Sala Música Antigua, Estante 4B">
+        <button type="button" class="btn btn-outline-danger"
+                onclick="eliminarSubcampo('c852-${index}-${subIndex}')">X</button>
       </div>
-    `;
-    contenedor.appendChild(div);
-    contadorY856++;
-}
+  `;
+  contenedor.appendChild(div);
+
+  console.log(`📚 Subcampo $c agregado en ubicación (852) #${index}`);
+};
+
+/* ============================================================
+   🌐 856 – RECURSOS DISPONIBLES
+   ============================================================ */
+
+// Agregar un recurso (856)
+window.agregarRecurso856 = function () {
+  const container = document.getElementById("recurso856-container");
+  const template = document.getElementById("tpl-recurso856");
+
+  const index = contadores8xx.recurso856++;
+  const nuevoCampo = template.content.cloneNode(true);
+
+  // Actualizar índices
+  nuevoCampo.querySelectorAll("[name]").forEach(input => {
+    input.name = input.name.replace("_0", `_${index}`);
+  });
+
+  nuevoCampo.querySelectorAll("[id]").forEach(el => {
+    el.id = el.id.replace("-0", `-${index}`);
+  });
+
+  // Actualizar etiquetas
+  nuevoCampo.querySelectorAll("h5").forEach(h => {
+    h.textContent = `Recurso disponible (856) #${index + 1}`;
+  });
+
+  container.appendChild(nuevoCampo);
+
+  contadores8xx.subU856[index] = 1;
+  contadores8xx.subY856[index] = 1;
+
+  console.log(`🌐 Recurso (856) agregado #${index}`);
+};
+
+// Eliminar recurso completo
+window.eliminarRecurso856 = function (boton) {
+  const bloque = boton.closest(".campo-repetible");
+  if (bloque) bloque.remove();
+  console.log("🗑️ Recurso (856) eliminado");
+};
+
+// Agregar subcampo $u (URL)
+window.agregarU856 = function () {
+  const index = contadores8xx.recurso856 - 1;
+  if (index < 0) return;
+
+  if (!contadores8xx.subU856[index]) contadores8xx.subU856[index] = 1;
+  const subIndex = contadores8xx.subU856[index]++;
+
+  const contenedor = document.getElementById(`recurso856-${index}-urls`);
+  if (!contenedor) return;
+
+  const div = document.createElement("div");
+  div.classList.add("mb-2");
+  div.setAttribute("data-subcampo", `u856-${index}-${subIndex}`);
+  div.innerHTML = `
+    <div class="input-group input-group-sm">
+      <span class="input-group-text">$u</span>
+      <input type="url" name="recurso856_u_${index}_${subIndex}" class="form-control" placeholder="https://...">
+      <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('u856-${index}-${subIndex}')">X</button>
+    </div>
+  `;
+  contenedor.appendChild(div);
+
+  console.log(`🔗 Subcampo $u agregado al recurso (856) #${index}`);
+};
+
+// Agregar subcampo $y (Texto del enlace)
+window.agregarY856 = function () {
+  const index = contadores8xx.recurso856 - 1;
+  if (index < 0) return;
+
+  if (!contadores8xx.subY856[index]) contadores8xx.subY856[index] = 1;
+  const subIndex = contadores8xx.subY856[index]++;
+
+  const contenedor = document.getElementById(`recurso856-${index}-textos`);
+  if (!contenedor) return;
+
+  const div = document.createElement("div");
+  div.classList.add("mb-2");
+  div.setAttribute("data-subcampo", `y856-${index}-${subIndex}`);
+  div.innerHTML = `
+    <div class="input-group input-group-sm">
+      <span class="input-group-text">$y</span>
+      <input type="text" name="recurso856_y_${index}_${subIndex}" class="form-control"
+             placeholder="Ej: Ver partitura, Escuchar audio, etc.">
+      <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('y856-${index}-${subIndex}')">X</button>
+    </div>
+  `;
+  contenedor.appendChild(div);
+
+  console.log(`📝 Subcampo $y agregado al recurso (856) #${index}`);
+};
+
+/* ============================================================
+   🧹 Función genérica para eliminar subcampos
+   ============================================================ */
+window.eliminarSubcampo = function (id) {
+  const subcampo = document.querySelector(`[data-subcampo="${id}"]`);
+  if (subcampo) subcampo.remove();
+  console.log(`❌ Subcampo eliminado: ${id}`);
+};

@@ -12,6 +12,7 @@ from .views import (
     # Autoridades
     get_autoridades_json,
 )
+from .views import views_base as vb
 
 urlpatterns = [
     # Rutas base
@@ -28,5 +29,10 @@ urlpatterns = [
     
     # API - Autoridades
     path('api/autoridades/', get_autoridades_json, name='get_autoridades_json'),
+
+    # 👇 nuevas rutas
+    path('obra/<int:obra_id>/ver/', vb.ver_obra, name='ver_obra'),
+    path('obra/<int:obra_id>/editar/', vb.editar_obra, name='editar_obra'),
+    path('obra/<int:obra_id>/eliminar/', vb.eliminar_obra, name='eliminar_obra'),
     
 ]
