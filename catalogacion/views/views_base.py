@@ -279,18 +279,26 @@ def ver_obra(request, obra_id):
 
     # Reutiliza relaciones si las tienes definidas
     contexto = {
+        # Bloque 0xx
         'obra': obra,
         'isbn': obra.isbns.all(),
         'ismn': obra.ismns.all(),
         'numero_editor': obra.numeros_editor.all(),
         'incipits': obra.incipits_musicales.all(),
         'codigo_lengua': obra.codigos_lengua.all(),
-        'compositor': obra.compositor,
+        'codigos_pais_entidad': obra.codigos_pais_entidad.all(),
+        # Bloque 1xx
+        'compositor': obra.funciones_compositor.all(),
+        'atribuciones_compositor': obra.atribuciones_compositor.all(),
+        'titulo_uniforme_130': obra.formas_130.all(),
+        'medios_interpretacion_130': obra.medios_interpretacion_130.all(),
+        # Bloque 7xx
         'nombres_relacionados': obra.nombres_relacionados_700.all(),
         'entidades_relacionadas': obra.entidades_relacionadas_710.all(),
         'enlaces_773': obra.enlaces_documento_fuente_773.all(),
         'enlaces_774': obra.enlaces_unidades_774.all(),
         'otras_relaciones': obra.otras_relaciones_787.all(),
+        # Bloque 8xx
         'ubicaciones': obra.ubicaciones_852.all(),
         'recursos': obra.disponibles_856.all(),
     }
