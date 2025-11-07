@@ -120,23 +120,31 @@ def crear_obra(request):
                 procesar_designacion_numerica_383(request, obra)
                 obra.tonalidad_384 = request.POST.get('tonalidad_384', '')
 
-                procesar_mencion_serie_490(request, obra)
+                print("Procesando bloque 5XX...")
                 procesar_nota_general_500(request, obra)
                 procesar_contenido_505(request, obra)
                 procesar_sumario_520(request, obra)
                 procesar_datos_biograficos_545(request, obra)
+                print("✔ Bloque 5XX procesado correctamente")
 
+                print("Procesando bloque 6XX...")
                 procesar_materia_650(request, obra)
                 procesar_genero_forma_655(request, obra)
+                print("✔ Bloque 6XX procesado correctamente")
 
+                print("Procesando bloque 7XX...")
                 procesar_nombre_relacionado_700(request, obra)
                 procesar_entidad_relacionada_710(request, obra)
                 procesar_enlace_fuente_773(request, obra)
                 procesar_enlace_unidad_774(request, obra)
                 procesar_otras_relaciones_787(request, obra)
+                print("✔ Bloque 7XX procesado correctamente")
 
+                print("Procesando bloque 8XX...")
                 procesar_ubicaciones_852(request, obra)
                 procesar_disponibles_856(request, obra)
+                print("✔ Bloque 8XX procesado correctamente")
+
 
                 # ========================================
                 # Guardado y depuración final

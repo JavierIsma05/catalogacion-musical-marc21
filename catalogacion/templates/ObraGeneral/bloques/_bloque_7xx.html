@@ -8,8 +8,8 @@
 
     <!-- =================== 700 =================== -->
     <div class="mb-4 p-3 border rounded bg-light-subtle">
-      <h4>700 1# Nombre Relacionado</h4>
-      <div class="alert alert-info py-2">
+      <h3 class="campo-label mb-0">700 1# Nombre Relacionado</h3>
+      <div class="alert alert-info small" role="alert">
         Registra nombres de personas relacionadas con la obra (compositores, arreglistas, copistas, etc.).
       </div>
 
@@ -17,7 +17,8 @@
         <div class="campo-repetible mb-3 p-3 border bg-white shadow-sm" data-campo="nombre-relacionado-0">
           <div class="campo-header d-flex justify-content-between align-items-center mb-3">
             <span class="campo-label fw-bold">Nombre Relacionado #1</span>
-            <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('nombre-relacionado-0')">Eliminar</button>
+            <button type="button" class="btn btn-outline-danger btn-sm"
+              onclick="eliminarCampo('nombre-relacionado-0')">Eliminar</button>
           </div>
 
           <div class="row g-2 mb-2">
@@ -34,7 +35,8 @@
           <div class="row g-2 mb-2">
             <div class="col-md-6">
               <label class="subcampo-label">$c Término asociado al nombre</label>
-              <input type="text" class="form-control" name="nombre700_c_0" placeholder="Ej: compositor, intérprete, editor, etc.">
+              <input type="text" class="form-control" name="nombre700_c_0"
+                placeholder="Ej: compositor, intérprete, editor, etc.">
             </div>
             <div class="col-md-6">
               <label class="subcampo-label">$t Título de obra</label>
@@ -48,32 +50,40 @@
             <div id="funciones700-0" class="mb-2">
               <div class="input-group input-group-sm mb-2" data-subcampo="funcion700-0-0">
                 <input type="text" name="nombre700_e_0_0" class="form-control" placeholder="Ej: compositor, arreglista">
-                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('funcion700-0-0')">X</button>
+                <button type="button" class="btn btn-outline-danger"
+                  onclick="eliminarSubcampo('funcion700-0-0')">X</button>
               </div>
             </div>
-            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarFuncion700(0)">+ Agregar función</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarFuncion700(0)">+ Agregar
+              función</button>
           </div>
 
           <div class="subcampo-group mt-3">
             <label class="subcampo-label">$i Relación (R)</label>
             <div id="relaciones700-0" class="mb-2">
               <div class="input-group input-group-sm mb-2" data-subcampo="relacion700-0-0">
-                <input type="text" name="nombre700_i_0_0" class="form-control" placeholder="Ej: Maestro de..., Estudiante de...">
-                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('relacion700-0-0')">X</button>
+                <input type="text" name="nombre700_i_0_0" class="form-control"
+                  placeholder="Ej: Maestro de..., Estudiante de...">
+                <button type="button" class="btn btn-outline-danger"
+                  onclick="eliminarSubcampo('relacion700-0-0')">X</button>
               </div>
             </div>
-            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarRelacion700(0)">+ Agregar relación</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarRelacion700(0)">+ Agregar
+              relación</button>
           </div>
 
           <div class="subcampo-group mt-3">
             <label class="subcampo-label">$j Autoría (R)</label>
             <div id="autorias700-0" class="mb-2">
               <div class="input-group input-group-sm mb-2" data-subcampo="autoria700-0-0">
-                <input type="text" name="nombre700_j_0_0" class="form-control" placeholder="Ej: Certificado, atribuido, copista">
-                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('autoria700-0-0')">X</button>
+                <input type="text" name="nombre700_j_0_0" class="form-control"
+                  placeholder="Ej: Certificado, atribuido, copista">
+                <button type="button" class="btn btn-outline-danger"
+                  onclick="eliminarSubcampo('autoria700-0-0')">X</button>
               </div>
             </div>
-            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarAutoria700(0)">+ Agregar autoría</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarAutoria700(0)">+ Agregar
+              autoría</button>
           </div>
         </div>
       </div>
@@ -85,8 +95,8 @@
 
     <!-- =================== 710 =================== -->
     <div class="mb-4 p-3 border rounded bg-light-subtle">
-      <h4>710 2# Entidad Relacionada</h4>
-      <div class="alert alert-info py-2">
+      <h3 class="campo-label mb-0">710 2# Entidad Relacionada</h3>
+      <div class="alert alert-info small" role="alert">
         Registra entidades o instituciones vinculadas a la obra (coeditor, patrocinante, lugar de estreno, etc.).
       </div>
 
@@ -94,13 +104,15 @@
         <div class="campo-repetible mb-3 p-3 border bg-white shadow-sm" data-campo="entidad710-0">
           <div class="campo-header d-flex justify-content-between align-items-center mb-3">
             <span class="campo-label fw-bold">Entidad Relacionada #1</span>
-            <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('entidad710-0')">Eliminar</button>
+            <button type="button" class="btn btn-outline-danger btn-sm"
+              onclick="eliminarCampo('entidad710-0')">Eliminar</button>
           </div>
 
           <div class="row g-2 mb-3">
             <div class="col-md-12">
               <label class="subcampo-label">$a Entidad relacionada</label>
-              <input type="text" class="form-control" name="entidad710_a_0" placeholder="Ej: Universidad Nacional de Loja, Ministerio de Cultura">
+              <input type="text" class="form-control" name="entidad710_a_0"
+                placeholder="Ej: Universidad Nacional de Loja, Ministerio de Cultura">
             </div>
           </div>
 
@@ -108,11 +120,14 @@
             <label class="subcampo-label">$e Función (R)</label>
             <div id="funciones710-0" class="mb-2">
               <div class="input-group input-group-sm mb-2" data-subcampo="funcion710-0-0">
-                <input type="text" name="entidad710_e_0_0" class="form-control" placeholder="Ej: coeditor, patrocinante, lugar de ejecución">
-                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('funcion710-0-0')">X</button>
+                <input type="text" name="entidad710_e_0_0" class="form-control"
+                  placeholder="Ej: coeditor, patrocinante, lugar de ejecución">
+                <button type="button" class="btn btn-outline-danger"
+                  onclick="eliminarSubcampo('funcion710-0-0')">X</button>
               </div>
             </div>
-            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarFuncion710(0)">+ Agregar función</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarFuncion710(0)">+ Agregar
+              función</button>
           </div>
         </div>
       </div>
@@ -124,8 +139,8 @@
 
     <!-- =================== 773 =================== -->
     <div class="mb-4 p-3 border rounded bg-light-subtle">
-      <h4>773 1# Colección</h4>
-      <div class="alert alert-info py-2">
+      <h3 class="campo-label mb-0">773 1# Colección</h3>
+      <div class="alert alert-info small" role="alert">
         Registra la colección o fuente principal donde pertenece la obra.
       </div>
 
@@ -133,7 +148,8 @@
         <div class="campo-repetible mb-3 p-3 border bg-white shadow-sm" data-campo="coleccion773-0">
           <div class="campo-header d-flex justify-content-between align-items-center mb-3">
             <span class="campo-label fw-bold">Colección #1</span>
-            <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('coleccion773-0')">Eliminar</button>
+            <button type="button" class="btn btn-outline-danger btn-sm"
+              onclick="eliminarCampo('coleccion773-0')">Eliminar</button>
           </div>
 
           <div class="row g-2 mb-3">
@@ -143,7 +159,8 @@
             </div>
             <div class="col-md-4">
               <label class="subcampo-label">$t Título de colección</label>
-              <input type="text" class="form-control" name="coleccion773_t_0" placeholder="Ej: Obras completas para piano">
+              <input type="text" class="form-control" name="coleccion773_t_0"
+                placeholder="Ej: Obras completas para piano">
             </div>
             <div class="col-md-4">
               <label class="subcampo-label">$w Número de documento fuente</label>
@@ -160,8 +177,8 @@
 
     <!-- =================== 774 =================== -->
     <div class="mb-4 p-3 border rounded bg-light-subtle">
-      <h4>774 1# Obra en esta colección</h4>
-      <div class="alert alert-info py-2">
+      <h3 class="campo-label mb-0">774 1# Obra en esta colección</h3>
+      <div class="alert alert-info small" role="alert">
         Registra obras contenidas dentro de una colección más grande.
       </div>
 
@@ -169,7 +186,8 @@
         <div class="campo-repetible mb-3 p-3 border bg-white shadow-sm" data-campo="obra774-0">
           <div class="campo-header d-flex justify-content-between align-items-center mb-3">
             <span class="campo-label fw-bold">Obra #1</span>
-            <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('obra774-0')">Eliminar</button>
+            <button type="button" class="btn btn-outline-danger btn-sm"
+              onclick="eliminarCampo('obra774-0')">Eliminar</button>
           </div>
 
           <div class="row g-2 mb-3">
@@ -196,8 +214,8 @@
 
     <!-- =================== 787 =================== -->
     <div class="mb-4 p-3 border rounded bg-light-subtle">
-      <h4>787 1# Otras Relaciones</h4>
-      <div class="alert alert-info py-2">
+      <h3 class="campo-label mb-0">787 1# Otras Relaciones</h3>
+      <div class="alert alert-info small" role="alert">
         Registra otras relaciones con obras vinculadas o relacionadas temáticamente.
       </div>
 
@@ -205,7 +223,8 @@
         <div class="campo-repetible mb-3 p-3 border bg-white shadow-sm" data-campo="otras787-0">
           <div class="campo-header d-flex justify-content-between align-items-center mb-3">
             <span class="campo-label fw-bold">Obra Relacionada #1</span>
-            <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('otras787-0')">Eliminar</button>
+            <button type="button" class="btn btn-outline-danger btn-sm"
+              onclick="eliminarCampo('otras787-0')">Eliminar</button>
           </div>
 
           <div class="row g-2 mb-3">
