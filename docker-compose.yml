@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: pg-marc21
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: marc21_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata_marc21:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer:latest
+    container_name: adminer-marc21
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  pgdata_marc21:

@@ -141,9 +141,34 @@
                 <div class="row g-2 mb-3">
                     <div class="col-md-12">
                         <label class="subcampo-label">$p Notación Musical (opcional)</label>
-                        <textarea name="incipit_p_0" class="form-control" rows="2" placeholder="Código de incipit musical (Plaine & Easie, MusicXML, ABC)"></textarea>
+
+                        <!-- textarea oficial 031 $p: aquí se guarda el PAE que Django recibe -->
+                        <textarea
+                            name="incipit_p_0"
+                            id="incipit_p_0"
+                            class="form-control mb-2"
+                            rows="2"
+                            placeholder="Código de incipit musical (Plaine & Easie, MusicXML, ABC)"></textarea>
+
+                        <!-- Canvas para dibujar el incipit -->
+                        <div class="border rounded p-2 bg-light">
+                            <canvas
+                                id="incipit_canvas_0"
+                                width="800"
+                                height="320"
+                                style="width: 100%; max-width: 100%;"></canvas>
+                        </div>
+
+                        <!-- Campos ocultos auxiliares, por si los usa el motor -->
+                        <input type="hidden" id="incipitPaec" name="incipit_paec_0">
+                        <input type="hidden" id="incipitTransposition" name="incipit_transp_0">
+
+                        <small class="text-muted d-block mt-1">
+                            El código PAE generado por el incipit se guardará en el campo $p.
+                        </small>
                     </div>
                 </div>
+
 
                 <!-- URLs repetibles para este incipit -->
                 <div class="subcampo-group">
