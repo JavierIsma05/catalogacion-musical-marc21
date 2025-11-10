@@ -1,37 +1,40 @@
 // Adapter mínimo entre el formulario Django (031) y el motor incipitManager.js
-// Requiere que incipitManager.js ya haya cargado y definido CanvasIncipit y TransformIncipitToPAEC.
+// Usa el objeto global CanvasIncipit que crea incipitManager.js.
 
 (function () {
-  // Si por lo que sea el legacy no está cargado, salimos
-  if (
-    typeof CanvasIncipit === "undefined" ||
-    typeof TransformIncipitToPAEC === "undefined"
-  ) {
-    console.warn(
-      "incipit-031-adapter: CanvasIncipit o TransformIncipitToPAEC no están disponibles"
-    );
+  // Verificamos que el legacy se haya cargado
+  if (typeof window.CanvasIncipit === "undefined") {
+    console.warn("incipit-031-adapter: CanvasIncipit no está disponible");
     return;
   }
 
-  // 1) Envolvemos la función global TransformIncipitToPAEC para copiar el PAE al textarea Django
-  var originalTransform = window.TransformIncipitToPAEC;
+  // 1) Envolvemos el método TransformIncipitToPAEC del objeto CanvasIncipit
+  var originalTransform = CanvasIncipit.TransformIncipitToPAEC
+    ? CanvasIncipit.TransformIncipitToPAEC.bind(CanvasIncipit)
+    : null;
 
-  window.TransformIncipitToPAEC = function (context) {
-    // Ejecutar la lógica original (calcula paec, var031p, etc. y escribe en #incipitPaec)
-    originalTransform(context);
+  if (!originalTransform) {
+    console.warn(
+      "incipit-031-adapter: CanvasIncipit.TransformIncipitToPAEC no está definido"
+    );
+  } else {
+    CanvasIncipit.TransformIncipitToPAEC = function (context) {
+      // Ejecutar lógica original del legacy
+      originalTransform(context);
 
-    // Leer el PAE que el legacy escribió en #incipitPaec
-    var paecInput = document.getElementById("incipitPaec");
-    var paeCode = paecInput ? paecInput.value : "";
+      // Leer el PAE que el legacy escribe en #incipitPaec
+      var paecInput = document.getElementById("incipitPaec");
+      var paeCode = paecInput ? paecInput.value : "";
 
-    // Copiar al textarea oficial del 031 $p (primer incipit)
-    var textareaP = document.getElementById("incipit_p_0");
-    if (textareaP && paeCode !== undefined) {
-      textareaP.value = paeCode;
-    }
-  };
+      // Copiar al textarea oficial del 031 $p (primer incipit)
+      var textareaP = document.getElementById("incipit_p_0");
+      if (textareaP && typeof paeCode === "string") {
+        textareaP.value = paeCode;
+      }
+    };
+  }
 
-  // 2) Inicializar el canvas del primer incipit al cargar la página
+  // 2) Inicializar el canvas del primer incipit una vez cargado el DOM
   document.addEventListener("DOMContentLoaded", function () {
     var canvasEl = document.getElementById("incipit_canvas_0");
     if (!canvasEl) {
@@ -39,7 +42,7 @@
       return;
     }
 
-    // Asegurarnos de que existen los hidden con los ids que el legacy espera
+    // Asegurarnos de que existen los hidden con los ids que espera el legacy
     var hiddenPaec = document.getElementById("incipitPaec");
     if (!hiddenPaec) {
       hiddenPaec = document.createElement("input");
@@ -58,8 +61,8 @@
       canvasEl.parentNode.appendChild(hiddenTransp);
     }
 
-    // Inicializar el canvas con la operación "add" (nuevo incipit editable)
-    // Tercer parámetro = PAE inicial (cadena vacía al crear)
+    // Inicializar el canvas del legacy: 'add' = nuevo incipit editable
+    // Tercer parámetro = PAE inicial (vacío al crear)
     CanvasIncipit.initializeCanvas("incipit_canvas_0", "add", "");
   });
 })();

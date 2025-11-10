@@ -2524,6 +2524,6 @@ function initializeIncipit(canvasElement, operation, paec, canvas) {
   }
 }
 
-// Al final del archivo legacy:
-window.CanvasClass = window.CanvasClass || CanvasClass; // si tu clase se llama CanvasClass
-window.IncipitClass = window.IncipitClass || IncipitClass; // opcional, si también la usas
+// // Al final del archivo legacy:
+// window.CanvasClass = window.CanvasClass || CanvasClass; // si tu clase se llama CanvasClass
+// window.IncipitClass = window.IncipitClass || IncipitClass; // opcional, si también la usas

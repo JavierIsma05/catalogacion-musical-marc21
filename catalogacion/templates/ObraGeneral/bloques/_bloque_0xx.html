@@ -150,15 +150,32 @@
                             rows="2"
                             placeholder="Código de incipit musical (Plaine & Easie, MusicXML, ABC)"></textarea>
 
-                        <!-- Canvas para dibujar el incipit -->
-                        <div class="border rounded p-2 bg-light">
+                        <!-- CONTENEDOR DEL CANVAS + BOTONES -->
+                        <div class="border rounded p-2 bg-light position-relative" style="min-height: 220px;">
                             <canvas
                                 id="incipit_canvas_0"
                                 width="800"
-                                height="320"
+                                height="180"
                                 style="width: 100%; max-width: 100%;"></canvas>
-                        </div>
 
+                            <!-- Botón subir nota -->
+                            <button
+                                type="button"
+                                id="toneUp"
+                                class="btn btn-sm btn-secondary"
+                                style="position: absolute; visibility: hidden; z-index: 10;">
+                                ▲
+                            </button>
+
+                            <!-- Botón bajar nota -->
+                            <button
+                                type="button"
+                                id="toneDown"
+                                class="btn btn-sm btn-secondary"
+                                style="position: absolute; visibility: hidden; z-index: 10;">
+                                ▼
+                            </button>
+                        </div>
                         <!-- Campos ocultos auxiliares, por si los usa el motor -->
                         <input type="hidden" id="incipitPaec" name="incipit_paec_0">
                         <input type="hidden" id="incipitTransposition" name="incipit_transp_0">

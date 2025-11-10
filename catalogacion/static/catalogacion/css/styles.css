@@ -183,3 +183,10 @@ label {
     background-color: #e9ecef;
     opacity: 1;
 }
+
+@font-face {
+  font-family: "Maestro";
+  src: url("/static/catalogacion/fonts/maestro.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
