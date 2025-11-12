@@ -1,0 +1,113 @@
+{# ============================================ #}
+{# BLOQUE 6XX - MATERIAS Y GÉNEROS/FORMA       #}
+{# ============================================ #}
+
+<div class="card border-0 shadow-sm mb-4" id="bloque-6xx">
+  <div class="card-body">
+    <h2 class="section-title">Campos 6XX – Materias y Géneros/Forma</h2>
+
+    <!-- ===================================== -->
+    <!-- 650 - MATERIA (Temas) -->
+    <!-- ===================================== -->
+    <div class="campo-repetible mb-4">
+      <div class="campo-header d-flex justify-content-between align-items-center">
+        <h3 class="campo-label mb-0">650 – Materia (Temas)</h3>
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMateria650()">
+          <i class="bi bi-plus"></i> Agregar
+        </button>
+      </div>
+
+      <div class="alert alert-info mt-2" role="alert">
+        <i class="bi bi-info-circle"></i>
+        <small>Campo repetible para registrar temas o materias principales relacionadas con la obra.</small>
+      </div>
+
+      <div id="materia-650-container">
+        <div class="campo-repetible mb-3" data-campo="materia-650-0">
+          <div class="campo-header d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-bold">Materia #1</span>
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('materia-650-0')">
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </div>
+
+          <!-- $a Materia (NR) -->
+          <div class="row g-2 mb-2">
+            <div class="col-md-12">
+              <label class="subcampo-label">$a Materia (NR)</label>
+              <input type="text" name="materia_650a_0" class="form-control form-control-sm" 
+                     placeholder="Ej: Música coral religiosa">
+            </div>
+          </div>
+
+          <!-- $x Subdivisión de materia (R) -->
+          <div id="submateria-650-0">
+            <div class="input-group mb-2">
+              <span class="input-group-text">$x</span>
+              <input type="text" name="materia_650x_0_0" class="form-control form-control-sm"
+                     placeholder="Ej: Siglo XIX">
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarSubMateria650(0)">
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <small class="text-muted">Ejemplo: 650 #4 $a Música coral religiosa $x Siglo XIX</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================== -->
+    <!-- 655 - MATERIA (Género/Forma) -->
+    <!-- ===================================== -->
+    <div class="campo-repetible mb-4">
+      <div class="campo-header d-flex justify-content-between align-items-center">
+        <h3 class="campo-label mb-0">655 – Materia (Género/Forma)</h3>
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMateria655()">
+          <i class="bi bi-plus"></i> Agregar
+        </button>
+      </div>
+
+      <div class="alert alert-info mt-2" role="alert">
+        <i class="bi bi-info-circle"></i>
+        <small>Campo repetible para registrar géneros o formas musicales.</small>
+      </div>
+
+      <div id="materia-655-container">
+        <div class="campo-repetible mb-3" data-campo="materia-655-0">
+          <div class="campo-header d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-bold">Género/Forma #1</span>
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('materia-655-0')">
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </div>
+
+          <!-- $a Materia (NR) -->
+          <div class="row g-2 mb-2">
+            <div class="col-md-12">
+              <label class="subcampo-label">$a Materia (Género/Forma) (NR)</label>
+              <input type="text" name="materia_655a_0" class="form-control form-control-sm"
+                     placeholder="Ej: Motetes">
+            </div>
+          </div>
+
+          <!-- $x Subdivisión general (R) -->
+          <div id="submateria-655-0">
+            <div class="input-group mb-2">
+              <span class="input-group-text">$x</span>
+              <input type="text" name="materia_655x_0_0" class="form-control form-control-sm"
+                     placeholder="Ej: Corales">
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarSubMateria655(0)">
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <small class="text-muted">Ejemplo: 655 #4 $a Motetes $x Corales</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

@@ -355,6 +355,171 @@ def debug_obra_datos(request, obra=None):
     else:
         print(f"    (vacío)")
     print()
+        # ========================================
+    # BLOQUE 5XX
+    # ========================================
+    print("📌 BLOQUE 5XX - NOTAS")
+    print("-" * 110)
+
+    # 500 - Nota General
+    print(f"  500:")
+    notas_generales = _extraer_subcampos_anidados_multiples(request, 'nota_general_500_a')
+    if notas_generales:
+        for i, nota in enumerate(notas_generales, 1):
+            print(f"    [{i}] $a: {nota}")
+    else:
+        print("    (vacío)")
+    print()
+
+    # 505 - Nota de Contenido
+    print(f"  505:")
+    notas_contenido = _extraer_subcampos_anidados_multiples(request, 'nota_contenido_505_a')
+    if notas_contenido:
+        for i, nota in enumerate(notas_contenido, 1):
+            print(f"    [{i}] $a: {nota}")
+    else:
+        print("    (vacío)")
+    print()
+
+    # 545 - Nota Biográfica
+    print(f"  545:")
+    notas_bio = _extraer_datos_repetibles(request, 'nota_biografica_545', ['a', 'u'])
+    if notas_bio:
+        for i, nota in enumerate(notas_bio, 1):
+            print(f"    [{i}] $a: {nota.get('a', '')}")
+            if nota.get('u'):
+                print(f"        $u: {nota.get('u', '')}")
+    else:
+        print("    (vacío)")
+    print()
+
+
+    # ========================================
+    # BLOQUE 6XX
+    # ========================================
+    print("📌 BLOQUE 6XX - MATERIAS Y GÉNEROS")
+    print("-" * 110)
+
+    # 650 - Materia
+    print(f"  650:")
+    materias = _extraer_subcampos_anidados_multiples(request, 'materia_650_a')
+    if materias:
+        for i, mat in enumerate(materias, 1):
+            print(f"    [{i}] $a: {mat}")
+    else:
+        print("    (vacío)")
+    print()
+
+    # 655 - Género/Forma
+    print(f"  655:")
+    generos = _extraer_subcampos_anidados_multiples(request, 'materia_genero_655_a')
+    if generos:
+        for i, gen in enumerate(generos, 1):
+            print(f"    [{i}] $a: {gen}")
+    else:
+        print("    (vacío)")
+    print()
+
+
+    # ========================================
+    # BLOQUE 7XX
+    # ========================================
+    print("📌 BLOQUE 7XX - ENTRADAS ADICIONALES")
+    print("-" * 110)
+
+    # 700 - Nombre relacionado
+    print(f"  700:")
+    idx = 0
+    tiene_700 = False
+    while True:
+        termino = request.POST.get(f'termino_asociado_700_c_{idx}', '')
+        funcion = request.POST.get(f'funcion_700_e_{idx}', '')
+        relacion = request.POST.get(f'relacion_700_i_{idx}', '')
+        autoria = request.POST.get(f'autoria_700_j_{idx}', '')
+        if any([termino, funcion, relacion, autoria]):
+            tiene_700 = True
+            print(f"    [{idx+1}]")
+            if termino: print(f"        $c: {termino}")
+            if funcion: print(f"        $e: {funcion}")
+            if relacion: print(f"        $i: {relacion}")
+            if autoria: print(f"        $j: {autoria}")
+        else:
+            if idx > 20:
+                break
+        idx += 1
+    if not tiene_700:
+        print("    (vacío)")
+    print()
+
+    # 710 - Entidad relacionada
+    print(f"  710:")
+    funciones_entidad = _extraer_subcampos_anidados_multiples(request, 'funcion_entidad_710_e')
+    if funciones_entidad:
+        for i, func in enumerate(funciones_entidad, 1):
+            print(f"    [{i}] $e: {func}")
+    else:
+        print("    (vacío)")
+    print()
+
+    # 773 - Documento fuente
+    print(f"  773:")
+    docs = _extraer_subcampos_anidados_multiples(request, 'coleccion_773_w')
+    if docs:
+        for i, doc in enumerate(docs, 1):
+            print(f"    [{i}] $w: {doc}")
+    else:
+        print("    (vacío)")
+    print()
+
+    # 774 - Obra en colección
+    print(f"  774:")
+    obras_rel = _extraer_subcampos_anidados_multiples(request, 'obra_coleccion_774_w')
+    if obras_rel:
+        for i, num in enumerate(obras_rel, 1):
+            print(f"    [{i}] $w: {num}")
+    else:
+        print("    (vacío)")
+    print()
+
+    # 787 - Otras relaciones
+    print(f"  787:")
+    otras_rel = _extraer_subcampos_anidados_multiples(request, 'otras_relaciones_787_w')
+    if otras_rel:
+        for i, num in enumerate(otras_rel, 1):
+            print(f"    [{i}] $w: {num}")
+    else:
+        print("    (vacío)")
+    print()
+
+
+    # ========================================
+    # BLOQUE 8XX
+    # ========================================
+    print("📌 BLOQUE 8XX - UBICACIÓN Y DISPONIBILIDAD")
+    print("-" * 110)
+
+    # 852 - Ubicación
+    print(f"  852:")
+    ubicaciones = _extraer_subcampos_anidados_multiples(request, 'ubicacion_852_c')
+    if ubicaciones:
+        for i, ubi in enumerate(ubicaciones, 1):
+            print(f"    [{i}] $c: {ubi}")
+    else:
+        print("    (vacío)")
+    print()
+
+    # 856 - Recurso electrónico
+    print(f"  856:")
+    urls = _extraer_datos_repetibles(request, 'disponible_856', ['u', 'y'])
+    if urls:
+        for i, u in enumerate(urls, 1):
+            print(f"    [{i}] $u: {u.get('u', '')}")
+            if u.get('y'):
+                print(f"        $y: {u.get('y', '')}")
+    else:
+        print("    (vacío)")
+    print()
+
     
     # ========================================
     # CAMPOS AUTOGENERADOS

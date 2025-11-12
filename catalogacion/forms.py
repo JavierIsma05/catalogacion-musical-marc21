@@ -47,6 +47,25 @@ from .models import (
     MencionSerie490,
     TituloSerie490,
     VolumenSerie490,
+    # Bloque 5XX
+    NotaGeneral500,
+    NotaContenido505,
+    NotaBiografica545,
+    # Bloque 6XX
+    Materia650,
+    MateriaGenero655,
+    # Bloque 7XX
+    TerminoAsociado700,
+    Funcion700,
+    Relacion700,
+    Autoria700,
+    FuncionEntidad710,
+    NumeroDocumentoRelacionado773,
+    NumeroObraRelacionada774,
+    NumeroObraRelacionada787,
+    # Bloque 8xx
+    Estanteria852,
+    Disponible856,
     # Principal
     ObraGeneral,
     AutoridadPersona,
@@ -956,6 +975,375 @@ MencionSerie490FormSet = forms.inlineformset_factory(
     max_num=10,
     can_delete=True
 )
+# ============================================================
+# 📋 BLOQUE 5XX - NOTAS Y DESCRIPCIONES
+# ============================================================
+# ---------- 500 Nota general ----------
+class NotaGeneral500Form(forms.ModelForm):
+    """500 $a - Nota general (R)"""
+    class Meta:
+        model = NotaGeneral500
+        fields = ['texto']
+        widgets = {
+            'texto': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 2,
+                'placeholder': '500 $a - Nota general'
+            })
+        }
+
+NotaGeneral500FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    NotaGeneral500,
+    form=NotaGeneral500Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ---------- 505 Contenido ----------
+class NotaContenido505Form(forms.ModelForm):
+    """505 $a - Contenido (R)"""
+    class Meta:
+        model = NotaContenido505
+        fields = ['contenido']
+        widgets = {
+            'contenido': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 2,
+                'placeholder': '505 $a - Contenido de la obra'
+            })
+        }
+
+NotaContenido505FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    NotaContenido505,
+    form=NotaContenido505Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+# ---------- 545 Datos biográficos ----------
+class NotaBiografica545Form(forms.ModelForm):
+    """545 $a - Datos biográficos del compositor (R)"""
+    class Meta:
+        model = NotaBiografica545
+        fields = ['datos_biograficos']
+        widgets = {
+            'datos_biograficos': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': '545 $a - Datos biográficos del compositor'
+            })
+        }
+
+class NotaBiografica545Form(forms.ModelForm):
+    """545 $u - URL relacionada (R)"""
+    class Meta:
+        model = NotaBiografica545
+        fields = ['url']
+        widgets = {
+            'url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': '545 $u - URL del recurso relacionado'
+            })
+        }
+
+NotaBiografica545FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    NotaBiografica545,
+    form=NotaBiografica545Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ============================================================
+# 📚 BLOQUE 6XX - MATERIAS
+# ============================================================
+class Materia650Form(forms.ModelForm):
+    """650 $x - Subdivisión de materia (R)"""
+    class Meta:
+        model = Materia650
+        fields = ['subdivision']
+        widgets = {
+            'subdivision': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '650 $x - Subdivisión de materia'
+            })
+        }
+
+Materia650FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Materia650,
+    form=Materia650Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+class MateriaGenero655Form(forms.ModelForm):
+    """655 $x - Subdivisión general (R)"""
+    class Meta:
+        model = MateriaGenero655
+        fields = ['subdivision_general']
+        widgets = {
+            'subdivision_general': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '655 $x - Subdivisión general'
+            })
+        }
+
+MateriaGenero655FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    MateriaGenero655,
+    form=MateriaGenero655Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ============================================================
+# 👥 BLOQUE 7XX - ENTRADAS ADICIONALES
+# ============================================================
+
+class TerminoAsociado700Form(forms.ModelForm):
+    """700 $c - Término asociado al nombre (R)"""
+    class Meta:
+        model = TerminoAsociado700
+        fields = ['termino']
+        widgets = {
+            'termino': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '700 $c - Término asociado al nombre'
+            })
+        }
+
+TerminoAsociado700FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    TerminoAsociado700,
+    form=TerminoAsociado700Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+class Funcion700Form(forms.ModelForm):
+    """700 $e - Función (R)"""
+    class Meta:
+        model = Funcion700
+        fields = ['funcion']
+        widgets = {
+            'funcion': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '700 $e - Función'
+            })
+        }
+        
+Funcion700FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Funcion700,
+    form=Funcion700Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+class Relacion700Form(forms.ModelForm):
+    """700 $i - Relación (R)"""
+    class Meta:
+        model = Relacion700
+        fields = ['descripcion']
+        widgets = {
+            'descripcion': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '700 $i - Relación'
+            })
+        }
+Relacion700FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Relacion700,
+    form=Relacion700Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+class Autoria700Form(forms.ModelForm):
+    """700 $j - Autoría (R)"""
+    class Meta:
+        model = Autoria700
+        fields = ['autoria']
+        widgets = {
+            'autoria': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '700 $j - Autoría'
+            })
+        }
+Autoria700FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Autoria700,
+    form=Autoria700Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ---------- 710 Entidad relacionada ----------
+class FuncionEntidad710Form(forms.ModelForm):
+    """710 $e - Función (R)"""
+    class Meta:
+        model = FuncionEntidad710
+        fields = ['funcion']
+        widgets = {
+            'funcion': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '710 $e - Función de la entidad'
+            })
+        }
+FuncionEntidad710FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    FuncionEntidad710,
+    form=FuncionEntidad710Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ---------- 773 Colección ----------
+class NumeroDocumentoRelacionado773Form(forms.ModelForm):
+    """773 $w - Número de documento fuente (R)"""
+    class Meta:
+        model = NumeroDocumentoRelacionado773
+        fields = ['numero']
+        widgets = {
+            'numero': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '773 $w - Número de documento fuente'
+            })
+        }
+NumeroDocumentoRelacionado773FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    NumeroDocumentoRelacionado773,
+    form=NumeroDocumentoRelacionado773Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ---------- 774 Obra en esta colección ----------
+class NumeroObraRelacionada774Form(forms.ModelForm):
+    """774 $w - Número de esta obra en la colección (R)"""
+    class Meta:
+        model = NumeroObraRelacionada774
+        fields = ['numero']
+        widgets = {
+            'numero': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '774 $w - Número de esta obra en la colección'
+            })
+        }
+NumeroObraRelacionada774FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    NumeroObraRelacionada774,
+    form=NumeroObraRelacionada774Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+# ---------- 787 Otras relaciones ----------
+class NumeroObraRelacionada787Form(forms.ModelForm):
+    """787 $w - Número de obra relacionada (R)"""
+    class Meta:
+        model = NumeroObraRelacionada787
+        fields = ['numero']
+        widgets = {
+            'numero': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '787 $w - Número de obra relacionada'
+            })
+        }
+NumeroObraRelacionada787FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    NumeroObraRelacionada787,
+    form=NumeroObraRelacionada787Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+# ============================================================
+# 🗂️ BLOQUE 8XX - UBICACIÓN Y DISPONIBILIDAD
+# ============================================================
+
+# ---------- 852 $c - Estantería ----------
+class Estanteria852Form(forms.ModelForm):
+    """852 $c - Estantería (R)"""
+    class Meta:
+        model = Estanteria852  # asegúrate que este sea tu modelo correcto
+        fields = ['estanteria']
+        widgets = {
+            'estanteria': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '852 $c - Estantería (R)'
+            })
+        }
+
+Ubicacion852_cFormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Estanteria852,
+    form=Estanteria852Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
+
+# ---------- 856 $u - URL ----------
+class Disponible856Form(forms.ModelForm):
+    """856 $u - URL (R)"""
+    class Meta:
+        model = Disponible856  # tu modelo de disponibilidad
+        fields = ['url']
+        widgets = {
+            'url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': '856 $u - URL del recurso'
+            })
+        }
+
+# ---------- 856 $y - Texto del enlace ----------
+class Disponible856Form(forms.ModelForm):
+    """856 $y - Texto del enlace (R)"""
+    class Meta:
+        model = Disponible856
+        fields = ['texto_enlace']
+        widgets = {
+            'texto_enlace': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '856 $y - Texto del enlace'
+            })
+        }
+
+Disponible856FormSet = forms.inlineformset_factory(
+    ObraGeneral,
+    Disponible856,
+    form=Disponible856Form,
+    extra=1,
+    min_num=0,
+    max_num=10,
+    can_delete=True
+)
 
 # ============================================================
 # 🎯 FORMULARIO PRINCIPAL - ObraGeneral
@@ -1057,6 +1445,26 @@ __all__ = [
     'TituloSerie490FormSet',
     'VolumenSerie490FormSet',
     'MencionSerie490FormSet',
+    # Bloque 5XX
+    'NotaGeneral500FormSet',
+    'NotaContenido505FormSet',
+    'NotaBiografica545FormSet',
+    # Bloque 6XX
+    'Materia650FormSet',
+    'MateriaGenero655FormSet',
+    # Bloque 7XX
+    'TerminoAsociado700Form',
+    'Funcion700Form',
+    'Relacion700Form',
+    'Autoria700Form',
+    'FuncionEntidad710Form',
+    'NumeroDocumentoRelacionado773Form',
+    'NumeroObraRelacionada774Form',
+    'NumeroObraRelacionada787Form',
+    # Bloque 8xx
+    'Estanteria852FormSet',
+    'Disponible856FormSet',
+
     # Principal
     'ObraGeneralForm',
 ]

@@ -1,0 +1,153 @@
+{# ============================================ #}
+{# BLOQUE 8XX - UBICACIÓN Y DISPONIBILIDAD #}
+{# ============================================ #}
+
+<div class="card border-0 shadow-sm mb-4" id="bloque-8xx">
+  <div class="card-body">
+    <h2 class="section-title">Campos 8XX – Ubicación y Disponibilidad</h2>
+
+    <!-- 852 - UBICACIÓN -->
+    <div class="mb-4">
+      <h3 class="campo-label">852 – Ubicación (R)</h3>
+
+      <div class="alert alert-info" role="alert">
+        <i class="bi bi-info-circle"></i>
+        <small>
+          Indica la institución o persona responsable, la estantería y la signatura original de la obra.
+        </small>
+      </div>
+
+      <!-- 852 $a - Institución o persona -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6 position-relative">
+          <label class="form-label small">$a Institución o persona (NR)</label>
+          <input type="text"
+                id="ubicacion_institucion"
+                name="institucion_persona_852a"
+                class="form-control form-control-sm"
+                style="color: #222; background-color: #ffffe0; border-color: #97fcc9;"
+                placeholder="Ej: Universidad Nacional de Loja">
+          <!-- Contenedor del autocompletado -->
+           <i class="bi bi-pencil position-absolute top-50 end-0 translate-middle-y me-2 text-success"></i>
+          <div id="ubicacion-autocomplete" class="autocomplete-dropdown"></div>
+        </div>
+
+
+        <!-- 852 $h - Signatura original -->
+        <div class="col-md-6">
+          <label class="form-label small">$h Signatura original (NR)</label>
+          <input type="text" name="signatura_original_852h"
+                 class="form-control form-control-sm"
+                 placeholder="Ej: Ms. Mus. 245">
+        </div>
+      </div>
+
+      <!-- 852 $c - Estantería (Repetible) -->
+      <div class="subcampo-group mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="subcampo-label mb-0">$c Estantería (R)</label>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarEstanteria852()">
+            <i class="bi bi-plus"></i> Agregar
+          </button>
+        </div>
+        <div id="estanterias-852">
+          <div class="mb-2" data-subcampo="estanteria-852-0">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text">$c</span>
+              <input type="text" name="estanteria_852c_0"
+                     class="form-control"
+                     placeholder="Ej: Sala Manuscritos, Estante B-3">
+              <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('estanteria-852-0')">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 856 - DISPONIBLE -->
+    <div>
+      <h3 class="campo-label">856 – Disponible (R)</h3>
+
+      <div class="alert alert-info" role="alert">
+        <i class="bi bi-link-45deg"></i>
+        <small>Campo repetible para incluir enlaces a recursos electrónicos disponibles.</small>
+      </div>
+
+      <!-- Campo repetible 856 -->
+      <div class="campo-repetible mb-3" data-campo="disponible-856-0">
+        <div class="campo-header d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-bold">856 #1 – Recurso Electrónico</span>
+          <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('disponible-856-0')">
+            <i class="bi bi-trash"></i> Eliminar
+          </button>
+        </div>
+
+        <!-- Subcampos $u (R) -->
+        <div class="subcampo-group mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="subcampo-label mb-0">$u URL del recurso (R)</label>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarURL856(0)">
+              <i class="bi bi-plus"></i>
+            </button>
+          </div>
+          <div id="urls-856-0">
+            <div class="mb-2" data-subcampo="url-856-0-0">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text">$u</span>
+                <input type="url"
+                       name="url_856u_0_0"
+                       class="form-control"
+                       placeholder="https://repositorio.unl.edu.ec/handle/123456789/xxxx">
+                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('url-856-0-0')">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subcampos $y (R) -->
+        <div class="subcampo-group mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="subcampo-label mb-0">$y Texto del enlace (R)</label>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarTextoEnlace856(0)">
+              <i class="bi bi-plus"></i>
+            </button>
+          </div>
+          <div id="textos-enlace-856-0">
+            <div class="mb-2" data-subcampo="texto-enlace-856-0-0">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text">$y</span>
+                <input type="text"
+                       name="texto_enlace_856y_0_0"
+                       class="form-control"
+                       placeholder="Ver partitura digital">
+                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('texto-enlace-856-0-0')">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ejemplo -->
+        <div>
+          <small class="text-muted">
+            <strong>Ejemplo:</strong>
+            856 4# $uhttps://repositorio.unl.edu.ec/... $yVer partitura digital
+          </small>
+        </div>
+      </div>
+
+      <!-- Contenedor para nuevos recursos 856 -->
+      <div id="disponibles-container"></div>
+
+      <!-- Botón para añadir más 856 -->
+      <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="agregarDisponible856()">
+        <i class="bi bi-plus-circle"></i> Agregar nuevo recurso 856
+      </button>
+    </div>
+  </div>
+</div>

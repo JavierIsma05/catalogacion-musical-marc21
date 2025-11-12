@@ -91,3 +91,16 @@ class AutoridadMateria(models.Model):
     
     def __str__(self):
         return self.termino
+
+class AutoridadEntidad(models.Model):
+    """Autoridad de entidades o instituciones (710 $a)"""
+    nombre = models.CharField(max_length=300, unique=True)
+    pais = models.CharField(max_length=100, blank=True, null=True)
+    descripcion = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Autoridad - Entidad"
+        verbose_name_plural = "Autoridad - Entidades"
+
+    def __str__(self):
+        return self.nombre

@@ -1,0 +1,256 @@
+<div class="card border-0 shadow-sm mb-4" id="bloque-7xx">
+  <div class="card-body">
+    <h2 class="section-title">Campos 7XX – Entradas secundarias (relaciones)</h2>
+
+    <!-- ===================== 700 ===================== -->
+    <div class="campo-repetible mb-4">
+      <div class="campo-header d-flex justify-content-between align-items-center">
+        <h3 class="campo-label mb-0">700 – Nombre relacionado (R)</h3>
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregar700()">
+          <i class="bi bi-plus"></i> Agregar 700
+        </button>
+      </div>
+
+      <div id="c700-container">
+        <div class="campo-repetible mb-3" data-campo="c700-0">
+          <div class="campo-header d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-bold">700 #1</span>
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('c700-0')">
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </div>
+
+          <div class="mb-2 position-relative">
+            <label class="subcampo-label">$a Apellidos, Nombres (NR)</label>
+            <input type="text" id="nombre_relacionado_apellidos_0" name="700a_0" style="color: #222; background-color: #ffffe0; border-color: #97fcc9;" class="form-control form-control-sm"
+              placeholder="Apellidos, Nombres">
+            <div id="nombre-relacionado-autocomplete-0" class="autocomplete-dropdown"></div>
+            
+          </div>
+
+          <div class="mb-2">
+            <label class="subcampo-label">$d Coordenadas biográficas (NR)</label>
+            <input type="text" id="nombre_relacionado_fechas_0" name="700d_0" class="form-control form-control-sm"
+              placeholder="Ej: 1820–1880">
+          </div>
+        
+
+
+      <!-- R: $c -->
+      <div class="subcampo-group mb-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <label class="subcampo-label mb-0">$c Término asociado (R)</label>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="addSub('c700-0','700c')"><i
+              class="bi bi-plus"></i></button>
+        </div>
+        <div id="c700-0_700c">
+          <div class="mb-1" data-sub="c700-0_700c_0">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text">$c</span>
+              <input name="700c_0_0" class="form-control" placeholder="p. ej.: Compositor" >
+              <button class="btn btn-outline-danger" type="button" onclick="delSub('c700-0_700c_0')"><i
+                  class="bi bi-x"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- R: $e -->
+      <div class="subcampo-group mb-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <label class="subcampo-label mb-0">$e Función (R)</label>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="addSub('c700-0','700e')"><i
+              class="bi bi-plus"></i></button>
+        </div>
+        <div id="c700-0_700e"></div>
+      </div>
+
+      <!-- R: $i -->
+      <div class="subcampo-group mb-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <label class="subcampo-label mb-0">$i Relación (R)</label>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="addSub('c700-0','700i')"><i
+              class="bi bi-plus"></i></button>
+        </div>
+        <div id="c700-0_700i"></div>
+      </div>
+
+      <!-- R: $j -->
+      <div class="subcampo-group mb-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <label class="subcampo-label mb-0">$j Autoría (R)</label>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="addSub('c700-0','700j')"><i
+              class="bi bi-plus"></i></button>
+        </div>
+        <div id="c700-0_700j"></div>
+      </div>
+
+      <!-- NR: $t -->
+      <div class="row g-2">
+        <div class="col-md-12">
+          <label class="subcampo-label">$t Título de obra (NR)</label>
+          <input name="700t_0" class="form-control form-control-sm" placeholder="Título de la obra">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 710 ===================== -->
+<div class="campo-repetible mb-4">
+  <div class="campo-header d-flex justify-content-between align-items-center">
+    <h3 class="campo-label mb-0">710 – Entidad relacionada (R)</h3>
+    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregar710()">
+      <i class="bi bi-plus"></i> Agregar 710
+    </button>
+  </div>
+
+  <div id="c710-container">
+    <div class="campo-repetible mb-3" data-campo="c710-0">
+      <div class="campo-header d-flex justify-content-between align-items-center mb-2">
+        <span class="fw-bold">710 #1</span>
+        <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('c710-0')"><i
+            class="bi bi-trash"></i> Eliminar</button>
+      </div>
+
+      <div class="row g-2 mb-2">
+        <div class="col-md-6">
+          <label class="subcampo-label">$a Entidad (NR)</label>
+          <input name="710a_0" class="form-control form-control-sm" placeholder="Nombre de la entidad" style="color: #222; background-color: #ffffe0; border-color: #97fcc9;">
+        </div>
+      </div>
+
+      <div class="subcampo-group">
+        <div class="d-flex justify-content-between align-items-center">
+          <label class="subcampo-label mb-0">$e Función (R)</label>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="addSub('c710-0','710e')"><i
+              class="bi bi-plus"></i></button>
+        </div>
+        <div id="c710-0_710e"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 773 ===================== -->
+<div class="campo-repetible mb-4">
+  <div class="campo-header d-flex justify-content-between align-items-center">
+    <h3 class="campo-label mb-0">773 – Colección (R)</h3>
+    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregar773()">
+      <i class="bi bi-plus"></i> Agregar 773
+    </button>
+  </div>
+
+  <div id="c773-container">
+    <div class="campo-repetible mb-3" data-campo="c773-0">
+      <div class="campo-header d-flex justify-content-between align-items-center mb-2">
+        <span class="fw-bold">773 #1</span>
+        <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('c773-0')"><i
+            class="bi bi-trash"></i> Eliminar</button>
+      </div>
+
+      <div class="row g-2 mb-2">
+        <div class="col-md-6">
+          <label class="subcampo-label">$a Compositor (NR)</label>
+          <input name="773a_0" class="form-control form-control-sm" placeholder="Apellidos, Nombres" style="color: #222; background-color: #ffffe0; border-color: #97fcc9;">
+        </div>
+        <div class="col-md-6">
+          <label class="subcampo-label">$t Título de colección (NR)</label>
+          <input name="773t_0" class="form-control form-control-sm" placeholder="Título de la colección">
+        </div>
+      </div>
+
+      <div class="subcampo-group">
+        <div class="d-flex justify-content-between align-items-center">
+          <label class="subcampo-label mb-0">$w Número de documento fuente (R)</label>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="addSub('c773-0','773w')"><i
+              class="bi bi-plus"></i></button>
+        </div>
+        <div id="c773-0_773w"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 774 ===================== -->
+<div class="campo-repetible mb-4">
+  <div class="campo-header d-flex justify-content-between align-items-center">
+    <h3 class="campo-label mb-0">774 – Obra en esta colección (R)</h3>
+    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregar774()">
+      <i class="bi bi-plus"></i> Agregar 774
+    </button>
+  </div>
+
+  <div id="c774-container">
+    <div class="campo-repetible mb-3" data-campo="c774-0">
+      <div class="campo-header d-flex justify-content-between align-items-center mb-2">
+        <span class="fw-bold">774 #1</span>
+        <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('c774-0')"><i
+            class="bi bi-trash"></i> Eliminar</button>
+      </div>
+
+      <div class="row g-2 mb-2">
+        <div class="col-md-6">
+          <label class="subcampo-label">$a Compositor (NR)</label>
+          <input name="774a_0" class="form-control form-control-sm" style="color: #222; background-color: #ffffe0; border-color: #97fcc9;">
+        </div>
+        <div class="col-md-6">
+          <label class="subcampo-label">$t Título (NR)</label>
+          <input name="774t_0" class="form-control form-control-sm">
+        </div>
+      </div>
+
+      <div class="subcampo-group">
+        <div class="d-flex justify-content-between align-items-center">
+          <label class="subcampo-label mb-0">$w Número de esta obra en la colección (R)</label>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="addSub('c774-0','774w')"><i
+              class="bi bi-plus"></i></button>
+        </div>
+        <div id="c774-0_774w"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 787 ===================== -->
+<div class="campo-repetible">
+  <div class="campo-header d-flex justify-content-between align-items-center">
+    <h3 class="campo-label mb-0">787 – Otras relaciones (R)</h3>
+    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregar787()">
+      <i class="bi bi-plus"></i> Agregar 787
+    </button>
+  </div>
+
+  <div id="c787-container">
+    <div class="campo-repetible mb-3" data-campo="c787-0">
+      <div class="campo-header d-flex justify-content-between align-items-center mb-2">
+        <span class="fw-bold">787 #1</span>
+        <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarCampo('c787-0')"><i
+            class="bi bi-trash"></i> Eliminar</button>
+      </div>
+
+      <div class="row g-2 mb-2">
+        <div class="col-md-6">
+          <label class="subcampo-label">$a Compositor (NR)</label>
+          <input name="787a_0" class="form-control form-control-sm" style="color: #222; background-color: #ffffe0; border-color: #97fcc9;">
+        </div>
+        <div class="col-md-6">
+          <label class="subcampo-label">$t Título (NR)</label>
+          <input name="787t_0" class="form-control form-control-sm">
+        </div>
+      </div>
+
+      <div class="subcampo-group">
+        <div class="d-flex justify-content-between align-items-center">
+          <label class="subcampo-label mb-0">$w Número de obra relacionada (R)</label>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="addSub('c787-0','787w')"><i
+              class="bi bi-plus"></i></button>
+        </div>
+        <div id="c787-0_787w"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>

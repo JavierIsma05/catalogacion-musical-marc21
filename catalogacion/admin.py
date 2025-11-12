@@ -23,6 +23,7 @@ from .models import (
     AutoridadPersona,
     AutoridadTituloUniforme,
     AutoridadFormaMusical,
+    AutoridadEntidad,
     # Bloque 1XX
     FuncionCompositor,
     AtribucionCompositor,
@@ -57,6 +58,26 @@ from .models import (
     MencionSerie490,
     TituloSerie490,
     VolumenSerie490,
+    # Bloque 5XX
+    NotaGeneral500,
+    NotaContenido505,
+    NotaBiografica545,
+
+    # Bloque 6XX
+    Materia650,
+    MateriaGenero655,
+
+    # Bloque 7XX
+    Relacion700,
+    Autoria700,
+    FuncionEntidad710,
+    NumeroDocumentoRelacionado773,
+    NumeroObraRelacionada774,
+    NumeroObraRelacionada787,
+  
+    # Bloque 8XX
+    Estanteria852,
+    Disponible856,
 )
 
 # ================================================
@@ -507,6 +528,109 @@ class MencionSerie490Inline(admin.StackedInline):
             "Primer indicador: 0=no relacionado, 1=relacionado con 800-830."
         )
         return formset
+# =====================================================
+# 🔧 INLINES BLOQUE 5XX – Notas y contenido
+# =====================================================
+class NotaGeneral500Inline(admin.TabularInline):
+    model = NotaGeneral500
+    extra = 1
+    fields = ['texto']
+    verbose_name = "500 Nota general"
+    verbose_name_plural = "📝 500 Notas generales (R)"
+
+
+class NotaContenido505Inline(admin.TabularInline):
+    model = NotaContenido505
+    extra = 1
+    fields = ['contenido']
+    verbose_name_plural = "📖 Contenidos (505 - R)"
+
+
+class NotaBiografica545Inline(admin.TabularInline):
+    model = NotaBiografica545
+    extra = 1
+    fields = ['datos_biograficos', 'url']
+    verbose_name_plural = "👤 Notas biográficas (545 - R)"
+
+
+# =====================================================
+# 🔧 INLINES BLOQUE 6XX – Materias y género/forma
+# =====================================================
+class Materia650Inline(admin.TabularInline):
+    model = Materia650
+    extra = 1
+    fields = ['subdivision']
+    verbose_name_plural = "📚 Materias (650 - R)"
+
+
+class MateriaGenero655Inline(admin.TabularInline):
+    model = MateriaGenero655
+    extra = 1
+    fields = ['subdivision_general']
+    verbose_name_plural = "🎭 Materias (Género/forma) (655 - R)"
+
+
+# =====================================================
+# 🔧 INLINES BLOQUE 7XX – Accesos adicionales y relaciones
+# =====================================================
+class Relacion700Inline(admin.TabularInline):
+    model = Relacion700
+    extra = 1
+    fields = ['descripcion']
+    verbose_name_plural = "🔗 Relaciones (700 $i - R)"
+
+
+class Autoria700Inline(admin.TabularInline):
+    model = Autoria700
+    extra = 1
+    fields = ['autoria']
+    verbose_name_plural = "🧾 Autorías (700 $j - R)"
+
+
+class FuncionEntidad710Inline(admin.TabularInline):
+    model = FuncionEntidad710
+    extra = 1
+    fields = ['funcion']
+    verbose_name_plural = "🏛️ Funciones de entidad (710 $e - R)"
+
+
+class NumeroDocRelacionado773Inline(admin.TabularInline):
+    model = NumeroDocumentoRelacionado773
+    extra = 1
+    fields = ['numero']
+    verbose_name_plural = "📘 Números de obra relacionadas (773 $w - R)"
+
+
+class NumeroObraRelacionada774Inline(admin.TabularInline):
+    model = NumeroObraRelacionada774
+    extra = 1
+    fields = ['numero']
+    verbose_name_plural = "📗 Números de obra relacionadas (774 $w - R)"
+
+
+class NumeroObraRelacionada787Inline(admin.TabularInline):
+    model = NumeroObraRelacionada787
+    extra = 1
+    fields = ['numero']
+    verbose_name_plural = "📙 Números de obra relacionadas (787 $w - R)"
+
+
+# =====================================================
+# 🔧 INLINES BLOQUE 8XX – Ubicación y disponibilidad
+# =====================================================
+class Estanteria852Inline(admin.TabularInline):
+    model = Estanteria852
+    extra = 1
+    fields = ['estanteria']
+    verbose_name_plural = "📚 Estanterías (852 $c - R)"
+
+
+class Disponible856Inline(admin.TabularInline):
+    model = Disponible856
+    extra = 1
+    fields = ['url', 'texto_enlace']
+    verbose_name_plural = "🌐 Recursos disponibles (856 - R)"
+
 
 
 # ================================================
@@ -616,6 +740,58 @@ class ObraGeneralAdmin(admin.ModelAdmin):
             ),
             'classes': ('wide',)
         }),
+        ('📝 BLOQUE 5XX – NOTAS Y CONTENIDO', {
+            'fields': (
+                'sumario_520',
+            ),
+            'description': 'Campos de notas (NR): Sumario o resumen del contenido de la obra (520 $a).',
+            'classes': ('wide',)
+        }),
+
+        ('🏷️ BLOQUE 6XX – MATERIAS Y GÉNERO/FORMA', {
+            'fields': (
+                'materia_principal_650',
+                'materia_genero_655',
+            ),
+            'description': (
+                'Campos 650 y 655 – Materias controladas según vocabularios autorizados. '
+                'Ambos son no repetibles (NR).'
+            ),
+            'classes': ('wide',)
+        }),
+
+        ('🤝 BLOQUE 7XX – RELACIONES Y ACCESOS ADICIONALES', {
+            'fields': (
+                'nombre_relacionado_700a',
+                'coordenadas_biograficas_700d',
+                'titulo_relacionado_700t',
+                'entidad_relacionada_710a',
+                'compositor_coleccion_773a',
+                'titulo_coleccion_773t',
+                'enlace_unidad_774',
+                'titulo_unidad_774t',
+                'encabezamiento_principal_787a',
+                'titulo_obra_relacionada_787t',
+            ),
+            'description': (
+                'Campos de relación no repetibles según MARC21. '
+                'Incluyen accesos personales, institucionales y relaciones con otras obras.'
+            ),
+            'classes': ('wide',)
+        }),
+
+        ('📦 BLOQUE 8XX – UBICACIÓN Y DISPONIBILIDAD', {
+            'fields': (
+                'institucion_persona_852a',
+                'signatura_original_852h',
+            ),
+            'description': (
+                'Campos 852 – Identifican la institución o persona depositaria y la signatura original. '
+                'Ambos son no repetibles (NR).'
+            ),
+            'classes': ('wide',)
+        }),
+
         
         ('📅 METADATOS DEL SISTEMA', {
             'fields': (
@@ -653,6 +829,24 @@ class ObraGeneralAdmin(admin.ModelAdmin):
         
         # Bloque 4XX
         MencionSerie490Inline,
+        # Bloque 5XX
+        NotaGeneral500Inline,
+        NotaContenido505Inline,
+        NotaBiografica545Inline,
+        # Bloque 6XX
+        Materia650Inline,
+        MateriaGenero655Inline,
+        # Bloque 7XX
+        Relacion700Inline,
+        Autoria700Inline,
+        FuncionEntidad710Inline,
+        NumeroDocRelacionado773Inline,
+        NumeroObraRelacionada774Inline,
+        NumeroObraRelacionada787Inline,
+        # Bloque 8XX
+        Estanteria852Inline,
+        Disponible856Inline,
+
     ]
     
     # Métodos de visualizacion
@@ -749,3 +943,11 @@ class AutoridadFormaMusicalAdmin(admin.ModelAdmin):
     """Admin para formas musicales"""
     list_display = ['forma']
     search_fields = ['forma']
+
+
+@admin.register(AutoridadEntidad)
+class AutoridadEntidadAdmin(admin.ModelAdmin):
+    """Admin para autoridades de entidades"""
+    list_display = ['nombre']
+    search_fields = ['nombre']
+

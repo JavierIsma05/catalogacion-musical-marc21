@@ -823,7 +823,143 @@
                                 {% endif %}
                             </div>
                         </div>
+                        
                     </div>
+                    <!-- ========================================
+     BLOQUE 5XX - NOTAS GENERALES
+========================================= -->
+<div class="bloque-section">
+  <h4 class="section-title">
+    <span class="marc-tag">5XX</span>
+    <span>Notas</span>
+  </h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="field-label">
+        <span class="marc-tag">500</span> Notas generales
+      </div>
+
+      {% if obra.notas.exists %}
+        {% for nota in obra.notas.all %}
+          <div class="repetible-item">
+            <span class="marc-subcampo">$a</span> {{ nota.texto }}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="field-value empty">Sin notas registradas</div>
+      {% endif %}
+      
+    </div>
+  </div>
+</div>
+<!-- ========================================
+     BLOQUE 6XX - TEMAS / MATERIAS
+========================================= -->
+<div class="bloque-section">
+  <h4 class="section-title">
+    <span class="marc-tag">6XX</span>
+    <span>Temas y Encabezamientos de Materia</span>
+  </h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="field-label">
+        <span class="marc-tag">650</span> Tema principal
+      </div>
+      {% if obra.temas.exists %}
+        {% for tema in obra.temas.all %}
+          <div class="repetible-item">
+            <span class="marc-subcampo">$a</span> {{ tema.tema_principal }}
+            {% if tema.subtema %}
+              <br><span class="marc-subcampo">$x</span> {{ tema.subtema }}
+            {% endif %}
+            {% if tema.periodo %}
+              <br><span class="marc-subcampo">$y</span> {{ tema.periodo }}
+            {% endif %}
+            {% if tema.lugar %}
+              <br><span class="marc-subcampo">$z</span> {{ tema.lugar }}
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="field-value empty">Sin temas registrados</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<!-- ========================================
+     BLOQUE 7XX - ENTRADAS SECUNDARIAS
+========================================= -->
+<div class="bloque-section">
+  <h4 class="section-title">
+    <span class="marc-tag">7XX</span>
+    <span>Entradas Secundarias (Relaciones)</span>
+  </h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="field-label">
+        <span class="marc-tag">700</span> Nombre relacionado
+      </div>
+
+      {% if obra.nombres_relacionados.exists %}
+        {% for rel in obra.nombres_relacionados.all %}
+          <div class="repetible-item">
+            <span class="marc-subcampo">$a</span> {{ rel.apellidos_nombres }}
+            {% if rel.coordenadas %}
+              <br><span class="marc-subcampo">$d</span> {{ rel.coordenadas }}
+            {% endif %}
+            {% if rel.termino_asociado %}
+              <br><span class="marc-subcampo">$c</span> {{ rel.termino_asociado }}
+            {% endif %}
+            {% if rel.funcion_relacion %}
+              <br><span class="marc-subcampo">$e</span> {{ rel.funcion_relacion }}
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="field-value empty">Sin nombres relacionados</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<!-- ========================================
+     BLOQUE 8XX - SERIES ADICIONALES
+========================================= -->
+<div class="bloque-section">
+  <h4 class="section-title">
+    <span class="marc-tag">8XX</span>
+    <span>Series Adicionales Relacionadas</span>
+  </h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="field-label">
+        <span class="marc-tag">830</span> Título de serie uniforme
+      </div>
+
+      {% if obra.series_adicionales.exists %}
+        {% for serie in obra.series_adicionales.all %}
+          <div class="repetible-item">
+            <span class="marc-subcampo">$a</span> {{ serie.titulo }}
+            {% if serie.numero %}
+              <br><span class="marc-subcampo">$v</span> {{ serie.numero }}
+            {% endif %}
+            {% if serie.issn %}
+              <br><span class="marc-subcampo">$x</span> {{ serie.issn }}
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="field-value empty">Sin series adicionales</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+
 
                     <!-- Metadatos del Sistema -->
                     <div class="row mt-5 pt-4 border-top">

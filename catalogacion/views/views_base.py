@@ -145,6 +145,43 @@ def crear_obra(request):
                 # Bloque 4XX
                 # ========================================
                 procesar_mencion_serie_490(request, obra)
+
+                # ========================================
+                # BLOQUE 5XX - Notas
+                # ========================================
+                from .views_5xx import (
+                    procesar_nota_general_500,
+                    procesar_nota_contenido_505,
+                    procesar_nota_biografica_545,
+                )
+
+                # ========================================
+                # BLOQUE 6XX - Materias
+                # ========================================
+                from .views_6xx import (
+                    procesar_materia_650,
+                    procesar_materia_genero_655,
+                )
+
+                # ========================================
+                # BLOQUE 7XX - Entradas adicionales y relaciones
+                # ========================================
+                from .views_7xx import (
+                    procesar_nombre_relacionado_700,
+                    procesar_entidad_relacionada_710,
+                    procesar_coleccion_773,
+                    procesar_obra_en_coleccion_774,
+                    procesar_otras_relaciones_787,
+                )
+
+                # ========================================
+                # BLOQUE 8XX - Ubicación y disponibilidad
+                # ========================================
+                from .views_8xx import (
+                    procesar_ubicacion_852,
+                    procesar_disponible_856,
+                )
+
                 # ========================================
                 # Generación de datos automáticos
                 # ========================================
