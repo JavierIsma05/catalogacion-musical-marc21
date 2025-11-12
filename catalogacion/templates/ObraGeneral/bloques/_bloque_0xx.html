@@ -151,30 +151,304 @@
                             placeholder="Código de incipit musical (Plaine & Easie, MusicXML, ABC)"></textarea>
 
                         <!-- CONTENEDOR DEL CANVAS + BOTONES -->
-                        <div class="border rounded p-2 bg-light position-relative" style="min-height: 220px;">
-                            <canvas
-                                id="incipit_canvas_0"
-                                width="800"
-                                height="180"
-                                style="width: 100%; max-width: 100%;"></canvas>
+                        <div class="border rounded p-2 bg-light">
+                             <div class="position-relative" style='display: inline-block;'>">
+                                <canvas
+                                    id="incipit_canvas_0"
+                                    width="750"
+                                    height="360"
+                                    style="display:block;"></canvas>
 
-                            <!-- Botón subir nota -->
-                            <button
-                                type="button"
-                                id="toneUp"
-                                class="btn btn-sm btn-secondary"
-                                style="position: absolute; visibility: hidden; z-index: 10;">
-                                ▲
-                            </button>
+                            </div>
+                                <div class="mt-2 d-flex gap-2 align-items-center">
+                                    <span class="text-muted">Altura:</span>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" onclick="CanvasIncipit.toneUpDown(CanvasIncipit, -1)">▲</button>
+                                        <button type="button" onclick="CanvasIncipit.toneUpDown(CanvasIncipit, 1)">▼</button>
 
-                            <!-- Botón bajar nota -->
-                            <button
-                                type="button"
-                                id="toneDown"
-                                class="btn btn-sm btn-secondary"
-                                style="position: absolute; visibility: hidden; z-index: 10;">
-                                ▼
-                            </button>
+                                    </div>
+                                </div>
+                                <div class="mt-3" id="incipit-toolbar-031">
+                                    <div class="row g-2">
+
+                                        <!-- CLAVES -->
+                                        <div class="col-md-3">
+                                        <h6 class="small text-muted mb-1">Clave</h6>
+                                        <div class="btn-group btn-group-sm d-flex flex-wrap" role="group" aria-label="Claves">
+                                            <!-- treble (G) → value: "1" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="ClefPressed('1')">
+                                            <span style="font-family: Maestro, 'Bravura', 'Music'; font-size: 20px;">𝄞</span>
+                                            </button>
+                                            <!-- alto (C) → value: "2" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="ClefPressed('2')">
+                                            <span style="font-family: Maestro, 'Bravura', 'Music'; font-size: 20px;">𝄡</span>
+                                            </button>
+                                            <!-- bass (F) → value: "3" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="ClefPressed('3')">
+                                            <span style="font-family: Maestro, 'Bravura', 'Music'; font-size: 20px;">𝄢</span>
+                                            </button>
+                                        </div>
+                                        </div>
+
+                                        <!-- FIGURAS (duraciones) -->
+                                        <div class="col-md-5">
+                                        <h6 class="small text-muted mb-1">Figuras</h6>
+                                        <div class="btn-group btn-group-sm d-flex flex-wrap" role="group" aria-label="Figuras">
+                                            <!-- longa → "b" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="NotePressed('b')">
+
+                                            <span style="font-family:'Bravura', 'Music'; font-size: 18px;">|𝅝|</span>
+                                            </button>
+                                            <!-- breve → "c" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="NotePressed('c')">
+
+                                            <span style="font-family:'Bravura', 'Music'; font-size: 18px;">||𝅝||</span>
+                                            </button>
+                                            <!-- semibreve → "d" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="NotePressed('d')">
+
+                                            <span style="font-family: Maestro, 'Bravura', 'Music'; font-size: 18px;">𝅝</span>
+                                            </button>
+                                            <!-- minim → "e" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="NotePressed('e')">
+                                            <span style="font-family: Maestro, 'Bravura', 'Music'; font-size: 18px;">𝅗𝅥</span>
+                                            </button>
+                                            <!-- crotchet → "f" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="NotePressed('f')">
+                                            <span style="font-family: Maestro, 'Bravura', 'Music'; font-size: 18px;">𝅘𝅥</span>
+                                            </button>
+                                            <!-- quaver → "g" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="NotePressed('g')">
+                                            <span style="font-family: Maestro, 'Bravura', 'Music'; font-size: 18px;">𝅘𝅥𝅮</span>
+                                            </button>
+                                            <!-- semiquaver → "h" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="NotePressed('h')">
+                                            <span style="font-family: Maestro, 'Bravura', 'Music'; font-size: 18px;">𝅘𝅥𝅯</span>
+                                            </button>
+                                            <!-- demisemiquaver → "i" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="NotePressed('i')">
+                                            <span style="font-family: Maestro, 'Bravura', 'Music'; font-size: 18px;">𝅘𝅥𝅰</span>
+                                            </button>
+                                        </div>
+
+                                        <div class="mt-1">
+                                            <!-- puntillo + borrar -->
+                                            <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary"
+                                                    title="Puntillo"
+                                                    onclick="dotPressed()">
+                                                <span style="font-family: 'Bravura', 'Music'; font-size: 18px;">·</span>
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-outline-danger"
+                                                    title="Eliminar nota"
+                                                    onclick="deleteNote(false)">
+                                                🗑 nota
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-outline-danger"
+                                                    title="Eliminar todo el incipit"
+                                                    onclick="deleteNote(true)">
+                                                🗑 todo
+                                            </button>
+                                            </div>
+                                        </div>
+                                        </div>
+
+                                        <!-- ALTERACIONES -->
+                                        <div class="col-md-4">
+                                        <h6 class="small text-muted mb-1">Alteraciones</h6>
+                                        <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Alteraciones">
+                                            <!-- doblesostenido → "l" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary"
+                                                    title="Doble sostenido"
+                                                    onclick="alterationPressed('l')">
+                                            𝄪
+                                            </button>
+                                            <!-- sostenido → "p" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary"
+                                                    title="Sostenido"
+                                                    onclick="alterationPressed('p')">
+                                            ♯
+                                            </button>
+                                            <!-- becuadro → "o" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary"
+                                                    title="Becuadro"
+                                                    onclick="alterationPressed('o')">
+                                            ♮
+                                            </button>
+                                            <!-- bemol → "m" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary"
+                                                    title="Bemol"
+                                                    onclick="alterationPressed('m')">
+                                            ♭
+                                            </button>
+                                            <!-- doblebemol → "n" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary"
+                                                    title="Doble bemol"
+                                                    onclick="alterationPressed('n')">
+                                            𝄫
+                                            </button>
+                                        </div>
+
+                                        <!-- Altura (usa toneUpDown que ya funciona)
+                                        <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Altura">
+                                            <button type="button"
+                                                    id="toneUp"
+                                                    class="btn btn-outline-secondary"
+                                                    title="Subir nota"
+                                                    onclick="toneUpDown(1)">
+                                            ▲
+                                            </button>
+                                            <button type="button"
+                                                    id="toneDown"
+                                                    class="btn btn-outline-secondary"
+                                                    title="Bajar nota"
+                                                    onclick="toneUpDown(-1)">
+                                            ▼
+                                            </button>
+                                        </div> -->
+                                        </div>
+                                    </div>
+
+                                    <!-- TIEMPO & BARRAS (fila aparte, tipo la UI original) -->
+                                    <div class="row g-2 mt-3">
+                                        <div class="col-md-6">
+                                        <h6 class="small text-muted mb-1">Compás</h6>
+                                        <div class="btn-group btn-group-sm d-flex flex-wrap" role="group" aria-label="Compases">
+                                            <!-- 4/4 → "t" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+
+                                                    onclick="TimePressed('t')">
+                                            4/4
+                                            </button>
+                                            <!-- 3/4 → "w" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="TimePressed('w')">
+                                            3/4
+                                            </button>
+                                            <!-- 2/4 → "v" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="TimePressed('v')">
+                                            2/4
+                                            </button>
+                                            <!-- 2/2 → "u" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="TimePressed('u')">
+                                            2/2
+                                            </button>
+                                            <!-- 3/8 → "x" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="TimePressed('x')">
+                                            3/8
+                                            </button>
+                                            <!-- 6/8 → "y" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="TimePressed('y')">
+                                            6/8
+                                            </button>
+                                            <!-- 9/8 → "z" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="TimePressed('z')">
+                                            9/8
+                                            </button>
+                                            <!-- 12/8 → "{" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="TimePressed('{')">
+                                            12/8
+                                            </button>
+                                            <!-- 3/2 → "|" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    onclick="TimePressed('|')">
+                                            3/2
+                                            </button>
+                                        </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                        <h6 class="small text-muted mb-1">Barras</h6>
+                                        <div class="btn-group btn-group-sm d-flex flex-wrap" role="group" aria-label="Barras de compás">
+                                            <!-- /  → ";" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    title="Barra simple"
+                                                    onclick="BarPressed(';')">
+                                            |
+                                            </button>
+                                            <!-- // → "<" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    title="Doble barra"
+                                                    onclick="BarPressed('<')">
+                                            ||
+                                            </button>
+                                            <!-- /: → "=" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    title="Inicio repetición"
+                                                    onclick="BarPressed('>')">
+                                            &#x1D106;:  <!-- simbología aproximada -->
+                                            </button>
+                                            <!-- //: → ">" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    title="Fin repetición"
+                                                    onclick="BarPressed('?')">
+                                            :||
+                                            </button>
+
+                                            <!-- ://: → "@" -->
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary me-1 mb-1"
+                                                    title="Repetición doble"
+                                                    onclick="BarPressed('@')">
+                                            :||:
+                                            </button>
+                                        </div>
+                                        <div style="font-family: Maestro, 'Bravura', 'Music'; font-size: 40px;" class="text-muted mt-1">
+  1 2 3 t u v w x y z
+</div>
+                                        </div>
+                                    </div>
+                                    </div>
+
                         </div>
                         <!-- Campos ocultos auxiliares, por si los usa el motor -->
                         <input type="hidden" id="incipitPaec" name="incipit_paec_0">

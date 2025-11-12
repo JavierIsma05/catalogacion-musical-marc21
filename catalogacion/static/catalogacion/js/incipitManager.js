@@ -561,6 +561,8 @@ function CanvasClass() {
   this.drawXPosition = new Array();
   this.drawIncipitElements = new Array();
   this.incipit = new IncipitClass();
+  this.shadowOffsetX = -10; // mueve la sombra 10px a la izquierda
+  // -10, -15, -20 según qué tan pegado se quiera la sombra
 
   this.getFont = function (context, fontSize) {
     var ratio = fontSize / context.fontBase; // calc ratio
@@ -886,33 +888,34 @@ function CanvasClass() {
 
   //Click on an Existing Element on the current canvas
   this.clickExistingElement = function (context, element) {
-    var up = document.getElementById("toneUp");
-    var down = document.getElementById("toneDown");
+    // var up = document.getElementById("toneUp");
+    // var down = document.getElementById("toneDown");
 
-    up.style.visibility = "hidden";
-    down.style.visibility = "hidden";
+    // up.style.visibility = "hidden";
+    // down.style.visibility = "hidden";
 
+    // Seleccionar la nota clicada y no tocar estilos de ningún botón
     if (element != null && element <= context.drawIncipitElements.length - 1) {
       positionNoteSelected = element;
 
-      if (!context.drawIncipitElements[positionNoteSelected].isClef) {
-        var position = context.getDrawPosition(
-          context,
-          context.drawIncipitElements[positionNoteSelected].xPosition,
-          8
-        );
+      // if (!context.drawIncipitElements[positionNoteSelected].isClef) {
+      //   var position = context.getDrawPosition(
+      //     context,
+      //     context.drawIncipitElements[positionNoteSelected].xPosition,
+      //     8
+      //   );
 
-        position.x = context.drawXPosition[positionNoteSelected];
+      //   position.x = context.drawXPosition[positionNoteSelected];
 
-        up.style.top = position.y - 25 + "px";
-        down.style.top = position.y + 195 + "px";
+      //   up.style.top = position.y - 25 + "px";
+      //   down.style.top = position.y + 195 + "px";
 
-        up.style.left = position.x + context.stepX / 3 + "px";
-        down.style.left = position.x + context.stepX / 3 + "px";
+      //   up.style.left = position.x + context.stepX / 3 + "px";
+      //   down.style.left = position.x + context.stepX / 3 + "px";
 
-        up.style.visibility = "visible";
-        down.style.visibility = "visible";
-      }
+      //   up.style.visibility = "visible";
+      //   down.style.visibility = "visible";
+      // }
 
       return true;
     }
@@ -920,7 +923,6 @@ function CanvasClass() {
     positionNoteSelected = null;
     return false;
   };
-
   //Add a new note on the Incipit
   this.addNote = function (context, cursor) {
     context.gDrawingContext.clearRect(
@@ -1018,6 +1020,8 @@ function CanvasClass() {
         context.drawIncipitElements.length,
         true
       );
+
+      notePosition.x += context.shadowOffsetX;
 
       var tempFont = noteToDraw.value;
       if (tempEle.yPosition < 9 && !tempEle.isClef)
@@ -1518,11 +1522,13 @@ function CanvasClass() {
         step*6 + pixelsToAdd occurs, to set it on the mouse position */
     var pixelsToAdd = 2;
     if (context.operation == "list") pixelsToAdd = 0.5;
+    this.verticalOffset = 5;
     var positionY =
       (elementY + drawingProblemYPatchAmountFix + context.minStepY) *
         context.stepY -
       context.stepY * contextMultiplier +
-      pixelsToAdd;
+      pixelsToAdd +
+      this.verticalOffset;
 
     return { x: positionX, y: positionY };
   };
