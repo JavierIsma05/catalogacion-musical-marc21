@@ -30,13 +30,14 @@ from ..models import (
 def procesar_mencion_serie_490(request, obra):
     """
     Procesar Mención de Serie (490) con subcampos anidados
-    Estructura: mencion_serie_<idx>_relacion
-              titulo_serie_490_<idx_padre>_<idx>_titulo
-              volumen_serie_490_<idx_padre>_<idx>_volumen
+    Estructura HTML/JS:
+        - mencion_serie_relacion_{idx}
+        - titulo_serie_490_a_{idx_padre}_{idx}
+        - volumen_serie_490_v_{idx_padre}_{idx}
     """
     indice = 0
     while True:
-        relacion = request.POST.get(f'mencion_serie_{indice}_relacion', '').strip()
+        relacion = request.POST.get(f'mencion_serie_relacion_{indice}', '').strip()
         
         # Verificar si hay títulos o volúmenes
         tiene_datos = bool(relacion)
@@ -45,7 +46,7 @@ def procesar_mencion_serie_490(request, obra):
             # Verificar títulos
             tit_idx = 0
             while True:
-                val = request.POST.get(f'titulo_serie_490_{indice}_{tit_idx}_titulo', '').strip()
+                val = request.POST.get(f'titulo_serie_490_a_{indice}_{tit_idx}', '').strip()
                 if val:
                     tiene_datos = True
                     break
@@ -57,7 +58,7 @@ def procesar_mencion_serie_490(request, obra):
             # Verificar volúmenes
             vol_idx = 0
             while True:
-                val = request.POST.get(f'volumen_serie_490_{indice}_{vol_idx}_volumen', '').strip()
+                val = request.POST.get(f'volumen_serie_490_v_{indice}_{vol_idx}', '').strip()
                 if val:
                     tiene_datos = True
                     break
@@ -80,7 +81,7 @@ def procesar_mencion_serie_490(request, obra):
         # Procesar títulos de serie ($a)
         sub_idx = 0
         while True:
-            titulo_texto = request.POST.get(f'titulo_serie_490_{indice}_{sub_idx}_titulo', '').strip()
+            titulo_texto = request.POST.get(f'titulo_serie_490_a_{indice}_{sub_idx}', '').strip()
             if not titulo_texto:
                 sub_idx += 1
                 if sub_idx > 20:
@@ -99,7 +100,7 @@ def procesar_mencion_serie_490(request, obra):
         # Procesar volúmenes ($v)
         sub_idx = 0
         while True:
-            volumen_texto = request.POST.get(f'volumen_serie_490_{indice}_{sub_idx}_volumen', '').strip()
+            volumen_texto = request.POST.get(f'volumen_serie_490_v_{indice}_{sub_idx}', '').strip()
             if not volumen_texto:
                 sub_idx += 1
                 if sub_idx > 20:
@@ -118,74 +119,3 @@ def procesar_mencion_serie_490(request, obra):
         indice += 1
         if indice > 50:
             break
-
-
-# ================================================
-# VISTAS DE GESTIÓN (Para edición posterior)
-# ================================================
-
-def gestionar_mencion_serie_490(request, obra_id):
-    """
-    Gestionar Mención de Serie (490)
-    Campo 490 - Mención de serie (Repetible)
-    
-    Subcampos repetibles:
-      - $a Título de serie (R)
-      - $v Volumen/número (R)
-    
-    Patrón de campos repetibles anidados.
-    """
-    obra = get_object_or_404(ObraGeneral, pk=obra_id)
-    
-    if request.method == 'POST':
-        try:
-            with transaction.atomic():
-                procesar_mencion_serie_490(request, obra)
-                messages.success(request, '✅ Mención de serie guardada correctamente')
-                return redirect('detalle_obra', obra_id=obra_id)
-        except Exception as e:
-            messages.error(request, f'❌ Error al guardar mención de serie: {str(e)}')
-    
-    # Preparar datos para el template
-    series_data = []
-    for serie in obra.menciones_serie.all():
-        series_data.append({
-            'id': serie.id,
-            'relacion': serie.get_relacion_display(),
-            'titulos': serie.titulos.all().order_by('id'),
-            'volumenes': serie.volumenes.all().order_by('id'),
-            'marc_format': serie.get_marc_format()
-        })
-    
-    contexto = {
-        'obra': obra,
-        'menciones_serie': series_data,
-    }
-    
-    return render(request, 'catalogacion/4xx/mencion_serie_490.html', contexto)
-
-
-def listar_campos_4xx(request, obra_id):
-    """
-    Vista resumen de todos los campos 4XX de una obra
-    Muestra información de series.
-    """
-    obra = get_object_or_404(ObraGeneral, pk=obra_id)
-    
-    # Preparar datos de menciones de serie con subcampos
-    series_data = []
-    for serie in obra.menciones_serie.all():
-        series_data.append({
-            'id': serie.id,
-            'relacion': serie.get_relacion_display(),
-            'titulos': serie.titulos.all(),
-            'volumenes': serie.volumenes.all(),
-            'marc_format': serie.get_marc_format()
-        })
-    
-    contexto = {
-        'obra': obra,
-        'series': series_data,
-    }
-    
-    return render(request, 'catalogacion/4xx/lista_campos_4xx.html', contexto)

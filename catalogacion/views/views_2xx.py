@@ -10,7 +10,6 @@ Campos incluidos:
 - 250: Mención de edición
 - 264: Producción, publicación, distribución, fabricación y copyright
 
-Todos estos campos son repetibles y algunos tienen subcampos repetibles.
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -24,158 +23,16 @@ from ..models import (
     ProduccionPublicacion,
 )
 
-from ..forms import (
-    TituloAlternativoFormSet,
-    EdicionFormSet,
-    ProduccionPublicacionFormSet,
-)
-
-
-def gestionar_titulos_alternativos(request, obra_id):
-    """
-    Gestionar Títulos Alternativos (246)
-    
-    Campo 246 - Título alternativo (Repetible)
-    Permite registrar variantes del título de la obra.
-    
-    Args:
-        obra_id: ID de la obra
-    
-    Returns:
-        Render del formulario o redirect después de guardar
-    """
-    obra = get_object_or_404(ObraGeneral, pk=obra_id)
-    
-    if request.method == 'POST':
-        formset = TituloAlternativoFormSet(request.POST, instance=obra)
-        if formset.is_valid():
-            try:
-                with transaction.atomic():
-                    formset.save()
-                    messages.success(request, '✅ Títulos alternativos guardados correctamente')
-                    return redirect('detalle_obra', obra_id=obra_id)
-            except Exception as e:
-                messages.error(request, f'❌ Error al guardar títulos alternativos: {str(e)}')
-    else:
-        formset = TituloAlternativoFormSet(instance=obra)
-    
-    contexto = {
-        'obra': obra,
-        'formset': formset,
-    }
-    return render(request, 'catalogacion/2xx/titulos_alternativos.html', contexto)
-
-
-def gestionar_ediciones(request, obra_id):
-    """
-    Gestionar Ediciones (250)
-    
-    Campo 250 - Mención de edición (Repetible)
-    Registra información sobre la edición de la obra.
-    
-    Args:
-        obra_id: ID de la obra
-    
-    Returns:
-        Render del formulario o redirect después de guardar
-    """
-    obra = get_object_or_404(ObraGeneral, pk=obra_id)
-    
-    if request.method == 'POST':
-        formset = EdicionFormSet(request.POST, instance=obra)
-        if formset.is_valid():
-            try:
-                with transaction.atomic():
-                    formset.save()
-                    messages.success(request, '✅ Ediciones guardadas correctamente')
-                    return redirect('detalle_obra', obra_id=obra_id)
-            except Exception as e:
-                messages.error(request, f'❌ Error al guardar ediciones: {str(e)}')
-    else:
-        formset = EdicionFormSet(instance=obra)
-    
-    contexto = {
-        'obra': obra,
-        'formset': formset,
-    }
-    return render(request, 'catalogacion/2xx/ediciones.html', contexto)
-
-
-def gestionar_produccion_publicacion(request, obra_id):
-    """
-    Gestionar Producción/Publicación (264)
-    
-    Campo 264 - Producción, publicación, distribución, fabricación y copyright (Repetible)
-    
-    Incluye:
-    - Lugar de publicación
-    - Editorial/Productor
-    - Fecha de publicación
-    
-    Args:
-        obra_id: ID de la obra
-    
-    Returns:
-        Render del formulario o redirect después de guardar
-    """
-    obra = get_object_or_404(ObraGeneral, pk=obra_id)
-    
-    if request.method == 'POST':
-        formset = ProduccionPublicacionFormSet(request.POST, instance=obra)
-        if formset.is_valid():
-            try:
-                with transaction.atomic():
-                    formset.save()
-                    messages.success(request, '✅ Datos de producción/publicación guardados correctamente')
-                    return redirect('detalle_obra', obra_id=obra_id)
-            except Exception as e:
-                messages.error(request, f'❌ Error al guardar producción/publicación: {str(e)}')
-    else:
-        formset = ProduccionPublicacionFormSet(instance=obra)
-    
-    contexto = {
-        'obra': obra,
-        'formset': formset,
-    }
-    return render(request, 'catalogacion/2xx/produccion_publicacion.html', contexto)
-
-
-def listar_campos_2xx(request, obra_id):
-    """
-    Vista resumen de todos los campos 2XX de una obra
-    
-    Muestra información de títulos, edición y publicación.
-    
-    Args:
-        obra_id: ID de la obra
-    
-    Returns:
-        Render con todos los campos 2XX
-    """
-    obra = get_object_or_404(ObraGeneral, pk=obra_id)
-    
-    contexto = {
-        'obra': obra,
-        'titulo_principal': obra.titulo_principal,
-        'subtitulo': obra.subtitulo,
-        'mencion_responsabilidad': obra.mencion_responsabilidad,
-        'titulos_alternativos': obra.titulos_alternativos.all(),
-        'ediciones': obra.ediciones.all(),
-        'producciones_publicaciones': obra.producciones_publicaciones.all(),
-    }
-    return render(request, 'catalogacion/2xx/lista_campos_2xx.html', contexto)
-
-
 def procesar_titulo_alternativo(request, obra):
     """
     Procesar Títulos Alternativos (246) desde el formulario
-    Campo repetible: titulo_alternativo_<indice>_<campo>
+    Campo repetible: titulo_alternativo_a_<indice>, titulo_alternativo_b_<indice>
     """
     from ..models.bloque_2xx import TituloAlternativo
     
     indice = 0
     while True:
-        titulo = request.POST.get(f'titulo_alternativo_{indice}_titulo', '').strip()
+        titulo = request.POST.get(f'titulo_alternativo_a_{indice}', '').strip()
         
         if not titulo:
             indice += 1
@@ -183,7 +40,7 @@ def procesar_titulo_alternativo(request, obra):
                 break
             continue
         
-        resto_titulo = request.POST.get(f'titulo_alternativo_{indice}_resto_titulo', '').strip()
+        resto_titulo = request.POST.get(f'titulo_alternativo_b_{indice}', '').strip()
         
         TituloAlternativo.objects.create(
             obra=obra,
@@ -198,13 +55,13 @@ def procesar_titulo_alternativo(request, obra):
 def procesar_edicion(request, obra):
     """
     Procesar Ediciones (250) desde el formulario
-    Campo repetible: edicion_<indice>_<campo>
+    Campo repetible: edicion_a_<indice>
     """
     from ..models.bloque_2xx import Edicion
     
     indice = 0
     while True:
-        edicion_texto = request.POST.get(f'edicion_{indice}_edicion', '').strip()
+        edicion_texto = request.POST.get(f'edicion_a_{indice}', '').strip()
         
         if not edicion_texto:
             indice += 1
@@ -212,12 +69,9 @@ def procesar_edicion(request, obra):
                 break
             continue
         
-        mencion_resp = request.POST.get(f'edicion_{indice}_mencion_responsabilidad_edicion', '').strip()
-        
         Edicion.objects.create(
             obra=obra,
-            edicion=edicion_texto,
-            mencion_responsabilidad_edicion=mencion_resp
+            edicion=edicion_texto
         )
         
         indice += 1
@@ -227,13 +81,13 @@ def procesar_edicion(request, obra):
 def procesar_produccion_publicacion(request, obra):
     """
     Procesar Producción/Publicación (264) desde el formulario
-    Campo repetible: produccion_publicacion_<indice>_<campo>
+    Campo repetible: produccion_publicacion_funcion_<indice>, produccion_publicacion_a_<indice>, etc.
     """
     from ..models.bloque_2xx import ProduccionPublicacion
     
     indice = 0
     while True:
-        funcion = request.POST.get(f'produccion_publicacion_{indice}_funcion', '').strip()
+        funcion = request.POST.get(f'produccion_publicacion_funcion_{indice}', '').strip()
         
         if not funcion:
             indice += 1
@@ -241,16 +95,16 @@ def procesar_produccion_publicacion(request, obra):
                 break
             continue
         
-        lugar = request.POST.get(f'produccion_publicacion_{indice}_lugar_produccion', '').strip()
-        nombre = request.POST.get(f'produccion_publicacion_{indice}_nombre_productor', '').strip()
-        fecha = request.POST.get(f'produccion_publicacion_{indice}_fecha_produccion', '').strip()
+        lugar = request.POST.get(f'produccion_publicacion_a_{indice}', '').strip()
+        nombre = request.POST.get(f'produccion_publicacion_b_{indice}', '').strip()
+        fecha = request.POST.get(f'produccion_publicacion_c_{indice}', '').strip()
         
         ProduccionPublicacion.objects.create(
             obra=obra,
             funcion=funcion,
-            lugar_produccion=lugar,
-            nombre_productor=nombre,
-            fecha_produccion=fecha
+            lugar=lugar,
+            nombre_entidad=nombre,
+            fecha=fecha
         )
         
         indice += 1
