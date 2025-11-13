@@ -26,6 +26,7 @@
       var paecInput = document.getElementById("incipitPaec");
       var paeCode = paecInput ? paecInput.value : "";
 
+
       // Copiar al textarea oficial del 031 $p (primer incipit)
       var textareaP = document.getElementById("incipit_p_0");
       if (textareaP && typeof paeCode === "string") {
@@ -44,6 +45,7 @@
 
     // Asegurarnos de que existen los hidden con los ids que espera el legacy
     var hiddenPaec = document.getElementById("incipitPaec");
+
     if (!hiddenPaec) {
       hiddenPaec = document.createElement("input");
       hiddenPaec.type = "hidden";

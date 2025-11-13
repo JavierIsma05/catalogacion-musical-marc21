@@ -239,6 +239,11 @@ class IncipitMusical(models.Model):
         max_length=20, blank=True, null=True, help_text="031 $n – Armadura"
     )
 
+    # Subcampo $o – Tiempo (ej. 4/4)
+    tiempo = models.CharField(
+        max_length=20, blank=True, null=True, help_text="031 $o – Tiempo"
+    )
+
     # Subcampo $p - Notación musical (PAE)
     notacion_musical = models.TextField(
         blank=True,

@@ -124,35 +124,58 @@
                         <label class="subcampo-label">$c Número de Pasaje</label>
                         <input type="number" name="incipit_c_0" class="form-control" placeholder="{{ incipit_defaults.numero_pasaje }}" value="{{ incipit_defaults.numero_pasaje }}" min="1">
                     </div>
-                </div>
-
-                <div class="row g-2 mb-2">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="subcampo-label">$d Título o Encabezamiento (opcional)</label>
                         <input type="text" name="incipit_d_0" class="form-control" placeholder="Ej: Aria, Allegro, Andante">
                     </div>
-                    <div class="col-md-6">
+
+                    <div class="col-md-4">
+                        <label class="subcampo-label">$g Clave</label>
+                        <input type="number" name="incipit_g_0" class="form-control" placeholder="{{ incipit_defaults.numero_obra }}" value="{{ incipit_defaults.numero_obra }}" min="1">
+                    </div>
+
+                    <div class="col-md-4">
                         <label class="subcampo-label">$m Voz/Instrumento</label>
                         <input type="text" name="incipit_m_0" class="form-control" placeholder="{{ incipit_defaults.voz_instrumento }}" value="{{ incipit_defaults.voz_instrumento }}">
                         <small class="text-muted">Predeterminado: {{ incipit_defaults.voz_instrumento }}</small>
+                        <!-- textarea oficial 031 $p: aquí se guarda el PAE que Django recibe -->
+                    </div>
+                    <div class="col-md-4">
+                            <label class="subcampo-label">$n Armadura</label>
+                            <input type="number" name="incipit_n_0" class="form-control" placeholder="{{ incipit_defaults.numero_obra }}" value="{{ incipit_defaults.numero_obra }}" min="1">
+                    </div>
+
+
+                    <div class="col-md-4">
+                        <label class="subcampo-label">$o Tiempo</label>
+                        <input type="number" name="incipit_o_0" class="form-control" placeholder="{{ incipit_defaults.numero_obra }}" value="{{ incipit_defaults.numero_obra }}" min="1">
+                    </div>
+                    </div>
+                    <label class="subcampo-label">$p Notación Musical (opcional)</label>
+                    <textarea
+                        name="incipit_p_0"
+                        id="incipit_p_0"
+                        class="form-control mb-2"
+                        rows="2"
+                        placeholder="Código de incipit musical (Plaine & Easie, MusicXML, ABC)"></textarea>
+
+                    <div class="mb-3">
+
+                        <div class="col-md-4">
+                        <label class="subcampo-label">$r Tonalidad o modo</label>
+                        <input type="number" name="incipit_r_0" class="form-control" placeholder="{{ incipit_defaults.numero_movimiento }}" value="{{ incipit_defaults.numero_movimiento }}" min="1">
                     </div>
                 </div>
 
+
+
                 <div class="row g-2 mb-3">
                     <div class="col-md-12">
-                        <label class="subcampo-label">$p Notación Musical (opcional)</label>
 
-                        <!-- textarea oficial 031 $p: aquí se guarda el PAE que Django recibe -->
-                        <textarea
-                            name="incipit_p_0"
-                            id="incipit_p_0"
-                            class="form-control mb-2"
-                            rows="2"
-                            placeholder="Código de incipit musical (Plaine & Easie, MusicXML, ABC)"></textarea>
 
                         <!-- CONTENEDOR DEL CANVAS + BOTONES -->
                         <div class="border rounded p-2 bg-light">
-                             <div class="position-relative" style='display: inline-block;'>">
+                             <div class="position-relative" style='display: inline-block;'>
                                 <canvas
                                     id="incipit_canvas_0"
                                     width="750"
@@ -442,9 +465,7 @@
                                             :||:
                                             </button>
                                         </div>
-                                        <div style="font-family: Maestro, 'Bravura', 'Music'; font-size: 40px;" class="text-muted mt-1">
-  1 2 3 t u v w x y z
-</div>
+
                                         </div>
                                     </div>
                                     </div>

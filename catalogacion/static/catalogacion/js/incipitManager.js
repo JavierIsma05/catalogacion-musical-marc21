@@ -865,7 +865,7 @@ function CanvasClass() {
         context.gCanvasElement.height
     );
 
-    cursor.x = Math.floor(x);
+    cursor.x = Math.floor(x)+20 //+ to adjust click position
     cursor.y = Math.floor(y / context.stepY);
 
     if (cursor.y > context.maxStepY) {
@@ -2073,7 +2073,9 @@ function CanvasClass() {
       if (context.drawIncipitElements[i].isClef) {
         clef = note.name;
         paecNote = context.incipit.getPAECByName(note.name);
-
+        // se agrega clave al PAEC
+        paec += paecNote + " ";
+        var031g = paecNote.substring(1, 4);
         if (context.drawIncipitElements[i].qtyAlteration > 0) {
           paecAlteration = context.incipit.getPAECByName(alteration.name);
 
@@ -2104,17 +2106,16 @@ function CanvasClass() {
           }
 
           var031n = paecAlteration;
+          // se agrega alteración al PAEC
           paec += "$" + paecAlteration;
         }
 
         if (context.drawIncipitElements[i].hasTime) {
           paecTime = context.incipit.getPAECByName(time.name);
           var031o = paecTime;
+          // se agrega tiempo al PAEC
           paec += "@" + paecTime;
         }
-
-        paec += paecNote + " ";
-        var031g = paecNote.substring(1, 4);
       } else {
         if (context.drawIncipitElements[i].hasBar) {
           paecBar = context.incipit.getPAECByName(
@@ -2176,9 +2177,18 @@ function CanvasClass() {
           context.drawIncipitElements[0].qtyAlteration,
           context.drawIncipitElements[0].alterationName
         );
-
+        //VAR 031 P CUERPO ejm:'4B
         var031p += paecOctave + paecRythm + paecAlteration + paecNote + paecBar;
+        //PAE COMPLETO ejm: $xFC@2/2%G-2 += '4B
         paec += paecOctave + paecRythm + paecAlteration + paecNote + paecBar;
+
+        // console.log(paecOctave, "---PAEC OCTAVE---");
+        // console.log(paecRythm, "---PAEC RYTHM---");
+        // console.log(paecAlteration, "---PAEC ALTERATION---");
+        // console.log(paecNote, "---PAEC NOTE---");
+        // console.log(paecBar, "---PAEC BAR---");
+        // console.log(paec, "-----PAEC TOTAL-----");
+        // console.log(var031p, "-----VAR 031P TOTAL-----");
 
         if (!note.isRest) {
           lastPositionY = context.drawIncipitElements[i].yPosition;
@@ -2189,9 +2199,13 @@ function CanvasClass() {
       }
     }
 
-    $("#incipitPaec").val(paec);
+
+
+    // Se cambia el valor de los campos paec (%$@Cuerpo) a var031p (cuerpo)
+    $("#incipitPaec").val(var031p);
     $("#incipitTransposition").val(transposition);
 
+    // Actualizar los campos 031g, 031n, 031o, 031p, 0312 si estamos en modo "add" o "edit"
     if (context.operation == "add" || context.operation == "edit") {
       $("#031g").val(var031g);
       $("#031n").val(var031n);
