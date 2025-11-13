@@ -82,6 +82,10 @@ function logearDatosFormulario(form) {
         bloque_2xx: {},
         bloque_3xx: {},
         bloque_4xx: {},
+        bloque_5xx: {},
+        bloque_6xx: {},
+        bloque_7xx: {},
+        bloque_8xx: {},
         otros: {},
     };
 
@@ -159,11 +163,42 @@ function logearDatosFormulario(form) {
             } else if (
                 key.includes("490") ||
                 key.includes("mencion_serie") ||
-                key.includes("titulo_serie_490") ||
+                key.includes("titulo_serie_490") || 
                 key.includes("volumen_serie_490")
             ) {
                 datosOrganizados.bloque_4xx[key] = value;
-            } else {
+            
+            } else if(
+                key.includes("500") ||
+                key.includes("505") ||
+                key.includes("nota_general") ||
+                key.includes("nota_contenido")
+            ) {
+                datosOrganizados.bloque_5xx[key]=value;
+            }
+            else if (
+                key.includes("600") ||
+                key.includes("650") ||
+                key.includes("materia")
+            ) {
+                datosOrganizados.bloque_6xx[key] = value;
+            }
+            else if (
+                key.includes("700") ||
+                key.includes("710") ||
+                key.includes("720") ||
+                key.includes("nombre_relacionado")
+            ) {
+                datosOrganizados.bloque_7xx[key] = value;
+            }
+            else if (
+                key.includes("800") ||
+                key.includes("810") ||
+                key.includes("830") ||
+                key.includes("ubicacion")
+            ) {
+                datosOrganizados.bloque_8xx[key] = value;
+            }else {
                 datosOrganizados.otros[key] = value;
             }
         }

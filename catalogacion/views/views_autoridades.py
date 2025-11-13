@@ -13,7 +13,7 @@ Maneja:
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from django.db.models import Q
-from ..models import AutoridadPersona, AutoridadTituloUniforme, AutoridadFormaMusical
+from ..models import AutoridadPersona, AutoridadTituloUniforme, AutoridadFormaMusical,AutoridadEntidad  # 👈 nuevo
 
 
 @require_GET
@@ -104,5 +104,25 @@ def get_autoridades_json(request):
             }
             for f in query
         ]
+    elif modelo == 'entidad':
+    # Búsqueda de entidades o instituciones (AutoridadEntidad)
+        if busqueda:
+            query = AutoridadEntidad.objects.filter(
+                nombre__icontains=busqueda
+            ).order_by('nombre')[:20]
+        else:
+            query = AutoridadEntidad.objects.all().order_by('nombre')[:100]
+        
+        resultados = [
+            {
+                'id': e.nombre,
+                'text': e.nombre,
+                'pais': e.pais or '',
+                'descripcion': e.descripcion or ''
+            }
+            for e in query
+        ]
+
+
     
     return JsonResponse({'results': resultados})

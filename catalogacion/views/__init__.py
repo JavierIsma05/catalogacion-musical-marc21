@@ -52,6 +52,7 @@ from .views_1xx import (
     procesar_subcampos_240,
 )
 
+
 # Exportar todas las vistas
 __all__ = [
     # Vistas base

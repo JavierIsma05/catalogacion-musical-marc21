@@ -313,8 +313,141 @@ class ObraGeneral(models.Model):
     #* Campo 490 → MencionSerie490, TituloSerie490, VolumenSerie490
     
     # ------------------------------------------------
-    #? 🟦 BLOQUES 5XX, 6XX, 7XX, 8XX
+    #? 🟦 BLOQUES 5XX
     # ------------------------------------------------
+    sumario_520 = models.TextField(
+        max_length=2000,
+        blank=True,
+        null=True,
+        help_text="520 ## $a Sumario (NR)"
+    )
+    # ------------------------------------------------
+    #? 🟦 BLOQUES 6XX
+    # ------------------------------------------------
+    
+    # 650 $a - Materia principal (NR)
+    materia_principal_650 = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="650 $a – Materia (Tema principal) (NR)"
+    )
+
+    # 655 $a - Materia de género/forma (NR)
+    materia_genero_655 = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="655 $a – Materia (Género/Forma) (NR)"
+    )
+    # ------------------------------------------------
+    #? 🟦 BLOQUE 7XX – Puntos de acceso adicionales y relaciones (NR)
+    # ------------------------------------------------
+
+    # 700 $a – Nombre personal principal (NR)
+    nombre_relacionado_700a = models.ForeignKey(
+        'AutoridadPersona',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name='obras_relacionadas_700a',
+        help_text="700 $a – Nombre personal relacionado (NR)"
+    )
+
+    # 700 $d – Coordenadas biográficas (NR)
+    coordenadas_biograficas_700d = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="700 $d – Coordenadas biográficas (NR)"
+    )
+
+    # 700 $t – Título de obra relacionada (NR)
+    titulo_relacionado_700t = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True,
+        help_text="700 $t – Título de la obra relacionada (NR)"
+    )
+
+    # 710 $a – Entidad o jurisdicción relacionada (NR)
+    entidad_relacionada_710a = models.ForeignKey(
+        'AutoridadEntidad',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name='obras_relacionadas_710a',
+        help_text="710 $a – Entidad o jurisdicción relacionada (NR)"
+    )
+
+    # 773 $a – Compositor de la colección (NR)
+    compositor_coleccion_773a = models.ForeignKey(
+        'AutoridadPersona',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name='obras_coleccion_773a',
+        help_text="773 $a – Compositor de la colección (NR)"
+    )
+
+    # 773 $t – Título de colección (NR)
+    titulo_coleccion_773t = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True,
+        help_text="773 $t – Título de la colección (NR)"
+    )
+    # 774 $a – Enlace a la unidad constituyente (NR)
+    enlace_unidad_774 = models.URLField(
+        blank=True,
+        null=True,
+        help_text="774 $a – Enlace a la unidad constituyente (NR)"
+    )
+    # 774 $t – Título de la unidad constituyente (NR)
+    titulo_unidad_774t = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True,
+        help_text="774 $t – Título de la unidad constituyente (NR)"
+    )
+    # 787 $a – Encabezamiento principal (NR)
+    encabezamiento_principal_787a = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True,
+        help_text="787 $a – Encabezamiento principal (NR)"
+    )
+
+    # 787 $t – Título de la obra relacionada (NR)
+    titulo_obra_relacionada_787t = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True,
+        help_text="787 $t – Título de la obra relacionada (NR)"
+    )
+    # ------------------------------------------------
+    #? 🟦 BLOQUE 8XX – Ubicación y disponibilidad
+    # ------------------------------------------------
+
+    # 852 $a – Institución o persona (NR)
+    institucion_persona_852a = models.ForeignKey(
+        'AutoridadEntidad',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name='obras_ubicacion_852a',
+        help_text="852 $a – Institución o persona (NR). Enlace a autoridad institucional."
+    )
+
+
+    # 852 $h – Signatura original (NR)
+    signatura_original_852h = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="852 $h – Signatura original (NR)"
+    )
+
   
     # ------------------------------------------------
     #? Metadatos del sistema
@@ -323,6 +456,25 @@ class ObraGeneral(models.Model):
     
     #? Métodos
     # ------------------------------------------------
+
+    def generar_relaciones_7xx(self):
+        """
+        Genera resumen de relaciones adicionales (700–710)
+        para visualización rápida o exportación MARC.
+        """
+        nombres = [str(n.persona) for n in self.nombres_relacionados_700.all()]
+        entidades = [str(e.entidad) for e in self.entidades_relacionadas_710.all()]
+        return ", ".join(nombres + entidades) or "Sin relaciones registradas"
+    
+    def get_enlaces_8xx(self):
+        """
+        Devuelve enlaces y ubicaciones disponibles (852, 856)
+        para mostrar o exportar.
+        """
+        ubicaciones = [str(u) for u in self.ubicaciones_852.all()]
+        enlaces = [str(e) for e in self.disponibles_856.all()]
+        return ubicaciones + enlaces
+
 
     def generar_clasificacion_092(self):
         """

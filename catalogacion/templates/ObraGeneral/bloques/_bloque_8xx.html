@@ -1,0 +1,187 @@
+{# ============================================ #}
+{# BLOQUE 8XX – UBICACIONES Y RECURSOS #}
+{# ============================================ #}
+
+<div class="card border-0 shadow-sm mb-4" id="bloque-8xx">
+  <div class="card-body">
+    <h2 class="section-title">Campos 8XX – Ubicaciones y Recursos</h2>
+
+    <!-- ================================================= -->
+    <!-- 852 – UBICACIONES -->
+    <!-- ================================================= -->
+    <div class="card border-0 shadow-sm mb-4 p-3 bg-light-subtle">
+      <h4>852 – Ubicaciones</h4>
+
+      <div class="alert alert-info py-2">
+        <i class="bi bi-info-circle"></i>
+        <small>Registra la institución, signatura y estantería donde se encuentra físicamente el recurso musical.</small>
+      </div>
+
+      <div id="ubicacion852-container">
+        <div class="campo-repetible mb-3 p-3 border bg-white rounded shadow-sm" data-campo="ubicacion852-0">
+          <div class="campo-header d-flex justify-content-between align-items-center mb-3">
+            <span class="campo-label fw-bold">Ubicación (852) #1</span>
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarUbicacion852()">
+              Eliminar
+            </button>
+          </div>
+
+          <!-- Subcampos principales -->
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label class="subcampo-label">$a Institución o persona (NR)</label>
+              <input type="text" name="ubicacion852_a_0" class="form-control"
+                     placeholder="Ej: Universidad Nacional de Loja">
+            </div>
+            <div class="col-md-6">
+              <label class="subcampo-label">$h Signatura original (NR)</label>
+              <input type="text" name="ubicacion852_h_0" class="form-control"
+                     placeholder="Ej: UNL-MUS-0456">
+            </div>
+          </div>
+
+          <!-- Subcampo $c (repetible) -->
+          <div class="subcampo-group mt-2">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="subcampo-label mb-0">$c Estantería / Departamento (R)</label>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarC852()">
+                + Agregar $c
+              </button>
+            </div>
+
+            <div id="ubicacion852-0-campos">
+              <div class="mb-2" data-subcampo="c852-0">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text">$c</span>
+                  <input type="text" name="ubicacion852_c_0_0" class="form-control"
+                         placeholder="Ej: Sala Música Antigua, Estante 4B">
+                  <button type="button" class="btn btn-outline-danger"
+                          onclick="eliminarSubcampo('c852-0')">X</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón global (oculto al inicio) -->
+      <button id="btnAgregarUbicacion852" type="button"
+              class="btn btn-outline-primary btn-add-field mt-3"
+              onclick="agregarUbicacion852()" style="display:none;">
+        + Agregar Ubicación (852)
+      </button>
+    </div>
+
+    <!-- Template para recrear ubicación -->
+    <template id="tpl-ubicacion852">
+      <div class="campo-repetible mb-3 p-3 border bg-white rounded shadow-sm" data-campo="ubicacion852-0">
+        <div class="campo-header d-flex justify-content-between align-items-center mb-3">
+          <span class="campo-label fw-bold">Ubicación (852) #1</span>
+          <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarUbicacion852()">Eliminar</button>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            <label class="subcampo-label">$a Institución o persona (NR)</label>
+            <input type="text" name="ubicacion852_a_0" class="form-control"
+                   placeholder="Ej: Universidad Nacional de Loja">
+          </div>
+          <div class="col-md-6">
+            <label class="subcampo-label">$h Signatura original (NR)</label>
+            <input type="text" name="ubicacion852_h_0" class="form-control"
+                   placeholder="Ej: UNL-MUS-0456">
+          </div>
+        </div>
+
+        <div class="subcampo-group mt-2">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="subcampo-label mb-0">$c Estantería / Departamento (R)</label>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarC852()">
+              + Agregar $c
+            </button>
+          </div>
+
+          <div id="ubicacion852-0-campos">
+            <div class="mb-2" data-subcampo="c852-0">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text">$c</span>
+                <input type="text" name="ubicacion852_c_0_0" class="form-control"
+                       placeholder="Ej: Sala Música Antigua, Estante 4B">
+                <button type="button" class="btn btn-outline-danger"
+                        onclick="eliminarSubcampo('c852-0')">X</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- ================================================= -->
+    <!-- 856 – RECURSOS DISPONIBLES -->
+    <!-- ================================================= -->
+    <div class="card border-0 shadow-sm mb-4 p-3 bg-light-subtle">
+      <h4>856 – Recursos disponibles</h4>
+
+      <div class="alert alert-info py-2">
+        <i class="bi bi-info-circle"></i>
+        <small>Incluye enlaces a recursos digitales asociados a la obra (audios, partituras, imágenes, etc.).</small>
+      </div>
+
+      <div id="recurso856-container"></div>
+
+      <button id="btnAgregarRecurso856" type="button"
+              class="btn btn-outline-primary btn-add-field mt-3"
+              onclick="agregarRecurso856()">
+        + Agregar Recurso (856)
+      </button>
+    </div>
+
+    <!-- 📦 Template para recurso -->
+    <template id="tpl-recurso856">
+      <div class="campo-repetible mb-4 p-3 border rounded bg-white shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0 fw-bold">Recurso disponible (856)</h5>
+          <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarRecurso856()">Eliminar</button>
+        </div>
+
+        <!-- Subcampo $u -->
+        <div class="subcampo-group mt-2">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="subcampo-label mb-0">$u URL del recurso (R)</label>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarU856()">+ Agregar $u</button>
+          </div>
+          <div id="recurso856-0-urls">
+            <div class="mb-2" data-subcampo="u856-0">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text">$u</span>
+                <input type="url" name="recurso856_u_0_0" class="form-control"
+                       placeholder="https://...">
+                <button type="button" class="btn btn-outline-danger"
+                        onclick="eliminarSubcampo('u856-0')">X</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subcampo $y -->
+        <div class="subcampo-group mt-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="subcampo-label mb-0">$y Texto del enlace (R)</label>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarY856()">+ Agregar $y</button>
+          </div>
+          <div id="recurso856-0-textos">
+            <div class="mb-2" data-subcampo="y856-0">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text">$y</span>
+                <input type="text" name="recurso856_y_0_0" class="form-control"
+                       placeholder="Ej: Ver partitura, Escuchar audio, etc.">
+                <button type="button" class="btn btn-outline-danger"
+                        onclick="eliminarSubcampo('y856-0')">X</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
+</div>

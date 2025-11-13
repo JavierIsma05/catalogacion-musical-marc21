@@ -355,6 +355,62 @@ def debug_obra_datos(request, obra=None):
     else:
         print(f"    (vacío)")
     print()
+
+        # ========================================
+    # BLOQUE 6XX
+    # ========================================
+    print("📌 BLOQUE 6XX - MATERIAS Y GÉNERO/FORMA")
+    print("-" * 110)
+
+    # 650 - Materia (R)
+    print("  650:")
+    materias = _extraer_datos_repetibles(request, 'materia', ['a'])
+    if materias:
+        for i in range(len(materias)):
+            materia_valor = request.POST.get(f'materia_a_{i}', '').strip()
+            if materia_valor:
+                print(f"    [{i+1}] $a: {materia_valor}", end="")
+                # Subdivisiones $x
+                sub_index = 0
+                while True:
+                    subdiv = request.POST.get(f'materia_x_{i}_{sub_index}', '').strip()
+                    if not subdiv:
+                        break
+                    print(f"\n        $x[{sub_index+1}]: {subdiv}", end="")
+                    sub_index += 1
+                print()
+    else:
+        print("    (vacío)")
+    print()
+
+    # 655 - Género/Forma (R)
+    print("  655:")
+    generos = _extraer_datos_repetibles(request, 'genero', ['a'])
+    if generos:
+        for i in range(len(generos)):
+            genero_valor = request.POST.get(f'genero_a_{i}', '').strip()
+            if genero_valor:
+                print(f"    [{i+1}] $a: {genero_valor}", end="")
+                # Subdivisiones $x
+                sub_index = 0
+                while True:
+                    subdiv = request.POST.get(f'genero_x_{i}_{sub_index}', '').strip()
+                    if not subdiv:
+                        break
+                    print(f"\n        $x[{sub_index+1}]: {subdiv}", end="")
+                    sub_index += 1
+                print()
+    else:
+        print("    (vacío)")
+    print()
+
+    
+    print("\n===== DEBUG BLOQUE 8XX =====")
+    for key, value in request.POST.items():
+        if key.startswith(('ubicacion_', 'estanteria_', 'disponible_')):
+            print(f"{key} -> {value}")
+    print("=============================\n")
+
     
     # ========================================
     # CAMPOS AUTOGENERADOS

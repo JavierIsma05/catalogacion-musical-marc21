@@ -44,32 +44,32 @@
                                     </td>
                                     <td>
                                         {% if obra.tipo_registro == 'd' %}
-                                            <span class="badge bg-info">Manuscrito</span>
+                                        <span class="badge bg-info">Manuscrito</span>
                                         {% else %}
-                                            <span class="badge bg-success">Impreso</span>
+                                        <span class="badge bg-success">Impreso</span>
                                         {% endif %}
                                         <br>
                                         <small class="text-muted">
                                             {% if obra.nivel_bibliografico == 'm' %}
-                                                Obra independiente
+                                            Obra independiente
                                             {% elif obra.nivel_bibliografico == 'c' %}
-                                                Colección
+                                            Colección
                                             {% elif obra.nivel_bibliografico == 'a' %}
-                                                Parte componente
+                                            Parte componente
                                             {% endif %}
                                         </small>
                                     </td>
                                     <td>
                                         {% if obra.compositor %}
-                                            <strong>{{ obra.compositor }}</strong>
-                                            {% if obra.titulo_240 %}
-                                                <br><small class="text-muted">{{ obra.titulo_240 }}</small>
-                                            {% endif %}
+                                        <strong>{{ obra.compositor }}</strong>
+                                        {% if obra.titulo_240 %}
+                                        <br><small class="text-muted">{{ obra.titulo_240 }}</small>
+                                        {% endif %}
                                         {% elif obra.titulo_uniforme %}
-                                            <strong>{{ obra.titulo_uniforme }}</strong>
-                                            <br><small class="text-muted">(Obra anónima)</small>
+                                        <strong>{{ obra.titulo_uniforme }}</strong>
+                                        <br><small class="text-muted">(Obra anónima)</small>
                                         {% else %}
-                                            <span class="text-muted">Sin compositor/título</span>
+                                        <span class="text-muted">Sin compositor/título</span>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -80,17 +80,21 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a href="{% url 'detalle_obra' obra.id %}" class="btn btn-outline-primary" title="Ver detalles">
+                                            <a href="{% url 'ver_obra' obra.id %}" class="btn btn-outline-primary"
+                                                title="Ver detalles">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <button type="button" class="btn btn-outline-secondary" title="Editar">
+                                            <a href="{% url 'editar_obra' obra.id %}" class="btn btn-outline-secondary"
+                                                title="Editar obra">
                                                 <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-outline-danger" title="Eliminar">
+                                            </a>
+                                            <a href="{% url 'eliminar_obra' obra.id %}" class="btn btn-outline-danger"
+                                                title="Eliminar obra">
                                                 <i class="bi bi-trash"></i>
-                                            </button>
+                                            </a>
                                         </div>
                                     </td>
+
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -117,20 +121,20 @@
 </div>
 
 <style>
-.table tbody tr {
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
+    .table tbody tr {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
 
-.table tbody tr:hover {
-    background-color: rgba(0, 123, 255, 0.05);
-}
+    .table tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
 
-code {
-    background-color: #f8f9fa;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 0.875em;
-}
+    code {
+        background-color: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.875em;
+    }
 </style>
 {% endblock %}
