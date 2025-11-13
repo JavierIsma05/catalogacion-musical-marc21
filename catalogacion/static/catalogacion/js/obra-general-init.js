@@ -163,42 +163,38 @@ function logearDatosFormulario(form) {
             } else if (
                 key.includes("490") ||
                 key.includes("mencion_serie") ||
-                key.includes("titulo_serie_490") || 
+                key.includes("titulo_serie_490") ||
                 key.includes("volumen_serie_490")
             ) {
                 datosOrganizados.bloque_4xx[key] = value;
-            
-            } else if(
+            } else if (
                 key.includes("500") ||
                 key.includes("505") ||
                 key.includes("nota_general") ||
                 key.includes("nota_contenido")
             ) {
-                datosOrganizados.bloque_5xx[key]=value;
-            }
-            else if (
+                datosOrganizados.bloque_5xx[key] = value;
+            } else if (
                 key.includes("600") ||
                 key.includes("650") ||
                 key.includes("materia")
             ) {
                 datosOrganizados.bloque_6xx[key] = value;
-            }
-            else if (
+            } else if (
                 key.includes("700") ||
                 key.includes("710") ||
                 key.includes("720") ||
                 key.includes("nombre_relacionado")
             ) {
                 datosOrganizados.bloque_7xx[key] = value;
-            }
-            else if (
+            } else if (
                 key.includes("800") ||
                 key.includes("810") ||
                 key.includes("830") ||
                 key.includes("ubicacion")
             ) {
                 datosOrganizados.bloque_8xx[key] = value;
-            }else {
+            } else {
                 datosOrganizados.otros[key] = value;
             }
         }
@@ -781,44 +777,37 @@ window.limpiarBorrador = function () {
 window.mostrarEstadisticas = mostrarEstadisticas;
 
 // ============================================
-// VERIFICACIÓN DE FUNCIONES DEL BLOQUE 1XX
+// VERIFICACIÓN DE FUNCIONES ACTIVAS
 // ============================================
 
 window.addEventListener("DOMContentLoaded", function () {
+    // Solo verificar funciones que realmente deben estar disponibles
+    // (Las demás fueron convertidas a campos NR)
     const funciones1xx = [
-        "agregarFuncionCompositor",
-        "agregarAtribucionCompositor",
-        "agregarForma130",
-        "agregarMedioInterpretacion130",
-        "agregarNumeroParteSeccion130",
-        "agregarNombreParteSeccion130",
-        "agregarForma240",
-        "agregarMedioInterpretacion240",
-        "agregarNumeroParteSeccion240",
-        "agregarNombreParteSeccion240",
+        "agregarFuncionCompositor", // Todavía repetible
+    ];
+
+    const funciones2xx = [
+        "agregarTituloAlternativo",
+        "agregarEdicion",
+        "agregarProduccionPublicacion",
+        "agregarLugar264",
+        "agregarNombreEntidad264",
+        "agregarFecha264",
     ];
 
     let faltantes = [];
-    funciones1xx.forEach((fn) => {
-        if (typeof window[fn] === "function") {
-            // console.log(`   ✅ ${fn}`);
-        } else {
+
+    [...funciones1xx, ...funciones2xx].forEach((fn) => {
+        if (typeof window[fn] !== "function") {
             console.error(`   ❌ ${fn} NO ENCONTRADA`);
             faltantes.push(fn);
         }
     });
 
     if (faltantes.length === 0) {
-        // console.log(
-        //     "✅ Todas las funciones del bloque 1XX están disponibles\n"
-        // );
+        console.log("✅ Todas las funciones repetibles están disponibles");
     } else {
-        console.error(
-            `❌ Faltan ${faltantes.length} funciones del bloque 1XX:`,
-            faltantes
-        );
-        console.error(
-            "⚠️ Verifica que el archivo campos-1xx-repetibles.js se esté cargando correctamente"
-        );
+        console.error(`❌ Faltan ${faltantes.length} funciones:`, faltantes);
     }
 });

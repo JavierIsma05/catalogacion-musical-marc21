@@ -15,11 +15,6 @@
                 </button>
             </div>
             
-            <div class="alert alert-info" role="alert">
-                <i class="bi bi-info-circle"></i>
-                <small>Serie a la que pertenece la obra. Incluye título de serie y designación de volumen/número.</small>
-            </div>
-            
             <!-- Primera mención de serie (siempre visible) -->
             <div class="campo-repetible" data-campo="mencion-serie-0">
                 <div class="campo-header">
@@ -33,7 +28,7 @@
                 <div class="row g-3 mb-3">
                     <div class="col-md-12">
                         <label class="form-label small">Relación de la Serie (Primer Indicador)</label>
-                        <select name="mencion_serie_relacion_0" class="form-select">
+                        <select name="mencion_serie_relacion_0" class="form-select" title="Relación de la serie">
                             <option value="0" selected>0 - No relacionado (sin entrada secundaria)</option>
                             <option value="1">1 - Relacionado (con entrada secundaria 800-830)</option>
                         </select>
@@ -47,7 +42,7 @@
                 <div class="subcampo-group mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="subcampo-label mb-0">$a Título de Serie</label>
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarTituloSerie490(0)">
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarTituloSerie490(0)" aria-label="Agregar título de serie">
                             <i class="bi bi-plus"></i>
                         </button>
                     </div>
@@ -59,7 +54,7 @@
                                        name="titulo_serie_490_a_0_0" 
                                        class="form-control" 
                                        placeholder="Ej: Colección Támesis. Serie A">
-                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('titulo-serie-490-0-0')">
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('titulo-serie-490-0-0')" aria-label="Eliminar título de serie">
                                     <i class="bi bi-x"></i>
                                 </button>
                             </div>
@@ -71,7 +66,7 @@
                 <div class="subcampo-group">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="subcampo-label mb-0">$v Designación de Volumen/Número</label>
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarVolumenSerie490(0)">
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarVolumenSerie490(0)" aria-label="Agregar volumen">
                             <i class="bi bi-plus"></i>
                         </button>
                     </div>
@@ -83,19 +78,12 @@
                                        name="volumen_serie_490_v_0_0" 
                                        class="form-control" 
                                        placeholder="Ej: 260, Vol. 5, Tomo III">
-                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('volumen-serie-490-0-0')">
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('volumen-serie-490-0-0')" aria-label="Eliminar volumen">
                                     <i class="bi bi-x"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Ejemplo de formato MARC -->
-                <div class="mt-3">
-                    <small class="text-muted">
-                        <strong>Ejemplo:</strong> 490 1# $aColección Támesis. Serie A $v260
-                    </small>
                 </div>
             </div>
             

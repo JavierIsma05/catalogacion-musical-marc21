@@ -28,6 +28,9 @@ from .models import (
     TituloAlternativo,
     Edicion,
     ProduccionPublicacion,
+    Lugar264,
+    NombreEntidad264,
+    Fecha264,
     # Bloque 3XX
     DescripcionFisica,
     Extension300,
@@ -535,22 +538,49 @@ EdicionFormSet = forms.inlineformset_factory(
 
 
 class ProduccionPublicacionForm(forms.ModelForm):
-    """264 - Produccion/Publicacion (R) - LIGADOS"""
+    """264 - Produccion/Publicacion (R) - Campo contenedor"""
     class Meta:
         model = ProduccionPublicacion
-        fields = ['funcion', 'lugar', 'nombre_entidad', 'fecha']
+        fields = ['funcion']
         widgets = {
             'funcion': forms.Select(attrs={
                 'class': 'form-select'
-            }),
+            })
+        }
+
+
+class Lugar264Form(forms.ModelForm):
+    """264 $a - Lugar (R)"""
+    class Meta:
+        model = Lugar264
+        fields = ['lugar']
+        widgets = {
             'lugar': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': '264 $a - Lugar'
-            }),
-            'nombre_entidad': forms.TextInput(attrs={
+            })
+        }
+
+
+class NombreEntidad264Form(forms.ModelForm):
+    """264 $b - Nombre de Entidad (R)"""
+    class Meta:
+        model = NombreEntidad264
+        fields = ['nombre']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '264 $b - Entidad'
-            }),
+                'placeholder': '264 $b - Nombre de la Entidad'
+            })
+        }
+
+
+class Fecha264Form(forms.ModelForm):
+    """264 $c - Fecha (R)"""
+    class Meta:
+        model = Fecha264
+        fields = ['fecha']
+        widgets = {
             'fecha': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': '264 $c - Fecha'

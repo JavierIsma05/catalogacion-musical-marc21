@@ -72,9 +72,9 @@
 
     // Valores predeterminados para Incipit Musical (031)
     window.INCIPIT_DEFAULTS = {
-        numero_obra: {{ incipit_defaults.numero_obra }},
-    numero_movimiento: { { incipit_defaults.numero_movimiento } },
-    numero_pasaje: { { incipit_defaults.numero_pasaje } },
+    numero_obra: {{ incipit_defaults.numero_obra }},
+    numero_movimiento: {{ incipit_defaults.numero_movimiento }},
+    numero_pasaje: {{ incipit_defaults.numero_pasaje }},
     voz_instrumento: '{{ incipit_defaults.voz_instrumento }}'
     };
 </script>
@@ -84,7 +84,7 @@
 <!-- BLOQUES  -->
 <script src="{% static 'catalogacion/js/campos-0xx-repetibles.js' %}"></script>
 <script src="{% static 'catalogacion/js/campos-1xx-repetibles.js' %}?v=2.0"></script>
-<script src="{% static 'catalogacion/js/campos-2xx-repetibles.js' %}"></script>
+<script src="{% static 'catalogacion/js/campos-2xx-repetibles.js' %}?v=2.0"></script>
 <script src="{% static 'catalogacion/js/campos-3xx-repetibles.js' %}"></script>
 <script src="{% static 'catalogacion/js/campos-4xx-repetibles.js' %}"></script>
 

@@ -73,6 +73,9 @@ from .bloque_2xx import (
     TituloAlternativo,
     Edicion,
     ProduccionPublicacion,
+    Lugar264,
+    NombreEntidad264,
+    Fecha264,
 )
 
 # =====================================================

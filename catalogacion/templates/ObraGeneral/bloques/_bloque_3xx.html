@@ -59,7 +59,7 @@
                 <label class="subcampo-label mb-2">$d Técnica de Registro <small class="text-muted">(NR - No Repetible)</small></label>
                 <div class="input-group input-group-sm">
                     <span class="input-group-text">$d</span>
-                    <select name="tecnica_340d" class="form-select form-select-sm">
+                    <select name="tecnica_340d" class="form-select form-select-sm" title="Técnica de registro">
                         <option value="autógrafo">Autógrafo</option>
                         <option value="posible autógrafo">Posible autógrafo</option>
                         <option value="manuscrito" selected>Manuscrito</option>
@@ -83,7 +83,7 @@
                 <label class="subcampo-label mb-2">$a Formato de Presentación <small class="text-muted">(NR - No Repetible)</small></label>
                 <div class="input-group input-group-sm">
                     <span class="input-group-text">$a</span>
-                    <select name="formato_348a" class="form-select form-select-sm">
+                    <select name="formato_348a" class="form-select form-select-sm" title="Formato de presentación">
                         <option value="parte">Parte</option>
                         <option value="partitura" selected>Partitura</option>
                         <option value="partitura de coro">Partitura de coro</option>
@@ -115,7 +115,7 @@
                 <div class="subcampo-group mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="subcampo-label mb-0">$a Medio de Interpretación</label>
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMedio382a(0)">
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMedio382a(0)" aria-label="Agregar medio">
                             <i class="bi bi-plus"></i>
                         </button>
                     </div>
@@ -123,13 +123,13 @@
                         <div class="mb-2" data-subcampo="medio-382a-0-0">
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text">$a</span>
-                                <select name="medio_382_a_0_0" class="form-select form-select-sm">
+                                <select name="medio_382_a_0_0" class="form-select form-select-sm" title="Medio de interpretación">
                                     <option value="piano" selected>Piano</option>
                                     <option value="dos pianos">Dos pianos</option>
                                     <option value="piano a cuatro manos">Piano a cuatro manos</option>
                                     <option value="piano con acompañamiento">Piano con acompañamiento</option>
                                 </select>
-                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('medio-382a-0-0')">
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('medio-382a-0-0')" aria-label="Eliminar medio">
                                     <i class="bi bi-x"></i>
                                 </button>
                             </div>
@@ -142,7 +142,7 @@
                     <label class="subcampo-label mb-2">$b Solista <small class="text-muted">(NR - No Repetible)</small></label>
                     <div class="input-group input-group-sm">
                         <span class="input-group-text">$b</span>
-                        <select name="solista_382b" class="form-select form-select-sm">
+                        <select name="solista_382b" class="form-select form-select-sm" title="Solista">
                             <option value="piano" selected>Piano</option>
                         </select>
                     </div>
@@ -152,7 +152,7 @@
                 <div class="subcampo-group">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="subcampo-label mb-0">$n Número de Intérpretes</label>
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNumeroInterpretes382(0)">
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNumeroInterpretes382(0)" aria-label="Agregar número de intérpretes">
                             <i class="bi bi-plus"></i>
                         </button>
                     </div>
@@ -161,7 +161,7 @@
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text">$n</span>
                                 <input type="number" min="1" name="numero_interpretes_382_n_0_0" class="form-control" placeholder="Ej: 2, 4, 8">
-                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('numero-interpretes-382-0-0')">
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('numero-interpretes-382-0-0')" aria-label="Eliminar número de intérpretes">
                                     <i class="bi bi-x"></i>
                                 </button>
                             </div>
@@ -209,7 +209,7 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label small">$a Tonalidad</label>
-                    <select name="tonalidad_384" class="form-select">
+                    <select name="tonalidad_384" class="form-select" title="Seleccionar tonalidad">
                         <option value="">-- Seleccionar --</option>
                         {% for key, value in tonalidades %}
                         <option value="{{ key }}">{{ value }}</option>

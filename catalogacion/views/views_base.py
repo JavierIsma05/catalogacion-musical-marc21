@@ -236,6 +236,7 @@ def _generar_contexto_json():
 
     return {
         'tonalidades': TONALIDADES,
+        'codigos_pais': CodigoPaisEntidad.CODIGOS_PAIS,  # Para templates (lista de tuplas)
         'codigos_pais_json': codigos_pais_json,
         'codigos_idioma_json': codigos_idioma_json,
         'tipo_numero_editor_json': tipo_numero_editor_json,

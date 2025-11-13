@@ -5,6 +5,9 @@
 contadores.registrar("tituloAlternativo", 1);
 contadores.registrar("edicion", 1);
 contadores.registrar("produccionPublicacion", 1);
+contadores.registrar("lugar264", 1);
+contadores.registrar("nombreEntidad264", 1);
+contadores.registrar("fecha264", 1);
 
 // ============================================
 // 246 - TÍTULO ALTERNATIVO (Repetible)
@@ -89,7 +92,7 @@ window.agregarEdicion = function () {
 };
 
 // ============================================
-// 264 - PRODUCCIÓN/PUBLICACIÓN (Repetible)
+// 264 - PRODUCCIÓN/PUBLICACIÓN (Repetible con subcampos R)
 // ============================================
 
 function generarHTMLProduccionPublicacion(index) {
@@ -103,7 +106,9 @@ function generarHTMLProduccionPublicacion(index) {
                     <i class="bi bi-trash"></i> Eliminar
                 </button>
             </div>
-            <div class="row g-3">
+            
+            <!-- Función (segundo indicador) -->
+            <div class="row g-3 mb-3">
                 <div class="col-md-4">
                     <label class="form-label small">Función</label>
                     <select name="produccion_publicacion_funcion_${index}" class="form-select">
@@ -114,28 +119,77 @@ function generarHTMLProduccionPublicacion(index) {
                         <option value="4">Copyright</option>
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label small">$a Lugar</label>
-                    <input type="text" 
-                           name="produccion_publicacion_a_${index}" 
-                           class="form-control" 
-                           placeholder="Ej: Quito, Madrid">
+            </div>
+            
+            <!-- Subcampo $a - Lugar (Repetible) -->
+            <div class="subcampo-group mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="subcampo-label mb-0">$a Lugar</label>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarLugar264(${index})">
+                        <i class="bi bi-plus"></i>
+                    </button>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label small">$b Nombre de la Entidad</label>
-                    <input type="text" 
-                           name="produccion_publicacion_b_${index}" 
-                           class="form-control" 
-                           placeholder="Ej: Editorial Musical">
+                <div id="lugares-264-${index}">
+                    <div class="mb-2" data-subcampo="lugar-264-${index}-0">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text">$a</span>
+                            <input type="text" 
+                                   name="produccion_publicacion_a_${index}_0" 
+                                   class="form-control" 
+                                   placeholder="Ej: Quito, Madrid">
+                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('lugar-264-${index}-0')">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="row g-3 mt-2">
-                <div class="col-md-4">
-                    <label class="form-label small">$c Fecha</label>
-                    <input type="text" 
-                           name="produccion_publicacion_c_${index}" 
-                           class="form-control" 
-                           placeholder="Ej: 2023, [2023]">
+            
+            <!-- Subcampo $b - Nombre de Entidad (Repetible) -->
+            <div class="subcampo-group mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="subcampo-label mb-0">$b Nombre de la Entidad</label>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarNombreEntidad264(${index})">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+                <div id="nombres-264-${index}">
+                    <div class="mb-2" data-subcampo="nombre-264-${index}-0">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text">$b</span>
+                            <input type="text" 
+                                   name="produccion_publicacion_b_${index}_0" 
+                                   class="form-control" 
+                                   placeholder="Ej: Editorial Musical">
+                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('nombre-264-${index}-0')">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Subcampo $c - Fecha (Repetible) -->
+            <div class="subcampo-group mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="subcampo-label mb-0">$c Fecha</label>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarFecha264(${index})">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+                <div id="fechas-264-${index}">
+                    <div class="mb-2" data-subcampo="fecha-264-${index}-0">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text">$c</span>
+                            <input type="text" 
+                                   name="produccion_publicacion_c_${index}_0" 
+                                   class="form-control" 
+                                   placeholder="Ej: 2023, [2023]">
+                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('fecha-264-${index}-0')">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -152,4 +206,79 @@ window.agregarProduccionPublicacion = function () {
     );
     contadores.incrementar("produccionPublicacion");
     console.log(`🏢 Producción/Publicación agregada (total: ${index + 1})`);
+};
+
+// Agregar subcampo $a - Lugar
+window.agregarLugar264 = function (parentIndex) {
+    const contenedor = document.getElementById(`lugares-264-${parentIndex}`);
+    if (!contenedor) return;
+
+    const index = contadores.obtener("lugar264");
+    const html = `
+        <div class="mb-2" data-subcampo="lugar-264-${parentIndex}-${index}">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text">$a</span>
+                <input type="text" 
+                       name="produccion_publicacion_a_${parentIndex}_${index}" 
+                       class="form-control" 
+                       placeholder="Ej: Quito, Madrid">
+                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('lugar-264-${parentIndex}-${index}')">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    contenedor.insertAdjacentHTML("beforeend", html);
+    contadores.incrementar("lugar264");
+    console.log(`📍 Lugar agregado al 264 #${parentIndex + 1}`);
+};
+
+// Agregar subcampo $b - Nombre de Entidad
+window.agregarNombreEntidad264 = function (parentIndex) {
+    const contenedor = document.getElementById(`nombres-264-${parentIndex}`);
+    if (!contenedor) return;
+
+    const index = contadores.obtener("nombreEntidad264");
+    const html = `
+        <div class="mb-2" data-subcampo="nombre-264-${parentIndex}-${index}">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text">$b</span>
+                <input type="text" 
+                       name="produccion_publicacion_b_${parentIndex}_${index}" 
+                       class="form-control" 
+                       placeholder="Ej: Editorial Musical">
+                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('nombre-264-${parentIndex}-${index}')">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    contenedor.insertAdjacentHTML("beforeend", html);
+    contadores.incrementar("nombreEntidad264");
+    console.log(`🏢 Nombre de entidad agregado al 264 #${parentIndex + 1}`);
+};
+
+// Agregar subcampo $c - Fecha
+window.agregarFecha264 = function (parentIndex) {
+    const contenedor = document.getElementById(`fechas-264-${parentIndex}`);
+    if (!contenedor) return;
+
+    const index = contadores.obtener("fecha264");
+    const html = `
+        <div class="mb-2" data-subcampo="fecha-264-${parentIndex}-${index}">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text">$c</span>
+                <input type="text" 
+                       name="produccion_publicacion_c_${parentIndex}_${index}" 
+                       class="form-control" 
+                       placeholder="Ej: 2023, [2023]">
+                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('fecha-264-${parentIndex}-${index}')">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    contenedor.insertAdjacentHTML("beforeend", html);
+    contadores.incrementar("fecha264");
+    console.log(`📅 Fecha agregada al 264 #${parentIndex + 1}`);
 };

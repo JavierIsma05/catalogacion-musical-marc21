@@ -105,8 +105,8 @@ class ProduccionPublicacion(models.Model):
     """
     Campo 264 (R) - Producción, publicación, distribución, fabricación, copyright
     
-    Campo completo repetible que permite múltiples instancias
-    para distinguir entre diferentes funciones de entidades.
+    Campo completo repetible que permite múltiples instancias.
+    Cada instancia puede tener múltiples lugares, entidades y fechas (subcampos R).
     """
     
     # Función de la entidad (segundo indicador)
@@ -129,32 +129,8 @@ class ProduccionPublicacion(models.Model):
     funcion = models.CharField(
         max_length=1,
         choices=FUNCIONES,
-        default='0',
+        default='1',
         help_text="264 segundo indicador – Función de la entidad"
-    )
-    
-    # Subcampo $a - Lugar (R)
-    lugar = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True,
-        help_text="264 $a – Lugar de producción/publicación (R)"
-    )
-    
-    # Subcampo $b - Nombre (R)
-    nombre_entidad = models.CharField(
-        max_length=300,
-        blank=True,
-        null=True,
-        help_text="264 $b – Nombre del productor/editor/distribuidor (R)"
-    )
-    
-    # Subcampo $c - Fecha (R)
-    fecha = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        help_text="264 $c – Fecha de producción/publicación (R)"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -167,40 +143,123 @@ class ProduccionPublicacion(models.Model):
     
     def __str__(self):
         funcion_display = self.get_funcion_display()
+        lugares = list(self.lugares.values_list('lugar', flat=True))
+        entidades = list(self.entidades.values_list('nombre', flat=True))
+        fechas = list(self.fechas.values_list('fecha', flat=True))
+        
         partes = []
-        if self.lugar:
-            partes.append(self.lugar)
-        if self.nombre_entidad:
-            partes.append(self.nombre_entidad)
-        if self.fecha:
-            partes.append(self.fecha)
+        if lugares:
+            partes.append(", ".join(lugares))
+        if entidades:
+            partes.append(", ".join(entidades))
+        if fechas:
+            partes.append(", ".join(fechas))
+        
         info = " : ".join(partes) if partes else "Sin datos"
         return f"[{funcion_display}] {info}"
     
     def get_marc_format(self):
         """Retorna el campo en formato MARC21"""
         marc = f"264 #{self.funcion}"
-        if self.lugar:
-            marc += f" $a{self.lugar}"
-        if self.nombre_entidad:
-            marc += f" $b{self.nombre_entidad}"
-        if self.fecha:
-            marc += f" $c{self.fecha}"
-        return marc
-    
-    def get_vista_usuario(self):
-        """Retorna vista legible para el usuario"""
-        funcion_display = self.get_funcion_display()
         
-        if funcion_display == 'Producción':
-            return f"Producido en {self.lugar} por {self.nombre_entidad} ({self.fecha})"
-        elif funcion_display == 'Publicación':
-            return f"Publicado en {self.lugar} por {self.nombre_entidad} ({self.fecha})"
-        elif funcion_display == 'Distribución':
-            return f"Distribuido en {self.lugar} por {self.nombre_entidad} ({self.fecha})"
-        elif funcion_display == 'Fabricación':
-            return f"Fabricado en {self.lugar} por {self.nombre_entidad} ({self.fecha})"
-        elif funcion_display == 'Copyright':
-            return f"Copyright © {self.fecha} {self.nombre_entidad}"
-        else:
-            return str(self)
+        for lugar in self.lugares.all():
+            marc += f" $a{lugar.lugar}"
+        for entidad in self.entidades.all():
+            marc += f" $b{entidad.nombre}"
+        for fecha in self.fechas.all():
+            marc += f" $c{fecha.fecha}"
+        
+        return marc if marc != f"264 #{self.funcion}" else ""
+
+
+class Lugar264(models.Model):
+    """
+    Subcampo $a de 264 (R)
+    Lugar - REPETIBLE dentro de cada 264
+    
+    Ejemplos: "Quito", "Madrid", "New York"
+    """
+    
+    produccion_publicacion = models.ForeignKey(
+        ProduccionPublicacion,
+        on_delete=models.CASCADE,
+        related_name='lugares',
+        help_text="Producción/Publicación a la que pertenece"
+    )
+    
+    lugar = models.CharField(
+        max_length=200,
+        help_text="264 $a – Lugar de producción/publicación"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Lugar (264 $a)"
+        verbose_name_plural = "Lugares (264 $a - R)"
+        ordering = ['produccion_publicacion', 'id']
+    
+    def __str__(self):
+        return self.lugar
+
+
+class NombreEntidad264(models.Model):
+    """
+    Subcampo $b de 264 (R)
+    Nombre de entidad - REPETIBLE dentro de cada 264
+    
+    Ejemplos: "Editorial Música Andina", "Casa de la Cultura Ecuatoriana"
+    """
+    
+    produccion_publicacion = models.ForeignKey(
+        ProduccionPublicacion,
+        on_delete=models.CASCADE,
+        related_name='entidades',
+        help_text="Producción/Publicación a la que pertenece"
+    )
+    
+    nombre = models.CharField(
+        max_length=300,
+        help_text="264 $b – Nombre del productor/editor/distribuidor"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Nombre de Entidad (264 $b)"
+        verbose_name_plural = "Nombres de Entidades (264 $b - R)"
+        ordering = ['produccion_publicacion', 'id']
+    
+    def __str__(self):
+        return self.nombre
+
+
+class Fecha264(models.Model):
+    """
+    Subcampo $c de 264 (R)
+    Fecha - REPETIBLE dentro de cada 264
+    
+    Ejemplos: "2023", "[2023]", "©2023"
+    """
+    
+    produccion_publicacion = models.ForeignKey(
+        ProduccionPublicacion,
+        on_delete=models.CASCADE,
+        related_name='fechas',
+        help_text="Producción/Publicación a la que pertenece"
+    )
+    
+    fecha = models.CharField(
+        max_length=100,
+        help_text="264 $c – Fecha de producción/publicación"
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Fecha (264 $c)"
+        verbose_name_plural = "Fechas (264 $c - R)"
+        ordering = ['produccion_publicacion', 'id']
+    
+    def __str__(self):
+        return self.fecha

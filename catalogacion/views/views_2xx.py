@@ -22,6 +22,11 @@ from ..models import (
     Edicion,
     ProduccionPublicacion,
 )
+from ..models.bloque_2xx import (
+    Lugar264,
+    NombreEntidad264,
+    Fecha264,
+)
 
 def procesar_titulo_alternativo(request, obra):
     """
@@ -81,9 +86,14 @@ def procesar_edicion(request, obra):
 def procesar_produccion_publicacion(request, obra):
     """
     Procesar Producción/Publicación (264) desde el formulario
-    Campo repetible: produccion_publicacion_funcion_<indice>, produccion_publicacion_a_<indice>, etc.
+    
+    Campo 264 repetible con subcampos repetibles:
+    - Función: produccion_publicacion_funcion_<indice>
+    - Subcampo $a (Lugar): produccion_publicacion_a_<indice>_<subindice>
+    - Subcampo $b (Nombre): produccion_publicacion_b_<indice>_<subindice>
+    - Subcampo $c (Fecha): produccion_publicacion_c_<indice>_<subindice>
     """
-    from ..models.bloque_2xx import ProduccionPublicacion
+    from ..models.bloque_2xx import ProduccionPublicacion, Lugar264, NombreEntidad264, Fecha264
     
     indice = 0
     while True:
@@ -95,17 +105,71 @@ def procesar_produccion_publicacion(request, obra):
                 break
             continue
         
-        lugar = request.POST.get(f'produccion_publicacion_a_{indice}', '').strip()
-        nombre = request.POST.get(f'produccion_publicacion_b_{indice}', '').strip()
-        fecha = request.POST.get(f'produccion_publicacion_c_{indice}', '').strip()
-        
-        ProduccionPublicacion.objects.create(
+        # Crear la instancia de ProduccionPublicacion
+        prod_pub = ProduccionPublicacion.objects.create(
             obra=obra,
-            funcion=funcion,
-            lugar=lugar,
-            nombre_entidad=nombre,
-            fecha=fecha
+            funcion=funcion
         )
+        
+        # Procesar lugares ($a) - subcampos repetibles
+        subindice = 0
+        while True:
+            lugar = request.POST.get(f'produccion_publicacion_a_{indice}_{subindice}', '').strip()
+            
+            if not lugar:
+                subindice += 1
+                if subindice > 50:
+                    break
+                continue
+            
+            Lugar264.objects.create(
+                produccion_publicacion=prod_pub,
+                lugar=lugar
+            )
+            
+            subindice += 1
+            if subindice > 50:
+                break
+        
+        # Procesar nombres de entidades ($b) - subcampos repetibles
+        subindice = 0
+        while True:
+            nombre = request.POST.get(f'produccion_publicacion_b_{indice}_{subindice}', '').strip()
+            
+            if not nombre:
+                subindice += 1
+                if subindice > 50:
+                    break
+                continue
+            
+            NombreEntidad264.objects.create(
+                produccion_publicacion=prod_pub,
+                nombre=nombre
+            )
+            
+            subindice += 1
+            if subindice > 50:
+                break
+        
+        # Procesar fechas ($c) - subcampos repetibles
+        subindice = 0
+        while True:
+            fecha = request.POST.get(f'produccion_publicacion_c_{indice}_{subindice}', '').strip()
+            
+            if not fecha:
+                subindice += 1
+                if subindice > 50:
+                    break
+                continue
+            
+            Fecha264.objects.create(
+                produccion_publicacion=prod_pub,
+                fecha=fecha
+            )
+            
+            subindice += 1
+            if subindice > 50:
+                break
         
         indice += 1
         if indice > 50:

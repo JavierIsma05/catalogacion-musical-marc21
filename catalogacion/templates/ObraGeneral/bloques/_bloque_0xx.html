@@ -124,7 +124,7 @@
                         <div class="mb-2" data-subcampo="url-0-0">
                             <div class="input-group input-group-sm">
                                 <input type="url" name="incipit_u_0_0" class="form-control" placeholder="https://...">
-                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('url-0-0')">
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('url-0-0')" aria-label="Eliminar URL">
                                     <i class="bi bi-x"></i>
                                 </button>
                             </div>
@@ -169,7 +169,7 @@
                 <div class="row g-2 mb-3">
                     <div class="col-md-6">
                         <label class="subcampo-label">Indicador 1 - Código de Traducción</label>
-                        <select name="codigo_lengua_ind1_0" class="form-select">
+                        <select name="codigo_lengua_ind1_0" class="form-select" title="Indicador de traducción">
                             {% for value, label in indicacion_traduccion %}
                             <option value="{{ value }}" {% if value == '0' %}selected{% endif %}>{{ value }} - {{ label }}</option>
                             {% endfor %}
@@ -177,7 +177,7 @@
                     </div>
                     <div class="col-md-6">
                         <label class="subcampo-label">Indicador 2 - Código de Fuente</label>
-                        <select name="codigo_lengua_ind2_0" class="form-select">
+                        <select name="codigo_lengua_ind2_0" class="form-select" title="Fuente del código">
                             {% for value, label in fuente_codigo %}
                             <option value="{{ value }}" {% if value == '#' %}selected{% endif %}>{{ value }} - {{ label }}</option>
                             {% endfor %}
@@ -196,12 +196,12 @@
                     <div id="codigo-lengua-0-idiomas">
                         <div class="mb-2" data-subcampo="idioma-0-0">
                             <div class="input-group input-group-sm">
-                                <select name="codigo_lengua_a_0_0" class="form-select form-select-sm">
+                                <select name="codigo_lengua_a_0_0" class="form-select form-select-sm" title="Seleccionar idioma">
                                     {% for value, label in codigos_idioma %}
                                     <option value="{{ value }}" {% if value == 'spa' %}selected{% endif %}>{{ label }}</option>
                                     {% endfor %}
                                 </select>
-                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('idioma-0-0')">
+                                <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('idioma-0-0')" aria-label="Eliminar idioma">
                                     <i class="bi bi-x"></i>
                                 </button>
                             </div>
@@ -231,7 +231,7 @@
                 <div class="row g-2">
                     <div class="col-md-12">
                         <label class="subcampo-label">$a Código de País</label>
-                        <select name="codigo_pais_a_0" class="form-select">
+                        <select name="codigo_pais_a_0" class="form-select" title="Seleccionar país">
                             {% for codigo, nombre in codigos_pais %}
                             <option value="{{ codigo }}" {% if codigo == 'ec' %}selected{% endif %}>{{ nombre }}</option>
                             {% endfor %}
@@ -257,29 +257,29 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label class="form-label small">$a Institución</label>
-                <input type="text" name="clasif_institucion" class="form-control" value="UNL" readonly disabled>
+                <input type="text" name="clasif_institucion" class="form-control" value="UNL" readonly disabled title="Centro catalogador">
                 <small class="text-muted">Copia del campo 040 $a</small>
             </div>
             <div class="col-md-6">
                 <label class="form-label small">$b Proyecto</label>
-                <input type="text" name="clasif_proyecto" class="form-control" value="BLMP" readonly disabled>
+                <input type="text" name="clasif_proyecto" class="form-control" value="BLMP" readonly disabled title="Proyecto de catalogación">
                 <small class="text-muted">Predeterminado: BLMP</small>
             </div>
         </div>
         <div class="row g-3 mt-2">
             <div class="col-md-4">
                 <label class="form-label small">$c País</label>
-                <input type="text" name="clasif_pais" class="form-control" readonly disabled placeholder="Del campo 044 $a">
+                <input type="text" name="clasif_pais" class="form-control" readonly disabled placeholder="Del campo 044 $a" title="Código de país">
                 <small class="text-muted">Copia del primer país (044 $a)</small>
             </div>
             <div class="col-md-4">
                 <label class="form-label small">$d Ms/Imp</label>
-                <input type="text" name="clasif_ms_imp" class="form-control" readonly disabled placeholder="Ms o Imp">
+                <input type="text" name="clasif_ms_imp" class="form-control" readonly disabled placeholder="Ms o Imp" title="Tipo de registro: Manuscrito o Impreso">
                 <small class="text-muted">Según tipo de registro (Líder/06)</small>
             </div>
             <div class="col-md-4">
                 <label class="form-label small">$0 Número de Control</label>
-                <input type="text" name="clasif_num_control" class="form-control" readonly disabled placeholder="Del campo 001">
+                <input type="text" name="clasif_num_control" class="form-control" readonly disabled placeholder="Del campo 001" title="Número de control del registro">
                 <small class="text-muted">Copia del campo 001</small>
             </div>
         </div>

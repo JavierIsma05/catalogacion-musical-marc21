@@ -40,7 +40,7 @@
             <div class="subcampo-group">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <label class="subcampo-label mb-0">$e Función del Compositor</label>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarFuncionCompositor()">
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarFuncionCompositor()" aria-label="Agregar función">
                         <i class="bi bi-plus"></i> 
                     </button>
                 </div>
@@ -48,7 +48,7 @@
                     <div class="mb-2" data-subcampo="funcion-compositor-0">
                         <div class="input-group input-group-sm">
                             <span class="input-group-text">$e</span>
-                            <select name="funcion_compositor_e_0" class="form-select form-select-sm">
+                            <select name="funcion_compositor_e_0" class="form-select form-select-sm" title="Seleccionar función del compositor">
                                 <option value="arreglista">Arreglista</option>
                                 <option value="coeditor">Coeditor</option>
                                 <option value="compilador">Compilador</option>
@@ -58,7 +58,7 @@
                                 <option value="editor">Editor</option>
                                 <option value="prologuista">Prologuista</option>
                             </select>
-                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('funcion-compositor-0')">
+                            <button type="button" class="btn btn-outline-danger" onclick="eliminarSubcampo('funcion-compositor-0')" aria-label="Eliminar función">
                                 <i class="bi bi-x"></i>
                             </button>
                         </div>
@@ -71,7 +71,7 @@
                 <label class="subcampo-label mb-2">$j Calificador de Atribución <small class="text-muted">(NR - No Repetible)</small></label>
                 <div class="input-group input-group-sm">
                     <span class="input-group-text">$j</span>
-                    <select name="atribucion_compositor_j" class="form-select form-select-sm">
+                    <select name="atribucion_compositor_j" class="form-select form-select-sm" title="Calificador de atribución">
                         <option value="atribuida">Atribuida</option>
                         <option value="certificada" selected>Certificada</option>
                         <option value="erronea">Errónea</option>
@@ -144,7 +144,7 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label small">$r Tonalidad</label>
-                    <select name="titulo_uniforme_tonalidad" class="form-select">
+                    <select name="titulo_uniforme_tonalidad" class="form-select" title="Seleccionar tonalidad">
                         <option value="">-- Seleccionar --</option>
                         {% for key, value in tonalidades %}
                         <option value="{{ key }}">{{ value }}</option>
@@ -239,7 +239,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label small">$r Tonalidad</label>
-                    <select name="titulo_240_tonalidad" class="form-select">
+                    <select name="titulo_240_tonalidad" class="form-select" title="Seleccionar tonalidad">
                         <option value="">-- Seleccionar --</option>
                         {% for key, value in tonalidades %}
                         <option value="{{ key }}">{{ value }}</option>
