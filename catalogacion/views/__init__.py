@@ -25,8 +25,8 @@ from .views_base import (
     coleccion_impresa,
     obra_individual_impresa,
     listar_obras,
-    detalle_obra,
 )
+
 
 # Importar vistas de autoridades
 from .views_autoridades import (

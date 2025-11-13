@@ -5,7 +5,6 @@ from .views import (
     plantillas,
     crear_obra,
     listar_obras,
-    detalle_obra,
     coleccion_manuscrita,
     obra_individual_manuscrita,
     coleccion_impresa,
@@ -21,7 +20,6 @@ urlpatterns = [
     path('plantillas/', plantillas, name='plantillas'),
     path('crear_obra/', crear_obra, name='crear_obra'),
     path('obras/', listar_obras, name='listar_obras'),
-    path('obras/<int:obra_id>/', detalle_obra, name='detalle_obra'),
     
     # Colecciones
     path('coleccion_manuscrita/', coleccion_manuscrita, name='coleccion_manuscrita'),

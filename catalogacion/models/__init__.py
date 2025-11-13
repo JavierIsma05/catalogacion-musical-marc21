@@ -26,6 +26,7 @@ from .autoridades import (
     AutoridadTituloUniforme,
     AutoridadFormaMusical,
     AutoridadMateria,
+    AutoridadEntidad,
 )
 
 # =====================================================
