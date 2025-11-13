@@ -2201,8 +2201,9 @@ function CanvasClass() {
 
 
 
-    // Se cambia el valor de los campos paec (%$@Cuerpo) a var031p (cuerpo)
-    $("#incipitPaec").val(var031p);
+    // Aqui Se cambia el valor de los campos paec (%$@Cuerpo) a var031p (cuerpo)
+    $("#incipitPaec").val(paec);
+    $("#incipit_g_0").val(var031p);
     $("#incipitTransposition").val(transposition);
 
     // Actualizar los campos 031g, 031n, 031o, 031p, 0312 si estamos en modo "add" o "edit"

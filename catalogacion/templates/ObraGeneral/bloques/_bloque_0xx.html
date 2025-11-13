@@ -131,7 +131,7 @@
 
                     <div class="col-md-4">
                         <label class="subcampo-label">$g Clave</label>
-                        <input type="number" name="incipit_g_0" class="form-control" placeholder="{{ incipit_defaults.numero_obra }}" value="{{ incipit_defaults.numero_obra }}" min="1">
+                        <input type="text" name="incipit_g_0" class="form-control" placeholder="" value="">
                     </div>
 
                     <div class="col-md-4">
@@ -142,13 +142,13 @@
                     </div>
                     <div class="col-md-4">
                             <label class="subcampo-label">$n Armadura</label>
-                            <input type="number" name="incipit_n_0" class="form-control" placeholder="{{ incipit_defaults.numero_obra }}" value="{{ incipit_defaults.numero_obra }}" min="1">
+                            <input type="text" name="incipit_n_0" class="form-control" placeholder="" value="">
                     </div>
 
 
                     <div class="col-md-4">
                         <label class="subcampo-label">$o Tiempo</label>
-                        <input type="number" name="incipit_o_0" class="form-control" placeholder="{{ incipit_defaults.numero_obra }}" value="{{ incipit_defaults.numero_obra }}" min="1">
+                        <input type="text" name="incipit_o_0" class="form-control" placeholder="" value="">
                     </div>
                     </div>
                     <label class="subcampo-label">$p Notación Musical (opcional)</label>
@@ -158,6 +158,7 @@
                         class="form-control mb-2"
                         rows="2"
                         placeholder="Código de incipit musical (Plaine & Easie, MusicXML, ABC)"></textarea>
+                        <button type="button" id="parse-inc-p0" class="btn btn-sm btn-outline-secondary">Parse</button>
 
                     <div class="mb-3">
 
