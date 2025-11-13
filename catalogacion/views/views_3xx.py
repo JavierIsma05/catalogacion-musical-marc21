@@ -52,215 +52,73 @@ from ..forms import (
 
 def procesar_descripcion_fisica_300(request, obra):
     """
-    Procesar Descripción Física (300) con subcampos anidados
+    Procesar Descripción Física (300) - ahora NR (No Repetible)
     Estructura HTML/JS: 
-        - otras_caracteristicas_300_b_{idx}
-        - material_acompanante_300_e_{idx}
-        - extension_300_a_{idx_padre}_{idx}
-        - dimension_300_c_{idx_padre}_{idx}
+        - extension_300_a
+        - otras_caracteristicas_300_b
+        - dimension_300_c
+        - material_acompanante_300_e
     """
-    indice = 0
-    while True:
-        # NOTA: JavaScript genera campos con notación MARC subcampo
-        otras_caract = request.POST.get(f'otras_caracteristicas_300_b_{indice}', '').strip()
-        material_acomp = request.POST.get(f'material_acompanante_300_e_{indice}', '').strip()
-        
-        # Verificar si hay datos
-        tiene_datos = otras_caract or material_acomp
-        
-        # Verificar si hay extensiones
-        ext_idx = 0
-        while True:
-            ext = request.POST.get(f'extension_300_a_{indice}_{ext_idx}', '').strip()
-            if ext:
-                tiene_datos = True
-                break
-            ext_idx += 1
-            if ext_idx > 20:
-                break
-        
-        # Verificar si hay dimensiones
-        if not tiene_datos:
-            dim_idx = 0
-            while True:
-                dim = request.POST.get(f'dimension_300_c_{indice}_{dim_idx}', '').strip()
-                if dim:
-                    tiene_datos = True
-                    break
-                dim_idx += 1
-                if dim_idx > 20:
-                    break
-        
-        if not tiene_datos:
-            indice += 1
-            if indice > 50:
-                break
-            continue
-        
-        # Crear descripción física
-        desc_fisica = DescripcionFisica.objects.create(
-            obra=obra,
-            otras_caracteristicas_fisicas=otras_caract,
-            material_acompanante=material_acomp
-        )
-        
-        # Procesar extensiones ($a)
-        ext_idx = 0
-        while True:
-            extension_texto = request.POST.get(f'extension_300_a_{indice}_{ext_idx}', '').strip()
-            if not extension_texto:
-                ext_idx += 1
-                if ext_idx > 20:
-                    break
-                continue
-            
-            Extension300.objects.create(
-                descripcion_fisica=desc_fisica,
-                extension=extension_texto
-            )
-            
-            ext_idx += 1
-            if ext_idx > 20:
-                break
-        
-        # Procesar dimensiones ($c)
-        dim_idx = 0
-        while True:
-            dimension_texto = request.POST.get(f'dimension_300_c_{indice}_{dim_idx}', '').strip()
-            if not dimension_texto:
-                dim_idx += 1
-                if dim_idx > 20:
-                    break
-                continue
-            
-            Dimension300.objects.create(
-                descripcion_fisica=desc_fisica,
-                dimension=dimension_texto
-            )
-            
-            dim_idx += 1
-            if dim_idx > 20:
-                break
-        
-        indice += 1
-        if indice > 50:
-            break
+    # Procesar campos NR directos en ObraGeneral
+    extension = request.POST.get('extension_300_a', '').strip()
+    otras_caract = request.POST.get('otras_caracteristicas_300_b', '').strip()
+    dimension = request.POST.get('dimension_300_c', '').strip()
+    material_acomp = request.POST.get('material_acompanante_300_e', '').strip()
+    
+    if extension:
+        obra.extension_300a = extension
+    if otras_caract:
+        obra.otras_caracteristicas_300b = otras_caract
+    if dimension:
+        obra.dimension_300c = dimension
+    if material_acomp:
+        obra.material_acompanante_300e = material_acomp
+    
+    if extension or otras_caract or dimension or material_acomp:
+        obra.save()
 
 
 def procesar_medio_fisico_340(request, obra):
     """
-    Procesar Medio Físico (340) con técnicas anidadas
-    Estructura HTML/JS: tecnica_340_d_{idx_padre}_{idx}
+    Procesar Medio Físico (340) - ahora NR (No Repetible)
+    Estructura HTML/JS: tecnica_340_d (campo directo en ObraGeneral)
     """
-    indice = 0
-    while True:
-        # Verificar si hay técnicas
-        tiene_tecnicas = False
-        tec_idx = 0
-        while True:
-            # JavaScript genera: tecnica_340_d_{indice}_{tec_idx}
-            tec = request.POST.get(f'tecnica_340_d_{indice}_{tec_idx}', '').strip()
-            if tec:
-                tiene_tecnicas = True
-                break
-            tec_idx += 1
-            if tec_idx > 20:
-                break
-        
-        if not tiene_tecnicas:
-            indice += 1
-            if indice > 50:
-                break
-            continue
-        
-        # Crear medio físico
-        medio = MedioFisico.objects.create(obra=obra)
-        
-        # Procesar técnicas ($d)
-        tec_idx = 0
-        while True:
-            tecnica_texto = request.POST.get(f'tecnica_340_d_{indice}_{tec_idx}', '').strip()
-            if not tecnica_texto:
-                tec_idx += 1
-                if tec_idx > 20:
-                    break
-                continue
-            
-            Tecnica340.objects.create(
-                medio_fisico=medio,
-                tecnica=tecnica_texto
-            )
-            
-            tec_idx += 1
-            if tec_idx > 20:
-                break
-        
-        indice += 1
-        if indice > 50:
-            break
+    tecnica = request.POST.get('tecnica_340_d', '').strip()
+    
+    if tecnica:
+        obra.tecnica_340d = tecnica
+        obra.save()
 
 
 def procesar_caracteristica_musica_348(request, obra):
     """
-    Procesar Características Música Notada (348) con formatos anidados
-    Estructura HTML/JS: formato_348_a_{idx_padre}_{idx}
+    Procesar Características Música Notada (348) - ahora NR (No Repetible)
+    Estructura HTML/JS: formato_348_a (campo directo en ObraGeneral)
     """
-    indice = 0
-    while True:
-        # Verificar si hay formatos
-        tiene_formatos = False
-        fmt_idx = 0
-        while True:
-            # JavaScript genera: formato_348_a_{indice}_{fmt_idx}
-            fmt = request.POST.get(f'formato_348_a_{indice}_{fmt_idx}', '').strip()
-            if fmt:
-                tiene_formatos = True
-                break
-            fmt_idx += 1
-            if fmt_idx > 20:
-                break
-        
-        if not tiene_formatos:
-            indice += 1
-            if indice > 50:
-                break
-            continue
-        
-        # Crear característica
-        caract = CaracteristicaMusicaNotada.objects.create(obra=obra)
-        
-        # Procesar formatos ($a)
-        fmt_idx = 0
-        while True:
-            formato_texto = request.POST.get(f'formato_348_a_{indice}_{fmt_idx}', '').strip()
-            if not formato_texto:
-                fmt_idx += 1
-                if fmt_idx > 20:
-                    break
-                continue
-            
-            Formato348.objects.create(
-                caracteristica=caract,
-                formato=formato_texto
-            )
-            
-            fmt_idx += 1
-            if fmt_idx > 20:
-                break
-        
-        indice += 1
-        if indice > 50:
-            break
+    formato = request.POST.get('formato_348_a', '').strip()
+    
+    if formato:
+        obra.formato_348a = formato
+        obra.save()
 
 
 def procesar_medio_interpretacion_382(request, obra):
     """
-    Procesar Medio de Interpretación (382) con subcampos anidados
+    Procesar Medio de Interpretación (382)
+    Campo 382 completo sigue siendo repetible (R)
+    Pero $b (solista) ahora es NR dentro de ObraGeneral
     Estructura HTML/JS:
-        - medio_382_a_{idx_padre}_{idx}
-        - solista_382_b_{idx_padre}_{idx}
-        - numero_interpretes_382_n_{idx_padre}_{idx}
+        - solista_382_b (campo directo NR en ObraGeneral)
+        - medio_382_a_{idx_padre}_{idx} (sigue siendo R)
+        - numero_interpretes_382_n_{idx_padre}_{idx} (sigue siendo R)
     """
+    # Procesar $b - Solista (NR)
+    solista = request.POST.get('solista_382_b', '').strip()
+    if solista:
+        obra.solista_382b = solista
+        obra.save()
+    
+    # El resto del campo 382 sigue siendo repetible (no cambió)
     indice = 0
     while True:
         # Verificar subcampos
@@ -276,18 +134,6 @@ def procesar_medio_interpretacion_382(request, obra):
             sub_idx += 1
             if sub_idx > 20:
                 break
-        
-        # Verificar si hay solistas
-        if not tiene_datos:
-            sub_idx = 0
-            while True:
-                val = request.POST.get(f'solista_382_b_{indice}_{sub_idx}', '').strip()
-                if val:
-                    tiene_datos = True
-                    break
-                sub_idx += 1
-                if sub_idx > 20:
-                    break
         
         # Verificar si hay números de intérpretes
         if not tiene_datos:
@@ -329,25 +175,6 @@ def procesar_medio_interpretacion_382(request, obra):
             if sub_idx > 20:
                 break
         
-        # Procesar solistas ($b)
-        sub_idx = 0
-        while True:
-            solista_texto = request.POST.get(f'solista_382_b_{indice}_{sub_idx}', '').strip()
-            if not solista_texto:
-                sub_idx += 1
-                if sub_idx > 20:
-                    break
-                continue
-            
-            Solista382.objects.create(
-                medio_interpretacion=medio,
-                solista=solista_texto
-            )
-            
-            sub_idx += 1
-            if sub_idx > 20:
-                break
-        
         # Procesar número intérpretes ($n)
         sub_idx = 0
         while True:
@@ -378,89 +205,23 @@ def procesar_medio_interpretacion_382(request, obra):
 
 def procesar_designacion_numerica_383(request, obra):
     """
-    Procesar Designación Numérica (383) con subcampos anidados
+    Procesar Designación Numérica (383) - ahora NR (No Repetible)
     Estructura HTML/JS:
-        - numero_obra_383_a_{idx_padre}_{idx}
-        - opus_383_b_{idx_padre}_{idx}
+        - numero_obra_383_a (campo directo en ObraGeneral)
+        - opus_383_b (campo directo en ObraGeneral)
     """
-    indice = 0
-    while True:
-        # Verificar si hay números de obra u opus
-        tiene_datos = False
-        
-        # Verificar números de obra
-        num_idx = 0
-        while True:
-            val = request.POST.get(f'numero_obra_383_a_{indice}_{num_idx}', '').strip()
-            if val:
-                tiene_datos = True
-                break
-            num_idx += 1
-            if num_idx > 20:
-                break
-        
-        # Verificar opus
-        if not tiene_datos:
-            opus_idx = 0
-            while True:
-                val = request.POST.get(f'opus_383_b_{indice}_{opus_idx}', '').strip()
-                if val:
-                    tiene_datos = True
-                    break
-                opus_idx += 1
-                if opus_idx > 20:
-                    break
-        
-        if not tiene_datos:
-            indice += 1
-            if indice > 50:
-                break
-            continue
-        
-        # Crear designación numérica
-        designacion = DesignacionNumericaObra.objects.create(obra=obra)
-        
-        # Procesar números de obra ($a)
-        sub_idx = 0
-        while True:
-            numero_texto = request.POST.get(f'numero_obra_383_a_{indice}_{sub_idx}', '').strip()
-            if not numero_texto:
-                sub_idx += 1
-                if sub_idx > 20:
-                    break
-                continue
-            
-            NumeroObra383.objects.create(
-                designacion_numerica=designacion,
-                numero_obra=numero_texto
-            )
-            
-            sub_idx += 1
-            if sub_idx > 20:
-                break
-        
-        # Procesar opus ($b)
-        sub_idx = 0
-        while True:
-            opus_texto = request.POST.get(f'opus_383_b_{indice}_{sub_idx}', '').strip()
-            if not opus_texto:
-                sub_idx += 1
-                if sub_idx > 20:
-                    break
-                continue
-            
-            Opus383.objects.create(
-                designacion_numerica=designacion,
-                opus=opus_texto
-            )
-            
-            sub_idx += 1
-            if sub_idx > 20:
-                break
-        
-        indice += 1
-        if indice > 50:
-            break
+    # Procesar $a - Número de obra (NR)
+    numero_obra = request.POST.get('numero_obra_383_a', '').strip()
+    if numero_obra:
+        obra.numero_obra_383a = numero_obra
+    
+    # Procesar $b - Opus (NR)
+    opus = request.POST.get('opus_383_b', '').strip()
+    if opus:
+        obra.opus_383b = opus
+    
+    if numero_obra or opus:
+        obra.save()
 
 
 # ================================================

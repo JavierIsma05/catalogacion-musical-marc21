@@ -39,80 +39,56 @@ from ..models import (
 
 def procesar_isbn(request, obra):
     """
-    Procesa múltiples ISBN del formulario
+    Procesa ISBN del formulario (NR - No Repetible)
     
-    Formato de campos: isbn_a_0, isbn_a_1, isbn_a_2, ...
-                       isbn_q_0, isbn_q_1, isbn_q_2, ...
+    Formato de campo: isbn_a (campo directo en ObraGeneral)
     
     Args:
         request: HttpRequest con datos POST
-        obra: Instancia de ObraGeneral donde se agregarán los ISBN
+        obra: Instancia de ObraGeneral donde se asignará el ISBN
     """
-    index = 0
-    while True:
-        isbn_value = request.POST.get(f'isbn_a_{index}')
-        if not isbn_value:
-            break
-        
-        if isbn_value.strip():
-            ISBN.objects.create(
-                obra=obra,
-                isbn=isbn_value.strip()
-            )
-        index += 1
+    isbn_value = request.POST.get('isbn_a', '').strip()
+    if isbn_value:
+        obra.isbn = isbn_value
+        obra.save()
 
 
 def procesar_ismn(request, obra):
     """
-    Procesa múltiples ISMN del formulario
+    Procesa ISMN del formulario (NR - No Repetible)
     
-    Formato: ismn_a_0, ismn_a_1, ...
+    Formato: ismn_a (campo directo en ObraGeneral)
     
     Args:
         request: HttpRequest con datos POST
-        obra: Instancia de ObraGeneral donde se agregarán los ISMN
+        obra: Instancia de ObraGeneral donde se asignará el ISMN
     """
-    index = 0
-    while True:
-        ismn_value = request.POST.get(f'ismn_a_{index}')
-        if not ismn_value:
-            break
-        
-        if ismn_value.strip():
-            ISMN.objects.create(
-                obra=obra,
-                ismn=ismn_value.strip()
-            )
-        index += 1
+    ismn_value = request.POST.get('ismn_a', '').strip()
+    if ismn_value:
+        obra.ismn = ismn_value
+        obra.save()
 
 
 def procesar_numero_editor(request, obra):
     """
-    Procesa múltiples Números de Editor
+    Procesa Número de Editor (NR - No Repetible)
     
-    Formato: numero_editor_a_0, numero_editor_tipo_0, numero_editor_control_0
+    Formato: numero_editor_a, nombre_editor_b (campos directos en ObraGeneral)
     
     Args:
         request: HttpRequest con datos POST
         obra: Instancia de ObraGeneral
     """
-    index = 0
-    while True:
-        numero = request.POST.get(f'numero_editor_a_{index}')
-        if not numero:
-            break
-        
-        if numero.strip():
-            tipo = request.POST.get(f'numero_editor_tipo_{index}', '2')
-            control = request.POST.get(f'numero_editor_control_{index}', '0')
-            
-            NumeroEditor.objects.create(
-                obra=obra,
-                numero_editor=numero.strip(),
-                tipo_numero=tipo,
-                control_nota=control
-            )
-        index += 1
+    numero = request.POST.get('numero_editor_a', '').strip()
+    nombre = request.POST.get('nombre_editor_b', '').strip()
+    
+    if numero:
+        obra.numero_editor = numero
+    if nombre:
+        obra.nombre_editor = nombre
+    
+    if numero or nombre:
+        obra.save()
 
 
 def procesar_incipit(request, obra):

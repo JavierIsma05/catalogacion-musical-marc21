@@ -103,18 +103,11 @@ def procesar_compositor(request, obra):
                 )
             idx += 1
         
-        # Procesar atribuciones ($j) - repetibles
-        idx = 0
-        while True:
-            atribucion = request.POST.get(f'atribucion_compositor_j_{idx}')
-            if atribucion is None:
-                break
-            if atribucion.strip():
-                AtribucionCompositor.objects.create(
-                    obra=obra,
-                    atribucion=atribucion.strip()
-                )
-            idx += 1
+        # Procesar atribución ($j) - NR (No Repetible)
+        atribucion = request.POST.get('atribucion_compositor_j', '').strip()
+        if atribucion:
+            obra.atribucion_compositor = atribucion
+            obra.save()
 
 
 def procesar_titulo_uniforme_130(request, obra):
@@ -162,71 +155,41 @@ def procesar_subcampos_130(request, obra):
     """
     Procesa los subcampos del campo 130 - Titulo Uniforme
     
-    Maneja:
-    - $k Forma musical (ForeignKey a AutoridadFormaMusical) - repetible
-    - $m Medio de interpretacion - repetible
-    - $n Numero de parte/seccion - repetible
-    - $p Nombre de parte/seccion - repetible
+    Maneja (ahora todos NR - No Repetibles):
+    - $k Forma musical (ForeignKey a AutoridadFormaMusical)
+    - $m Medio de interpretacion
+    - $n Numero de parte/seccion
+    - $p Nombre de parte/seccion
     
     Args:
         request: HttpRequest con datos POST
         obra: Instancia de ObraGeneral
     """
-    # Procesar $k - Forma musical (repetible, con autoridad)
-    idx = 0
-    while True:
-        forma_nombre = request.POST.get(f'forma_130_k_{idx}')
-        if forma_nombre is None:
-            break
-        if forma_nombre.strip():
-            # Crear o recuperar autoridad de forma musical
-            forma_autoridad, created = AutoridadFormaMusical.objects.get_or_create(
-                forma=forma_nombre.strip()
-            )
-            Forma130.objects.create(
-                obra=obra,
-                forma=forma_autoridad
-            )
-        idx += 1
+    # Procesar $k - Forma musical (NR, con autoridad)
+    forma_nombre = request.POST.get('forma_130_k', '').strip()
+    if forma_nombre:
+        forma_autoridad, created = AutoridadFormaMusical.objects.get_or_create(
+            forma=forma_nombre
+        )
+        obra.forma_130 = forma_autoridad
     
-    # Procesar $m - Medio de interpretacion (repetible)
-    idx = 0
-    while True:
-        medio = request.POST.get(f'medio_interpretacion_130_m_{idx}')
-        if medio is None:
-            break
-        if medio.strip():
-            MedioInterpretacion130.objects.create(
-                obra=obra,
-                medio=medio.strip()
-            )
-        idx += 1
+    # Procesar $m - Medio de interpretacion (NR)
+    medio = request.POST.get('medio_interpretacion_130_m', '').strip()
+    if medio:
+        obra.medio_interpretacion_130 = medio
     
-    # Procesar $n - Numero de parte/seccion (repetible)
-    idx = 0
-    while True:
-        numero = request.POST.get(f'numero_parte_130_n_{idx}')
-        if numero is None:
-            break
-        if numero.strip():
-            NumeroParteSeccion130.objects.create(
-                obra=obra,
-                numero=numero.strip()
-            )
-        idx += 1
+    # Procesar $n - Numero de parte/seccion (NR)
+    numero = request.POST.get('numero_parte_130_n', '').strip()
+    if numero:
+        obra.numero_parte_130 = numero
     
-    # Procesar $p - Nombre de parte/seccion (repetible)
-    idx = 0
-    while True:
-        nombre = request.POST.get(f'nombre_parte_130_p_{idx}')
-        if nombre is None:
-            break
-        if nombre.strip():
-            NombreParteSeccion130.objects.create(
-                obra=obra,
-                nombre=nombre.strip()
-            )
-        idx += 1
+    # Procesar $p - Nombre de parte/seccion (NR)
+    nombre = request.POST.get('nombre_parte_130_p', '').strip()
+    if nombre:
+        obra.nombre_parte_130 = nombre
+    
+    if forma_nombre or medio or numero or nombre:
+        obra.save()
 
 
 def procesar_titulo_uniforme_240(request, obra):
@@ -274,68 +237,38 @@ def procesar_subcampos_240(request, obra):
     """
     Procesa los subcampos del campo 240 - Titulo Uniforme con Compositor
     
-    Maneja:
-    - $k Forma musical (ForeignKey a AutoridadFormaMusical) - repetible
-    - $m Medio de interpretacion - repetible
-    - $n Numero de parte/seccion - repetible
-    - $p Nombre de parte/seccion - repetible
+    Maneja (ahora todos NR - No Repetibles):
+    - $k Forma musical (ForeignKey a AutoridadFormaMusical)
+    - $m Medio de interpretacion
+    - $n Numero de parte/seccion
+    - $p Nombre de parte/seccion
     
     Args:
         request: HttpRequest con datos POST
         obra: Instancia de ObraGeneral
     """
-    # Procesar $k - Forma musical (repetible, con autoridad - igual que 130)
-    idx = 0
-    while True:
-        forma_nombre = request.POST.get(f'forma_240_k_{idx}')
-        if forma_nombre is None:
-            break
-        if forma_nombre.strip():
-            # Crear o recuperar autoridad de forma musical
-            forma_autoridad, created = AutoridadFormaMusical.objects.get_or_create(
-                forma=forma_nombre.strip()
-            )
-            Forma240.objects.create(
-                obra=obra,
-                forma=forma_autoridad
-            )
-        idx += 1
+    # Procesar $k - Forma musical (NR, con autoridad)
+    forma_nombre = request.POST.get('forma_240_k', '').strip()
+    if forma_nombre:
+        forma_autoridad, created = AutoridadFormaMusical.objects.get_or_create(
+            forma=forma_nombre
+        )
+        obra.forma_240 = forma_autoridad
     
-    # Procesar $m - Medio de interpretacion (repetible)
-    idx = 0
-    while True:
-        medio = request.POST.get(f'medio_interpretacion_240_m_{idx}')
-        if medio is None:
-            break
-        if medio.strip():
-            MedioInterpretacion240.objects.create(
-                obra=obra,
-                medio=medio.strip()
-            )
-        idx += 1
+    # Procesar $m - Medio de interpretacion (NR)
+    medio = request.POST.get('medio_interpretacion_240_m', '').strip()
+    if medio:
+        obra.medio_interpretacion_240 = medio
     
-    # Procesar $n - Numero de parte/seccion (repetible)
-    idx = 0
-    while True:
-        numero = request.POST.get(f'numero_parte_240_n_{idx}')
-        if numero is None:
-            break
-        if numero.strip():
-            NumeroParteSeccion240.objects.create(
-                obra=obra,
-                numero=numero.strip()
-            )
-        idx += 1
+    # Procesar $n - Numero de parte/seccion (NR)
+    numero = request.POST.get('numero_parte_240_n', '').strip()
+    if numero:
+        obra.numero_parte_240 = numero
     
-    # Procesar $p - Nombre de parte/seccion (repetible)
-    idx = 0
-    while True:
-        nombre = request.POST.get(f'nombre_parte_240_p_{idx}')
-        if nombre is None:
-            break
-        if nombre.strip():
-            NombreParteSeccion240.objects.create(
-                obra=obra,
-                nombre=nombre.strip()
-            )
-        idx += 1
+    # Procesar $p - Nombre de parte/seccion (NR)
+    nombre = request.POST.get('nombre_parte_240_p', '').strip()
+    if nombre:
+        obra.nombre_parte_240 = nombre
+    
+    if forma_nombre or medio or numero or nombre:
+        obra.save()
