@@ -133,6 +133,39 @@ class ObraGeneral(models.Model):
     )
     
     # 028 ## Número de editor (NR)
+    # Primer indicador: Tipo de número de editor
+    tipo_numero_028 = models.CharField(
+        max_length=1,
+        choices=[
+            ('0', 'Número de publicación'),
+            ('1', 'Número de matriz'),
+            ('2', 'Número de plancha'),
+            ('3', 'Otro número de música'),
+            ('4', 'Número de videograbación'),
+            ('5', 'Otro número de editor'),
+        ],
+        default='2',
+        blank=True,
+        null=True,
+        help_text="028 Primer indicador – Tipo de número de editor"
+    )
+    
+    # Segundo indicador: Control de nota/punto de acceso adicional
+    control_nota_028 = models.CharField(
+        max_length=1,
+        choices=[
+            ('0', 'No hay nota ni punto de acceso adicional'),
+            ('1', 'Nota, hay punto de acceso adicional'),
+            ('2', 'Nota, no hay punto de acceso adicional'),
+            ('3', 'No hay nota, hay punto de acceso adicional'),
+        ],
+        default='0',
+        blank=True,
+        null=True,
+        help_text="028 Segundo indicador – Control de nota/punto de acceso adicional"
+    )
+    
+    # Subcampo $a - Número de editor
     numero_editor = models.CharField(
         max_length=100,
         blank=True,
@@ -140,6 +173,7 @@ class ObraGeneral(models.Model):
         help_text="028 $a – Número de editor, plancha o placa (NR - No Repetible)"
     )
     
+    # Subcampo $b - Nombre del editor
     nombre_editor = models.CharField(
         max_length=200,
         blank=True,

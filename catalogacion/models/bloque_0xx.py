@@ -368,7 +368,7 @@ class CodigoLengua(models.Model):
     
     def __str__(self):
         indicadores = f"{self.indicacion_traduccion}{self.fuente_codigo}"
-        idiomas = ", ".join([idioma.get_codigo_idioma_display() for idioma in self.idiomas.all()])
+        idiomas = ", ".join([idioma.get_codigo_display() for idioma in self.idiomas.all()])
         return f"041 {indicadores} - {idiomas if idiomas else 'Sin idiomas'}"
     
     def get_indicadores(self):
