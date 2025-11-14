@@ -256,21 +256,23 @@ class ObraGeneral(models.Model):
         help_text="100 $a y $d – Compositor principal (cruzar con 600, 700)"
     )
     
-    #* Subcampo $e (R) - Funciones del compositor → FuncionCompositor
+    #* Subcampo $e (R) - Campo repetible en modelo separado: FuncionCompositor
     
-    # 100 $j - Atribución (NR)
-    atribucion_compositor = models.CharField(
+    # 100 $j - Autoria (NR)
+    autoria = models.CharField(
         max_length=50,
         choices=[
-            ('atribuido', 'Atribuido'),
-            ('dudoso', 'Dudoso'),
+            ('atribuida', 'Atribuida'),
+            ('certificada', 'Certificada'),
+            ('erronea', 'Erronea'),
         ],
+        default='certificada',
         blank=True,
         null=True,
-        help_text="100 $j – Atribución del compositor (NR - No Repetible)"
+        help_text="100 $j – Autoria del compositor (NR - No Repetible)"
     )
 
-    # 130 0# Título uniforme como punto de acceso principal (NR)
+    #* 130 0# Título uniforme como punto de acceso principal (NR)
     titulo_uniforme = models.ForeignKey(
         'AutoridadTituloUniforme',
         on_delete=models.PROTECT,
@@ -293,8 +295,8 @@ class ObraGeneral(models.Model):
     # 130 $m - Medio de interpretación (NR)
     medio_interpretacion_130 = models.CharField(
         max_length=200,
-        blank=True,
-        null=True,
+        choices=[("piano", "piano")],
+        default="piano",
         help_text="130 $m – Medio de interpretación (NR - No Repetible)"
     )
     
@@ -306,6 +308,14 @@ class ObraGeneral(models.Model):
         help_text="130 $n – Número de parte/sección (NR - No Repetible)"
     )
     
+    # 130 $o - Arreglo (NR)
+    arreglo_130 = models.CharField(
+        max_length=10,
+        choices=[("arreglo", "arreglo")],
+        default="arreglo",
+        help_text="130 $o – Arreglo (NR - No Repetible)"
+    )
+    
     # 130 $p - Nombre de parte/sección (NR)
     nombre_parte_130 = models.CharField(
         max_length=300,
@@ -314,16 +324,8 @@ class ObraGeneral(models.Model):
         help_text="130 $p – Nombre de parte/sección (NR - No Repetible)"
     )
 
-    # 130 $o - Arreglo (NR)
-    titulo_uniforme_arreglo = models.CharField(
-        max_length=10, 
-        blank=True, 
-        null=True,
-        default='arreglo',
-        help_text="130 $o – Arreglo (NR - No Repetible)"
-    )
-    
-    titulo_uniforme_tonalidad = models.CharField(
+    # 130 $r - Tonalidad (NR)
+    tonalidad_130 = models.CharField(
         max_length=20,
         blank=True,
         null=True,
@@ -335,7 +337,7 @@ class ObraGeneral(models.Model):
     #? 🟦 BLOQUE 2XX – Títulos y mención de responsabilidad
     # ------------------------------------------------
     
-    #* 240 10 Título uniforme con compositor (NR)
+    #* 240 10 $a Título uniforme con compositor (NR)
     titulo_240 = models.ForeignKey(
         'AutoridadTituloUniforme',
         on_delete=models.PROTECT,
@@ -355,11 +357,11 @@ class ObraGeneral(models.Model):
         help_text="240 $k – Forma musical (NR - No Repetible)"
     )
     
-    # 240 $m - Medio de interpretación (NR)
+    # 240 $m - Medio de interpretación (NR)   
     medio_interpretacion_240 = models.CharField(
         max_length=200,
-        blank=True,
-        null=True,
+        choices=[("piano", "piano")],
+        default="piano",
         help_text="240 $m – Medio de interpretación (NR - No Repetible)"
     )
     
@@ -380,21 +382,23 @@ class ObraGeneral(models.Model):
     )
     
     # 240 $o - Arreglo (NR)
-    titulo_240_arreglo = models.CharField(
+    arreglo_240 = models.CharField(
         max_length=10,
-        blank=True,
-        null=True,
-        default='arreglo',
+        choices=[("arreglo", "arreglo")],
+        default="arreglo",
         help_text="240 $o – Arreglo (NR - No Repetible)"
     )
     
-    titulo_240_tonalidad = models.CharField(
+    # 240 $r - Tonalidad (NR)
+    tonalidad_240 = models.CharField(
         max_length=20,
         blank=True,
         null=True,
         choices=TONALIDADES,
         help_text="240 $r – Tonalidad (NR - No repetible)"
     )
+    
+    #* Campo 245 → TituloYResponsabilidad
     
     # 245 10 Mención de título (NR)
     titulo_principal = models.CharField(
@@ -426,7 +430,7 @@ class ObraGeneral(models.Model):
     # ------------------------------------------------
 
     # 300 $a - Extensión (NR)
-    extension_300a = models.CharField(
+    extension = models.CharField(
         max_length=300,
         blank=True,
         null=True,
@@ -434,7 +438,7 @@ class ObraGeneral(models.Model):
     )
     
     # 300 $b - Otras características físicas (NR)
-    otras_caracteristicas_300b = models.CharField(
+    otras_caracteristicas = models.CharField(
         max_length=300,
         blank=True,
         null=True,
@@ -442,7 +446,7 @@ class ObraGeneral(models.Model):
     )
     
     # 300 $c - Dimensión (NR)
-    dimension_300c = models.CharField(
+    dimension = models.CharField(
         max_length=100,
         blank=True,
         null=True,
@@ -450,39 +454,62 @@ class ObraGeneral(models.Model):
     )
     
     # 300 $e - Material acompañante (NR)
-    material_acompanante_300e = models.CharField(
+    material_acompanante = models.CharField(
         max_length=300,
         blank=True,
         null=True,
         help_text="300 $e – Material acompañante (NR - No Repetible)"
     )
     
-    # 340 $d - Técnica (NR)
-    tecnica_340d = models.CharField(
+    #* 340 $d - Técnica (NR)
+    
+    TECNICAS = [
+        ('autógrafo', 'Autógrafo'),
+        ('posible autógrafo', 'Posible autógrafo'),
+        ('manuscrito', 'Manuscrito'),
+        ('manuscrito de copista no identificado', 'Manuscrito de copista no identificado'),
+        ('impreso', 'Impreso'),
+        ('fotocopia de manuscrito', 'Fotocopia de manuscrito'),
+        ('fotocopia de impreso', 'Fotocopia de impreso'),
+    ]
+
+    # 340 $d - Técnica (NR) 
+    ms_imp = models.CharField(
         max_length=200,
+        choices=TECNICAS,
         blank=True,
         null=True,
         help_text="340 $d – Técnica (NR - No Repetible)"
     )
     
-    # 348 $a - Formato de la música notada (NR)
-    formato_348a = models.CharField(
+    #* 348 $a - Formato de la música notada (NR)
+    FORMATOS = [
+        ('parte', 'parte'),
+        ('partitura', 'partitura'),
+        ('partitura de coro', 'partitura de coro'),
+        ('partitura piano vocal', 'partitura piano vocal'),
+    ]
+
+    formato = models.CharField(
         max_length=100,
+        choices=FORMATOS,
         blank=True,
         null=True,
         help_text="348 $a – Formato de la música notada (NR - No Repetible)"
     )
+
     
-    # 382 $b - Solista (NR)
-    solista_382b = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True,
-        help_text="382 $b – Solista (NR - No Repetible)"
+    #* 382 $b - Solista (NR)
+    solista = models.CharField(
+        max_length=100,
+        choices=[("piano", "piano")],
+        default="piano",
+        help_text="240 $m – Medio de interpretación (NR - No Repetible)"
     )
     
-    # 383 $a - Número de obra (NR)
-    numero_obra_383a = models.CharField(
+    
+    #* 383 $a - Número de obra (NR)
+    numero_obra = models.CharField(
         max_length=100,
         blank=True,
         null=True,
@@ -490,14 +517,14 @@ class ObraGeneral(models.Model):
     )
     
     # 383 $b - Número de opus (NR)
-    opus_383b = models.CharField(
+    opus = models.CharField(
         max_length=100,
         blank=True,
         null=True,
         help_text="383 $b – Número de opus (NR - No Repetible)"
     )
     
-    # 384 $a - Tonalidad (NR)
+    #* 384 $a - Tonalidad (NR)
     tonalidad_384 = models.CharField(
         max_length=20,
         choices=TONALIDADES,
