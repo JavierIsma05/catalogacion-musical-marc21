@@ -5,36 +5,33 @@
 
 {% block extra_css %}
 <style>
-    .formset-row {
-        border-left: 3px solid #dee2e6;
-        padding-left: 15px;
-        margin-bottom: 15px;
-        position: relative;
+    /* Estilos mínimos adicionales */
+    .page-container-sidebar {
+        display: flex;
+        gap: 1.5rem;
     }
     
-    .formset-row:hover {
-        border-left-color: #0d6efd;
-        background-color: #f8f9fa;
-    }
-    
-    .delete-row-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-    }
-    
-    .nav-pills-vertical {
+    .sidebar-navigation {
+        width: 240px;
         position: sticky;
-        top: 20px;
+        top: 80px;
+        align-self: flex-start;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+    
+    .form-main-content {
+        flex: 1;
+        min-width: 0;
     }
     
     .bloque-section {
-        scroll-margin-top: 80px;
+        scroll-margin-top: 100px;
     }
     
     .campo-requerido::after {
         content: " *";
-        color: #dc3545;
+        color: #B87F7F;
         font-weight: bold;
     }
 </style>
@@ -51,100 +48,77 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="page-container-sidebar">
     <!-- Sidebar de navegación -->
-    <div class="col-lg-3">
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">
+    <aside class="sidebar-navigation">
+        <div class="card">
+            <div class="card-header">
                 <h6 class="mb-0">
-                    <i class="bi bi-list-nested"></i> Navegación MARC21
+                    <i class="bi bi-list-nested"></i> Navegación
                 </h6>
             </div>
             <div class="card-body p-0">
-                <nav class="nav nav-pills nav-pills-vertical flex-column p-3" id="bloques-nav">
+                <nav class="nav nav-pills nav-pills-vertical flex-column p-2" id="bloques-nav">
                     <a class="nav-link active" href="#info-basica">
                         <i class="bi bi-info-circle"></i> Info Básica
                     </a>
                     <a class="nav-link" href="#bloque-0xx">
-                        <i class="bi bi-code-square"></i> 0XX - Control
+                        <i class="bi bi-hash"></i> 0XX - Control
                     </a>
                     <a class="nav-link" href="#bloque-1xx">
-                        <i class="bi bi-person"></i> 1XX - Punto Principal
+                        <i class="bi bi-person"></i> 1XX - Principal
                     </a>
                     <a class="nav-link" href="#bloque-2xx">
                         <i class="bi bi-bookmark"></i> 2XX - Títulos
                     </a>
                     <a class="nav-link" href="#bloque-3xx">
-                        <i class="bi bi-rulers"></i> 3XX - Descripción
+                        <i class="bi bi-file-text"></i> 3XX - Descripción
                     </a>
                     <a class="nav-link" href="#bloque-4xx">
                         <i class="bi bi-collection"></i> 4XX - Series
                     </a>
                     <a class="nav-link" href="#bloque-5xx">
-                        <i class="bi bi-journal-text"></i> 5XX - Notas
+                        <i class="bi bi-journal"></i> 5XX - Notas
                     </a>
                     <a class="nav-link" href="#bloque-6xx">
                         <i class="bi bi-tags"></i> 6XX - Materias
                     </a>
                     <a class="nav-link" href="#bloque-7xx">
-                        <i class="bi bi-link-45deg"></i> 7XX - Enlaces
+                        <i class="bi bi-link"></i> 7XX - Enlaces
                     </a>
                     <a class="nav-link" href="#bloque-8xx">
-                        <i class="bi bi-geo-alt"></i> 8XX - Ubicación
+                        <i class="bi bi-geo"></i> 8XX - Ubicación
                     </a>
                 </nav>
             </div>
         </div>
-        
-        <!-- Card de ayuda -->
-        <div class="card shadow-sm border-info">
-            <div class="card-body">
-                <h6 class="text-info">
-                    <i class="bi bi-lightbulb"></i> Tipo de Obra
-                </h6>
-                <p class="small mb-2">
-                    <strong>{{ tipo_obra_titulo }}</strong>
-                </p>
-                <p class="small text-muted mb-0">
-                    {{ tipo_obra_descripcion }}
-                </p>
-            </div>
-        </div>
-    </div>
+    </aside>
     
     <!-- Formulario principal -->
-    <div class="col-lg-9">
+    <main class="form-main-content">
         <form method="post" id="obra-form" novalidate>
             {% csrf_token %}
             
             <!-- Header del formulario -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
                         <i class="bi bi-file-earmark-plus"></i>
                         Crear {{ tipo_obra_titulo }}
-                    </h4>
-                    <span class="badge bg-light text-dark">
-                        {{ form.instance.get_tipo_registro_display }} / 
-                        Nivel {{ form.instance.get_nivel_bibliografico_display }}
-                    </span>
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info d-flex align-items-center" role="alert">
+                    <div class="alert alert-info mb-0">
                         <i class="bi bi-info-circle me-2"></i>
-                        <div>
-                            <strong>Campos obligatorios:</strong> Los campos marcados con 
-                            <span class="campo-requerido">asterisco</span> son obligatorios.
-                            El sistema validará según el tipo de obra seleccionado.
-                        </div>
+                        Los campos marcados con <span class="campo-requerido">asterisco</span> son obligatorios.
                     </div>
                 </div>
             </div>
             
             <!-- Información básica -->
-            <section id="info-basica" class="bloque-section mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-secondary text-white">
+            <section id="info-basica" class="bloque-section">
+                <div class="card">
+                    <div class="card-header">
                         <h5 class="mb-0">
                             <i class="bi bi-info-circle"></i>
                             Información Básica
