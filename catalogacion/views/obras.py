@@ -35,6 +35,12 @@ from catalogacion.forms import (
     EnlaceDocumentoFuente773FormSet,
     EnlaceUnidadConstituyente774FormSet,
     OtrasRelaciones787FormSet,
+    # Formsets del bloque 8XX
+    Ubicacion852FormSet,
+    Estanteria852FormSet,
+    Disponible856FormSet,
+    URL856FormSet,
+    TextoEnlace856FormSet,
 )
 
 # Mapeo de tipos de obra a configuraciones MARC21
@@ -191,6 +197,13 @@ class CrearObraView(CreateView):
             'enlaces_documento_fuente_773': EnlaceDocumentoFuente773FormSet(prefix='enlaces_773'),
             'enlaces_unidad_constituyente_774': EnlaceUnidadConstituyente774FormSet(prefix='enlaces_774'),
             'otras_relaciones_787': OtrasRelaciones787FormSet(prefix='relaciones_787'),
+            
+            # Bloque 8XX
+            'ubicaciones_852': Ubicacion852FormSet(prefix='ubicaciones_852'),
+            'estanterias_852': Estanteria852FormSet(prefix='estanterias_852'),
+            'disponibles_856': Disponible856FormSet(prefix='disponibles_856'),
+            'urls_856': URL856FormSet(prefix='urls_856'),
+            'textos_enlace_856': TextoEnlace856FormSet(prefix='textos_enlace_856'),
         }
     
     def _get_formsets_post(self):
@@ -225,6 +238,13 @@ class CrearObraView(CreateView):
             'enlaces_documento_fuente_773': EnlaceDocumentoFuente773FormSet(self.request.POST, prefix='enlaces_773'),
             'enlaces_unidad_constituyente_774': EnlaceUnidadConstituyente774FormSet(self.request.POST, prefix='enlaces_774'),
             'otras_relaciones_787': OtrasRelaciones787FormSet(self.request.POST, prefix='relaciones_787'),
+            
+            # Bloque 8XX
+            'ubicaciones_852': Ubicacion852FormSet(self.request.POST, prefix='ubicaciones_852'),
+            'estanterias_852': Estanteria852FormSet(self.request.POST, prefix='estanterias_852'),
+            'disponibles_856': Disponible856FormSet(self.request.POST, prefix='disponibles_856'),
+            'urls_856': URL856FormSet(self.request.POST, prefix='urls_856'),
+            'textos_enlace_856': TextoEnlace856FormSet(self.request.POST, prefix='textos_enlace_856'),
         }
     
     @transaction.atomic
@@ -242,7 +262,9 @@ class CrearObraView(CreateView):
                    'sumarios', 'datos_biograficos', 'materias_650',
                    'materias_genero_655', 'nombres_relacionados_700',
                    'entidades_relacionadas_710', 'enlaces_documento_fuente_773',
-                   'enlaces_unidad_constituyente_774', 'otras_relaciones_787']:
+                   'enlaces_unidad_constituyente_774', 'otras_relaciones_787',
+                   'ubicaciones_852', 'estanterias_852', 'disponibles_856',
+                   'urls_856', 'textos_enlace_856']:
             formset = context.get(key)
             if formset:
                 formsets[key] = formset
@@ -365,6 +387,11 @@ class EditarObraView(UpdateView):
             'enlaces_documento_fuente_773': EnlaceDocumentoFuente773FormSet(instance=self.object, prefix='enlaces_773'),
             'enlaces_unidad_constituyente_774': EnlaceUnidadConstituyente774FormSet(instance=self.object, prefix='enlaces_774'),
             'otras_relaciones_787': OtrasRelaciones787FormSet(instance=self.object, prefix='relaciones_787'),
+            'ubicaciones_852': Ubicacion852FormSet(instance=self.object, prefix='ubicaciones_852'),
+            'estanterias_852': Estanteria852FormSet(instance=self.object, prefix='estanterias_852'),
+            'disponibles_856': Disponible856FormSet(instance=self.object, prefix='disponibles_856'),
+            'urls_856': URL856FormSet(instance=self.object, prefix='urls_856'),
+            'textos_enlace_856': TextoEnlace856FormSet(instance=self.object, prefix='textos_enlace_856'),
         }
     
     def _get_formsets_post(self):
@@ -388,6 +415,11 @@ class EditarObraView(UpdateView):
             'enlaces_documento_fuente_773': EnlaceDocumentoFuente773FormSet(self.request.POST, instance=self.object, prefix='enlaces_773'),
             'enlaces_unidad_constituyente_774': EnlaceUnidadConstituyente774FormSet(self.request.POST, instance=self.object, prefix='enlaces_774'),
             'otras_relaciones_787': OtrasRelaciones787FormSet(self.request.POST, instance=self.object, prefix='relaciones_787'),
+            'ubicaciones_852': Ubicacion852FormSet(self.request.POST, instance=self.object, prefix='ubicaciones_852'),
+            'estanterias_852': Estanteria852FormSet(self.request.POST, instance=self.object, prefix='estanterias_852'),
+            'disponibles_856': Disponible856FormSet(self.request.POST, instance=self.object, prefix='disponibles_856'),
+            'urls_856': URL856FormSet(self.request.POST, instance=self.object, prefix='urls_856'),
+            'textos_enlace_856': TextoEnlace856FormSet(self.request.POST, instance=self.object, prefix='textos_enlace_856'),
         }
     
     @transaction.atomic
@@ -405,7 +437,9 @@ class EditarObraView(UpdateView):
                    'sumarios', 'datos_biograficos', 'materias_650',
                    'materias_genero_655', 'nombres_relacionados_700',
                    'entidades_relacionadas_710', 'enlaces_documento_fuente_773',
-                   'enlaces_unidad_constituyente_774', 'otras_relaciones_787']:
+                   'enlaces_unidad_constituyente_774', 'otras_relaciones_787',
+                   'ubicaciones_852', 'estanterias_852', 'disponibles_856',
+                   'urls_856', 'textos_enlace_856']:
             formset = context.get(key)
             if formset:
                 formsets[key] = formset

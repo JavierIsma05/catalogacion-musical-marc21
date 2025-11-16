@@ -45,6 +45,12 @@ from catalogacion.models import (
     EnlaceDocumentoFuente773,
     EnlaceUnidadConstituyente774,
     OtrasRelaciones787,
+    # Bloque 8XX
+    Ubicacion852,
+    Estanteria852,
+    Disponible856,
+    URL856,
+    TextoEnlace856,
 )
 
 from .forms_0xx import (
@@ -92,6 +98,13 @@ from .forms_7xx import (
     EnlaceDocumentoFuente773Form,
     EnlaceUnidadConstituyente774Form,
     OtrasRelaciones787Form,
+)
+from .forms_8xx import (
+    Ubicacion852Form,
+    Estanteria852Form,
+    Disponible856Form,
+    URL856Form,
+    TextoEnlace856Form,
 )
 
 
@@ -439,4 +452,44 @@ OtrasRelaciones787FormSet = inlineformset_factory(
 # =====================================================
 # BLOQUE 8XX - FORMSETS
 # =====================================================
-# No hay formsets para bloque 8XX actualmente
+
+Ubicacion852FormSet = inlineformset_factory(
+    ObraGeneral,
+    Ubicacion852,
+    form=Ubicacion852Form,
+    extra=1,
+    can_delete=True,
+    max_num=5,
+)
+
+Estanteria852FormSet = inlineformset_factory(
+    Ubicacion852,
+    Estanteria852,
+    form=Estanteria852Form,
+    extra=1,
+    can_delete=True,
+)
+
+Disponible856FormSet = inlineformset_factory(
+    ObraGeneral,
+    Disponible856,
+    form=Disponible856Form,
+    extra=1,
+    can_delete=True,
+)
+
+URL856FormSet = inlineformset_factory(
+    Disponible856,
+    URL856,
+    form=URL856Form,
+    extra=1,
+    can_delete=True,
+)
+
+TextoEnlace856FormSet = inlineformset_factory(
+    Disponible856,
+    TextoEnlace856,
+    form=TextoEnlace856Form,
+    extra=1,
+    can_delete=True,
+)

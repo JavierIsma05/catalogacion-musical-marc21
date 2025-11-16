@@ -1,31 +1,22 @@
-{# Bloque 8XX - Ubicación y series #}
+{# Bloque 8XX - Ubicación y disponibilidad electrónica #}
 <section id="bloque-8xx" class="bloque-section">
     <div class="card">
         <div class="card-header">
             <h5 class="mb-0">
                 <i class="bi bi-geo"></i>
-                Bloque 8XX - Ubicación
+                Bloque 8XX - Ubicación y Disponibilidad
             </h5>
         </div>
         <div class="card-body">
-            {# Formset: 830 - Entrada de serie (Repetible) #}
+            {# Campo 852 - Ubicación física #}
             <div class="row mb-4">
                 <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-collection"></i> Campo 830 - Entrada de Serie (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=series_830 titulo="Serie" %}
-                    </div>
-                </div>
-            </div>
-            
-            {# Campo 852 - Ubicación física #}
-            <div class="row">
-                <div class="col-12">
                     <h6>
-                        <i class="bi bi-house-door"></i> Campo 852 - Ubicación
+                        <i class="bi bi-house-door"></i> Campo 852 - Ubicación Física
                     </h6>
+                    <p class="small text-muted mb-3">
+                        Institución y signatura original (campos base en ObraGeneral).
+                    </p>
                 </div>
                 
                 <div class="col-md-6 mb-3">
@@ -33,6 +24,11 @@
                         {{ form.institucion_persona_852a.label }}
                     </label>
                     {{ form.institucion_persona_852a }}
+                    {% if form.institucion_persona_852a.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.institucion_persona_852a.errors }}
+                        </div>
+                    {% endif %}
                 </div>
                 
                 <div class="col-md-6 mb-3">
@@ -40,6 +36,65 @@
                         {{ form.signatura_original_852h.label }}
                     </label>
                     {{ form.signatura_original_852h }}
+                    {% if form.signatura_original_852h.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.signatura_original_852h.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {# Formset: 852 - Ubicaciones (Repetible) con subcampo Estantería #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
+                            <i class="bi bi-archive"></i> Campo 852 - Ubicaciones Adicionales (R)
+                        </h6>
+                        <p class="small text-muted mb-3">
+                            Ubicaciones adicionales con información de estantería ($c).
+                        </p>
+                        {% include 'catalogacion/includes/formset_template.html' with formset=ubicaciones_852 titulo="Ubicación" %}
+                        
+                        {# Subcampo repetible: Estantería 852 $c #}
+                        <div class="ms-4 mt-3 p-3 border-start border-3 border-info bg-white">
+                            <h6 class="text-info small">
+                                <i class="bi bi-inbox"></i> Subcampo 852 $c - Estantería (R)
+                            </h6>
+                            {% include 'catalogacion/includes/formset_template.html' with formset=estanterias_852 titulo="Estantería" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {# Formset: 856 - Ubicación y acceso electrónico (Repetible) #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
+                            <i class="bi bi-link-45deg"></i> Campo 856 - Ubicación Electrónica (R)
+                        </h6>
+                        <p class="small text-muted mb-3">
+                            Información sobre ubicación y acceso a recursos electrónicos.
+                        </p>
+                        {% include 'catalogacion/includes/formset_template.html' with formset=disponibles_856 titulo="Recurso Electrónico" %}
+                        
+                        {# Subcampo repetible: URL 856 $u #}
+                        <div class="ms-4 mt-3 p-3 border-start border-3 border-primary bg-white">
+                            <h6 class="text-primary small">
+                                <i class="bi bi-link"></i> Subcampo 856 $u - URL (R)
+                            </h6>
+                            {% include 'catalogacion/includes/formset_template.html' with formset=urls_856 titulo="URL" %}
+                        </div>
+                        
+                        {# Subcampo repetible: Texto del enlace 856 $y #}
+                        <div class="ms-4 mt-3 p-3 border-start border-3 border-success bg-white">
+                            <h6 class="text-success small">
+                                <i class="bi bi-tag"></i> Subcampo 856 $y - Texto del Enlace (R)
+                            </h6>
+                            {% include 'catalogacion/includes/formset_template.html' with formset=textos_enlace_856 titulo="Texto del Enlace" %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

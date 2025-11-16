@@ -128,10 +128,14 @@ from .bloque_7xx import (
 # ============================================
 # BLOQUE 8XX
 # ============================================
+# BLOQUE 8XX
+# ============================================
 from .bloque_8xx import (
     Ubicacion852,
     Estanteria852,
     Disponible856,
+    URL856,
+    TextoEnlace856,
 )
 
 # ============================================
@@ -226,6 +230,8 @@ __all__ = [
     'Ubicacion852',
     'Estanteria852',
     'Disponible856',
+    'URL856',
+    'TextoEnlace856',
     
     # Utilidades
     'ObraGeneralManager',

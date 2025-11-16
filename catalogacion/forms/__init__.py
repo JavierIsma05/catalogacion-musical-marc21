@@ -62,6 +62,14 @@ from .forms_7xx import (
     OtrasRelaciones787Form,
 )
 
+from .forms_8xx import (
+    Ubicacion852Form,
+    Estanteria852Form,
+    Disponible856Form,
+    URL856Form,
+    TextoEnlace856Form,
+)
+
 # Formsets
 from .formsets import (
     # Bloque 0XX
@@ -111,6 +119,13 @@ from .formsets import (
     EnlaceDocumentoFuente773FormSet,
     EnlaceUnidadConstituyente774FormSet,
     OtrasRelaciones787FormSet,
+    
+    # Bloque 8XX
+    Ubicacion852FormSet,
+    Estanteria852FormSet,
+    Disponible856FormSet,
+    URL856FormSet,
+    TextoEnlace856FormSet,
 )
 
 # Widgets personalizados
@@ -172,6 +187,13 @@ __all__ = [
     'EnlaceUnidadConstituyente774Form',
     'OtrasRelaciones787Form',
     
+    # Forms bloque 8XX
+    'Ubicacion852Form',
+    'Estanteria852Form',
+    'Disponible856Form',
+    'URL856Form',
+    'TextoEnlace856Form',
+    
     # Formsets bloque 0XX
     'IncipitMusicalFormSet',
     'IncipitURLFormSet',
@@ -219,6 +241,13 @@ __all__ = [
     'EnlaceDocumentoFuente773FormSet',
     'EnlaceUnidadConstituyente774FormSet',
     'OtrasRelaciones787FormSet',
+    
+    # Formsets bloque 8XX
+    'Ubicacion852FormSet',
+    'Estanteria852FormSet',
+    'Disponible856FormSet',
+    'URL856FormSet',
+    'TextoEnlace856FormSet',
     
     # Widgets
     'Select2Widget',

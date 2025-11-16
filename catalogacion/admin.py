@@ -329,13 +329,13 @@ class Estanteria852Inline(admin.TabularInline):
     verbose_name_plural = "Estanterías (852 $c - R)"
 
 
-class Ubicacion852Inline(admin.StackedInline):
-    model = Ubicacion852
-    extra = 0
-    fields = ['institucion_persona', 'signatura_original']
-    verbose_name = "Ubicación (852)"
-    verbose_name_plural = "📍 Ubicaciones (852 - R)"
-    show_change_link = True
+# class Ubicacion852Inline(admin.StackedInline):
+#     model = Ubicacion852
+#     extra = 0
+#     fields = ['institucion_persona', 'signatura_original']
+#     verbose_name = "Ubicación (852)"
+#     verbose_name_plural = "📍 Ubicaciones (852 - R)"
+#     show_change_link = True
 
 
 class Disponible856Inline(admin.TabularInline):
@@ -852,7 +852,6 @@ class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
         EnlaceUnidadConstituyente774Inline,
         OtrasRelaciones787Inline,
         # Bloque 8xx - Ubicación
-        Ubicacion852Inline,
         Disponible856Inline,
     ]
     
@@ -1103,14 +1102,14 @@ class NombreRelacionado700Admin(admin.ModelAdmin):
         return False  # Ocultar del menú principal
 
 
-@admin.register(Ubicacion852)
-class Ubicacion852Admin(admin.ModelAdmin):
-    list_display = ['institucion_persona', 'signatura_original', 'obra']
-    search_fields = ['institucion_persona', 'signatura_original']
-    inlines = [Estanteria852Inline]
+# @admin.register(Ubicacion852)
+# class Ubicacion852Admin(admin.ModelAdmin):
+#     list_display = ['institucion_persona', 'signatura_original', 'obra']
+#     search_fields = ['institucion_persona', 'signatura_original']
+#     inlines = [Estanteria852Inline]
     
-    def has_module_permission(self, request):
-        return False  # Ocultar del menú principal
+#     def has_module_permission(self, request):
+#         return False  # Ocultar del menú principal
 
 
 # ============================================

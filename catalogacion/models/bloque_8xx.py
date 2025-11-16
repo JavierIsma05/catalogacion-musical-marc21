@@ -7,9 +7,9 @@ from django.db import models
 class Ubicacion852(models.Model):
     """
     852 ## Ubicación (R)
-    - $a Institución o persona (NR)
     - $c Estantería (R)
-    - $h Signatura original (NR)
+    
+    Nota: Los subcampos $a (institución) y $h (signatura) están en ObraGeneral
     """
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -17,20 +17,9 @@ class Ubicacion852(models.Model):
         related_name='ubicaciones_852'
     )
 
-    institucion_persona = models.CharField(
-        max_length=255,
-        help_text="852 $a – Institución o persona (no repetible)"
-    )
-
-    signatura_original = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        help_text="852 $h – Signatura original (no repetible)"
-    )
-
     def __str__(self):
-        return f"{self.institucion_persona} ({self.signatura_original or 'sin signatura'})"
+        estanterias = self.estanterias.count()
+        return f"Ubicación ({estanterias} estantería{'s' if estanterias != 1 else ''})"
 
     class Meta:
         verbose_name = "852 - Ubicación"
@@ -63,8 +52,7 @@ class Estanteria852(models.Model):
 class Disponible856(models.Model):
     """
     856 4# Disponible (R)
-    - $u URL (R)
-    - $y Texto del enlace (R)
+    Campo contenedor para recursos electrónicos disponibles
     """
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -72,21 +60,56 @@ class Disponible856(models.Model):
         related_name='disponibles_856'
     )
 
+    def __str__(self):
+        urls = self.urls_856.count()
+        return f"Recurso disponible ({urls} URL{'s' if urls != 1 else ''})"
+
+    class Meta:
+        verbose_name = "856 - Disponible"
+        verbose_name_plural = "🌐 856 - Recursos disponibles"
+
+
+class URL856(models.Model):
+    """
+    Subcampo repetible 856 $u – URL (R)
+    """
+    disponible = models.ForeignKey(
+        Disponible856,
+        on_delete=models.CASCADE,
+        related_name='urls_856'
+    )
+
     url = models.URLField(
         max_length=500,
         help_text="856 $u – URL del recurso disponible"
     )
 
+    def __str__(self):
+        return self.url[:50]
+
+    class Meta:
+        verbose_name = "856 $u – URL"
+        verbose_name_plural = "🔗 856 $u – URLs"
+
+
+class TextoEnlace856(models.Model):
+    """
+    Subcampo repetible 856 $y – Texto del enlace (R)
+    """
+    disponible = models.ForeignKey(
+        Disponible856,
+        on_delete=models.CASCADE,
+        related_name='textos_enlace_856'
+    )
+
     texto_enlace = models.CharField(
         max_length=255,
-        blank=True,
-        null=True,
-        help_text="856 $y – Texto del enlace (repetible)"
+        help_text="856 $y – Texto del enlace"
     )
 
     def __str__(self):
-        return f"{self.texto_enlace or 'Recurso disponible'} → {self.url}"
+        return self.texto_enlace
 
     class Meta:
-        verbose_name = "856 - Disponible"
-        verbose_name_plural = "🌐 856 - Recursos disponibles"
+        verbose_name = "856 $y – Texto del enlace"
+        verbose_name_plural = "📝 856 $y – Textos de enlaces"
