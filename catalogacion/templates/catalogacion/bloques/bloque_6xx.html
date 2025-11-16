@@ -9,22 +9,28 @@
         </div>
         <div class="card-body">
             {# Campo 650 - Encabezamiento de Materia (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">650</span> Encabezamiento de Materia <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">650</span>
+                    <h6>Encabezamiento de Materia</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Materias temáticas de la obra.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=materias_650 titulo="Materia" %}
             </div>
             
             {# Campo 655 - Término de Género/Forma (Repetible) #}
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">655</span> Género/Forma <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">655</span>
+                    <h6>Género/Forma</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Género musical o forma de la obra.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=generos_655 titulo="Género/Forma" %}
             </div>
         </div>

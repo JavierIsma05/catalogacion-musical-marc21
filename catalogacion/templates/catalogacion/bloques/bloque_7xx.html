@@ -9,52 +9,67 @@
         </div>
         <div class="card-body">
             {# Campo 700 - Nombres Relacionados (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">700</span> Nombres Relacionados <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">700</span>
+                    <h6>Nombres Relacionados</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Personas relacionadas con la obra (intérpretes, arreglistas, etc.).</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=nombres_relacionados_700 titulo="Persona Relacionada" %}
             </div>
             
             {# Campo 710 - Entidades Corporativas (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">710</span> Entidades Corporativas <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">710</span>
+                    <h6>Entidades Corporativas</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Orquestas, coros, editoriales, etc.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=entidades_relacionadas_710 titulo="Entidad" %}
             </div>
             
             {# Campo 773 - Documento Fuente (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">773</span> Documento Fuente <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">773</span>
+                    <h6>Documento Fuente</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Enlace a la colección o compilación que contiene esta obra.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=enlaces_documento_fuente_773 titulo="Enlace a Colección" %}
             </div>
             
             {# Campo 774 - Unidades Constituyentes (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">774</span> Unidades Constituyentes <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">774</span>
+                    <h6>Unidades Constituyentes</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Obras contenidas en esta compilación.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=enlaces_unidad_constituyente_774 titulo="Obra Contenida" %}
             </div>
             
             {# Campo 787 - Otras Relaciones (Repetible) #}
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">787</span> Otras Relaciones <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">787</span>
+                    <h6>Otras Relaciones</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Otras obras relacionadas.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=otras_relaciones_787 titulo="Relación" %}
             </div>
         </div>

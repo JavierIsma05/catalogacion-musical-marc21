@@ -8,43 +8,55 @@
             </h5>
         </div>
         <div class="card-body">
-            {# Campo 500 - Nota General (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">500</span> Nota General <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            {# Campo 500 - Nota general (Repetible) #}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">500</span>
+                    <h6>Nota General</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
-                {% include 'catalogacion/includes/formset_template.html' with formset=notas_generales_500 titulo="Nota General" %}
+                
+                <p class="form-text">Información general que no encaja en otros campos.</p>
+                
+                {% include 'catalogacion/includes/formset_template.html' with formset=notas_generales titulo="Nota General" %}
             </div>
             
             {# Campo 505 - Nota de Contenido (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">505</span> Contenido <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">505</span>
+                    <h6>Contenido</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Listado de contenidos de la obra.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=notas_contenido_505 titulo="Contenido" %}
             </div>
             
             {# Campo 520 - Sumario/Resumen (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">520</span> Sumario <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">520</span>
+                    <h6>Sumario</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Resumen o sumario del contenido.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=sumarios_520 titulo="Sumario" %}
             </div>
             
             {# Campo 545 - Datos Biográficos o Históricos (Repetible) #}
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">545</span> Datos Biográficos <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">545</span>
+                    <h6>Datos Biográficos</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Información biográfica o histórica relevante.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=datos_biograficos_545 titulo="Datos Biográficos" %}
             </div>
         </div>

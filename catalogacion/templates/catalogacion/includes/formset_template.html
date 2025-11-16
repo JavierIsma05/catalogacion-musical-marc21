@@ -6,9 +6,14 @@ Uso: {% include 'catalogacion/includes/formset_template.html' with formset=perso
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
     {{ formset.management_form }}
     
+    <button type="button" class="add-form-row mb-3" title="Agregar {{ titulo|default:'Campo' }}">
+        <i class="bi bi-plus-circle"></i>
+        Agregar {{ titulo|default:'Campo' }}
+    </button>
+    
     <div class="formset-forms">
         {% for form in formset %}
-        <div class="formset-row mb-2 {% if form.instance.pk %}existing-form{% else %}empty-form{% endif %}">
+        <div class="formset-row {% if form.instance.pk %}existing-form{% else %}empty-form{% endif %}">
             {% if form.instance.pk %}
                 <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
             {% endif %}
@@ -19,30 +24,21 @@ Uso: {% include 'catalogacion/includes/formset_template.html' with formset=perso
                 </div>
             {% endif %}
             
-            <div class="border rounded p-2 bg-light">
+            <button type="button" class="delete-row-btn" title="Eliminar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            
+            <div class="campo-grid">
                 {% for field in form.visible_fields %}
                     {% if field.name != 'DELETE' %}
-                    <div class="row align-items-center mb-2">
-                        <div class="col-3">
-                            <label for="{{ field.id_for_label }}" class="form-label mb-0 small">
-                                {{ field.label }}{% if field.field.required %}<span class="text-danger">*</span>{% endif %}:
-                            </label>
-                        </div>
-                        <div class="col-9">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="flex-grow-1">
-                                    {{ field }}
-                                    {% if field.errors %}
-                                        <div class="invalid-feedback d-block">{{ field.errors }}</div>
-                                    {% endif %}
-                                </div>
-                                {% if forloop.last and formset.can_delete %}
-                                <button type="button" class="btn btn-sm btn-outline-danger delete-row-btn flex-shrink-0" title="Eliminar">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                                {% endif %}
-                            </div>
-                        </div>
+                    <div class="col-full">
+                        <label class="form-label" for="{{ field.id_for_label }}">
+                            {{ field.label }}{% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="invalid-feedback d-block">{{ field.errors }}</div>
+                        {% endif %}
                     </div>
                     {% endif %}
                 {% endfor %}
@@ -50,10 +46,6 @@ Uso: {% include 'catalogacion/includes/formset_template.html' with formset=perso
         </div>
         {% endfor %}
     </div>
-    
-    <button type="button" class="btn btn-sm btn-success add-form-row mt-2" title="Agregar {{ titulo|default:'Campo' }}">
-        <i class="bi bi-plus-circle"></i> Agregar
-    </button>
 </div>
 
 <script>
@@ -117,14 +109,14 @@ Uso: {% include 'catalogacion/includes/formset_template.html' with formset=perso
                 deleteCheckbox.checked = false;
                 row.style.opacity = '1';
                 deleteBtn.classList.remove('btn-warning');
-                deleteBtn.classList.add('btn-outline-danger');
+                deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
                 deleteBtn.title = 'Eliminar';
             } else {
                 // Marcar para eliminación
                 deleteCheckbox.checked = true;
                 row.style.opacity = '0.5';
-                deleteBtn.classList.remove('btn-outline-danger');
                 deleteBtn.classList.add('btn-warning');
+                deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
                 deleteBtn.title = 'Cancelar eliminación';
             }
         } else {

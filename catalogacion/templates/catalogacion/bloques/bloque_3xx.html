@@ -10,147 +10,144 @@
         <div class="card-body">
             
             {# Campo 300 - Descripción física #}
-            <div class="mb-3 pb-3 border-bottom">
-                <h6 class="fw-bold mb-2">
-                    <span class="badge bg-primary me-1">300</span> Descripción Física
-                </h6>
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.extension.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.extension.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">300</span>
+                    <h6>Descripción Física</h6>
+                </div>
+                
+                <div class="campo-grid">
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.extension.id_for_label }}">{{ form.extension.label }}</label>
                         {{ form.extension }}
                     </div>
-                </div>
-                
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.otras_caracteristicas.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.otras_caracteristicas.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
+                    
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.otras_caracteristicas.id_for_label }}">{{ form.otras_caracteristicas.label }}</label>
                         {{ form.otras_caracteristicas }}
                     </div>
-                </div>
-                
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.dimension.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.dimension.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
+                    
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.dimension.id_for_label }}">{{ form.dimension.label }}</label>
                         {{ form.dimension }}
                     </div>
-                </div>
-                
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.material_acompanante.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.material_acompanante.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
+                    
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.material_acompanante.id_for_label }}">{{ form.material_acompanante.label }}</label>
                         {{ form.material_acompanante }}
                     </div>
                 </div>
             </div>
             
             {# Campo 340 - Características técnicas #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.ms_imp.id_for_label }}" class="form-label mb-0 fw-bold">
-                            <span class="badge bg-primary me-1">340</span> {{ form.ms_imp.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">340</span>
+                    <h6>Características Técnicas</h6>
+                </div>
+                
+                <div class="campo-grid">
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.ms_imp.id_for_label }}">{{ form.ms_imp.label }}</label>
                         {{ form.ms_imp }}
                     </div>
                 </div>
             </div>
             
             {# Campo 348 - Formato #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.formato.id_for_label }}" class="form-label mb-0 fw-bold">
-                            <span class="badge bg-primary me-1">348</span> {{ form.formato.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">348</span>
+                    <h6>Formato</h6>
+                </div>
+                
+                <div class="campo-grid">
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.formato.id_for_label }}">{{ form.formato.label }}</label>
                         {{ form.formato }}
                     </div>
                 </div>
             </div>
             
-            {# Campo 382 - Medio de interpretación (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">382</span> Medio de Interpretación <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
-                </div>
-                <p class="small text-muted mb-2">
-                    Instrumentos y voces para los que está escrita la obra.
-                </p>
-                {% include 'catalogacion/includes/formset_template.html' with formset=medios_interpretacion titulo="Medio de Interpretación" %}
-            </div>
+<!-- Campo 382 - Medio de Interpretación (Repetible) -->
+<div class="campo-marc">
+    <div class="campo-titulo">
+        <span class="badge-marc">382</span>
+        <h6>Medio de Interpretación</h6>
+        <span class="badge-repetible">REPETIBLE</span>
+    </div>
+    
+    <p class="form-text">Instrumentos y voces para los que está escrita la obra.</p>
+    
+    <div class="formset-container">
+        {% for form in medios_interpretacion %}
+        <div class="formset-row">
+            <button type="button" class="delete-row-btn" title="Eliminar">
+                <i class="bi bi-x-lg"></i>
+            </button>
             
-            {# Campo 383 - Designación numérica de obra musical #}
-            <div class="mb-3 pb-3 border-bottom">
-                <h6 class="fw-bold mb-2">
-                    <span class="badge bg-primary me-1">383</span> Designación Numérica
-                </h6>
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.numero_obra.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.numero_obra.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
-                        {{ form.numero_obra }}
-                    </div>
+            <div class="campo-grid">
+                <div class="col-half">
+                    <label class="form-label" for="{{ form.instrumento.id_for_label }}">Instrumento/Voz</label>
+                    {{ form.instrumento }}
                 </div>
                 
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.opus.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.opus.label }}:
-                        </label>
+                <div class="col-quarter">
+                    <label class="form-label" for="{{ form.cantidad.id_for_label }}">Cantidad</label>
+                    {{ form.cantidad }}
+                </div>
+                
+                <div class="col-quarter">
+                    <label class="form-label" for="{{ form.solista.id_for_label }}">Solista</label>
+                    {{ form.solista }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <button type="button" class="add-form-row" data-formset-add>
+        <i class="bi bi-plus-circle"></i>
+        Agregar Medio de Interpretación
+    </button>
+</div>
+
+            
+            {# Campo 383 - Designación numérica de obra musical #}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">383</span>
+                    <h6>Designación Numérica</h6>
+                </div>
+                
+                <div class="campo-grid">
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.numero_obra.id_for_label }}">{{ form.numero_obra.label }}</label>
+                        {{ form.numero_obra }}
                     </div>
-                    <div class="col-9">
+                    
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.opus.id_for_label }}">{{ form.opus.label }}</label>
                         {{ form.opus }}
                     </div>
                 </div>
             </div>
             
             {# Campo 384 - Tonalidad #}
-            <div class="mb-3">
-                <h6 class="fw-bold mb-2">
-                    <span class="badge bg-primary me-1">384</span> Tonalidad
-                </h6>
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.tonalidad_384.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.tonalidad_384.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
-                        {{ form.tonalidad_384 }}
-                    </div>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">384</span>
+                    <h6>Tonalidad</h6>
                 </div>
                 
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.solista.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.solista.label }}:
-                        </label>
+                <div class="campo-grid">
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.tonalidad_384.id_for_label }}">{{ form.tonalidad_384.label }}</label>
+                        {{ form.tonalidad_384 }}
                     </div>
-                    <div class="col-9">
+                    
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.solista.id_for_label }}">{{ form.solista.label }}</label>
                         {{ form.solista }}
                     </div>
                 </div>

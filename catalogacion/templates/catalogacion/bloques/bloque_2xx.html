@@ -9,78 +9,72 @@
         </div>
         <div class="card-body">
             
-            {# Campo 245 - Título principal #}
-            <div class="mb-3 pb-3 border-bottom">
-                <h6 class="fw-bold mb-2">
-                    <span class="badge bg-primary me-1">245</span> Título Principal <span class="text-danger">*</span>
-                </h6>
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.titulo_principal.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.titulo_principal.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
-                        {{ form.titulo_principal }}
-                        {% if form.titulo_principal.errors %}
-                            <div class="invalid-feedback d-block">{{ form.titulo_principal.errors }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.subtitulo.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.subtitulo.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
-                        {{ form.subtitulo }}
-                    </div>
-                </div>
-                
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.mencion_responsabilidad.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.mencion_responsabilidad.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
-                        {{ form.mencion_responsabilidad }}
-                    </div>
-                </div>
-            </div>
+<!-- Campo 245 - Título Principal -->
+<div class="campo-marc">
+    <div class="campo-titulo">
+        <span class="badge-marc">245</span>
+        <h6>Título Principal</h6>
+        <span class="badge badge bg-danger">Requerido</span>
+    </div>
+    
+    <div class="campo-grid">
+        <div class="col-full">
+            <label class="form-label campo-requerido" for="id_titulo_principal">{{ form.titulo_principal.label }}</label>
+            {{ form.titulo_principal }}
+            {% if form.titulo_principal.errors %}
+                <div class="invalid-feedback">{{ form.titulo_principal.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-half">
+            <label class="form-label" for="id_subtitulo">{{ form.subtitulo.label }}</label>
+            {{ form.subtitulo }}
+        </div>
+        
+        <div class="col-half">
+            <label class="form-label" for="id_mencion_responsabilidad">{{ form.mencion_responsabilidad.label }}</label>
+            {{ form.mencion_responsabilidad }}
+        </div>
+    </div>
+</div>
+
             
             {# Campo 246 - Títulos alternativos (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">246</span> Títulos Alternativos <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">246</span>
+                    <h6>Títulos Alternativos</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Títulos variantes o alternativos de la obra.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=titulos_alternativos titulo="Título Alternativo" %}
             </div>
             
             {# Campo 250 - Edición (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">250</span> Edición <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">250</span>
+                    <h6>Edición</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Información sobre la edición de la obra.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=ediciones titulo="Edición" %}
             </div>
             
             {# Campo 264 - Producción/Publicación (Repetible) #}
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">264</span> Producción/Publicación <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">264</span>
+                    <h6>Producción/Publicación</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
-                <p class="small text-muted mb-2">
-                    Información del editor, lugar y fecha de publicación.
-                </p>
+                
+                <p class="form-text">Información del editor, lugar y fecha de publicación.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=produccion_publicacion titulo="Producción/Publicación" %}
             </div>
             

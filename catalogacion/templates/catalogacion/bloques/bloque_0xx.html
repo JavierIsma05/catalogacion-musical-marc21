@@ -10,119 +10,121 @@
         <div class="card-body">
             
             {# Campo 020 - ISBN #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.isbn.id_for_label }}" class="form-label mb-0 fw-bold">
-                            <span class="badge bg-primary me-1">020</span> ISBN:
-                        </label>
-                    </div>
-                    <div class="col-9">
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">020</span>
+                    <h6>ISBN</h6>
+                </div>
+                
+                <div class="campo-grid">
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.isbn.id_for_label }}">{{ form.isbn.label }}</label>
                         {{ form.isbn }}
                         {% if form.isbn.errors %}
-                            <div class="invalid-feedback d-block">{{ form.isbn.errors }}</div>
+                            <div class="invalid-feedback">{{ form.isbn.errors }}</div>
                         {% endif %}
                     </div>
                 </div>
             </div>
             
             {# Campo 024 - ISMN #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.ismn.id_for_label }}" class="form-label mb-0 fw-bold">
-                            <span class="badge bg-primary me-1">024</span> ISMN:
-                        </label>
-                    </div>
-                    <div class="col-9">
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">024</span>
+                    <h6>ISMN</h6>
+                </div>
+                
+                <div class="campo-grid">
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.ismn.id_for_label }}">{{ form.ismn.label }}</label>
                         {{ form.ismn }}
                         {% if form.ismn.errors %}
-                            <div class="invalid-feedback d-block">{{ form.ismn.errors }}</div>
+                            <div class="invalid-feedback">{{ form.ismn.errors }}</div>
                         {% endif %}
                     </div>
                 </div>
             </div>
             
-            {# Campo 028 - Número de editor #}
-            <div class="mb-3 pb-3 border-bottom">
-                <h6 class="fw-bold mb-2">
-                    <span class="badge bg-primary me-1">028</span> Número de Editor
-                </h6>
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.tipo_numero_028.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.tipo_numero_028.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
-                        {{ form.tipo_numero_028 }}
-                    </div>
-                </div>
-                
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.numero_editor.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.numero_editor.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
-                        {{ form.numero_editor }}
-                    </div>
-                </div>
-                
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.nombre_editor.id_for_label }}" class="form-label mb-0 small">
-                            {{ form.nombre_editor.label }}:
-                        </label>
-                    </div>
-                    <div class="col-9">
-                        {{ form.nombre_editor }}
-                    </div>
-                </div>
-            </div>
+<!-- Campo 028 - Número de Editor -->
+<div class="campo-marc">
+    <div class="campo-titulo">
+        <span class="badge-marc">028</span>
+        <h6>Número de Editor</h6>
+    </div>
+    
+    <div class="campo-grid">
+        <div class="col-third">
+            <label class="form-label" for="id_tipo_numero_028">{{ form.tipo_numero_028.label }}</label>
+            {{ form.tipo_numero_028 }}
+            {% if form.tipo_numero_028.errors %}
+                <div class="invalid-feedback">{{ form.tipo_numero_028.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-third">
+            <label class="form-label" for="id_numero_editor">{{ form.numero_editor.label }}</label>
+            {{ form.numero_editor }}
+        </div>
+        
+        <div class="col-third">
+            <label class="form-label" for="id_nombre_editor">{{ form.nombre_editor.label }}</label>
+            {{ form.nombre_editor }}
+        </div>
+    </div>
+</div>
+
             
             {# Campo 031 - Íncipit musical (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">031</span> Íncipit Musical <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">031</span>
+                    <h6>Íncipit Musical</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Representación del comienzo de la pieza musical.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=incipits_musicales titulo="Íncipit" %}
             </div>
             
             {# Campo 040 - Fuente de catalogación #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="row align-items-center mb-2">
-                    <div class="col-3">
-                        <label for="{{ form.centro_catalogador.id_for_label }}" class="form-label mb-0 fw-bold">
-                            <span class="badge bg-primary me-1">040</span> Fuente de Catalogación:
-                        </label>
-                    </div>
-                    <div class="col-9">
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">040</span>
+                    <h6>Fuente de Catalogación</h6>
+                </div>
+                
+                <div class="campo-grid">
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.centro_catalogador.id_for_label }}">{{ form.centro_catalogador.label }}</label>
                         {{ form.centro_catalogador }}
                     </div>
                 </div>
             </div>
             
             {# Campo 041 - Código de idioma (Repetible) #}
-            <div class="mb-3 pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">041</span> Código de Idioma <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">041</span>
+                    <h6>Código de Idioma</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">Idioma(s) del contenido de la obra.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=codigos_lengua titulo="Idioma" %}
             </div>
             
             {# Campo 044 - País (Repetible) #}
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0">
-                        <span class="badge bg-primary me-1">044</span> Código de País <span class="badge bg-secondary ms-1">R</span>
-                    </h6>
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">044</span>
+                    <h6>Código de País</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
+                
+                <p class="form-text">País de publicación o producción.</p>
+                
                 {% include 'catalogacion/includes/formset_template.html' with formset=codigos_pais titulo="País" %}
             </div>
             
