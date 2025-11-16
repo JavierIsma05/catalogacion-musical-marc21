@@ -1,0 +1,200 @@
+{# Bloque 1XX - Punto de acceso principal #}
+<section id="bloque-1xx" class="bloque-section mb-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-person-badge"></i>
+                Bloque 1XX - Punto de Acceso Principal
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Importante:</strong> Solo puede haber compositor (100) O título uniforme (130), no ambos.
+                Para colecciones sin compositor use 130. Para obras individuales use 100.
+            </div>
+            
+            {# Campo 100 - Compositor #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h6 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-person"></i> Campo 100 - Compositor
+                    </h6>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.compositor.id_for_label }}" class="form-label">
+                        {{ form.compositor.label }}
+                    </label>
+                    {{ form.compositor }}
+                    <small class="form-text text-muted">100 $a - Apellidos, Nombres</small>
+                    {% if form.compositor.errors %}
+                        <div class="invalid-feedback d-block">{{ form.compositor.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.autoria.id_for_label }}" class="form-label">
+                        {{ form.autoria.label }}
+                    </label>
+                    {{ form.autoria }}
+                    <small class="form-text text-muted">100 $j - Término de autoría</small>
+                    {% if form.autoria.errors %}
+                        <div class="invalid-feedback d-block">{{ form.autoria.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                {# Formset: 100 $e - Funciones del compositor (Repetible) #}
+                <div class="col-12">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
+                            <i class="bi bi-tags"></i> Campo 100 $e - Funciones (R)
+                        </h6>
+                        {% include 'catalogacion/includes/formset_template.html' with formset=funciones_compositor titulo="Función" %}
+                    </div>
+                </div>
+            </div>
+            
+            {# Campo 130 - Título uniforme (punto de acceso principal) #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h6 class="text-success border-bottom pb-2">
+                        <i class="bi bi-bookmark-star"></i> Campo 130 - Título Uniforme Principal
+                    </h6>
+                    <p class="small text-muted">
+                        Use este campo para colecciones sin compositor único. 
+                        Si la obra tiene compositor, use el campo 240 en su lugar.
+                    </p>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.titulo_uniforme.id_for_label }}" class="form-label">
+                        {{ form.titulo_uniforme.label }}
+                    </label>
+                    {{ form.titulo_uniforme }}
+                    <small class="form-text text-muted">130 $a - Título uniforme</small>
+                    {% if form.titulo_uniforme.errors %}
+                        <div class="invalid-feedback d-block">{{ form.titulo_uniforme.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.forma_130.id_for_label }}" class="form-label">
+                        {{ form.forma_130.label }}
+                    </label>
+                    {{ form.forma_130 }}
+                    <small class="form-text text-muted">130 $k - Forma musical</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.medio_interpretacion_130.id_for_label }}" class="form-label">
+                        {{ form.medio_interpretacion_130.label }}
+                    </label>
+                    {{ form.medio_interpretacion_130 }}
+                    <small class="form-text text-muted">130 $m - Medio de interpretación</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.tonalidad_130.id_for_label }}" class="form-label">
+                        {{ form.tonalidad_130.label }}
+                    </label>
+                    {{ form.tonalidad_130 }}
+                    <small class="form-text text-muted">130 $r - Tonalidad</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.numero_parte_130.id_for_label }}" class="form-label">
+                        {{ form.numero_parte_130.label }}
+                    </label>
+                    {{ form.numero_parte_130 }}
+                    <small class="form-text text-muted">130 $n - Número de parte</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.nombre_parte_130.id_for_label }}" class="form-label">
+                        {{ form.nombre_parte_130.label }}
+                    </label>
+                    {{ form.nombre_parte_130 }}
+                    <small class="form-text text-muted">130 $p - Nombre de parte</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.arreglo_130.id_for_label }}" class="form-label">
+                        {{ form.arreglo_130.label }}
+                    </label>
+                    {{ form.arreglo_130 }}
+                    <small class="form-text text-muted">130 $o - Arreglo</small>
+                </div>
+            </div>
+            
+            {# Campo 240 - Título uniforme subordinado #}
+            <div class="row">
+                <div class="col-12">
+                    <h6 class="text-warning border-bottom pb-2">
+                        <i class="bi bi-bookmark"></i> Campo 240 - Título Uniforme (subordinado al 100)
+                    </h6>
+                    <p class="small text-muted">
+                        Use este campo cuando la obra tiene compositor (campo 100). 
+                        No use si ya utilizó el campo 130.
+                    </p>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.titulo_240.id_for_label }}" class="form-label">
+                        {{ form.titulo_240.label }}
+                    </label>
+                    {{ form.titulo_240 }}
+                    <small class="form-text text-muted">240 $a - Título uniforme</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.forma_240.id_for_label }}" class="form-label">
+                        {{ form.forma_240.label }}
+                    </label>
+                    {{ form.forma_240 }}
+                    <small class="form-text text-muted">240 $k - Forma musical</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.medio_interpretacion_240.id_for_label }}" class="form-label">
+                        {{ form.medio_interpretacion_240.label }}
+                    </label>
+                    {{ form.medio_interpretacion_240 }}
+                    <small class="form-text text-muted">240 $m - Medio de interpretación</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.tonalidad_240.id_for_label }}" class="form-label">
+                        {{ form.tonalidad_240.label }}
+                    </label>
+                    {{ form.tonalidad_240 }}
+                    <small class="form-text text-muted">240 $r - Tonalidad</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.numero_parte_240.id_for_label }}" class="form-label">
+                        {{ form.numero_parte_240.label }}
+                    </label>
+                    {{ form.numero_parte_240 }}
+                    <small class="form-text text-muted">240 $n - Número de parte</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.nombre_parte_240.id_for_label }}" class="form-label">
+                        {{ form.nombre_parte_240.label }}
+                    </label>
+                    {{ form.nombre_parte_240 }}
+                    <small class="form-text text-muted">240 $p - Nombre de parte</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.arreglo_240.id_for_label }}" class="form-label">
+                        {{ form.arreglo_240.label }}
+                    </label>
+                    {{ form.arreglo_240 }}
+                    <small class="form-text text-muted">240 $o - Arreglo</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

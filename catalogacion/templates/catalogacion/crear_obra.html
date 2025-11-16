@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Crear {{ tipo_obra_titulo }} - MARC21{% endblock %}
+
+{% block extra_css %}
+<style>
+    .formset-row {
+        border-left: 3px solid #dee2e6;
+        padding-left: 15px;
+        margin-bottom: 15px;
+        position: relative;
+    }
+    
+    .formset-row:hover {
+        border-left-color: #0d6efd;
+        background-color: #f8f9fa;
+    }
+    
+    .delete-row-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    
+    .nav-pills-vertical {
+        position: sticky;
+        top: 20px;
+    }
+    
+    .bloque-section {
+        scroll-margin-top: 80px;
+    }
+    
+    .campo-requerido::after {
+        content: " *";
+        color: #dc3545;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'catalogacion:seleccionar_tipo' %}">Tipo de Obra</a></li>
+        <li class="breadcrumb-item active">{{ tipo_obra_titulo }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar de navegación -->
+    <div class="col-lg-3">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0">
+                    <i class="bi bi-list-nested"></i> Navegación MARC21
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <nav class="nav nav-pills nav-pills-vertical flex-column p-3" id="bloques-nav">
+                    <a class="nav-link active" href="#info-basica">
+                        <i class="bi bi-info-circle"></i> Info Básica
+                    </a>
+                    <a class="nav-link" href="#bloque-0xx">
+                        <i class="bi bi-code-square"></i> 0XX - Control
+                    </a>
+                    <a class="nav-link" href="#bloque-1xx">
+                        <i class="bi bi-person"></i> 1XX - Punto Principal
+                    </a>
+                    <a class="nav-link" href="#bloque-2xx">
+                        <i class="bi bi-bookmark"></i> 2XX - Títulos
+                    </a>
+                    <a class="nav-link" href="#bloque-3xx">
+                        <i class="bi bi-rulers"></i> 3XX - Descripción
+                    </a>
+                    <a class="nav-link" href="#bloque-4xx">
+                        <i class="bi bi-collection"></i> 4XX - Series
+                    </a>
+                    <a class="nav-link" href="#bloque-5xx">
+                        <i class="bi bi-journal-text"></i> 5XX - Notas
+                    </a>
+                    <a class="nav-link" href="#bloque-6xx">
+                        <i class="bi bi-tags"></i> 6XX - Materias
+                    </a>
+                    <a class="nav-link" href="#bloque-7xx">
+                        <i class="bi bi-link-45deg"></i> 7XX - Enlaces
+                    </a>
+                    <a class="nav-link" href="#bloque-8xx">
+                        <i class="bi bi-geo-alt"></i> 8XX - Ubicación
+                    </a>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Card de ayuda -->
+        <div class="card shadow-sm border-info">
+            <div class="card-body">
+                <h6 class="text-info">
+                    <i class="bi bi-lightbulb"></i> Tipo de Obra
+                </h6>
+                <p class="small mb-2">
+                    <strong>{{ tipo_obra_titulo }}</strong>
+                </p>
+                <p class="small text-muted mb-0">
+                    {{ tipo_obra_descripcion }}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Formulario principal -->
+    <div class="col-lg-9">
+        <form method="post" id="obra-form" novalidate>
+            {% csrf_token %}
+            
+            <!-- Header del formulario -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-file-earmark-plus"></i>
+                        Crear {{ tipo_obra_titulo }}
+                    </h4>
+                    <span class="badge bg-light text-dark">
+                        {{ form.instance.get_tipo_registro_display }} / 
+                        Nivel {{ form.instance.get_nivel_bibliografico_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info d-flex align-items-center" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <div>
+                            <strong>Campos obligatorios:</strong> Los campos marcados con 
+                            <span class="campo-requerido">asterisco</span> son obligatorios.
+                            El sistema validará según el tipo de obra seleccionado.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información básica -->
+            <section id="info-basica" class="bloque-section mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-info-circle"></i>
+                            Información Básica
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo_registro.id_for_label }}" class="form-label campo-requerido">
+                                    Tipo de Registro
+                                </label>
+                                {{ form.tipo_registro }}
+                                {% if form.tipo_registro.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo_registro.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.nivel_bibliografico.id_for_label }}" class="form-label campo-requerido">
+                                    Nivel Bibliográfico
+                                </label>
+                                {{ form.nivel_bibliografico }}
+                                {% if form.nivel_bibliografico.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.nivel_bibliografico.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.titulo_principal.id_for_label }}" class="form-label campo-requerido">
+                                    {{ form.titulo_principal.label }}
+                                </label>
+                                {{ form.titulo_principal }}
+                                <small class="form-text text-muted">Campo 245 $a</small>
+                                {% if form.titulo_principal.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.titulo_principal.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Bloque 0XX - Control -->
+            {% include 'catalogacion/bloques/bloque_0xx.html' %}
+            
+            <!-- Bloque 1XX - Punto de acceso principal -->
+            {% include 'catalogacion/bloques/bloque_1xx.html' %}
+            
+            <!-- Bloque 2XX - Títulos y publicación -->
+            {% include 'catalogacion/bloques/bloque_2xx.html' %}
+            
+            <!-- Bloque 3XX - Descripción física -->
+            {% include 'catalogacion/bloques/bloque_3xx.html' %}
+            
+            <!-- Bloque 4XX - Series -->
+            {% include 'catalogacion/bloques/bloque_4xx.html' %}
+            
+            <!-- Bloque 5XX - Notas -->
+            {% include 'catalogacion/bloques/bloque_5xx.html' %}
+            
+            <!-- Bloque 6XX - Materias -->
+            {% include 'catalogacion/bloques/bloque_6xx.html' %}
+            
+            <!-- Bloque 7XX - Enlaces y relaciones -->
+            {% include 'catalogacion/bloques/bloque_7xx.html' %}
+            
+            <!-- Bloque 8XX - Ubicación -->
+            {% include 'catalogacion/bloques/bloque_8xx.html' %}
+            
+            <!-- Botones de acción -->
+            <div class="card shadow-sm mt-4 mb-5 sticky-bottom">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'catalogacion:seleccionar_tipo' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        
+                        <div class="btn-group" role="group">
+                            <button type="submit" name="action" value="draft" class="btn btn-outline-primary">
+                                <i class="bi bi-save"></i> Guardar Borrador
+                            </button>
+                            <button type="submit" name="action" value="publish" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Publicar Obra
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de ayuda MARC21 -->
+{% include 'catalogacion/includes/help_modal.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+<script src="{% static 'js/catalogacion/crear_obra.js' %}"></script>
+
+<script>
+$(document).ready(function() {
+    // Activar Select2 en campos de autoridades
+    $('.select2').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: function() {
+            return $(this).data('placeholder');
+        },
+        allowClear: true
+    });
+    
+    // Scroll spy para navegación
+    const navLinks = document.querySelectorAll('#bloques-nav .nav-link');
+    const sections = document.querySelectorAll('.bloque-section');
+    
+    window.addEventListener('scroll', () => {
+        let current = '';
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            
+            if (pageYOffset >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+                link.classList.add('active');
+            }
+        });
+    });
+    
+    // Smooth scroll al hacer click en navegación
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                targetSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Validación de formulario
+    const form = document.getElementById('obra-form');
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Mostrar mensaje de error
+            alert('Por favor complete todos los campos obligatorios.');
+        }
+        
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock %}

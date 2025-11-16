@@ -14,8 +14,8 @@ from catalogacion.models import (
     OtrasRelaciones787,
     AutoridadPersona,
     AutoridadEntidad,
+    EncabezamientoEnlace,
 )
-from models.auxiliares import EncabezamientoEnlace
 from .widgets import Select2Widget, TextAreaAutosize
 
 
@@ -37,21 +37,19 @@ class NombreRelacionado700Form(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['persona'].queryset = AutoridadPersona.objects.filter(
-            activo=True
-        ).order_by('apellidos_nombres')
+        self.fields['persona'].queryset = AutoridadPersona.objects.all().order_by('apellidos_nombres')
 
 
 class TerminoAsociado700Form(forms.ModelForm):
-    """Formulario para campo 700 $t - Título asociado"""
+    """Formulario para campo 700 $c - Término asociado"""
     
     class Meta:
         model = TerminoAsociado700
-        fields = ['titulo_asociado']
+        fields = ['termino']
         widgets = {
-            'titulo_asociado': forms.TextInput(attrs={
+            'termino': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '700 $t - Título de la obra',
+                'placeholder': '700 $c - Término asociado al nombre',
             }),
         }
 
@@ -77,9 +75,9 @@ class Relacion700Form(forms.ModelForm):
     
     class Meta:
         model = Relacion700
-        fields = ['informacion_relacion']
+        fields = ['descripcion']
         widgets = {
-            'informacion_relacion': forms.TextInput(attrs={
+            'descripcion': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': '700 $i - Información de relación',
             }),
@@ -124,9 +122,7 @@ class EntidadRelacionada710Form(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['entidad'].queryset = AutoridadEntidad.objects.filter(
-            activo=True
-        ).order_by('nombre')
+        self.fields['entidad'].queryset = AutoridadEntidad.objects.all().order_by('nombre')
 
 
 class EnlaceDocumentoFuente773Form(forms.ModelForm):
@@ -134,20 +130,20 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
     
     class Meta:
         model = EnlaceDocumentoFuente773
-        fields = ['titulo_fuente', 'numero_obra']
+        fields = ['titulo', 'numero_obra_relacionada']
         widgets = {
-            'titulo_fuente': forms.TextInput(attrs={
+            'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': '773 $t - Título de la colección',
             }),
-            'numero_obra': forms.TextInput(attrs={
+            'numero_obra_relacionada': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '773 $g - Número de obra dentro de la colección',
+                'placeholder': '773 $w - Número de obra relacionada',
             }),
         }
         labels = {
-            'titulo_fuente': '773 $t - Título de documento fuente',
-            'numero_obra': '773 $g - Número de obra',
+            'titulo': '773 $t - Título del documento fuente',
+            'numero_obra_relacionada': '773 $w - Número de obra relacionada',
         }
     
     # Campo adicional para el encabezamiento polimórfico
@@ -162,7 +158,7 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
     )
     
     encabezamiento_persona = forms.ModelChoiceField(
-        queryset=AutoridadPersona.objects.filter(activo=True),
+        queryset=AutoridadPersona.objects.all(),
         required=False,
         widget=Select2Widget(attrs={
             'data-url': '/catalogacion/autocompletar/persona/',
@@ -185,9 +181,7 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
         super().__init__(*args, **kwargs)
         from catalogacion.models import AutoridadTituloUniforme
         
-        self.fields['encabezamiento_titulo'].queryset = AutoridadTituloUniforme.objects.filter(
-            activo=True
-        ).order_by('titulo')
+        self.fields['encabezamiento_titulo'].queryset = AutoridadTituloUniforme.objects.all().order_by('titulo')
         
         # Si existe una instancia, cargar el encabezamiento actual
         if self.instance.pk and hasattr(self.instance, 'encabezamiento'):
@@ -250,20 +244,20 @@ class EnlaceUnidadConstituyente774Form(forms.ModelForm):
     
     class Meta:
         model = EnlaceUnidadConstituyente774
-        fields = ['titulo_unidad', 'numero_obra']
+        fields = ['titulo', 'numero_obra_relacionada']
         widgets = {
-            'titulo_unidad': forms.TextInput(attrs={
+            'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': '774 $t - Título de la obra contenida',
             }),
-            'numero_obra': forms.TextInput(attrs={
+            'numero_obra_relacionada': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '774 $g - Número de obra',
+                'placeholder': '774 $w - Número de obra relacionada',
             }),
         }
         labels = {
-            'titulo_unidad': '774 $t - Título de unidad constituyente',
-            'numero_obra': '774 $g - Número de obra',
+            'titulo': '774 $t - Título de unidad constituyente',
+            'numero_obra_relacionada': '774 $w - Número de obra relacionada',
         }
 
 
@@ -272,18 +266,18 @@ class OtrasRelaciones787Form(forms.ModelForm):
     
     class Meta:
         model = OtrasRelaciones787
-        fields = ['informacion_relacion', 'titulo_relacionado']
+        fields = ['titulo', 'numero_obra_relacionada']
         widgets = {
-            'informacion_relacion': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '787 $i - Información de relación',
-            }),
-            'titulo_relacionado': forms.TextInput(attrs={
+            'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': '787 $t - Título relacionado',
             }),
+            'numero_obra_relacionada': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '787 $w - Número de obra relacionada',
+            }),
         }
         labels = {
-            'informacion_relacion': '787 $i - Tipo de relación',
-            'titulo_relacionado': '787 $t - Título',
+            'titulo': '787 $t - Título',
+            'numero_obra_relacionada': '787 $w - Número de obra relacionada',
         }

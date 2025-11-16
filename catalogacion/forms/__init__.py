@@ -28,12 +28,21 @@ from .forms_2xx import (
 )
 
 from .forms_3xx import (
-    DescripcionFisicaForm,
+    MedioInterpretacion382Form,
+    MedioInterpretacion382_aForm,
+)
+
+from .forms_4xx import (
+    MencionSerie490Form,
+    TituloSerie490Form,
+    VolumenSerie490Form,
 )
 
 from .forms_5xx import (
-    SumarioForm,
-    NotaGeneralForm,
+    NotaGeneral500Form,
+    Contenido505Form,
+    Sumario520Form,
+    DatosBiograficos545Form,
 )
 
 from .forms_6xx import (
@@ -53,10 +62,6 @@ from .forms_7xx import (
     OtrasRelaciones787Form,
 )
 
-from .forms_8xx import (
-    SerieForm,
-)
-
 # Formsets
 from .formsets import (
     # Bloque 0XX
@@ -66,6 +71,9 @@ from .formsets import (
     IdiomaObraFormSet,
     CodigoPaisEntidadFormSet,
     
+    # Bloque 1XX
+    FuncionCompositorFormSet,
+    
     # Bloque 2XX
     TituloAlternativoFormSet,
     EdicionFormSet,
@@ -74,9 +82,20 @@ from .formsets import (
     NombreEntidad264FormSet,
     Fecha264FormSet,
     
+    # Bloque 3XX
+    MedioInterpretacion382FormSet,
+    MedioInterpretacion382_aFormSet,
+    
+    # Bloque 4XX
+    MencionSerie490FormSet,
+    TituloSerie490FormSet,
+    VolumenSerie490FormSet,
+    
     # Bloque 5XX
-    SumarioFormSet,
-    NotaGeneralFormSet,
+    NotaGeneral500FormSet,
+    Contenido505FormSet,
+    Sumario520FormSet,
+    DatosBiograficos545FormSet,
     
     # Bloque 6XX
     Materia650FormSet,
@@ -92,9 +111,6 @@ from .formsets import (
     EnlaceDocumentoFuente773FormSet,
     EnlaceUnidadConstituyente774FormSet,
     OtrasRelaciones787FormSet,
-    
-    # Bloque 8XX
-    SerieFormSet,
 )
 
 # Widgets personalizados
@@ -127,11 +143,19 @@ __all__ = [
     'Fecha264Form',
     
     # Forms bloque 3XX
-    'DescripcionFisicaForm',
+    'MedioInterpretacion382Form',
+    'MedioInterpretacion382_aForm',
+    
+    # Forms bloque 4XX
+    'MencionSerie490Form',
+    'TituloSerie490Form',
+    'VolumenSerie490Form',
     
     # Forms bloque 5XX
-    'SumarioForm',
-    'NotaGeneralForm',
+    'NotaGeneral500Form',
+    'Contenido505Form',
+    'Sumario520Form',
+    'DatosBiograficos545Form',
     
     # Forms bloque 6XX
     'Materia650Form',
@@ -148,25 +172,44 @@ __all__ = [
     'EnlaceUnidadConstituyente774Form',
     'OtrasRelaciones787Form',
     
-    # Forms bloque 8XX
-    'SerieForm',
-    
-    # Formsets
+    # Formsets bloque 0XX
     'IncipitMusicalFormSet',
     'IncipitURLFormSet',
     'CodigoLenguaFormSet',
     'IdiomaObraFormSet',
     'CodigoPaisEntidadFormSet',
+    
+    # Formsets bloque 1XX
+    'FuncionCompositorFormSet',
+    
+    # Formsets bloque 2XX
     'TituloAlternativoFormSet',
     'EdicionFormSet',
     'ProduccionPublicacionFormSet',
     'Lugar264FormSet',
     'NombreEntidad264FormSet',
     'Fecha264FormSet',
-    'SumarioFormSet',
-    'NotaGeneralFormSet',
+    
+    # Formsets bloque 3XX
+    'MedioInterpretacion382FormSet',
+    'MedioInterpretacion382_aFormSet',
+    
+    # Formsets bloque 4XX
+    'MencionSerie490FormSet',
+    'TituloSerie490FormSet',
+    'VolumenSerie490FormSet',
+    
+    # Formsets bloque 5XX
+    'NotaGeneral500FormSet',
+    'Contenido505FormSet',
+    'Sumario520FormSet',
+    'DatosBiograficos545FormSet',
+    
+    # Formsets bloque 6XX
     'Materia650FormSet',
     'MateriaGenero655FormSet',
+    
+    # Formsets bloque 7XX
     'NombreRelacionado700FormSet',
     'TerminoAsociado700FormSet',
     'Funcion700FormSet',
@@ -176,7 +219,6 @@ __all__ = [
     'EnlaceDocumentoFuente773FormSet',
     'EnlaceUnidadConstituyente774FormSet',
     'OtrasRelaciones787FormSet',
-    'SerieFormSet',
     
     # Widgets
     'Select2Widget',

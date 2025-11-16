@@ -1,0 +1,27 @@
+{# Breadcrumb reutilizable #}
+{% comment %}
+Uso: {% include 'catalogacion/includes/breadcrumb.html' with items=breadcrumb_items %}
+donde breadcrumb_items es una lista de diccionarios: [{'text': 'Inicio', 'url': '/'}, {'text': 'Obras', 'url': None}]
+{% endcomment %}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'index' %}">
+                <i class="bi bi-house-door"></i> Inicio
+            </a>
+        </li>
+        
+        {% for item in items %}
+            {% if item.url %}
+                <li class="breadcrumb-item">
+                    <a href="{{ item.url }}">{{ item.text }}</a>
+                </li>
+            {% else %}
+                <li class="breadcrumb-item active" aria-current="page">
+                    {{ item.text }}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+</nav>

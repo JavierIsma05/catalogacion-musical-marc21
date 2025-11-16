@@ -1,0 +1,33 @@
+{# Bloque 4XX - Series #}
+<section id="bloque-4xx" class="bloque-section mb-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-collection"></i>
+                Bloque 4XX - Mención de Series
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i>
+                Las series son publicaciones que agrupan varias obras bajo un título común. 
+                Principalmente aplicable a obras impresas.
+            </div>
+            
+            {# Formset: 490 - Mención de serie (Repetible) #}
+            <div class="row">
+                <div class="col-12">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
+                            <i class="bi bi-stack"></i> Campo 490 - Mención de Serie (R)
+                        </h6>
+                        <p class="small text-muted mb-3">
+                            Información sobre la serie a la que pertenece la obra publicada.
+                        </p>
+                        {% include 'catalogacion/includes/formset_template.html' with formset=menciones_serie titulo="Serie" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

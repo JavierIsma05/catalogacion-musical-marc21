@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Seleccionar Tipo de Obra - MARC21{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'catalogacion:index' %}">Inicio</a></li>
+        <li class="breadcrumb-item active">Seleccionar Tipo de Obra</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">
+                    <i class="bi bi-file-earmark-plus"></i>
+                    Crear Nueva Obra - Seleccione el Tipo
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="lead text-center mb-4">
+                    Seleccione el tipo de obra musical que desea catalogar según el estándar MARC21
+                </p>
+                
+                <form method="post" action="{% url 'catalogacion:seleccionar_tipo' %}">
+                    {% csrf_token %}
+                    
+                    <div class="row g-4">
+                        <!-- COLECCIÓN MANUSCRITA -->
+                        <div class="col-lg-6">
+                            <div class="card h-100 border-warning shadow-sm tipo-obra-card" 
+                                 onclick="selectTipo('coleccion_manuscrita')">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input tipo-obra-radio" 
+                                               type="radio" 
+                                               name="tipo_obra" 
+                                               value="coleccion_manuscrita" 
+                                               id="tipo_coleccion_manuscrita">
+                                        <label class="form-check-label w-100" for="tipo_coleccion_manuscrita">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <i class="bi bi-collection display-5 text-warning me-3"></i>
+                                                <div>
+                                                    <h5 class="mb-0">Colección Manuscrita</h5>
+                                                    <small class="text-muted">Nivel c / Tipo d</small>
+                                                </div>
+                                            </div>
+                                            <p class="text-muted mb-2">
+                                                Conjunto de obras musicales manuscritas agrupadas bajo un 
+                                                título uniforme. Sin compositor único definido.
+                                            </p>
+                                            <div class="alert alert-warning mb-0 small">
+                                                <strong>Punto de acceso:</strong> 130 (Título uniforme principal)<br>
+                                                <strong>Enlaces:</strong> 774 (Obras contenidas)
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- OBRA EN COLECCIÓN MANUSCRITA -->
+                        <div class="col-lg-6">
+                            <div class="card h-100 border-primary shadow-sm tipo-obra-card" 
+                                 onclick="selectTipo('obra_en_coleccion_manuscrita')">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input tipo-obra-radio" 
+                                               type="radio" 
+                                               name="tipo_obra" 
+                                               value="obra_en_coleccion_manuscrita" 
+                                               id="tipo_obra_coleccion_ms">
+                                        <label class="form-check-label w-100" for="tipo_obra_coleccion_ms">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <i class="bi bi-file-earmark-music display-5 text-primary me-3"></i>
+                                                <div>
+                                                    <h5 class="mb-0">Obra en Colección Manuscrita</h5>
+                                                    <small class="text-muted">Nivel a / Tipo d</small>
+                                                </div>
+                                            </div>
+                                            <p class="text-muted mb-2">
+                                                Obra individual manuscrita que forma parte de una colección mayor. 
+                                                Tiene compositor y título propios.
+                                            </p>
+                                            <div class="alert alert-primary mb-0 small">
+                                                <strong>Punto de acceso:</strong> 100 (Compositor)<br>
+                                                <strong>Enlaces:</strong> 773 (Colección padre)
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- OBRA MANUSCRITA INDIVIDUAL -->
+                        <div class="col-lg-6">
+                            <div class="card h-100 border-success shadow-sm tipo-obra-card" 
+                                 onclick="selectTipo('obra_manuscrita_individual')">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input tipo-obra-radio" 
+                                               type="radio" 
+                                               name="tipo_obra" 
+                                               value="obra_manuscrita_individual" 
+                                               id="tipo_manuscrita_individual">
+                                        <label class="form-check-label w-100" for="tipo_manuscrita_individual">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <i class="bi bi-file-earmark display-5 text-success me-3"></i>
+                                                <div>
+                                                    <h5 class="mb-0">Obra Manuscrita Individual</h5>
+                                                    <small class="text-muted">Nivel m / Tipo d</small>
+                                                </div>
+                                            </div>
+                                            <p class="text-muted mb-2">
+                                                Obra musical manuscrita completa e independiente. 
+                                                No forma parte de ninguna colección.
+                                            </p>
+                                            <div class="alert alert-success mb-0 small">
+                                                <strong>Punto de acceso:</strong> 100 (Compositor)<br>
+                                                <strong>Enlaces:</strong> 787 (Relaciones diversas)
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- COLECCIÓN IMPRESA -->
+                        <div class="col-lg-6">
+                            <div class="card h-100 border-info shadow-sm tipo-obra-card" 
+                                 onclick="selectTipo('coleccion_impresa')">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input tipo-obra-radio" 
+                                               type="radio" 
+                                               name="tipo_obra" 
+                                               value="coleccion_impresa" 
+                                               id="tipo_coleccion_impresa">
+                                        <label class="form-check-label w-100" for="tipo_coleccion_impresa">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <i class="bi bi-collection-fill display-5 text-info me-3"></i>
+                                                <div>
+                                                    <h5 class="mb-0">Colección Impresa</h5>
+                                                    <small class="text-muted">Nivel c / Tipo c</small>
+                                                </div>
+                                            </div>
+                                            <p class="text-muted mb-2">
+                                                Conjunto de obras musicales publicadas agrupadas. 
+                                                Incluye ISBN/ISMN, editor y serie.
+                                            </p>
+                                            <div class="alert alert-info mb-0 small">
+                                                <strong>Identificadores:</strong> 020 (ISBN), 024 (ISMN), 028 (Núm. editor)<br>
+                                                <strong>Series:</strong> 490 (Mención de serie)
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- OBRA EN COLECCIÓN IMPRESA -->
+                        <div class="col-lg-6">
+                            <div class="card h-100 border-secondary shadow-sm tipo-obra-card" 
+                                 onclick="selectTipo('obra_en_coleccion_impresa')">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input tipo-obra-radio" 
+                                               type="radio" 
+                                               name="tipo_obra" 
+                                               value="obra_en_coleccion_impresa" 
+                                               id="tipo_obra_coleccion_impresa">
+                                        <label class="form-check-label w-100" for="tipo_obra_coleccion_impresa">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <i class="bi bi-file-music display-5 text-secondary me-3"></i>
+                                                <div>
+                                                    <h5 class="mb-0">Obra en Colección Impresa</h5>
+                                                    <small class="text-muted">Nivel a / Tipo c</small>
+                                                </div>
+                                            </div>
+                                            <p class="text-muted mb-2">
+                                                Obra individual publicada dentro de una colección impresa mayor.
+                                            </p>
+                                            <div class="alert alert-secondary mb-0 small">
+                                                <strong>Punto de acceso:</strong> 100 (Compositor)<br>
+                                                <strong>Enlaces:</strong> 773 (Colección padre)
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- OBRA IMPRESA INDIVIDUAL -->
+                        <div class="col-lg-6">
+                            <div class="card h-100 border-dark shadow-sm tipo-obra-card" 
+                                 onclick="selectTipo('obra_impresa_individual')">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input tipo-obra-radio" 
+                                               type="radio" 
+                                               name="tipo_obra" 
+                                               value="obra_impresa_individual" 
+                                               id="tipo_impresa_individual">
+                                        <label class="form-check-label w-100" for="tipo_impresa_individual">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <i class="bi bi-file-text display-5 text-dark me-3"></i>
+                                                <div>
+                                                    <h5 class="mb-0">Obra Impresa Individual</h5>
+                                                    <small class="text-muted">Nivel m / Tipo c</small>
+                                                </div>
+                                            </div>
+                                            <p class="text-muted mb-2">
+                                                Obra musical publicada completa e independiente. 
+                                                Partitura impresa con identificadores estándar.
+                                            </p>
+                                            <div class="alert alert-dark mb-0 small">
+                                                <strong>Identificadores:</strong> ISBN/ISMN obligatorios<br>
+                                                <strong>Publicación:</strong> 264 (Editor, lugar, fecha)
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg" id="btn-continuar" disabled>
+                            Continuar <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ayuda contextual -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h6 class="alert-heading">
+                <i class="bi bi-info-circle"></i> Ayuda sobre Tipos de Obra
+            </h6>
+            <ul class="mb-0 small">
+                <li><strong>Nivel bibliográfico</strong>: c=Colección, a=Analítica (parte de), m=Monografía (individual)</li>
+                <li><strong>Tipo de registro</strong>: d=Manuscrito, c=Impreso/Publicado</li>
+                <li><strong>Punto de acceso principal</strong>: 100=Compositor, 130=Título uniforme (para colecciones)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Resaltar card seleccionado y habilitar botón continuar
+function selectTipo(tipo) {
+    // Remover selección previa
+    document.querySelectorAll('.tipo-obra-card').forEach(card => {
+        card.classList.remove('border-3', 'shadow');
+    });
+    
+    // Seleccionar radio correspondiente
+    const radio = document.querySelector(`input[value="${tipo}"]`);
+    radio.checked = true;
+    
+    // Resaltar card seleccionado
+    radio.closest('.tipo-obra-card').classList.add('border-3', 'shadow');
+    
+    // Habilitar botón continuar
+    document.getElementById('btn-continuar').disabled = false;
+}
+
+// Permitir selección al hacer click en toda la card
+document.querySelectorAll('.tipo-obra-card').forEach(card => {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function(e) {
+        if (e.target.type !== 'radio') {
+            const radio = this.querySelector('input[type="radio"]');
+            selectTipo(radio.value);
+        }
+    });
+});
+
+// Habilitar botón si ya hay selección (por ejemplo, al volver atrás)
+document.querySelectorAll('.tipo-obra-radio').forEach(radio => {
+    if (radio.checked) {
+        selectTipo(radio.value);
+    }
+});
+</script>
+{% endblock %}

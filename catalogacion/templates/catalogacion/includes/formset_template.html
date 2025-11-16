@@ -1,0 +1,127 @@
+{% comment %}
+Template reutilizable para renderizar formsets con botón de agregar/eliminar
+Uso: {% include 'catalogacion/includes/formset_template.html' with formset=personas_700 titulo="Campo 700 - Personas Relacionadas" %}
+{% endcomment %}
+
+<div class="formset-container mb-3" data-formset-prefix="{{ formset.prefix }}">
+    {{ formset.management_form }}
+    
+    <div class="formset-forms">
+        {% for form in formset %}
+        <div class="formset-row p-3 mb-3 border rounded {% if form.instance.pk %}existing-form{% else %}empty-form{% endif %}">
+            {% if form.instance.pk %}
+                <!-- Formulario existente -->
+                <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
+            {% endif %}
+            
+            <!-- Checkbox de eliminación (oculto por defecto) -->
+            {% if formset.can_delete %}
+            <div class="form-check mb-2">
+                {{ form.DELETE }}
+                <label class="form-check-label text-danger" for="{{ form.DELETE.id_for_label }}">
+                    <i class="bi bi-trash"></i> Marcar para eliminar
+                </label>
+            </div>
+            {% endif %}
+            
+            <!-- Campos del formulario -->
+            <div class="row">
+                {% for field in form.visible_fields %}
+                    {% if field.name != 'DELETE' %}
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            {{ field.label }}
+                            {% if field.field.required %}
+                                <span class="text-danger">*</span>
+                            {% endif %}
+                        </label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <!-- Botón eliminar -->
+            {% if formset.can_delete %}
+            <button type="button" class="btn btn-sm btn-outline-danger delete-row-btn">
+                <i class="bi bi-trash"></i> Eliminar
+            </button>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Botón agregar -->
+    <button type="button" class="btn btn-success add-form-row">
+        <i class="bi bi-plus-circle"></i> Agregar {{ titulo|default:"Campo" }}
+    </button>
+</div>
+
+<script>
+// Script para manejar agregar/eliminar formularios
+(function() {
+    const prefix = '{{ formset.prefix }}';
+    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+    const addButton = container.querySelector('.add-form-row');
+    const formsContainer = container.querySelector('.formset-forms');
+    
+    // Función para agregar nuevo formulario
+    addButton.addEventListener('click', function() {
+        const totalForms = parseInt(totalFormsInput.value);
+        const emptyForm = formsContainer.querySelector('.empty-form').cloneNode(true);
+        
+        // Actualizar índices en el nuevo formulario
+        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
+        emptyForm.classList.remove('empty-form');
+        
+        // Agregar antes del botón
+        formsContainer.appendChild(emptyForm);
+        
+        // Incrementar contador
+        totalFormsInput.value = totalForms + 1;
+        
+        // Reactivar Select2 si existe
+        if (typeof $.fn.select2 !== 'undefined') {
+            emptyForm.querySelectorAll('.select2').forEach(select => {
+                $(select).select2({
+                    theme: 'bootstrap-5',
+                    width: '100%'
+                });
+            });
+        }
+    });
+    
+    // Función para eliminar formulario
+    container.addEventListener('click', function(e) {
+        if (e.target.closest('.delete-row-btn')) {
+            const row = e.target.closest('.formset-row');
+            const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
+            
+            if (deleteCheckbox) {
+                // Marcar para eliminación si es formulario existente
+                if (row.classList.contains('existing-form')) {
+                    deleteCheckbox.checked = true;
+                    row.style.opacity = '0.5';
+                    e.target.closest('.delete-row-btn').textContent = 'Cancelar';
+                } else {
+                    // Remover completamente si es nuevo
+                    row.remove();
+                    
+                    // Actualizar contador
+                    const totalForms = parseInt(totalFormsInput.value);
+                    totalFormsInput.value = totalForms - 1;
+                }
+            }
+        }
+    });
+})();
+</script>

@@ -1,0 +1,152 @@
+{# Bloque 3XX - Descripción física y características técnicas #}
+<section id="bloque-3xx" class="bloque-section mb-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">
+                <i class="bi bi-rulers"></i>
+                Bloque 3XX - Descripción Física y Características
+            </h5>
+        </div>
+        <div class="card-body">
+            {# Campo 300 - Descripción física #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h6 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-file-earmark-text"></i> Campo 300 - Descripción Física
+                    </h6>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.extension.id_for_label }}" class="form-label">
+                        {{ form.extension.label }}
+                    </label>
+                    {{ form.extension }}
+                    <small class="form-text text-muted">300 $a - Extensión (ej: 1 partitura, 2 partichelas)</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.otras_caracteristicas.id_for_label }}" class="form-label">
+                        {{ form.otras_caracteristicas.label }}
+                    </label>
+                    {{ form.otras_caracteristicas }}
+                    <small class="form-text text-muted">300 $b - Otras características físicas</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.dimension.id_for_label }}" class="form-label">
+                        {{ form.dimension.label }}
+                    </label>
+                    {{ form.dimension }}
+                    <small class="form-text text-muted">300 $c - Dimensiones (ej: 30 cm)</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.material_acompanante.id_for_label }}" class="form-label">
+                        {{ form.material_acompanante.label }}
+                    </label>
+                    {{ form.material_acompanante }}
+                    <small class="form-text text-muted">300 $e - Material acompañante</small>
+                </div>
+            </div>
+            
+            {# Campo 340 - Características técnicas #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h6 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-gear"></i> Campo 340 - Características Técnicas
+                    </h6>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.ms_imp.id_for_label }}" class="form-label">
+                        {{ form.ms_imp.label }}
+                    </label>
+                    {{ form.ms_imp }}
+                    <small class="form-text text-muted">340 $d - Técnica de producción</small>
+                </div>
+            </div>
+            
+            {# Campo 348 - Formato #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h6 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-file-binary"></i> Campo 348 - Formato de Notación Musical
+                    </h6>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.formato.id_for_label }}" class="form-label">
+                        {{ form.formato.label }}
+                    </label>
+                    {{ form.formato }}
+                    <small class="form-text text-muted">348 $a - Formato de la notación musical</small>
+                </div>
+            </div>
+            
+            {# Formset: 382 - Medio de interpretación (Repetible) #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
+                            <i class="bi bi-music-note-list"></i> Campo 382 - Medio de Interpretación (R)
+                        </h6>
+                        <p class="small text-muted mb-3">
+                            Instrumentos y voces para los que está escrita la obra.
+                        </p>
+                        {% include 'catalogacion/includes/formset_template.html' with formset=medios_interpretacion titulo="Medio de Interpretación" %}
+                    </div>
+                </div>
+            </div>
+            
+            {# Campo 383 - Designación numérica de obra musical #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h6 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-hash"></i> Campo 383 - Designación Numérica
+                    </h6>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.numero_obra.id_for_label }}" class="form-label">
+                        {{ form.numero_obra.label }}
+                    </label>
+                    {{ form.numero_obra }}
+                    <small class="form-text text-muted">383 $a - Número serial</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.opus.id_for_label }}" class="form-label">
+                        {{ form.opus.label }}
+                    </label>
+                    {{ form.opus }}
+                    <small class="form-text text-muted">383 $b - Opus</small>
+                </div>
+            </div>
+            
+            {# Campo 384 - Tonalidad #}
+            <div class="row">
+                <div class="col-12">
+                    <h6 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-music-note"></i> Campo 384 - Tonalidad
+                    </h6>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.tonalidad_384.id_for_label }}" class="form-label">
+                        {{ form.tonalidad_384.label }}
+                    </label>
+                    {{ form.tonalidad_384 }}
+                    <small class="form-text text-muted">384 $a - Tonalidad</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.solista.id_for_label }}" class="form-label">
+                        {{ form.solista.label }}
+                    </label>
+                    {{ form.solista }}
+                    <small class="form-text text-muted">382 $b - Solista</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

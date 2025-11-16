@@ -1,0 +1,123 @@
+{# Bloque 0XX - Campos de control e identificación #}
+<section id="bloque-0xx" class="bloque-section mb-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-code-square"></i>
+                Bloque 0XX - Números de Control e Identificación
+            </h5>
+        </div>
+        <div class="card-body">
+            {# Campos de identificación #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h6 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-upc-scan"></i> Identificadores Estándar
+                    </h6>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.isbn.id_for_label }}" class="form-label">
+                        {{ form.isbn.label }}
+                    </label>
+                    {{ form.isbn }}
+                    <small class="form-text text-muted">020 $a - ISBN (solo obras impresas)</small>
+                    {% if form.isbn.errors %}
+                        <div class="invalid-feedback d-block">{{ form.isbn.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.ismn.id_for_label }}" class="form-label">
+                        {{ form.ismn.label }}
+                    </label>
+                    {{ form.ismn }}
+                    <small class="form-text text-muted">024 $a - ISMN (solo obras impresas)</small>
+                    {% if form.ismn.errors %}
+                        <div class="invalid-feedback d-block">{{ form.ismn.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.tipo_numero_028.id_for_label }}" class="form-label">
+                        {{ form.tipo_numero_028.label }}
+                    </label>
+                    {{ form.tipo_numero_028 }}
+                    <small class="form-text text-muted">028 - Tipo</small>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.numero_editor.id_for_label }}" class="form-label">
+                        {{ form.numero_editor.label }}
+                    </label>
+                    {{ form.numero_editor }}
+                    <small class="form-text text-muted">028 $a - Número</small>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.nombre_editor.id_for_label }}" class="form-label">
+                        {{ form.nombre_editor.label }}
+                    </label>
+                    {{ form.nombre_editor }}
+                    <small class="form-text text-muted">028 $b - Editor</small>
+                </div>
+            </div>
+            
+            {# Formset: 031 - Íncipit musical (Repetible) #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
+                            <i class="bi bi-music-note-beamed"></i> Campo 031 - Íncipit Musical (R)
+                        </h6>
+                        <p class="small text-muted mb-3">
+                            Notación codificada del inicio de la obra musical.
+                        </p>
+                        {% include 'catalogacion/includes/formset_template.html' with formset=incipits_musicales titulo="Íncipit" %}
+                    </div>
+                </div>
+            </div>
+            
+            {# Campo 040 - Fuente de catalogación #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h6 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-building"></i> Campo 040 - Fuente de Catalogación
+                    </h6>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.centro_catalogador.id_for_label }}" class="form-label">
+                        {{ form.centro_catalogador.label }}
+                    </label>
+                    {{ form.centro_catalogador }}
+                    <small class="form-text text-muted">040 $a - Centro catalogador</small>
+                </div>
+            </div>
+            
+            {# Formset: 041 - Código de idioma (Repetible) #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
+                            <i class="bi bi-translate"></i> Campo 041 - Código de Idioma (R)
+                        </h6>
+                        {% include 'catalogacion/includes/formset_template.html' with formset=codigos_lengua titulo="Idioma" %}
+                    </div>
+                </div>
+            </div>
+            
+            {# Formset: 044 - País (Repetible) #}
+            <div class="row">
+                <div class="col-12">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
+                            <i class="bi bi-globe"></i> Campo 044 - Código de País (R)
+                        </h6>
+                        {% include 'catalogacion/includes/formset_template.html' with formset=codigos_pais titulo="País" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

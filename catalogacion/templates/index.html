@@ -1,18 +1,137 @@
-{% extends 'base.html' %} {% block title %}Inicio | MARC21 Musical{% endblock %}
-{% block content %}
-<div class="text-center py-5">
-    <h2 class="fw-bold text-primary">
-        Bienvenido al Sistema de Catalogación MARC21 Musical 🎶
-    </h2>
-    <p class="lead mt-3">
-        Gestione obras musicales, registros de colección y plantillas
-        fácilmente.
-    </p>
+{% extends 'base.html' %}
+{% load static %}
 
-    <div class="mt-4 d-flex gap-3 justify-content-center flex-wrap">
-        <a href="{% url 'plantillas' %}" class="btn btn-outline-primary">
-            <i class="bi bi-file-earmark-text"></i> Crear obra
-        </a>
+{% block title %}Inicio - Catalogación MARC21{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron bg-light p-5 rounded-3 border">
+            <h1 class="display-4">
+                <i class="bi bi-journal-music text-primary"></i>
+                Sistema de Catalogación MARC21 Musical
+            </h1>
+            <p class="lead">
+                Sistema especializado para catalogación de obras musicales manuscritas e impresas
+                siguiendo el estándar MARC21 bibliográfico.
+            </p>
+            <hr class="my-4">
+            <p>
+                Gestiona colecciones, obras individuales y autoridades de manera integrada.
+            </p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a class="btn btn-primary btn-lg" href="{% url 'catalogacion:seleccionar_tipo' %}" role="button">
+                    <i class="bi bi-plus-circle"></i> Crear Nueva Obra
+                </a>
+                <a class="btn btn-outline-secondary btn-lg" href="{% url 'catalogacion:lista_obras' %}" role="button">
+                    <i class="bi bi-list-ul"></i> Ver Catálogo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas rápidas -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <i class="bi bi-file-earmark-music display-4 text-primary"></i>
+                <h5 class="card-title mt-2">{{ stats.total_obras }}</h5>
+                <p class="card-text text-muted">Total de Obras</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <i class="bi bi-collection display-4 text-success"></i>
+                <h5 class="card-title mt-2">{{ stats.colecciones }}</h5>
+                <p class="card-text text-muted">Colecciones</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <i class="bi bi-file-earmark display-4 text-warning"></i>
+                <h5 class="card-title mt-2">{{ stats.manuscritos }}</h5>
+                <p class="card-text text-muted">Manuscritos</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-info">
+            <div class="card-body text-center">
+                <i class="bi bi-printer display-4 text-info"></i>
+                <h5 class="card-title mt-2">{{ stats.impresos }}</h5>
+                <p class="card-text text-muted">Impresos</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Obras recientes -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history"></i> Obras Recientes
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if obras_recientes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Número de Control</th>
+                                <th>Título</th>
+                                <th>Compositor</th>
+                                <th>Tipo</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for obra in obras_recientes %}
+                            <tr>
+                                <td><code>{{ obra.numero_control }}</code></td>
+                                <td>{{ obra.titulo_principal }}</td>
+                                <td>{{ obra.compositor|default:"—" }}</td>
+                                <td>
+                                    <span class="badge bg-{{ obra.tipo_registro|yesno:'warning,info' }}">
+                                        {{ obra.get_tipo_registro_display }}
+                                    </span>
+                                </td>
+                                <td>{{ obra.fecha_creacion_sistema|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <a href="{% url 'catalogacion:detalle_obra' pk=obra.pk %}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'catalogacion:editar_obra' pk=obra.pk %}" 
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4">
+                    No hay obras catalogadas aún. 
+                    <a href="{% url 'catalogacion:seleccionar_tipo' %}">Crear la primera obra</a>
+                </p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

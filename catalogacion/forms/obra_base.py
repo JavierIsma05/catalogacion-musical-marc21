@@ -249,29 +249,17 @@ class ObraGeneralForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         # Configurar querysets para autoridades
-        self.fields['compositor'].queryset = AutoridadPersona.objects.filter(
-            activo=True
-        ).order_by('apellidos_nombres')
+        self.fields['compositor'].queryset = AutoridadPersona.objects.all().order_by('apellidos_nombres')
         
-        self.fields['titulo_uniforme'].queryset = AutoridadTituloUniforme.objects.filter(
-            activo=True
-        ).order_by('titulo')
+        self.fields['titulo_uniforme'].queryset = AutoridadTituloUniforme.objects.all().order_by('titulo')
         
-        self.fields['titulo_240'].queryset = AutoridadTituloUniforme.objects.filter(
-            activo=True
-        ).order_by('titulo')
+        self.fields['titulo_240'].queryset = AutoridadTituloUniforme.objects.all().order_by('titulo')
         
-        self.fields['forma_130'].queryset = AutoridadFormaMusical.objects.filter(
-            activo=True
-        ).order_by('forma')
+        self.fields['forma_130'].queryset = AutoridadFormaMusical.objects.all().order_by('forma')
         
-        self.fields['forma_240'].queryset = AutoridadFormaMusical.objects.filter(
-            activo=True
-        ).order_by('forma')
+        self.fields['forma_240'].queryset = AutoridadFormaMusical.objects.all().order_by('forma')
         
-        self.fields['institucion_persona_852a'].queryset = AutoridadEntidad.objects.filter(
-            activo=True
-        ).order_by('nombre')
+        self.fields['institucion_persona_852a'].queryset = AutoridadEntidad.objects.all().order_by('nombre')
         
         # Hacer título principal obligatorio
         self.fields['titulo_principal'].required = True

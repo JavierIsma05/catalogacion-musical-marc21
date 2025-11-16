@@ -28,9 +28,7 @@ class Materia650Form(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['materia'].queryset = AutoridadMateria.objects.filter(
-            activo=True
-        ).order_by('termino')
+        self.fields['materia'].queryset = AutoridadMateria.objects.all().order_by('termino')
 
 
 class MateriaGenero655Form(forms.ModelForm):
@@ -38,13 +36,13 @@ class MateriaGenero655Form(forms.ModelForm):
     
     class Meta:
         model = MateriaGenero655
-        fields = ['genero_forma']
+        fields = ['materia']
         widgets = {
-            'genero_forma': forms.TextInput(attrs={
+            'materia': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': '655 $a - Término de género/forma',
             }),
         }
         labels = {
-            'genero_forma': '655 $a - Término de género/forma',
+            'materia': '655 $a - Término de género/forma',
         }

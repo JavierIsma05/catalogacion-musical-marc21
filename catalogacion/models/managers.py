@@ -7,6 +7,10 @@ from django.db import models
 class ObraGeneralManager(models.Manager):
     """Manager con métodos de consulta comunes"""
 
+    def activos(self):
+        """Retorna solo obras activas (no eliminadas)"""
+        return self.filter(activo=True)
+
     def manuscritas(self):
         """Retorna solo obras manuscritas"""
         return self.filter(tipo_registro='d')

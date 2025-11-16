@@ -1,0 +1,55 @@
+{# Bloque 8XX - Ubicación y series #}
+<section id="bloque-8xx" class="bloque-section mb-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-geo-alt-fill"></i>
+                Bloque 8XX - Ubicación y Series Secundarias
+            </h5>
+        </div>
+        <div class="card-body">
+            {# Formset: 830 - Entrada de serie (Repetible) #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
+                            <i class="bi bi-collection"></i> Campo 830 - Entrada de Serie (R)
+                        </h6>
+                        <p class="small text-muted mb-3">
+                            Entrada secundaria de serie con título uniforme.
+                        </p>
+                        {% include 'catalogacion/includes/formset_template.html' with formset=series_830 titulo="Serie" %}
+                    </div>
+                </div>
+            </div>
+            
+            {# Campo 852 - Ubicación física #}
+            <div class="row">
+                <div class="col-12">
+                    <h6 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-house-door"></i> Campo 852 - Ubicación
+                    </h6>
+                    <p class="small text-muted">
+                        Información sobre dónde se encuentra físicamente el documento.
+                    </p>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.institucion_persona_852a.id_for_label }}" class="form-label">
+                        {{ form.institucion_persona_852a.label }}
+                    </label>
+                    {{ form.institucion_persona_852a }}
+                    <small class="form-text text-muted">852 $a - Institución o persona propietaria</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.signatura_original_852h.id_for_label }}" class="form-label">
+                        {{ form.signatura_original_852h.label }}
+                    </label>
+                    {{ form.signatura_original_852h }}
+                    <small class="form-text text-muted">852 $h - Signatura topográfica original</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

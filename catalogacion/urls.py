@@ -1,38 +1,48 @@
-from django.urls import path
-# from .views import (
-#     # Vistas base
-#     # index,
-#     # plantillas,
-#     # crear_obra,
-#     # listar_obras,
-#     # coleccion_manuscrita,
-#     # obra_individual_manuscrita,
-#     # coleccion_impresa,
-#     # obra_individual_impresa,
-#     # Autoridades
-#     # get_autoridades_json,
-# )
-from .views import views_base as vb
+"""
+URLs principales de catalogación
+"""
+from django.urls import path, include
+
+from catalogacion.views import (
+    IndexView,
+    SeleccionarTipoObraView,
+    CrearObraView,
+    EditarObraView,
+    DetalleObraView,
+    ListaObrasView,
+    EliminarObraView,
+)
+from catalogacion.views.utils import (
+    autocompletar_persona,
+    autocompletar_entidad,
+    autocompletar_titulo_uniforme,
+    autocompletar_materia,
+)
+
+app_name = 'catalogacion'
 
 urlpatterns = [
-    # Rutas base
-    # path('', index, name='index'),
-    # path('plantillas/', plantillas, name='plantillas'),
-    # path('crear_obra/', crear_obra, name='crear_obra'),
-    # path('obras/', listar_obras, name='listar_obras'),
+    # Página principal
+    path('', IndexView.as_view(), name='index'),
     
-    # Colecciones
-    # path('coleccion_manuscrita/', coleccion_manuscrita, name='coleccion_manuscrita'),
-    # path('obra_individual_manuscrita/', obra_individual_manuscrita, name='obra_individual_manuscrita'),
-    # path('coleccion_impresa/', coleccion_impresa, name='coleccion_impresa'),
-    # path('obra_individual_impresa/', obra_individual_impresa, name='obra_individual_impresa'),
+    # Obras
+    path('obras/', include([
+        path('', ListaObrasView.as_view(), name='lista_obras'),
+        path('seleccionar-tipo/', SeleccionarTipoObraView.as_view(), name='seleccionar_tipo'),
+        path('crear/<str:tipo>/', CrearObraView.as_view(), name='crear_obra'),
+        path('<int:pk>/', DetalleObraView.as_view(), name='detalle_obra'),
+        path('<int:pk>/editar/', EditarObraView.as_view(), name='editar_obra'),
+        path('<int:pk>/eliminar/', EliminarObraView.as_view(), name='eliminar_obra'),
+    ])),
     
-    # API - Autoridades
-    # path('api/autoridades/', get_autoridades_json, name='get_autoridades_json'),
-
-    # 👇 nuevas rutas
-    # path('obra/<int:obra_id>/ver/', vb.ver_obra, name='ver_obra'),
-    # path('obra/<int:obra_id>/editar/', vb.editar_obra, name='editar_obra'),
-    # path('obra/<int:obra_id>/eliminar/', vb.eliminar_obra, name='eliminar_obra'),
+    # APIs de autocompletado
+    path('api/', include([
+        path('autocompletar/persona/', autocompletar_persona, name='autocompletar_persona'),
+        path('autocompletar/entidad/', autocompletar_entidad, name='autocompletar_entidad'),
+        path('autocompletar/titulo-uniforme/', autocompletar_titulo_uniforme, name='autocompletar_titulo'),
+        path('autocompletar/materia/', autocompletar_materia, name='autocompletar_materia'),
+    ])),
     
+    # Autoridades (sub-app)
+    path('autoridades/', include(('catalogacion.urls_autoridades', 'autoridades'))),
 ]

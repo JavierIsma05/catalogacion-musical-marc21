@@ -45,8 +45,6 @@ from catalogacion.models import (
     EnlaceDocumentoFuente773,
     EnlaceUnidadConstituyente774,
     OtrasRelaciones787,
-    # Bloque 8XX
-    Serie830,
 )
 
 from .forms_0xx import (
@@ -95,7 +93,6 @@ from .forms_7xx import (
     EnlaceUnidadConstituyente774Form,
     OtrasRelaciones787Form,
 )
-from .forms_8xx import Serie830Form
 
 
 # =====================================================
@@ -442,11 +439,4 @@ OtrasRelaciones787FormSet = inlineformset_factory(
 # =====================================================
 # BLOQUE 8XX - FORMSETS
 # =====================================================
-
-Serie830FormSet = inlineformset_factory(
-    ObraGeneral,
-    Serie830,
-    form=Serie830Form,
-    extra=1,
-    can_delete=True,
-)
+# No hay formsets para bloque 8XX actualmente

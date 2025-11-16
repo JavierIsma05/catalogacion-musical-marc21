@@ -1,0 +1,129 @@
+{# Bloque 2XX - Títulos, edición y publicación #}
+<section id="bloque-2xx" class="bloque-section mb-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-bookmark-fill"></i>
+                Bloque 2XX - Títulos, Edición y Publicación
+            </h5>
+        </div>
+        <div class="card-body">
+            {# Campo 245 - Título principal (ya incluido en info básica, aquí campos adicionales) #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h6 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-bookmark"></i> Campo 245 - Título Principal
+                    </h6>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.subtitulo.id_for_label }}" class="form-label">
+                        {{ form.subtitulo.label }}
+                    </label>
+                    {{ form.subtitulo }}
+                    <small class="form-text text-muted">245 $b - Subtítulo o resto del título</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.mencion_responsabilidad.id_for_label }}" class="form-label">
+                        {{ form.mencion_responsabilidad.label }}
+                    </label>
+                    {{ form.mencion_responsabilidad }}
+                    <small class="form-text text-muted">245 $c - Mención de responsabilidad</small>
+                </div>
+            </div>
+            
+            {# Formset: 246 - Títulos alternativos (Repetible) #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
+                            <i class="bi bi-bookmarks"></i> Campo 246 - Títulos Alternativos (R)
+                        </h6>
+                        <p class="small text-muted mb-3">
+                            Títulos abreviados, en otros idiomas, paralelos, etc.
+                        </p>
+                        {% include 'catalogacion/includes/formset_template.html' with formset=titulos_alternativos titulo="Título Alternativo" %}
+                    </div>
+                </div>
+            </div>
+            
+            {# Formset: 250 - Edición (Repetible) #}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
+                            <i class="bi bi-layers"></i> Campo 250 - Edición (R)
+                        </h6>
+                        {% include 'catalogacion/includes/formset_template.html' with formset=ediciones titulo="Edición" %}
+                    </div>
+                </div>
+            </div>
+            
+            {# Formset: 264 - Producción/Publicación (Repetible) #}
+            <div class="row">
+                <div class="col-12">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
+                            <i class="bi bi-building"></i> Campo 264 - Producción/Publicación (R)
+                        </h6>
+                        <p class="small text-muted mb-3">
+                            Información del editor, lugar y fecha de publicación. 
+                            Puede tener múltiples lugares, editores y fechas.
+                        </p>
+                        
+                        {# El formset 264 es más complejo porque tiene subcampos anidados #}
+                        {{ produccion_publicacion.management_form }}
+                        
+                        <div id="produccion-container">
+                            {% for prod_form in produccion_publicacion %}
+                            <div class="produccion-item border rounded p-3 mb-3">
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Función de la entidad</label>
+                                        {{ prod_form.funcion }}
+                                    </div>
+                                </div>
+                                
+                                {# Subcampo $a - Lugar (repetible) #}
+                                <div class="mb-3">
+                                    <label class="form-label">264 $a - Lugar(es)</label>
+                                    <div class="lugares-container" data-produccion-index="{{ forloop.counter0 }}">
+                                        {# Aquí irían los formsets anidados de lugares #}
+                                    </div>
+                                </div>
+                                
+                                {# Subcampo $b - Nombre de entidad (repetible) #}
+                                <div class="mb-3">
+                                    <label class="form-label">264 $b - Editor(es)</label>
+                                    <div class="editores-container" data-produccion-index="{{ forloop.counter0 }}">
+                                        {# Aquí irían los formsets anidados de editores #}
+                                    </div>
+                                </div>
+                                
+                                {# Subcampo $c - Fecha (repetible) #}
+                                <div class="mb-3">
+                                    <label class="form-label">264 $c - Fecha(s)</label>
+                                    <div class="fechas-container" data-produccion-index="{{ forloop.counter0 }}">
+                                        {# Aquí irían los formsets anidados de fechas #}
+                                    </div>
+                                </div>
+                                
+                                {% if produccion_publicacion.can_delete %}
+                                <button type="button" class="btn btn-sm btn-outline-danger delete-produccion">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="button" class="btn btn-success add-produccion">
+                            <i class="bi bi-plus-circle"></i> Agregar Producción/Publicación
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
