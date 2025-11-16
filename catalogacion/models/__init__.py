@@ -1,47 +1,52 @@
 """
-Modulo de modelos Django para catalogacion MARC21
-==================================================
-
-Importa todos los modelos organizados por bloques MARC bibliograficos.
-
-Estructura:
-- autoridades.py: Vocabularios controlados (personas, titulos, formas, materias)
-- bloque_0xx.py: Campos de control y codigos (020, 024, 028, 031, 041, 044)
-- bloque_1xx.py: Puntos de acceso principales (100, 130, 240)
-- bloque_2xx.py: Titulos y publicacion (246, 250, 264)
-- bloque_3xx.py: Descripcion fisica (300, 340, 348, 382, 383)
-- bloque_4xx.py: Series (490)
-- bloque_5xx.py: Notas y contenido (500, 505, 520, 545)
-- bloque_6xx.py: Materias y género/forma (650, 655)
-- bloque_7xx.py: Accesos adicionales y relaciones (700, 710, 773, 774, 787)
-- bloque_8xx.py: Ubicación y disponibilidad (852, 856)
-- obra_general.py: Modelo principal ObraGeneral
+Exportación centralizada de modelos MARC21.
+Basado en la estructura refactorizada con modelo único.
 """
 
-# =====================================================
-# Importar autoridades
-# =====================================================
+# ============================================
+# AUTORIDADES
+# ============================================
 from .autoridades import (
     AutoridadPersona,
     AutoridadTituloUniforme,
     AutoridadFormaMusical,
-    AutoridadMateria,
     AutoridadEntidad,
+    AutoridadMateria,
 )
 
-# =====================================================
-# Importar constantes de obra_general
-# =====================================================
-from .obra_general import TONALIDADES
+# ============================================
+# MODELO PRINCIPAL
+# ============================================
+from .obra_general import (
+    ObraGeneral,
+    NumeroControlSecuencia,
+)
 
-# =====================================================
-# Importar modelos bloque 0XX
-# =====================================================
+# ============================================
+# MODELOS AUXILIARES
+# ============================================
+from .auxiliares import (
+    SoftDeleteMixin,
+    HistorialCambio,
+    EncabezamientoEnlace,
+    ObraLengua,
+)
+
+# ============================================
+# VALIDADORES
+# ============================================
+from .validadores import (
+    ValidadorBase,
+    ValidadorColeccion,
+    ValidadorObraEnColeccion,
+    ValidadorObraIndependiente,
+    obtener_validador,
+)
+
+# ============================================
+# BLOQUE 0XX
+# ============================================
 from .bloque_0xx import (
-    CODIGOS_LENGUAJE,
-    ISBN,
-    ISMN,
-    NumeroEditor,
     IncipitMusical,
     IncipitURL,
     CodigoLengua,
@@ -49,26 +54,16 @@ from .bloque_0xx import (
     CodigoPaisEntidad,
 )
 
-# =====================================================
-# Importar modelos bloque 1XX
-# =====================================================
+# ============================================
+# BLOQUE 1XX
+# ============================================
 from .bloque_1xx import (
-    FORMAS_MUSICALES,
     FuncionCompositor,
-    AtribucionCompositor,
-    Forma130,
-    MedioInterpretacion130,
-    NumeroParteSeccion130,
-    NombreParteSeccion130,
-    Forma240,
-    MedioInterpretacion240,
-    NumeroParteSeccion240,
-    NombreParteSeccion240,
 )
 
-# =====================================================
-# Importar modelos bloque 2XX
-# =====================================================
+# ============================================
+# BLOQUE 2XX
+# ============================================
 from .bloque_2xx import (
     TituloAlternativo,
     Edicion,
@@ -78,38 +73,26 @@ from .bloque_2xx import (
     Fecha264,
 )
 
-# =====================================================
-# Importar modelos bloque 3XX
-# =====================================================
+# ============================================
+# BLOQUE 3XX
+# ============================================
 from .bloque_3xx import (
-    DescripcionFisica,
-    Extension300,
-    Dimension300,
-    MedioFisico,
-    Tecnica340,
-    CaracteristicaMusicaNotada,
-    Formato348,
     MedioInterpretacion382,
     MedioInterpretacion382_a,
-    Solista382,
-    NumeroInterpretes382,
-    DesignacionNumericaObra,
-    NumeroObra383,
-    Opus383,
 )
 
-# =====================================================
-# Importar modelos bloque 4XX
-# =====================================================
+# ============================================
+# BLOQUE 4XX
+# ============================================
 from .bloque_4xx import (
     MencionSerie490,
     TituloSerie490,
     VolumenSerie490,
 )
 
-# =====================================================
-# Importar modelos bloque 5XX - Notas y contenido
-# =====================================================
+# ============================================
+# BLOQUE 5XX
+# ============================================
 from .bloque_5xx import (
     NotaGeneral500,
     Contenido505,
@@ -117,9 +100,9 @@ from .bloque_5xx import (
     DatosBiograficos545,
 )
 
-# =====================================================
-# Importar modelos bloque 6XX - Materias y género/forma
-# =====================================================
+# ============================================
+# BLOQUE 6XX
+# ============================================
 from .bloque_6xx import (
     Materia650,
     SubdivisionMateria650,
@@ -127,13 +110,10 @@ from .bloque_6xx import (
     SubdivisionGeneral655,
 )
 
-# =====================================================
-# Importar modelos bloque 7XX - Accesos adicionales y relaciones
-# =====================================================
+# ============================================
+# BLOQUE 7XX
+# ============================================
 from .bloque_7xx import (
-    FUNCIONES_PERSONA,
-    AUTORIAS_CHOICES,
-    FUNCIONES_ENTIDAD,
     NombreRelacionado700,
     TerminoAsociado700,
     Funcion700,
@@ -145,115 +125,108 @@ from .bloque_7xx import (
     OtrasRelaciones787,
 )
 
-# =====================================================
-# Importar modelos bloque 8XX - Ubicación y disponibilidad
-# =====================================================
+# ============================================
+# BLOQUE 8XX
+# ============================================
 from .bloque_8xx import (
-    Ubicacion852, Estanteria852, Disponible856
+    Ubicacion852,
+    Estanteria852,
+    Disponible856,
 )
 
-# =====================================================
-# Importar modelo principal
-# =====================================================
-from .obra_general import ObraGeneral
+# ============================================
+# UTILIDADES
+# ============================================
+from .managers import ObraGeneralManager
 
+# ============================================
+# ACTIVAR SIGNALS DE AUDITORÍA
+# ============================================
+from . import signals_auditoria  # noqa: F401
 
-# =====================================================
-# Exportar todos los modelos
-# =====================================================
+# ============================================
+# __all__ para import *
+# ============================================
 __all__ = [
-    # Constantes
-    'TONALIDADES',
-    'CODIGOS_LENGUAJE',
-    'FORMAS_MUSICALES',
-    
     # Autoridades
     'AutoridadPersona',
     'AutoridadTituloUniforme',
     'AutoridadFormaMusical',
+    'AutoridadEntidad',
     'AutoridadMateria',
     
-    # Bloque 0XX - Control y codigos
-    'ISBN',
-    'ISMN',
-    'NumeroEditor',
+    # Modelo principal
+    'ObraGeneral',
+    'NumeroControlSecuencia',
+    
+    # Modelos auxiliares
+    'SoftDeleteMixin',
+    'HistorialCambio',
+    'EncabezamientoEnlace',
+    'ObraLengua',
+    
+    # Validadores
+    'ValidadorBase',
+    'ValidadorColeccion',
+    'ValidadorObraEnColeccion',
+    'ValidadorObraIndependiente',
+    'obtener_validador',
+    
+    # Bloque 0XX
     'IncipitMusical',
     'IncipitURL',
     'CodigoLengua',
     'IdiomaObra',
     'CodigoPaisEntidad',
     
-    # Bloque 1XX - Puntos de acceso principales
+    # Bloque 1XX
     'FuncionCompositor',
-    'AtribucionCompositor',
-    'Forma130',
-    'MedioInterpretacion130',
-    'NumeroParteSeccion130',
-    'NombreParteSeccion130',
-    'Forma240',
-    'MedioInterpretacion240',
-    'NumeroParteSeccion240',
-    'NombreParteSeccion240',
     
-    # Bloque 2XX - Titulos y publicacion
+    # Bloque 2XX
     'TituloAlternativo',
     'Edicion',
     'ProduccionPublicacion',
+    'Lugar264',
+    'NombreEntidad264',
+    'Fecha264',
     
-    # Bloque 3XX - Descripcion fisica
-    'DescripcionFisica',
-    'Extension300',
-    'Dimension300',
-    'MedioFisico',
-    'Tecnica340',
-    'CaracteristicaMusicaNotada',
-    'Formato348',
+    # Bloque 3XX
     'MedioInterpretacion382',
     'MedioInterpretacion382_a',
-    'Solista382',
-    'NumeroInterpretes382',
-    'DesignacionNumericaObra',
-    'NumeroObra383',
-    'Opus383',
     
-    # Bloque 4XX - Series
+    # Bloque 4XX
     'MencionSerie490',
     'TituloSerie490',
     'VolumenSerie490',
-
-    # Bloque 5XX - Notas y contenido
+    
+    # Bloque 5XX
     'NotaGeneral500',
     'Contenido505',
     'Sumario520',
     'DatosBiograficos545',
-
-    # Bloque 6XX - Materias y género/forma
+    
+    # Bloque 6XX
     'Materia650',
     'SubdivisionMateria650',
     'MateriaGenero655',
     'SubdivisionGeneral655',
-
-   # Bloque 7XX
-    'FUNCIONES_PERSONA', 
-    'AUTORIAS_CHOICES', 
-    'FUNCIONES_ENTIDAD',
-    'NombreRelacionado700', 
-    'TerminoAsociado700', 
+    
+    # Bloque 7XX
+    'NombreRelacionado700',
+    'TerminoAsociado700',
     'Funcion700',
-    'Relacion700', 
-    'Autoria700', 
+    'Relacion700',
+    'Autoria700',
     'EntidadRelacionada710',
-    'EnlaceDocumentoFuente773', 
-    'EnlaceUnidadConstituyente774', 
+    'EnlaceDocumentoFuente773',
+    'EnlaceUnidadConstituyente774',
     'OtrasRelaciones787',
     
-
-    # Bloque 8XX - Ubicación y disponibilidad
-    'Ubicacion852', 
+    # Bloque 8XX
+    'Ubicacion852',
     'Estanteria852',
     'Disponible856',
-
     
-    # Modelo principal
-    'ObraGeneral',
+    # Utilidades
+    'ObraGeneralManager',
 ]

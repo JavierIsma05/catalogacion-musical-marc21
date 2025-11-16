@@ -1,29 +1,37 @@
+"""
+Modelos de Autoridades para catalogación MARC21
+Centraliza nombres, títulos y términos controlados
+"""
 from django.db import models
 
 
 class AutoridadPersona(models.Model):
     """
-    Base de datos de autoridades para nombres de personas.
-    Se usa en: Campo 100 (compositor), Campo 600 (materia-persona), 
-    Campo 700 (colaborador), Campo 773/774/787 (enlaces)
+    Autoridad para nombres de personas.
+    Usado en: 100, 600, 700, 773, 774, 787
     """
     apellidos_nombres = models.CharField(
-        max_length=200, 
+        max_length=200,
         unique=True,
+        db_index=True,
         help_text="Formato: Apellidos, Nombres (normalizado)"
     )
     fechas = models.CharField(
-        max_length=50, 
+        max_length=50,
         blank=True,
         help_text="Coordenadas biográficas: año nacimiento - año muerte"
     )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+
     class Meta:
         verbose_name = "Autoridad - Persona"
         verbose_name_plural = "Autoridades - Personas"
         ordering = ['apellidos_nombres']
-    
+        indexes = [
+            models.Index(fields=['apellidos_nombres']),
+        ]
+
     def __str__(self):
         if self.fechas:
             return f"{self.apellidos_nombres} {self.fechas}"
@@ -32,76 +40,111 @@ class AutoridadPersona(models.Model):
 
 class AutoridadTituloUniforme(models.Model):
     """
-    Base de datos de autoridades para títulos uniformes.
-    Se usa en: Campo 130 (título principal), Campo 240 (título con compositor)
+    Autoridad para títulos uniformes.
+    Usado en: 130, 240
     """
     titulo = models.CharField(
-        max_length=300, 
+        max_length=300,
         unique=True,
+        db_index=True,
         help_text="Título uniforme normalizado"
     )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+
     class Meta:
         verbose_name = "Autoridad - Título Uniforme"
         verbose_name_plural = "Autoridades - Títulos Uniformes"
         ordering = ['titulo']
-    
+        indexes = [
+            models.Index(fields=['titulo']),
+        ]
+
     def __str__(self):
         return self.titulo
 
 
 class AutoridadFormaMusical(models.Model):
     """
-    Base de datos de autoridades para formas musicales.
-    Se usa en: Campo 130 $k, Campo 240 $k, Campo 655 (género/forma)
+    Autoridad para formas musicales.
+    Usado en: 130 $k, 240 $k, 655
     """
     forma = models.CharField(
-        max_length=100, 
+        max_length=100,
         unique=True,
+        db_index=True,
         help_text="Forma o género musical (ej: Pasillo, Sinfonía, Vals)"
     )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+
     class Meta:
         verbose_name = "Autoridad - Forma Musical"
         verbose_name_plural = "Autoridades - Formas Musicales"
         ordering = ['forma']
-    
+        indexes = [
+            models.Index(fields=['forma']),
+        ]
+
     def __str__(self):
         return self.forma
 
 
 class AutoridadMateria(models.Model):
     """
-    Base de datos de autoridades para términos de materia.
-    Se usa en: Campo 650 (materia general)
+    Autoridad para términos de materia.
+    Usado en: 650
     """
     termino = models.CharField(
-        max_length=200, 
+        max_length=200,
         unique=True,
+        db_index=True,
         help_text="Término de materia normalizado"
     )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+
     class Meta:
         verbose_name = "Autoridad - Materia"
         verbose_name_plural = "Autoridades - Materias"
         ordering = ['termino']
-    
+        indexes = [
+            models.Index(fields=['termino']),
+        ]
+
     def __str__(self):
         return self.termino
 
+
 class AutoridadEntidad(models.Model):
-    """Autoridad de entidades o instituciones (710 $a)"""
-    nombre = models.CharField(max_length=300, unique=True)
-    pais = models.CharField(max_length=100, blank=True, null=True)
-    descripcion = models.TextField(blank=True, null=True)
+    """
+    Autoridad para entidades o instituciones.
+    Usado en: 710, 852
+    """
+    nombre = models.CharField(
+        max_length=300,
+        unique=True,
+        db_index=True
+    )
+    pais = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    descripcion = models.TextField(
+        blank=True,
+        null=True
+    )
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Autoridad de entidad"
-        verbose_name_plural = "Autoridades de entidades"
+        verbose_name = "Autoridad - Entidad"
+        verbose_name_plural = "Autoridades - Entidades"
+        ordering = ['nombre']
+        indexes = [
+            models.Index(fields=['nombre']),
+        ]
 
     def __str__(self):
         return self.nombre
-

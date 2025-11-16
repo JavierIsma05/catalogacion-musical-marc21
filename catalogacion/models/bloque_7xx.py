@@ -1,5 +1,6 @@
 from django.db import models
 from .autoridades import AutoridadPersona, AutoridadEntidad
+from .auxiliares import EncabezamientoEnlace
 
 # =====================================================
 # ⚙️ Choices (listas controladas)
@@ -216,9 +217,9 @@ class EnlaceDocumentoFuente773(models.Model):
     )
 
     encabezamiento_principal = models.ForeignKey(
-        AutoridadPersona,
+        EncabezamientoEnlace,
         on_delete=models.PROTECT,
-        help_text="773 $a – Encabezamiento principal (NR)",
+        help_text="773 $a – Encabezamiento principal (Persona, Título o Entidad)",
     )
 
     titulo = models.CharField(
@@ -251,9 +252,9 @@ class EnlaceUnidadConstituyente774(models.Model):
     )
 
     encabezamiento_principal = models.ForeignKey(
-        AutoridadEntidad,
+        EncabezamientoEnlace,
         on_delete=models.PROTECT,
-        help_text="774 $a – Encabezamiento principal (NR)",
+        help_text="774 $a – Encabezamiento principal (Persona, Título o Entidad)",
     )
 
     titulo = models.CharField(
@@ -286,9 +287,9 @@ class OtrasRelaciones787(models.Model):
     )
 
     encabezamiento_principal = models.ForeignKey(
-        AutoridadPersona,
+        EncabezamientoEnlace,
         on_delete=models.PROTECT,
-        help_text="787 $a – Encabezamiento principal (NR)",
+        help_text="787 $a – Encabezamiento principal (Persona, Título o Entidad)",
     )
 
     titulo = models.CharField(

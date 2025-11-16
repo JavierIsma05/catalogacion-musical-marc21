@@ -32,20 +32,20 @@ from .models import (
     NombreEntidad264,
     Fecha264,
     # Bloque 3XX
-    DescripcionFisica,
-    Extension300,
-    Dimension300,
-    MedioFisico,
-    Tecnica340,
-    CaracteristicaMusicaNotada,
-    Formato348,
+    # DescripcionFisica,  # No existe
+    # Extension300,  # No existe
+    # Dimension300,  # No existe
+    # MedioFisico,  # No existe
+    # Tecnica340,  # No existe
+    # CaracteristicaMusicaNotada,  # No existe
+    # Formato348,  # No existe
     MedioInterpretacion382,
     MedioInterpretacion382_a,
-    Solista382,
-    NumeroInterpretes382,
-    DesignacionNumericaObra,
-    NumeroObra383,
-    Opus383,
+    # Solista382,  # No existe
+    # NumeroInterpretes382,  # No existe
+    # DesignacionNumericaObra,  # No existe
+    # NumeroObra383,  # No existe
+    # Opus383,  # No existe
     # Bloque 4XX
     MencionSerie490,
     TituloSerie490,
@@ -601,168 +601,171 @@ ProduccionPublicacionFormSet = forms.inlineformset_factory(
 # ============================================================
 # 📋 BLOQUE 3XX - DESCRIPCIoN FiSICA
 # ============================================================
+# DESHABILITADO - Los modelos DescripcionFisica, Extension300, Dimension300 no existen
 
-class Extension300Form(forms.ModelForm):
-    """300 $a - Extension (R)"""
-    class Meta:
-        model = Extension300
-        fields = ['extension']
-        widgets = {
-            'extension': forms.TextInput(attrs={
-                'class': 'form-control form-control-sm',
-                'placeholder': '300 $a - Ej: 1 partitura (24 p.)'
-            })
-        }
-
-
-Extension300FormSet = forms.inlineformset_factory(
-    DescripcionFisica,
-    Extension300,
-    form=Extension300Form,
-    extra=1,
-    min_num=0,
-    max_num=10,
-    can_delete=True
-)
+# class Extension300Form(forms.ModelForm):
+#     """300 $a - Extension (R)"""
+#     class Meta:
+#         model = Extension300
+#         fields = ['extension']
+#         widgets = {
+#             'extension': forms.TextInput(attrs={
+#                 'class': 'form-control form-control-sm',
+#                 'placeholder': '300 $a - Ej: 1 partitura (24 p.)'
+#             })
+#         }
 
 
-class Dimension300Form(forms.ModelForm):
-    """300 $c - Dimension (R)"""
-    class Meta:
-        model = Dimension300
-        fields = ['dimension']
-        widgets = {
-            'dimension': forms.TextInput(attrs={
-                'class': 'form-control form-control-sm',
-                'placeholder': '300 $c - Ej: 30 cm'
-            })
-        }
+# Extension300FormSet = forms.inlineformset_factory(
+#     DescripcionFisica,
+#     Extension300,
+#     form=Extension300Form,
+#     extra=1,
+#     min_num=0,
+#     max_num=10,
+#     can_delete=True
+# )
 
 
-Dimension300FormSet = forms.inlineformset_factory(
-    DescripcionFisica,
-    Dimension300,
-    form=Dimension300Form,
-    extra=1,
-    min_num=0,
-    max_num=10,
-    can_delete=True
-)
+# class Dimension300Form(forms.ModelForm):
+#     """300 $c - Dimension (R)"""
+#     class Meta:
+#         model = Dimension300
+#         fields = ['dimension']
+#         widgets = {
+#             'dimension': forms.TextInput(attrs={
+#                 'class': 'form-control form-control-sm',
+#                 'placeholder': '300 $c - Ej: 30 cm'
+#             })
+#         }
 
 
-class DescripcionFisicaForm(forms.ModelForm):
-    """300 - Descripcion Fisica (R)"""
-    class Meta:
-        model = DescripcionFisica
-        fields = ['otras_caracteristicas_fisicas', 'material_acompanante']
-        widgets = {
-            'otras_caracteristicas_fisicas': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '300 $b - Caracteristicas'
-            }),
-            'material_acompanante': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '300 $e - Material acompañante'
-            })
-        }
+# Dimension300FormSet = forms.inlineformset_factory(
+#     DescripcionFisica,
+#     Dimension300,
+#     form=Dimension300Form,
+#     extra=1,
+#     min_num=0,
+#     max_num=10,
+#     can_delete=True
+# )
 
 
-DescripcionFisicaFormSet = forms.inlineformset_factory(
-    ObraGeneral,
-    DescripcionFisica,
-    form=DescripcionFisicaForm,
-    extra=1,
-    min_num=0,
-    max_num=10,
-    can_delete=True
-)
+# class DescripcionFisicaForm(forms.ModelForm):
+#     """300 - Descripcion Fisica (R)"""
+#     class Meta:
+#         model = DescripcionFisica
+#         fields = ['otras_caracteristicas_fisicas', 'material_acompanante']
+#         widgets = {
+#             'otras_caracteristicas_fisicas': forms.TextInput(attrs={
+#                 'class': 'form-control',
+#                 'placeholder': '300 $b - Caracteristicas'
+#             }),
+#             'material_acompanante': forms.TextInput(attrs={
+#                 'class': 'form-control',
+#                 'placeholder': '300 $e - Material acompañante'
+#             })
+#         }
+
+
+# DescripcionFisicaFormSet = forms.inlineformset_factory(
+#     ObraGeneral,
+#     DescripcionFisica,
+#     form=DescripcionFisicaForm,
+#     extra=1,
+#     min_num=0,
+#     max_num=10,
+#     can_delete=True
+# )
 
 
 # ============ 340 - MEDIO FiSICO ============
+# DESHABILITADO - Los modelos MedioFisico y Tecnica340 no existen
 
-class Tecnica340Form(forms.ModelForm):
-    """340 $d - Tecnica (R)"""
-    class Meta:
-        model = Tecnica340
-        fields = ['tecnica']
-        widgets = {
-            'tecnica': forms.Select(attrs={
-                'class': 'form-select'
-            })
-        }
-
-
-Tecnica340FormSet = forms.inlineformset_factory(
-    MedioFisico,
-    Tecnica340,
-    form=Tecnica340Form,
-    extra=1,
-    min_num=1,
-    max_num=10,
-    can_delete=True
-)
+# class Tecnica340Form(forms.ModelForm):
+#     """340 $d - Tecnica (R)"""
+#     class Meta:
+#         model = Tecnica340
+#         fields = ['tecnica']
+#         widgets = {
+#             'tecnica': forms.Select(attrs={
+#                 'class': 'form-select'
+#             })
+#         }
 
 
-class MedioFisicoForm(forms.ModelForm):
-    """340 - Medio Fisico (R)"""
-    class Meta:
-        model = MedioFisico
-        fields = []
-        widgets = {}
+# Tecnica340FormSet = forms.inlineformset_factory(
+#     MedioFisico,
+#     Tecnica340,
+#     form=Tecnica340Form,
+#     extra=1,
+#     min_num=1,
+#     max_num=10,
+#     can_delete=True
+# )
 
 
-MedioFisicoFormSet = forms.inlineformset_factory(
-    ObraGeneral,
-    MedioFisico,
-    form=MedioFisicoForm,
-    extra=1,
-    min_num=0,
-    max_num=5,
-    can_delete=True
-)
+# class MedioFisicoForm(forms.ModelForm):
+#     """340 - Medio Fisico (R)"""
+#     class Meta:
+#         model = MedioFisico
+#         fields = []
+#         widgets = {}
+
+
+# MedioFisicoFormSet = forms.inlineformset_factory(
+#     ObraGeneral,
+#     MedioFisico,
+#     form=MedioFisicoForm,
+#     extra=1,
+#     min_num=0,
+#     max_num=5,
+#     can_delete=True
+# )
 
 # ============ 348 - CARACTERiSTICAS MuSICA NOTADA ============
+# DESHABILITADO - Los modelos Formato348 y CaracteristicaMusicaNotada no existen
 
-class Formato348Form(forms.ModelForm):
-    """348 $a - Formato (R)"""
-    class Meta:
-        model = Formato348
-        fields = ['formato']
-        widgets = {
-            'formato': forms.Select(attrs={
-                'class': 'form-select'
-            })
-        }
-
-
-Formato348FormSet = forms.inlineformset_factory(
-    CaracteristicaMusicaNotada,
-    Formato348,
-    form=Formato348Form,
-    extra=1,
-    min_num=1,
-    max_num=10,
-    can_delete=True
-)
+# class Formato348Form(forms.ModelForm):
+#     """348 $a - Formato (R)"""
+#     class Meta:
+#         model = Formato348
+#         fields = ['formato']
+#         widgets = {
+#             'formato': forms.Select(attrs={
+#                 'class': 'form-select'
+#             })
+#         }
 
 
-class CaracteristicaMusicaNotadaForm(forms.ModelForm):
-    """348 - Caracteristicas Musica Notada (R)"""
-    class Meta:
-        model = CaracteristicaMusicaNotada
-        fields = []
-        widgets = {}
+# Formato348FormSet = forms.inlineformset_factory(
+#     CaracteristicaMusicaNotada,
+#     Formato348,
+#     form=Formato348Form,
+#     extra=1,
+#     min_num=1,
+#     max_num=10,
+#     can_delete=True
+# )
 
 
-CaracteristicaMusicaNotadaFormSet = forms.inlineformset_factory(
-    ObraGeneral,
-    CaracteristicaMusicaNotada,
-    form=CaracteristicaMusicaNotadaForm,
-    extra=1,
-    min_num=0,
-    max_num=10,
-    can_delete=True
-)
+# class CaracteristicaMusicaNotadaForm(forms.ModelForm):
+#     """348 - Caracteristicas Musica Notada (R)"""
+#     class Meta:
+#         model = CaracteristicaMusicaNotada
+#         fields = []
+#         widgets = {}
+
+
+# CaracteristicaMusicaNotadaFormSet = forms.inlineformset_factory(
+#     ObraGeneral,
+#     CaracteristicaMusicaNotada,
+#     form=CaracteristicaMusicaNotadaForm,
+#     extra=1,
+#     min_num=0,
+#     max_num=10,
+#     can_delete=True
+# )
 
 # ============ 382 - MEDIO DE INTERPRETACIoN ============
 
@@ -788,52 +791,52 @@ MedioInterpretacion382_aFormSet = forms.inlineformset_factory(
     can_delete=True
 )
 
-
-class Solista382Form(forms.ModelForm):
-    """382 $b - Solista (R)"""
-    class Meta:
-        model = Solista382
-        fields = ['solista']
-        widgets = {
-            'solista': forms.Select(attrs={
-                'class': 'form-select'
-            })
-        }
-
-
-Solista382FormSet = forms.inlineformset_factory(
-    MedioInterpretacion382,
-    Solista382,
-    form=Solista382Form,
-    extra=1,
-    min_num=0,
-    max_num=10,
-    can_delete=True
-)
+# DESHABILITADO - Los modelos Solista382 y NumeroInterpretes382 no existen
+# class Solista382Form(forms.ModelForm):
+#     """382 $b - Solista (R)"""
+#     class Meta:
+#         model = Solista382
+#         fields = ['solista']
+#         widgets = {
+#             'solista': forms.Select(attrs={
+#                 'class': 'form-select'
+#             })
+#         }
 
 
-class NumeroInterpretes382Form(forms.ModelForm):
-    """382 $n - Numero (R)"""
-    class Meta:
-        model = NumeroInterpretes382
-        fields = ['numero']
-        widgets = {
-            'numero': forms.NumberInput(attrs={
-                'class': 'form-control form-control-sm',
-                'placeholder': '382 $n - Ej: 2, 4, 8'
-            })
-        }
+# Solista382FormSet = forms.inlineformset_factory(
+#     MedioInterpretacion382,
+#     Solista382,
+#     form=Solista382Form,
+#     extra=1,
+#     min_num=0,
+#     max_num=10,
+#     can_delete=True
+# )
 
 
-NumeroInterpretes382FormSet = forms.inlineformset_factory(
-    MedioInterpretacion382,
-    NumeroInterpretes382,
-    form=NumeroInterpretes382Form,
-    extra=1,
-    min_num=0,
-    max_num=10,
-    can_delete=True
-)
+# class NumeroInterpretes382Form(forms.ModelForm):
+#     """382 $n - Numero (R)"""
+#     class Meta:
+#         model = NumeroInterpretes382
+#         fields = ['numero']
+#         widgets = {
+#             'numero': forms.NumberInput(attrs={
+#                 'class': 'form-control form-control-sm',
+#                 'placeholder': '382 $n - Ej: 2, 4, 8'
+#             })
+#         }
+
+
+# NumeroInterpretes382FormSet = forms.inlineformset_factory(
+#     MedioInterpretacion382,
+#     NumeroInterpretes382,
+#     form=NumeroInterpretes382Form,
+#     extra=1,
+#     min_num=0,
+#     max_num=10,
+#     can_delete=True
+# )
 
 
 class MedioInterpretacion382Form(forms.ModelForm):
@@ -855,72 +858,73 @@ MedioInterpretacion382FormSet = forms.inlineformset_factory(
 )
 
 # ============ 383 - DESIGNACIoN NUMeRICA ============
+# DESHABILITADO - Los modelos DesignacionNumericaObra, NumeroObra383, Opus383 no existen
 
-class NumeroObra383Form(forms.ModelForm):
-    """383 $a - Numero de obra (R)"""
-    class Meta:
-        model = NumeroObra383
-        fields = ['numero_obra']
-        widgets = {
-            'numero_obra': forms.TextInput(attrs={
-                'class': 'form-control form-control-sm',
-                'placeholder': '383 $a - Ej: 1, K. 545, BWV 1001'
-            })
-        }
-
-
-NumeroObra383FormSet = forms.inlineformset_factory(
-    DesignacionNumericaObra,
-    NumeroObra383,
-    form=NumeroObra383Form,
-    extra=1,
-    min_num=0,
-    max_num=10,
-    can_delete=True
-)
+# class NumeroObra383Form(forms.ModelForm):
+#     """383 $a - Numero de obra (R)"""
+#     class Meta:
+#         model = NumeroObra383
+#         fields = ['numero_obra']
+#         widgets = {
+#             'numero_obra': forms.TextInput(attrs={
+#                 'class': 'form-control form-control-sm',
+#                 'placeholder': '383 $a - Ej: 1, K. 545, BWV 1001'
+#             })
+#         }
 
 
-class Opus383Form(forms.ModelForm):
-    """383 $b - Opus (R)"""
-    class Meta:
-        model = Opus383
-        fields = ['opus']
-        widgets = {
-            'opus': forms.TextInput(attrs={
-                'class': 'form-control form-control-sm',
-                'placeholder': '383 $b - Ej: Op. 27, No. 2'
-            })
-        }
+# NumeroObra383FormSet = forms.inlineformset_factory(
+#     DesignacionNumericaObra,
+#     NumeroObra383,
+#     form=NumeroObra383Form,
+#     extra=1,
+#     min_num=0,
+#     max_num=10,
+#     can_delete=True
+# )
 
 
-Opus383FormSet = forms.inlineformset_factory(
-    DesignacionNumericaObra,
-    Opus383,
-    form=Opus383Form,
-    extra=1,
-    min_num=0,
-    max_num=10,
-    can_delete=True
-)
+# class Opus383Form(forms.ModelForm):
+#     """383 $b - Opus (R)"""
+#     class Meta:
+#         model = Opus383
+#         fields = ['opus']
+#         widgets = {
+#             'opus': forms.TextInput(attrs={
+#                 'class': 'form-control form-control-sm',
+#                 'placeholder': '383 $b - Ej: Op. 27, No. 2'
+#             })
+#         }
 
 
-class DesignacionNumericaObraForm(forms.ModelForm):
-    """383 - Designacion Numerica (R)"""
-    class Meta:
-        model = DesignacionNumericaObra
-        fields = []
-        widgets = {}
+# Opus383FormSet = forms.inlineformset_factory(
+#     DesignacionNumericaObra,
+#     Opus383,
+#     form=Opus383Form,
+#     extra=1,
+#     min_num=0,
+#     max_num=10,
+#     can_delete=True
+# )
 
 
-DesignacionNumericaObraFormSet = forms.inlineformset_factory(
-    ObraGeneral,
-    DesignacionNumericaObra,
-    form=DesignacionNumericaObraForm,
-    extra=1,
-    min_num=0,
-    max_num=10,
-    can_delete=True
-)
+# class DesignacionNumericaObraForm(forms.ModelForm):
+#     """383 - Designacion Numerica (R)"""
+#     class Meta:
+#         model = DesignacionNumericaObra
+#         fields = []
+#         widgets = {}
+
+
+# DesignacionNumericaObraFormSet = forms.inlineformset_factory(
+#     ObraGeneral,
+#     DesignacionNumericaObra,
+#     form=DesignacionNumericaObraForm,
+#     extra=1,
+#     min_num=0,
+#     max_num=10,
+#     can_delete=True
+# )
 
 # ============================================================
 # 📋 BLOQUE 4XX - SERIES
@@ -1241,20 +1245,20 @@ __all__ = [
     'EdicionFormSet',
     'ProduccionPublicacionFormSet',
     # Bloque 3XX
-    'Extension300FormSet',
-    'Dimension300FormSet',
-    'DescripcionFisicaFormSet',
-    'Tecnica340FormSet',
-    'MedioFisicoFormSet',
-    'Formato348FormSet',
-    'CaracteristicaMusicaNotadaFormSet',
+    # 'Extension300FormSet',  # No existe
+    # 'Dimension300FormSet',  # No existe
+    # 'DescripcionFisicaFormSet',  # No existe
+    # 'Tecnica340FormSet',  # No existe
+    # 'MedioFisicoFormSet',  # No existe
+    # 'Formato348FormSet',  # No existe
+    # 'CaracteristicaMusicaNotadaFormSet',  # No existe
     'MedioInterpretacion382_aFormSet',
-    'Solista382FormSet',
-    'NumeroInterpretes382FormSet',
+    # 'Solista382FormSet',  # No existe
+    # 'NumeroInterpretes382FormSet',  # No existe
     'MedioInterpretacion382FormSet',
-    'NumeroObra383FormSet',
-    'Opus383FormSet',
-    'DesignacionNumericaObraFormSet',
+    # 'NumeroObra383FormSet',  # No existe
+    # 'Opus383FormSet',  # No existe
+    # 'DesignacionNumericaObraFormSet',  # No existe
     # Bloque 4XX
     'TituloSerie490FormSet',
     'VolumenSerie490FormSet',

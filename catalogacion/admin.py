@@ -1,940 +1,1207 @@
-# """
-# Admin unificado para modelos MARC21
-# ====================================
+"""
+Configuración del Admin de Django organizado por tipo de plantilla MARC21
+"""
+from django.contrib import admin
+from django.core.exceptions import ValidationError
+from django.utils.html import format_html
+from django.urls import reverse
 
-# Configuracion completa del Django admin para toda la ficha MARC21
-# con soporte para campos repetibles, subcampos repetibles e inlines anidados.
+from .models import (
+    ObraGeneral,
+    NumeroControlSecuencia,
+    AutoridadPersona,
+    AutoridadTituloUniforme,
+    AutoridadFormaMusical,
+    AutoridadEntidad,
+    AutoridadMateria,
+    # Modelos auxiliares
+    ObraLengua,
+    # Bloque 0xx
+    IncipitMusical,
+    CodigoLengua,
+    # Bloque 1xx
+    FuncionCompositor,
+    # Bloque 2xx
+    TituloAlternativo,
+    Edicion,
+    ProduccionPublicacion,
+    Lugar264,
+    NombreEntidad264,
+    Fecha264,
+    # Bloque 3xx
+    MedioInterpretacion382,
+    MedioInterpretacion382_a,
+    # Bloque 4xx
+    MencionSerie490,
+    TituloSerie490,
+    VolumenSerie490,
+    # Bloque 5xx
+    NotaGeneral500,
+    Contenido505,
+    Sumario520,
+    DatosBiograficos545,
+    # Bloque 6xx
+    Materia650,
+    SubdivisionMateria650,
+    MateriaGenero655,
+    SubdivisionGeneral655,
+    # Bloque 7xx
+    NombreRelacionado700,
+    TerminoAsociado700,
+    Funcion700,
+    Relacion700,
+    Autoria700,
+    EntidadRelacionada710,
+    EnlaceDocumentoFuente773,
+    EnlaceUnidadConstituyente774,
+    OtrasRelaciones787,
+    # Bloque 8xx
+    Ubicacion852,
+    Estanteria852,
+    Disponible856,
+)
+from .formatters import MARCFormatter
 
-# Estructura de inlines:
-# - TabularInline: para campos simples y repetibles
-# - StackedInline: para contenedores principales
-# """
 
-# from django.contrib import admin
-# from django.utils.html import format_html
-# from django.urls import reverse
-# from django.db.models import Count
+# ============================================
+# INLINES PARA CAMPOS REPETIBLES
+# ============================================
 
-# from catalogacion.models.autoridades import AutoridadEntidad
+# Bloque 0xx - Íncipits
+class IncipitMusicalInline(admin.TabularInline):
+    model = IncipitMusical
+    extra = 0
+    fields = ['numero_obra', 'numero_movimiento', 'numero_pasaje', 'titulo_encabezamiento', 'voz_instrumento']
+    verbose_name = "Íncipit Musical (031)"
+    verbose_name_plural = "📝 Íncipits Musicales (031 - R)"
 
-# # Importar todos los modelos
-# from .models import (
-#     # ObraGeneral
-#     ObraGeneral,
-#     # Bloque 0XX
-#     AutoridadPersona,
-#     AutoridadTituloUniforme,
-#     AutoridadFormaMusical,
-#     # Bloque 1XX
-#     FuncionCompositor,
-#     AtribucionCompositor,
-#     Forma130,
-#     MedioInterpretacion130,
-#     NumeroParteSeccion130,
-#     NombreParteSeccion130,
-#     Forma240,
-#     MedioInterpretacion240,
-#     NumeroParteSeccion240,
-#     NombreParteSeccion240,
-#     # Bloque 2XX
-#     TituloAlternativo,
-#     Edicion,
-#     ProduccionPublicacion,
-#     # Bloque 3XX
-#     DescripcionFisica,
-#     Extension300,
-#     Dimension300,
-#     MedioFisico,
-#     Tecnica340,
-#     CaracteristicaMusicaNotada,
-#     Formato348,
-#     MedioInterpretacion382,
-#     MedioInterpretacion382_a,
-#     Solista382,
-#     NumeroInterpretes382,
-#     DesignacionNumericaObra,
-#     NumeroObra383,
-#     Opus383,
-#     # Bloque 4XX
-#     MencionSerie490,
-#     TituloSerie490,
-#     VolumenSerie490,
-#     # Bloque 5XX
-#     NotaGeneral500,
-#     Contenido505,
-#     Sumario520,
-#     DatosBiograficos545,
-#     # Bloque 6XX
-#     Materia650, 
-#     SubdivisionMateria650,
-#     MateriaGenero655, 
-#     SubdivisionGeneral655,
-#     # Bloque 7XX
-#     NombreRelacionado700, 
-#     TerminoAsociado700, 
-#     Funcion700,
-#     Relacion700, 
-#     Autoria700, 
-#     EntidadRelacionada710,
-#     EnlaceDocumentoFuente773, 
-#     EnlaceUnidadConstituyente774, 
-#     OtrasRelaciones787,
-#     # Bloque 8XX
-#     Ubicacion852, 
-#     Estanteria852, 
-#     Disponible856,
 
-# )
+# Bloque 1xx - Funciones del Compositor
+class FuncionCompositorInline(admin.TabularInline):
+    model = FuncionCompositor
+    extra = 1
+    fields = ['funcion']
+    verbose_name = "Función del Compositor (100 $e)"
+    verbose_name_plural = "🎼 Funciones del Compositor (100 $e - R)"
 
-# # ================================================
-# # 🔧 INLINES PARA BLOQUE 1XX - Puntos de acceso
-# # ================================================
 
-# class FuncionCompositorInline(admin.TabularInline):
-#     """100 $e - Funciones del compositor (R)"""
-#     model = FuncionCompositor
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
+# Bloque 2xx - Títulos y Publicación
+class TituloAlternativoInline(admin.TabularInline):
+    model = TituloAlternativo
+    extra = 0
+    fields = ['titulo', 'resto_titulo']
+    verbose_name = "Título Alternativo (246)"
+    verbose_name_plural = "📚 Títulos Alternativos (246 - R)"
+
+
+class EdicionInline(admin.TabularInline):
+    model = Edicion
+    extra = 0
+    fields = ['edicion']
+    verbose_name = "Edición (250)"
+    verbose_name_plural = "📖 Ediciones (250 - R)"
+
+
+class Lugar264Inline(admin.TabularInline):
+    model = Lugar264
+    extra = 1
+    fields = ['lugar']
+    verbose_name = "Lugar (264 $a)"
+    verbose_name_plural = "Lugares (264 $a - R)"
+
+
+class Entidad264Inline(admin.TabularInline):
+    model = NombreEntidad264
+    extra = 1
+    fields = ['nombre']
+    verbose_name = "Entidad (264 $b)"
+    verbose_name_plural = "Entidades (264 $b - R)"
+
+
+class Fecha264Inline(admin.TabularInline):
+    model = Fecha264
+    extra = 1
+    fields = ['fecha']
+    verbose_name = "Fecha (264 $c)"
+    verbose_name_plural = "Fechas (264 $c - R)"
+
+
+class ProduccionPublicacionInline(admin.StackedInline):
+    model = ProduccionPublicacion
+    extra = 0
+    fields = ['funcion']
+    inlines = [Lugar264Inline, Entidad264Inline, Fecha264Inline]
+    verbose_name = "Producción/Publicación (264)"
+    verbose_name_plural = "🏭 Producción/Publicación (264 - R)"
+
+
+# Bloque 3xx - Medio de Interpretación
+class MedioInterpretacion382_aInline(admin.TabularInline):
+    model = MedioInterpretacion382_a
+    extra = 1
+    fields = ['medio']
+    verbose_name = "Medio (382 $a)"
+    verbose_name_plural = "Medios (382 $a - R)"
+
+
+class MedioInterpretacion382Inline(admin.StackedInline):
+    model = MedioInterpretacion382
+    extra = 0
+    verbose_name = "Medio de Interpretación (382)"
+    verbose_name_plural = "🎹 Medio de Interpretación (382 - R)"
+    show_change_link = True
+
+
+# Bloque 4xx - Series
+class TituloSerie490Inline(admin.TabularInline):
+    model = TituloSerie490
+    extra = 1
+    fields = ['titulo_serie']
+    verbose_name = "Título Serie (490 $a)"
+    verbose_name_plural = "Títulos (490 $a - R)"
+
+
+class VolumenSerie490Inline(admin.TabularInline):
+    model = VolumenSerie490
+    extra = 1
+    fields = ['volumen']
+    verbose_name = "Volumen (490 $v)"
+    verbose_name_plural = "Volúmenes (490 $v - R)"
+
+
+class MencionSerie490Inline(admin.StackedInline):
+    model = MencionSerie490
+    extra = 0
+    fields = ['relacion']
+    verbose_name = "Mención de Serie (490)"
+    verbose_name_plural = "📚 Menciones de Serie (490 - R)"
+    show_change_link = True
+
+
+# Bloque 5xx - Notas
+class NotaGeneral500Inline(admin.TabularInline):
+    model = NotaGeneral500
+    extra = 0
+    fields = ['nota_general']
+    verbose_name = "Nota General (500)"
+    verbose_name_plural = "📝 Notas Generales (500 - R)"
+
+
+class Contenido505Inline(admin.TabularInline):
+    model = Contenido505
+    extra = 0
+    fields = ['contenido']
+    verbose_name = "Contenido (505)"
+    verbose_name_plural = "📋 Contenidos (505 - R)"
+
+
+class Sumario520Inline(admin.TabularInline):
+    model = Sumario520
+    extra = 0
+    fields = ['sumario']
+    verbose_name = "Sumario (520)"
+    verbose_name_plural = "📄 Sumarios (520 - R)"
+
+
+class DatosBiograficos545Inline(admin.TabularInline):
+    model = DatosBiograficos545
+    extra = 0
+    fields = ['datos_biograficos', 'url']
+    verbose_name = "Datos Biográficos (545)"
+    verbose_name_plural = "👤 Datos Biográficos (545 - R)"
+
+
+# Bloque 6xx - Materias
+class SubdivisionMateria650Inline(admin.TabularInline):
+    model = SubdivisionMateria650
+    extra = 1
+    fields = ['subdivision']
+    verbose_name = "Subdivisión (650 $x)"
+    verbose_name_plural = "Subdivisiones (650 $x - R)"
+
+
+class Materia650Inline(admin.StackedInline):
+    model = Materia650
+    extra = 0
+    fields = ['materia']
+    verbose_name = "Materia (650)"
+    verbose_name_plural = "🏷️ Materias - Temas (650 - R)"
+    show_change_link = True
+
+
+class SubdivisionGeneral655Inline(admin.TabularInline):
+    model = SubdivisionGeneral655
+    extra = 1
+    fields = ['subdivision']
+    verbose_name = "Subdivisión (655 $x)"
+    verbose_name_plural = "Subdivisiones (655 $x - R)"
+
+
+class MateriaGenero655Inline(admin.StackedInline):
+    model = MateriaGenero655
+    extra = 0
+    fields = ['materia']
+    verbose_name = "Materia Género/Forma (655)"
+    verbose_name_plural = "🎭 Materias - Género/Forma (655 - R)"
+    show_change_link = True
+
+
+# Bloque 7xx - Puntos de Acceso Adicionales
+class TerminoAsociado700Inline(admin.TabularInline):
+    model = TerminoAsociado700
+    extra = 0
+    fields = ['termino']
+    verbose_name = "Término Asociado (700 $c)"
+    verbose_name_plural = "Términos Asociados (700 $c - R)"
+
+
+class Funcion700Inline(admin.TabularInline):
+    model = Funcion700
+    extra = 1
+    fields = ['funcion']
+    verbose_name = "Función (700 $e)"
+    verbose_name_plural = "Funciones (700 $e - R)"
+
+
+class Relacion700Inline(admin.TabularInline):
+    model = Relacion700
+    extra = 0
+    fields = ['descripcion']
+    verbose_name = "Relación (700 $i)"
+    verbose_name_plural = "Relaciones (700 $i - R)"
+
+
+class Autoria700Inline(admin.TabularInline):
+    model = Autoria700
+    extra = 0
+    fields = ['autoria']
+    verbose_name = "Autoría (700 $j)"
+    verbose_name_plural = "Autorías (700 $j - R)"
+
+
+class NombreRelacionado700Inline(admin.StackedInline):
+    model = NombreRelacionado700
+    extra = 0
+    fields = ['persona', 'fechas', 'titulo_obra']
+    verbose_name = "Nombre Relacionado (700)"
+    verbose_name_plural = "👥 Nombres Relacionados (700 - R)"
+    show_change_link = True
+
+
+class EntidadRelacionada710Inline(admin.TabularInline):
+    model = EntidadRelacionada710
+    extra = 0
+    fields = ['entidad', 'funcion']
+    verbose_name = "Entidad Relacionada (710)"
+    verbose_name_plural = "🏛️ Entidades Relacionadas (710 - R)"
+
+
+class EnlaceDocumentoFuente773Inline(admin.TabularInline):
+    model = EnlaceDocumentoFuente773
+    extra = 0
+    fields = ['encabezamiento_principal', 'titulo', 'numero_obra_relacionada']
+    verbose_name = "Documento Fuente (773)"
+    verbose_name_plural = "📘 Documentos Fuente (773 - R)"
+
+
+class EnlaceUnidadConstituyente774Inline(admin.TabularInline):
+    model = EnlaceUnidadConstituyente774
+    extra = 0
+    fields = ['encabezamiento_principal', 'titulo', 'numero_obra_relacionada']
+    verbose_name = "Unidad Constituyente (774)"
+    verbose_name_plural = "📗 Unidades Constituyentes (774 - R)"
+
+
+class OtrasRelaciones787Inline(admin.TabularInline):
+    model = OtrasRelaciones787
+    extra = 0
+    fields = ['encabezamiento_principal', 'titulo', 'numero_obra_relacionada']
+    verbose_name = "Otra Relación (787)"
+    verbose_name_plural = "🔗 Otras Relaciones (787 - R)"
+
+
+# Bloque 8xx - Ubicación
+class Estanteria852Inline(admin.TabularInline):
+    model = Estanteria852
+    extra = 1
+    fields = ['estanteria']
+    verbose_name = "Estantería (852 $c)"
+    verbose_name_plural = "Estanterías (852 $c - R)"
+
+
+class Ubicacion852Inline(admin.StackedInline):
+    model = Ubicacion852
+    extra = 0
+    fields = ['institucion_persona', 'signatura_original']
+    verbose_name = "Ubicación (852)"
+    verbose_name_plural = "📍 Ubicaciones (852 - R)"
+    show_change_link = True
+
+
+class Disponible856Inline(admin.TabularInline):
+    model = Disponible856
+    extra = 0
+    fields = ['url', 'texto_enlace']
+    verbose_name = "Recurso Disponible (856)"
+    verbose_name_plural = "🌐 Recursos Disponibles (856 - R)"
+
+
+# ============================================
+# INLINES PARA MODELOS AUXILIARES
+# ============================================
+
+class ObraLenguaInline(admin.TabularInline):
+    """Inline para campo 041 - Código de Lengua"""
+    model = ObraLengua
+    extra = 1
+    fields = ['lengua', 'tipo_lengua', 'orden']
+    ordering = ['orden']
+    verbose_name = "Lengua (041)"
+    verbose_name_plural = "🌍 Lenguas (041 - Código de Lengua)"
+
+
+# ============================================
+# MIXIN PARA VALIDACIÓN DE INLINES
+# ============================================
+
+class InlineValidationMixin:
+    """Mixin para validar relaciones después de guardar todos los inlines"""
     
-#     fields = ['funcion']
-#     verbose_name = "Funcion"
-#     verbose_name_plural = "✏️ Funciones Compositor (100 $e - R)"
-
-
-#     """130 $k - Formas (R)"""
-#     model = Forma130
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
+    def save_model(self, request, obj, form, change):
+        """Guardar el modelo - validar solo en edición"""
+        if not change:
+            # Primera vez guardando (creación inicial)
+            # Guardar sin validaciones completas del modelo
+            obj.save()
+            request._obra_to_validate = None  # No validar en creación
+        else:
+            # Guardado normal
+            super().save_model(request, obj, form, change)
+            request._obra_to_validate = obj
     
-#     fields = ['forma']
-#     verbose_name = "Forma"
-#     verbose_name_plural = "📋 Formas (130 $k - R)"
-
-
-#     """130 $n - Numeros de parte (R)"""
-#     model = NumeroParteSeccion130
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     fields = ['numero']
-#     verbose_name = "Numero"
-#     verbose_name_plural = "🔢 Numeros de Parte/Seccion (130 $n - R)"
-
-
-#     """240 $k - Formas (R)"""
-#     model = Forma240
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     fields = ['forma']
-#     verbose_name = "Forma"
-#     verbose_name_plural = "📋 Formas (240 $k - R)"
-
-
-#     """240 $n - Numeros de parte (R)"""
-#     model = NumeroParteSeccion240
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     fields = ['numero']
-#     verbose_name = "Numero"
-#     verbose_name_plural = "🔢 Numeros de Parte/Seccion (240 $n - R)"
-
-
-# # 🔧 INLINES PARA BLOQUE 2XX - Titulos y publicacion
-# # ================================================
-
-# class TituloAlternativoInline(admin.TabularInline):
-#     """246 - Titulos alternativos (R)"""
-#     model = TituloAlternativo
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     fields = ['titulo', 'resto_titulo']
-#     verbose_name = "Titulo Alternativo"
-#     verbose_name_plural = "🔤 Titulos Alternativos (246 - R)"
-
-
-# class EdicionInline(admin.TabularInline):
-#     """250 - Ediciones (R)"""
-#     model = Edicion
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     fields = ['edicion']
-#     verbose_name = "Edicion"
-#     verbose_name_plural = "📖 Ediciones (250 - R)"
-
-
-# class ProduccionPublicacionInline(admin.TabularInline):
-#     """264 - Produccion/Publicacion (R) - LIGADOS"""
-#     model = ProduccionPublicacion
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     fields = ['funcion', 'lugar', 'nombre_entidad', 'fecha']
-#     verbose_name = "Produccion/Publicacion"
-#     verbose_name_plural = "🏭 Producciones/Publicaciones (264 - R, LIGADOS)"
-    
-#     def get_formset(self, request, obj=None, **kwargs):
-#         formset = super().get_formset(request, obj, **kwargs)
-#         formset.help_text = (
-#             "⚠️ Campo 264 es COMPLETAMENTE REPETIBLE. "
-#             "Los subcampos $a (lugar), $b (entidad), $c (fecha) estan LIGADOS. "
-#             "Cada fila es una instancia de 264 con su funcion."
-#         )
-#         return formset
-
-
-# # ================================================
-# # 🔧 INLINES PARA BLOQUE 3XX - Descripcion fisica
-# # ================================================
-
-#     """300 $c - Dimensiones (R) - ANIDADO"""
-#     model = Dimension300
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     fields = ['dimension']
-#     verbose_name = "Dimension"
-#     verbose_name_plural = "📏 Dimensiones (300 $c - R)"
-
-
-# class DescripcionFisicaInline(admin.StackedInline):
-#     """300 - Descripcion fisica (R) - PRINCIPAL"""
-#     model = DescripcionFisica
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     inlines = [Extension300Inline, Dimension300Inline]
-#     fields = ['otras_caracteristicas_fisicas', 'material_acompanante']
-#     verbose_name = "Descripcion Fisica"
-#     verbose_name_plural = "📚 Descripciones Fisicas (300 - R)"
-#     classes = ['collapse']
-    
-#     def get_formset(self, request, obj=None, **kwargs):
-#         formset = super().get_formset(request, obj, **kwargs)
-#         formset.help_text = (
-#             "⚠️ Campo 300 es COMPLETAMENTE REPETIBLE. "
-#             "Dentro de cada 300, los subcampos $a (extension) y $c (dimension) "
-#             "también son REPETIBLES. Agregue multiples para cada categoria."
-#         )
-#         return formset
-
-
-#     """340 - Medio fisico (R) - PRINCIPAL"""
-#     model = MedioFisico
-#     extra = 1
-#     min_num = 0
-#     max_num = 5
-    
-#     inlines = [Tecnica340Inline]
-#     verbose_name = "Medio Fisico"
-#     verbose_name_plural = "📀 Medios Fisicos (340 - R)"
-#     classes = ['collapse']
-    
-#     def get_formset(self, request, obj=None, **kwargs):
-#         formset = super().get_formset(request, obj, **kwargs)
-#         formset.help_text = (
-#             "⚠️ Campo 340 es COMPLETAMENTE REPETIBLE. "
-#             "Dentro de cada 340, el subcampo $d (técnica) también es REPETIBLE. "
-#             "Se autogenera basado en tipo_registro. Agregue multiples técnicas."
-#         )
-#         return formset
-
-
-#     """348 - Caracteristicas musica notada (R) - PRINCIPAL"""
-#     model = CaracteristicaMusicaNotada
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     inlines = [Formato348Inline]
-#     verbose_name = "Caracteristica Musica Notada"
-#     verbose_name_plural = "🎼 Caracteristicas Musica Notada (348 - R)"
-#     classes = ['collapse']
-    
-#     def get_formset(self, request, obj=None, **kwargs):
-#         formset = super().get_formset(request, obj, **kwargs)
-#         formset.help_text = (
-#             "⚠️ Campo 348 es COMPLETAMENTE REPETIBLE. "
-#             "Dentro de cada 348, $a (formato) también es REPETIBLE. "
-#             "NO use si la musica es para piano en doble pauta tradicional."
-#         )
-#         return formset
-
-
-# class MedioInterpretacion382_aInline(admin.TabularInline):
-#     """382 $a - Medios (R) - ANIDADO"""
-#     model = MedioInterpretacion382_a
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     fields = ['medio']
-#     verbose_name = "Medio"
-#     verbose_name_plural = "🎵 Medios (382 $a - R)"
-
-
-#     """382 $n - Numeros (R) - ANIDADO"""
-#     model = NumeroInterpretes382
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     fields = ['numero']
-#     verbose_name = "Numero"
-#     verbose_name_plural = "👥 Numeros Intérpretes (382 $n - R)"
-
-
-# class MedioInterpretacion382Inline(admin.StackedInline):
-#     """382 - Medio de interpretacion (R) - PRINCIPAL"""
-#     model = MedioInterpretacion382
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     inlines = [
-#         MedioInterpretacion382_aInline,
-#         Solista382Inline,
-#         NumeroInterpretes382Inline
-#     ]
-#     verbose_name = "Medio de Interpretacion"
-#     verbose_name_plural = "🎼 Medios de Interpretacion (382 - R)"
-#     classes = ['collapse']
-    
-#     def get_formset(self, request, obj=None, **kwargs):
-#         formset = super().get_formset(request, obj, **kwargs)
-#         formset.help_text = (
-#             "⚠️ Campo 382 es COMPLETAMENTE REPETIBLE. "
-#             "Dentro de cada 382, $a (medios), $b (solistas), $n (cantidad) "
-#             "son todos REPETIBLES e INDEPENDIENTES."
-#         )
-#         return formset
-
-
-#     """383 $b - Opus (R) - ANIDADO"""
-#     model = Opus383
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     fields = ['opus']
-#     verbose_name = "Opus"
-#     verbose_name_plural = "♯ Opus (383 $b - R)"
-
-
-# class DesignacionNumericaObraInline(admin.StackedInline):
-#     """383 - Designacion numérica (R) - PRINCIPAL"""
-#     model = DesignacionNumericaObra
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     inlines = [NumeroObra383Inline, Opus383Inline]
-#     verbose_name = "Designacion Numérica"
-#     verbose_name_plural = "🔢 Designaciones Numéricas (383 - R)"
-#     classes = ['collapse']
-    
-#     def get_formset(self, request, obj=None, **kwargs):
-#         formset = super().get_formset(request, obj, **kwargs)
-#         formset.help_text = (
-#             "⚠️ Campo 383 es COMPLETAMENTE REPETIBLE. "
-#             "Dentro de cada 383, $a (numero) y $b (opus) son REPETIBLES e INDEPENDIENTES."
-#         )
-#         return formset
-
-
-# # ================================================
-# # 🔧 INLINES PARA BLOQUE 4XX - Series
-# # ================================================
-
-# class TituloSerie490Inline(admin.TabularInline):
-#     """490 $a - Titulos (R) - ANIDADO"""
-#     model = TituloSerie490
-#     extra = 1
-#     min_num = 1
-#     max_num = 10
-    
-#     fields = ['titulo_serie']
-#     verbose_name = "Titulo"
-#     verbose_name_plural = "📚 Titulos de Serie (490 $a - R)"
-
-
-# class VolumenSerie490Inline(admin.TabularInline):
-#     """490 $v - Volumenes (R) - ANIDADO"""
-#     model = VolumenSerie490
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     fields = ['volumen']
-#     verbose_name = "Volumen"
-#     verbose_name_plural = "📖 Volumenes (490 $v - R)"
-
-
-# class MencionSerie490Inline(admin.StackedInline):
-#     """490 - Mencion de serie (R) - PRINCIPAL"""
-#     model = MencionSerie490
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-    
-#     inlines = [TituloSerie490Inline, VolumenSerie490Inline]
-#     fields = ['relacion']
-#     verbose_name = "Mencion de Serie"
-#     verbose_name_plural = "📚 Menciones de Serie (490 - R)"
-#     classes = ['collapse']
-    
-#     def get_formset(self, request, obj=None, **kwargs):
-#         formset = super().get_formset(request, obj, **kwargs)
-#         formset.help_text = (
-#             "⚠️ Campo 490 es COMPLETAMENTE REPETIBLE. "
-#             "Dentro de cada 490, $a (titulo) y $v (volumen) son REPETIBLES. "
-#             "Primer indicador: 0=no relacionado, 1=relacionado con 800-830."
-#         )
-#         return formset
-
-# # =====================================================
-# # 🗒️ BLOQUE 5XX – Notas y descripciones
-# # =====================================================
-
-# # -------------------------------
-# # 500 ## Nota general (R)
-# # -------------------------------
-# class NotaGeneral500Inline(admin.StackedInline):
-#     """500 ## Nota general (R)"""
-#     model = NotaGeneral500
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['nota_general']
-#     verbose_name = "Nota general"
-#     verbose_name_plural = "🗒️ Notas generales (500 - R)"
-#     classes = ['collapse']
-
-
-# # -------------------------------
-# # 505 00 Contenido (R)
-# # -------------------------------
-# class Contenido505Inline(admin.StackedInline):
-#     """505 00 Contenido (R)"""
-#     model = Contenido505
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['contenido']
-#     verbose_name = "Contenido"
-#     verbose_name_plural = "📄 Contenidos (505 - R)"
-#     classes = ['collapse']
-
-
-# # -------------------------------
-# # 520 ## Sumario (R)
-# # -------------------------------
-# class Sumario520Inline(admin.StackedInline):
-#     """520 ## Sumario (R)"""
-#     model = Sumario520
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['sumario']
-#     verbose_name = "Sumario"
-#     verbose_name_plural = "📘 Sumarios (520 - R)"
-#     classes = ['collapse']
-
-
-# # -------------------------------
-# # 545 0# Datos biográficos del compositor (R)
-# # -------------------------------
-# class DatosBiograficos545Inline(admin.StackedInline):
-#     """545 0# Datos biográficos del compositor (R)"""
-#     model = DatosBiograficos545
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['datos_biograficos', 'url']
-#     verbose_name = "Datos biográficos del compositor"
-#     verbose_name_plural = "🎼 Datos biográficos del compositor (545 - R)"
-#     classes = ['collapse']
-
-# # ============================================================
-# # BLOQUE 6XX - MATERIAS
-# # ============================================================
-
-# # 650 – Materia (Temas)
-# class SubdivisionMateria650Inline(admin.TabularInline):
-#     model = SubdivisionMateria650
-#     extra = 1
-#     verbose_name = "Subdivisión de materia"
-#     verbose_name_plural = "Subdivisiones ($x)"
-
-
-# class Materia650Inline(admin.StackedInline):
-#     model = Materia650
-#     extra = 1
-#     verbose_name = "Materia (Tema)"
-#     verbose_name_plural = "Materias (650)"
-#     inlines = [SubdivisionMateria650Inline]
-
-
-# # 655 – Materia (Género/Forma)
-# class SubdivisionGeneral655Inline(admin.TabularInline):
-#     model = SubdivisionGeneral655
-#     extra = 1
-#     verbose_name = "Subdivisión general"
-#     verbose_name_plural = "Subdivisiones ($x)"
-
-
-# class MateriaGenero655Inline(admin.StackedInline):
-#     model = MateriaGenero655
-#     extra = 1
-#     verbose_name = "Materia (Género/Forma)"
-#     verbose_name_plural = "Materias (655)"
-#     inlines = [SubdivisionGeneral655Inline]
-
-
-# # =====================================================
-# # 🟣 BLOQUE 7XX – Accesos adicionales y relaciones
-# # =====================================================
-
-# # --- Subcampos del 700 ---
-# class TerminoAsociado700Inline(admin.TabularInline):
-#     """700 $c – Término asociado al nombre (R)"""
-#     model = TerminoAsociado700
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['termino']
-#     verbose_name = "Término asociado"
-#     verbose_name_plural = "🧩 Términos asociados (700 $c - R)"
-
-
-# class Funcion700Inline(admin.TabularInline):
-#     """700 $e – Función (R)"""
-#     model = Funcion700
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['funcion']
-#     verbose_name = "Función"
-#     verbose_name_plural = "🎶 Funciones (700 $e - R)"
-
-
-# class Relacion700Inline(admin.TabularInline):
-#     """700 $i – Relación (R)"""
-#     model = Relacion700
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['descripcion']
-#     verbose_name = "Relación"
-#     verbose_name_plural = "🔗 Relaciones (700 $i - R)"
-
-
-# class Autoria700Inline(admin.TabularInline):
-#     """700 $j – Autoría (R)"""
-#     model = Autoria700
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['autoria']
-#     verbose_name = "Autoría"
-#     verbose_name_plural = "📜 Autorías (700 $j - R)"
-
-
-# class NombreRelacionado700Inline(admin.StackedInline):
-#     """700 1# – Nombre relacionado (R)"""
-#     model = NombreRelacionado700
-#     autocomplete_fields = ['persona']
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-
-#     # ✅ $d se rellena automáticamente desde AutoridadPersona
-#     readonly_fields = ['fechas']  
-#     fields = ['persona', 'fechas', 'titulo_obra']
-
-#     verbose_name = "Nombre relacionado"
-#     verbose_name_plural = "🧑‍🎤 Nombres relacionados (700 - R)"
-
-#     inlines = [
-#         TerminoAsociado700Inline,
-#         Funcion700Inline,
-#         Relacion700Inline,
-#         Autoria700Inline,
-#     ]
-
-#     class Media:
-#         # ✅ Asegúrate de que esta ruta coincida con tu carpeta "static/catalogacion/js/"
-#         js = ('catalogacion/js/auto_fecha_persona.js',)
-
-
-# # --- Subcampos del 710 ---
-# class EntidadRelacionada710Inline(admin.StackedInline):
-#     """710 2# – Entidad relacionada (R)"""
-#     model = EntidadRelacionada710
-#     autocomplete_fields = ['entidad']
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['entidad', 'funcion']
-#     verbose_name = "Entidad relacionada"
-#     verbose_name_plural = "🏛️ Entidades relacionadas (710 - R)"
-
-
-# # --- Enlaces entre obras ---
-# class EnlaceDocumentoFuente773Inline(admin.StackedInline):
-#     """773 1# – Enlace a documento fuente (R)"""
-#     model = EnlaceDocumentoFuente773
-#     autocomplete_fields = ['encabezamiento_principal']
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['encabezamiento_principal', 'titulo', 'numero_obra_relacionada']
-#     verbose_name = "Documento fuente"
-#     verbose_name_plural = "📘 Documentos fuente (773 - R)"
-
-
-# class EnlaceUnidadConstituyente774Inline(admin.StackedInline):
-#     """774 1# – Enlace a unidad constituyente (R)"""
-#     model = EnlaceUnidadConstituyente774
-#     autocomplete_fields = ['encabezamiento_principal']
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['encabezamiento_principal', 'titulo', 'numero_obra_relacionada']
-#     verbose_name = "Unidad constituyente"
-#     verbose_name_plural = "📚 Unidades constituyentes (774 - R)"
-
-
-# class OtrasRelaciones787Inline(admin.StackedInline):
-#     """787 1# – Otras relaciones (R)"""
-#     model = OtrasRelaciones787
-#     autocomplete_fields = ['encabezamiento_principal']
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['encabezamiento_principal', 'titulo', 'numero_obra_relacionada']
-#     verbose_name = "Otra relación"
-#     verbose_name_plural = "🔗 Otras relaciones (787 - R)"
-
-
-# # ============================================================
-# # 📦 BLOQUE 8XX – ADMIN COMPLETO Y CORREGIDO
-# # ============================================================
-
-# class Estanteria852Inline(admin.TabularInline):
-#     """Subcampo repetible $c – Estantería"""
-#     model = Estanteria852
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['estanteria']
-#     verbose_name = "Estantería ($c)"
-#     verbose_name_plural = "📚 Estanterías ($c)"
-
-
-# class Ubicacion852Inline(admin.StackedInline):
-#     """Bloque 852 ## – Ubicación (R)"""
-#     model = Ubicacion852
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['institucion_persona', 'signatura_original']
-#     inlines = [Estanteria852Inline]  # 👈 Aquí se anidan las estanterías
-#     verbose_name = "Ubicación (852)"
-#     verbose_name_plural = "📍 Ubicaciones (852)"
-#     show_change_link = True
-
-
-# class Disponible856Inline(admin.StackedInline):
-#     """Bloque 856 4# – Disponible (R)"""
-#     model = Disponible856
-#     extra = 1
-#     min_num = 0
-#     max_num = 10
-#     fields = ['url', 'texto_enlace']
-#     verbose_name = "Recurso disponible (856)"
-#     verbose_name_plural = "🌐 Recursos disponibles (856)"
-#     show_change_link = True
-
-
-
-
-# # ================================================
-# # 🎯 ADMIN PRINCIPAL - ObraGeneral
-# # ================================================
-
-# @admin.register(ObraGeneral)
-# class ObraGeneralAdmin(admin.ModelAdmin):
-#     """
-#     Admin principal para ObraGeneral
-#     Integra todos los campos MARC21 en una ficha completa
-#     """
-    
-#     list_display = [
-#         'num_control',
-#         'titulo_principal_corto',
-#         'compositor_display',
-#         'tipo_registro_display',
-#         'fecha_creacion_sistema'
-#     ]
-    
-#     list_filter = [
-#         'tipo_registro',
-#         'nivel_bibliografico',
-#         'fecha_creacion_sistema',
-#     ]
-    
-#     search_fields = [
-#         'num_control',
-#         'titulo_principal',
-#         'compositor__apellidos_nombres'
-#     ]
-    
-#     readonly_fields = [
-#         'num_control',
-#         'estado_registro',
-#         'fecha_hora_ultima_transaccion',
-#         'codigo_informacion',
-#         'clasif_institucion',
-#         'clasif_proyecto',
-#         'clasif_pais',
-#         'clasif_ms_imp',
-#         'clasif_num_control',
-#         'fecha_creacion_sistema',
-#         'fecha_modificacion_sistema',
-#         'signatura_display'
-#     ]
-    
-#     fieldsets = (
-#         ('🔑 CABECERA Y CONTROL', {
-#             'fields': (
-#                 'num_control',
-#                 'tipo_registro',
-#                 'nivel_bibliografico',
-#                 'estado_registro',
-#                 'fecha_hora_ultima_transaccion',
-#                 'codigo_informacion',
-#             ),
-#             'classes': ('collapse',)
-#         }),
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
         
-#         ('🏢 CLASIFICACIoN LOCAL (092)', {
-#             'fields': (
-#                 'centro_catalogador',
-#                 'signatura_display',
-#                 'clasif_institucion',
-#                 'clasif_proyecto',
-#                 'clasif_pais',
-#                 'clasif_ms_imp',
-#                 'clasif_num_control',
-#             ),
-#             'classes': ('collapse',)
-#         }),
-        
-#         ('👤 BLOQUE 1XX - PUNTOS DE ACCESO PRINCIPALES', {
-#             'fields': (
-#                 'compositor',
-#                 'titulo_uniforme',
-#                 'titulo_uniforme_tonalidad',
-#                 'titulo_uniforme_arreglo',
-#                 'titulo_240',
-#                 'titulo_240_tonalidad',
-#                 'titulo_240_arreglo',
-#             ),
-#             'description': (
-#                 '⚠️ REGLA: Si hay compositor (100), use campo 240. '
-#                 'Si NO hay compositor, use campo 130. '
-#                 'Debe haber al menos uno de estos puntos de acceso.'
-#             ),
-#             'classes': ('wide',)
-#         }),
-        
-#         ('📖 BLOQUE 2XX - TiTULOS Y PUBLICACIoN', {
-#             'fields': (
-#                 'titulo_principal',
-#                 'subtitulo',
-#                 'mencion_responsabilidad',
-#             ),
-#             'description': 'Campo 245 - Mencion de titulo (obligatorio)'
-#         }),
-        
-#         ('🎵 BLOQUE 3XX - DESCRIPCIoN FiSICA Y CARACTERiSTICAS', {
-#             'fields': ('tonalidad_384',),
-#             'description': (
-#                 'Campo 384 - Tonalidad (NR). '
-#                 'Resto de campos 3XX se gestionan en inlines.'
-#             ),
-#             'classes': ('wide',)
-#         }),
-        
-#         ('📅 METADATOS DEL SISTEMA', {
-#             'fields': (
-#                 'fecha_creacion_sistema',
-#                 'fecha_modificacion_sistema',
-#             ),
-#             'classes': ('collapse',)
-#         }),
-#     )
+        if hasattr(request, '_obra_to_validate') and request._obra_to_validate:
+            obj = request._obra_to_validate
+            try:
+                obj.clean()
+            except ValidationError as e:
+                if hasattr(e, 'error_dict'):
+                    for field, errors in e.error_dict.items():
+                        for error in errors:
+                            self.message_user(
+                                request,
+                                f"Error en {field}: {error.message}",
+                                level='warning'
+                            )
+                else:
+                    self.message_user(request, f"Error de validación: {str(e)}", level='warning')
+
+
+# ============================================
+# FIELDSETS POR TIPO DE PLANTILLA
+# ============================================
+
+# COLECCIÓN MANUSCRITA (d, c)
+FIELDSETS_COLECCION_MANUSCRITA = (
+    ('📋 Identificación', {
+        'fields': ('num_control', 'tipo_registro', 'nivel_bibliografico', 'tipo_obra_display')
+    }),
+    ('🎵 Punto de Acceso Principal', {
+        'fields': (
+            ('compositor', 'autoria'),
+            ('titulo_uniforme', 'forma_130'),
+            ('medio_interpretacion_130', 'tonalidad_130'),
+            ('numero_parte_130', 'arreglo_130', 'nombre_parte_130'),
+        )
+    }),
+    ('🎼 Título Uniforme con Compositor (240)', {
+        'fields': (
+            ('titulo_240', 'forma_240'),
+            ('medio_interpretacion_240', 'tonalidad_240'),
+            ('numero_parte_240', 'arreglo_240', 'nombre_parte_240'),
+        ),
+        'classes': ('collapse',)
+    }),
+    ('📖 Título y Responsabilidad (245/246/264)', {
+        'fields': (
+            'titulo_principal',
+            'subtitulo',
+            'mencion_responsabilidad',
+        )
+    }),
+    ('📐 Descripción Física (300/340/348)', {
+        'fields': (
+            'extension',
+            'otras_caracteristicas',
+            ('dimension', 'material_acompanante'),
+            ('ms_imp', 'formato'),
+        ),
+        'classes': ('collapse',)
+    }),
+    ('🎹 Medio de Interpretación (382)', {
+        'fields': (
+            ('medio_interpretacion_130', 'solista'),
+        ),
+        'classes': ('collapse',)
+    }),
+    # Los campos 500/505/520/545, 650/655, 700/710 se manejan con inlines
+    ('🏛️ Catalogación (040/092)', {
+        'fields': ('centro_catalogador', 'signatura_completa_display'),
+        'classes': ('collapse',)
+    }),
+    ('📅 Metadatos del Sistema', {
+        'fields': ('fecha_creacion_sistema', 'fecha_modificacion_sistema', 'fecha_hora_ultima_transaccion'),
+        'classes': ('collapse',)
+    }),
+    ('👁️ Vista Previa MARC', {
+        'fields': ('preview_marc',),
+        'classes': ('collapse',)
+    }),
+)
+
+# OBRA INDIVIDUAL EN COLECCIÓN MANUSCRITA (d, a)
+FIELDSETS_OBRA_EN_COLECCION_MANUSCRITA = (
+    ('📋 Identificación', {
+        'fields': ('num_control', 'tipo_registro', 'nivel_bibliografico', 'tipo_obra_display')
+    }),
+    ('🎵 Compositor (100)', {
+        'fields': (
+            ('compositor', 'autoria'),
+        )
+    }),
+    ('🎼 Título Uniforme (240)', {
+        'fields': (
+            ('titulo_240', 'forma_240'),
+            ('medio_interpretacion_240', 'tonalidad_240'),
+            ('numero_parte_240', 'arreglo_240', 'nombre_parte_240'),
+        )
+    }),
+    ('📖 Título y Responsabilidad (245/246/264)', {
+        'fields': (
+            'titulo_principal',
+            'subtitulo',
+            'mencion_responsabilidad',
+        )
+    }),
+    ('📐 Descripción Física (300/340/348)', {
+        'fields': (
+            'extension',
+            'otras_caracteristicas',
+            ('dimension', 'material_acompanante'),
+            ('ms_imp', 'formato'),
+        ),
+        'classes': ('collapse',)
+    }),
+    ('🎹 Medio de Interpretación y Designación (382/383/384)', {
+        'fields': (
+            ('medio_interpretacion_240', 'solista'),
+            ('numero_obra', 'opus'),
+            'tonalidad_384',
+        ),
+        'classes': ('collapse',)
+    }),
+    # Los campos 500/520/545, 650/655, 700/710, 773 se manejan con inlines
+    ('🏛️ Catalogación (040/092)', {
+        'fields': ('centro_catalogador', 'signatura_completa_display'),
+        'classes': ('collapse',)
+    }),
+    ('📅 Metadatos del Sistema', {
+        'fields': ('fecha_creacion_sistema', 'fecha_modificacion_sistema', 'fecha_hora_ultima_transaccion'),
+        'classes': ('collapse',)
+    }),
+    ('👁️ Vista Previa MARC', {
+        'fields': ('preview_marc',),
+        'classes': ('collapse',)
+    }),
+)
+
+# OBRA INDIVIDUAL MANUSCRITA (d, m)
+FIELDSETS_OBRA_MANUSCRITA = (
+    ('📋 Identificación', {
+        'fields': ('num_control', 'tipo_registro', 'nivel_bibliografico', 'tipo_obra_display')
+    }),
+    ('🎵 Compositor (100)', {
+        'fields': (
+            ('compositor', 'autoria'),
+        )
+    }),
+    ('🎼 Título Uniforme (240)', {
+        'fields': (
+            ('titulo_240', 'forma_240'),
+            ('medio_interpretacion_240', 'tonalidad_240'),
+            ('numero_parte_240', 'arreglo_240', 'nombre_parte_240'),
+        )
+    }),
+    ('📖 Título y Responsabilidad (245/246/264)', {
+        'fields': (
+            'titulo_principal',
+            'subtitulo',
+            'mencion_responsabilidad',
+        )
+    }),
+    ('📐 Descripción Física (300/340/348)', {
+        'fields': (
+            'extension',
+            'otras_caracteristicas',
+            ('dimension', 'material_acompanante'),
+            ('ms_imp', 'formato'),
+        ),
+        'classes': ('collapse',)
+    }),
+    ('🎹 Medio de Interpretación y Designación (382/383/384)', {
+        'fields': (
+            ('medio_interpretacion_240', 'solista'),
+            ('numero_obra', 'opus'),
+            'tonalidad_384',
+        ),
+        'classes': ('collapse',)
+    }),
+    # Los campos 500/520/545, 650/655, 700/710, 787 se manejan con inlines
+    ('🏛️ Catalogación (040/092)', {
+        'fields': ('centro_catalogador', 'signatura_completa_display'),
+        'classes': ('collapse',)
+    }),
+    ('📅 Metadatos del Sistema', {
+        'fields': ('fecha_creacion_sistema', 'fecha_modificacion_sistema', 'fecha_hora_ultima_transaccion'),
+        'classes': ('collapse',)
+    }),
+    ('👁️ Vista Previa MARC', {
+        'fields': ('preview_marc',),
+        'classes': ('collapse',)
+    }),
+)
+
+# COLECCIÓN IMPRESA (c, c)
+FIELDSETS_COLECCION_IMPRESA = (
+    ('📋 Identificación', {
+        'fields': ('num_control', 'tipo_registro', 'nivel_bibliografico', 'tipo_obra_display')
+    }),
+    ('🔢 Identificadores (020/024/028)', {
+        'fields': (
+            ('isbn', 'ismn'),
+            ('numero_editor', 'nombre_editor'),
+        )
+    }),
+    ('🎵 Punto de Acceso Principal', {
+        'fields': (
+            ('compositor', 'autoria'),
+            ('titulo_uniforme', 'forma_130'),
+            ('medio_interpretacion_130', 'tonalidad_130'),
+            ('numero_parte_130', 'arreglo_130', 'nombre_parte_130'),
+        )
+    }),
+    ('🎼 Título Uniforme con Compositor (240)', {
+        'fields': (
+            ('titulo_240', 'forma_240'),
+            ('medio_interpretacion_240', 'tonalidad_240'),
+            ('numero_parte_240', 'arreglo_240', 'nombre_parte_240'),
+        ),
+        'classes': ('collapse',)
+    }),
+    ('📖 Título y Responsabilidad (245/246/250/264)', {
+        'fields': (
+            'titulo_principal',
+            'subtitulo',
+            'mencion_responsabilidad',
+        )
+    }),
+    ('📐 Descripción Física (300/340/348)', {
+        'fields': (
+            'extension',
+            'otras_caracteristicas',
+            ('dimension', 'material_acompanante'),
+            ('ms_imp', 'formato'),
+        ),
+        'classes': ('collapse',)
+    }),
+    ('🎹 Medio de Interpretación (382)', {
+        'fields': (
+            ('medio_interpretacion_130', 'solista'),
+        ),
+        'classes': ('collapse',)
+    }),
+    ('📝 Notas y Contenido (500/505/520/545)', {
+        'fields': ('sumario_520',),
+        'classes': ('collapse',)
+    }),
+    ('🏷️ Materias (650/655)', {
+        'fields': (
+            'materia_principal_650',
+            'materia_genero_655',
+        ),
+        'classes': ('collapse',)
+    }),
+    ('🔗 Puntos de Acceso Adicionales (700/710)', {
+        'fields': (
+            ('nombre_relacionado_700a', 'coordenadas_biograficas_700d', 'titulo_relacionado_700t'),
+            'entidad_relacionada_710a',
+        ),
+        'classes': ('collapse',)
+    }),
+    ('🏛️ Catalogación (040/092)', {
+        'fields': ('centro_catalogador', 'signatura_completa_display'),
+        'classes': ('collapse',)
+    }),
+    ('📅 Metadatos del Sistema', {
+        'fields': ('fecha_creacion_sistema', 'fecha_modificacion_sistema', 'fecha_hora_ultima_transaccion'),
+        'classes': ('collapse',)
+    }),
+    ('👁️ Vista Previa MARC', {
+        'fields': ('preview_marc',),
+        'classes': ('collapse',)
+    }),
+)
+
+# OBRA INDIVIDUAL EN COLECCIÓN IMPRESA (c, a)
+FIELDSETS_OBRA_EN_COLECCION_IMPRESA = (
+    ('📋 Identificación', {
+        'fields': ('num_control', 'tipo_registro', 'nivel_bibliografico', 'tipo_obra_display')
+    }),
+    ('🎵 Compositor (100)', {
+        'fields': (
+            ('compositor', 'autoria'),
+        )
+    }),
+    ('🎼 Título Uniforme (240)', {
+        'fields': (
+            ('titulo_240', 'forma_240'),
+            ('medio_interpretacion_240', 'tonalidad_240'),
+            ('numero_parte_240', 'arreglo_240', 'nombre_parte_240'),
+        )
+    }),
+    ('📖 Título y Responsabilidad (245/246/264)', {
+        'fields': (
+            'titulo_principal',
+            'subtitulo',
+            'mencion_responsabilidad',
+        )
+    }),
+    ('📐 Descripción Física (300/340/348)', {
+        'fields': (
+            'extension',
+            'otras_caracteristicas',
+            ('dimension', 'material_acompanante'),
+            ('ms_imp', 'formato'),
+        ),
+        'classes': ('collapse',)
+    }),
+    ('🎹 Medio de Interpretación y Designación (382/383/384)', {
+        'fields': (
+            ('medio_interpretacion_240', 'solista'),
+            ('numero_obra', 'opus'),
+            'tonalidad_384',
+        ),
+        'classes': ('collapse',)
+    }),
+    # Los campos 500/520/545, 650/655, 700/710, 773 se manejan con inlines
+    ('🏛️ Catalogación (040/092)', {
+        'fields': ('centro_catalogador', 'signatura_completa_display'),
+        'classes': ('collapse',)
+    }),
+    ('📅 Metadatos del Sistema', {
+        'fields': ('fecha_creacion_sistema', 'fecha_modificacion_sistema', 'fecha_hora_ultima_transaccion'),
+        'classes': ('collapse',)
+    }),
+    ('👁️ Vista Previa MARC', {
+        'fields': ('preview_marc',),
+        'classes': ('collapse',)
+    }),
+)
+
+# OBRA INDIVIDUAL IMPRESA (c, m)
+FIELDSETS_OBRA_IMPRESA = (
+    ('📋 Identificación', {
+        'fields': ('num_control', 'tipo_registro', 'nivel_bibliografico', 'tipo_obra_display')
+    }),
+    ('🔢 Identificadores (020/024/028)', {
+        'fields': (
+            ('isbn', 'ismn'),
+            ('numero_editor', 'nombre_editor'),
+        )
+    }),
+    ('🎵 Compositor (100)', {
+        'fields': (
+            ('compositor', 'autoria'),
+        )
+    }),
+    ('🎼 Título Uniforme (240)', {
+        'fields': (
+            ('titulo_240', 'forma_240'),
+            ('medio_interpretacion_240', 'tonalidad_240'),
+            ('numero_parte_240', 'arreglo_240', 'nombre_parte_240'),
+        )
+    }),
+    ('📖 Título y Responsabilidad (245/246/250/264)', {
+        'fields': (
+            'titulo_principal',
+            'subtitulo',
+            'mencion_responsabilidad',
+        )
+    }),
+    ('📐 Descripción Física (300/340/348)', {
+        'fields': (
+            'extension',
+            'otras_caracteristicas',
+            ('dimension', 'material_acompanante'),
+            ('ms_imp', 'formato'),
+        ),
+        'classes': ('collapse',)
+    }),
+    ('🎹 Medio de Interpretación y Designación (382/383/384)', {
+        'fields': (
+            ('medio_interpretacion_240', 'solista'),
+            ('numero_obra', 'opus'),
+            'tonalidad_384',
+        ),
+        'classes': ('collapse',)
+    }),
+    # Los campos 500/520/545, 650/655, 700/710, 787 se manejan con inlines
+    ('🏛️ Catalogación (040/092)', {
+        'fields': ('centro_catalogador', 'signatura_completa_display'),
+        'classes': ('collapse',)
+    }),
+    ('📅 Metadatos del Sistema', {
+        'fields': ('fecha_creacion_sistema', 'fecha_modificacion_sistema', 'fecha_hora_ultima_transaccion'),
+        'classes': ('collapse',)
+    }),
+    ('👁️ Vista Previa MARC', {
+        'fields': ('preview_marc',),
+        'classes': ('collapse',)
+    }),
+)
+
+
+# ============================================
+# ADMIN PRINCIPAL
+# ============================================
+
+@admin.register(ObraGeneral)
+class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
+    """Admin que cambia los fieldsets según el tipo de obra"""
     
-#     inlines = [
-#         # Bloque 1XX
-#         FuncionCompositorInline,
-#         AtribucionCompositorInline,
-#         Forma130Inline,
-#         MedioInterpretacion130Inline,
-#         NumeroParteSeccion130Inline,
-#         NombreParteSeccion130Inline,
-#         Forma240Inline,
-#         MedioInterpretacion240Inline,
-#         NumeroParteSeccion240Inline,
-#         NombreParteSeccion240Inline,
-        
-#         # Bloque 2XX
-#         TituloAlternativoInline,
-#         EdicionInline,
-#         ProduccionPublicacionInline,
-        
-#         # Bloque 3XX
-#         DescripcionFisicaInline,
-#         MedioFisicoInline,
-#         CaracteristicaMusicaNotadaInline,
-#         MedioInterpretacion382Inline,
-#         DesignacionNumericaObraInline,
-        
-#         # Bloque 4XX
-#         MencionSerie490Inline,
-#         # Bloque 5XX
-#         NotaGeneral500Inline,
-#         Contenido505Inline,
-#         Sumario520Inline,
-#         DatosBiograficos545Inline,
-#         # Bloque 6XX
-#         Materia650Inline,
-#         MateriaGenero655Inline,
-#         # Bloque 7XX
-#         NombreRelacionado700Inline,
-#         EntidadRelacionada710Inline,
-#         EnlaceDocumentoFuente773Inline,
-#         EnlaceUnidadConstituyente774Inline,
-#         OtrasRelaciones787Inline,
-#         # Bloque 8XX
-#         Ubicacion852Inline,     # 852 completo (con estanterías)
-#         Disponible856Inline,    # 856 URLs
-
-        
-        
-#     ]
-#     list_display = ('titulo_principal', 'nivel_bibliografico')
+    search_fields = [
+        'num_control',
+        'titulo_principal',
+        'subtitulo',
+        'compositor__apellidos_nombres',
+        'titulo_uniforme__titulo',
+    ]
     
-#     # Métodos de visualizacion
-#     def titulo_principal_corto(self, obj):
-#         """Mostrar titulo principal acortado"""
-#         titulo = obj.titulo_principal or '(sin titulo)'
-#         if len(titulo) > 50:
-#             return f"{titulo[:47]}..."
-#         return titulo
-#     titulo_principal_corto.short_description = "Titulo"
+    list_filter = [
+        'tipo_registro',
+        'nivel_bibliografico',
+        'centro_catalogador',
+        'fecha_creacion_sistema',
+    ]
     
-#     def compositor_display(self, obj):
-#         """Mostrar compositor con enlace"""
-#         if obj.compositor:
-#             return format_html(
-#                 '<strong>{}</strong>',
-#                 obj.compositor.apellidos_nombres
-#             )
-#         return format_html('<em>Anonimo</em>')
-#     compositor_display.short_description = "Compositor"
+    list_display = [
+        'num_control_link',
+        'titulo_principal_truncado',
+        'tipo_obra_badge',
+        'punto_acceso_principal',
+        'fecha_creacion_sistema',
+        'ver_marc',
+    ]
     
-#     def tipo_registro_display(self, obj):
-#         """Mostrar tipo de registro con etiqueta"""
-#         tipos = {'c': '📄 Impreso', 'd': '✍️ Manuscrito'}
-#         etiqueta = tipos.get(obj.tipo_registro, 'Desconocido')
-#         color = '#00AA00' if obj.tipo_registro == 'd' else '#0000AA'
-#         return format_html(
-#             '<span style="color: {}; font-weight: bold;">{}</span>',
-#             color,
-#             etiqueta
-#         )
-#     tipo_registro_display.short_description = "Tipo"
+    ordering = ['-fecha_creacion_sistema']
     
-#     def signatura_display(self, obj):
-#         """Mostrar signatura completa"""
-#         return format_html(
-#             '<code style="background: #f0f0f0; padding: 5px; border-radius: 3px;">{}</code>',
-#             obj.get_signatura_completa()
-#         )
-#     signatura_display.short_description = "Signatura Completa"
+    readonly_fields = [
+        'num_control',
+        'estado_registro',
+        'codigo_informacion',
+        'fecha_hora_ultima_transaccion',
+        'fecha_creacion_sistema',
+        'fecha_modificacion_sistema',
+        'tipo_obra_display',
+        'signatura_completa_display',
+        'preview_marc',
+    ]
     
-#     # Acciones personalizadas
-#     actions = ['generar_clasificacion_accion']
+    actions = ['exportar_marc', 'duplicar_obras']
     
-#     def generar_clasificacion_accion(self, request, queryset):
-#         """Accion para regenerar clasificacion 092"""
-#         updated = 0
-#         for obra in queryset:
-#             obra.generar_clasificacion_092()
-#             obra.save()
-#             updated += 1
+    # Inlines para campos repetibles (organizados por bloque MARC)
+    inlines = [
+        # Modelos Auxiliares - Lenguas
+        ObraLenguaInline,
+        # Bloque 0xx - Íncipits
+        IncipitMusicalInline,
+        # Bloque 1xx - Compositor
+        FuncionCompositorInline,
+        # Bloque 2xx - Títulos y Publicación
+        TituloAlternativoInline,
+        EdicionInline,
+        ProduccionPublicacionInline,
+        # Bloque 3xx - Medio de Interpretación
+        MedioInterpretacion382Inline,
+        # Bloque 4xx - Series
+        MencionSerie490Inline,
+        # Bloque 5xx - Notas
+        NotaGeneral500Inline,
+        Contenido505Inline,
+        Sumario520Inline,
+        DatosBiograficos545Inline,
+        # Bloque 6xx - Materias
+        Materia650Inline,
+        MateriaGenero655Inline,
+        # Bloque 7xx - Puntos de Acceso Adicionales
+        NombreRelacionado700Inline,
+        EntidadRelacionada710Inline,
+        EnlaceDocumentoFuente773Inline,
+        EnlaceUnidadConstituyente774Inline,
+        OtrasRelaciones787Inline,
+        # Bloque 8xx - Ubicación
+        Ubicacion852Inline,
+        Disponible856Inline,
+    ]
+    
+    # Métodos para cambiar fieldsets dinámicamente
+    
+    def get_fieldsets(self, request, obj=None):
+        """Retorna los fieldsets según el tipo de obra"""
+        if obj is None:
+            # Para crear nueva obra, mostrar campos básicos
+            return (
+                ('📋 Crear Nueva Obra', {
+                    'fields': ('tipo_registro', 'nivel_bibliografico')
+                }),
+            )
         
-#         self.message_user(
-#             request,
-#             f'{updated} obra(s) clasificada(s) correctamente.'
-#         )
-#     generar_clasificacion_accion.short_description = "♻️ Regenerar clasificacion (092)"
-    
-#     # Métodos de validacion
-#     def save_model(self, request, obj, form, change):
-#         """Guardar modelo con validaciones"""
-#         try:
-#             obj.full_clean()
-#         except Exception as e:
-#             from django.contrib.admin import display
-#             self.message_user(request, f'⚠️ {str(e)}', level='ERROR')
-#             return
+        # Determinar tipo de obra
+        tipo = (obj.tipo_registro, obj.nivel_bibliografico)
         
-#         super().save_model(request, obj, form, change)
-#         self.message_user(request, '✅ Obra guardada correctamente.')
+        fieldsets_map = {
+            ('d', 'c'): FIELDSETS_COLECCION_MANUSCRITA,
+            ('d', 'a'): FIELDSETS_OBRA_EN_COLECCION_MANUSCRITA,
+            ('d', 'm'): FIELDSETS_OBRA_MANUSCRITA,
+            ('c', 'c'): FIELDSETS_COLECCION_IMPRESA,
+            ('c', 'a'): FIELDSETS_OBRA_EN_COLECCION_IMPRESA,
+            ('c', 'm'): FIELDSETS_OBRA_IMPRESA,
+        }
+        
+        return fieldsets_map.get(tipo, FIELDSETS_OBRA_MANUSCRITA)
+    
+    def get_readonly_fields(self, request, obj=None):
+        """Campos de solo lectura según si es creación o edición"""
+        if obj is None:
+            # En creación, permitir seleccionar tipo y nivel
+            return []
+        
+        # En edición, todo readonly excepto los campos editables
+        return self.readonly_fields + ['tipo_registro', 'nivel_bibliografico']
+    
+    def get_form(self, request, obj=None, **kwargs):
+        """Personalizar el formulario según si es creación o edición"""
+        form = super().get_form(request, obj, **kwargs)
+        
+        if obj is None:
+            # En creación, hacer campos opcionales temporalmente
+            for field_name in ['titulo_principal', 'compositor', 'titulo_uniforme']:
+                if field_name in form.base_fields:
+                    form.base_fields[field_name].required = False
+        
+        return form
+    
+    # Métodos de visualización
+    
+    def num_control_link(self, obj):
+        url = reverse('admin:catalogacion_obrageneral_change', args=[obj.pk])
+        return format_html('<a href="{}">{}</a>', url, obj.num_control)
+    num_control_link.short_description = 'N° Control'
+    num_control_link.admin_order_field = 'num_control'
+    
+    def titulo_principal_truncado(self, obj):
+        if len(obj.titulo_principal) > 50:
+            return obj.titulo_principal[:50] + '...'
+        return obj.titulo_principal
+    titulo_principal_truncado.short_description = 'Título'
+    titulo_principal_truncado.admin_order_field = 'titulo_principal'
+    
+    def tipo_obra_badge(self, obj):
+        colors = {
+            'CM': '#8B4513',
+            'OICM': '#A0522D',
+            'OIM': '#CD853F',
+            'CI': '#4169E1',
+            'OICI': '#4682B4',
+            'OII': '#5F9EA0',
+        }
+        color = colors.get(obj.tipo_obra, '#999')
+        return format_html(
+            '<span style="background-color: {}; color: white; '
+            'padding: 3px 10px; border-radius: 3px; font-size: 0.85em;">{}</span>',
+            color,
+            obj.tipo_obra_descripcion
+        )
+    tipo_obra_badge.short_description = 'Tipo'
+    
+    def punto_acceso_principal(self, obj):
+        if obj.compositor:
+            return f"👤 {obj.compositor}"
+        if obj.titulo_uniforme:
+            return f"📚 {obj.titulo_uniforme}"
+        return "⚠️ Sin definir"
+    punto_acceso_principal.short_description = 'Punto de Acceso'
+    
+    def ver_marc(self, obj):
+        return format_html(
+            '<a class="button" href="{}#marc-preview">Ver MARC</a>',
+            reverse('admin:catalogacion_obrageneral_change', args=[obj.pk])
+        )
+    ver_marc.short_description = 'MARC'
+    
+    def tipo_obra_display(self, obj):
+        if obj.pk:
+            return f"{obj.tipo_obra} - {obj.tipo_obra_descripcion}"
+        return "Se asignará al guardar"
+    tipo_obra_display.short_description = 'Tipo de Obra'
+    
+    def signatura_completa_display(self, obj):
+        if obj.pk:
+            return obj.signatura_completa
+        return "Se generará al guardar"
+    signatura_completa_display.short_description = 'Signatura (092)'
+    
+    def preview_marc(self, obj):
+        if not obj.pk:
+            return "Guarde la obra para ver el registro MARC"
+        
+        formatter = MARCFormatter(obj)
+        marc_text = formatter.format_full_record()
+        
+        return format_html(
+            '<pre id="marc-preview" style="background-color: #f5f5f5; padding: 15px; '
+            'border: 1px solid #ddd; border-radius: 4px; '
+            'font-family: monospace; font-size: 0.9em;">{}</pre>',
+            marc_text
+        )
+    preview_marc.short_description = 'Registro MARC Completo'
+    
+    # Acciones
+    
+    def exportar_marc(self, request, queryset):
+        from django.http import HttpResponse
+        
+        response = HttpResponse(content_type='text/plain; charset=utf-8')
+        response['Content-Disposition'] = 'attachment; filename="obras_marc.txt"'
+        
+        for obra in queryset:
+            formatter = MARCFormatter(obra)
+            response.write(formatter.format_full_record())
+            response.write("\n\n" + "="*80 + "\n\n")
+        
+        self.message_user(request, f"{queryset.count()} obras exportadas correctamente.")
+        return response
+    exportar_marc.short_description = "📥 Exportar como MARC21"
+    
+    def duplicar_obras(self, request, queryset):
+        contador = 0
+        for obra in queryset:
+            obra.pk = None
+            obra.num_control = None
+            obra.save()
+            contador += 1
+        
+        self.message_user(request, f"✅ {contador} obra(s) duplicada(s) correctamente.")
+    duplicar_obras.short_description = "📋 Duplicar obras"
+    
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        
+        total = ObraGeneral.objects.count()
+        manuscritas = ObraGeneral.objects.manuscritas().count()
+        impresas = ObraGeneral.objects.impresas().count()
+        colecciones = ObraGeneral.objects.colecciones().count()
+        
+        extra_context['stats'] = {
+            'total': total,
+            'manuscritas': manuscritas,
+            'impresas': impresas,
+            'colecciones': colecciones,
+        }
+        
+        return super().changelist_view(request, extra_context)
 
 
-# # ================================================
-# # REGISTROS DE MODELOS AUXILIARES
-# # ================================================
-
-# @admin.register(AutoridadPersona)
-# class AutoridadPersonaAdmin(admin.ModelAdmin):
-#     """Admin para autoridades de personas"""
-#     list_display = ['apellidos_nombres', 'fechas']
-#     search_fields = ['apellidos_nombres']
-#     list_filter = ['fechas']
-
-
-# @admin.register(AutoridadTituloUniforme)
-# class AutoridadTituloUniformeAdmin(admin.ModelAdmin):
-#     """Admin para titulos uniformes"""
-#     list_display = ['titulo']
-#     search_fields = ['titulo']
+@admin.register(NumeroControlSecuencia)
+class NumeroControlSecuenciaAdmin(admin.ModelAdmin):
+    list_display = ['tipo_registro_display', 'ultimo_numero', 'fecha_actualizacion']
+    readonly_fields = ['tipo_registro', 'ultimo_numero', 'fecha_actualizacion']
+    
+    def tipo_registro_display(self, obj):
+        return obj.get_tipo_registro_display()
+    tipo_registro_display.short_description = 'Tipo de Registro'
+    
+    def has_add_permission(self, request):
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
-# @admin.register(AutoridadFormaMusical)
-# class AutoridadFormaMusicalAdmin(admin.ModelAdmin):
-#     """Admin para formas musicales"""
-#     list_display = ['forma']
-#     search_fields = ['forma']
+# ============================================
+# ADMIN PARA MODELOS ANIDADOS (CON SUBCAMPOS REPETIBLES)
+# ============================================
 
-# @admin.register(AutoridadEntidad)
-# class AutoridadEntidadAdmin(admin.ModelAdmin):
-#     search_fields = ['nombre', 'pais', 'descripcion']
-#     list_display = ['nombre', 'pais']
+@admin.register(ProduccionPublicacion)
+class ProduccionPublicacionAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'funcion', 'obra']
+    list_filter = ['funcion']
+    inlines = [Lugar264Inline, Entidad264Inline, Fecha264Inline]
+    
+    def has_module_permission(self, request):
+        return False  # Ocultar del menú principal
+
+
+@admin.register(MedioInterpretacion382)
+class MedioInterpretacion382Admin(admin.ModelAdmin):
+    list_display = ['__str__', 'obra']
+    inlines = [MedioInterpretacion382_aInline]
+    
+    def has_module_permission(self, request):
+        return False  # Ocultar del menú principal
+
+
+@admin.register(MencionSerie490)
+class MencionSerie490Admin(admin.ModelAdmin):
+    list_display = ['__str__', 'relacion', 'obra']
+    list_filter = ['relacion']
+    inlines = [TituloSerie490Inline, VolumenSerie490Inline]
+    
+    def has_module_permission(self, request):
+        return False  # Ocultar del menú principal
+
+
+@admin.register(Materia650)
+class Materia650Admin(admin.ModelAdmin):
+    list_display = ['materia', 'obra']
+    search_fields = ['materia']
+    inlines = [SubdivisionMateria650Inline]
+    
+    def has_module_permission(self, request):
+        return False  # Ocultar del menú principal
+
+
+@admin.register(MateriaGenero655)
+class MateriaGenero655Admin(admin.ModelAdmin):
+    list_display = ['materia', 'obra']
+    search_fields = ['materia']
+    inlines = [SubdivisionGeneral655Inline]
+    
+    def has_module_permission(self, request):
+        return False  # Ocultar del menú principal
+
+
+@admin.register(NombreRelacionado700)
+class NombreRelacionado700Admin(admin.ModelAdmin):
+    list_display = ['persona', 'titulo_obra', 'obra']
+    search_fields = ['persona__apellidos_nombres', 'titulo_obra']
+    inlines = [TerminoAsociado700Inline, Funcion700Inline, Relacion700Inline, Autoria700Inline]
+    
+    def has_module_permission(self, request):
+        return False  # Ocultar del menú principal
+
+
+@admin.register(Ubicacion852)
+class Ubicacion852Admin(admin.ModelAdmin):
+    list_display = ['institucion_persona', 'signatura_original', 'obra']
+    search_fields = ['institucion_persona', 'signatura_original']
+    inlines = [Estanteria852Inline]
+    
+    def has_module_permission(self, request):
+        return False  # Ocultar del menú principal
+
+
+# ============================================
+# ADMIN PARA AUTORIDADES
+# ============================================
+
+@admin.register(AutoridadPersona)
+class AutoridadPersonaAdmin(admin.ModelAdmin):
+    list_display = ['apellidos_nombres', 'fechas', 'fecha_modificacion']
+    search_fields = ['apellidos_nombres', 'fechas']
+    readonly_fields = ['fecha_creacion', 'fecha_modificacion']
+    ordering = ['apellidos_nombres']
+    
+    fieldsets = (
+        ('Información de la Persona', {
+            'fields': ('apellidos_nombres', 'fechas')
+        }),
+        ('Metadatos', {
+            'fields': ('fecha_creacion', 'fecha_modificacion'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(AutoridadTituloUniforme)
+class AutoridadTituloUniformeAdmin(admin.ModelAdmin):
+    list_display = ['titulo', 'fecha_modificacion']
+    search_fields = ['titulo']
+    readonly_fields = ['fecha_creacion', 'fecha_modificacion']
+    ordering = ['titulo']
+    
+    fieldsets = (
+        ('Información del Título', {
+            'fields': ('titulo',)
+        }),
+        ('Metadatos', {
+            'fields': ('fecha_creacion', 'fecha_modificacion'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(AutoridadFormaMusical)
+class AutoridadFormaMusicalAdmin(admin.ModelAdmin):
+    list_display = ['forma', 'fecha_modificacion']
+    search_fields = ['forma']
+    readonly_fields = ['fecha_creacion', 'fecha_modificacion']
+    ordering = ['forma']
+    
+    fieldsets = (
+        ('Información de la Forma Musical', {
+            'fields': ('forma',)
+        }),
+        ('Metadatos', {
+            'fields': ('fecha_creacion', 'fecha_modificacion'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(AutoridadEntidad)
+class AutoridadEntidadAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'pais', 'fecha_modificacion']
+    search_fields = ['nombre', 'pais']
+    readonly_fields = ['fecha_creacion', 'fecha_modificacion']
+    ordering = ['nombre']
+    
+    fieldsets = (
+        ('Información de la Entidad', {
+            'fields': ('nombre', 'pais', 'descripcion')
+        }),
+        ('Metadatos', {
+            'fields': ('fecha_creacion', 'fecha_modificacion'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(AutoridadMateria)
+class AutoridadMateriaAdmin(admin.ModelAdmin):
+    list_display = ['termino', 'fecha_modificacion']
+    search_fields = ['termino']
+    readonly_fields = ['fecha_creacion', 'fecha_modificacion']
+    ordering = ['termino']
+    
+    fieldsets = (
+        ('Información de la Materia', {
+            'fields': ('termino',)
+        }),
+        ('Metadatos', {
+            'fields': ('fecha_creacion', 'fecha_modificacion'),
+            'classes': ('collapse',)
+        }),
+    )
