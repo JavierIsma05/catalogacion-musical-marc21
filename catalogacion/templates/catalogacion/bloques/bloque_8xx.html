@@ -9,94 +9,95 @@
         </div>
         <div class="card-body">
             {# Campo 852 - Ubicación Física (campos base) #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">852</span>
-                    Ubicación Física
+            <div class="mb-3 pb-3 border-bottom">
+                <h6 class="fw-bold mb-2">
+                    <span class="badge bg-primary me-1">852</span> Ubicación Física
                 </h6>
-                <p class="small text-muted mb-3">
+                <p class="small text-muted mb-2">
                     Institución y signatura original (campos base en ObraGeneral).
                 </p>
                 
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <label for="{{ form.institucion_persona_852a.id_for_label }}" class="form-label">
-                            {{ form.institucion_persona_852a.label }}
+                <div class="row align-items-center mb-2">
+                    <div class="col-3">
+                        <label for="{{ form.institucion_persona_852a.id_for_label }}" class="form-label mb-0 small">
+                            {{ form.institucion_persona_852a.label }}:
                         </label>
+                    </div>
+                    <div class="col-9">
                         {{ form.institucion_persona_852a }}
                         {% if form.institucion_persona_852a.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.institucion_persona_852a.errors }}
-                            </div>
+                            <div class="invalid-feedback d-block">{{ form.institucion_persona_852a.errors }}</div>
                         {% endif %}
                     </div>
-                    
-                    <div class="col-12 mb-3">
-                        <label for="{{ form.signatura_original_852h.id_for_label }}" class="form-label">
-                            {{ form.signatura_original_852h.label }}
+                </div>
+                
+                <div class="row align-items-center mb-2">
+                    <div class="col-3">
+                        <label for="{{ form.signatura_original_852h.id_for_label }}" class="form-label mb-0 small">
+                            {{ form.signatura_original_852h.label }}:
                         </label>
+                    </div>
+                    <div class="col-9">
                         {{ form.signatura_original_852h }}
                         {% if form.signatura_original_852h.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.signatura_original_852h.errors }}
-                            </div>
+                            <div class="invalid-feedback d-block">{{ form.signatura_original_852h.errors }}</div>
                         {% endif %}
                     </div>
                 </div>
             </div>
             
             {# Campo 852 - Ubicaciones Adicionales (Repetible) #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">852</span>
-                    Ubicaciones Adicionales
-                    <span class="badge bg-secondary">R</span>
-                </h6>
-                <p class="small text-muted mb-3">
+            <div class="mb-3 pb-3 border-bottom">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0">
+                        <span class="badge bg-primary me-1">852</span> Ubicaciones Adicionales <span class="badge bg-secondary ms-1">R</span>
+                    </h6>
+                </div>
+                <p class="small text-muted mb-2">
                     Ubicaciones adicionales con información de estantería ($c).
                 </p>
                 {% include 'catalogacion/includes/formset_template.html' with formset=ubicaciones_852 titulo="Ubicación" %}
                 
                 {# Subcampo repetible: Estantería 852 $c #}
-                <div class="ms-4 mt-3 p-3 border-start border-3 border-info bg-white rounded">
-                    <h6 class="mb-3">
-                        <span class="badge bg-secondary me-2">852$c</span>
-                        Estantería
-                        <span class="badge bg-secondary">R</span>
-                    </h6>
+                <div class="ms-3 mt-2 ps-3 border-start border-2 border-secondary">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0 small">
+                            <span class="badge bg-secondary me-1">852$c</span> Estantería <span class="badge bg-secondary ms-1">R</span>
+                        </h6>
+                    </div>
                     {% include 'catalogacion/includes/formset_template.html' with formset=estanterias_852 titulo="Estantería" %}
                 </div>
             </div>
             
             {# Campo 856 - Ubicación y Acceso Electrónico (Repetible) #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">856</span>
-                    Ubicación Electrónica
-                    <span class="badge bg-secondary">R</span>
-                </h6>
-                <p class="small text-muted mb-3">
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0">
+                        <span class="badge bg-primary me-1">856</span> Ubicación Electrónica <span class="badge bg-secondary ms-1">R</span>
+                    </h6>
+                </div>
+                <p class="small text-muted mb-2">
                     Información sobre ubicación y acceso a recursos electrónicos.
                 </p>
                 {% include 'catalogacion/includes/formset_template.html' with formset=disponibles_856 titulo="Recurso Electrónico" %}
                 
                 {# Subcampo repetible: URL 856 $u #}
-                <div class="ms-4 mt-3 p-3 border-start border-3 border-primary bg-white rounded">
-                    <h6 class="mb-3">
-                        <span class="badge bg-secondary me-2">856$u</span>
-                        URL
-                        <span class="badge bg-secondary">R</span>
-                    </h6>
+                <div class="ms-3 mt-2 ps-3 border-start border-2 border-info">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0 small">
+                            <span class="badge bg-secondary me-1">856$u</span> URL <span class="badge bg-secondary ms-1">R</span>
+                        </h6>
+                    </div>
                     {% include 'catalogacion/includes/formset_template.html' with formset=urls_856 titulo="URL" %}
                 </div>
                 
                 {# Subcampo repetible: Texto del enlace 856 $y #}
-                <div class="ms-4 mt-3 p-3 border-start border-3 border-success bg-white rounded">
-                    <h6 class="mb-3">
-                        <span class="badge bg-secondary me-2">856$y</span>
-                        Texto del Enlace
-                        <span class="badge bg-secondary">R</span>
-                    </h6>
+                <div class="ms-3 mt-2 ps-3 border-start border-2 border-success">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0 small">
+                            <span class="badge bg-secondary me-1">856$y</span> Texto del Enlace <span class="badge bg-secondary ms-1">R</span>
+                        </h6>
+                    </div>
                     {% include 'catalogacion/includes/formset_template.html' with formset=textos_enlace_856 titulo="Texto del Enlace" %}
                 </div>
             </div>

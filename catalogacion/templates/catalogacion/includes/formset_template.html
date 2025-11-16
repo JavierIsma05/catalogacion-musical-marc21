@@ -3,53 +3,45 @@ Template reutilizable para renderizar formsets con botón de agregar/eliminar
 Uso: {% include 'catalogacion/includes/formset_template.html' with formset=personas_700 titulo="Campo 700 - Personas Relacionadas" %}
 {% endcomment %}
 
-<div class="formset-container mb-3" data-formset-prefix="{{ formset.prefix }}">
+<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
     {{ formset.management_form }}
     
     <div class="formset-forms">
         {% for form in formset %}
-        <div class="formset-row mb-3 {% if form.instance.pk %}existing-form{% else %}empty-form{% endif %}">
+        <div class="formset-row mb-2 {% if form.instance.pk %}existing-form{% else %}empty-form{% endif %}">
             {% if form.instance.pk %}
-                <!-- Formulario existente -->
                 <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
             {% endif %}
             
-            <!-- Checkbox de eliminación (oculto) -->
             {% if formset.can_delete %}
                 <div class="d-none">
                     {{ form.DELETE }}
                 </div>
             {% endif %}
             
-            <!-- Campos del formulario con botón eliminar -->
-            <div class="border rounded p-3 position-relative">
-                <!-- Botón eliminar (solo icono) -->
-                {% if formset.can_delete %}
-                <button type="button" class="btn btn-sm btn-outline-danger delete-row-btn position-absolute top-0 end-0 m-2" title="Eliminar">
-                    <i class="bi bi-trash"></i>
-                </button>
-                {% endif %}
-                
-                <!-- Campos cada uno en su fila completa -->
+            <div class="border rounded p-2 bg-light">
                 {% for field in form.visible_fields %}
                     {% if field.name != 'DELETE' %}
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <label for="{{ field.id_for_label }}" class="form-label">
-                                {{ field.label }}
-                                {% if field.field.required %}
-                                    <span class="text-danger">*</span>
-                                {% endif %}
+                    <div class="row align-items-center mb-2">
+                        <div class="col-3">
+                            <label for="{{ field.id_for_label }}" class="form-label mb-0 small">
+                                {{ field.label }}{% if field.field.required %}<span class="text-danger">*</span>{% endif %}:
                             </label>
-                            {{ field }}
-                            {% if field.help_text %}
-                                <small class="form-text text-muted">{{ field.help_text }}</small>
-                            {% endif %}
-                            {% if field.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ field.errors }}
+                        </div>
+                        <div class="col-9">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="flex-grow-1">
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">{{ field.errors }}</div>
+                                    {% endif %}
                                 </div>
-                            {% endif %}
+                                {% if forloop.last and formset.can_delete %}
+                                <button type="button" class="btn btn-sm btn-outline-danger delete-row-btn flex-shrink-0" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     {% endif %}
@@ -59,9 +51,8 @@ Uso: {% include 'catalogacion/includes/formset_template.html' with formset=perso
         {% endfor %}
     </div>
     
-    <!-- Botón agregar (solo icono) -->
-    <button type="button" class="btn btn-sm btn-success add-form-row" title="Agregar {{ titulo|default:'Campo' }}">
-        <i class="bi bi-plus-circle"></i>
+    <button type="button" class="btn btn-sm btn-success add-form-row mt-2" title="Agregar {{ titulo|default:'Campo' }}">
+        <i class="bi bi-plus-circle"></i> Agregar
     </button>
 </div>
 

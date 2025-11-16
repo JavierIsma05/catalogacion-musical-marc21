@@ -9,12 +9,12 @@
         </div>
         <div class="card-body">
             {# Campo 490 - Mención de Serie (Repetible) #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">490</span>
-                    Mención de Serie
-                    <span class="badge bg-secondary">R</span>
-                </h6>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0">
+                        <span class="badge bg-primary me-1">490</span> Mención de Serie <span class="badge bg-secondary ms-1">R</span>
+                    </h6>
+                </div>
                 {% include 'catalogacion/includes/formset_template.html' with formset=menciones_serie titulo="Serie" %}
             </div>
         </div>

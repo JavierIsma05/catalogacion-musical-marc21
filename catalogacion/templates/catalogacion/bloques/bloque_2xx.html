@@ -10,66 +10,75 @@
         <div class="card-body">
             
             {# Campo 245 - Título principal #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">245</span>
-                    Título Principal
+            <div class="mb-3 pb-3 border-bottom">
+                <h6 class="fw-bold mb-2">
+                    <span class="badge bg-primary me-1">245</span> Título Principal <span class="text-danger">*</span>
                 </h6>
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <label for="{{ form.titulo_principal.id_for_label }}" class="form-label campo-requerido">
-                            {{ form.titulo_principal.label }}
-                            <span class="text-danger">*</span>
+                <div class="row align-items-center mb-2">
+                    <div class="col-3">
+                        <label for="{{ form.titulo_principal.id_for_label }}" class="form-label mb-0 small">
+                            {{ form.titulo_principal.label }}:
                         </label>
+                    </div>
+                    <div class="col-9">
                         {{ form.titulo_principal }}
                         {% if form.titulo_principal.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.titulo_principal.errors }}
-                            </div>
+                            <div class="invalid-feedback d-block">{{ form.titulo_principal.errors }}</div>
                         {% endif %}
                     </div>
-                    
-                    <div class="col-12 mb-3">
-                        <label for="{{ form.subtitulo.id_for_label }}" class="form-label">
-                            {{ form.subtitulo.label }}
+                </div>
+                
+                <div class="row align-items-center mb-2">
+                    <div class="col-3">
+                        <label for="{{ form.subtitulo.id_for_label }}" class="form-label mb-0 small">
+                            {{ form.subtitulo.label }}:
                         </label>
+                    </div>
+                    <div class="col-9">
                         {{ form.subtitulo }}
                     </div>
-                    
-                    <div class="col-12 mb-3">
-                        <label for="{{ form.mencion_responsabilidad.id_for_label }}" class="form-label">
-                            {{ form.mencion_responsabilidad.label }}
+                </div>
+                
+                <div class="row align-items-center mb-2">
+                    <div class="col-3">
+                        <label for="{{ form.mencion_responsabilidad.id_for_label }}" class="form-label mb-0 small">
+                            {{ form.mencion_responsabilidad.label }}:
                         </label>
+                    </div>
+                    <div class="col-9">
                         {{ form.mencion_responsabilidad }}
                     </div>
                 </div>
             </div>
             
             {# Campo 246 - Títulos alternativos (Repetible) #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">246</span>
-                    Títulos Alternativos <span class="badge bg-secondary">R</span>
-                </h6>
+            <div class="mb-3 pb-3 border-bottom">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0">
+                        <span class="badge bg-primary me-1">246</span> Títulos Alternativos <span class="badge bg-secondary ms-1">R</span>
+                    </h6>
+                </div>
                 {% include 'catalogacion/includes/formset_template.html' with formset=titulos_alternativos titulo="Título Alternativo" %}
             </div>
             
             {# Campo 250 - Edición (Repetible) #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">250</span>
-                    Edición <span class="badge bg-secondary">R</span>
-                </h6>
+            <div class="mb-3 pb-3 border-bottom">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0">
+                        <span class="badge bg-primary me-1">250</span> Edición <span class="badge bg-secondary ms-1">R</span>
+                    </h6>
+                </div>
                 {% include 'catalogacion/includes/formset_template.html' with formset=ediciones titulo="Edición" %}
             </div>
             
             {# Campo 264 - Producción/Publicación (Repetible) #}
-            <div class="mb-4">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">264</span>
-                    Producción/Publicación <span class="badge bg-secondary">R</span>
-                </h6>
-                <p class="small text-muted mb-3">
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0">
+                        <span class="badge bg-primary me-1">264</span> Producción/Publicación <span class="badge bg-secondary ms-1">R</span>
+                    </h6>
+                </div>
+                <p class="small text-muted mb-2">
                     Información del editor, lugar y fecha de publicación.
                 </p>
                 {% include 'catalogacion/includes/formset_template.html' with formset=produccion_publicacion titulo="Producción/Publicación" %}

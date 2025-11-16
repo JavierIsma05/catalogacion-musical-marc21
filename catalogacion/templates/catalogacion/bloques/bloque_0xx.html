@@ -10,16 +10,14 @@
         <div class="card-body">
             
             {# Campo 020 - ISBN #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">020</span>
-                    ISBN
-                </h6>
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <label for="{{ form.isbn.id_for_label }}" class="form-label">
-                            {{ form.isbn.label }}
+            <div class="mb-3 pb-3 border-bottom">
+                <div class="row align-items-center mb-2">
+                    <div class="col-3">
+                        <label for="{{ form.isbn.id_for_label }}" class="form-label mb-0 fw-bold">
+                            <span class="badge bg-primary me-1">020</span> ISBN:
                         </label>
+                    </div>
+                    <div class="col-9">
                         {{ form.isbn }}
                         {% if form.isbn.errors %}
                             <div class="invalid-feedback d-block">{{ form.isbn.errors }}</div>
@@ -29,16 +27,14 @@
             </div>
             
             {# Campo 024 - ISMN #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">024</span>
-                    ISMN
-                </h6>
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <label for="{{ form.ismn.id_for_label }}" class="form-label">
-                            {{ form.ismn.label }}
+            <div class="mb-3 pb-3 border-bottom">
+                <div class="row align-items-center mb-2">
+                    <div class="col-3">
+                        <label for="{{ form.ismn.id_for_label }}" class="form-label mb-0 fw-bold">
+                            <span class="badge bg-primary me-1">024</span> ISMN:
                         </label>
+                    </div>
+                    <div class="col-9">
                         {{ form.ismn }}
                         {% if form.ismn.errors %}
                             <div class="invalid-feedback d-block">{{ form.ismn.errors }}</div>
@@ -48,75 +44,85 @@
             </div>
             
             {# Campo 028 - Número de editor #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">028</span>
-                    Número de Editor
+            <div class="mb-3 pb-3 border-bottom">
+                <h6 class="fw-bold mb-2">
+                    <span class="badge bg-primary me-1">028</span> Número de Editor
                 </h6>
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <label for="{{ form.tipo_numero_028.id_for_label }}" class="form-label">
-                            {{ form.tipo_numero_028.label }}
+                <div class="row align-items-center mb-2">
+                    <div class="col-3">
+                        <label for="{{ form.tipo_numero_028.id_for_label }}" class="form-label mb-0 small">
+                            {{ form.tipo_numero_028.label }}:
                         </label>
+                    </div>
+                    <div class="col-9">
                         {{ form.tipo_numero_028 }}
                     </div>
-                    
-                    <div class="col-12 mb-3">
-                        <label for="{{ form.numero_editor.id_for_label }}" class="form-label">
-                            {{ form.numero_editor.label }}
+                </div>
+                
+                <div class="row align-items-center mb-2">
+                    <div class="col-3">
+                        <label for="{{ form.numero_editor.id_for_label }}" class="form-label mb-0 small">
+                            {{ form.numero_editor.label }}:
                         </label>
+                    </div>
+                    <div class="col-9">
                         {{ form.numero_editor }}
                     </div>
-                    
-                    <div class="col-12 mb-3">
-                        <label for="{{ form.nombre_editor.id_for_label }}" class="form-label">
-                            {{ form.nombre_editor.label }}
+                </div>
+                
+                <div class="row align-items-center mb-2">
+                    <div class="col-3">
+                        <label for="{{ form.nombre_editor.id_for_label }}" class="form-label mb-0 small">
+                            {{ form.nombre_editor.label }}:
                         </label>
+                    </div>
+                    <div class="col-9">
                         {{ form.nombre_editor }}
                     </div>
                 </div>
             </div>
             
             {# Campo 031 - Íncipit musical (Repetible) #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">031</span>
-                    Íncipit Musical <span class="badge bg-secondary">R</span>
-                </h6>
+            <div class="mb-3 pb-3 border-bottom">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0">
+                        <span class="badge bg-primary me-1">031</span> Íncipit Musical <span class="badge bg-secondary ms-1">R</span>
+                    </h6>
+                </div>
                 {% include 'catalogacion/includes/formset_template.html' with formset=incipits_musicales titulo="Íncipit" %}
             </div>
             
             {# Campo 040 - Fuente de catalogación #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">040</span>
-                    Fuente de Catalogación
-                </h6>
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <label for="{{ form.centro_catalogador.id_for_label }}" class="form-label">
-                            {{ form.centro_catalogador.label }}
+            <div class="mb-3 pb-3 border-bottom">
+                <div class="row align-items-center mb-2">
+                    <div class="col-3">
+                        <label for="{{ form.centro_catalogador.id_for_label }}" class="form-label mb-0 fw-bold">
+                            <span class="badge bg-primary me-1">040</span> Fuente de Catalogación:
                         </label>
+                    </div>
+                    <div class="col-9">
                         {{ form.centro_catalogador }}
                     </div>
                 </div>
             </div>
             
             {# Campo 041 - Código de idioma (Repetible) #}
-            <div class="mb-4 pb-3 border-bottom">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">041</span>
-                    Código de Idioma <span class="badge bg-secondary">R</span>
-                </h6>
+            <div class="mb-3 pb-3 border-bottom">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0">
+                        <span class="badge bg-primary me-1">041</span> Código de Idioma <span class="badge bg-secondary ms-1">R</span>
+                    </h6>
+                </div>
                 {% include 'catalogacion/includes/formset_template.html' with formset=codigos_lengua titulo="Idioma" %}
             </div>
             
             {# Campo 044 - País (Repetible) #}
-            <div class="mb-4">
-                <h6 class="text-primary mb-3">
-                    <span class="badge bg-primary me-2">044</span>
-                    Código de País <span class="badge bg-secondary">R</span>
-                </h6>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0">
+                        <span class="badge bg-primary me-1">044</span> Código de País <span class="badge bg-secondary ms-1">R</span>
+                    </h6>
+                </div>
                 {% include 'catalogacion/includes/formset_template.html' with formset=codigos_pais titulo="País" %}
             </div>
             
