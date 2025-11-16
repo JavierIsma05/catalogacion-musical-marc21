@@ -8,12 +8,24 @@
             </h5>
         </div>
         <div class="card-body">
-            {# Campo 245 - Título principal (ya incluido en info básica, aquí campos adicionales) #}
+            {# Campo 245 - Título principal #}
             <div class="row mb-4">
                 <div class="col-12">
-                    <h6 class="text-primary border-bottom pb-2">
+                    <h6>
                         <i class="bi bi-bookmark"></i> Campo 245 - Título Principal
                     </h6>
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <label for="{{ form.titulo_principal.id_for_label }}" class="form-label campo-requerido">
+                        {{ form.titulo_principal.label }}
+                    </label>
+                    {{ form.titulo_principal }}
+                    {% if form.titulo_principal.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.titulo_principal.errors }}
+                        </div>
+                    {% endif %}
                 </div>
                 
                 <div class="col-md-6 mb-3">
@@ -21,7 +33,6 @@
                         {{ form.subtitulo.label }}
                     </label>
                     {{ form.subtitulo }}
-                    <small class="form-text text-muted">245 $b - Subtítulo o resto del título</small>
                 </div>
                 
                 <div class="col-md-6 mb-3">
@@ -29,7 +40,6 @@
                         {{ form.mencion_responsabilidad.label }}
                     </label>
                     {{ form.mencion_responsabilidad }}
-                    <small class="form-text text-muted">245 $c - Mención de responsabilidad</small>
                 </div>
             </div>
             
@@ -40,9 +50,6 @@
                         <h6 class="text-secondary">
                             <i class="bi bi-bookmarks"></i> Campo 246 - Títulos Alternativos (R)
                         </h6>
-                        <p class="small text-muted mb-3">
-                            Títulos abreviados, en otros idiomas, paralelos, etc.
-                        </p>
                         {% include 'catalogacion/includes/formset_template.html' with formset=titulos_alternativos titulo="Título Alternativo" %}
                     </div>
                 </div>

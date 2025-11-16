@@ -37,7 +37,6 @@ class TituloSerie490Form(forms.ModelForm):
         widgets = {
             'titulo_serie': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '490 $a - Título de la serie',
             }),
         }
 
@@ -51,6 +50,5 @@ class VolumenSerie490Form(forms.ModelForm):
         widgets = {
             'volumen': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '490 $v - Designación de volumen',
             }),
         }

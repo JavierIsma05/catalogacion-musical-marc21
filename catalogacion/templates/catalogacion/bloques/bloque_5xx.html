@@ -8,10 +8,6 @@
             </h5>
         </div>
         <div class="card-body">
-            <p class="text-muted">
-                Las notas proporcionan información adicional descriptiva o explicativa sobre la obra.
-            </p>
-            
             {# Formset: 500 - Nota general (Repetible) #}
             <div class="row mb-4">
                 <div class="col-12">
@@ -19,9 +15,6 @@
                         <h6 class="text-secondary">
                             <i class="bi bi-chat-left-text"></i> Campo 500 - Nota General (R)
                         </h6>
-                        <p class="small text-muted mb-3">
-                            Información descriptiva general que no tiene un campo específico.
-                        </p>
                         {% include 'catalogacion/includes/formset_template.html' with formset=notas_generales titulo="Nota General" %}
                     </div>
                 </div>
@@ -34,9 +27,6 @@
                         <h6 class="text-secondary">
                             <i class="bi bi-list-ol"></i> Campo 505 - Nota de Contenido (R)
                         </h6>
-                        <p class="small text-muted mb-3">
-                            Lista de las partes o movimientos de la obra (ej: I. Allegro, II. Andante).
-                        </p>
                         {% include 'catalogacion/includes/formset_template.html' with formset=contenidos titulo="Contenido" %}
                     </div>
                 </div>
@@ -49,9 +39,6 @@
                         <h6 class="text-secondary">
                             <i class="bi bi-file-text"></i> Campo 520 - Sumario/Resumen (R)
                         </h6>
-                        <p class="small text-muted mb-3">
-                            Resumen del contenido musical o contexto histórico de la obra.
-                        </p>
                         {% include 'catalogacion/includes/formset_template.html' with formset=sumarios titulo="Sumario" %}
                     </div>
                 </div>
@@ -64,9 +51,6 @@
                         <h6 class="text-secondary">
                             <i class="bi bi-person-lines-fill"></i> Campo 545 - Datos Biográficos (R)
                         </h6>
-                        <p class="small text-muted mb-3">
-                            Información biográfica relevante del compositor u otros autores.
-                        </p>
                         {% include 'catalogacion/includes/formset_template.html' with formset=datos_biograficos titulo="Datos Biográficos" %}
                     </div>
                 </div>

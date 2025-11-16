@@ -28,7 +28,6 @@ class NombreRelacionado700Form(forms.ModelForm):
         widgets = {
             'persona': Select2Widget(attrs={
                 'data-url': '/catalogacion/autocompletar/persona/',
-                'data-placeholder': 'Buscar persona (700 $a)',
             }),
         }
         labels = {
@@ -49,7 +48,6 @@ class TerminoAsociado700Form(forms.ModelForm):
         widgets = {
             'termino': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '700 $c - Término asociado al nombre',
             }),
         }
 
@@ -79,7 +77,6 @@ class Relacion700Form(forms.ModelForm):
         widgets = {
             'descripcion': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '700 $i - Información de relación',
             }),
         }
 
@@ -109,7 +106,6 @@ class EntidadRelacionada710Form(forms.ModelForm):
         widgets = {
             'entidad': Select2Widget(attrs={
                 'data-url': '/catalogacion/autocompletar/entidad/',
-                'data-placeholder': 'Buscar entidad (710 $a)',
             }),
             'funcion': forms.Select(attrs={
                 'class': 'form-select',
@@ -134,11 +130,9 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '773 $t - Título de la colección',
             }),
             'numero_obra_relacionada': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '773 $w - Número de obra relacionada',
             }),
         }
         labels = {
@@ -162,7 +156,6 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
         required=False,
         widget=Select2Widget(attrs={
             'data-url': '/catalogacion/autocompletar/persona/',
-            'data-placeholder': '773 $a - Compositor de la colección',
         }),
         label='773 $a - Compositor',
     )
@@ -172,7 +165,6 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
         required=False,
         widget=Select2Widget(attrs={
             'data-url': '/catalogacion/autocompletar/titulo-uniforme/',
-            'data-placeholder': '773 $s - Título uniforme de la colección',
         }),
         label='773 $s - Título uniforme',
     )
@@ -248,11 +240,9 @@ class EnlaceUnidadConstituyente774Form(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '774 $t - Título de la obra contenida',
             }),
             'numero_obra_relacionada': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '774 $w - Número de obra relacionada',
             }),
         }
         labels = {
@@ -270,11 +260,9 @@ class OtrasRelaciones787Form(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '787 $t - Título relacionado',
             }),
             'numero_obra_relacionada': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '787 $w - Número de obra relacionada',
             }),
         }
         labels = {

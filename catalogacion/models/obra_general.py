@@ -15,6 +15,7 @@ from .autoridades import (
 from .constantes import TONALIDADES, TECNICAS, FORMATOS, MEDIOS_INTERPRETACION, TIPO_OBRA_MAP
 from .managers import ObraGeneralManager
 from .utils import (
+    actualizar_fecha_hora_transaccion,
     generar_numero_control,
     generar_codigo_informacion,
     generar_signatura_completa,
@@ -202,7 +203,7 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
         help_text="100 $j — Autoría del compositor"
     )
 
-    # Campo 130 - Título uniforme principal (cuando NO hay compositor)
+    # Campo 130 - Título uniforme principal 
     titulo_uniforme = models.ForeignKey(
         AutoridadTituloUniforme,
         on_delete=models.PROTECT,
@@ -548,24 +549,37 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     # ===========================================
     # MÉTODOS DE PREPARACIÓN
     # ===========================================
-    
+
     def _preparar_para_creacion(self):
         """Prepara campos automáticos antes de la primera creación"""
         # Generar número de control si no existe
         if not self.num_control:
             self.num_control = generar_numero_control(self.tipo_registro)
         
-        # Generar código de información si no existe
+        # Generar código de información (008) si no existe
         if not self.codigo_informacion:
             self.codigo_informacion = generar_codigo_informacion()
         
-        # Establecer estado del registro
+        # Establecer estado del registro (Leader/05)
         if not self.estado_registro:
             self.estado_registro = 'n'
         
-        # Generar fecha/hora de última transacción
-        from datetime import datetime
-        self.fecha_hora_ultima_transaccion = datetime.now().strftime("%Y%m%d%H%M%S")
+        # Generar fecha/hora de última transacción (005)
+        self.fecha_hora_ultima_transaccion = actualizar_fecha_hora_transaccion()
+            
+    def generar_leader(self):
+        """
+        Genera la cabecera MARC21 completa (24 caracteres)
+        Formato: |||||[estado][tipo][nivel]||||||||||||4500
+        """
+        leader = '|' * 5  # Posiciones 00-04 (longitud del registro, calculado después)
+        leader += self.estado_registro or 'n'  # Posición 05
+        leader += self.tipo_registro or '|'    # Posición 06
+        leader += self.nivel_bibliografico or '|'  # Posición 07
+        leader += '|' * 12  # Posiciones 08-19 (datos técnicos)
+        leader += '4500'    # Posiciones 20-23 (constante MARC21)
+        
+        return leader
 
     # ===========================================
     # MÉTODOS DE VALIDACIÓN
@@ -599,9 +613,14 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     
     def save(self, *args, **kwargs):
         """Guarda la obra con inicialización automática"""
+        from .utils import actualizar_fecha_hora_transaccion
+        
         # Solo en creación
         if not self.pk:
             self._preparar_para_creacion()
+        else:
+            # En actualización, solo actualizar campo 005
+            self.fecha_hora_ultima_transaccion = actualizar_fecha_hora_transaccion()
         
         # Guardar
         super().save(*args, **kwargs)
@@ -624,3 +643,27 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
         """Retorna la URL canónica de la obra"""
         from django.urls import reverse
         return reverse('obra_detalle', kwargs={'pk': self.pk})
+    
+    def campo_005_marc(self):
+        """
+        Retorna el campo 005 en formato MARC
+        Formato: ddmmaaaahhmmss
+        """
+        return self.fecha_hora_ultima_transaccion
+    
+    def campo_008_marc(self):
+        """
+        Retorna el campo 008 completo (40 posiciones)
+        """
+        return self.codigo_informacion
+    
+    def exportar_marc21_control(self):
+        """
+        Exporta la cabecera y campos de control en formato MARC21
+        """
+        return {
+            'Leader': self.generar_leader(),
+            '001': self.num_control,
+            '005': self.campo_005_marc(),
+            '008': self.campo_008_marc(),
+        }

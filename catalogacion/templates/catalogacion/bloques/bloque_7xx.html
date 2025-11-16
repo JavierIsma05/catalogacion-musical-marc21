@@ -8,10 +8,6 @@
             </h5>
         </div>
         <div class="card-body">
-            <p class="text-muted">
-                Este bloque permite relacionar la obra con otros autores, entidades y obras relacionadas.
-            </p>
-            
             {# Formset: 700 - Nombres relacionados (Repetible) #}
             <div class="row mb-4">
                 <div class="col-12">
@@ -19,9 +15,6 @@
                         <h6 class="text-secondary">
                             <i class="bi bi-person-plus"></i> Campo 700 - Nombres Relacionados (R)
                         </h6>
-                        <p class="small text-muted mb-3">
-                            Compositores adicionales, arreglistas, editores, dedicatarios, etc.
-                        </p>
                         {% include 'catalogacion/includes/formset_template.html' with formset=nombres_relacionados_700 titulo="Persona Relacionada" %}
                     </div>
                 </div>
@@ -34,9 +27,6 @@
                         <h6 class="text-secondary">
                             <i class="bi bi-building"></i> Campo 710 - Entidades Corporativas (R)
                         </h6>
-                        <p class="small text-muted mb-3">
-                            Organizaciones relacionadas (editores, patrocinadores, lugares de estreno).
-                        </p>
                         {% include 'catalogacion/includes/formset_template.html' with formset=entidades_relacionadas_710 titulo="Entidad" %}
                     </div>
                 </div>
@@ -45,14 +35,10 @@
             {# Formset: 773 - Documento fuente (Repetible) #}
             <div class="row mb-4">
                 <div class="col-12">
-                    <div class="border rounded p-3 bg-warning">
-                        <h6 class="text-dark">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
                             <i class="bi bi-arrow-up-square"></i> Campo 773 - Documento Fuente (R)
                         </h6>
-                        <p class="small text-dark mb-3">
-                            <strong>Colección padre:</strong> Use este campo cuando la obra forma parte de una colección mayor. 
-                            Enlaza con la obra que contiene ésta.
-                        </p>
                         {% include 'catalogacion/includes/formset_template.html' with formset=enlaces_documento_fuente_773 titulo="Enlace a Colección" %}
                     </div>
                 </div>
@@ -61,16 +47,11 @@
             {# Formset: 774 - Unidades constituyentes (Repetible) #}
             <div class="row mb-4">
                 <div class="col-12">
-                    <div class="border rounded p-3 bg-success text-white">
-                        <h6>
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="text-secondary">
                             <i class="bi bi-arrow-down-square"></i> Campo 774 - Unidades Constituyentes (R)
                         </h6>
-                        <p class="small mb-3">
-                            <strong>Obras contenidas:</strong> Use este campo en colecciones para listar las obras individuales que contiene.
-                        </p>
-                        <div class="bg-white p-3 rounded">
-                            {% include 'catalogacion/includes/formset_template.html' with formset=enlaces_unidad_constituyente_774 titulo="Obra Contenida" %}
-                        </div>
+                        {% include 'catalogacion/includes/formset_template.html' with formset=enlaces_unidad_constituyente_774 titulo="Obra Contenida" %}
                     </div>
                 </div>
             </div>
@@ -82,9 +63,6 @@
                         <h6 class="text-secondary">
                             <i class="bi bi-diagram-3"></i> Campo 787 - Otras Relaciones (R)
                         </h6>
-                        <p class="small text-muted mb-3">
-                            Relaciones diversas con otras obras (adaptaciones, versiones, arreglos, etc.).
-                        </p>
                         {% include 'catalogacion/includes/formset_template.html' with formset=otras_relaciones_787 titulo="Relación" %}
                     </div>
                 </div>

@@ -59,10 +59,7 @@
             </div>
             <div class="card-body p-0">
                 <nav class="nav nav-pills nav-pills-vertical flex-column p-2" id="bloques-nav">
-                    <a class="nav-link active" href="#info-basica">
-                        <i class="bi bi-info-circle"></i> Info Básica
-                    </a>
-                    <a class="nav-link" href="#bloque-0xx">
+                    <a class="nav-link active" href="#bloque-0xx">
                         <i class="bi bi-hash"></i> 0XX - Control
                     </a>
                     <a class="nav-link" href="#bloque-1xx">
@@ -98,6 +95,22 @@
     <main class="form-main-content">
         <form method="post" id="obra-form" novalidate>
             {% csrf_token %}
+
+            <!-- Campos ocultos para tipo de registro y nivel bibliográfico -->
+            <input type="hidden" name="tipo_registro" value="{{ form.tipo_registro.value|default:'' }}" id="id_tipo_registro">
+            <input type="hidden" name="nivel_bibliografico" value="{{ form.nivel_bibliografico.value|default:'' }}" id="id_nivel_bibliografico">    
+
+            {% if debug %}
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <strong>Información técnica (solo desarrollo):</strong><br>
+                <small>
+                    Tipo de registro: <code>{{ form.tipo_registro.value }}</code><br>
+                    Nivel bibliográfico: <code>{{ form.nivel_bibliografico.value }}</code><br>
+                    Tipo de obra: <strong>{{ tipo_obra_titulo }}</strong>
+                </small>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
             
             <!-- Header del formulario -->
             <div class="card mb-3">
@@ -107,67 +120,9 @@
                         Crear {{ tipo_obra_titulo }}
                     </h5>
                 </div>
-                <div class="card-body">
-                    <div class="alert alert-info mb-0">
-                        <i class="bi bi-info-circle me-2"></i>
-                        Los campos marcados con <span class="campo-requerido">asterisco</span> son obligatorios.
-                    </div>
-                </div>
             </div>
             
-            <!-- Información básica -->
-            <section id="info-basica" class="bloque-section">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="bi bi-info-circle"></i>
-                            Información Básica
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.tipo_registro.id_for_label }}" class="form-label campo-requerido">
-                                    Tipo de Registro
-                                </label>
-                                {{ form.tipo_registro }}
-                                {% if form.tipo_registro.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.tipo_registro.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.nivel_bibliografico.id_for_label }}" class="form-label campo-requerido">
-                                    Nivel Bibliográfico
-                                </label>
-                                {{ form.nivel_bibliografico }}
-                                {% if form.nivel_bibliografico.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.nivel_bibliografico.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="col-12 mb-3">
-                                <label for="{{ form.titulo_principal.id_for_label }}" class="form-label campo-requerido">
-                                    {{ form.titulo_principal.label }}
-                                </label>
-                                {{ form.titulo_principal }}
-                                <small class="form-text text-muted">Campo 245 $a</small>
-                                {% if form.titulo_principal.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.titulo_principal.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Bloque 0XX - Control -->
+            <!-- Bloque 0XX - Control e Identificación -->
             {% include 'catalogacion/bloques/bloque_0xx.html' %}
             
             <!-- Bloque 1XX - Punto de acceso principal -->

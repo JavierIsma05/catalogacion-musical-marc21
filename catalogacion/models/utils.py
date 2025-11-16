@@ -2,6 +2,7 @@
 Funciones auxiliares para generación de números de control y códigos MARC
 """
 from datetime import datetime
+from django.utils import timezone
 from django.db import transaction
 from django.db.models import Max
 
@@ -41,14 +42,25 @@ def generar_numero_control(tipo_registro):
 
 def generar_codigo_informacion():
     """
-    Genera el campo 008 con la fecha actual.
-    
-    Returns:
-        str: Código de 40 caracteres con fecha de creación
+    Genera el campo 008 (40 posiciones)
+    Posiciones 00-05: Fecha de creación (ddmmaa)
+    Posiciones 06-39: Barras verticales
     """
-    fecha_creacion = datetime.now().strftime("%y%m%d")
-    # Completar hasta 40 caracteres con espacios
-    return fecha_creacion + (" " * (40 - len(fecha_creacion)))
+    now = timezone.now()
+    # Formato: ddmmaa (día, mes, año con 2 dígitos)
+    fecha_creacion = now.strftime('%d%m%y')
+    # Completar con barras verticales hasta 40 posiciones
+    resto = '|' * 34  # 40 - 6 = 34
+    
+    return fecha_creacion + resto
+
+def actualizar_fecha_hora_transaccion():
+    """
+    Genera el campo 005 con fecha y hora actual
+    Formato: ddmmaaaahhmmss
+    """
+    now = timezone.now()
+    return now.strftime('%d%m%Y%H%M%S')
 
 
 def obtener_pais_principal(obra):

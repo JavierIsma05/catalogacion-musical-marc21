@@ -130,7 +130,8 @@ class CrearObraView(CreateView):
         """Configurar el formulario con valores iniciales según tipo de obra"""
         kwargs = super().get_form_kwargs()
         
-        # Si es GET, establecer valores iniciales
+        # IMPORTANTE: Solo pre-cargar en GET inicial
+        # En POST, los valores vienen del formulario oculto
         if self.request.method == 'GET':
             kwargs['initial'] = {
                 'tipo_registro': self.config_obra['tipo_registro'],
@@ -235,16 +236,15 @@ class CrearObraView(CreateView):
         formsets_validos = True
         formsets = {}
         
-        for key, formset in context.items():
-            if key.endswith('_formset') or key in [
-                'incipits_musicales', 'codigos_lengua', 'codigos_pais',
-                'funciones_compositor', 'titulos_alternativos', 'ediciones',
-                'produccion_publicacion', 'notas_generales', 'contenidos',
-                'sumarios', 'datos_biograficos', 'materias_650',
-                'materias_genero_655', 'nombres_relacionados_700',
-                'entidades_relacionadas_710', 'enlaces_documento_fuente_773',
-                'enlaces_unidad_constituyente_774', 'otras_relaciones_787'
-            ]:
+        for key in ['incipits_musicales', 'codigos_lengua', 'codigos_pais',
+                   'funciones_compositor', 'titulos_alternativos', 'ediciones',
+                   'produccion_publicacion', 'notas_generales', 'contenidos',
+                   'sumarios', 'datos_biograficos', 'materias_650',
+                   'materias_genero_655', 'nombres_relacionados_700',
+                   'entidades_relacionadas_710', 'enlaces_documento_fuente_773',
+                   'enlaces_unidad_constituyente_774', 'otras_relaciones_787']:
+            formset = context.get(key)
+            if formset:
                 formsets[key] = formset
                 if not formset.is_valid():
                     formsets_validos = False
@@ -259,10 +259,15 @@ class CrearObraView(CreateView):
         # Guardar la obra principal
         self.object = form.save(commit=False)
         
-        # Establecer valores según el tipo de obra
-        self.object.tipo_registro = self.config_obra['tipo_registro']
-        self.object.nivel_bibliografico = self.config_obra['nivel_bibliografico']
+        # IMPORTANTE: Asegurar que tipo_registro y nivel_bibliografico estén asignados
+        # Estos valores vienen del formulario oculto en el POST
+        if not self.object.tipo_registro:
+            self.object.tipo_registro = self.config_obra['tipo_registro']
         
+        if not self.object.nivel_bibliografico:
+            self.object.nivel_bibliografico = self.config_obra['nivel_bibliografico']
+        
+        # Guardar obra (esto ejecuta el método save() del modelo que genera campos automáticos)
         self.object.save()
         
         # Guardar todos los formsets
@@ -440,6 +445,8 @@ class ListaObrasView(ListView):
     paginate_by = 20
     
     def get_queryset(self):
+        from django.db.models import Q
+        
         queryset = ObraGeneral.objects.activos().select_related(
             'compositor',
             'titulo_uniforme',
@@ -451,7 +458,7 @@ class ListaObrasView(ListView):
         if q:
             queryset = queryset.filter(
                 Q(titulo_principal__icontains=q) |
-                Q(numero_control__icontains=q) |
+                Q(num_control__icontains=q) |
                 Q(compositor__apellidos_nombres__icontains=q)
             )
         

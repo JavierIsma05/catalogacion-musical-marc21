@@ -19,7 +19,6 @@ class Materia650Form(forms.ModelForm):
         widgets = {
             'materia': Select2Widget(attrs={
                 'data-url': '/catalogacion/autocompletar/materia/',
-                'data-placeholder': 'Buscar materia (650 $a)',
             }),
         }
         labels = {
@@ -40,7 +39,6 @@ class MateriaGenero655Form(forms.ModelForm):
         widgets = {
             'materia': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '655 $a - Término de género/forma',
             }),
         }
         labels = {

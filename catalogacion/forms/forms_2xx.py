@@ -21,11 +21,9 @@ class TituloAlternativoForm(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '246 $a - Título alternativo',
             }),
             'resto_titulo': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '246 $b - Resto del título',
             }),
         }
 
@@ -39,7 +37,6 @@ class EdicionForm(forms.ModelForm):
         widgets = {
             'edicion': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '250 $a - Enunciado de edición',
             }),
         }
 
@@ -69,7 +66,6 @@ class Lugar264Form(forms.ModelForm):
         widgets = {
             'lugar': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '264 $a - Lugar de publicación',
             }),
         }
 
@@ -83,7 +79,6 @@ class NombreEntidad264Form(forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '264 $b - Nombre del editor',
             }),
         }
 

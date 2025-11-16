@@ -18,9 +18,7 @@ class NotaGeneral500Form(forms.ModelForm):
         model = NotaGeneral500
         fields = ['nota_general']
         widgets = {
-            'nota_general': TextAreaAutosize(attrs={
-                'placeholder': '500 $a - Nota general',
-            }),
+            'nota_general': TextAreaAutosize(attrs={}),
         }
         labels = {
             'nota_general': '500 $a - Nota general',
@@ -35,7 +33,6 @@ class Contenido505Form(forms.ModelForm):
         fields = ['contenido']
         widgets = {
             'contenido': TextAreaAutosize(attrs={
-                'placeholder': '505 $a - Contenido formateado',
                 'rows': 5,
             }),
         }
@@ -52,7 +49,6 @@ class Sumario520Form(forms.ModelForm):
         fields = ['sumario']
         widgets = {
             'sumario': TextAreaAutosize(attrs={
-                'placeholder': '520 $a - Sumario, resumen, etc.',
                 'rows': 4,
             }),
         }
@@ -69,12 +65,10 @@ class DatosBiograficos545Form(forms.ModelForm):
         fields = ['datos_biograficos', 'url']
         widgets = {
             'datos_biograficos': TextAreaAutosize(attrs={
-                'placeholder': '545 $a - Datos biográficos del compositor',
                 'rows': 5,
             }),
             'url': forms.URLInput(attrs={
                 'class': 'form-control',
-                'placeholder': '545 $u - URL con más información',
             }),
         }
         labels = {

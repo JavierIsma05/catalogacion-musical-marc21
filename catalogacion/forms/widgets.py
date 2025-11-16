@@ -10,7 +10,6 @@ class Select2Widget(forms.Select):
     def __init__(self, attrs=None, choices=()):
         default_attrs = {
             'class': 'form-select select2',
-            'data-placeholder': 'Buscar...',
         }
         if attrs:
             default_attrs.update(attrs)

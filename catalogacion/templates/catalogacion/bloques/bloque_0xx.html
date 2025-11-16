@@ -11,7 +11,7 @@
             {# Campos de identificación #}
             <div class="row mb-4">
                 <div class="col-12">
-                    <h6 class="text-primary border-bottom pb-2">
+                    <h6>
                         <i class="bi bi-upc-scan"></i> Identificadores Estándar
                     </h6>
                 </div>
@@ -21,7 +21,6 @@
                         {{ form.isbn.label }}
                     </label>
                     {{ form.isbn }}
-                    <small class="form-text text-muted">020 $a - ISBN (solo obras impresas)</small>
                     {% if form.isbn.errors %}
                         <div class="invalid-feedback d-block">{{ form.isbn.errors }}</div>
                     {% endif %}
@@ -32,7 +31,6 @@
                         {{ form.ismn.label }}
                     </label>
                     {{ form.ismn }}
-                    <small class="form-text text-muted">024 $a - ISMN (solo obras impresas)</small>
                     {% if form.ismn.errors %}
                         <div class="invalid-feedback d-block">{{ form.ismn.errors }}</div>
                     {% endif %}
@@ -43,7 +41,6 @@
                         {{ form.tipo_numero_028.label }}
                     </label>
                     {{ form.tipo_numero_028 }}
-                    <small class="form-text text-muted">028 - Tipo</small>
                 </div>
                 
                 <div class="col-md-4 mb-3">
@@ -51,7 +48,6 @@
                         {{ form.numero_editor.label }}
                     </label>
                     {{ form.numero_editor }}
-                    <small class="form-text text-muted">028 $a - Número</small>
                 </div>
                 
                 <div class="col-md-4 mb-3">
@@ -59,7 +55,6 @@
                         {{ form.nombre_editor.label }}
                     </label>
                     {{ form.nombre_editor }}
-                    <small class="form-text text-muted">028 $b - Editor</small>
                 </div>
             </div>
             
@@ -70,9 +65,6 @@
                         <h6 class="text-secondary">
                             <i class="bi bi-music-note-beamed"></i> Campo 031 - Íncipit Musical (R)
                         </h6>
-                        <p class="small text-muted mb-3">
-                            Notación codificada del inicio de la obra musical.
-                        </p>
                         {% include 'catalogacion/includes/formset_template.html' with formset=incipits_musicales titulo="Íncipit" %}
                     </div>
                 </div>
@@ -81,7 +73,7 @@
             {# Campo 040 - Fuente de catalogación #}
             <div class="row mb-4">
                 <div class="col-12">
-                    <h6 class="text-primary border-bottom pb-2">
+                    <h6>
                         <i class="bi bi-building"></i> Campo 040 - Fuente de Catalogación
                     </h6>
                 </div>
@@ -91,7 +83,6 @@
                         {{ form.centro_catalogador.label }}
                     </label>
                     {{ form.centro_catalogador }}
-                    <small class="form-text text-muted">040 $a - Centro catalogador</small>
                 </div>
             </div>
             

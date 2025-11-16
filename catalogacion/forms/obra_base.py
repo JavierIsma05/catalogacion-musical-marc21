@@ -81,27 +81,22 @@ class ObraGeneralForm(forms.ModelForm):
         
         widgets = {
             # Selects con autoridades
+            'tipo_registro': forms.HiddenInput(),
+            'nivel_bibliografico': forms.HiddenInput(),
+            
             'compositor': Select2Widget(attrs={
                 'data-url': '/catalogacion/autocompletar/persona/',
-                'data-placeholder': 'Buscar compositor (100 $a)',
             }),
             'titulo_uniforme': Select2Widget(attrs={
                 'data-url': '/catalogacion/autocompletar/titulo-uniforme/',
-                'data-placeholder': 'Buscar título uniforme (130 $a)',
             }),
             'titulo_240': Select2Widget(attrs={
                 'data-url': '/catalogacion/autocompletar/titulo-uniforme/',
-                'data-placeholder': 'Buscar título uniforme (240 $a)',
             }),
-            'forma_130': Select2Widget(attrs={
-                'data-placeholder': 'Seleccionar forma musical (130 $k)',
-            }),
-            'forma_240': Select2Widget(attrs={
-                'data-placeholder': 'Seleccionar forma musical (240 $k)',
-            }),
+            'forma_130': Select2Widget(attrs={}),
+            'forma_240': Select2Widget(attrs={}),
             'institucion_persona_852a': Select2Widget(attrs={
                 'data-url': '/catalogacion/autocompletar/entidad/',
-                'data-placeholder': 'Buscar institución (852 $a)',
             }),
             
             # Selects normales
@@ -124,82 +119,62 @@ class ObraGeneralForm(forms.ModelForm):
             # Inputs de texto
             'centro_catalogador': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '040 $a - Centro catalogador',
             }),
             'isbn': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '020 $a - ISBN',
             }),
             'ismn': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '024 $a - ISMN',
             }),
             'numero_editor': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '028 $a - Número de editor',
             }),
             'nombre_editor': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '028 $b - Nombre del editor',
             }),
             'numero_parte_130': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '130 $n - Número de parte',
             }),
             'nombre_parte_130': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '130 $p - Nombre de parte',
             }),
             'numero_parte_240': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '240 $n - Número de parte',
             }),
             'nombre_parte_240': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '240 $p - Nombre de parte',
             }),
             'titulo_principal': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '245 $a - Título principal *',
                 'required': True,
             }),
             'subtitulo': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '245 $b - Subtítulo',
             }),
             'extension': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '300 $a - Extensión (ej: 1 partitura)',
             }),
             'otras_caracteristicas': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '300 $b - Otras características',
             }),
             'dimension': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '300 $c - Dimensiones (ej: 30 cm)',
             }),
             'material_acompanante': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '300 $e - Material acompañante',
             }),
             'numero_obra': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '383 $a - Número serial',
             }),
             'opus': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '383 $b - Opus',
             }),
             'signatura_original_852h': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '852 $h - Signatura original',
             }),
             
             # TextAreas
-            'mencion_responsabilidad': TextAreaAutosize(attrs={
-                'placeholder': '245 $c - Mención de responsabilidad',
-            }),
+            'mencion_responsabilidad': TextAreaAutosize(attrs={}),
         }
         
         labels = {
