@@ -8,52 +8,44 @@
             </h5>
         </div>
         <div class="card-body">
-            {# Formset: 500 - Nota general (Repetible) #}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-chat-left-text"></i> Campo 500 - Nota General (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=notas_generales titulo="Nota General" %}
-                    </div>
-                </div>
+            {# Campo 500 - Nota General (Repetible) #}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="text-primary mb-3">
+                    <span class="badge bg-primary me-2">500</span>
+                    Nota General
+                    <span class="badge bg-secondary">R</span>
+                </h6>
+                {% include 'catalogacion/includes/formset_template.html' with formset=notas_generales_500 titulo="Nota General" %}
             </div>
             
-            {# Formset: 505 - Contenido (Repetible) #}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-list-ol"></i> Campo 505 - Nota de Contenido (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=contenidos titulo="Contenido" %}
-                    </div>
-                </div>
+            {# Campo 505 - Nota de Contenido (Repetible) #}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="text-primary mb-3">
+                    <span class="badge bg-primary me-2">505</span>
+                    Contenido
+                    <span class="badge bg-secondary">R</span>
+                </h6>
+                {% include 'catalogacion/includes/formset_template.html' with formset=notas_contenido_505 titulo="Contenido" %}
             </div>
             
-            {# Formset: 520 - Sumario (Repetible) #}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-file-text"></i> Campo 520 - Sumario/Resumen (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=sumarios titulo="Sumario" %}
-                    </div>
-                </div>
+            {# Campo 520 - Sumario/Resumen (Repetible) #}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="text-primary mb-3">
+                    <span class="badge bg-primary me-2">520</span>
+                    Sumario
+                    <span class="badge bg-secondary">R</span>
+                </h6>
+                {% include 'catalogacion/includes/formset_template.html' with formset=sumarios_520 titulo="Sumario" %}
             </div>
             
-            {# Formset: 545 - Datos biográficos (Repetible) #}
-            <div class="row">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-person-lines-fill"></i> Campo 545 - Datos Biográficos (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=datos_biograficos titulo="Datos Biográficos" %}
-                    </div>
-                </div>
+            {# Campo 545 - Datos Biográficos o Históricos (Repetible) #}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="text-primary mb-3">
+                    <span class="badge bg-primary me-2">545</span>
+                    Datos Biográficos
+                    <span class="badge bg-secondary">R</span>
+                </h6>
+                {% include 'catalogacion/includes/formset_template.html' with formset=datos_biograficos_545 titulo="Datos Biográficos" %}
             </div>
         </div>
     </div>

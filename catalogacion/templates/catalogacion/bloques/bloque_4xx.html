@@ -8,16 +8,14 @@
             </h5>
         </div>
         <div class="card-body">
-            {# Formset: 490 - Mención de serie (Repetible) #}
-            <div class="row">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-stack"></i> Campo 490 - Mención de Serie (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=menciones_serie titulo="Serie" %}
-                    </div>
-                </div>
+            {# Campo 490 - Mención de Serie (Repetible) #}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="text-primary mb-3">
+                    <span class="badge bg-primary me-2">490</span>
+                    Mención de Serie
+                    <span class="badge bg-secondary">R</span>
+                </h6>
+                {% include 'catalogacion/includes/formset_template.html' with formset=menciones_serie titulo="Serie" %}
             </div>
         </div>
     </div>

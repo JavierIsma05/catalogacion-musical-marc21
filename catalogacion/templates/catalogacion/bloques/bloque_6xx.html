@@ -8,28 +8,24 @@
             </h5>
         </div>
         <div class="card-body">
-            {# Formset: 650 - Materia (Repetible) #}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-tag"></i> Campo 650 - Encabezamiento de Materia (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=materias_650 titulo="Materia" %}
-                    </div>
-                </div>
+            {# Campo 650 - Encabezamiento de Materia (Repetible) #}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="text-primary mb-3">
+                    <span class="badge bg-primary me-2">650</span>
+                    Encabezamiento de Materia
+                    <span class="badge bg-secondary">R</span>
+                </h6>
+                {% include 'catalogacion/includes/formset_template.html' with formset=materias_650 titulo="Materia" %}
             </div>
             
-            {# Formset: 655 - Género/Forma (Repetible) #}
-            <div class="row">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-tags"></i> Campo 655 - Término de Género/Forma (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=materias_genero_655 titulo="Género/Forma" %}
-                    </div>
-                </div>
+            {# Campo 655 - Término de Género/Forma (Repetible) #}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="text-primary mb-3">
+                    <span class="badge bg-primary me-2">655</span>
+                    Género/Forma
+                    <span class="badge bg-secondary">R</span>
+                </h6>
+                {% include 'catalogacion/includes/formset_template.html' with formset=generos_655 titulo="Género/Forma" %}
             </div>
         </div>
     </div>

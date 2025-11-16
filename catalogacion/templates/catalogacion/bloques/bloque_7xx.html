@@ -8,64 +8,54 @@
             </h5>
         </div>
         <div class="card-body">
-            {# Formset: 700 - Nombres relacionados (Repetible) #}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-person-plus"></i> Campo 700 - Nombres Relacionados (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=nombres_relacionados_700 titulo="Persona Relacionada" %}
-                    </div>
-                </div>
+            {# Campo 700 - Nombres Relacionados (Repetible) #}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="text-primary mb-3">
+                    <span class="badge bg-primary me-2">700</span>
+                    Nombres Relacionados
+                    <span class="badge bg-secondary">R</span>
+                </h6>
+                {% include 'catalogacion/includes/formset_template.html' with formset=nombres_relacionados_700 titulo="Persona Relacionada" %}
             </div>
             
-            {# Formset: 710 - Entidades relacionadas (Repetible) #}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-building"></i> Campo 710 - Entidades Corporativas (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=entidades_relacionadas_710 titulo="Entidad" %}
-                    </div>
-                </div>
+            {# Campo 710 - Entidades Corporativas (Repetible) #}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="text-primary mb-3">
+                    <span class="badge bg-primary me-2">710</span>
+                    Entidades Corporativas
+                    <span class="badge bg-secondary">R</span>
+                </h6>
+                {% include 'catalogacion/includes/formset_template.html' with formset=entidades_relacionadas_710 titulo="Entidad" %}
             </div>
             
-            {# Formset: 773 - Documento fuente (Repetible) #}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-arrow-up-square"></i> Campo 773 - Documento Fuente (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=enlaces_documento_fuente_773 titulo="Enlace a Colección" %}
-                    </div>
-                </div>
+            {# Campo 773 - Documento Fuente (Repetible) #}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="text-primary mb-3">
+                    <span class="badge bg-primary me-2">773</span>
+                    Documento Fuente
+                    <span class="badge bg-secondary">R</span>
+                </h6>
+                {% include 'catalogacion/includes/formset_template.html' with formset=enlaces_documento_fuente_773 titulo="Enlace a Colección" %}
             </div>
             
-            {# Formset: 774 - Unidades constituyentes (Repetible) #}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-arrow-down-square"></i> Campo 774 - Unidades Constituyentes (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=enlaces_unidad_constituyente_774 titulo="Obra Contenida" %}
-                    </div>
-                </div>
+            {# Campo 774 - Unidades Constituyentes (Repetible) #}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="text-primary mb-3">
+                    <span class="badge bg-primary me-2">774</span>
+                    Unidades Constituyentes
+                    <span class="badge bg-secondary">R</span>
+                </h6>
+                {% include 'catalogacion/includes/formset_template.html' with formset=enlaces_unidad_constituyente_774 titulo="Obra Contenida" %}
             </div>
             
-            {# Formset: 787 - Otras relaciones (Repetible) #}
-            <div class="row">
-                <div class="col-12">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="text-secondary">
-                            <i class="bi bi-diagram-3"></i> Campo 787 - Otras Relaciones (R)
-                        </h6>
-                        {% include 'catalogacion/includes/formset_template.html' with formset=otras_relaciones_787 titulo="Relación" %}
-                    </div>
-                </div>
+            {# Campo 787 - Otras Relaciones (Repetible) #}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="text-primary mb-3">
+                    <span class="badge bg-primary me-2">787</span>
+                    Otras Relaciones
+                    <span class="badge bg-secondary">R</span>
+                </h6>
+                {% include 'catalogacion/includes/formset_template.html' with formset=otras_relaciones_787 titulo="Relación" %}
             </div>
         </div>
     </div>
