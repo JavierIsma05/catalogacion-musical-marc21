@@ -31,7 +31,7 @@
                 
                 <p class="form-text">Listado de contenidos de la obra.</p>
                 
-                {% include 'catalogacion/includes/formset_template.html' with formset=notas_contenido_505 titulo="Contenido" %}
+                {% include 'catalogacion/includes/formset_template.html' with formset=contenidos titulo="Contenido" %}
             </div>
             
             {# Campo 520 - Sumario/Resumen (Repetible) #}
@@ -44,7 +44,7 @@
                 
                 <p class="form-text">Resumen o sumario del contenido.</p>
                 
-                {% include 'catalogacion/includes/formset_template.html' with formset=sumarios_520 titulo="Sumario" %}
+                {% include 'catalogacion/includes/formset_template.html' with formset=sumarios titulo="Sumario" %}
             </div>
             
             {# Campo 545 - Datos Biográficos o Históricos (Repetible) #}
@@ -57,7 +57,7 @@
                 
                 <p class="form-text">Información biográfica o histórica relevante.</p>
                 
-                {% include 'catalogacion/includes/formset_template.html' with formset=datos_biograficos_545 titulo="Datos Biográficos" %}
+                {% include 'catalogacion/includes/formset_template.html' with formset=datos_biograficos titulo="Datos Biográficos" %}
             </div>
         </div>
     </div>

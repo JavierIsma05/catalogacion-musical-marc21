@@ -13,7 +13,7 @@ Uso: {% include 'catalogacion/includes/formset_template.html' with formset=perso
     
     <div class="formset-forms">
         {% for form in formset %}
-        <div class="formset-row {% if form.instance.pk %}existing-form{% else %}empty-form{% endif %}">
+        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %}">
             {% if form.instance.pk %}
                 <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
             {% endif %}
@@ -45,6 +45,26 @@ Uso: {% include 'catalogacion/includes/formset_template.html' with formset=perso
             </div>
         </div>
         {% endfor %}
+        
+        {# Template vacío para clonar (siempre presente) #}
+        <div class="formset-row empty-form">
+            <button type="button" class="delete-row-btn" title="Eliminar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            
+            <div class="campo-grid">
+                {% for field in formset.empty_form.visible_fields %}
+                    {% if field.name != 'DELETE' %}
+                    <div class="col-full">
+                        <label class="form-label" for="{{ field.id_for_label }}">
+                            {{ field.label }}{% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                        </label>
+                        {{ field }}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -76,15 +96,16 @@ Uso: {% include 'catalogacion/includes/formset_template.html' with formset=perso
         // Actualizar índices en el nuevo formulario
         emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
         emptyForm.classList.remove('empty-form');
+        emptyForm.style.display = '';
         
-        // Agregar al contenedor
-        formsContainer.appendChild(emptyForm);
+        // Agregar al contenedor (antes del template vacío)
+        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
         
         // Incrementar contador
         totalFormsInput.value = totalForms + 1;
         
         // Reactivar Select2 si existe
-        if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
+        if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
             emptyForm.querySelectorAll('.select2').forEach(select => {
                 $(select).select2({
                     theme: 'bootstrap-5',

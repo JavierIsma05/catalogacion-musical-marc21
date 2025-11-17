@@ -11,36 +11,29 @@ from django.db import transaction
 from catalogacion.models import ObraGeneral
 from catalogacion.forms import (
     ObraGeneralForm,
-    # Formsets del bloque 0XX
-    IncipitMusicalFormSet,
-    CodigoLenguaFormSet,
-    CodigoPaisEntidadFormSet,
-    # Formsets del bloque 1XX
+)
+from catalogacion.forms.formsets import (
+    # Bloque 0XX
+    IncipitMusicalFormSet, CodigoLenguaFormSet, CodigoPaisEntidadFormSet,
+    # Bloque 1XX  
     FuncionCompositorFormSet,
-    # Formsets del bloque 2XX
-    TituloAlternativoFormSet,
-    EdicionFormSet,
-    ProduccionPublicacionFormSet,
-    # Formsets del bloque 5XX
-    NotaGeneral500FormSet,
-    Contenido505FormSet,
-    Sumario520FormSet,
-    DatosBiograficos545FormSet,
-    # Formsets del bloque 6XX
-    Materia650FormSet,
-    MateriaGenero655FormSet,
-    # Formsets del bloque 7XX
-    NombreRelacionado700FormSet,
-    EntidadRelacionada710FormSet,
-    EnlaceDocumentoFuente773FormSet,
-    EnlaceUnidadConstituyente774FormSet,
+    # Bloque 2XX
+    TituloAlternativoFormSet, EdicionFormSet, ProduccionPublicacionFormSet,
+    # Bloque 3XX
+    MedioInterpretacion382_aFormSet,
+    # Bloque 4XX
+    MencionSerie490FormSet,
+    # Bloque 5XX
+    NotaGeneral500FormSet, Contenido505FormSet, Sumario520FormSet, DatosBiograficos545FormSet,
+    # Bloque 6XX
+    Materia650FormSet, MateriaGenero655FormSet,
+    # Bloque 7XX
+    NombreRelacionado700FormSet, EntidadRelacionada710FormSet,
+    EnlaceDocumentoFuente773FormSet, EnlaceUnidadConstituyente774FormSet,
     OtrasRelaciones787FormSet,
-    # Formsets del bloque 8XX
-    Ubicacion852FormSet,
-    Estanteria852FormSet,
-    Disponible856FormSet,
-    URL856FormSet,
-    TextoEnlace856FormSet,
+    # Bloque 8XX
+    Ubicacion852FormSet, Estanteria852FormSet,
+    Disponible856FormSet, URL856FormSet, TextoEnlace856FormSet,
 )
 
 # Mapeo de tipos de obra a configuraciones MARC21
@@ -181,6 +174,12 @@ class CrearObraView(CreateView):
             'ediciones': EdicionFormSet(prefix='ediciones'),
             'produccion_publicacion': ProduccionPublicacionFormSet(prefix='produccion'),
             
+            # Bloque 3XX
+            'medios_interpretacion': MedioInterpretacion382_aFormSet(prefix='medios_382'),
+            
+            # Bloque 4XX
+            'menciones_serie_490': MencionSerie490FormSet(prefix='menciones_490'),
+            
             # Bloque 5XX
             'notas_generales': NotaGeneral500FormSet(prefix='notas_500'),
             'contenidos': Contenido505FormSet(prefix='contenidos_505'),
@@ -222,6 +221,12 @@ class CrearObraView(CreateView):
             'ediciones': EdicionFormSet(self.request.POST, prefix='ediciones'),
             'produccion_publicacion': ProduccionPublicacionFormSet(self.request.POST, prefix='produccion'),
             
+            # Bloque 3XX
+            'medios_interpretacion': MedioInterpretacion382_aFormSet(self.request.POST, prefix='medios_382'),
+            
+            # Bloque 4XX
+            'menciones_serie_490': MencionSerie490FormSet(self.request.POST, prefix='menciones_490'),
+            
             # Bloque 5XX
             'notas_generales': NotaGeneral500FormSet(self.request.POST, prefix='notas_500'),
             'contenidos': Contenido505FormSet(self.request.POST, prefix='contenidos_505'),
@@ -258,7 +263,8 @@ class CrearObraView(CreateView):
         
         for key in ['incipits_musicales', 'codigos_lengua', 'codigos_pais',
                    'funciones_compositor', 'titulos_alternativos', 'ediciones',
-                   'produccion_publicacion', 'notas_generales', 'contenidos',
+                   'produccion_publicacion', 'medios_interpretacion',
+                   'menciones_serie_490', 'notas_generales', 'contenidos',
                    'sumarios', 'datos_biograficos', 'materias_650',
                    'materias_genero_655', 'nombres_relacionados_700',
                    'entidades_relacionadas_710', 'enlaces_documento_fuente_773',
@@ -376,6 +382,8 @@ class EditarObraView(UpdateView):
             'titulos_alternativos': TituloAlternativoFormSet(instance=self.object, prefix='titulos_alt'),
             'ediciones': EdicionFormSet(instance=self.object, prefix='ediciones'),
             'produccion_publicacion': ProduccionPublicacionFormSet(instance=self.object, prefix='produccion'),
+            'medios_interpretacion': MedioInterpretacion382_aFormSet(instance=self.object, prefix='medios_382'),
+            'menciones_serie_490': MencionSerie490FormSet(instance=self.object, prefix='menciones_490'),
             'notas_generales': NotaGeneral500FormSet(instance=self.object, prefix='notas_500'),
             'contenidos': Contenido505FormSet(instance=self.object, prefix='contenidos_505'),
             'sumarios': Sumario520FormSet(instance=self.object, prefix='sumarios_520'),
@@ -404,6 +412,8 @@ class EditarObraView(UpdateView):
             'titulos_alternativos': TituloAlternativoFormSet(self.request.POST, instance=self.object, prefix='titulos_alt'),
             'ediciones': EdicionFormSet(self.request.POST, instance=self.object, prefix='ediciones'),
             'produccion_publicacion': ProduccionPublicacionFormSet(self.request.POST, instance=self.object, prefix='produccion'),
+            'medios_interpretacion': MedioInterpretacion382_aFormSet(self.request.POST, instance=self.object, prefix='medios_382'),
+            'menciones_serie_490': MencionSerie490FormSet(self.request.POST, instance=self.object, prefix='menciones_490'),
             'notas_generales': NotaGeneral500FormSet(self.request.POST, instance=self.object, prefix='notas_500'),
             'contenidos': Contenido505FormSet(self.request.POST, instance=self.object, prefix='contenidos_505'),
             'sumarios': Sumario520FormSet(self.request.POST, instance=self.object, prefix='sumarios_520'),
@@ -433,7 +443,8 @@ class EditarObraView(UpdateView):
         
         for key in ['incipits_musicales', 'codigos_lengua', 'codigos_pais',
                    'funciones_compositor', 'titulos_alternativos', 'ediciones',
-                   'produccion_publicacion', 'notas_generales', 'contenidos',
+                   'produccion_publicacion', 'medios_interpretacion',
+                   'menciones_serie_490', 'notas_generales', 'contenidos',
                    'sumarios', 'datos_biograficos', 'materias_650',
                    'materias_genero_655', 'nombres_relacionados_700',
                    'entidades_relacionadas_710', 'enlaces_documento_fuente_773',

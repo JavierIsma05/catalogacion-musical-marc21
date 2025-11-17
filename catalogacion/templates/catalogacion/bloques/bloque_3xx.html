@@ -79,37 +79,7 @@
     
     <p class="form-text">Instrumentos y voces para los que está escrita la obra.</p>
     
-    <div class="formset-container">
-        {% for form in medios_interpretacion %}
-        <div class="formset-row">
-            <button type="button" class="delete-row-btn" title="Eliminar">
-                <i class="bi bi-x-lg"></i>
-            </button>
-            
-            <div class="campo-grid">
-                <div class="col-half">
-                    <label class="form-label" for="{{ form.instrumento.id_for_label }}">Instrumento/Voz</label>
-                    {{ form.instrumento }}
-                </div>
-                
-                <div class="col-quarter">
-                    <label class="form-label" for="{{ form.cantidad.id_for_label }}">Cantidad</label>
-                    {{ form.cantidad }}
-                </div>
-                
-                <div class="col-quarter">
-                    <label class="form-label" for="{{ form.solista.id_for_label }}">Solista</label>
-                    {{ form.solista }}
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    
-    <button type="button" class="add-form-row" data-formset-add>
-        <i class="bi bi-plus-circle"></i>
-        Agregar Medio de Interpretación
-    </button>
+    {% include 'catalogacion/includes/formset_template.html' with formset=medios_interpretacion titulo="Medio de Interpretación" %}
 </div>
 
             

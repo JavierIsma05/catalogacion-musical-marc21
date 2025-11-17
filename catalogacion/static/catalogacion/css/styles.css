@@ -403,7 +403,7 @@ textarea.form-control {
 }
 
 .formset-row.empty-form {
-    display: none;
+    display: none !important;
 }
 
 /* Contenido del formset en grid */

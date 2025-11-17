@@ -8,53 +8,41 @@
             </h5>
         </div>
         <div class="card-body">
-            {# Campo 852 - Ubicación Física (campos base) #}
+            {# Campo 852 - Ubicación Física #}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">852</span>
                     <h6>Ubicación Física</h6>
                 </div>
                 
-                <p class="form-text">Institución y signatura original.</p>
+                <p class="form-text">Información de ubicación física de la obra.</p>
                 
                 <div class="campo-grid">
                     <div class="col-half">
-                        <label class="form-label" for="{{ form.institucion_persona_852a.id_for_label }}">{{ form.institucion_persona_852a.label }}</label>
+                        <label class="form-label" for="{{ form.institucion_persona_852a.id_for_label }}">852 $a - Institución o persona</label>
                         {{ form.institucion_persona_852a }}
                         {% if form.institucion_persona_852a.errors %}
-                            <div class="invalid-feedback">{{ form.institucion_persona_852a.errors }}</div>
+                            <div class="invalid-feedback d-block">{{ form.institucion_persona_852a.errors }}</div>
                         {% endif %}
                     </div>
                     
                     <div class="col-half">
-                        <label class="form-label" for="{{ form.signatura_original_852h.id_for_label }}">{{ form.signatura_original_852h.label }}</label>
+                        <label class="form-label" for="{{ form.signatura_original_852h.id_for_label }}">852 $h - Signatura original</label>
                         {{ form.signatura_original_852h }}
                         {% if form.signatura_original_852h.errors %}
-                            <div class="invalid-feedback">{{ form.signatura_original_852h.errors }}</div>
+                            <div class="invalid-feedback d-block">{{ form.signatura_original_852h.errors }}</div>
                         {% endif %}
                     </div>
                 </div>
-            </div>
-            
-            {# Campo 852 - Ubicaciones Adicionales (Repetible) #}
-            <div class="campo-marc">
-                <div class="campo-titulo">
-                    <span class="badge-marc">852</span>
-                    <h6>Ubicaciones Adicionales</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
-                </div>
-                
-                <p class="form-text">Ubicaciones adicionales con información de estantería.</p>
-                
-                {% include 'catalogacion/includes/formset_template.html' with formset=ubicaciones_852 titulo="Ubicación" %}
                 
                 {# Subcampo repetible: Estantería 852 $c #}
-                <div class="mt-3 ms-4">
+                <div class="mt-3">
                     <div class="campo-titulo">
                         <span class="badge-marc">852$c</span>
                         <h6>Estantería</h6>
                         <span class="badge-repetible">REPETIBLE</span>
                     </div>
+                    <p class="form-text">Ubicación en estantería (puede agregar múltiples estanterías).</p>
                     {% include 'catalogacion/includes/formset_template.html' with formset=estanterias_852 titulo="Estantería" %}
                 </div>
             </div>
@@ -67,29 +55,9 @@
                     <span class="badge-repetible">REPETIBLE</span>
                 </div>
                 
-                <p class="form-text">Información sobre ubicación y acceso a recursos electrónicos.</p>
+                <p class="form-text">URLs y recursos electrónicos asociados a la obra. Cada recurso puede tener una URL ($u) y un texto descriptivo ($y).</p>
                 
                 {% include 'catalogacion/includes/formset_template.html' with formset=disponibles_856 titulo="Recurso Electrónico" %}
-                
-                {# Subcampo repetible: URL 856 $u #}
-                <div class="mt-3 ms-4">
-                    <div class="campo-titulo">
-                        <span class="badge-marc">856$u</span>
-                        <h6>URL</h6>
-                        <span class="badge-repetible">REPETIBLE</span>
-                    </div>
-                    {% include 'catalogacion/includes/formset_template.html' with formset=urls_856 titulo="URL" %}
-                </div>
-                
-                {# Subcampo repetible: Texto del enlace 856 $y #}
-                <div class="mt-3 ms-4">
-                    <div class="campo-titulo">
-                        <span class="badge-marc">856$y</span>
-                        <h6>Texto del Enlace</h6>
-                        <span class="badge-repetible">REPETIBLE</span>
-                    </div>
-                    {% include 'catalogacion/includes/formset_template.html' with formset=textos_enlace_856 titulo="Texto del Enlace" %}
-                </div>
             </div>
         </div>
     </div>
