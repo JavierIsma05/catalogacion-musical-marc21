@@ -110,17 +110,12 @@ class CodigoPaisEntidadForm(forms.ModelForm):
     
     class Meta:
         model = CodigoPaisEntidad
-        fields = ['codigo_pais', 'orden']
+        fields = ['codigo_pais']
         widgets = {
             'codigo_pais': forms.Select(attrs={
                 'class': 'form-select',
             }),
-            'orden': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 0,
-            }),
         }
         labels = {
             'codigo_pais': '044 $a - Código de país',
-            'orden': 'Orden de aparición',
         }

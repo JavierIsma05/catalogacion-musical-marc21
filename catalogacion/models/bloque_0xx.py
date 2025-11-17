@@ -248,20 +248,15 @@ class CodigoPaisEntidad(models.Model):
         help_text="044 $a — Código ISO 3166-1 alfa-2 del país"
     )
     
-    orden = models.PositiveIntegerField(
-        default=0,
-        help_text="Orden de aparición (0 = primero)"
-    )
-    
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         verbose_name = "País Editor/Productor (044 $a)"
         verbose_name_plural = "Países Editor/Productor (044 $a)"
-        ordering = ['obra', 'orden', 'id']
+        ordering = ['obra', 'id']
         unique_together = [['obra', 'codigo_pais']]
         indexes = [
-            models.Index(fields=['obra', 'orden']),
+            models.Index(fields=['obra']),
         ]
     
     def __str__(self):
