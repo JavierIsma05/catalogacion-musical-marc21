@@ -184,6 +184,13 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
         help_text="100 $a y $d — Compositor principal"
     )
     
+    termino_asociado = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="100 $c — Término asociado al nombre"
+    )
+    
     autoria = models.CharField(
         max_length=50,
         choices=[

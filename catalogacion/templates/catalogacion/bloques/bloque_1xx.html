@@ -26,6 +26,14 @@
                     </div>
                     
                     <div class="col-full">
+                        <label class="form-label" for="{{ form.termino_asociado.id_for_label }}">{{ form.termino_asociado.label }}</label>
+                        {{ form.termino_asociado }}
+                        {% if form.termino_asociado.errors %}
+                            <div class="invalid-feedback">{{ form.termino_asociado.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-full">
                         <label class="form-label" for="{{ form.autoria.id_for_label }}">{{ form.autoria.label }}</label>
                         {{ form.autoria }}
                         {% if form.autoria.errors %}

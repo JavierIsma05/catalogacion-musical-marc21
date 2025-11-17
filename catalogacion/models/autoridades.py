@@ -16,7 +16,7 @@ class AutoridadPersona(models.Model):
         db_index=True,
         help_text="Formato: Apellidos, Nombres (normalizado)"
     )
-    fechas = models.CharField(
+    coordenadas_biograficas = models.CharField(
         max_length=50,
         blank=True,
         help_text="Coordenadas biográficas: año nacimiento - año muerte"
@@ -33,8 +33,8 @@ class AutoridadPersona(models.Model):
         ]
 
     def __str__(self):
-        if self.fechas:
-            return f"{self.apellidos_nombres} {self.fechas}"
+        if self.coordenadas_biograficas:
+            return f"{self.apellidos_nombres} ({self.coordenadas_biograficas})"
         return self.apellidos_nombres
 
 

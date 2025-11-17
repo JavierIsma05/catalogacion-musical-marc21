@@ -36,6 +36,7 @@ class ObraGeneralForm(forms.ModelForm):
             
             # Punto de acceso principal (100/130/240)
             'compositor',
+            'termino_asociado',
             'autoria',
             'titulo_uniforme',
             'forma_130',
@@ -119,6 +120,9 @@ class ObraGeneralForm(forms.ModelForm):
             'centro_catalogador': forms.TextInput(attrs={
                 'class': 'form-control',
             }),
+            'termino_asociado': forms.TextInput(attrs={
+                'class': 'form-control',
+            }),
             'isbn': forms.TextInput(attrs={
                 'class': 'form-control',
             }),
@@ -183,6 +187,7 @@ class ObraGeneralForm(forms.ModelForm):
             'control_nota_028': '028 - Control de nota',
             'numero_editor': '028 $a - Número de editor',
             'compositor': '100 $a - Compositor',
+            'termino_asociado': '100 $c - Término asociado',
             'autoria': '100 $j - Autoría',
             'titulo_uniforme': '130 $a - Título uniforme',
             'forma_130': '130 $k - Forma musical',

@@ -1118,14 +1118,14 @@ class NombreRelacionado700Admin(admin.ModelAdmin):
 
 @admin.register(AutoridadPersona)
 class AutoridadPersonaAdmin(admin.ModelAdmin):
-    list_display = ['apellidos_nombres', 'fechas', 'fecha_modificacion']
-    search_fields = ['apellidos_nombres', 'fechas']
+    list_display = ['apellidos_nombres', 'coordenadas_biograficas', 'fecha_modificacion']
+    search_fields = ['apellidos_nombres', 'coordenadas_biograficas']
     readonly_fields = ['fecha_creacion', 'fecha_modificacion']
     ordering = ['apellidos_nombres']
     
     fieldsets = (
         ('Información de la Persona', {
-            'fields': ('apellidos_nombres', 'fechas')
+            'fields': ('apellidos_nombres', 'coordenadas_biograficas')
         }),
         ('Metadatos', {
             'fields': ('fecha_creacion', 'fecha_modificacion'),

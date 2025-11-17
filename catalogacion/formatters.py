@@ -79,8 +79,11 @@ class MARCFormatter:
         
         marc = f"100 1# $a{self.obra.compositor.apellidos_nombres}"
         
-        if self.obra.compositor.fechas:
-            marc += f" $d{self.obra.compositor.fechas}"
+        if self.obra.termino_asociado:
+            marc += f" $c{self.obra.termino_asociado}"
+        
+        if self.obra.compositor.coordenadas_biograficas:
+            marc += f" $d{self.obra.compositor.coordenadas_biograficas}"
         
         if self.obra.autoria and self.obra.autoria != 'certificada':
             marc += f" $j{self.obra.autoria}"
@@ -295,7 +298,8 @@ class MARCFormatter:
             '040': {'a': self.obra.centro_catalogador},
             '100': {
                 'a': str(self.obra.compositor),
-                'd': self.obra.compositor.fechas if self.obra.compositor else None,
+                'c': self.obra.termino_asociado,
+                'd': self.obra.compositor.coordenadas_biograficas if self.obra.compositor else None,
                 'j': self.obra.autoria,
             } if self.obra.compositor else None,
             '130': {
