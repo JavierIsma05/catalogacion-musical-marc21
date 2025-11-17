@@ -216,10 +216,10 @@ class EnlaceDocumentoFuente773(models.Model):
         related_name='enlaces_documento_fuente_773',
     )
 
-    encabezamiento_principal = models.ForeignKey(
+    compositor_773 = models.ForeignKey(
         EncabezamientoEnlace,
         on_delete=models.PROTECT,
-        help_text="773 $a – Encabezamiento principal (Persona, Título o Entidad)",
+        help_text="773 $a – Compositor (Persona, Título o Entidad)",
     )
 
     titulo = models.CharField(
@@ -266,10 +266,10 @@ class EnlaceUnidadConstituyente774(models.Model):
         related_name='enlaces_unidades_774',
     )
 
-    encabezamiento_principal = models.ForeignKey(
+    compositor_774 = models.ForeignKey(
         EncabezamientoEnlace,
         on_delete=models.PROTECT,
-        help_text="774 $a – Encabezamiento principal (Persona, Título o Entidad)",
+        help_text="774 $a – Compositor (Persona, Título o Entidad)",
     )
 
     titulo = models.CharField(
@@ -316,7 +316,7 @@ class OtrasRelaciones787(models.Model):
         related_name='otras_relaciones_787',
     )
 
-    encabezamiento_principal = models.ForeignKey(
+    compositor_787 = models.ForeignKey(
         EncabezamientoEnlace,
         on_delete=models.PROTECT,
         help_text="787 $a – Encabezamiento principal (Persona, Título o Entidad)",
@@ -327,13 +327,6 @@ class OtrasRelaciones787(models.Model):
         help_text="787 $t – Título (NR)"
     )
 
-    numero_obra_relacionada = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        help_text="787 $w – Número de obra relacionada (R)"
-    )
-
     class Meta:
         verbose_name = "787 – Otra relación"
         verbose_name_plural = "787 – Otras relaciones (R)"
@@ -341,3 +334,24 @@ class OtrasRelaciones787(models.Model):
 
     def __str__(self):
         return self.titulo
+
+class NumeroObraRelacionada787(models.Model):
+    """787 $w – Número de obra relacionada (R)"""
+    enlace_787 = models.ForeignKey(
+        OtrasRelaciones787,
+        on_delete=models.CASCADE,
+        related_name='numeros_obra',
+    )
+    
+    numero = models.CharField(
+        max_length=50,
+        help_text="787 $w – Número de control de la obra relacionada"
+    )
+
+    class Meta:
+        verbose_name = "787 $w – Número de obra"
+        verbose_name_plural = "787 $w – Números de obra (R)"
+        ordering = ['enlace_787', 'id']
+
+    def __str__(self):
+        return self.numero

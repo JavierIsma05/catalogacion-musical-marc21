@@ -299,7 +299,7 @@ class EntidadRelacionada710Inline(admin.TabularInline):
 class EnlaceDocumentoFuente773Inline(admin.TabularInline):
     model = EnlaceDocumentoFuente773
     extra = 0
-    fields = ['encabezamiento_principal', 'titulo', 'numero_obra_relacionada']
+    fields = ['compositor_773', 'titulo', 'numero_obra_relacionada']
     verbose_name = "Documento Fuente (773)"
     verbose_name_plural = "📘 Documentos Fuente (773 - R)"
 
@@ -307,7 +307,7 @@ class EnlaceDocumentoFuente773Inline(admin.TabularInline):
 class EnlaceUnidadConstituyente774Inline(admin.TabularInline):
     model = EnlaceUnidadConstituyente774
     extra = 0
-    fields = ['encabezamiento_principal', 'titulo', 'numero_obra_relacionada']
+    fields = ['compositor_774', 'titulo', 'numero_obra_relacionada']
     verbose_name = "Unidad Constituyente (774)"
     verbose_name_plural = "📗 Unidades Constituyentes (774 - R)"
 

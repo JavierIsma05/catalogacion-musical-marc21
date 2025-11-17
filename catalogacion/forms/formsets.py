@@ -47,6 +47,7 @@ from catalogacion.models import (
     EnlaceUnidadConstituyente774,
     NumeroObraRelacionada774,
     OtrasRelaciones787,
+    NumeroObraRelacionada787,
     # Bloque 8XX
     Ubicacion852,
     Estanteria852,
@@ -102,6 +103,7 @@ from .forms_7xx import (
     EnlaceUnidadConstituyente774Form,
     NumeroObraRelacionada774Form,
     OtrasRelaciones787Form,
+    NumeroObraRelacionada787Form,
 )
 from .forms_8xx import (
     Ubicacion852Form,
@@ -465,6 +467,14 @@ OtrasRelaciones787FormSet = inlineformset_factory(
     ObraGeneral,
     OtrasRelaciones787,
     form=OtrasRelaciones787Form,
+    extra=1,
+    can_delete=True,
+)
+
+NumeroObraRelacionada787FormSet = inlineformset_factory(
+    OtrasRelaciones787,
+    NumeroObraRelacionada787,
+    form=NumeroObraRelacionada787Form,
     extra=1,
     can_delete=True,
 )

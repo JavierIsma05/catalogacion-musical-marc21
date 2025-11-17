@@ -125,6 +125,7 @@ from .bloque_7xx import (
     EnlaceUnidadConstituyente774,
     NumeroObraRelacionada774,
     OtrasRelaciones787,
+    NumeroObraRelacionada787
 )
 
 # ============================================

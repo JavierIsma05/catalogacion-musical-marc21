@@ -33,16 +33,16 @@ Similar al campo 041, los números de obra ($w) se manejan con JavaScript
                     <div class="campo-grid">
                         {# Campo 773 $a - Encabezamiento principal #}
                         <div class="col-full">
-                            <label class="form-label" for="{{ form.encabezamiento_principal.id_for_label }}">
-                                {{ form.encabezamiento_principal.label }}
-                                {% if form.encabezamiento_principal.field.required %}<span class="text-danger">*</span>{% endif %}
+                            <label class="form-label" for="{{ form.compositor_773.id_for_label }}">
+                                {{ form.compositor_773.label }}
+                                {% if form.compositor_773.field.required %}<span class="text-danger">*</span>{% endif %}
                             </label>
-                            {{ form.encabezamiento_principal }}
-                            {% if form.encabezamiento_principal.errors %}
-                                <div class="invalid-feedback d-block">{{ form.encabezamiento_principal.errors }}</div>
+                            {{ form.compositor_773 }}
+                            {% if form.compositor_773.errors %}
+                                <div class="invalid-feedback d-block">{{ form.compositor_773.errors }}</div>
                             {% endif %}
-                            {% if form.encabezamiento_principal.help_text %}
-                                <small class="form-text text-muted">{{ form.encabezamiento_principal.help_text }}</small>
+                            {% if form.compositor_773.help_text %}
+                                <small class="form-text text-muted">{{ form.compositor_773.help_text }}</small>
                             {% endif %}
                         </div>
                         
@@ -110,10 +110,10 @@ Similar al campo 041, los números de obra ($w) se manejan con JavaScript
                     <div class="campo-grid">
                         <div class="col-full">
                             <label class="form-label">
-                                {{ formset.empty_form.encabezamiento_principal.label }}
-                                {% if formset.empty_form.encabezamiento_principal.field.required %}<span class="text-danger">*</span>{% endif %}
+                                {{ formset.empty_form.compositor_773.label }}
+                                {% if formset.empty_form.compositor_773.field.required %}<span class="text-danger">*</span>{% endif %}
                             </label>
-                            {{ formset.empty_form.encabezamiento_principal }}
+                            {{ formset.empty_form.compositor_773 }}
                         </div>
                         
                         <div class="col-full">

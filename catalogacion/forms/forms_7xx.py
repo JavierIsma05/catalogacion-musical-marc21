@@ -15,6 +15,7 @@ from catalogacion.models import (
     EnlaceUnidadConstituyente774,
     NumeroObraRelacionada774,
     OtrasRelaciones787,
+    NumeroObraRelacionada787,
     AutoridadPersona,
     AutoridadTituloUniforme,
     AutoridadEntidad,
@@ -130,9 +131,9 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
     
     class Meta:
         model = EnlaceDocumentoFuente773
-        fields = ['encabezamiento_principal', 'titulo']
+        fields = ['compositor_773', 'titulo']
         widgets = {
-            'encabezamiento_principal': Select2Widget(attrs={
+            'compositor_773': Select2Widget(attrs={
                 'data-url': '/catalogacion/autocompletar/persona/',
             }),
             'titulo': forms.TextInput(attrs={
@@ -141,14 +142,14 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
             }),
         }
         labels = {
-            'encabezamiento_principal': '773 $a - Encabezamiento principal',
+            'compositor_773': '773 $a - Compositor',
             'titulo': '773 $t - Título',
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['titulo'].required = True
-        self.fields['encabezamiento_principal'].required = True
+        self.fields['compositor_773'].required = True
 
 
 class NumeroObraRelacionada773Form(forms.ModelForm):
@@ -173,9 +174,9 @@ class EnlaceUnidadConstituyente774Form(forms.ModelForm):
     
     class Meta:
         model = EnlaceUnidadConstituyente774
-        fields = ['encabezamiento_principal', 'titulo']
+        fields = ['compositor_774', 'titulo']
         widgets = {
-            'encabezamiento_principal': Select2Widget(attrs={
+            'compositor_774': Select2Widget(attrs={
                 'data-url': '/catalogacion/autocompletar/persona/',
             }),
             'titulo': forms.TextInput(attrs={
@@ -184,14 +185,14 @@ class EnlaceUnidadConstituyente774Form(forms.ModelForm):
             }),
         }
         labels = {
-            'encabezamiento_principal': '774 $a - Encabezamiento principal',
+            'compositor_774': '774 $a - Compositor',
             'titulo': '774 $t - Título de unidad constituyente',
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['titulo'].required = True
-        self.fields['encabezamiento_principal'].required = True
+        self.fields['compositor_774'].required = True
 
 
 class NumeroObraRelacionada774Form(forms.ModelForm):
@@ -216,16 +217,39 @@ class OtrasRelaciones787Form(forms.ModelForm):
     
     class Meta:
         model = OtrasRelaciones787
-        fields = ['titulo', 'numero_obra_relacionada']
+        fields = ['compositor_787', 'titulo']
         widgets = {
+            'compositor_787': Select2Widget(attrs={
+                'data-url': '/catalogacion/autocompletar/persona/',
+            }),
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
-            }),
-            'numero_obra_relacionada': forms.TextInput(attrs={
-                'class': 'form-control',
+                'placeholder': 'Título de la obra relacionada'
             }),
         }
         labels = {
+            'compositor_787': '787 $a - Compositor',
             'titulo': '787 $t - Título',
-            'numero_obra_relacionada': '787 $w - Número de obra relacionada',
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['titulo'].required = True
+        self.fields['compositor_787'].required = True
+
+
+class NumeroObraRelacionada787Form(forms.ModelForm):
+    """Formulario para 787 $w - Número de obra relacionada"""
+    
+    class Meta:
+        model = NumeroObraRelacionada787
+        fields = ['numero']
+        widgets = {
+            'numero': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: 001234567'
+            }),
+        }
+        labels = {
+            'numero': '787 $w - Número de obra',
         }
