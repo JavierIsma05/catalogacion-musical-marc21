@@ -33,7 +33,7 @@ from catalogacion.forms.formsets import (
     EnlaceUnidadConstituyente774FormSet, NumeroObraRelacionada774FormSet,
     OtrasRelaciones787FormSet,
     # Bloque 8XX
-    Ubicacion852FormSet, Estanteria852FormSet,
+    Ubicacion852FormSet,
     Disponible856FormSet, URL856FormSet, TextoEnlace856FormSet,
 )
 from catalogacion.models.autoridades import AutoridadPersona
@@ -200,8 +200,7 @@ class CrearObraView(CreateView):
             'otras_relaciones_787': OtrasRelaciones787FormSet(prefix='relaciones_787'),
             
             # Bloque 8XX
-            'ubicaciones_852': Ubicacion852FormSet(prefix='ubicaciones_852'),
-            'estanterias_852': Estanteria852FormSet(prefix='estanterias_852'),
+            'ubicaciones_852': Ubicacion852FormSet(instance=None, prefix='ubicaciones_852'),
             'disponibles_856': Disponible856FormSet(prefix='disponibles_856'),
             'urls_856': URL856FormSet(prefix='urls_856'),
             'textos_enlace_856': TextoEnlace856FormSet(prefix='textos_enlace_856'),
@@ -247,8 +246,7 @@ class CrearObraView(CreateView):
             'otras_relaciones_787': OtrasRelaciones787FormSet(self.request.POST, prefix='relaciones_787'),
             
             # Bloque 8XX
-            'ubicaciones_852': Ubicacion852FormSet(self.request.POST, prefix='ubicaciones_852'),
-            'estanterias_852': Estanteria852FormSet(self.request.POST, prefix='estanterias_852'),
+            'ubicaciones_852': Ubicacion852FormSet(self.request.POST, instance=None, prefix='ubicaciones_852'),
             'disponibles_856': Disponible856FormSet(self.request.POST, prefix='disponibles_856'),
             'urls_856': URL856FormSet(self.request.POST, prefix='urls_856'),
             'textos_enlace_856': TextoEnlace856FormSet(self.request.POST, prefix='textos_enlace_856'),
@@ -368,6 +366,44 @@ class CrearObraView(CreateView):
                         numero=numero
                     )
     
+    def _save_estanterias_852(self, formset):
+        """
+        Procesar inputs de estanterías generados por JavaScript.
+        Los inputs tienen nombres como: estanteria_ubicacion_852_0_1234567890
+        donde 0 es el índice de la ubicación y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import Estanteria852
+        
+        # Agrupar estanterías por índice de ubicación
+        estanterias_por_ubicacion = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('estanteria_ubicacion_852_') and value.strip():
+                try:
+                    # Extraer índice de la ubicación: estanteria_ubicacion_852_0_1234567890 -> 0
+                    parts = key.split('_')
+                    ubicacion_index = int(parts[3])
+                    
+                    if ubicacion_index not in estanterias_por_ubicacion:
+                        estanterias_por_ubicacion[ubicacion_index] = []
+                    
+                    estanterias_por_ubicacion[ubicacion_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar estanterías para cada ubicación
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in estanterias_por_ubicacion:
+                # Eliminar estanterías existentes
+                form.instance.estanterias.all().delete()
+                
+                # Crear nuevas estanterías
+                for estanteria in estanterias_por_ubicacion[index]:
+                    Estanteria852.objects.create(
+                        ubicacion=form.instance,
+                        estanteria=estanteria
+                    )
+    
     @transaction.atomic
     def form_valid(self, form):
         """Guardar obra y todos los formsets en una transacción atómica"""
@@ -385,7 +421,7 @@ class CrearObraView(CreateView):
                    'materias_genero_655', 'nombres_relacionados_700',
                    'entidades_relacionadas_710', 'enlaces_documento_fuente_773',
                    'enlaces_unidad_constituyente_774', 'otras_relaciones_787',
-                   'ubicaciones_852', 'estanterias_852', 'disponibles_856',
+                   'ubicaciones_852', 'disponibles_856',
                    'urls_856', 'textos_enlace_856']:
             formset = context.get(key)
             if formset:
@@ -444,6 +480,10 @@ class CrearObraView(CreateView):
             # Si es el formset 787, procesar números de obra desde inputs JavaScript
             if key == 'otras_relaciones_787':
                 self._save_numeros_obra_787(formset)
+            
+            # Si es el formset 852, procesar estanterías desde inputs JavaScript
+            if key == 'ubicaciones_852':
+                self._save_estanterias_852(formset)
         
         # Mensaje de éxito
         action = self.request.POST.get('action', 'publish')
@@ -597,7 +637,6 @@ class EditarObraView(UpdateView):
             'enlaces_unidad_constituyente_774': EnlaceUnidadConstituyente774FormSet(instance=self.object, prefix='enlaces_774'),
             'otras_relaciones_787': OtrasRelaciones787FormSet(instance=self.object, prefix='relaciones_787'),
             'ubicaciones_852': Ubicacion852FormSet(instance=self.object, prefix='ubicaciones_852'),
-            'estanterias_852': Estanteria852FormSet(instance=self.object, prefix='estanterias_852'),
             'disponibles_856': Disponible856FormSet(instance=self.object, prefix='disponibles_856'),
             'urls_856': URL856FormSet(instance=self.object, prefix='urls_856'),
             'textos_enlace_856': TextoEnlace856FormSet(instance=self.object, prefix='textos_enlace_856'),
@@ -627,7 +666,6 @@ class EditarObraView(UpdateView):
             'enlaces_unidad_constituyente_774': EnlaceUnidadConstituyente774FormSet(self.request.POST, instance=self.object, prefix='enlaces_774'),
             'otras_relaciones_787': OtrasRelaciones787FormSet(self.request.POST, instance=self.object, prefix='relaciones_787'),
             'ubicaciones_852': Ubicacion852FormSet(self.request.POST, instance=self.object, prefix='ubicaciones_852'),
-            'estanterias_852': Estanteria852FormSet(self.request.POST, instance=self.object, prefix='estanterias_852'),
             'disponibles_856': Disponible856FormSet(self.request.POST, instance=self.object, prefix='disponibles_856'),
             'urls_856': URL856FormSet(self.request.POST, instance=self.object, prefix='urls_856'),
             'textos_enlace_856': TextoEnlace856FormSet(self.request.POST, instance=self.object, prefix='textos_enlace_856'),
@@ -747,6 +785,44 @@ class EditarObraView(UpdateView):
                         numero=numero
                     )
     
+    def _save_estanterias_852(self, formset):
+        """
+        Procesar inputs de estanterías generados por JavaScript.
+        Los inputs tienen nombres como: estanteria_ubicacion_852_0_1234567890
+        donde 0 es el índice de la ubicación y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import Estanteria852
+        
+        # Agrupar estanterías por índice de ubicación
+        estanterias_por_ubicacion = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('estanteria_ubicacion_852_') and value.strip():
+                try:
+                    # Extraer índice de la ubicación: estanteria_ubicacion_852_0_1234567890 -> 0
+                    parts = key.split('_')
+                    ubicacion_index = int(parts[3])
+                    
+                    if ubicacion_index not in estanterias_por_ubicacion:
+                        estanterias_por_ubicacion[ubicacion_index] = []
+                    
+                    estanterias_por_ubicacion[ubicacion_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar estanterías para cada ubicación
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in estanterias_por_ubicacion:
+                # Eliminar estanterías existentes
+                form.instance.estanterias.all().delete()
+                
+                # Crear nuevas estanterías
+                for estanteria in estanterias_por_ubicacion[index]:
+                    Estanteria852.objects.create(
+                        ubicacion=form.instance,
+                        estanteria=estanteria
+                    )
+    
     @transaction.atomic
     def form_valid(self, form):
         """Similar a CrearObraView"""
@@ -764,7 +840,7 @@ class EditarObraView(UpdateView):
                    'materias_genero_655', 'nombres_relacionados_700',
                    'entidades_relacionadas_710', 'enlaces_documento_fuente_773',
                    'enlaces_unidad_constituyente_774', 'otras_relaciones_787',
-                   'ubicaciones_852', 'estanterias_852', 'disponibles_856',
+                   'ubicaciones_852', 'disponibles_856',
                    'urls_856', 'textos_enlace_856']:
             formset = context.get(key)
             if formset:
@@ -794,6 +870,10 @@ class EditarObraView(UpdateView):
             # Si es el formset 787, procesar números de obra desde inputs JavaScript
             if key == 'otras_relaciones_787':
                 self._save_numeros_obra_787(formset)
+            
+            # Si es el formset 852, procesar estanterías desde inputs JavaScript
+            if key == 'ubicaciones_852':
+                self._save_estanterias_852(formset)
         
         messages.success(self.request, 'Obra actualizada exitosamente.')
         return redirect(self.get_success_url())
@@ -821,8 +901,7 @@ class ListaObrasView(ListView):
         
         queryset = ObraGeneral.objects.activos().select_related(
             'compositor',
-            'titulo_uniforme',
-            'institucion_persona_852a'
+            'titulo_uniforme'
         ).order_by('-fecha_creacion_sistema')
         
         # Filtro de búsqueda

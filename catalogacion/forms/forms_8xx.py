@@ -8,22 +8,39 @@ from catalogacion.models import (
     Disponible856,
     URL856,
     TextoEnlace856,
+    AutoridadEntidad,
 )
-from .widgets import TextAreaAutosize
+from .widgets import TextAreaAutosize, Select2Widget
 
 
 class Ubicacion852Form(forms.ModelForm):
     """
-    Formulario para campo 852 - Ubicación (contenedor)
-    Los subcampos $a y $h están en ObraGeneral
+    Formulario para campo 852 - Ubicación
+    Incluye $a (institución) y $h (signatura)
     """
     
     class Meta:
         model = Ubicacion852
-        fields = []  # No tiene campos propios, solo subcampos relacionados
-        
-    def __str__(self):
-        return "852 - Ubicación"
+        fields = ['institucion_persona', 'signatura_original']
+        widgets = {
+            'institucion_persona': Select2Widget(attrs={
+                'data-url': '/catalogacion/autocompletar/entidad/',
+            }),
+            'signatura_original': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: Ms-123'
+            }),
+        }
+        labels = {
+            'institucion_persona': '852 $a - Institución o persona',
+            'signatura_original': '852 $h - Signatura original',
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['institucion_persona'].queryset = AutoridadEntidad.objects.all().order_by('nombre')
+        self.fields['institucion_persona'].required = False
+        self.fields['signatura_original'].required = False
 
 
 class Estanteria852Form(forms.ModelForm):

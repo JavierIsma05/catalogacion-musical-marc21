@@ -436,24 +436,10 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     # Los campos 773/774/787 se manejan completamente mediante relaciones
 
     # ===========================================
-    # CAMPOS 852 - UBICACIÓN
+    # CAMPO 852 - UBICACIÓN
     # ===========================================
-    
-    institucion_persona_852a = models.ForeignKey(
-        AutoridadEntidad,
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True,
-        related_name='obras_ubicacion_852a',
-        help_text="852 $a — Institución o persona"
-    )
-    
-    signatura_original_852h = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        help_text="852 $h — Signatura original"
-    )
+    # Los campos 852 ($a, $h, $c) se manejan completamente mediante
+    # el modelo Ubicacion852 y sus relaciones (ver bloque_8xx.py)
 
     # ===========================================
     # METADATOS DEL SISTEMA

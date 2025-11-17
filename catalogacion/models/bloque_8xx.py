@@ -1,4 +1,5 @@
 from django.db import models
+from .autoridades import AutoridadEntidad
 
 # ============================================================
 # 📦 BLOQUE 8XX – UBICACIÓN Y DISPONIBILIDAD
@@ -7,19 +8,40 @@ from django.db import models
 class Ubicacion852(models.Model):
     """
     852 ## Ubicación (R)
+    - $a Institución o persona (NR)
+    - $h Signatura original (NR)
     - $c Estantería (R)
-    
-    Nota: Los subcampos $a (institución) y $h (signatura) están en ObraGeneral
     """
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
         related_name='ubicaciones_852'
     )
+    
+    institucion_persona = models.ForeignKey(
+        AutoridadEntidad,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name='ubicaciones_852',
+        help_text="852 $a — Institución o persona"
+    )
+    
+    signatura_original = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="852 $h — Signatura original"
+    )
 
     def __str__(self):
-        estanterias = self.estanterias.count()
-        return f"Ubicación ({estanterias} estantería{'s' if estanterias != 1 else ''})"
+        if self.institucion_persona:
+            return f"Ubicación: {self.institucion_persona}"
+        elif self.signatura_original:
+            return f"Ubicación: {self.signatura_original}"
+        else:
+            estanterias = self.estanterias.count()
+            return f"Ubicación ({estanterias} estantería{'s' if estanterias != 1 else ''})"
 
     class Meta:
         verbose_name = "852 - Ubicación"

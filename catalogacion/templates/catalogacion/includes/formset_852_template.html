@@ -1,6 +1,6 @@
 {% comment %}
-Template para campo 787 - Otras Relaciones
-Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
+Template para campo 852 - Ubicación Física
+El campo 852 es repetible y contiene subcampos repetibles ($c estantería)
 {% endcomment %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
@@ -11,9 +11,9 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
         {% endfor %}
     </div>
     
-    <button type="button" class="add-form-row mb-3" title="Agregar Otra Relación">
+    <button type="button" class="add-form-row mb-3" title="Agregar Ubicación">
         <i class="bi bi-plus-circle"></i>
-        Agregar Otra Relación
+        Agregar Ubicación
     </button>
     
     <div class="formset-forms">
@@ -36,60 +36,58 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="campo-grid">
-                        {# Campo 787 $a - Encabezamiento principal #}
-                        <div class="col-full">
-                            <label class="form-label" for="{{ form.compositor_787.id_for_label }}">
-                                {{ form.compositor_787.label }}
-                                {% if form.compositor_787.field.required %}<span class="text-danger">*</span>{% endif %}
+                        {# Campo 852 $a - Institución o persona #}
+                        <div class="col-half">
+                            <label class="form-label" for="{{ form.institucion_persona.id_for_label }}">
+                                {{ form.institucion_persona.label }}
                             </label>
-                            {{ form.compositor_787 }}
-                            {% if form.compositor_787.errors %}
-                                <div class="invalid-feedback d-block">{{ form.compositor_787.errors }}</div>
+                            {{ form.institucion_persona }}
+                            {% if form.institucion_persona.errors %}
+                                <div class="invalid-feedback d-block">{{ form.institucion_persona.errors }}</div>
                             {% endif %}
-                            {% if form.compositor_787.help_text %}
-                                <small class="form-text text-muted">{{ form.compositor_787.help_text }}</small>
+                            {% if form.institucion_persona.help_text %}
+                                <small class="form-text text-muted">{{ form.institucion_persona.help_text }}</small>
                             {% endif %}
                         </div>
                         
-                        {# Campo 787 $t - Título #}
-                        <div class="col-full">
-                            <label class="form-label" for="{{ form.titulo.id_for_label }}">
-                                {{ form.titulo.label }}
-                                {% if form.titulo.field.required %}<span class="text-danger">*</span>{% endif %}
+                        {# Campo 852 $h - Signatura original #}
+                        <div class="col-half">
+                            <label class="form-label" for="{{ form.signatura_original.id_for_label }}">
+                                {{ form.signatura_original.label }}
                             </label>
-                            {{ form.titulo }}
-                            {% if form.titulo.errors %}
-                                <div class="invalid-feedback d-block">{{ form.titulo.errors }}</div>
+                            {{ form.signatura_original }}
+                            {% if form.signatura_original.errors %}
+                                <div class="invalid-feedback d-block">{{ form.signatura_original.errors }}</div>
                             {% endif %}
-                            {% if form.titulo.help_text %}
-                                <small class="form-text text-muted">{{ form.titulo.help_text }}</small>
+                            {% if form.signatura_original.help_text %}
+                                <small class="form-text text-muted">{{ form.signatura_original.help_text }}</small>
                             {% endif %}
                         </div>
                         
-                        {# Botón para agregar números de obra ($w) #}
+                        {# Botón para agregar estanterías ($c) #}
                         <div class="col-full">
-                            <button type="button" class="btn btn-sm btn-outline-primary add-numero-btn w-100" data-enlace-index="{{ forloop.counter0 }}">
+                            <button type="button" class="btn btn-sm btn-outline-primary add-estanteria-btn w-100" data-ubicacion-index="{{ forloop.counter0 }}">
                                 <i class="bi bi-plus-circle"></i>
-                                Agregar Número de Obra ($w)
+                                Agregar Estantería ($c)
                             </button>
                         </div>
                         
-                        {# Subcampo $w - Números de obra (Repetible) #}
-                        <div class="col-full numeros-container" data-numeros-container="{{ forloop.counter0 }}">
+                        {# Subcampo $c - Estanterías (Repetible) #}
+                        <div class="col-full estanterias-container" data-estanterias-container="{{ forloop.counter0 }}">
                             {% if form.instance.pk %}
-                                {# Cargar números existentes #}
-                                {% for numero in form.instance.numeros_obra.all %}
-                                <div class="numero-form-row">
+                                {# Cargar estanterías existentes #}
+                                {% for estanteria in form.instance.estanterias.all %}
+                                <div class="estanteria-form-row">
                                     <div class="d-flex flex-column w-100 mb-2">
-                                        <label class="form-label small">787 $w - Número de obra relacionada</label>
+                                        <label class="form-label small">852 $c - Estantería</label>
                                         <div class="d-flex gap-2 align-items-center">
                                             <input type="text" 
-                                                   class="form-control numero-input" 
-                                                   name="numero_enlace_787_{{ forloop.parentloop.counter0 }}_{{ numero.pk }}"
-                                                   value="{{ numero.numero }}"
-                                                   placeholder="Ej: 001234567" 
+                                                   class="form-control estanteria-input" 
+                                                   name="estanteria_ubicacion_852_{{ forloop.parentloop.counter0 }}_{{ estanteria.pk }}"
+                                                   value="{{ estanteria.estanteria }}"
+                                                   placeholder="Ej: Sala A, Estante 3" 
                                                    style="flex: 1;">
-                                            <button type="button" class="btn btn-sm btn-outline-danger delete-numero-btn" title="Eliminar número">
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-estanteria-btn" title="Eliminar estantería">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -104,7 +102,7 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
         </div>
         {% endfor %}
         
-        {# Template vacío para clonar enlaces #}
+        {# Template vacío para clonar ubicaciones #}
         <div class="formset-row empty-form">
             <button type="button" class="delete-row-btn" title="Eliminar">
                 <i class="bi bi-x-lg"></i>
@@ -113,31 +111,29 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="campo-grid">
-                        <div class="col-full">
+                        <div class="col-half">
                             <label class="form-label">
-                                {{ formset.empty_form.compositor_787.label }}
-                                {% if formset.empty_form.compositor_787.field.required %}<span class="text-danger">*</span>{% endif %}
+                                {{ formset.empty_form.institucion_persona.label }}
                             </label>
-                            {{ formset.empty_form.compositor_787 }}
+                            {{ formset.empty_form.institucion_persona }}
+                        </div>
+                        
+                        <div class="col-half">
+                            <label class="form-label">
+                                {{ formset.empty_form.signatura_original.label }}
+                            </label>
+                            {{ formset.empty_form.signatura_original }}
                         </div>
                         
                         <div class="col-full">
-                            <label class="form-label">
-                                {{ formset.empty_form.titulo.label }}
-                                {% if formset.empty_form.titulo.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ formset.empty_form.titulo }}
-                        </div>
-                        
-                        <div class="col-full">
-                            <button type="button" class="btn btn-sm btn-outline-primary add-numero-btn w-100" data-enlace-index="__prefix__">
+                            <button type="button" class="btn btn-sm btn-outline-primary add-estanteria-btn w-100" data-ubicacion-index="__prefix__">
                                 <i class="bi bi-plus-circle"></i>
-                                Agregar Número de Obra ($w)
+                                Agregar Estantería ($c)
                             </button>
                         </div>
                         
-                        <div class="col-full numeros-container" data-numeros-container="__prefix__">
-                            {# Los números se agregarán aquí dinámicamente #}
+                        <div class="col-full estanterias-container" data-estanterias-container="__prefix__">
+                            {# Las estanterías se agregarán aquí dinámicamente #}
                         </div>
                     </div>
                 </div>
@@ -146,13 +142,13 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
     </div>
 </div>
 
-{# Template global para números de obra (fuera del formset loop) #}
-<div class="numero-form-row numero-template-787 d-none">
+{# Template global para estanterías (fuera del formset loop) #}
+<div class="estanteria-form-row estanteria-template-852 d-none">
     <div class="d-flex flex-column w-100 mb-2">
-        <label class="form-label small">787 $w - Número de obra relacionada</label>
+        <label class="form-label small">852 $c - Estantería</label>
         <div class="d-flex gap-2 align-items-center">
-            <input type="text" class="form-control numero-input" placeholder="Ej: 001234567" style="flex: 1;">
-            <button type="button" class="btn btn-sm btn-outline-danger delete-numero-btn" title="Eliminar número">
+            <input type="text" class="form-control estanteria-input" placeholder="Ej: Sala A, Estante 3" style="flex: 1;">
+            <button type="button" class="btn btn-sm btn-outline-danger delete-estanteria-btn" title="Eliminar estantería">
                 <i class="bi bi-trash"></i>
             </button>
         </div>
@@ -160,7 +156,7 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
 </div>
 
 <script>
-// Script para manejar el campo 787 con números de obra repetibles
+// Script para manejar el campo 852 con estanterías repetibles
 (function() {
     const prefix = '{{ formset.prefix }}';
     const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
@@ -169,11 +165,11 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
     const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
     const addButton = container.querySelector('.add-form-row');
     const formsContainer = container.querySelector('.formset-forms');
-    const numeroTemplate = document.querySelector('.numero-template-787');
+    const estanteriaTemplate = document.querySelector('.estanteria-template-852');
     
-    if (!totalFormsInput || !addButton || !formsContainer || !numeroTemplate) return;
+    if (!totalFormsInput || !addButton || !formsContainer || !estanteriaTemplate) return;
     
-    // Agregar nuevo enlace 787
+    // Agregar nueva ubicación 852
     addButton.addEventListener('click', function() {
         const totalForms = parseInt(totalFormsInput.value);
         const emptyFormTemplate = formsContainer.querySelector('.empty-form');
@@ -190,7 +186,7 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
         
         // Inicializar Select2 si existe
         if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
-            emptyForm.querySelectorAll('.form-select:not(.numero-input)').forEach(select => {
+            emptyForm.querySelectorAll('.form-select:not(.estanteria-input)').forEach(select => {
                 $(select).select2({
                     theme: 'bootstrap-5',
                     width: '100%'
@@ -199,7 +195,7 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
         }
     });
     
-    // Eliminar enlace 787
+    // Eliminar ubicación 852
     container.addEventListener('click', function(e) {
         const deleteBtn = e.target.closest('.delete-row-btn');
         if (!deleteBtn) return;
@@ -229,34 +225,34 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
         }
     });
     
-    // Manejar números de obra (subcampo $w repetible)
+    // Manejar estanterías (subcampo $c repetible)
     container.addEventListener('click', function(e) {
-        // Agregar número
-        const addNumeroBtn = e.target.closest('.add-numero-btn');
-        if (addNumeroBtn) {
-            const enlaceIndex = addNumeroBtn.getAttribute('data-enlace-index');
-            const numerosContainer = container.querySelector(`[data-numeros-container="${enlaceIndex}"]`);
+        // Agregar estantería
+        const addEstanteriaBtn = e.target.closest('.add-estanteria-btn');
+        if (addEstanteriaBtn) {
+            const ubicacionIndex = addEstanteriaBtn.getAttribute('data-ubicacion-index');
+            const estanteriasContainer = container.querySelector(`[data-estanterias-container="${ubicacionIndex}"]`);
             
-            if (!numerosContainer) return;
+            if (!estanteriasContainer) return;
             
-            const newNumero = numeroTemplate.cloneNode(true);
-            newNumero.classList.remove('numero-template-787', 'd-none');
+            const newEstanteria = estanteriaTemplate.cloneNode(true);
+            newEstanteria.classList.remove('estanteria-template-852', 'd-none');
             
             // Actualizar el name del input
-            const input = newNumero.querySelector('.numero-input');
+            const input = newEstanteria.querySelector('.estanteria-input');
             if (input) {
-                input.name = `numero_enlace_787_${enlaceIndex}_${Date.now()}`;
+                input.name = `estanteria_ubicacion_852_${ubicacionIndex}_${Date.now()}`;
             }
             
-            numerosContainer.appendChild(newNumero);
+            estanteriasContainer.appendChild(newEstanteria);
         }
         
-        // Eliminar número
-        const deleteNumeroBtn = e.target.closest('.delete-numero-btn');
-        if (deleteNumeroBtn) {
-            const numeroRow = deleteNumeroBtn.closest('.numero-form-row');
-            if (!numeroRow.classList.contains('numero-template-787')) {
-                numeroRow.remove();
+        // Eliminar estantería
+        const deleteEstanteriaBtn = e.target.closest('.delete-estanteria-btn');
+        if (deleteEstanteriaBtn) {
+            const estanteriaRow = deleteEstanteriaBtn.closest('.estanteria-form-row');
+            if (!estanteriaRow.classList.contains('estanteria-template-852')) {
+                estanteriaRow.remove();
             }
         }
     });

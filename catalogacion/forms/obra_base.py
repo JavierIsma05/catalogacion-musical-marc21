@@ -135,10 +135,6 @@ class ObraGeneralForm(forms.ModelForm):
             'numero_obra',
             'opus',
             'tonalidad_384',
-            
-            # Ubicación (852)
-            'institucion_persona_852a',
-            'signatura_original_852h',
         ]
         
         widgets = {
@@ -157,9 +153,6 @@ class ObraGeneralForm(forms.ModelForm):
             }),
             'forma_130': Select2Widget(attrs={}),
             'forma_240': Select2Widget(attrs={}),
-            'institucion_persona_852a': Select2Widget(attrs={
-                'data-url': '/catalogacion/autocompletar/entidad/',
-            }),
             
             # Selects normales
             'tipo_registro': forms.Select(attrs={'class': 'form-select'}),
@@ -231,9 +224,6 @@ class ObraGeneralForm(forms.ModelForm):
             'opus': forms.TextInput(attrs={
                 'class': 'form-control',
             }),
-            'signatura_original_852h': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
             
             # TextAreas
             'mencion_responsabilidad': TextAreaAutosize(attrs={}),
@@ -278,8 +268,6 @@ class ObraGeneralForm(forms.ModelForm):
             'numero_obra': '383 $a - Número serial de obra',
             'opus': '383 $b - Número de opus',
             'tonalidad_384': '384 $a - Tonalidad',
-            'institucion_persona_852a': '852 $a - Institución',
-            'signatura_original_852h': '852 $h - Signatura original',
         }
     
     def __init__(self, *args, **kwargs):
@@ -295,8 +283,6 @@ class ObraGeneralForm(forms.ModelForm):
         self.fields['forma_130'].queryset = AutoridadFormaMusical.objects.all().order_by('forma')
         
         self.fields['forma_240'].queryset = AutoridadFormaMusical.objects.all().order_by('forma')
-        
-        self.fields['institucion_persona_852a'].queryset = AutoridadEntidad.objects.all().order_by('nombre')
         
         # Hacer título principal obligatorio
         self.fields['titulo_principal'].required = True
