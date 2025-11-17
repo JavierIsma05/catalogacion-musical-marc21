@@ -61,8 +61,6 @@ class MARCFormatter:
         ind2 = self.obra.control_nota_028 or '0'
         
         marc = f"028 {ind1}{ind2} $a{self.obra.numero_editor}"
-        if self.obra.nombre_editor:
-            marc += f" $b{self.obra.nombre_editor}"
         
         return marc
     
@@ -293,7 +291,6 @@ class MARCFormatter:
                 'ind1': self.obra.tipo_numero_028,
                 'ind2': self.obra.control_nota_028,
                 'a': self.obra.numero_editor,
-                'b': self.obra.nombre_editor,
             } if self.obra.numero_editor else None,
             '040': {'a': self.obra.centro_catalogador},
             '100': {

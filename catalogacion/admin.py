@@ -581,7 +581,7 @@ FIELDSETS_COLECCION_IMPRESA = (
     ('🔢 Identificadores (020/024/028)', {
         'fields': (
             ('isbn', 'ismn'),
-            ('numero_editor', 'nombre_editor'),
+            'numero_editor',
         )
     }),
     ('🎵 Punto de Acceso Principal', {
@@ -718,7 +718,7 @@ FIELDSETS_OBRA_IMPRESA = (
     ('🔢 Identificadores (020/024/028)', {
         'fields': (
             ('isbn', 'ismn'),
-            ('numero_editor', 'nombre_editor'),
+            'numero_editor',
         )
     }),
     ('🎵 Compositor (100)', {

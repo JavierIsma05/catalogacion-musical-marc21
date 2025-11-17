@@ -62,13 +62,19 @@
         </div>
         
         <div class="col-third">
-            <label class="form-label" for="id_numero_editor">{{ form.numero_editor.label }}</label>
-            {{ form.numero_editor }}
+            <label class="form-label" for="id_control_nota_028">{{ form.control_nota_028.label }}</label>
+            {{ form.control_nota_028 }}
+            {% if form.control_nota_028.errors %}
+                <div class="invalid-feedback">{{ form.control_nota_028.errors }}</div>
+            {% endif %}
         </div>
         
         <div class="col-third">
-            <label class="form-label" for="id_nombre_editor">{{ form.nombre_editor.label }}</label>
-            {{ form.nombre_editor }}
+            <label class="form-label" for="id_numero_editor">{{ form.numero_editor.label }}</label>
+            {{ form.numero_editor }}
+            {% if form.numero_editor.errors %}
+                <div class="invalid-feedback">{{ form.numero_editor.errors }}</div>
+            {% endif %}
         </div>
     </div>
 </div>

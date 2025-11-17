@@ -33,7 +33,6 @@ class ObraGeneralForm(forms.ModelForm):
             'tipo_numero_028',
             'control_nota_028',
             'numero_editor',
-            'nombre_editor',
             
             # Punto de acceso principal (100/130/240)
             'compositor',
@@ -129,9 +128,6 @@ class ObraGeneralForm(forms.ModelForm):
             'numero_editor': forms.TextInput(attrs={
                 'class': 'form-control',
             }),
-            'nombre_editor': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
             'numero_parte_130': forms.TextInput(attrs={
                 'class': 'form-control',
             }),
@@ -186,7 +182,6 @@ class ObraGeneralForm(forms.ModelForm):
             'tipo_numero_028': '028 - Tipo de número',
             'control_nota_028': '028 - Control de nota',
             'numero_editor': '028 $a - Número de editor',
-            'nombre_editor': '028 $b - Nombre del editor',
             'compositor': '100 $a - Compositor',
             'autoria': '100 $j - Autoría',
             'titulo_uniforme': '130 $a - Título uniforme',

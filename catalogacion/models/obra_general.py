@@ -159,12 +159,6 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
         help_text="028 $a — Número de editor, plancha o placa"
     )
     
-    nombre_editor = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True,
-        help_text="028 $b — Nombre del editor"
-    )
 
     # ===========================================
     # CAMPO 040 - CENTRO CATALOGADOR
