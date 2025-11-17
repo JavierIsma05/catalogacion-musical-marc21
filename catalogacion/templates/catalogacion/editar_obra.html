@@ -1,0 +1,13 @@
+{% extends 'catalogacion/crear_obra.html' %}
+
+{% block title %}Editar {{ tipo_obra_titulo }} - MARC21{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'catalogacion:index' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="#">Obras</a></li>
+        <li class="breadcrumb-item active">Editar {{ tipo_obra_titulo }}</li>
+    </ol>
+</nav>
+{% endblock %}

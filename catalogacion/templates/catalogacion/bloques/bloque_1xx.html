@@ -17,11 +17,25 @@
                 </div>
                 
                 <div class="campo-grid">
+                    {# Campo oculto para el ID del compositor #}
+                    <input type="hidden" name="compositor" id="id_compositor" value="{{ form.compositor.value|default:'' }}">
+                    
                     <div class="col-full">
-                        <label class="form-label" for="{{ form.compositor.id_for_label }}">{{ form.compositor.label }}</label>
-                        {{ form.compositor }}
-                        {% if form.compositor.errors %}
-                            <div class="invalid-feedback">{{ form.compositor.errors }}</div>
+                        <label class="form-label" for="id_compositor_texto">{{ form.compositor_texto.label }}</label>
+                        {{ form.compositor_texto }}
+                        <div class="form-text">Escriba para buscar compositores existentes o ingrese un nombre nuevo</div>
+                        <div id="compositor-suggestions" class="autocomplete-suggestions"></div>
+                        {% if form.compositor_texto.errors %}
+                            <div class="invalid-feedback d-block">{{ form.compositor_texto.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-full">
+                        <label class="form-label" for="id_compositor_coordenadas">{{ form.compositor_coordenadas.label }}</label>
+                        {{ form.compositor_coordenadas }}
+                        <div class="form-text">Fechas de vida (Ej: 1900-1980)</div>
+                        {% if form.compositor_coordenadas.errors %}
+                            <div class="invalid-feedback d-block">{{ form.compositor_coordenadas.errors }}</div>
                         {% endif %}
                     </div>
                     

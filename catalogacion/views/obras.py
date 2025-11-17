@@ -35,6 +35,7 @@ from catalogacion.forms.formsets import (
     Ubicacion852FormSet, Estanteria852FormSet,
     Disponible856FormSet, URL856FormSet, TextoEnlace856FormSet,
 )
+from catalogacion.models.autoridades import AutoridadPersona
 
 # Mapeo de tipos de obra a configuraciones MARC21
 TIPO_OBRA_CONFIG = {
@@ -287,15 +288,29 @@ class CrearObraView(CreateView):
         # Guardar la obra principal
         self.object = form.save(commit=False)
         
-        # IMPORTANTE: Asegurar que tipo_registro y nivel_bibliografico estén asignados
-        # Estos valores vienen del formulario oculto en el POST
+        # Manejar compositor: crear si no existe
+        compositor_display = self.request.POST.get('compositor_display', '').strip()
+        if compositor_display and not self.object.compositor_id:
+            # Crear nuevo compositor
+            compositor, created = AutoridadPersona.objects.get_or_create(
+                apellidos_nombres=compositor_display,
+                defaults={'fechas': ''}
+            )
+            self.object.compositor = compositor
+            
+            if created:
+                messages.info(
+                    self.request,
+                    f'Se creó el compositor: {compositor_display}'
+                )
+        
+        # Asegurar tipo_registro y nivel_bibliografico
         if not self.object.tipo_registro:
             self.object.tipo_registro = self.config_obra['tipo_registro']
         
         if not self.object.nivel_bibliografico:
             self.object.nivel_bibliografico = self.config_obra['nivel_bibliografico']
         
-        # Guardar obra (esto ejecuta el método save() del modelo que genera campos automáticos)
         self.object.save()
         
         # Guardar todos los formsets
@@ -332,6 +347,18 @@ class EditarObraView(UpdateView):
     model = ObraGeneral
     form_class = ObraGeneralForm
     template_name = 'catalogacion/editar_obra.html'
+    
+    def get_form_kwargs(self):
+        """Pre-poblar campos de autocomplete para modo edición"""
+        kwargs = super().get_form_kwargs()
+        
+        # En GET, pre-poblar los campos de texto del autocomplete
+        if self.request.method == 'GET' and self.object and self.object.compositor:
+            kwargs['initial'] = kwargs.get('initial', {})
+            kwargs['initial']['compositor_texto'] = self.object.compositor.apellidos_nombres
+            kwargs['initial']['compositor_coordenadas'] = self.object.compositor.coordenadas_biograficas or ''
+        
+        return kwargs
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

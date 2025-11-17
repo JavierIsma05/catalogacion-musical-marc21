@@ -19,6 +19,26 @@ class ObraGeneralForm(forms.ModelForm):
     Maneja campos no repetibles del modelo principal
     """
     
+    # Campos adicionales para autocomplete editable de compositor
+    compositor_texto = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Escriba o seleccione un compositor...',
+            'autocomplete': 'off',
+        }),
+        label='100 $a - Compositor (Apellidos, Nombres)'
+    )
+    
+    compositor_coordenadas = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ej: 1900-1980',
+        }),
+        label='100 $d - Coordenadas biográficas'
+    )
+    
     class Meta:
         model = ObraGeneral
         fields = [
@@ -240,8 +260,40 @@ class ObraGeneralForm(forms.ModelForm):
         self.fields['titulo_principal'].required = True
     
     def clean(self):
-        """Validación personalizada"""
+        """Validación personalizada y creación automática de compositor"""
         cleaned_data = super().clean()
+        
+        # Manejar compositor autocomplete editable
+        compositor_texto = cleaned_data.get('compositor_texto', '').strip()
+        compositor_coordenadas = cleaned_data.get('compositor_coordenadas', '').strip()
+        
+        if compositor_texto:
+            # Si hay texto, buscar o crear la persona
+            try:
+                # Primero intentar encontrar por nombre exacto
+                persona = AutoridadPersona.objects.get(apellidos_nombres__iexact=compositor_texto)
+                
+                # Actualizar coordenadas si se proporcionaron y son diferentes
+                if compositor_coordenadas and persona.coordenadas_biograficas != compositor_coordenadas:
+                    persona.coordenadas_biograficas = compositor_coordenadas
+                    persona.save()
+                
+                cleaned_data['compositor'] = persona
+                
+            except AutoridadPersona.DoesNotExist:
+                # Crear nueva persona
+                persona = AutoridadPersona.objects.create(
+                    apellidos_nombres=compositor_texto,
+                    coordenadas_biograficas=compositor_coordenadas
+                )
+                cleaned_data['compositor'] = persona
+                
+            except AutoridadPersona.MultipleObjectsReturned:
+                # Si hay múltiples coincidencias, tomar la primera
+                persona = AutoridadPersona.objects.filter(
+                    apellidos_nombres__iexact=compositor_texto
+                ).first()
+                cleaned_data['compositor'] = persona
         
         # Validar punto de acceso principal (100 vs 130)
         compositor = cleaned_data.get('compositor')

@@ -15,18 +15,53 @@ from catalogacion.models import (
 def autocompletar_persona(request):
     """
     API para autocompletar personas en Select2
+    Soporta búsqueda por apellidos_nombres y coordenadas_biograficas
+    Permite crear nuevas personas si se envía 'crear=true'
+    Permite buscar por ID si se envía 'id=123'
     """
     q = request.GET.get('q', '')
+    crear = request.GET.get('crear', 'false') == 'true'
+    persona_id = request.GET.get('id', None)
     
+    # Si se busca por ID específico
+    if persona_id:
+        try:
+            persona = AutoridadPersona.objects.get(id=persona_id)
+            return JsonResponse({
+                'results': [{
+                    'id': persona.id,
+                    'text': str(persona),
+                    'apellidos_nombres': persona.apellidos_nombres,
+                    'coordenadas_biograficas': persona.coordenadas_biograficas or '',
+                }]
+            })
+        except AutoridadPersona.DoesNotExist:
+            return JsonResponse({'results': []})
+    
+    # Si se solicita crear una nueva persona
+    if crear and q:
+        persona, created = AutoridadPersona.objects.get_or_create(
+            apellidos_nombres=q,
+            defaults={'coordenadas_biograficas': ''}
+        )
+        return JsonResponse({
+            'id': persona.id,
+            'text': str(persona),
+            'created': created
+        })
+    
+    # Búsqueda normal
     personas = AutoridadPersona.objects.filter(
         Q(apellidos_nombres__icontains=q) |
-        Q(codigo_autoridad__icontains=q)
-    )[:20]
+        Q(coordenadas_biograficas__icontains=q)
+    ).order_by('apellidos_nombres')[:20]
     
     results = [
         {
             'id': p.id,
-            'text': f"{p.apellidos_nombres} ({p.fechas})" if p.fechas else p.apellidos_nombres,
+            'text': str(p),
+            'apellidos_nombres': p.apellidos_nombres,
+            'coordenadas_biograficas': p.coordenadas_biograficas or '',
         }
         for p in personas
     ]
@@ -42,13 +77,13 @@ def autocompletar_entidad(request):
     
     entidades = AutoridadEntidad.objects.filter(
         Q(nombre__icontains=q) |
-        Q(codigo_autoridad__icontains=q)
-    )[:20]
+        Q(pais__icontains=q)
+    ).order_by('nombre')[:20]
     
     results = [
         {
             'id': e.id,
-            'text': f"{e.nombre} ({e.lugar})" if e.lugar else e.nombre,
+            'text': str(e),
         }
         for e in entidades
     ]
@@ -63,9 +98,8 @@ def autocompletar_titulo_uniforme(request):
     q = request.GET.get('q', '')
     
     titulos = AutoridadTituloUniforme.objects.filter(
-        Q(titulo__icontains=q) |
-        Q(codigo_autoridad__icontains=q)
-    )[:20]
+        titulo__icontains=q
+    ).order_by('titulo')[:20]
     
     results = [
         {
@@ -85,9 +119,8 @@ def autocompletar_materia(request):
     q = request.GET.get('q', '')
     
     materias = AutoridadMateria.objects.filter(
-        Q(termino__icontains=q) |
-        Q(codigo_autoridad__icontains=q)
-    )[:20]
+        termino__icontains=q
+    ).order_by('termino')[:20]
     
     results = [
         {

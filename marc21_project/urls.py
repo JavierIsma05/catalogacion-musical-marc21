@@ -13,12 +13,11 @@ urlpatterns = [
     # Aplicación de catalogación (incluye index)
     path('', include('catalogacion.urls')),
     
+    # Autoridades y APIs de autocomplete
+    path('catalogacion/', include('catalogacion.urls_autoridades')),
+    
     # Handlers de error personalizados (pendiente de implementar)
 ]
-
-# Configurar páginas de error personalizadas (pendiente)
-# handler404 = 'catalogacion.views.errors.error_404'
-# handler500 = 'catalogacion.views.errors.error_500'
 
 # Servir archivos estáticos y media en desarrollo
 if settings.DEBUG:

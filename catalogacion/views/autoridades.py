@@ -4,8 +4,11 @@ Views para gestión de autoridades (Personas, Entidades, etc.)
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView
 from django.contrib import messages
 from django.urls import reverse_lazy
-from django.db.models import Q
 from django.shortcuts import redirect
+
+from django.http import JsonResponse
+from django.views import View
+from django.db.models import Q
 
 from catalogacion.models import (
     AutoridadPersona,
@@ -239,3 +242,109 @@ class EliminarEntidadView(DeleteView):
         self.object.delete()
         messages.success(request, f'Autoridad de entidad "{nombre}" eliminada exitosamente.')
         return redirect(self.success_url)
+
+
+class AutocompletarPersonaView(View):
+    """
+    API para autocompletar nombres de personas
+    Retorna sugerencias basadas en el texto ingresado
+    """
+    def get(self, request):
+        query = request.GET.get('q', '').strip()
+        
+        if len(query) < 2:
+            return JsonResponse({'results': []})
+        
+        # Buscar en apellidos_nombres y coordenadas_biograficas
+        personas = AutoridadPersona.objects.filter(
+            Q(apellidos_nombres__icontains=query) |
+            Q(coordenadas_biograficas__icontains=query)
+        ).values(
+            'id',
+            'apellidos_nombres',
+            'coordenadas_biograficas'
+        )[:10]  # Limitar a 10 resultados
+        
+        # Formatear resultados
+        results = []
+        for persona in personas:
+            nombre_completo = persona['apellidos_nombres']
+            if persona['coordenadas_biograficas']:
+                nombre_completo += f" ({persona['coordenadas_biograficas']})"
+            
+            results.append({
+                'id': persona['id'],
+                'text': nombre_completo,
+                'apellidos_nombres': persona['apellidos_nombres'],
+                'coordenadas_biograficas': persona['coordenadas_biograficas'] or ''
+            })
+        
+        return JsonResponse({'results': results})
+
+
+class AutocompletarEntidadView(View):
+    """
+    API para autocompletar nombres de entidades
+    """
+    def get(self, request):
+        query = request.GET.get('q', '').strip()
+        
+        if len(query) < 2:
+            return JsonResponse({'results': []})
+        
+        entidades = AutoridadEntidad.objects.filter(
+            nombre_entidad__icontains=query
+        ).values(
+            'id',
+            'nombre_entidad',
+            'lugar'
+        )[:10]
+        
+        results = []
+        for entidad in entidades:
+            nombre_completo = entidad['nombre_entidad']
+            if entidad['lugar']:
+                nombre_completo += f" ({entidad['lugar']})"
+            
+            results.append({
+                'id': entidad['id'],
+                'text': nombre_completo,
+                'nombre_entidad': entidad['nombre_entidad'],
+                'lugar': entidad['lugar'] or ''
+            })
+        
+        return JsonResponse({'results': results})
+
+
+class AutocompletarTituloUniformeView(View):
+    """
+    API para autocompletar títulos uniformes
+    """
+    def get(self, request):
+        query = request.GET.get('q', '').strip()
+        
+        if len(query) < 2:
+            return JsonResponse({'results': []})
+        
+        titulos = AutoridadTituloUniforme.objects.filter(
+            titulo__icontains=query
+        ).values(
+            'id',
+            'titulo',
+            'forma'
+        )[:10]
+        
+        results = []
+        for titulo in titulos:
+            nombre_completo = titulo['titulo']
+            if titulo['forma']:
+                nombre_completo += f" ({titulo['forma']})"
+            
+            results.append({
+                'id': titulo['id'],
+                'text': nombre_completo,
+                'titulo': titulo['titulo'],
+                'forma': titulo['forma'] or ''
+            })
+        
+        return JsonResponse({'results': results})

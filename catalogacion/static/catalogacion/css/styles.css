@@ -851,6 +851,73 @@ textarea.form-control {
 }
 
 /* ============================================
+   AUTOCOMPLETE EDITABLE
+   ============================================ */
+.autocomplete-suggestions {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-height: 300px;
+    overflow-y: auto;
+    width: 100%;
+    display: none;
+    margin-top: 2px;
+}
+
+.autocomplete-suggestions.show {
+    display: block;
+}
+
+.autocomplete-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--gray-200);
+    transition: background-color 0.15s ease;
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.selected {
+    background-color: var(--gray-100);
+}
+
+.autocomplete-item-main {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.autocomplete-item-main i {
+    font-size: 1rem;
+    color: var(--primary);
+}
+
+.autocomplete-item-new {
+    background-color: var(--gray-50);
+    border-top: 2px solid var(--primary);
+}
+
+.autocomplete-item-new:hover {
+    background-color: var(--accent-light);
+    color: white;
+}
+
+.autocomplete-item-new i {
+    color: var(--accent);
+}
+
+/* Posicionamiento relativo para el contenedor del input */
+.campo-grid > div:has(#compositor-suggestions) {
+    position: relative;
+}
+
+/* ============================================
    PRINT STYLES
    ============================================ */
 @media print {

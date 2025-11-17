@@ -2,7 +2,6 @@
 URLs para gestión de autoridades
 """
 from django.urls import path
-
 from catalogacion.views.autoridades import (
     # Personas
     ListaPersonasView,
@@ -10,13 +9,15 @@ from catalogacion.views.autoridades import (
     EditarPersonaView,
     VerPersonaView,
     EliminarPersonaView,
-    
     # Entidades
     ListaEntidadesView,
     CrearEntidadView,
     EditarEntidadView,
     VerEntidadView,
     EliminarEntidadView,
+    AutocompletarPersonaView,
+    AutocompletarEntidadView,
+    AutocompletarTituloUniformeView,
 )
 
 urlpatterns = [
@@ -33,4 +34,21 @@ urlpatterns = [
     path('entidades/<int:pk>/', VerEntidadView.as_view(), name='ver_entidad'),
     path('entidades/<int:pk>/editar/', EditarEntidadView.as_view(), name='editar_entidad'),
     path('entidades/<int:pk>/eliminar/', EliminarEntidadView.as_view(), name='eliminar_entidad'),
+    
+    # APIs de autocomplete
+    path(
+        'api/autocompletar/persona/',
+        AutocompletarPersonaView.as_view(),
+        name='autocompletar_persona'
+    ),
+    path(
+        'api/autocompletar/entidad/',
+        AutocompletarEntidadView.as_view(),
+        name='autocompletar_entidad'
+    ),
+    path(
+        'api/autocompletar/titulo/',
+        AutocompletarTituloUniformeView.as_view(),
+        name='autocompletar_titulo'
+    ),
 ]
