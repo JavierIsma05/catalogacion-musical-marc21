@@ -52,12 +52,11 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">774</span>
                     <h6>Unidades Constituyentes</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
                 </div>
                 
                 <p class="form-text">Obras contenidas en esta compilación.</p>
                 
-                {% include 'catalogacion/includes/formset_template.html' with formset=enlaces_unidad_constituyente_774 titulo="Obra Contenida" %}
+                {% include 'catalogacion/includes/formset_774_template.html' with formset=enlaces_unidad_constituyente_774 %}
             </div>
             
             {# Campo 787 - Otras Relaciones (Repetible) #}

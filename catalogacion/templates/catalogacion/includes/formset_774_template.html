@@ -1,14 +1,14 @@
 {% comment %}
-Template para campo 773 - Enlace a Documento Fuente
-Similar al campo 041, los números de obra ($w) se manejan con JavaScript
+Template para campo 774 - Enlace a Unidad Constituyente
+Similar al campo 773, los números de obra ($w) se manejan con JavaScript
 {% endcomment %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
     {{ formset.management_form }}
     
-    <button type="button" class="add-form-row mb-3" title="Agregar Enlace a Colección">
+    <button type="button" class="add-form-row mb-3" title="Agregar Obra Constituyente">
         <i class="bi bi-plus-circle"></i>
-        Agregar Enlace a Colección
+        Agregar Obra Constituyente
     </button>
     
     <div class="formset-forms">
@@ -31,7 +31,7 @@ Similar al campo 041, los números de obra ($w) se manejan con JavaScript
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="campo-grid">
-                        {# Campo 773 $a - Encabezamiento principal #}
+                        {# Campo 774 $a - Encabezamiento principal #}
                         <div class="col-full">
                             <label class="form-label" for="{{ form.encabezamiento_principal.id_for_label }}">
                                 {{ form.encabezamiento_principal.label }}
@@ -46,7 +46,7 @@ Similar al campo 041, los números de obra ($w) se manejan con JavaScript
                             {% endif %}
                         </div>
                         
-                        {# Campo 773 $t - Título #}
+                        {# Campo 774 $t - Título #}
                         <div class="col-full">
                             <label class="form-label" for="{{ form.titulo.id_for_label }}">
                                 {{ form.titulo.label }}
@@ -76,11 +76,11 @@ Similar al campo 041, los números de obra ($w) se manejan con JavaScript
                                 {% for numero in form.instance.numeros_obra.all %}
                                 <div class="numero-form-row">
                                     <div class="d-flex flex-column w-100 mb-2">
-                                        <label class="form-label small">773 $w - Número de obra en la colección</label>
+                                        <label class="form-label small">774 $w - Número de obra constituyente</label>
                                         <div class="d-flex gap-2 align-items-center">
                                             <input type="text" 
                                                    class="form-control numero-input" 
-                                                   name="numero_enlace_773_{{ forloop.parentloop.counter0 }}_{{ numero.pk }}"
+                                                   name="numero_enlace_774_{{ forloop.parentloop.counter0 }}_{{ numero.pk }}"
                                                    value="{{ numero.numero }}"
                                                    placeholder="Ej: 001234567" 
                                                    style="flex: 1;">
@@ -142,9 +142,9 @@ Similar al campo 041, los números de obra ($w) se manejan con JavaScript
 </div>
 
 {# Template global para números de obra (fuera del formset loop) #}
-<div class="numero-form-row numero-template d-none">
+<div class="numero-form-row numero-template-774 d-none">
     <div class="d-flex flex-column w-100 mb-2">
-        <label class="form-label small">773 $w - Número de obra en la colección</label>
+        <label class="form-label small">774 $w - Número de obra constituyente</label>
         <div class="d-flex gap-2 align-items-center">
             <input type="text" class="form-control numero-input" placeholder="Ej: 001234567" style="flex: 1;">
             <button type="button" class="btn btn-sm btn-outline-danger delete-numero-btn" title="Eliminar número">
@@ -155,7 +155,7 @@ Similar al campo 041, los números de obra ($w) se manejan con JavaScript
 </div>
 
 <script>
-// Script para manejar el campo 773 con números de obra repetibles
+// Script para manejar el campo 774 con números de obra repetibles
 (function() {
     const prefix = '{{ formset.prefix }}';
     const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
@@ -164,11 +164,11 @@ Similar al campo 041, los números de obra ($w) se manejan con JavaScript
     const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
     const addButton = container.querySelector('.add-form-row');
     const formsContainer = container.querySelector('.formset-forms');
-    const numeroTemplate = document.querySelector('.numero-template');
+    const numeroTemplate = document.querySelector('.numero-template-774');
     
     if (!totalFormsInput || !addButton || !formsContainer || !numeroTemplate) return;
     
-    // Agregar nuevo enlace 773
+    // Agregar nuevo enlace 774
     addButton.addEventListener('click', function() {
         const totalForms = parseInt(totalFormsInput.value);
         const emptyFormTemplate = formsContainer.querySelector('.empty-form');
@@ -194,7 +194,7 @@ Similar al campo 041, los números de obra ($w) se manejan con JavaScript
         }
     });
     
-    // Eliminar enlace 773
+    // Eliminar enlace 774
     container.addEventListener('click', function(e) {
         const deleteBtn = e.target.closest('.delete-row-btn');
         if (!deleteBtn) return;
@@ -235,12 +235,12 @@ Similar al campo 041, los números de obra ($w) se manejan con JavaScript
             if (!numerosContainer) return;
             
             const newNumero = numeroTemplate.cloneNode(true);
-            newNumero.classList.remove('numero-template', 'd-none');
+            newNumero.classList.remove('numero-template-774', 'd-none');
             
             // Actualizar el name del input
             const input = newNumero.querySelector('.numero-input');
             if (input) {
-                input.name = `numero_enlace_773_${enlaceIndex}_${Date.now()}`;
+                input.name = `numero_enlace_774_${enlaceIndex}_${Date.now()}`;
             }
             
             numerosContainer.appendChild(newNumero);
@@ -250,7 +250,7 @@ Similar al campo 041, los números de obra ($w) se manejan con JavaScript
         const deleteNumeroBtn = e.target.closest('.delete-numero-btn');
         if (deleteNumeroBtn) {
             const numeroRow = deleteNumeroBtn.closest('.numero-form-row');
-            if (!numeroRow.classList.contains('numero-template')) {
+            if (!numeroRow.classList.contains('numero-template-774')) {
                 numeroRow.remove();
             }
         }

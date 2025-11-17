@@ -292,6 +292,44 @@ class CrearObraView(CreateView):
                         numero=numero
                     )
     
+    def _save_numeros_obra_774(self, formset):
+        """
+        Procesar inputs de números de obra generados por JavaScript.
+        Los inputs tienen nombres como: numero_enlace_774_0_1234567890
+        donde 0 es el índice del enlace y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import NumeroObraRelacionada774
+        
+        # Agrupar números por índice de enlace
+        numeros_por_enlace = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('numero_enlace_774_') and value.strip():
+                try:
+                    # Extraer índice del enlace: numero_enlace_774_0_1234567890 -> 0
+                    parts = key.split('_')
+                    enlace_index = int(parts[3])
+                    
+                    if enlace_index not in numeros_por_enlace:
+                        numeros_por_enlace[enlace_index] = []
+                    
+                    numeros_por_enlace[enlace_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar números para cada enlace
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in numeros_por_enlace:
+                # Eliminar números existentes
+                form.instance.numeros_obra.all().delete()
+                
+                # Crear nuevos números
+                for numero in numeros_por_enlace[index]:
+                    NumeroObraRelacionada774.objects.create(
+                        enlace_774=form.instance,
+                        numero=numero
+                    )
+    
     @transaction.atomic
     def form_valid(self, form):
         """Guardar obra y todos los formsets en una transacción atómica"""
@@ -360,6 +398,10 @@ class CrearObraView(CreateView):
             # Si es el formset 773, procesar números de obra desde inputs JavaScript
             if key == 'enlaces_documento_fuente_773':
                 self._save_numeros_obra_773(formset)
+            
+            # Si es el formset 774, procesar números de obra desde inputs JavaScript
+            if key == 'enlaces_unidad_constituyente_774':
+                self._save_numeros_obra_774(formset)
         
         # Mensaje de éxito
         action = self.request.POST.get('action', 'publish')
@@ -587,6 +629,44 @@ class EditarObraView(UpdateView):
                         numero=numero
                     )
     
+    def _save_numeros_obra_774(self, formset):
+        """
+        Procesar inputs de números de obra generados por JavaScript.
+        Los inputs tienen nombres como: numero_enlace_774_0_1234567890
+        donde 0 es el índice del enlace y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import NumeroObraRelacionada774
+        
+        # Agrupar números por índice de enlace
+        numeros_por_enlace = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('numero_enlace_774_') and value.strip():
+                try:
+                    # Extraer índice del enlace: numero_enlace_774_0_1234567890 -> 0
+                    parts = key.split('_')
+                    enlace_index = int(parts[3])
+                    
+                    if enlace_index not in numeros_por_enlace:
+                        numeros_por_enlace[enlace_index] = []
+                    
+                    numeros_por_enlace[enlace_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar números para cada enlace
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in numeros_por_enlace:
+                # Eliminar números existentes
+                form.instance.numeros_obra.all().delete()
+                
+                # Crear nuevos números
+                for numero in numeros_por_enlace[index]:
+                    NumeroObraRelacionada774.objects.create(
+                        enlace_774=form.instance,
+                        numero=numero
+                    )
+    
     @transaction.atomic
     def form_valid(self, form):
         """Similar a CrearObraView"""
@@ -626,6 +706,10 @@ class EditarObraView(UpdateView):
             # Si es el formset 773, procesar números de obra desde inputs JavaScript
             if key == 'enlaces_documento_fuente_773':
                 self._save_numeros_obra_773(formset)
+            
+            # Si es el formset 774, procesar números de obra desde inputs JavaScript
+            if key == 'enlaces_unidad_constituyente_774':
+                self._save_numeros_obra_774(formset)
         
         messages.success(self.request, 'Obra actualizada exitosamente.')
         return redirect(self.get_success_url())
