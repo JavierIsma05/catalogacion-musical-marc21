@@ -121,7 +121,9 @@ from .bloque_7xx import (
     Autoria700,
     EntidadRelacionada710,
     EnlaceDocumentoFuente773,
+    NumeroObraRelacionada773,
     EnlaceUnidadConstituyente774,
+    NumeroObraRelacionada774,
     OtrasRelaciones787,
 )
 

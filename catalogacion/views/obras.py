@@ -29,7 +29,8 @@ from catalogacion.forms.formsets import (
     Materia650FormSet, MateriaGenero655FormSet,
     # Bloque 7XX
     NombreRelacionado700FormSet, EntidadRelacionada710FormSet,
-    EnlaceDocumentoFuente773FormSet, EnlaceUnidadConstituyente774FormSet,
+    EnlaceDocumentoFuente773FormSet, NumeroObraRelacionada773FormSet,
+    EnlaceUnidadConstituyente774FormSet, NumeroObraRelacionada774FormSet,
     OtrasRelaciones787FormSet,
     # Bloque 8XX
     Ubicacion852FormSet, Estanteria852FormSet,
@@ -253,6 +254,44 @@ class CrearObraView(CreateView):
             'textos_enlace_856': TextoEnlace856FormSet(self.request.POST, prefix='textos_enlace_856'),
         }
     
+    def _save_numeros_obra_773(self, formset):
+        """
+        Procesar inputs de números de obra generados por JavaScript.
+        Los inputs tienen nombres como: numero_enlace_773_0_1234567890
+        donde 0 es el índice del enlace y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import NumeroObraRelacionada773
+        
+        # Agrupar números por índice de enlace
+        numeros_por_enlace = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('numero_enlace_773_') and value.strip():
+                try:
+                    # Extraer índice del enlace: numero_enlace_773_0_1234567890 -> 0
+                    parts = key.split('_')
+                    enlace_index = int(parts[3])
+                    
+                    if enlace_index not in numeros_por_enlace:
+                        numeros_por_enlace[enlace_index] = []
+                    
+                    numeros_por_enlace[enlace_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar números para cada enlace
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in numeros_por_enlace:
+                # Eliminar números existentes
+                form.instance.numeros_obra.all().delete()
+                
+                # Crear nuevos números
+                for numero in numeros_por_enlace[index]:
+                    NumeroObraRelacionada773.objects.create(
+                        enlace_773=form.instance,
+                        numero=numero
+                    )
+    
     @transaction.atomic
     def form_valid(self, form):
         """Guardar obra y todos los formsets en una transacción atómica"""
@@ -314,9 +353,13 @@ class CrearObraView(CreateView):
         self.object.save()
         
         # Guardar todos los formsets
-        for formset in formsets.values():
+        for key, formset in formsets.items():
             formset.instance = self.object
-            formset.save()
+            instances = formset.save()
+            
+            # Si es el formset 773, procesar números de obra desde inputs JavaScript
+            if key == 'enlaces_documento_fuente_773':
+                self._save_numeros_obra_773(formset)
         
         # Mensaje de éxito
         action = self.request.POST.get('action', 'publish')
@@ -396,7 +439,35 @@ class EditarObraView(UpdateView):
         else:
             context.update(self._get_formsets_get())
         
+        # Agregar formsets anidados de números de obra para 773
+        self._attach_nested_formsets_773(context)
+        
         return context
+    
+    def _attach_nested_formsets_773(self, context):
+        """Agregar formsets anidados de números de obra a cada formulario 773"""
+        formset_773 = context.get('enlaces_documento_fuente_773')
+        if not formset_773:
+            return
+        
+        # Para cada formulario en el formset 773
+        for form in formset_773:
+            if form.instance.pk:
+                # Si la instancia ya existe, crear formset con datos
+                if self.request.POST:
+                    form.numeros_formset = NumeroObraRelacionada773FormSet(
+                        self.request.POST,
+                        instance=form.instance,
+                        prefix=f'{formset_773.prefix}-{form.prefix}-numeros'
+                    )
+                else:
+                    form.numeros_formset = NumeroObraRelacionada773FormSet(
+                        instance=form.instance,
+                        prefix=f'{formset_773.prefix}-{form.prefix}-numeros'
+                    )
+            else:
+                # Nueva instancia, formset vacío
+                form.numeros_formset = None
     
     def _determinar_tipo_obra(self, obra):
         """Determinar el tipo de obra basado en sus características"""
@@ -478,6 +549,44 @@ class EditarObraView(UpdateView):
             'textos_enlace_856': TextoEnlace856FormSet(self.request.POST, instance=self.object, prefix='textos_enlace_856'),
         }
     
+    def _save_numeros_obra_773(self, formset):
+        """
+        Procesar inputs de números de obra generados por JavaScript.
+        Los inputs tienen nombres como: numero_enlace_773_0_1234567890
+        donde 0 es el índice del enlace y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import NumeroObraRelacionada773
+        
+        # Agrupar números por índice de enlace
+        numeros_por_enlace = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('numero_enlace_773_') and value.strip():
+                try:
+                    # Extraer índice del enlace: numero_enlace_773_0_1234567890 -> 0
+                    parts = key.split('_')
+                    enlace_index = int(parts[3])
+                    
+                    if enlace_index not in numeros_por_enlace:
+                        numeros_por_enlace[enlace_index] = []
+                    
+                    numeros_por_enlace[enlace_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar números para cada enlace
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in numeros_por_enlace:
+                # Eliminar números existentes
+                form.instance.numeros_obra.all().delete()
+                
+                # Crear nuevos números
+                for numero in numeros_por_enlace[index]:
+                    NumeroObraRelacionada773.objects.create(
+                        enlace_773=form.instance,
+                        numero=numero
+                    )
+    
     @transaction.atomic
     def form_valid(self, form):
         """Similar a CrearObraView"""
@@ -511,8 +620,12 @@ class EditarObraView(UpdateView):
         self.object = form.save()
         
         # Guardar formsets
-        for formset in formsets.values():
+        for key, formset in formsets.items():
             formset.save()
+            
+            # Si es el formset 773, procesar números de obra desde inputs JavaScript
+            if key == 'enlaces_documento_fuente_773':
+                self._save_numeros_obra_773(formset)
         
         messages.success(self.request, 'Obra actualizada exitosamente.')
         return redirect(self.get_success_url())

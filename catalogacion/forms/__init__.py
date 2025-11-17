@@ -58,7 +58,9 @@ from .forms_7xx import (
     Autoria700Form,
     EntidadRelacionada710Form,
     EnlaceDocumentoFuente773Form,
+    NumeroObraRelacionada773Form,
     EnlaceUnidadConstituyente774Form,
+    NumeroObraRelacionada774Form,
     OtrasRelaciones787Form,
 )
 
@@ -117,7 +119,9 @@ from .formsets import (
     Autoria700FormSet,
     EntidadRelacionada710FormSet,
     EnlaceDocumentoFuente773FormSet,
+    NumeroObraRelacionada773FormSet,
     EnlaceUnidadConstituyente774FormSet,
+    NumeroObraRelacionada774FormSet,
     OtrasRelaciones787FormSet,
     
     # Bloque 8XX
@@ -184,7 +188,9 @@ __all__ = [
     'Autoria700Form',
     'EntidadRelacionada710Form',
     'EnlaceDocumentoFuente773Form',
+    'NumeroObraRelacionada773Form',
     'EnlaceUnidadConstituyente774Form',
+    'NumeroObraRelacionada774Form',
     'OtrasRelaciones787Form',
     
     # Forms bloque 8XX
@@ -239,7 +245,9 @@ __all__ = [
     'Autoria700FormSet',
     'EntidadRelacionada710FormSet',
     'EnlaceDocumentoFuente773FormSet',
+    'NumeroObraRelacionada773FormSet',
     'EnlaceUnidadConstituyente774FormSet',
+    'NumeroObraRelacionada774FormSet',
     'OtrasRelaciones787FormSet',
     
     # Formsets bloque 8XX

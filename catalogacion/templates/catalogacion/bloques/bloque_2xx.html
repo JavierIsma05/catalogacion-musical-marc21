@@ -14,12 +14,11 @@
     <div class="campo-titulo">
         <span class="badge-marc">245</span>
         <h6>Título Principal</h6>
-        <span class="badge badge bg-danger">Requerido</span>
     </div>
     
     <div class="campo-grid">
         <div class="col-full">
-            <label class="form-label campo-requerido" for="id_titulo_principal">{{ form.titulo_principal.label }}</label>
+            <label class="form-label " for="id_titulo_principal">{{ form.titulo_principal.label }}</label>
             {{ form.titulo_principal }}
             {% if form.titulo_principal.errors %}
                 <div class="invalid-feedback">{{ form.titulo_principal.errors }}</div>

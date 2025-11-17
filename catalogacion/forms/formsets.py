@@ -43,7 +43,9 @@ from catalogacion.models import (
     Autoria700,
     EntidadRelacionada710,
     EnlaceDocumentoFuente773,
+    NumeroObraRelacionada773,
     EnlaceUnidadConstituyente774,
+    NumeroObraRelacionada774,
     OtrasRelaciones787,
     # Bloque 8XX
     Ubicacion852,
@@ -96,7 +98,9 @@ from .forms_7xx import (
     Autoria700Form,
     EntidadRelacionada710Form,
     EnlaceDocumentoFuente773Form,
+    NumeroObraRelacionada773Form,
     EnlaceUnidadConstituyente774Form,
+    NumeroObraRelacionada774Form,
     OtrasRelaciones787Form,
 )
 from .forms_8xx import (
@@ -433,10 +437,26 @@ EnlaceDocumentoFuente773FormSet = inlineformset_factory(
     max_num=1,  # Normalmente solo una colección padre
 )
 
+NumeroObraRelacionada773FormSet = inlineformset_factory(
+    EnlaceDocumentoFuente773,
+    NumeroObraRelacionada773,
+    form=NumeroObraRelacionada773Form,
+    extra=1,
+    can_delete=True,
+)
+
 EnlaceUnidadConstituyente774FormSet = inlineformset_factory(
     ObraGeneral,
     EnlaceUnidadConstituyente774,
     form=EnlaceUnidadConstituyente774Form,
+    extra=1,
+    can_delete=True,
+)
+
+NumeroObraRelacionada774FormSet = inlineformset_factory(
+    EnlaceUnidadConstituyente774,
+    NumeroObraRelacionada774,
+    form=NumeroObraRelacionada774Form,
     extra=1,
     can_delete=True,
 )
