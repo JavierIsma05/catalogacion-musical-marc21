@@ -19,6 +19,7 @@ from catalogacion.views.autoridades import (
     AutocompletarEntidadView,
     AutocompletarTituloUniformeView,
 )
+from catalogacion.views.utils import autocompletar_forma_musical
 
 urlpatterns = [
     # Personas
@@ -50,5 +51,10 @@ urlpatterns = [
         'api/autocompletar/titulo/',
         AutocompletarTituloUniformeView.as_view(),
         name='autocompletar_titulo'
+    ),
+    path(
+        'api/autocompletar/forma-musical/',
+        autocompletar_forma_musical,
+        name='autocompletar_forma_musical'
     ),
 ]

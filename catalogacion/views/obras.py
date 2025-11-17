@@ -353,10 +353,29 @@ class EditarObraView(UpdateView):
         kwargs = super().get_form_kwargs()
         
         # En GET, pre-poblar los campos de texto del autocomplete
-        if self.request.method == 'GET' and self.object and self.object.compositor:
+        if self.request.method == 'GET' and self.object:
             kwargs['initial'] = kwargs.get('initial', {})
-            kwargs['initial']['compositor_texto'] = self.object.compositor.apellidos_nombres
-            kwargs['initial']['compositor_coordenadas'] = self.object.compositor.coordenadas_biograficas or ''
+            
+            # Compositor (100 $a)
+            if self.object.compositor:
+                kwargs['initial']['compositor_texto'] = self.object.compositor.apellidos_nombres
+                kwargs['initial']['compositor_coordenadas'] = self.object.compositor.coordenadas_biograficas or ''
+            
+            # Título uniforme (130 $a)
+            if self.object.titulo_uniforme:
+                kwargs['initial']['titulo_uniforme_texto'] = self.object.titulo_uniforme.titulo
+            
+            # Forma musical 130 (130 $k)
+            if self.object.forma_130:
+                kwargs['initial']['forma_130_texto'] = self.object.forma_130.forma
+            
+            # Título 240 (240 $a)
+            if self.object.titulo_240:
+                kwargs['initial']['titulo_240_texto'] = self.object.titulo_240.titulo
+            
+            # Forma musical 240 (240 $k)
+            if self.object.forma_240:
+                kwargs['initial']['forma_240_texto'] = self.object.forma_240.forma
         
         return kwargs
     

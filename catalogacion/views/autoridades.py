@@ -319,32 +319,40 @@ class AutocompletarEntidadView(View):
 class AutocompletarTituloUniformeView(View):
     """
     API para autocompletar títulos uniformes
+    Soporta búsqueda por título y por ID
     """
     def get(self, request):
         query = request.GET.get('q', '').strip()
+        titulo_id = request.GET.get('id', None)
+        
+        # Si se busca por ID específico
+        if titulo_id:
+            try:
+                titulo = AutoridadTituloUniforme.objects.get(id=titulo_id)
+                return JsonResponse({
+                    'results': [{
+                        'id': titulo.id,
+                        'text': titulo.titulo,
+                        'titulo': titulo.titulo,
+                    }]
+                })
+            except AutoridadTituloUniforme.DoesNotExist:
+                return JsonResponse({'results': []})
         
         if len(query) < 2:
             return JsonResponse({'results': []})
         
         titulos = AutoridadTituloUniforme.objects.filter(
             titulo__icontains=query
-        ).values(
-            'id',
-            'titulo',
-            'forma'
-        )[:10]
+        ).order_by('titulo')[:20]
         
-        results = []
-        for titulo in titulos:
-            nombre_completo = titulo['titulo']
-            if titulo['forma']:
-                nombre_completo += f" ({titulo['forma']})"
-            
-            results.append({
-                'id': titulo['id'],
-                'text': nombre_completo,
-                'titulo': titulo['titulo'],
-                'forma': titulo['forma'] or ''
-            })
+        results = [
+            {
+                'id': t.id,
+                'text': t.titulo,
+                'titulo': t.titulo,
+            }
+            for t in titulos
+        ]
         
         return JsonResponse({'results': results})

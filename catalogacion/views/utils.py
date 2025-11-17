@@ -8,6 +8,7 @@ from catalogacion.models import (
     AutoridadPersona,
     AutoridadEntidad,
     AutoridadTituloUniforme,
+    AutoridadFormaMusical,
     AutoridadMateria,
 )
 
@@ -93,9 +94,26 @@ def autocompletar_entidad(request):
 
 def autocompletar_titulo_uniforme(request):
     """
-    API para autocompletar títulos uniformes en Select2
+    API para autocompletar títulos uniformes
+    Soporta búsqueda por título
+    Permite buscar por ID si se envía 'id=123'
     """
     q = request.GET.get('q', '')
+    titulo_id = request.GET.get('id', None)
+    
+    # Si se busca por ID específico
+    if titulo_id:
+        try:
+            titulo = AutoridadTituloUniforme.objects.get(id=titulo_id)
+            return JsonResponse({
+                'results': [{
+                    'id': titulo.id,
+                    'text': titulo.titulo,
+                    'titulo': titulo.titulo,
+                }]
+            })
+        except AutoridadTituloUniforme.DoesNotExist:
+            return JsonResponse({'results': []})
     
     titulos = AutoridadTituloUniforme.objects.filter(
         titulo__icontains=q
@@ -105,6 +123,7 @@ def autocompletar_titulo_uniforme(request):
         {
             'id': t.id,
             'text': t.titulo,
+            'titulo': t.titulo,
         }
         for t in titulos
     ]
@@ -128,6 +147,45 @@ def autocompletar_materia(request):
             'text': m.termino,
         }
         for m in materias
+    ]
+    
+    return JsonResponse({'results': results})
+
+
+def autocompletar_forma_musical(request):
+    """
+    API para autocompletar formas musicales
+    Soporta búsqueda por forma
+    Permite buscar por ID si se envía 'id=123'
+    """
+    q = request.GET.get('q', '')
+    forma_id = request.GET.get('id', None)
+    
+    # Si se busca por ID específico
+    if forma_id:
+        try:
+            forma = AutoridadFormaMusical.objects.get(id=forma_id)
+            return JsonResponse({
+                'results': [{
+                    'id': forma.id,
+                    'text': forma.forma,
+                    'forma': forma.forma,
+                }]
+            })
+        except AutoridadFormaMusical.DoesNotExist:
+            return JsonResponse({'results': []})
+    
+    formas = AutoridadFormaMusical.objects.filter(
+        forma__icontains=q
+    ).order_by('forma')[:20]
+    
+    results = [
+        {
+            'id': f.id,
+            'text': f.forma,
+            'forma': f.forma,
+        }
+        for f in formas
     ]
     
     return JsonResponse({'results': results})

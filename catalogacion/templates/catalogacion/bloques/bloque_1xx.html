@@ -75,17 +75,30 @@
                 </div>
                 
                 <div class="campo-grid">
+                    {# Campo oculto para el ID del título uniforme #}
+                    <input type="hidden" name="titulo_uniforme" id="id_titulo_uniforme" value="{{ form.titulo_uniforme.value|default:'' }}">
+                    
                     <div class="col-full">
-                        <label class="form-label" for="{{ form.titulo_uniforme.id_for_label }}">{{ form.titulo_uniforme.label }}</label>
-                        {{ form.titulo_uniforme }}
-                        {% if form.titulo_uniforme.errors %}
-                            <div class="invalid-feedback">{{ form.titulo_uniforme.errors }}</div>
+                        <label class="form-label" for="id_titulo_uniforme_texto">{{ form.titulo_uniforme_texto.label }}</label>
+                        {{ form.titulo_uniforme_texto }}
+                        <div class="form-text">Escriba para buscar títulos existentes o ingrese uno nuevo</div>
+                        <div id="titulo-uniforme-suggestions" class="autocomplete-suggestions"></div>
+                        {% if form.titulo_uniforme_texto.errors %}
+                            <div class="invalid-feedback d-block">{{ form.titulo_uniforme_texto.errors }}</div>
                         {% endif %}
                     </div>
                     
+                    {# Campo oculto para el ID de la forma musical 130 #}
+                    <input type="hidden" name="forma_130" id="id_forma_130" value="{{ form.forma_130.value|default:'' }}">
+                    
                     <div class="col-half">
-                        <label class="form-label" for="{{ form.forma_130.id_for_label }}">{{ form.forma_130.label }}</label>
-                        {{ form.forma_130 }}
+                        <label class="form-label" for="id_forma_130_texto">{{ form.forma_130_texto.label }}</label>
+                        {{ form.forma_130_texto }}
+                        <div class="form-text">Escriba para buscar formas musicales o ingrese una nueva</div>
+                        <div id="forma-130-suggestions" class="autocomplete-suggestions"></div>
+                        {% if form.forma_130_texto.errors %}
+                            <div class="invalid-feedback d-block">{{ form.forma_130_texto.errors }}</div>
+                        {% endif %}
                     </div>
                     
                     <div class="col-half">
@@ -123,14 +136,30 @@
                 </div>
                 
                 <div class="campo-grid">
+                    {# Campo oculto para el ID del título 240 #}
+                    <input type="hidden" name="titulo_240" id="id_titulo_240" value="{{ form.titulo_240.value|default:'' }}">
+                    
                     <div class="col-full">
-                        <label class="form-label" for="{{ form.titulo_240.id_for_label }}">{{ form.titulo_240.label }}</label>
-                        {{ form.titulo_240 }}
+                        <label class="form-label" for="id_titulo_240_texto">{{ form.titulo_240_texto.label }}</label>
+                        {{ form.titulo_240_texto }}
+                        <div class="form-text">Escriba para buscar títulos existentes o ingrese uno nuevo</div>
+                        <div id="titulo-240-suggestions" class="autocomplete-suggestions"></div>
+                        {% if form.titulo_240_texto.errors %}
+                            <div class="invalid-feedback d-block">{{ form.titulo_240_texto.errors }}</div>
+                        {% endif %}
                     </div>
                     
+                    {# Campo oculto para el ID de la forma musical 240 #}
+                    <input type="hidden" name="forma_240" id="id_forma_240" value="{{ form.forma_240.value|default:'' }}">
+                    
                     <div class="col-half">
-                        <label class="form-label" for="{{ form.forma_240.id_for_label }}">{{ form.forma_240.label }}</label>
-                        {{ form.forma_240 }}
+                        <label class="form-label" for="id_forma_240_texto">{{ form.forma_240_texto.label }}</label>
+                        {{ form.forma_240_texto }}
+                        <div class="form-text">Escriba para buscar formas musicales o ingrese una nueva</div>
+                        <div id="forma-240-suggestions" class="autocomplete-suggestions"></div>
+                        {% if form.forma_240_texto.errors %}
+                            <div class="invalid-feedback d-block">{{ form.forma_240_texto.errors }}</div>
+                        {% endif %}
                     </div>
                     
                     <div class="col-half">

@@ -1,184 +1,216 @@
 /**
- * Autocomplete mejorado para compositor con opción de crear nuevo
+ * Autocomplete editable para campo Compositor (100 $a)
+ * Permite buscar compositores existentes o crear nuevos
  */
 
-class CompositorAutocomplete {
-    constructor(inputId) {
-        this.input = document.getElementById(inputId);
-        this.hiddenInput = document.getElementById(
-            inputId.replace("_display", "")
-        );
-        this.suggestionsList = null;
-        this.debounceTimer = null;
-        this.selectedIndex = -1;
+(function () {
+    "use strict";
 
-        if (this.input) {
-            this.init();
-        }
+    const compositorInput = document.getElementById("id_compositor_texto");
+    const coordenadasInput = document.getElementById(
+        "id_compositor_coordenadas"
+    );
+    const compositorIdInput = document.getElementById("id_compositor");
+    const suggestionsContainer = document.getElementById(
+        "compositor-suggestions"
+    );
+
+    if (!compositorInput || !suggestionsContainer) {
+        console.warn("Compositor autocomplete: elementos no encontrados");
+        return;
     }
 
-    init() {
-        // Crear contenedor de sugerencias
-        this.suggestionsList = document.createElement("ul");
-        this.suggestionsList.className = "autocomplete-suggestions";
-        this.suggestionsList.style.display = "none";
-        this.input.parentNode.appendChild(this.suggestionsList);
+    let debounceTimer = null;
+    let currentSuggestions = [];
+    let selectedIndex = -1;
 
-        // Event listeners
-        this.input.addEventListener("input", (e) => this.handleInput(e));
-        this.input.addEventListener("keydown", (e) => this.handleKeydown(e));
-        this.input.addEventListener("blur", (e) => this.handleBlur(e));
-
-        // Si hay valor inicial, mostrarlo
-        if (this.hiddenInput && this.hiddenInput.value) {
-            this.loadInitialValue();
-        }
+    // Inicializar - si hay un compositor seleccionado, cargar sus datos
+    if (compositorIdInput.value) {
+        loadCompositorData(compositorIdInput.value);
     }
 
-    handleInput(e) {
+    // Evento de escritura en el input
+    compositorInput.addEventListener("input", function (e) {
         const query = e.target.value.trim();
 
-        // Limpiar el hidden input cuando el usuario escribe
-        if (this.hiddenInput) {
-            this.hiddenInput.value = "";
-        }
-
-        clearTimeout(this.debounceTimer);
-
         if (query.length < 2) {
-            this.hideSuggestions();
+            hideSuggestions();
             return;
         }
 
-        // Debounce: esperar 300ms después de que el usuario deje de escribir
-        this.debounceTimer = setTimeout(() => {
-            this.searchCompositors(query);
+        // Debounce para evitar demasiadas peticiones
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            searchCompositors(query);
         }, 300);
-    }
+    });
 
-    handleKeydown(e) {
-        const items = this.suggestionsList.querySelectorAll("li");
+    // Navegación con teclado
+    compositorInput.addEventListener("keydown", function (e) {
+        if (!suggestionsContainer.classList.contains("show")) return;
 
-        if (items.length === 0) return;
+        const items =
+            suggestionsContainer.querySelectorAll(".autocomplete-item");
 
         switch (e.key) {
             case "ArrowDown":
                 e.preventDefault();
-                this.selectedIndex = Math.min(
-                    this.selectedIndex + 1,
-                    items.length - 1
-                );
-                this.updateSelection(items);
+                selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                updateSelection(items);
                 break;
 
             case "ArrowUp":
                 e.preventDefault();
-                this.selectedIndex = Math.max(this.selectedIndex - 1, 0);
-                this.updateSelection(items);
+                selectedIndex = Math.max(selectedIndex - 1, -1);
+                updateSelection(items);
                 break;
 
             case "Enter":
                 e.preventDefault();
-                if (this.selectedIndex >= 0 && items[this.selectedIndex]) {
-                    items[this.selectedIndex].click();
-                } else {
-                    // Si no hay selección, crear nuevo
-                    this.createNew();
+                if (selectedIndex >= 0 && items[selectedIndex]) {
+                    items[selectedIndex].click();
                 }
                 break;
 
             case "Escape":
-                this.hideSuggestions();
+                e.preventDefault();
+                hideSuggestions();
                 break;
         }
-    }
+    });
 
-    handleBlur(e) {
-        // Esperar un poco antes de ocultar para permitir clic en sugerencias
-        setTimeout(() => {
-            // Si el input está vacío o no hay ID, intentar crear nuevo
-            if (this.input.value.trim() && !this.hiddenInput.value) {
-                // El usuario escribió algo pero no seleccionó nada
-                // Lo dejamos para que se cree al guardar el formulario
-            }
-            this.hideSuggestions();
-        }, 200);
-    }
-
-    async searchCompositors(query) {
-        try {
-            const response = await fetch(
-                `/catalogacion/api/autocompletar/persona/?q=${encodeURIComponent(
-                    query
-                )}`
-            );
-
-            if (!response.ok) {
-                throw new Error("Error en la búsqueda");
-            }
-
-            const data = await response.json();
-            this.displaySuggestions(data.results);
-        } catch (error) {
-            console.error("Error al buscar compositores:", error);
-            this.hideSuggestions();
+    // Cerrar al hacer click fuera
+    document.addEventListener("click", function (e) {
+        if (
+            !compositorInput.contains(e.target) &&
+            !suggestionsContainer.contains(e.target)
+        ) {
+            hideSuggestions();
         }
+    });
+
+    // Buscar compositores
+    function searchCompositors(query) {
+        fetch(
+            `/catalogacion/api/autocompletar/persona/?q=${encodeURIComponent(
+                query
+            )}`
+        )
+            .then((response) => response.json())
+            .then((data) => {
+                currentSuggestions = data.results || [];
+                showSuggestions(currentSuggestions, query);
+            })
+            .catch((error) => {
+                console.error("Error al buscar compositores:", error);
+            });
     }
 
-    displaySuggestions(results) {
-        this.suggestionsList.innerHTML = "";
-        this.selectedIndex = -1;
+    // Mostrar sugerencias
+    function showSuggestions(suggestions, query) {
+        suggestionsContainer.innerHTML = "";
+        selectedIndex = -1;
 
-        if (results.length === 0) {
+        if (suggestions.length === 0) {
             // Mostrar opción para crear nuevo
-            const li = document.createElement("li");
-            li.className = "autocomplete-suggestion-item create-new";
-            li.innerHTML = `<i class="bi bi-plus-circle"></i> Crear "${this.input.value}"`;
-            li.addEventListener("click", () => this.createNew());
-            this.suggestionsList.appendChild(li);
+            const createItem = createSuggestionItem({
+                apellidos_nombres: query,
+                coordenadas_biograficas: "",
+                isNew: true,
+            });
+            suggestionsContainer.appendChild(createItem);
         } else {
-            results.forEach((result, index) => {
-                const li = document.createElement("li");
-                li.className = "autocomplete-suggestion-item";
-                li.textContent = result.text;
-                li.dataset.id = result.id;
-                li.dataset.apellidosNombres = result.apellidos_nombres;
-                li.dataset.fechas = result.fechas;
-
-                li.addEventListener("click", () =>
-                    this.selectSuggestion(result)
-                );
-                this.suggestionsList.appendChild(li);
+            // Mostrar sugerencias existentes
+            suggestions.forEach((suggestion) => {
+                const item = createSuggestionItem(suggestion);
+                suggestionsContainer.appendChild(item);
             });
 
-            // Agregar opción "Crear nuevo" al final
-            const li = document.createElement("li");
-            li.className = "autocomplete-suggestion-item create-new";
-            li.innerHTML = `<i class="bi bi-plus-circle"></i> Crear nuevo compositor`;
-            li.addEventListener("click", () => this.createNew());
-            this.suggestionsList.appendChild(li);
+            // Agregar opción para crear nuevo al final
+            const createItem = createSuggestionItem({
+                apellidos_nombres: query,
+                coordenadas_biograficas: "",
+                isNew: true,
+            });
+            suggestionsContainer.appendChild(createItem);
         }
 
-        this.suggestionsList.style.display = "block";
+        suggestionsContainer.classList.add("show");
     }
 
-    selectSuggestion(result) {
-        this.input.value = result.text;
-        this.hiddenInput.value = result.id;
-        this.hideSuggestions();
+    // Crear elemento de sugerencia
+    function createSuggestionItem(data) {
+        const item = document.createElement("div");
+        item.className = "autocomplete-item";
+
+        if (data.isNew) {
+            item.classList.add("autocomplete-item-new");
+            item.innerHTML = `
+                <i class="bi bi-plus-circle me-2"></i>
+                <strong>Crear nuevo:</strong> "${escapeHtml(
+                    data.apellidos_nombres
+                )}"
+            `;
+        } else {
+            item.innerHTML = `
+                <div><strong>${escapeHtml(
+                    data.apellidos_nombres
+                )}</strong></div>
+                ${
+                    data.coordenadas_biograficas
+                        ? `<small class="text-muted">${escapeHtml(
+                              data.coordenadas_biograficas
+                          )}</small>`
+                        : ""
+                }
+            `;
+        }
+
+        item.addEventListener("click", function () {
+            selectCompositor(data);
+        });
+
+        return item;
     }
 
-    createNew() {
-        // Marcar que se debe crear un nuevo registro
-        // El formulario Django manejará la creación
-        this.hiddenInput.value = ""; // Dejar vacío para que Django cree uno nuevo
-        this.input.setAttribute("data-create-new", "true");
-        this.hideSuggestions();
+    // Seleccionar compositor
+    function selectCompositor(data) {
+        if (data.isNew) {
+            // Crear nuevo - dejar el ID vacío para que Django lo cree
+            compositorInput.value = data.apellidos_nombres;
+            coordenadasInput.value = "";
+            compositorIdInput.value = "";
+        } else {
+            // Seleccionar existente
+            compositorInput.value = data.apellidos_nombres;
+            coordenadasInput.value = data.coordenadas_biograficas || "";
+            compositorIdInput.value = data.id;
+        }
+
+        hideSuggestions();
     }
 
-    updateSelection(items) {
+    // Cargar datos de compositor existente
+    function loadCompositorData(compositorId) {
+        fetch(`/catalogacion/api/autocompletar/persona/?id=${compositorId}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.results && data.results.length > 0) {
+                    const compositor = data.results[0];
+                    compositorInput.value = compositor.apellidos_nombres;
+                    coordenadasInput.value =
+                        compositor.coordenadas_biograficas || "";
+                }
+            })
+            .catch((error) => {
+                console.error("Error al cargar compositor:", error);
+            });
+    }
+
+    // Actualizar selección visual
+    function updateSelection(items) {
         items.forEach((item, index) => {
-            if (index === this.selectedIndex) {
+            if (index === selectedIndex) {
                 item.classList.add("selected");
                 item.scrollIntoView({ block: "nearest" });
             } else {
@@ -187,29 +219,17 @@ class CompositorAutocomplete {
         });
     }
 
-    hideSuggestions() {
-        this.suggestionsList.style.display = "none";
-        this.selectedIndex = -1;
+    // Ocultar sugerencias
+    function hideSuggestions() {
+        suggestionsContainer.classList.remove("show");
+        suggestionsContainer.innerHTML = "";
+        selectedIndex = -1;
     }
 
-    async loadInitialValue() {
-        // Si ya hay un ID, cargar el nombre
-        try {
-            const response = await fetch(
-                `/catalogacion/api/autocompletar/persona/?q=${this.hiddenInput.value}`
-            );
-            const data = await response.json();
-
-            if (data.results.length > 0) {
-                this.input.value = data.results[0].text;
-            }
-        } catch (error) {
-            console.error("Error al cargar valor inicial:", error);
-        }
+    // Escapar HTML
+    function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
     }
-}
-
-// Inicializar cuando el DOM esté listo
-document.addEventListener("DOMContentLoaded", function () {
-    new CompositorAutocomplete("id_compositor_display");
-});
+})();

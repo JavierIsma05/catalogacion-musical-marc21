@@ -39,6 +39,48 @@ class ObraGeneralForm(forms.ModelForm):
         label='100 $d - Coordenadas biográficas'
     )
     
+    # Campos adicionales para autocomplete editable de título uniforme 130
+    titulo_uniforme_texto = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Escriba o seleccione un título uniforme...',
+            'autocomplete': 'off',
+        }),
+        label='130 $a - Título Uniforme'
+    )
+    
+    forma_130_texto = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Escriba o seleccione una forma musical...',
+            'autocomplete': 'off',
+        }),
+        label='130 $k - Forma Musical'
+    )
+    
+    # Campos adicionales para autocomplete editable de título uniforme 240
+    titulo_240_texto = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Escriba o seleccione un título uniforme...',
+            'autocomplete': 'off',
+        }),
+        label='240 $a - Título Uniforme'
+    )
+    
+    forma_240_texto = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Escriba o seleccione una forma musical...',
+            'autocomplete': 'off',
+        }),
+        label='240 $k - Forma Musical'
+    )
+    
     class Meta:
         model = ObraGeneral
         fields = [
@@ -260,7 +302,7 @@ class ObraGeneralForm(forms.ModelForm):
         self.fields['titulo_principal'].required = True
     
     def clean(self):
-        """Validación personalizada y creación automática de compositor"""
+        """Validación personalizada y creación automática de autoridades"""
         cleaned_data = super().clean()
         
         # Manejar compositor autocomplete editable
@@ -268,32 +310,59 @@ class ObraGeneralForm(forms.ModelForm):
         compositor_coordenadas = cleaned_data.get('compositor_coordenadas', '').strip()
         
         if compositor_texto:
-            # Si hay texto, buscar o crear la persona
             try:
-                # Primero intentar encontrar por nombre exacto
                 persona = AutoridadPersona.objects.get(apellidos_nombres__iexact=compositor_texto)
-                
-                # Actualizar coordenadas si se proporcionaron y son diferentes
                 if compositor_coordenadas and persona.coordenadas_biograficas != compositor_coordenadas:
                     persona.coordenadas_biograficas = compositor_coordenadas
                     persona.save()
-                
                 cleaned_data['compositor'] = persona
-                
             except AutoridadPersona.DoesNotExist:
-                # Crear nueva persona
                 persona = AutoridadPersona.objects.create(
                     apellidos_nombres=compositor_texto,
                     coordenadas_biograficas=compositor_coordenadas
                 )
                 cleaned_data['compositor'] = persona
-                
             except AutoridadPersona.MultipleObjectsReturned:
-                # Si hay múltiples coincidencias, tomar la primera
                 persona = AutoridadPersona.objects.filter(
                     apellidos_nombres__iexact=compositor_texto
                 ).first()
                 cleaned_data['compositor'] = persona
+        
+        # Manejar título uniforme 130 autocomplete editable
+        titulo_uniforme_texto = cleaned_data.get('titulo_uniforme_texto', '').strip()
+        if titulo_uniforme_texto:
+            titulo, _ = AutoridadTituloUniforme.objects.get_or_create(
+                titulo__iexact=titulo_uniforme_texto,
+                defaults={'titulo': titulo_uniforme_texto}
+            )
+            cleaned_data['titulo_uniforme'] = titulo
+        
+        # Manejar forma musical 130 autocomplete editable
+        forma_130_texto = cleaned_data.get('forma_130_texto', '').strip()
+        if forma_130_texto:
+            forma, _ = AutoridadFormaMusical.objects.get_or_create(
+                forma__iexact=forma_130_texto,
+                defaults={'forma': forma_130_texto}
+            )
+            cleaned_data['forma_130'] = forma
+        
+        # Manejar título uniforme 240 autocomplete editable
+        titulo_240_texto = cleaned_data.get('titulo_240_texto', '').strip()
+        if titulo_240_texto:
+            titulo, _ = AutoridadTituloUniforme.objects.get_or_create(
+                titulo__iexact=titulo_240_texto,
+                defaults={'titulo': titulo_240_texto}
+            )
+            cleaned_data['titulo_240'] = titulo
+        
+        # Manejar forma musical 240 autocomplete editable
+        forma_240_texto = cleaned_data.get('forma_240_texto', '').strip()
+        if forma_240_texto:
+            forma, _ = AutoridadFormaMusical.objects.get_or_create(
+                forma__iexact=forma_240_texto,
+                defaults={'forma': forma_240_texto}
+            )
+            cleaned_data['forma_240'] = forma
         
         # Validar punto de acceso principal (100 vs 130)
         compositor = cleaned_data.get('compositor')
