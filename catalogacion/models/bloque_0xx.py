@@ -168,13 +168,6 @@ class CodigoLengua(models.Model):
         help_text="Segundo indicador: Fuente del código"
     )
     
-    fuente_especificada = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        help_text="041 $2 — Fuente del código (solo si segundo indicador es 7)"
-    )
-    
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:

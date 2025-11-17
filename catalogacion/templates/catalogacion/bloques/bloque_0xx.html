@@ -108,7 +108,7 @@
                 </div>
             </div>
             
-            {# Campo 041 - Código de idioma (Repetible) #}
+            {# Campo 041 - Código de idioma (Repetible) con subcampo $a #}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">041</span>
@@ -116,9 +116,9 @@
                     <span class="badge-repetible">REPETIBLE</span>
                 </div>
                 
-                <p class="form-text">Idioma(s) del contenido de la obra.</p>
+                <p class="form-text">Idioma(s) del contenido de la obra. Cada código puede tener múltiples idiomas ($a).</p>
                 
-                {% include 'catalogacion/includes/formset_template.html' with formset=codigos_lengua titulo="Idioma" %}
+                {% include 'catalogacion/includes/campo_041_template.html' with formset=codigos_lengua %}
             </div>
             
             {# Campo 044 - País (Repetible) #}

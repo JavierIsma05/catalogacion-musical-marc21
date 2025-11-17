@@ -78,7 +78,6 @@ class CodigoLenguaForm(forms.ModelForm):
         fields = [
             'indicacion_traduccion',
             'fuente_codigo',
-            'fuente_especificada',
         ]
         widgets = {
             'indicacion_traduccion': forms.Select(attrs={
@@ -86,10 +85,6 @@ class CodigoLenguaForm(forms.ModelForm):
             }),
             'fuente_codigo': forms.Select(attrs={
                 'class': 'form-select',
-            }),
-            'fuente_especificada': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '041 $2 - Fuente del código',
             }),
         }
 

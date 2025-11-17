@@ -765,6 +765,92 @@ textarea.form-control {
 }
 
 /* ============================================
+   SUBCAMPOS ANIDADOS (Campo 041, etc.)
+   ============================================ */
+.subcampo-container {
+    background: var(--gray-100);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+    padding: 1rem;
+}
+
+.subcampo-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.idiomas-list {
+    margin-bottom: 0.75rem;
+}
+
+.idioma-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.idiomas-formset {
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.75rem;
+}
+
+.idioma-form-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+    align-items: end;
+    margin-bottom: 0.5rem;
+}
+
+.idioma-form-row.idioma-template {
+    display: none;
+}
+
+.idioma-form-row .col-half {
+    display: flex;
+    flex-direction: column;
+}
+
+.idioma-form-row .col-auto {
+    display: flex;
+    align-items: center;
+    padding-bottom: 0;
+}
+
+.delete-idioma-btn {
+    height: 38px;
+    min-height: 38px;
+    padding: 0 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+}
+
+.idioma-form-content {
+    flex: 1;
+}
+
+.add-idioma-btn.w-100 {
+    margin-top: 1.85rem;
+}
+
+.add-idioma-btn {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+}
+
+/* ============================================
    PRINT STYLES
    ============================================ */
 @media print {
