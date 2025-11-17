@@ -32,8 +32,8 @@
         : paeCode.length;
     const percentPart = paeCode.slice(0, endForPercent).trim();
     if (percentPart.startsWith("%")) {
-      const match = percentPart.match(/%([A-G])/);
-      if (match) clef = match[1]; // Solo la letra (G, C, F)
+      const match = percentPart.match(/%([GCF](?:-[1-5])?)/);
+      if (match) clef = match[1]; // G-2 completo
     }
 
     // Extraer armadura desde $ hasta @
