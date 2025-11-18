@@ -4,99 +4,7 @@
 {% block title %}Crear {{ tipo_obra_titulo }} - MARC21{% endblock %}
 
 {% block extra_css %}
-<style>
-    /* Contenedor de pestañas */
-    .tabs-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 2rem 1.5rem;
-    }
-    
-    /* Navegación de pestañas horizontal */
-    .tabs-navigation {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 2rem;
-        border-bottom: 2px solid #E2E8F0;
-        overflow-x: auto;
-        padding-bottom: 0;
-    }
-    
-    .tab-button {
-        padding: 0.75rem 1.5rem;
-        border: none;
-        background: transparent;
-        color: #718096;
-        font-size: 0.9rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-        border-bottom: 3px solid transparent;
-        white-space: nowrap;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .tab-button:hover {
-        color: #3498DB;
-        background: #F7F9FA;
-    }
-    
-    .tab-button.active {
-        color: #3498DB;
-        border-bottom-color: #3498DB;
-        background: #F7F9FA;
-    }
-    
-    /* Contenido de pestañas */
-    .tab-content {
-        display: none;
-    }
-    
-    .tab-content.active {
-        display: block;
-        animation: fadeIn 0.3s ease-in;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* Botones de navegación */
-    .tab-navigation-buttons {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #E2E8F0;
-    }
-    
-    .campo-requerido::after {
-        content: " *";
-        color: #E74C3C;
-        font-weight: bold;
-    }
-    
-    /* Indicador de progreso */
-    .progress-indicator {
-        margin-bottom: 2rem;
-    }
-    
-    .progress-bar-custom {
-        height: 4px;
-        background: #E2E8F0;
-        border-radius: 2px;
-        overflow: hidden;
-    }
-    
-    .progress-bar-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #3498DB, #5DADE2);
-        transition: width 0.3s ease;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'catalogacion/css/crear-obra.css' %}">
 {% endblock %}
 
 {% block breadcrumb %}
@@ -139,31 +47,31 @@
 
         <!-- Navegación de pestañas -->
         <div class="tabs-navigation">
-            <button type="button" class="tab-button active" data-tab="tab-0xx">
+            <button type="button" class="tab-button active" data-tab="tab-0xx" data-tab-index="0">
                 <i class="bi bi-hash"></i> 0XX - Control
             </button>
-            <button type="button" class="tab-button" data-tab="tab-1xx">
+            <button type="button" class="tab-button" data-tab="tab-1xx" data-tab-index="1">
                 <i class="bi bi-person"></i> 1XX - Principal
             </button>
-            <button type="button" class="tab-button" data-tab="tab-2xx">
+            <button type="button" class="tab-button" data-tab="tab-2xx" data-tab-index="2">
                 <i class="bi bi-bookmark"></i> 2XX - Títulos
             </button>
-            <button type="button" class="tab-button" data-tab="tab-3xx">
+            <button type="button" class="tab-button" data-tab="tab-3xx" data-tab-index="3">
                 <i class="bi bi-file-text"></i> 3XX - Descripción
             </button>
-            <button type="button" class="tab-button" data-tab="tab-4xx">
+            <button type="button" class="tab-button" data-tab="tab-4xx" data-tab-index="4">
                 <i class="bi bi-collection"></i> 4XX - Series
             </button>
-            <button type="button" class="tab-button" data-tab="tab-5xx">
+            <button type="button" class="tab-button" data-tab="tab-5xx" data-tab-index="5">
                 <i class="bi bi-journal"></i> 5XX - Notas
             </button>
-            <button type="button" class="tab-button" data-tab="tab-6xx">
-                <i class="bi bi-tags"></i> 6XX - Materias
+            <button type="button" class="tab-button" data-tab="tab-6xx" data-tab-index="6">
+                <i class="bi bi-tag"></i> 6XX - Materias
             </button>
-            <button type="button" class="tab-button" data-tab="tab-7xx">
-                <i class="bi bi-link"></i> 7XX - Enlaces
+            <button type="button" class="tab-button" data-tab="tab-7xx" data-tab-index="7">
+                <i class="bi bi-people"></i> 7XX - Secundarias
             </button>
-            <button type="button" class="tab-button" data-tab="tab-8xx">
+            <button type="button" class="tab-button" data-tab="tab-8xx" data-tab-index="8">
                 <i class="bi bi-geo"></i> 8XX - Ubicación
             </button>
         </div>
@@ -299,11 +207,12 @@ const tabs = ['tab-0xx', 'tab-1xx', 'tab-2xx', 'tab-3xx', 'tab-4xx', 'tab-5xx', 
 let currentTabIndex = 0;
 
 // Borrador a recuperar (si viene desde lista de borradores)
-const BORRADOR_A_RECUPERAR = {{ request.session.borrador_id|default:'null' }};
+const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
 </script>
 
 <script src="{% static 'catalogacion/js/compositor-autocomplete.js' %}"></script>
 <script src="{% static 'catalogacion/js/titulos-formas-autocomplete.js' %}"></script>
+<script src="{% static 'catalogacion/js/required-fields-tracker.js' %}"></script>
 <script src="{% static 'catalogacion/js/borrador-system.js' %}"></script>
 
 <script>

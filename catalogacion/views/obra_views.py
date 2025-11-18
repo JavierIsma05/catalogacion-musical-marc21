@@ -92,6 +92,16 @@ class CrearObraView(ObraFormsetMixin, CreateView):
         with_post = self.request.method == 'POST'
         context.update(self._get_formsets(instance=None, with_post=with_post))
         
+        # Pasar borrador_id SOLO si viene de recuperar_borrador_view
+        # y luego limpiar inmediatamente la sesión
+        if 'borrador_id' in self.request.session:
+            context['borrador_id_recuperar'] = self.request.session.get('borrador_id')
+            # Limpiar la sesión inmediatamente para que no persista
+            del self.request.session['borrador_id']
+            if 'tipo_obra' in self.request.session:
+                del self.request.session['tipo_obra']
+            self.request.session.modified = True
+        
         return context
     
     @transaction.atomic

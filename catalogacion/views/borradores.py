@@ -420,3 +420,30 @@ def recuperar_borrador_view(request, pk):
     )
     
     return redirect('catalogacion:crear_obra', tipo=tipo_obra_correcto)
+
+
+@require_http_methods(["POST"])
+def limpiar_sesion_borrador_ajax(request):
+    """
+    Limpia las variables de sesión relacionadas con borradores.
+    Se llama después de cargar exitosamente un borrador para evitar recargas automáticas.
+    """
+    try:
+        # Limpiar variables de sesión de borrador
+        if 'borrador_id' in request.session:
+            del request.session['borrador_id']
+        if 'tipo_obra' in request.session:
+            del request.session['tipo_obra']
+        
+        request.session.modified = True
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Sesión limpiada exitosamente'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)

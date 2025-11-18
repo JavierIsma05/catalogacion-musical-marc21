@@ -168,6 +168,11 @@
             "id_nivel_bibliografico"
         )?.value;
 
+        // Si los campos no están disponibles aún, retornar null
+        if (!tipoRegistro || !nivelBibliografico) {
+            return null;
+        }
+
         // Mapeo correcto según TIPO_OBRA_CONFIG en obra_config.py
         if (tipoRegistro === "d" && nivelBibliografico === "c") {
             return "coleccion_manuscrita";
@@ -192,6 +197,17 @@
         try {
             const datos = serializeFormData();
             const tipoObra = getTipoObra();
+
+            // No guardar si el tipo de obra no está determinado aún
+            if (!tipoObra || tipoObra === "desconocido") {
+                if (!esAutoguardado) {
+                    console.warn(
+                        "No se puede guardar: tipo de obra no determinado"
+                    );
+                }
+                return;
+            }
+
             const pestanaActual =
                 typeof currentTabIndex !== "undefined" ? currentTabIndex : 0;
 
@@ -246,11 +262,18 @@
     }
 
     /**
-     * Verifica si existe un borrador
+     * Verifica si existe un borrador (solo muestra advertencia, no carga automáticamente)
      */
     async function verificarBorradorExistente() {
         try {
             const tipoObra = getTipoObra();
+
+            // Esperar a que los campos estén disponibles
+            if (!tipoObra || tipoObra === "desconocido") {
+                console.log("Esperando a que el formulario esté listo...");
+                return;
+            }
+
             const response = await fetch(
                 `${API_URLS.verificar}?tipo_obra=${encodeURIComponent(
                     tipoObra
@@ -259,11 +282,63 @@
             const result = await response.json();
 
             if (result.success && result.tiene_borrador) {
-                mostrarDialogoRecuperarBorrador(result.borrador);
+                // Solo mostrar advertencia informativa, NO cargar el borrador
+                mostrarAdvertenciaBorradorGuardado(result.borrador);
             }
         } catch (error) {
             console.error("Error verificando borrador:", error);
         }
+    }
+
+    /**
+     * Muestra advertencia de que hay un borrador guardado (sin cargarlo)
+     */
+    function mostrarAdvertenciaBorradorGuardado(borrador) {
+        const dias = borrador.dias_antiguedad;
+        let tiempoGuardado =
+            dias === 0
+                ? "guardado hoy"
+                : dias === 1
+                ? "guardado ayer"
+                : `guardado hace ${dias} días`;
+
+        const modalHtml = `
+            <div class="modal fade" id="modalAdvertenciaBorrador" tabindex="-1" data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content border-warning">
+                        <div class="modal-header bg-warning text-dark">
+                            <h6 class="modal-title mb-0">
+                                <i class="bi bi-exclamation-triangle"></i> Borrador Guardado
+                            </h6>
+                        </div>
+                        <div class="modal-body text-center py-4">
+                            <i class="bi bi-cloud-check text-warning" style="font-size: 3rem;"></i>
+                            <p class="mt-3 mb-2">Tienes un borrador guardado</p>
+                            <small class="text-muted">Última modificación: ${tiempoGuardado}</small>
+                            <p class="mt-3 mb-1 fw-bold">El formulario está vacío ahora</p>
+                            <p class="mb-0"><small class="text-muted">Para recuperar tu borrador, ve a la sección de <strong>Borradores</strong> y haz clic en <strong>Continuar</strong>.</small></p>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal">
+                                <i class="bi bi-check-circle"></i> Entendido
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML("beforeend", modalHtml);
+        const modalElement = document.getElementById(
+            "modalAdvertenciaBorrador"
+        );
+        const modal = new bootstrap.Modal(modalElement);
+
+        modalElement.addEventListener("hidden.bs.modal", () => {
+            modalElement.remove();
+        });
+
+        modal.show();
     }
 
     /**
@@ -342,21 +417,32 @@
 
             if (result.success) {
                 const borrador = result.borrador;
-                
+
                 // VALIDACIÓN: Verificar que el tipo de obra coincida
                 const tipoObraActual = getTipoObra();
-                if (borrador.tipo_obra !== tipoObraActual) {
+
+                // Si aún no se ha determinado el tipo de obra, esperar
+                if (!tipoObraActual || tipoObraActual === "desconocido") {
                     console.warn(
-                        `Tipo de obra no coincide. Borrador: ${borrador.tipo_obra}, Actual: ${tipoObraActual}`
+                        "Tipo de obra aún no determinado, reintentando..."
+                    );
+                    // Reintentar después de un momento
+                    setTimeout(() => cargarBorrador(id), 500);
+                    return;
+                }
+
+                if (borrador.tipo_obra !== tipoObraActual) {
+                    console.error(
+                        `ERROR: Tipo de obra no coincide. Borrador: ${borrador.tipo_obra}, Actual: ${tipoObraActual}`
                     );
                     mostrarNotificacion(
-                        "Este borrador es de otro tipo de obra. El formulario estará vacío.",
-                        "warning",
-                        4000
+                        "Error: Este borrador es de otro tipo de obra.",
+                        "error",
+                        5000
                     );
                     return;
                 }
-                
+
                 borradorId = borrador.id;
                 const datos = borrador.datos_formulario;
 
@@ -382,6 +468,19 @@
                     "success"
                 );
                 actualizarIndicadorGuardado();
+
+                // Limpiar la variable de sesión para evitar recargas automáticas
+                if (typeof BORRADOR_A_RECUPERAR !== "undefined") {
+                    // Hacer una petición para limpiar la sesión
+                    fetch("/api/borradores/limpiar-sesion/", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": getCsrfToken(),
+                        },
+                    }).catch((err) =>
+                        console.error("Error limpiando sesión:", err)
+                    );
+                }
             } else {
                 mostrarNotificacion("Error al cargar borrador", "error");
             }
@@ -890,20 +989,39 @@
     function init() {
         if (!form) return;
 
-        // Si hay un borrador específico a recuperar (desde lista de borradores)
-        if (
-            typeof BORRADOR_A_RECUPERAR !== "undefined" &&
-            BORRADOR_A_RECUPERAR !== null
-        ) {
-            cargarBorrador(BORRADOR_A_RECUPERAR);
-        } else {
-            verificarBorradorExistente();
-        }
+        // Esperar a que los campos tipo_registro y nivel_bibliografico estén disponibles
+        const esperarFormularioListo = () => {
+            const tipoRegistro = document.getElementById("id_tipo_registro");
+            const nivelBibliografico = document.getElementById(
+                "id_nivel_bibliografico"
+            );
 
-        iniciarAutoguardado();
+            if (!tipoRegistro || !nivelBibliografico) {
+                // Reintentar después de 100ms
+                setTimeout(esperarFormularioListo, 100);
+                return;
+            }
 
-        form.addEventListener("input", onFormChange);
-        form.addEventListener("change", onFormChange);
+            // Formulario listo, proceder con la inicialización
+            // Si hay un borrador específico a recuperar (desde lista de borradores con botón "Continuar")
+            if (
+                typeof BORRADOR_A_RECUPERAR !== "undefined" &&
+                BORRADOR_A_RECUPERAR !== null
+            ) {
+                // Esperar un poco más para asegurar que todo está cargado
+                setTimeout(() => cargarBorrador(BORRADOR_A_RECUPERAR), 300);
+            } else {
+                // NO cargar borrador automáticamente, solo verificar si existe y mostrar advertencia
+                setTimeout(verificarBorradorExistente, 300);
+            }
+
+            iniciarAutoguardado();
+
+            form.addEventListener("input", onFormChange);
+            form.addEventListener("change", onFormChange);
+        };
+
+        esperarFormularioListo();
     }
 
     if (document.readyState === "loading") {

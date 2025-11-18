@@ -1,0 +1,406 @@
+/**
+ * Estilos para formulario de creación/edición de obras MARC21
+ */
+
+/* ============================================
+   CONTENEDOR PRINCIPAL Y PESTAÑAS
+   ============================================ */
+
+.tabs-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* Panel de progreso de campos obligatorios */
+.progress-panel {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.progress-panel h6 {
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.progress-stats {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.progress-circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.progress-circle svg {
+    transform: rotate(-90deg);
+}
+
+.progress-circle circle {
+    fill: none;
+    stroke-width: 8;
+}
+
+.progress-circle .bg-circle {
+    stroke: rgba(255, 255, 255, 0.2);
+}
+
+.progress-circle .progress-circle-bar {
+    stroke: #48bb78;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: white;
+}
+
+.progress-details {
+    flex: 1;
+    min-width: 200px;
+}
+
+.progress-details p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.95rem;
+}
+
+.progress-details .field-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.field-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.field-badge.complete {
+    background: rgba(72, 187, 120, 0.3);
+}
+
+.field-badge.incomplete {
+    background: rgba(245, 101, 101, 0.3);
+}
+
+/* Navegación de pestañas */
+.tabs-navigation {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #E2E8F0;
+    overflow-x: auto;
+    padding-bottom: 0;
+    scrollbar-width: thin;
+}
+
+.tabs-navigation::-webkit-scrollbar {
+    height: 4px;
+}
+
+.tabs-navigation::-webkit-scrollbar-thumb {
+    background: #CBD5E0;
+    border-radius: 2px;
+}
+
+.tab-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: transparent;
+    color: #718096;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.tab-button:hover {
+    color: #3498DB;
+    background: #F7F9FA;
+}
+
+.tab-button.active {
+    color: #3498DB;
+    border-bottom-color: #3498DB;
+    background: #F7F9FA;
+}
+
+/* Indicador de campos obligatorios en pestaña */
+.tab-button .required-indicator {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background: #F56565;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+.tab-button.has-required-complete .required-indicator {
+    background: #48BB78;
+    animation: none;
+}
+
+/* ============================================
+   CONTENIDO DE PESTAÑAS
+   ============================================ */
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   CAMPOS DEL FORMULARIO
+   ============================================ */
+
+/* Grupo de campo con badge obligatorio */
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-group.required-field {
+    padding-left: 8px;
+    border-left: 3px solid #F59E0B;
+}
+
+.form-group.required-field.field-complete {
+    border-left-color: #10B981;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2D3748;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.required-badge {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+.required-badge.complete {
+    background: linear-gradient(135deg, #10B981, #059669);
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.field-help-text {
+    font-size: 0.85rem;
+    color: #718096;
+    margin-top: 0.25rem;
+}
+
+/* Inputs con validación visual */
+.form-control.required-input:invalid {
+    border-color: #FED7D7;
+    background-color: #FFF5F5;
+}
+
+.form-control.required-input:valid {
+    border-color: #C6F6D5;
+    background-color: #F0FFF4;
+}
+
+.form-control:focus {
+    border-color: #3498DB;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* ============================================
+   NAVEGACIÓN ENTRE PESTAÑAS
+   ============================================ */
+
+.tab-navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #E2E8F0;
+}
+
+/* ============================================
+   INDICADOR DE GUARDADO
+   ============================================ */
+
+.save-indicator {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.save-indicator.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.save-indicator.saving {
+    background: #FFF3CD;
+    border-left: 4px solid #FFC107;
+}
+
+.save-indicator.saved {
+    background: #D4EDDA;
+    border-left: 4px solid #28A745;
+}
+
+.save-indicator .spinner-border {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+/* ============================================
+   NOTIFICACIONES
+   ============================================ */
+
+.notification-toast {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    min-width: 300px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 1rem 1.25rem;
+    z-index: 1050;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+}
+
+.notification-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-toast.success {
+    border-left: 4px solid #28A745;
+}
+
+.notification-toast.error {
+    border-left: 4px solid #DC3545;
+}
+
+.notification-toast.warning {
+    border-left: 4px solid #FFC107;
+}
+
+.notification-toast.info {
+    border-left: 4px solid #17A2B8;
+}
+
+/* ============================================
+   RESPONSIVO
+   ============================================ */
+
+@media (max-width: 768px) {
+    .tabs-container {
+        padding: 1rem;
+    }
+
+    .tab-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .progress-panel {
+        padding: 1rem;
+    }
+
+    .progress-stats {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .progress-circle {
+        width: 60px;
+        height: 60px;
+    }
+
+    .tab-navigation-buttons {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .tab-navigation-buttons button {
+        width: 100%;
+    }
+}
