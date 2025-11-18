@@ -55,19 +55,6 @@ class CrearObraView(ObraFormsetMixin, CreateView):
     template_name = 'catalogacion/crear_obra.html'
     
     def post(self, request, *args, **kwargs):
-        """POST interceptado para logging"""
-        # TRIPLE LOGGING para asegurar que se vea
-        print("\n" + "🔵"*40, flush=True)
-        print("📨 POST REQUEST RECIBIDO en CrearObraView", flush=True)
-        print(f"📋 Total campos POST: {len(request.POST)}", flush=True)
-        print("🔵"*40 + "\n", flush=True)
-        
-        logger.info("\n" + "🔵"*40)
-        logger.info("📨 POST REQUEST RECIBIDO en CrearObraView")
-        logger.debug(f"📋 Datos POST: {dict(request.POST.lists())}")
-        logger.info("🔵"*40 + "\n")
-        
-        # También escribir en archivo por si acaso
         try:
             with open('debug_post.txt', 'a', encoding='utf-8') as f:
                 f.write(f"\n\n{'='*60}\n")
@@ -135,23 +122,15 @@ class CrearObraView(ObraFormsetMixin, CreateView):
     @transaction.atomic
     def form_valid(self, form):
         """Guardar obra y todos los formsets en una transacción atómica"""
-        logger.info("\n" + "="*80)
-        logger.info("🚀 FORM_VALID LLAMADO - Iniciando guardado de obra")
-        logger.info("="*80)
         
         context = self.get_context_data()
         
         # Validar todos los formsets
         formsets_validos, formsets = self._validar_formsets(context)
         
-        logger.info(f"\n✅ Formsets válidos: {formsets_validos}")
-        logger.info(f"📦 Formsets recibidos: {list(formsets.keys())}")
-        
         if not formsets_validos:
-            logger.error("\n❌ ERROR: Formsets NO válidos")
             for nombre, formset in formsets.items():
                 if hasattr(formset, 'errors') and formset.errors:
-                    logger.error(f"\n  ❌ Errores en {nombre}:")
                     for i, errors in enumerate(formset.errors):
                         if errors:
                             logger.error(f"     Form {i}: {errors}")

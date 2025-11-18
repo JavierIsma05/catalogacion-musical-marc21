@@ -624,7 +624,7 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     def get_absolute_url(self):
         """Retorna la URL canónica de la obra"""
         from django.urls import reverse
-        return reverse('obra_detalle', kwargs={'pk': self.pk})
+        return reverse('catalogacion:detalle_obra', kwargs={'pk': self.pk})
     
     def campo_005_marc(self):
         """

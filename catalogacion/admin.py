@@ -171,7 +171,7 @@ class VolumenSerie490Inline(admin.TabularInline):
 class MencionSerie490Inline(admin.StackedInline):
     model = MencionSerie490
     extra = 0
-    fields = ['relacion']
+    fields = []  # No hay campos editables directamente, se manejan con inlines
     verbose_name = "Mención de Serie (490)"
     verbose_name_plural = "📚 Menciones de Serie (490 - R)"
     show_change_link = True
@@ -425,7 +425,7 @@ FIELDSETS_COLECCION_MANUSCRITA = (
     }),
     ('🎹 Medio de Interpretación (382)', {
         'fields': (
-            ('medio_interpretacion_130', 'solista'),
+            'medio_interpretacion_130',
         ),
         'classes': ('collapse',)
     }),
@@ -479,7 +479,7 @@ FIELDSETS_OBRA_EN_COLECCION_MANUSCRITA = (
     }),
     ('🎹 Medio de Interpretación y Designación (382/383/384)', {
         'fields': (
-            ('medio_interpretacion_240', 'solista'),
+            'medio_interpretacion_240',
             ('numero_obra', 'opus'),
             'tonalidad_384',
         ),
@@ -535,7 +535,7 @@ FIELDSETS_OBRA_MANUSCRITA = (
     }),
     ('🎹 Medio de Interpretación y Designación (382/383/384)', {
         'fields': (
-            ('medio_interpretacion_240', 'solista'),
+            'medio_interpretacion_240',
             ('numero_obra', 'opus'),
             'tonalidad_384',
         ),
@@ -601,7 +601,7 @@ FIELDSETS_COLECCION_IMPRESA = (
     }),
     ('🎹 Medio de Interpretación (382)', {
         'fields': (
-            ('medio_interpretacion_130', 'solista'),
+            'medio_interpretacion_130',
         ),
         'classes': ('collapse',)
     }),
@@ -672,7 +672,7 @@ FIELDSETS_OBRA_EN_COLECCION_IMPRESA = (
     }),
     ('🎹 Medio de Interpretación y Designación (382/383/384)', {
         'fields': (
-            ('medio_interpretacion_240', 'solista'),
+            'medio_interpretacion_240',
             ('numero_obra', 'opus'),
             'tonalidad_384',
         ),
@@ -734,7 +734,7 @@ FIELDSETS_OBRA_IMPRESA = (
     }),
     ('🎹 Medio de Interpretación y Designación (382/383/384)', {
         'fields': (
-            ('medio_interpretacion_240', 'solista'),
+            'medio_interpretacion_240',
             ('numero_obra', 'opus'),
             'tonalidad_384',
         ),

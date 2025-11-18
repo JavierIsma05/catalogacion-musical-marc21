@@ -1,0 +1,644 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ obra.titulo_principal }} - Detalle de Obra{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'catalogacion/css/detalle-obra.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="detalle-container">
+    <!-- Header con información principal -->
+    <div class="detalle-header">
+        <div class="header-content">
+            <div class="header-breadcrumb">
+                <a href="{% url 'catalogacion:index' %}">Inicio</a>
+                <span class="separator">›</span>
+                <a href="{% url 'catalogacion:lista_obras' %}">Catálogo</a>
+                <span class="separator">›</span>
+                <span class="current">{{ obra.titulo_principal|truncatewords:5 }}</span>
+            </div>
+            
+            <div class="header-main">
+                <div class="header-info">
+                    {% if obra.signatura_completa %}
+                    <div class="signatura-badge">
+                        <i class="bi bi-bookmark"></i>
+                        <span>{{ obra.signatura_completa }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <h1 class="obra-titulo">{{ obra.titulo_principal }}</h1>
+                    
+                    {% if obra.subtitulo %}
+                    <h2 class="obra-subtitulo">{{ obra.subtitulo }}</h2>
+                    {% endif %}
+                    
+                    {% if obra.compositor %}
+                    <div class="compositor-info">
+                        <span class="compositor-nombre">{{ obra.compositor.nombre_completo }}</span>
+                        {% if obra.compositor.coordenadas_biograficas %}
+                        <span class="compositor-fechas">({{ obra.compositor.coordenadas_biograficas }})</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="header-actions">
+                    <a href="{% url 'catalogacion:editar_obra' pk=obra.pk %}" class="btn btn-outline">
+                        <i class="bi bi-pencil"></i>
+                        Editar
+                    </a>
+                    <!-- <button class="btn btn-outline" onclick="window.print()">
+                        <i class="bi bi-printer"></i>
+                        Imprimir
+                    </button>
+                    <button class="btn btn-outline" onclick="compartir()">
+                        <i class="bi bi-share"></i>
+                        Compartir
+                    </button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal con navegación lateral -->
+    <div class="detalle-body">
+        <!-- Sidebar de navegación -->
+        <aside class="detalle-sidebar">
+            <nav class="sidebar-nav">
+                <h6 class="nav-title">Contenido</h6>
+                <ul class="nav-list">
+                    <li><a href="#seccion-basica" class="nav-link active">
+                        <i class="bi bi-info-circle"></i>
+                        Información básica
+                    </a></li>
+                    <li><a href="#seccion-produccion" class="nav-link">
+                        <i class="bi bi-building"></i>
+                        Producción
+                    </a></li>
+                    <li><a href="#seccion-fisica" class="nav-link">
+                        <i class="bi bi-book"></i>
+                        Descripción física
+                    </a></li>
+                    <li><a href="#seccion-musical" class="nav-link">
+                        <i class="bi bi-music-note"></i>
+                        Datos musicales
+                    </a></li>
+                    <li><a href="#seccion-materias" class="nav-link">
+                        <i class="bi bi-tags"></i>
+                        Materias y géneros
+                    </a></li>
+                    <li><a href="#seccion-relacionados" class="nav-link">
+                        <i class="bi bi-diagram-3"></i>
+                        Nombres relacionados
+                    </a></li>
+                    <li><a href="#seccion-notas" class="nav-link">
+                        <i class="bi bi-journal-text"></i>
+                        Notas
+                    </a></li>
+                    <li><a href="#seccion-ubicacion" class="nav-link">
+                        <i class="bi bi-geo-alt"></i>
+                        Ubicación y acceso
+                    </a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="detalle-main">
+            <!-- Información básica -->
+            <section id="seccion-basica" class="detalle-section">
+                <div class="section-header">
+                    <h3 class="section-title">Información básica</h3>
+                </div>
+                
+                <div class="data-grid">
+                    {% if obra.coleccion %}
+                    <div class="data-item full-width">
+                        <span class="data-label">Colección</span>
+                        <span class="data-value">{{ obra.coleccion.nombre_completo }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.titulo_uniforme %}
+                    <div class="data-item full-width">
+                        <span class="data-label">Título uniforme (130)</span>
+                        <span class="data-value">
+                            {{ obra.titulo_uniforme.nombre_completo }}
+                            {% if obra.medio_interpretacion_130 %}, {{ obra.medio_interpretacion_130 }}{% endif %}
+                            {% if obra.tonalidad_130 %}, {{ obra.tonalidad_130 }}{% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.titulo_240 %}
+                    <div class="data-item full-width">
+                        <span class="data-label">Título uniforme (240)</span>
+                        <span class="data-value">
+                            {{ obra.titulo_240.nombre_completo }}
+                            {% if obra.medio_interpretacion_240 %}, {{ obra.medio_interpretacion_240 }}{% endif %}
+                            {% if obra.tonalidad_240 %}, {{ obra.tonalidad_240 }}{% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.titulos_alternativos.all %}
+                    <div class="data-item full-width">
+                        <span class="data-label">Títulos alternativos (246)</span>
+                        <div class="data-list">
+                            {% for titulo in obra.titulos_alternativos.all %}
+                            <span class="data-value-item">
+                                {% if titulo.indicador_titulo %}{{ titulo.get_indicador_titulo_display }}: {% endif %}
+                                {{ titulo.titulo_alternativo }}
+                                {% if titulo.parte %}: {{ titulo.parte }}{% endif %}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.ms_imp %}
+                    <div class="data-item">
+                        <span class="data-label">Tipo de material (340)</span>
+                        <span class="data-value badge-tipo">{{ obra.get_ms_imp_display }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.mencion_responsabilidad %}
+                    <div class="data-item full-width">
+                        <span class="data-label">Mención de responsabilidad (245c)</span>
+                        <span class="data-value">{{ obra.mencion_responsabilidad }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Producción y Edición -->
+            <section id="seccion-produccion" class="detalle-section">
+                <div class="section-header">
+                    <h3 class="section-title">Producción y edición</h3>
+                </div>
+                
+                <div class="data-grid">
+                    {% if obra.producciones_publicacion.exists %}
+                    {% for prod in obra.producciones_publicacion.all %}
+                    <div class="data-item full-width">
+                        <span class="data-label">Publicación (264)</span>
+                        <span class="data-value">
+                            {% if prod.lugar_produccion %}{{ prod.lugar_produccion }}{% endif %}
+                            {% if prod.editor %} : {{ prod.editor }}{% endif %}
+                            {% if prod.fecha_produccion %}, {{ prod.fecha_produccion }}{% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    
+                    {% if obra.ediciones.exists %}
+                    {% for edicion in obra.ediciones.all %}
+                    <div class="data-item">
+                        <span class="data-label">Edición (250)</span>
+                        <span class="data-value">{{ edicion.mencion_edicion }}</span>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    
+                    {% if obra.isbn %}
+                    <div class="data-item">
+                        <span class="data-label">ISBN (020)</span>
+                        <span class="data-value font-mono">{{ obra.isbn }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.ismn %}
+                    <div class="data-item">
+                        <span class="data-label">ISMN (024)</span>
+                        <span class="data-value font-mono">{{ obra.ismn }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.numero_editor %}
+                    <div class="data-item">
+                        <span class="data-label">Número de editor (028)</span>
+                        <span class="data-value font-mono">{{ obra.numero_editor }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Descripción física -->
+            <section id="seccion-fisica" class="detalle-section">
+                <div class="section-header">
+                    <h3 class="section-title">Descripción física</h3>
+                </div>
+                
+                <div class="data-grid">
+                    {% if obra.extension %}
+                    <div class="data-item">
+                        <span class="data-label">Extensión (300a)</span>
+                        <span class="data-value">{{ obra.extension }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.otras_caracteristicas %}
+                    <div class="data-item">
+                        <span class="data-label">Detalles (300b)</span>
+                        <span class="data-value">{{ obra.otras_caracteristicas }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.dimension %}
+                    <div class="data-item">
+                        <span class="data-label">Dimensiones (300c)</span>
+                        <span class="data-value">{{ obra.dimension }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.material_acompanante %}
+                    <div class="data-item full-width">
+                        <span class="data-label">Material acompañante (300e)</span>
+                        <span class="data-value">{{ obra.material_acompanante }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Datos musicales -->
+            <section id="seccion-musical" class="detalle-section">
+                <div class="section-header">
+                    <h3 class="section-title">Datos musicales</h3>
+                </div>
+                
+                <div class="data-grid">
+                    {% if obra.medios_interpretacion.exists %}
+                    <div class="data-item full-width">
+                        <span class="data-label">Medio de interpretación (382)</span>
+                        <div class="data-value">
+                            {% for medio in obra.medios_interpretacion.all %}
+                                {{ medio.medio }}{% if medio.solista %} (solista: {{ medio.solista }}){% endif %}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.tonalidad_384 %}
+                    <div class="data-item">
+                        <span class="data-label">Tonalidad (384)</span>
+                        <span class="data-value">{{ obra.tonalidad_384 }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.numero_obra or obra.opus %}
+                    <div class="data-item">
+                        <span class="data-label">Designación numérica (383)</span>
+                        <span class="data-value">
+                            {% if obra.numero_obra %}{{ obra.numero_obra }}{% endif %}
+                            {% if obra.opus %} / Op. {{ obra.opus }}{% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if obra.formato %}
+                    <div class="data-item">
+                        <span class="data-label">Formato de presentación (348)</span>
+                        <span class="data-value">{{ obra.get_formato_display }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if obra.incipits_musicales.all %}
+                <div class="incipit-section">
+                    <h4 class="subsection-title">Íncipit musical (031)</h4>
+                    {% for incipit in obra.incipits_musicales.all %}
+                    <div class="incipit-card">
+                        <div class="incipit-header">
+                            {% if incipit.numero_orden or incipit.numero_movimiento or incipit.numero_parte %}
+                            <span class="incipit-id">
+                                {% if incipit.numero_orden %}{{ incipit.numero_orden }}{% endif %}{% if incipit.numero_movimiento %}.{{ incipit.numero_movimiento }}{% endif %}{% if incipit.numero_parte %}.{{ incipit.numero_parte }}{% endif %}
+                            </span>
+                            {% endif %}
+                            {% if incipit.titulo_movimiento %}
+                            <span class="incipit-label">{{ incipit.titulo_movimiento }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="incipit-data">
+                            {% if incipit.tonalidad %}
+                            <div class="incipit-item">
+                                <span class="incipit-key">Tonalidad:</span>
+                                <span class="incipit-value">{{ incipit.tonalidad }}</span>
+                            </div>
+                            {% endif %}
+                            {% if incipit.compas %}
+                            <div class="incipit-item">
+                                <span class="incipit-key">Compás:</span>
+                                <span class="incipit-value">{{ incipit.compas }}</span>
+                            </div>
+                            {% endif %}
+                            {% if incipit.codigo_notacion %}
+                            <div class="incipit-notation">
+                                <code>{{ incipit.codigo_notacion }}</code>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Materias y géneros -->
+            <section id="seccion-materias" class="detalle-section">
+                <div class="section-header">
+                    <h3 class="section-title">Materias y géneros</h3>
+                </div>
+                
+                {% if obra.materias_655.all or obra.materias_650.all %}
+                <div class="tags-container">
+                    {% for materia in obra.materias_655.all %}
+                    <span class="tag tag-genero">
+                        <i class="bi bi-tag"></i>
+                        {{ materia.materia }}{% if materia.subdivisiones.all %} -- {{ materia.subdivisiones.all.0.subdivision }}{% endif %}
+                    </span>
+                    {% endfor %}
+                    
+                    {% for materia in obra.materias_650.all %}
+                    <span class="tag tag-materia">
+                        <i class="bi bi-bookmark"></i>
+                        {{ materia.materia }}{% if materia.subdivisiones.all %} -- {{ materia.subdivisiones.all.0.subdivision }}{% endif %}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="empty-message">No hay materias o géneros registrados.</p>
+                {% endif %}
+                
+                {% if obra.series_490.all %}
+                <div class="data-grid mt-3">
+                    {% for serie in obra.series_490.all %}
+                    <div class="data-item full-width">
+                        <span class="data-label">Serie (490)</span>
+                        <span class="data-value">
+                            {{ serie.titulo_serie }}{% if serie.numero_serie %} ; {{ serie.numero_serie }}{% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Nombres relacionados -->
+            <section id="seccion-relacionados" class="detalle-section">
+                <div class="section-header">
+                    <h3 class="section-title">Nombres relacionados</h3>
+                </div>
+                
+                {% if obra.nombres_relacionados_700.all or obra.entidades_relacionadas_710.all %}
+                <div class="relacionados-grid">
+                    {% for nombre in obra.nombres_relacionados_700.all %}
+                    <div class="relacionado-card">
+                        <div class="relacionado-nombre">{{ nombre.persona.nombre_completo }}</div>
+                        {% if nombre.coordenadas_biograficas %}
+                        <div class="relacionado-fechas">{{ nombre.coordenadas_biograficas }}</div>
+                        {% endif %}
+                        {% if nombre.funciones.all %}
+                        <div class="relacionado-rol">
+                            {% for funcion in nombre.funciones.all %}{{ funcion.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                        </div>
+                        {% endif %}
+                        {% if nombre.autoria %}
+                        <div class="relacionado-atributo">{{ nombre.get_autoria_display }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    {% for entidad in obra.entidades_relacionadas_710.all %}
+                    <div class="relacionado-card entidad">
+                        <div class="relacionado-nombre">
+                            <i class="bi bi-building"></i>
+                            {{ entidad.entidad.nombre_completo }}
+                        </div>
+                        {% if entidad.funciones.all %}
+                        <div class="relacionado-rol">
+                            {% for funcion in entidad.funciones.all %}{{ funcion.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="empty-message">No hay nombres relacionados registrados.</p>
+                {% endif %}
+            </section>
+
+            <!-- Notas -->
+            <section id="seccion-notas" class="detalle-section">
+                <div class="section-header">
+                    <h3 class="section-title">Notas</h3>
+                </div>
+                
+                {% if obra.notas_generales_500.all %}
+                <div class="notas-list">
+                    {% for nota in obra.notas_generales_500.all %}
+                    <div class="nota-item">
+                        <i class="bi bi-chat-left-text"></i>
+                        <p>{{ nota.nota_general }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if obra.contenidos_505.all %}
+                {% for contenido in obra.contenidos_505.all %}
+                <div class="nota-especial">
+                    <h4 class="nota-titulo">Contenido (505)</h4>
+                    <p>{{ contenido.contenido }}</p>
+                </div>
+                {% endfor %}
+                {% endif %}
+                
+                {% if obra.sumarios_520.all %}
+                {% for sumario in obra.sumarios_520.all %}
+                <div class="nota-especial">
+                    <h4 class="nota-titulo">Sumario (520)</h4>
+                    <p>{{ sumario.sumario }}</p>
+                </div>
+                {% endfor %}
+                {% endif %}
+                
+                {% if obra.datos_biograficos_545.all %}
+                {% for dato in obra.datos_biograficos_545.all %}
+                <div class="nota-especial">
+                    <h4 class="nota-titulo">Datos biográficos (545)</h4>
+                    {% for texto in dato.textos_biograficos_545.all %}
+                    <p>{{ texto.texto }}</p>
+                    {% endfor %}
+                    {% for uri in dato.uris_545.all %}
+                    <a href="{{ uri.uri }}" class="nota-link" target="_blank">
+                        <i class="bi bi-link-45deg"></i>
+                        Ver más información
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                {% endif %}
+                
+                {% if not obra.notas_generales_500.all and not obra.contenidos_505.all and not obra.sumarios_520.all and not obra.datos_biograficos_545.all %}
+                <p class="empty-message">No hay notas registradas.</p>
+                {% endif %}
+            </section>
+
+            <!-- Ubicación y acceso -->
+            <section id="seccion-ubicacion" class="detalle-section">
+                <div class="section-header">
+                    <h3 class="section-title">Ubicación y acceso</h3>
+                </div>
+                
+                {% if obra.ubicaciones_852.all %}
+                {% for ubicacion in obra.ubicaciones_852.all %}
+                <div class="ubicacion-card">
+                    <div class="ubicacion-icon">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="ubicacion-info">
+                        {% if ubicacion.institucion_persona %}
+                        <div class="ubicacion-item">
+                            <span class="ubicacion-label">Institución:</span>
+                            <span class="ubicacion-value">{{ ubicacion.institucion_persona.nombre_completo }}</span>
+                        </div>
+                        {% endif %}
+                        {% if ubicacion.signatura_original %}
+                        <div class="ubicacion-item">
+                            <span class="ubicacion-label">Clasificación:</span>
+                            <span class="ubicacion-value">{{ ubicacion.signatura_original }}</span>
+                        </div>
+                        {% endif %}
+                        {% if ubicacion.estanterias.all %}
+                        <div class="ubicacion-item">
+                            <span class="ubicacion-label">Localización:</span>
+                            <span class="ubicacion-value">
+                                {% for estanteria in ubicacion.estanterias.all %}
+                                    {{ estanteria.estanteria }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
+                
+                {% if obra.disponibles_856.all %}
+                <div class="acceso-online">
+                    <h4 class="subsection-title">Disponible en línea (856)</h4>
+                    {% for disponible in obra.disponibles_856.all %}
+                        {% for url in disponible.urls_856.all %}
+                        <a href="{{ url.url }}" class="acceso-link" target="_blank">
+                            <i class="bi bi-link-45deg"></i>
+                            <span>
+                                {% if disponible.textos_enlace_856.all %}
+                                    {{ disponible.textos_enlace_856.first.texto_enlace }}
+                                {% else %}
+                                    Acceder al recurso
+                                {% endif %}
+                            </span>
+                            <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if obra.enlaces_unidades_774.all or obra.otras_relaciones_787.all or obra.enlaces_documento_fuente_773.all %}
+                <div class="relaciones-obras">
+                    <h4 class="subsection-title">Obras relacionadas</h4>
+                    
+                    {% for relacion in obra.enlaces_documento_fuente_773.all %}
+                    <div class="relacion-item">
+                        <i class="bi bi-collection-fill"></i>
+                        <span><strong>773 - Documento fuente:</strong> {{ relacion.titulo }}</span>
+                    </div>
+                    {% endfor %}
+                    
+                    {% for relacion in obra.enlaces_unidades_774.all %}
+                    <div class="relacion-item">
+                        <i class="bi bi-collection"></i>
+                        <span><strong>774 - Unidad constituyente:</strong> {{ relacion.titulo }}</span>
+                    </div>
+                    {% endfor %}
+                    
+                    {% for relacion in obra.otras_relaciones_787.all %}
+                    <div class="relacion-item">
+                        <i class="bi bi-diagram-2"></i>
+                        <span><strong>787 - Otra relación:</strong> {{ relacion.titulo }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+</div>
+
+<script>
+// Navegación lateral activa
+document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('.detalle-section');
+    
+    // Smooth scroll
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Actualizar activo
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
+    });
+    
+    // Intersection Observer para actualizar navegación
+    const observerOptions = {
+        root: null,
+        rootMargin: '-100px 0px -50% 0px',
+        threshold: 0
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute('id');
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${id}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, observerOptions);
+    
+    sections.forEach(section => observer.observe(section));
+});
+
+function compartir() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ obra.titulo_principal|escapejs }}',
+            text: 'Obra catalogada en UNL-BLMP',
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copiar al portapapeles
+        navigator.clipboard.writeText(window.location.href);
+        alert('Enlace copiado al portapapeles');
+    }
+}
+</script>
+{% endblock %}

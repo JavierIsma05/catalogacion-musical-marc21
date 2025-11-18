@@ -100,9 +100,9 @@
                         <tbody>
                             {% for obra in obras_recientes %}
                             <tr>
-                                <td><code>{{ obra.numero_control }}</code></td>
+                                <td><code>{{ obra.num_control|default:"—" }}</code></td>
                                 <td>{{ obra.titulo_principal }}</td>
-                                <td>{{ obra.compositor|default:"—" }}</td>
+                                <td>{{ obra.mencion_responsabilidad|default:"—" }}</td>
                                 <td>
                                     <span class="badge bg-{{ obra.tipo_registro|yesno:'warning,info' }}">
                                         {{ obra.get_tipo_registro_display }}
