@@ -5,7 +5,6 @@ Contiene funcionalidad compartida entre CrearObraView y EditarObraView.
 from django.contrib import messages
 from django.db import transaction
 
-from catalogacion.models.autoridades import AutoridadPersona
 from catalogacion.forms.formsets import (
     # Bloque 0XX
     IncipitMusicalFormSet, CodigoLenguaFormSet, CodigoPaisEntidadFormSet,
@@ -160,29 +159,6 @@ class ObraFormsetMixin:
                     formsets_validos = False
         
         return formsets_validos, formsets
-    
-    def _manejar_compositor(self, form):
-        """
-        Manejar la creación/asignación del compositor.
-        Crea una nueva autoridad si no existe.
-        
-        Args:
-            form: Formulario de ObraGeneral
-        """
-        compositor_display = self.request.POST.get('compositor_display', '').strip()
-        if compositor_display and not form.instance.compositor_id:
-            # Crear nuevo compositor
-            compositor, created = AutoridadPersona.objects.get_or_create(
-                apellidos_nombres=compositor_display,
-                defaults={'fechas': ''}
-            )
-            form.instance.compositor = compositor
-            
-            if created:
-                messages.info(
-                    self.request,
-                    f'Se creó el compositor: {compositor_display}'
-                )
     
     def _guardar_formsets(self, formsets, instance):
         """

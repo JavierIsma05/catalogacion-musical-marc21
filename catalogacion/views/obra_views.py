@@ -103,9 +103,6 @@ class CrearObraView(ObraFormsetMixin, ObraSuccessMessageMixin, CreateView):
         # Guardar la obra principal
         self.object = form.save(commit=False)
         
-        # Manejar compositor (crear si no existe)
-        self._manejar_compositor(form)
-        
         # Asegurar tipo_registro y nivel_bibliografico
         if not self.object.tipo_registro:
             self.object.tipo_registro = self.config_obra['tipo_registro']
@@ -222,9 +219,6 @@ class EditarObraView(ObraFormsetMixin, ObraSuccessMessageMixin, UpdateView):
         
         # Actualizar la obra principal
         self.object = form.save(commit=False)
-        
-        # Manejar compositor (crear si no existe)
-        self._manejar_compositor(form)
         
         self.object.save()
         
