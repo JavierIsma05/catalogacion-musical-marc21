@@ -2,6 +2,7 @@
 Mixins para vistas de obras MARC21.
 Contiene funcionalidad compartida entre CrearObraView y EditarObraView.
 """
+import logging
 from django.contrib import messages
 from django.db import transaction
 
@@ -30,6 +31,9 @@ from catalogacion.forms.formsets import (
     Disponible856FormSet,
 )
 from catalogacion.views.obra_formset_handlers import SUBCAMPO_HANDLERS
+
+# Configurar logger
+logger = logging.getLogger('catalogacion')
 
 
 class ObraFormsetMixin:
@@ -148,16 +152,42 @@ class ObraFormsetMixin:
         Returns:
             tuple: (formsets_validos: bool, formsets: dict)
         """
+        logger.info("🔍 Iniciando validación de formsets...")
         formsets_validos = True
         formsets = {}
         
+        # Formsets opcionales que NO deben validarse si no tienen datos POST
+        formsets_opcionales = {
+            'incipits_musicales': 'incipits-TOTAL_FORMS',
+            'menciones_serie_490': 'menciones_490-TOTAL_FORMS',
+            'enlaces_documento_fuente_773': 'enlaces_773-TOTAL_FORMS',
+            'otras_relaciones_787': 'relaciones_787-TOTAL_FORMS',
+        }
+        
         for key in self._get_formset_names():
             formset = context.get(key)
+            
+            # Si es formset opcional y NO tiene ManagementForm en POST, saltarlo
+            if key in formsets_opcionales:
+                mgmt_field = formsets_opcionales[key]
+                if mgmt_field not in self.request.POST:
+                    logger.debug(f"  ⏭️  {key}: SALTADO (no está en el template)")
+                    continue
+            
             if formset:
                 formsets[key] = formset
-                if not formset.is_valid():
+                is_valid = formset.is_valid()
+                
+                if is_valid:
+                    logger.debug(f"  ✅ {key}: VÁLIDO")
+                else:
+                    logger.error(f"  ❌ {key}: INVÁLIDO")
+                    logger.error(f"     Errores: {formset.errors}")
+                    if hasattr(formset, 'non_form_errors') and formset.non_form_errors():
+                        logger.error(f"     Errores no-form: {formset.non_form_errors()}")
                     formsets_validos = False
         
+        logger.info(f"✅ Resultado final: {'TODOS VÁLIDOS' if formsets_validos else 'HAY ERRORES'}")
         return formsets_validos, formsets
     
     def _guardar_formsets(self, formsets, instance):

@@ -298,11 +298,18 @@ class ObraGeneralForm(forms.ModelForm):
         titulo_uniforme = cleaned_data.get('titulo_uniforme')
         titulo_uniforme_texto = cleaned_data.get('titulo_uniforme_texto', '').strip()
         
-        if not compositor and not compositor_texto and not titulo_uniforme and not titulo_uniforme_texto:
+        # Verificar si hay AL MENOS uno de los dos puntos de acceso
+        tiene_compositor = bool(compositor or compositor_texto)
+        tiene_titulo_uniforme = bool(titulo_uniforme or titulo_uniforme_texto)
+        
+        if not tiene_compositor and not tiene_titulo_uniforme:
             raise forms.ValidationError(
                 'Debe especificar al menos un punto de acceso principal: '
                 'Campo 100 (Compositor) o Campo 130 (Título Uniforme)'
             )
+        
+        # NOTA: Se permite tener AMBOS campos (100 Y 130) simultáneamente
+        # Esto es válido para colecciones y otras estructuras MARC21 complejas
         
         # Manejar compositor autocomplete editable
         compositor_texto = cleaned_data.get('compositor_texto', '').strip()
@@ -363,17 +370,11 @@ class ObraGeneralForm(forms.ModelForm):
             )
             cleaned_data['forma_240'] = forma
         
-        # Validar punto de acceso principal (100 vs 130)
-        compositor = cleaned_data.get('compositor')
-        titulo_uniforme = cleaned_data.get('titulo_uniforme')
+        # ✅ VALIDACIÓN ELIMINADA: Se permite tener 100 Y 130 simultáneamente
+        # Los campos 100 (Compositor) y 130 (Título Uniforme) pueden coexistir
+        # Esto es válido especialmente para colecciones manuscritas y otros casos complejos
         
-        if compositor and titulo_uniforme:
-            raise forms.ValidationError(
-                "No puede tener compositor (100) y título uniforme (130) simultáneamente. "
-                "Si hay compositor, use el campo 240 para título uniforme."
-            )
-        
-        # Validar campos condicionalessegun tipo de obra
+        # Validar campos condicionales según tipo de obra
         tipo_registro = cleaned_data.get('tipo_registro')
         
         # Manuscritos no pueden tener ISBN/ISMN

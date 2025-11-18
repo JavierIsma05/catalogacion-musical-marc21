@@ -103,6 +103,8 @@ from .bloque_5xx import (
     Contenido505,
     Sumario520,
     DatosBiograficos545,
+    TextoBiografico545,
+    URI545,
 )
 
 # ============================================

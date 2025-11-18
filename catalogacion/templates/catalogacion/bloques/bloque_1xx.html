@@ -80,7 +80,7 @@
                 </div>
                 
                 <div class="campo-grid">
-                    {# Campo oculto para el ID del título uniforme #}
+                    {# Campo oculto para el ID del título uniforme - SOLO si 130 es visible #}
                     <input type="hidden" name="titulo_uniforme" id="id_titulo_uniforme" value="{{ form.titulo_uniforme.value|default:'' }}">
                     
                     <div class="col-full">
@@ -93,7 +93,7 @@
                         {% endif %}
                     </div>
                     
-                    {# Campo oculto para el ID de la forma musical 130 #}
+                    {# Campo oculto para el ID de la forma musical 130 - SOLO si 130 es visible #}
                     <input type="hidden" name="forma_130" id="id_forma_130" value="{{ form.forma_130.value|default:'' }}">
                     
                     <div class="col-half">

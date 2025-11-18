@@ -20,7 +20,6 @@
     const API_URLS = {
         guardar: "/api/borradores/guardar/",
         autoguardar: "/api/borradores/autoguardar/",
-        verificar: "/api/borradores/verificar/",
         obtener: (id) => `/api/borradores/${id}/`,
         eliminar: (id) => `/api/borradores/${id}/eliminar/`,
     };
@@ -259,150 +258,6 @@
                 mostrarNotificacion("Error de conexión", "error");
             }
         }
-    }
-
-    /**
-     * Verifica si existe un borrador (solo muestra advertencia, no carga automáticamente)
-     */
-    async function verificarBorradorExistente() {
-        try {
-            const tipoObra = getTipoObra();
-
-            // Esperar a que los campos estén disponibles
-            if (!tipoObra || tipoObra === "desconocido") {
-                console.log("Esperando a que el formulario esté listo...");
-                return;
-            }
-
-            const response = await fetch(
-                `${API_URLS.verificar}?tipo_obra=${encodeURIComponent(
-                    tipoObra
-                )}`
-            );
-            const result = await response.json();
-
-            if (result.success && result.tiene_borrador) {
-                // Solo mostrar advertencia informativa, NO cargar el borrador
-                mostrarAdvertenciaBorradorGuardado(result.borrador);
-            }
-        } catch (error) {
-            console.error("Error verificando borrador:", error);
-        }
-    }
-
-    /**
-     * Muestra advertencia de que hay un borrador guardado (sin cargarlo)
-     */
-    function mostrarAdvertenciaBorradorGuardado(borrador) {
-        const dias = borrador.dias_antiguedad;
-        let tiempoGuardado =
-            dias === 0
-                ? "guardado hoy"
-                : dias === 1
-                ? "guardado ayer"
-                : `guardado hace ${dias} días`;
-
-        const modalHtml = `
-            <div class="modal fade" id="modalAdvertenciaBorrador" tabindex="-1" data-bs-backdrop="static">
-                <div class="modal-dialog modal-dialog-centered modal-sm">
-                    <div class="modal-content border-warning">
-                        <div class="modal-header bg-warning text-dark">
-                            <h6 class="modal-title mb-0">
-                                <i class="bi bi-exclamation-triangle"></i> Borrador Guardado
-                            </h6>
-                        </div>
-                        <div class="modal-body text-center py-4">
-                            <i class="bi bi-cloud-check text-warning" style="font-size: 3rem;"></i>
-                            <p class="mt-3 mb-2">Tienes un borrador guardado</p>
-                            <small class="text-muted">Última modificación: ${tiempoGuardado}</small>
-                            <p class="mt-3 mb-1 fw-bold">El formulario está vacío ahora</p>
-                            <p class="mb-0"><small class="text-muted">Para recuperar tu borrador, ve a la sección de <strong>Borradores</strong> y haz clic en <strong>Continuar</strong>.</small></p>
-                        </div>
-                        <div class="modal-footer justify-content-center">
-                            <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal">
-                                <i class="bi bi-check-circle"></i> Entendido
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.insertAdjacentHTML("beforeend", modalHtml);
-        const modalElement = document.getElementById(
-            "modalAdvertenciaBorrador"
-        );
-        const modal = new bootstrap.Modal(modalElement);
-
-        modalElement.addEventListener("hidden.bs.modal", () => {
-            modalElement.remove();
-        });
-
-        modal.show();
-    }
-
-    /**
-     * Muestra diálogo de recuperación
-     */
-    function mostrarDialogoRecuperarBorrador(borrador) {
-        const dias = borrador.dias_antiguedad;
-        let tiempoGuardado =
-            dias === 0
-                ? "Guardado hoy"
-                : dias === 1
-                ? "Guardado ayer"
-                : `Guardado hace ${dias} días`;
-
-        const modalHtml = `
-            <div class="modal fade" id="modalRecuperarBorrador" tabindex="-1" data-bs-backdrop="static">
-                <div class="modal-dialog modal-dialog-centered modal-sm">
-                    <div class="modal-content">
-                        <div class="modal-header bg-info text-white">
-                            <h6 class="modal-title mb-0">
-                                <i class="bi bi-cloud-arrow-down"></i> Borrador Encontrado
-                            </h6>
-                        </div>
-                        <div class="modal-body text-center py-4">
-                            <i class="bi bi-cloud-check text-info" style="font-size: 3rem;"></i>
-                            <p class="mt-3 mb-2">Tienes un borrador guardado</p>
-                            <small class="text-muted">${tiempoGuardado}</small>
-                            <p class="mt-3 mb-0"><small class="text-muted">¿Deseas recuperarlo?</small></p>
-                        </div>
-                        <div class="modal-footer justify-content-center">
-                            <button type="button" class="btn btn-outline-danger btn-sm" id="btnEmpezarNuevo">
-                                <i class="bi bi-x-circle"></i> Empezar de Nuevo
-                            </button>
-                            <button type="button" class="btn btn-info btn-sm" id="btnRecuperar">
-                                <i class="bi bi-check-circle"></i> Recuperar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.insertAdjacentHTML("beforeend", modalHtml);
-        const modalElement = document.getElementById("modalRecuperarBorrador");
-        const modal = new bootstrap.Modal(modalElement);
-
-        document
-            .getElementById("btnRecuperar")
-            .addEventListener("click", () => {
-                modal.hide();
-                cargarBorrador(borrador.id);
-                setTimeout(() => modalElement.remove(), 300);
-            });
-
-        document
-            .getElementById("btnEmpezarNuevo")
-            .addEventListener("click", () => {
-                modal.hide();
-                limpiarFormularioCompleto();
-                eliminarBorrador(borrador.id);
-                setTimeout(() => modalElement.remove(), 300);
-            });
-
-        modal.show();
     }
 
     /**
@@ -978,8 +833,18 @@
      * Eliminar borrador al publicar
      */
     form.addEventListener("submit", (e) => {
+        console.log("🗑️ [BORRADOR-SYSTEM] Listener de submit activado");
+        console.log("   Submitter:", e.submitter);
+        console.log("   Submitter value:", e.submitter?.value);
+        console.log("   BorradorId actual:", borradorId);
+
         if (e.submitter?.value === "publish" && borradorId) {
+            console.log("   ✅ Eliminando borrador:", borradorId);
             eliminarBorrador(borradorId);
+        } else {
+            console.log(
+                "   ℹ️ No se elimina borrador (no es publish o no hay borradorId)"
+            );
         }
     });
 
@@ -1010,9 +875,6 @@
             ) {
                 // Esperar un poco más para asegurar que todo está cargado
                 setTimeout(() => cargarBorrador(BORRADOR_A_RECUPERAR), 300);
-            } else {
-                // NO cargar borrador automáticamente, solo verificar si existe y mostrar advertencia
-                setTimeout(verificarBorradorExistente, 300);
             }
 
             iniciarAutoguardado();

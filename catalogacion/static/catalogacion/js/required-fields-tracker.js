@@ -391,8 +391,8 @@
         // Actualizar UI del campo en la lista
         updateFieldItemUI(fieldId, isComplete);
 
-        // Actualizar progreso general
-        updateProgress();
+        // NO llamar a updateProgress() aquí para evitar bucle infinito
+        // updateProgress() se llama desde los event listeners de cambio
 
         return isComplete;
     }
