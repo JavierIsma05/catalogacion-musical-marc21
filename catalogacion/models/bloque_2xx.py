@@ -43,6 +43,14 @@ class TituloAlternativo(models.Model):
         null=True,
         help_text="246 $b – Resto del título variante"
     )
+
+    # Subcampo $i - Texto de visualización (no repetible)
+    texto_visualizacion = models.CharField(
+        max_length=500,
+        blank=True,
+        null=True,
+        help_text="246 $i – Texto de visualización"
+    )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
@@ -52,9 +60,12 @@ class TituloAlternativo(models.Model):
         ordering = ['obra', 'id']
         
     def __str__(self):
+        partes = [self.titulo]
         if self.resto_titulo:
-            return f"{self.titulo} {self.resto_titulo}"
-        return self.titulo
+            partes.append(self.resto_titulo)
+        if self.texto_visualizacion:
+            partes.append(f"[{self.texto_visualizacion}]")
+        return " - ".join(filter(None, partes))
 
 
 # ================================================

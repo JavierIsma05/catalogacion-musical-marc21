@@ -339,7 +339,7 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     mencion_responsabilidad = models.TextField(
         blank=True,
         null=True,
-        help_text="245 $c — Mención de responsabilidad"
+        help_text="245 $c — Nombres en fuente"
     )
 
     # ===========================================

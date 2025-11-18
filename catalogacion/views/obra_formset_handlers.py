@@ -180,6 +180,48 @@ def save_textos_enlace_856(request_post, formset):
     )
 
 
+def save_lugares_264(request_post, formset):
+    """Procesa lugares ($a) del campo 264."""
+    from catalogacion.models import Lugar264
+    
+    handler = FormsetSubcampoHandler(request_post)
+    handler.procesar_subcampo_simple(
+        formset=formset,
+        prefijo_input='lugar_produccion_264_',
+        modelo_subcampo=Lugar264,
+        campo_fk='produccion_publicacion',
+        campo_valor='lugar'
+    )
+
+
+def save_entidades_264(request_post, formset):
+    """Procesa entidades ($b) del campo 264."""
+    from catalogacion.models import NombreEntidad264
+    
+    handler = FormsetSubcampoHandler(request_post)
+    handler.procesar_subcampo_simple(
+        formset=formset,
+        prefijo_input='entidad_produccion_264_',
+        modelo_subcampo=NombreEntidad264,
+        campo_fk='produccion_publicacion',
+        campo_valor='nombre'
+    )
+
+
+def save_fechas_264(request_post, formset):
+    """Procesa fechas ($c) del campo 264."""
+    from catalogacion.models import Fecha264
+    
+    handler = FormsetSubcampoHandler(request_post)
+    handler.procesar_subcampo_simple(
+        formset=formset,
+        prefijo_input='fecha_produccion_264_',
+        modelo_subcampo=Fecha264,
+        campo_fk='produccion_publicacion',
+        campo_valor='fecha'
+    )
+
+
 def save_titulos_490(request_post, formset):
     """Procesa títulos de serie del campo 490."""
     from catalogacion.models import TituloSerie490
@@ -272,6 +314,9 @@ SUBCAMPO_HANDLERS = {
     '_save_estanterias_852': save_estanterias_852,
     '_save_urls_856': save_urls_856,
     '_save_textos_enlace_856': save_textos_enlace_856,
+    '_save_lugares_264': save_lugares_264,
+    '_save_entidades_264': save_entidades_264,
+    '_save_fechas_264': save_fechas_264,
     '_save_titulos_490': save_titulos_490,
     '_save_volumenes_490': save_volumenes_490,
     '_save_textos_biograficos_545': save_textos_biograficos_545,

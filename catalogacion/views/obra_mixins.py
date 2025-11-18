@@ -170,6 +170,7 @@ class ObraFormsetMixin:
         """
         # Mapeo de claves de formset a sus handlers de subcampos
         formset_subcampo_mapping = {
+            'produccion_publicacion': ['_save_lugares_264', '_save_entidades_264', '_save_fechas_264'],
             'menciones_serie_490': ['_save_titulos_490', '_save_volumenes_490'],
             'enlaces_documento_fuente_773': ['_save_numeros_obra_773'],
             'enlaces_unidad_constituyente_774': ['_save_numeros_obra_774'],

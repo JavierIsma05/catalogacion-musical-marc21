@@ -257,7 +257,7 @@ class ObraGeneralForm(forms.ModelForm):
             'tonalidad_240': '240 $r - Tonalidad',
             'titulo_principal': '245 $a - Título principal *',
             'subtitulo': '245 $b - Subtítulo',
-            'mencion_responsabilidad': '245 $c - Mención de responsabilidad',
+            'mencion_responsabilidad': '245 $c - Nombres en fuente',
             'extension': '300 $a - Extensión',
             'otras_caracteristicas': '300 $b - Otras características físicas',
             'dimension': '300 $c - Dimensiones',

@@ -398,6 +398,13 @@ FORMSETS_CON_SUBCAMPOS = {
         'handler_url': '_save_urls_856',
         'handler_texto': '_save_textos_enlace_856',
     },
+    # Campo 264 - Producción/Publicación
+    'produccion_publicacion_formset': {
+        'subcampos': ['lugar', 'entidad', 'fecha'],
+        'handler_lugar': '_save_lugares_264',
+        'handler_entidad': '_save_entidades_264',
+        'handler_fecha': '_save_fechas_264',
+    },
     # Campo 490 - Mención de serie
     'mencion_serie_490_formset': {
         'subcampos': ['titulo', 'volumen'],

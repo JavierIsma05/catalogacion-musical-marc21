@@ -17,7 +17,7 @@ class TituloAlternativoForm(forms.ModelForm):
     
     class Meta:
         model = TituloAlternativo
-        fields = ['titulo', 'resto_titulo']
+        fields = ['titulo', 'resto_titulo', 'texto_visualizacion']
         widgets = {
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -25,6 +25,14 @@ class TituloAlternativoForm(forms.ModelForm):
             'resto_titulo': forms.TextInput(attrs={
                 'class': 'form-control',
             }),
+            'texto_visualizacion': forms.TextInput(attrs={
+                'class': 'form-control',
+            }),
+        }
+        labels = {
+            'titulo': '246 $a - Título alternativo',
+            'resto_titulo': '246 $b - Resto del título',
+            'texto_visualizacion': '246 $i - Texto de visualización',
         }
 
 
