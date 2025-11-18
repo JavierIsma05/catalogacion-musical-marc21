@@ -1,0 +1,396 @@
+{% comment %}
+Template especializado para el campo 700 - Nombres Relacionados.
+Permite repetir el campo completo y también los subcampos $c (término asociado) y $e (función).
+{% endcomment %}
+
+<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
+    <div style="display:none;">
+        {% for hidden in formset.management_form %}
+            {{ hidden }}
+        {% endfor %}
+    </div>
+    
+    <button type="button" class="add-form-row mb-3" title="Agregar nombre relacionado">
+        <i class="bi bi-plus-circle"></i>
+        Agregar Nombre Relacionado (700)
+    </button>
+    
+    <div class="formset-forms">
+        {% for form in formset %}
+        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+            {% if formset.can_delete %}
+                <div class="d-none">
+                    {{ form.DELETE }}
+                </div>
+            {% endif %}
+            
+            <button type="button" class="delete-row-btn" title="Eliminar registro 700">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger mb-3">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+            
+            <div class="campo-grid">
+                {# Subcampo $a - Nombre (NR) #}
+                <div class="col-full">
+                    <label class="form-label" for="{{ form.persona.id_for_label }}">{{ form.persona.label }}</label>
+                    {{ form.persona }}
+                    {% if form.persona.errors %}
+                        <div class="invalid-feedback d-block">{{ form.persona.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                {# Subcampo $d - Coordenadas biográficas (NR) #}
+                <div class="col-half">
+                    <label class="form-label" for="{{ form.coordenadas_biograficas.id_for_label }}">{{ form.coordenadas_biograficas.label }}</label>
+                    {{ form.coordenadas_biograficas }}
+                    {% if form.coordenadas_biograficas.errors %}
+                        <div class="invalid-feedback d-block">{{ form.coordenadas_biograficas.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                {# Subcampo $t - Título de obra (NR) #}
+                <div class="col-half">
+                    <label class="form-label" for="{{ form.titulo_obra.id_for_label }}">{{ form.titulo_obra.label }}</label>
+                    {{ form.titulo_obra }}
+                    {% if form.titulo_obra.errors %}
+                        <div class="invalid-feedback d-block">{{ form.titulo_obra.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                {# Subcampo $i - Relación (NR) #}
+                <div class="col-half">
+                    <label class="form-label" for="{{ form.relacion.id_for_label }}">{{ form.relacion.label }}</label>
+                    {{ form.relacion }}
+                    {% if form.relacion.errors %}
+                        <div class="invalid-feedback d-block">{{ form.relacion.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                {# Subcampo $j - Autoría (NR) #}
+                <div class="col-half">
+                    <label class="form-label" for="{{ form.autoria.id_for_label }}">{{ form.autoria.label }}</label>
+                    {{ form.autoria }}
+                    {% if form.autoria.errors %}
+                        <div class="invalid-feedback d-block">{{ form.autoria.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                {# Botón para agregar términos asociados ($c) #}
+                <div class="col-full mt-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-termino-btn w-100" data-nombre-index="{{ forloop.counter0 }}">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar Término Asociado ($c)
+                    </button>
+                </div>
+                
+                {# Subcampo $c - Términos asociados (Repetible) #}
+                <div class="col-full terminos-container" data-terminos-container="{{ forloop.counter0 }}">
+                    {% if form.instance.pk %}
+                        {# Cargar términos existentes #}
+                        {% for termino in form.instance.terminos_asociados.all %}
+                        <div class="termino-form-row">
+                            <div class="d-flex flex-column w-100 mb-2">
+                                <label class="form-label small">700 $c - Término asociado</label>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <input type="text" class="form-control termino-input" name="termino_asociado_700_{{ forloop.parentloop.counter0 }}_{{ termino.pk }}" value="{{ termino.termino }}" placeholder="Dr., Lic., etc." style="flex: 1;">
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-termino-btn" title="Eliminar término">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
+                {# Botón para agregar funciones ($e) #}
+                <div class="col-full mt-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-funcion-btn w-100" data-nombre-index="{{ forloop.counter0 }}">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar Función ($e)
+                    </button>
+                </div>
+                
+                {# Subcampo $e - Funciones (Repetible) #}
+                <div class="col-full funciones-container" data-funciones-container="{{ forloop.counter0 }}">
+                    {% if form.instance.pk %}
+                        {# Cargar funciones existentes #}
+                        {% for funcion in form.instance.funciones.all %}
+                        <div class="funcion-form-row">
+                            <div class="d-flex flex-column w-100 mb-2">
+                                <label class="form-label small">700 $e - Función</label>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <select class="form-select funcion-select" name="funcion_700_{{ forloop.parentloop.counter0 }}_{{ funcion.pk }}" style="flex: 1;">
+                                        {% for value, label in funcion.FUNCIONES_PERSONA %}
+                                            <option value="{{ value }}" {% if funcion.funcion == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-funcion-btn" title="Eliminar función">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="formset-row empty-form mb-3" style="display:none;">
+            <div style="display:none;">
+                {% for hidden in formset.empty_form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+            </div>
+            <button type="button" class="delete-row-btn" title="Eliminar registro 700">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="campo-grid">
+                {# Subcampo $a - Nombre (NR) #}
+                <div class="col-full">
+                    <label class="form-label" for="{{ formset.empty_form.persona.id_for_label }}">{{ formset.empty_form.persona.label }}</label>
+                    {{ formset.empty_form.persona }}
+                </div>
+                
+                {# Subcampo $d - Coordenadas biográficas (NR) #}
+                <div class="col-half">
+                    <label class="form-label" for="{{ formset.empty_form.coordenadas_biograficas.id_for_label }}">{{ formset.empty_form.coordenadas_biograficas.label }}</label>
+                    {{ formset.empty_form.coordenadas_biograficas }}
+                </div>
+                
+                {# Subcampo $t - Título de obra (NR) #}
+                <div class="col-half">
+                    <label class="form-label" for="{{ formset.empty_form.titulo_obra.id_for_label }}">{{ formset.empty_form.titulo_obra.label }}</label>
+                    {{ formset.empty_form.titulo_obra }}
+                </div>
+                
+                {# Subcampo $i - Relación (NR) #}
+                <div class="col-half">
+                    <label class="form-label" for="{{ formset.empty_form.relacion.id_for_label }}">{{ formset.empty_form.relacion.label }}</label>
+                    {{ formset.empty_form.relacion }}
+                </div>
+                
+                {# Subcampo $j - Autoría (NR) #}
+                <div class="col-half">
+                    <label class="form-label" for="{{ formset.empty_form.autoria.id_for_label }}">{{ formset.empty_form.autoria.label }}</label>
+                    {{ formset.empty_form.autoria }}
+                </div>
+                
+                <div class="col-full mt-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-termino-btn w-100" data-nombre-index="__prefix__">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar Término Asociado ($c)
+                    </button>
+                </div>
+                
+                <div class="col-full terminos-container" data-terminos-container="__prefix__">
+                    {# Los términos se agregarán aquí dinámicamente #}
+                </div>
+                
+                <div class="col-full mt-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-funcion-btn w-100" data-nombre-index="__prefix__">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar Función ($e)
+                    </button>
+                </div>
+                
+                <div class="col-full funciones-container" data-funciones-container="__prefix__">
+                    {# Las funciones se agregarán aquí dinámicamente #}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Templates globales para términos y funciones (fuera del formset loop) #}
+<div class="termino-form-row termino-template-700 d-none">
+    <div class="d-flex flex-column w-100 mb-2">
+        <label class="form-label small">700 $c - Término asociado</label>
+        <div class="d-flex gap-2 align-items-center">
+            <input type="text" class="form-control termino-input" placeholder="Dr., Lic., etc." style="flex: 1;">
+            <button type="button" class="btn btn-sm btn-outline-danger delete-termino-btn" title="Eliminar término">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="funcion-form-row funcion-template-700 d-none">
+    <div class="d-flex flex-column w-100 mb-2">
+        <label class="form-label small">700 $e - Función</label>
+        <div class="d-flex gap-2 align-items-center">
+            <select class="form-select funcion-select" style="flex: 1;">
+                <option value="arreglista">Arreglista</option>
+                <option value="coeditor">Coeditor</option>
+                <option value="compilador">Compilador</option>
+                <option value="compositor">Compositor</option>
+                <option value="copista">Copista</option>
+                <option value="dedicatario">Dedicatario</option>
+                <option value="editor">Editor</option>
+                <option value="prologuista">Prologuista</option>
+            </select>
+            <button type="button" class="btn btn-sm btn-outline-danger delete-funcion-btn" title="Eliminar función">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const container = document.querySelector('[data-formset-prefix="{{ formset.prefix }}"]');
+    if (!container) return;
+    
+    const terminoTemplate = document.querySelector('.termino-template-700');
+    const funcionTemplate = document.querySelector('.funcion-template-700');
+    
+    // Reindexar formularios después de agregar/eliminar
+    function reindexForms() {
+        const rows = container.querySelectorAll('.formset-row:not(.empty-form)');
+        const totalInput = container.querySelector('[name="{{ formset.prefix }}-TOTAL_FORMS"]');
+        if (totalInput) totalInput.value = rows.length;
+        
+        rows.forEach((row, index) => {
+            // Actualizar atributos de campos del formulario principal
+            row.querySelectorAll('input, select, textarea').forEach(field => {
+                ['name', 'id'].forEach(attr => {
+                    const val = field.getAttribute(attr);
+                    if (val && val.includes('__prefix__')) {
+                        field.setAttribute(attr, val.replace('__prefix__', index));
+                    } else if (val && /-\d+-/.test(val)) {
+                        field.setAttribute(attr, val.replace(/-\d+-/, `-${index}-`));
+                    }
+                });
+            });
+            
+            // Actualizar labels
+            row.querySelectorAll('label').forEach(label => {
+                const forAttr = label.getAttribute('for');
+                if (forAttr && forAttr.includes('__prefix__')) {
+                    label.setAttribute('for', forAttr.replace('__prefix__', index));
+                } else if (forAttr && /-\d+-/.test(forAttr)) {
+                    label.setAttribute('for', forAttr.replace(/-\d+-/, `-${index}-`));
+                }
+            });
+            
+            // Actualizar data-nombre-index en botones
+            row.querySelectorAll('[data-nombre-index]').forEach(btn => {
+                btn.setAttribute('data-nombre-index', index);
+            });
+            
+            // Actualizar data-terminos-container y data-funciones-container
+            const terminosContainer = row.querySelector('[data-terminos-container]');
+            const funcionesContainer = row.querySelector('[data-funciones-container]');
+            if (terminosContainer) terminosContainer.setAttribute('data-terminos-container', index);
+            if (funcionesContainer) funcionesContainer.setAttribute('data-funciones-container', index);
+            
+            // Actualizar nombres de subcampos dinámicos
+            function actualizarSubcampo(selector, prefix) {
+                row.querySelectorAll(selector).forEach(input => {
+                    const match = input.name.match(new RegExp(`${prefix}(\\d+)_(\\d+)`));
+                    if (match) {
+                        input.name = `${prefix}${index}_${match[2]}`;
+                    }
+                });
+            }
+            
+            actualizarSubcampo('input[name^="termino_asociado_700_"]', 'termino_asociado_700_');
+            actualizarSubcampo('select[name^="funcion_700_"]', 'funcion_700_');
+        });
+    }
+    
+    // Event delegation para todos los botones
+    container.addEventListener('click', (e) => {
+        const addBtn = e.target.closest('.add-form-row');
+        if (addBtn) {
+            const emptyForm = container.querySelector('.empty-form');
+            if (emptyForm) {
+                const nuevo = emptyForm.cloneNode(true);
+                nuevo.classList.remove('empty-form');
+                nuevo.style.display = '';
+                container.querySelector('.formset-forms').appendChild(nuevo);
+                reindexForms();
+            }
+            return;
+        }
+        
+        const deleteBtn = e.target.closest('.delete-row-btn');
+        if (deleteBtn) {
+            const row = deleteBtn.closest('.formset-row');
+            if (row && !row.classList.contains('empty-form')) {
+                const deleteCheckbox = row.querySelector('[name$="-DELETE"]');
+                if (deleteCheckbox && row.classList.contains('existing-form')) {
+                    deleteCheckbox.checked = true;
+                    row.style.opacity = '0.5';
+                    deleteBtn.classList.add('btn-warning');
+                    deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
+                } else {
+                    row.remove();
+                    reindexForms();
+                }
+            }
+            return;
+        }
+        
+        const addTerminoBtn = e.target.closest('.add-termino-btn');
+        if (addTerminoBtn) {
+            const index = addTerminoBtn.getAttribute('data-nombre-index');
+            const target = container.querySelector(`[data-terminos-container="${index}"]`);
+            if (target && terminoTemplate) {
+                const nuevo = terminoTemplate.cloneNode(true);
+                nuevo.classList.remove('termino-template-700', 'd-none');
+                const input = nuevo.querySelector('.termino-input');
+                if (input) {
+                    input.name = `termino_asociado_700_${index}_${Date.now()}`;
+                }
+                target.appendChild(nuevo);
+            }
+            return;
+        }
+        
+        const addFuncionBtn = e.target.closest('.add-funcion-btn');
+        if (addFuncionBtn) {
+            const index = addFuncionBtn.getAttribute('data-nombre-index');
+            const target = container.querySelector(`[data-funciones-container="${index}"]`);
+            if (target && funcionTemplate) {
+                const nuevo = funcionTemplate.cloneNode(true);
+                nuevo.classList.remove('funcion-template-700', 'd-none');
+                const select = nuevo.querySelector('.funcion-select');
+                if (select) {
+                    select.name = `funcion_700_${index}_${Date.now()}`;
+                }
+                target.appendChild(nuevo);
+            }
+            return;
+        }
+        
+        if (e.target.closest('.delete-termino-btn')) {
+            const row = e.target.closest('.termino-form-row');
+            if (row && !row.classList.contains('termino-template-700')) {
+                row.remove();
+            }
+            return;
+        }
+        
+        if (e.target.closest('.delete-funcion-btn')) {
+            const row = e.target.closest('.funcion-form-row');
+            if (row && !row.classList.contains('funcion-template-700')) {
+                row.remove();
+            }
+            return;
+        }
+    });
+    
+    reindexForms();
+})();
+</script>

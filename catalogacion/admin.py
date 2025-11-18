@@ -50,8 +50,6 @@ from .models import (
     NombreRelacionado700,
     TerminoAsociado700,
     Funcion700,
-    Relacion700,
-    Autoria700,
     EntidadRelacionada710,
     EnlaceDocumentoFuente773,
     EnlaceUnidadConstituyente774,
@@ -262,22 +260,6 @@ class Funcion700Inline(admin.TabularInline):
     fields = ['funcion']
     verbose_name = "Función (700 $e)"
     verbose_name_plural = "Funciones (700 $e - R)"
-
-
-class Relacion700Inline(admin.TabularInline):
-    model = Relacion700
-    extra = 0
-    fields = ['descripcion']
-    verbose_name = "Relación (700 $i)"
-    verbose_name_plural = "Relaciones (700 $i - R)"
-
-
-class Autoria700Inline(admin.TabularInline):
-    model = Autoria700
-    extra = 0
-    fields = ['autoria']
-    verbose_name = "Autoría (700 $j)"
-    verbose_name_plural = "Autorías (700 $j - R)"
 
 
 class NombreRelacionado700Inline(admin.StackedInline):
@@ -1095,9 +1077,9 @@ class MateriaGenero655Admin(admin.ModelAdmin):
 
 @admin.register(NombreRelacionado700)
 class NombreRelacionado700Admin(admin.ModelAdmin):
-    list_display = ['persona', 'titulo_obra', 'obra']
-    search_fields = ['persona__apellidos_nombres', 'titulo_obra']
-    inlines = [TerminoAsociado700Inline, Funcion700Inline, Relacion700Inline, Autoria700Inline]
+    list_display = ['persona', 'relacion', 'autoria', 'titulo_obra', 'obra']
+    search_fields = ['persona__apellidos_nombres', 'titulo_obra', 'relacion', 'autoria']
+    inlines = [TerminoAsociado700Inline, Funcion700Inline]
     
     def has_module_permission(self, request):
         return False  # Ocultar del menú principal

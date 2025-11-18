@@ -122,8 +122,7 @@ from .bloque_7xx import (
     NombreRelacionado700,
     TerminoAsociado700,
     Funcion700,
-    Relacion700,
-    Autoria700,
+    # Relacion700 y Autoria700 eliminados - ahora son campos no repetibles en NombreRelacionado700
     EntidadRelacionada710,
     EnlaceDocumentoFuente773,
     NumeroObraRelacionada773,
@@ -227,8 +226,7 @@ __all__ = [
     'NombreRelacionado700',
     'TerminoAsociado700',
     'Funcion700',
-    'Relacion700',
-    'Autoria700',
+    # 'Relacion700' y 'Autoria700' eliminados
     'EntidadRelacionada710',
     'EnlaceDocumentoFuente773',
     'EnlaceUnidadConstituyente774',

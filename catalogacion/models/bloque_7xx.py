@@ -40,7 +40,7 @@ FUNCIONES_ENTIDAD = [
 class NombreRelacionado700(models.Model):
     """
     700 1# – Punto de acceso adicional (Nombre de persona)
-    $a (NR), $c (R), $d (NR), $e (R), $i (R), $j (R), $t (NR)
+    $a (NR), $c (R), $d (NR), $e (R), $i (NR), $j (NR), $t (NR)
     """
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -54,11 +54,26 @@ class NombreRelacionado700(models.Model):
         help_text="700 $a – Apellidos, Nombres (controlado, NR)",
     )
 
-    fechas = models.CharField(
+    coordenadas_biograficas = models.CharField(
         max_length=50,
         blank=True,
         null=True,
-        help_text="700 $d – Fechas asociadas al nombre (NR)",
+        help_text="700 $d – Coordenadas biográficas (NR)",
+    )
+
+    relacion = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="700 $i – Información sobre la relación (NR)"
+    )
+
+    autoria = models.CharField(
+        max_length=20,
+        choices=AUTORIAS_CHOICES,
+        blank=True,
+        null=True,
+        help_text="700 $j – Calificador de atribución (NR)"
     )
 
     titulo_obra = models.CharField(
@@ -122,48 +137,8 @@ class Funcion700(models.Model):
         return self.get_funcion_display()
 
 
-class Relacion700(models.Model):
-    """700 $i – Información sobre la relación (R)"""
-    nombre_700 = models.ForeignKey(
-        NombreRelacionado700,
-        on_delete=models.CASCADE,
-        related_name='relaciones',
-    )
-    descripcion = models.CharField(
-        max_length=200,
-        help_text="700 $i – Relación (R)"
-    )
-
-    class Meta:
-        verbose_name = "700 $i – Relación"
-        verbose_name_plural = "700 $i – Relaciones (R)"
-        ordering = ['nombre_700', 'id']
-
-    def __str__(self):
-        return self.descripcion
-
-
-class Autoria700(models.Model):
-    """700 $j – Calificador de atribución (R)"""
-    nombre_700 = models.ForeignKey(
-        NombreRelacionado700,
-        on_delete=models.CASCADE,
-        related_name='autoridades_autoria',
-    )
-    autoria = models.CharField(
-        max_length=20,
-        choices=AUTORIAS_CHOICES,
-        default='certificada',
-        help_text="700 $j – Autoría (R)"
-    )
-
-    class Meta:
-        verbose_name = "700 $j – Autoría"
-        verbose_name_plural = "700 $j – Autorías (R)"
-        ordering = ['nombre_700', 'id']
-
-    def __str__(self):
-        return self.get_autoria_display()
+# NOTA: Los subcampos $i (relación) y $j (autoría) ahora son campos
+# no repetibles dentro de NombreRelacionado700
 
 
 # =====================================================

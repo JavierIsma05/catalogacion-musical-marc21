@@ -39,8 +39,6 @@ from catalogacion.models import (
     NombreRelacionado700,
     TerminoAsociado700,
     Funcion700,
-    Relacion700,
-    Autoria700,
     EntidadRelacionada710,
     EnlaceDocumentoFuente773,
     NumeroObraRelacionada773,
@@ -94,8 +92,6 @@ from .forms_7xx import (
     NombreRelacionado700Form,
     TerminoAsociado700Form,
     Funcion700Form,
-    Relacion700Form,
-    Autoria700Form,
     EntidadRelacionada710Form,
     EnlaceDocumentoFuente773Form,
     NumeroObraRelacionada773Form,
@@ -395,21 +391,9 @@ Funcion700FormSet = inlineformset_factory(
     can_delete=True,
 )
 
-Relacion700FormSet = inlineformset_factory(
-    NombreRelacionado700,
-    Relacion700,
-    form=Relacion700Form,
-    extra=1,
-    can_delete=True,
-)
-
-Autoria700FormSet = inlineformset_factory(
-    NombreRelacionado700,
-    Autoria700,
-    form=Autoria700Form,
-    extra=1,
-    can_delete=True,
-)
+# NOTA: Relacion700FormSet y Autoria700FormSet eliminados
+# porque $i (relación) y $j (autoría) ahora son campos no repetibles
+# dentro de NombreRelacionado700
 
 EntidadRelacionada710FormSet = inlineformset_factory(
     ObraGeneral,

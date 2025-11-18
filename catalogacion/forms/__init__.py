@@ -53,8 +53,7 @@ from .forms_7xx import (
     NombreRelacionado700Form,
     TerminoAsociado700Form,
     Funcion700Form,
-    Relacion700Form,
-    Autoria700Form,
+    # Relacion700Form y Autoria700Form eliminados
     EntidadRelacionada710Form,
     EnlaceDocumentoFuente773Form,
     NumeroObraRelacionada773Form,
@@ -112,8 +111,7 @@ from .formsets import (
     NombreRelacionado700FormSet,
     TerminoAsociado700FormSet,
     Funcion700FormSet,
-    Relacion700FormSet,
-    Autoria700FormSet,
+    # Relacion700FormSet y Autoria700FormSet eliminados
     EntidadRelacionada710FormSet,
     EnlaceDocumentoFuente773FormSet,
     NumeroObraRelacionada773FormSet,
@@ -179,8 +177,7 @@ __all__ = [
     'NombreRelacionado700Form',
     'TerminoAsociado700Form',
     'Funcion700Form',
-    'Relacion700Form',
-    'Autoria700Form',
+    # 'Relacion700Form' y 'Autoria700Form' eliminados
     'EntidadRelacionada710Form',
     'EnlaceDocumentoFuente773Form',
     'NumeroObraRelacionada773Form',
@@ -234,8 +231,7 @@ __all__ = [
     'NombreRelacionado700FormSet',
     'TerminoAsociado700FormSet',
     'Funcion700FormSet',
-    'Relacion700FormSet',
-    'Autoria700FormSet',
+    # 'Relacion700FormSet' y 'Autoria700FormSet' eliminados
     'EntidadRelacionada710FormSet',
     'EnlaceDocumentoFuente773FormSet',
     'NumeroObraRelacionada773FormSet',

@@ -7,8 +7,6 @@ from catalogacion.models import (
     NombreRelacionado700,
     TerminoAsociado700,
     Funcion700,
-    Relacion700,
-    Autoria700,
     EntidadRelacionada710,
     EnlaceDocumentoFuente773,
     NumeroObraRelacionada773,
@@ -29,14 +27,33 @@ class NombreRelacionado700Form(forms.ModelForm):
     
     class Meta:
         model = NombreRelacionado700
-        fields = ['persona']
+        fields = ['persona', 'coordenadas_biograficas', 'relacion', 'autoria', 'titulo_obra']
         widgets = {
             'persona': Select2Widget(attrs={
                 'data-url': '/catalogacion/autocompletar/persona/',
             }),
+            'coordenadas_biograficas': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '1900-1980'
+            }),
+            'relacion': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'intérprete de, arreglista de, etc.'
+            }),
+            'autoria': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+            'titulo_obra': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Título de la obra relacionada'
+            }),
         }
         labels = {
             'persona': '700 $a - Nombre relacionado',
+            'coordenadas_biograficas': '700 $d - Coordenadas biográficas',
+            'relacion': '700 $i - Relación',
+            'autoria': '700 $j - Autoría',
+            'titulo_obra': '700 $t - Título de obra',
         }
     
     def __init__(self, *args, **kwargs):
@@ -73,33 +90,9 @@ class Funcion700Form(forms.ModelForm):
         }
 
 
-class Relacion700Form(forms.ModelForm):
-    """Formulario para campo 700 $i - Información de relación"""
-    
-    class Meta:
-        model = Relacion700
-        fields = ['descripcion']
-        widgets = {
-            'descripcion': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
-        }
-
-
-class Autoria700Form(forms.ModelForm):
-    """Formulario para campo 700 $j - Autoría"""
-    
-    class Meta:
-        model = Autoria700
-        fields = ['autoria']
-        widgets = {
-            'autoria': forms.Select(attrs={
-                'class': 'form-select',
-            }),
-        }
-        labels = {
-            'autoria': '700 $j - Término de autoría',
-        }
+# NOTA: Los formularios Relacion700Form y Autoria700Form fueron eliminados
+# porque $i (relación) y $j (autoría) ahora son campos no repetibles
+# dentro de NombreRelacionado700Form
 
 
 class EntidadRelacionada710Form(forms.ModelForm):

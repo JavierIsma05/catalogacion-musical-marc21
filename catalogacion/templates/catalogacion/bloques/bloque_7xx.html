@@ -9,6 +9,7 @@
         </div>
         <div class="card-body">
             {# Campo 700 - Nombres Relacionados (Repetible) #}
+            {% if 'nombres_relacionados_700' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">700</span>
@@ -16,10 +17,11 @@
                     <span class="badge-repetible">REPETIBLE</span>
                 </div>
                 
-                <p class="form-text">Personas relacionadas con la obra (intérpretes, arreglistas, etc.).</p>
+                <p class="form-text">Personas relacionadas con la obra: intérpretes, arreglistas, editores, etc. Incluye subcampos no repetibles ($a, $d, $i, $j, $t) y repetibles ($c, $e).</p>
                 
-                {% include 'catalogacion/includes/formset_template.html' with formset=nombres_relacionados_700 titulo="Persona Relacionada" %}
+                {% include 'catalogacion/includes/formset_700_template.html' with formset=nombres_relacionados_700 %}
             </div>
+            {% endif %}
             
             {# Campo 710 - Entidades Corporativas (Repetible) #}
             <div class="campo-marc">

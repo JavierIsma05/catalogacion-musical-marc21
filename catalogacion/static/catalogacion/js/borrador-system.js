@@ -55,6 +55,8 @@
             //    - entidad_produccion_264_0_1234567890 (campo 264 $b)
             //    - fecha_produccion_264_0_1234567890 (campo 264 $c)
             //    - medio_interpretacion_382_0_1234567890 (campo 382 $a)
+            //    - termino_asociado_700_0_1234567890 (campo 700 $c)
+            //    - funcion_700_0_1234567890 (campo 700 $e)
             // 2. tipo_subtipo_campo_parentIndex_timestamp (5 partes):
             //    - numero_enlace_773_0_1234567890 (campo 773)
 
@@ -596,6 +598,22 @@
                 addButton = document.querySelector(
                     `.add-medio-btn[data-medio-index="${parentIndex}"]`
                 );
+            } else if (tipo === "termino" && subtipo === "asociado") {
+                // Campo 700 - Términos asociados ($c)
+                container = document.querySelector(
+                    `[data-terminos-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-termino-btn[data-nombre-index="${parentIndex}"]`
+                );
+            } else if (tipo === "funcion" && subtipo === "700") {
+                // Campo 700 - Funciones ($e)
+                container = document.querySelector(
+                    `[data-funciones-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-funcion-btn[data-nombre-index="${parentIndex}"]`
+                );
             }
 
             if (!container || !addButton) {
@@ -610,7 +628,7 @@
 
                 // Buscar el último input/select/textarea creado
                 const lastRow = container.querySelector(
-                    ":scope > div:last-child, :scope > .idioma-form-row:last-child, :scope > .titulo-form-row:last-child, :scope > .volumen-form-row:last-child, :scope > .texto-form-row:last-child, :scope > .uri-form-row:last-child, :scope > .url-form-row:last-child, :scope > .numero-form-row:last-child, :scope > .estanteria-form-row:last-child, :scope > .lugar-form-row:last-child, :scope > .entidad-form-row:last-child, :scope > .fecha-form-row:last-child, :scope > .medio-form-row:last-child"
+                    ":scope > div:last-child, :scope > .idioma-form-row:last-child, :scope > .titulo-form-row:last-child, :scope > .volumen-form-row:last-child, :scope > .texto-form-row:last-child, :scope > .uri-form-row:last-child, :scope > .url-form-row:last-child, :scope > .numero-form-row:last-child, :scope > .estanteria-form-row:last-child, :scope > .lugar-form-row:last-child, :scope > .entidad-form-row:last-child, :scope > .fecha-form-row:last-child, :scope > .medio-form-row:last-child, :scope > .termino-form-row:last-child, :scope > .funcion-form-row:last-child"
                 );
 
                 if (lastRow) {
@@ -709,7 +727,7 @@
 
                             // Limpiar subcampos dentro de la fila
                             row.querySelectorAll(
-                                "[data-idiomas-container], [data-titulos-container], [data-volumenes-container], [data-textos-container], [data-uris-container], [data-urls-container], [data-numeros-container], [data-estanterias-container], [data-lugares-container], [data-entidades-container], [data-fechas-container], [data-medios-container]"
+                                "[data-idiomas-container], [data-titulos-container], [data-volumenes-container], [data-textos-container], [data-uris-container], [data-urls-container], [data-numeros-container], [data-estanterias-container], [data-lugares-container], [data-entidades-container], [data-fechas-container], [data-medios-container], [data-terminos-container], [data-funciones-container]"
                             ).forEach((subContainer) => {
                                 subContainer.innerHTML = "";
                             });
