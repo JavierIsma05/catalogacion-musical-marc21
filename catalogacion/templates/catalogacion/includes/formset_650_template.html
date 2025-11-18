@@ -1,0 +1,217 @@
+{% comment %}
+Template para campo 650 - Materia (Tema)
+El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de materia)
+{% endcomment %}
+
+<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
+    {# Renderizar management_form sin mensajes de error #}
+    <div style="display: none;">
+        {% for field in formset.management_form %}
+            {{ field }}
+        {% endfor %}
+    </div>
+    
+    <button type="button" class="add-form-row mb-3" title="Agregar Materia">
+        <i class="bi bi-plus-circle"></i>
+        Agregar Materia (Tema)
+    </button>
+    
+    <div class="formset-forms">
+        {% for form in formset %}
+        {% if form.instance.pk %}
+        {# Solo mostrar materias existentes #}
+        <div class="formset-row existing-form mb-3">
+            <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
+            
+            {% if formset.can_delete %}
+                <div class="d-none">
+                    {{ form.DELETE }}
+                </div>
+            {% endif %}
+            
+            <button type="button" class="delete-row-btn" title="Eliminar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            
+            <div class="campo-grid">
+                {# Campo $a - Encabezamiento de materia #}
+                <div class="col-full">
+                    <label class="form-label">650 $a - Encabezamiento de materia</label>
+                    {{ form.materia }}
+                    {% if form.materia.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.materia.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {# Botón para agregar subdivisiones ($x) #}
+                <div class="col-full">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-subdivision-btn w-100" data-materia-index="{{ forloop.counter0 }}">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar Subdivisión ($x)
+                    </button>
+                </div>
+                
+                {# Subcampo $x - Subdivisiones (Repetible) #}
+                <div class="col-full subdivisiones-container" data-subdivisiones-container="{{ forloop.counter0 }}">
+                    {% if form.instance.pk %}
+                        {# Cargar subdivisiones existentes #}
+                        {% for subdivision in form.instance.subdivisiones.all %}
+                        <div class="subdivision-form-row">
+                            <div class="d-flex flex-column w-100 mb-2">
+                                <label class="form-label small">650 $x - Subdivisión de materia</label>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <input type="text" 
+                                           class="form-control subdivision-input" 
+                                           name="subdivision_materia_650_{{ forloop.parentloop.counter0 }}_{{ subdivision.pk }}"
+                                           value="{{ subdivision.subdivision }}"
+                                           placeholder="Subdivisión de materia" 
+                                           style="flex: 1;">
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-subdivision-btn" title="Eliminar subdivisión">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        
+        {# Template vacío para clonar materias #}
+        <div class="formset-row empty-form mb-3" style="display: none;">
+            <button type="button" class="delete-row-btn" title="Eliminar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            
+            <div class="campo-grid">
+                <div class="col-full">
+                    <label class="form-label">650 $a - Encabezamiento de materia</label>
+                    <input type="text" class="form-control" placeholder="Materia principal">
+                </div>
+                
+                <div class="col-full">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-subdivision-btn w-100" data-materia-index="__prefix__">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar Subdivisión ($x)
+                    </button>
+                </div>
+                
+                <div class="col-full subdivisiones-container" data-subdivisiones-container="__prefix__">
+                    {# Las subdivisiones se agregarán aquí dinámicamente #}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Template global para subdivisiones (fuera del formset loop) #}
+<div class="subdivision-form-row subdivision-template-650 d-none">
+    <div class="d-flex flex-column w-100 mb-2">
+        <label class="form-label small">650 $x - Subdivisión de materia</label>
+        <div class="d-flex gap-2 align-items-center">
+            <input type="text" class="form-control subdivision-input" placeholder="Subdivisión de materia" style="flex: 1;">
+            <button type="button" class="btn btn-sm btn-outline-danger delete-subdivision-btn" title="Eliminar subdivisión">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Script para manejar el campo 650 con subdivisiones repetibles
+(function() {
+    const prefix = '{{ formset.prefix }}';
+    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+    if (!container) return;
+    
+    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+    const addButton = container.querySelector('.add-form-row');
+    const formsContainer = container.querySelector('.formset-forms');
+    const subdivisionTemplate = document.querySelector('.subdivision-template-650');
+    
+    if (!totalFormsInput || !addButton || !formsContainer || !subdivisionTemplate) return;
+    
+    // Agregar nueva materia 650
+    addButton.addEventListener('click', function() {
+        const totalForms = parseInt(totalFormsInput.value);
+        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
+        
+        if (!emptyFormTemplate) return;
+        
+        const emptyForm = emptyFormTemplate.cloneNode(true);
+        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
+        emptyForm.classList.remove('empty-form');
+        emptyForm.style.display = '';
+        
+        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
+        totalFormsInput.value = totalForms + 1;
+    });
+    
+    // Eliminar materia 650
+    container.addEventListener('click', function(e) {
+        const deleteBtn = e.target.closest('.delete-row-btn');
+        if (!deleteBtn) return;
+        
+        const row = deleteBtn.closest('.formset-row');
+        if (!row || row.classList.contains('empty-form')) return;
+        
+        const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
+        
+        if (row.classList.contains('existing-form')) {
+            if (deleteCheckbox && deleteCheckbox.checked) {
+                deleteCheckbox.checked = false;
+                row.style.opacity = '1';
+                deleteBtn.classList.remove('btn-warning');
+                deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
+                deleteBtn.title = 'Eliminar';
+            } else if (deleteCheckbox) {
+                deleteCheckbox.checked = true;
+                row.style.opacity = '0.5';
+                deleteBtn.classList.add('btn-warning');
+                deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
+                deleteBtn.title = 'Cancelar eliminación';
+            }
+        } else {
+            row.remove();
+            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
+        }
+    });
+    
+    // Manejar subdivisiones (subcampo $x repetible)
+    container.addEventListener('click', function(e) {
+        // Agregar subdivisión
+        const addSubdivisionBtn = e.target.closest('.add-subdivision-btn');
+        if (addSubdivisionBtn) {
+            const materiaIndex = addSubdivisionBtn.getAttribute('data-materia-index');
+            const subdivisionesContainer = container.querySelector(`[data-subdivisiones-container="${materiaIndex}"]`);
+            
+            if (!subdivisionesContainer) return;
+            
+            const newSubdivision = subdivisionTemplate.cloneNode(true);
+            newSubdivision.classList.remove('subdivision-template-650', 'd-none');
+            
+            // Actualizar el name del input
+            const input = newSubdivision.querySelector('.subdivision-input');
+            if (input) {
+                input.name = `subdivision_materia_650_${materiaIndex}_${Date.now()}`;
+            }
+            
+            subdivisionesContainer.appendChild(newSubdivision);
+        }
+        
+        // Eliminar subdivisión
+        const deleteSubdivisionBtn = e.target.closest('.delete-subdivision-btn');
+        if (deleteSubdivisionBtn) {
+            const subdivisionRow = deleteSubdivisionBtn.closest('.subdivision-form-row');
+            if (!subdivisionRow.classList.contains('subdivision-template-650')) {
+                subdivisionRow.remove();
+            }
+        }
+    });
+})();
+</script>

@@ -354,6 +354,7 @@ Materia650FormSet = inlineformset_factory(
     form=Materia650Form,
     formset=Materia650FormSet,
     extra=1,
+    max_num=10,
     can_delete=True,
 )
 
@@ -362,6 +363,7 @@ MateriaGenero655FormSet = inlineformset_factory(
     MateriaGenero655,
     form=MateriaGenero655Form,
     extra=1,
+    max_num=10,
     can_delete=True,
 )
 

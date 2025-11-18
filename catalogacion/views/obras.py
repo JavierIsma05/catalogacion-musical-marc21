@@ -629,6 +629,82 @@ class CrearObraView(CreateView):
                         uri=uri
                     )
     
+    def _save_subdivisiones_650(self, formset):
+        """
+        Procesar inputs de subdivisiones de materia generados por JavaScript.
+        Los inputs tienen nombres como: subdivision_materia_650_0_1234567890
+        donde 0 es el índice de la materia y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import SubdivisionMateria650
+        
+        # Agrupar subdivisiones por índice de materia
+        subdivisiones_por_materia = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('subdivision_materia_650_') and value.strip():
+                try:
+                    # Extraer índice de la materia: subdivision_materia_650_0_1234567890 -> 0
+                    parts = key.split('_')
+                    materia_index = int(parts[3])
+                    
+                    if materia_index not in subdivisiones_por_materia:
+                        subdivisiones_por_materia[materia_index] = []
+                    
+                    subdivisiones_por_materia[materia_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar subdivisiones para cada materia
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in subdivisiones_por_materia:
+                # Eliminar subdivisiones existentes
+                form.instance.subdivisiones.all().delete()
+                
+                # Crear nuevas subdivisiones
+                for subdivision in subdivisiones_por_materia[index]:
+                    SubdivisionMateria650.objects.create(
+                        materia650=form.instance,
+                        subdivision=subdivision
+                    )
+    
+    def _save_subdivisiones_655(self, formset):
+        """
+        Procesar inputs de subdivisiones de género generados por JavaScript.
+        Los inputs tienen nombres como: subdivision_genero_655_0_1234567890
+        donde 0 es el índice del género y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import SubdivisionGeneral655
+        
+        # Agrupar subdivisiones por índice de género
+        subdivisiones_por_genero = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('subdivision_genero_655_') and value.strip():
+                try:
+                    # Extraer índice del género: subdivision_genero_655_0_1234567890 -> 0
+                    parts = key.split('_')
+                    genero_index = int(parts[3])
+                    
+                    if genero_index not in subdivisiones_por_genero:
+                        subdivisiones_por_genero[genero_index] = []
+                    
+                    subdivisiones_por_genero[genero_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar subdivisiones para cada género
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in subdivisiones_por_genero:
+                # Eliminar subdivisiones existentes
+                form.instance.subdivisiones.all().delete()
+                
+                # Crear nuevas subdivisiones
+                for subdivision in subdivisiones_por_genero[index]:
+                    SubdivisionGeneral655.objects.create(
+                        materia655=form.instance,
+                        subdivision=subdivision
+                    )
+    
     @transaction.atomic
     def form_valid(self, form):
         """Guardar obra y todos los formsets en una transacción atómica"""
@@ -724,6 +800,14 @@ class CrearObraView(CreateView):
             if key == 'datos_biograficos':
                 self._save_textos_biograficos_545(formset)
                 self._save_uris_545(formset)
+            
+            # Si es el formset 650, procesar subdivisiones desde inputs JavaScript
+            if key == 'materias_650':
+                self._save_subdivisiones_650(formset)
+            
+            # Si es el formset 655, procesar subdivisiones desde inputs JavaScript
+            if key == 'materias_genero_655':
+                self._save_subdivisiones_655(formset)
         
         # Mensaje de éxito
         action = self.request.POST.get('action', 'publish')
@@ -1287,6 +1371,82 @@ class EditarObraView(UpdateView):
                         uri=uri
                     )
     
+    def _save_subdivisiones_650(self, formset):
+        """
+        Procesar inputs de subdivisiones de materia generados por JavaScript.
+        Los inputs tienen nombres como: subdivision_materia_650_0_1234567890
+        donde 0 es el índice de la materia y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import SubdivisionMateria650
+        
+        # Agrupar subdivisiones por índice de materia
+        subdivisiones_por_materia = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('subdivision_materia_650_') and value.strip():
+                try:
+                    # Extraer índice de la materia: subdivision_materia_650_0_1234567890 -> 0
+                    parts = key.split('_')
+                    materia_index = int(parts[3])
+                    
+                    if materia_index not in subdivisiones_por_materia:
+                        subdivisiones_por_materia[materia_index] = []
+                    
+                    subdivisiones_por_materia[materia_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar subdivisiones para cada materia
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in subdivisiones_por_materia:
+                # Eliminar subdivisiones existentes
+                form.instance.subdivisiones.all().delete()
+                
+                # Crear nuevas subdivisiones
+                for subdivision in subdivisiones_por_materia[index]:
+                    SubdivisionMateria650.objects.create(
+                        materia650=form.instance,
+                        subdivision=subdivision
+                    )
+    
+    def _save_subdivisiones_655(self, formset):
+        """
+        Procesar inputs de subdivisiones de género generados por JavaScript.
+        Los inputs tienen nombres como: subdivision_genero_655_0_1234567890
+        donde 0 es el índice del género y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import SubdivisionGeneral655
+        
+        # Agrupar subdivisiones por índice de género
+        subdivisiones_por_genero = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('subdivision_genero_655_') and value.strip():
+                try:
+                    # Extraer índice del género: subdivision_genero_655_0_1234567890 -> 0
+                    parts = key.split('_')
+                    genero_index = int(parts[3])
+                    
+                    if genero_index not in subdivisiones_por_genero:
+                        subdivisiones_por_genero[genero_index] = []
+                    
+                    subdivisiones_por_genero[genero_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar subdivisiones para cada género
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in subdivisiones_por_genero:
+                # Eliminar subdivisiones existentes
+                form.instance.subdivisiones.all().delete()
+                
+                # Crear nuevas subdivisiones
+                for subdivision in subdivisiones_por_genero[index]:
+                    SubdivisionGeneral655.objects.create(
+                        materia655=form.instance,
+                        subdivision=subdivision
+                    )
+    
     @transaction.atomic
     def form_valid(self, form):
         """Similar a CrearObraView"""
@@ -1353,6 +1513,14 @@ class EditarObraView(UpdateView):
             if key == 'datos_biograficos':
                 self._save_textos_biograficos_545(formset)
                 self._save_uris_545(formset)
+            
+            # Si es el formset 650, procesar subdivisiones desde inputs JavaScript
+            if key == 'materias_650':
+                self._save_subdivisiones_650(formset)
+            
+            # Si es el formset 655, procesar subdivisiones desde inputs JavaScript
+            if key == 'materias_genero_655':
+                self._save_subdivisiones_655(formset)
         
         messages.success(self.request, 'Obra actualizada exitosamente.')
         return redirect(self.get_success_url())

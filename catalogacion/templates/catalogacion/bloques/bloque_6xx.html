@@ -16,9 +16,9 @@
                     <span class="badge-repetible">REPETIBLE</span>
                 </div>
                 
-                <p class="form-text">Materias temáticas de la obra.</p>
+                <p class="form-text">Materias temáticas de la obra. Subcampo $x (subdivisión de materia) repetible.</p>
                 
-                {% include 'catalogacion/includes/formset_template.html' with formset=materias_650 titulo="Materia" %}
+                {% include 'catalogacion/includes/formset_650_template.html' with formset=materias_650 %}
             </div>
             
             {# Campo 655 - Término de Género/Forma (Repetible) #}
@@ -29,9 +29,9 @@
                     <span class="badge-repetible">REPETIBLE</span>
                 </div>
                 
-                <p class="form-text">Género musical o forma de la obra.</p>
+                <p class="form-text">Género musical o forma de la obra. Subcampo $x (subdivisión general) repetible.</p>
                 
-                {% include 'catalogacion/includes/formset_template.html' with formset=materias_genero_655 titulo="Género/Forma" %}
+                {% include 'catalogacion/includes/formset_655_template.html' with formset=materias_genero_655 %}
             </div>
         </div>
     </div>

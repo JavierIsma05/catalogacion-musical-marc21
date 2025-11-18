@@ -11,7 +11,7 @@ from .widgets import Select2Widget
 
 
 class Materia650Form(forms.ModelForm):
-    """Formulario para campo 650 - Materia"""
+    """Formulario para campo 650 - Materia (subcampos manejados con JavaScript)"""
     
     class Meta:
         model = Materia650
@@ -31,7 +31,7 @@ class Materia650Form(forms.ModelForm):
 
 
 class MateriaGenero655Form(forms.ModelForm):
-    """Formulario para campo 655 - Género/Forma"""
+    """Formulario para campo 655 - Género/Forma (subcampos manejados con JavaScript)"""
     
     class Meta:
         model = MateriaGenero655
