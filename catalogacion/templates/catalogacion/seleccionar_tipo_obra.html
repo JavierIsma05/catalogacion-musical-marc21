@@ -8,12 +8,12 @@
 .tipo-selection-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 1.5rem 1rem;
 }
 
 .selection-header {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .selection-header h2 {
@@ -29,18 +29,63 @@
     margin: 0;
 }
 
+.info-banner {
+    background: linear-gradient(135deg, var(--info-light) 0%, #e3f2fd 100%);
+    border: 1px solid var(--info);
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.info-banner-icon {
+    width: 32px;
+    height: 32px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.info-banner-icon i {
+    font-size: 1rem;
+    color: var(--info);
+}
+
+.info-banner-content {
+    flex: 1;
+    font-size: 0.75rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.info-banner-content strong {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.info-item {
+    display: inline;
+    margin-right: 1rem;
+}
+
 .tipos-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
 .tipo-card {
     background: white;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    padding: 1.25rem;
+    padding: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
@@ -172,41 +217,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 1.5rem;
+    padding-top: 1rem;
     border-top: 1px solid var(--border-color);
-}
-
-.help-section {
-    background: var(--info-light);
-    border: 1px solid var(--info);
-    border-radius: 4px;
-    padding: 1rem;
-    margin-top: 2rem;
-}
-
-.help-section h6 {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0 0 0.625rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-}
-
-.help-section ul {
-    margin: 0;
-    padding-left: 1.25rem;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-}
-
-.help-section li {
-    margin-bottom: 0.375rem;
-}
-
-.help-section strong {
-    color: var(--text-primary);
 }
 </style>
 {% endblock %}
@@ -225,6 +237,18 @@
     <div class="selection-header">
         <h2>Crear Nueva Obra MARC21</h2>
         <p>Seleccione el tipo de obra musical que desea catalogar según el estándar MARC21</p>
+    </div>
+
+    <!-- Banner de información compacto -->
+    <div class="info-banner">
+        <div class="info-banner-icon">
+            <i class="bi bi-info-circle-fill"></i>
+        </div>
+        <div class="info-banner-content">
+            <span class="info-item"><strong>Nivel:</strong> c=Colección, a=Analítica, m=Monografía</span>
+            <span class="info-item"><strong>Tipo:</strong> d=Manuscrito, c=Impreso</span>
+            <span class="info-item"><strong>Acceso:</strong> 100=Compositor, 130=Título uniforme</span>
+        </div>
     </div>
 
     <form method="post" action="{% url 'catalogacion:seleccionar_tipo' %}" id="tipo-form">
@@ -438,18 +462,6 @@
             </button>
         </div>
     </form>
-
-    <div class="help-section">
-        <h6>
-            <i class="bi bi-info-circle"></i>
-            Información sobre Tipos de Obra
-        </h6>
-        <ul>
-            <li><strong>Nivel bibliográfico:</strong> c=Colección, a=Analítica (parte de), m=Monografía (individual)</li>
-            <li><strong>Tipo de registro:</strong> d=Manuscrito, c=Impreso/Publicado</li>
-            <li><strong>Punto de acceso principal:</strong> 100=Compositor, 130=Título uniforme (colecciones)</li>
-        </ul>
-    </div>
 </div>
 {% endblock %}
 

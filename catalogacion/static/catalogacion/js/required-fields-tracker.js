@@ -7,9 +7,15 @@
     "use strict";
 
     // Configuración de campos obligatorios por tipo de obra
+    // Solo se incluyen campos editables por el usuario (040, 092, 100/130, 245, 340, 382)
+    // Los campos 001, 005 y 008 son automáticos y no se rastrean
     const REQUIRED_FIELDS_CONFIG = {
         coleccion_manuscrita: [
-            { id: "id_num_control", label: "001 - Número de Control", tab: 0 },
+            {
+                id: "id_fuente_catalogacion_040",
+                label: "040 - Fuente de Catalogación",
+                tab: 0,
+            },
             {
                 id: "id_titulo_uniforme",
                 label: "130 - Título Uniforme",
@@ -19,6 +25,11 @@
                 id: "id_titulo_principal",
                 label: "245 - Título Principal",
                 tab: 2,
+            },
+            {
+                id: "id_designacion_especifica_340",
+                label: "340 - Designación Específica",
+                tab: 3,
             },
             {
                 id: "id_medio_interpretacion_382",
@@ -28,12 +39,21 @@
             },
         ],
         obra_en_coleccion_manuscrita: [
-            { id: "id_num_control", label: "001 - Número de Control", tab: 0 },
+            {
+                id: "id_fuente_catalogacion_040",
+                label: "040 - Fuente de Catalogación",
+                tab: 0,
+            },
             { id: "id_compositor", label: "100 - Compositor", tab: 1 },
             {
                 id: "id_titulo_principal",
                 label: "245 - Título Principal",
                 tab: 2,
+            },
+            {
+                id: "id_designacion_especifica_340",
+                label: "340 - Designación Específica",
+                tab: 3,
             },
             {
                 id: "id_medio_interpretacion_382",
@@ -43,12 +63,21 @@
             },
         ],
         obra_manuscrita_individual: [
-            { id: "id_num_control", label: "001 - Número de Control", tab: 0 },
+            {
+                id: "id_fuente_catalogacion_040",
+                label: "040 - Fuente de Catalogación",
+                tab: 0,
+            },
             { id: "id_compositor", label: "100 - Compositor", tab: 1 },
             {
                 id: "id_titulo_principal",
                 label: "245 - Título Principal",
                 tab: 2,
+            },
+            {
+                id: "id_designacion_especifica_340",
+                label: "340 - Designación Específica",
+                tab: 3,
             },
             {
                 id: "id_medio_interpretacion_382",
@@ -58,7 +87,11 @@
             },
         ],
         coleccion_impresa: [
-            { id: "id_num_control", label: "001 - Número de Control", tab: 0 },
+            {
+                id: "id_fuente_catalogacion_040",
+                label: "040 - Fuente de Catalogación",
+                tab: 0,
+            },
             {
                 id: "id_titulo_uniforme",
                 label: "130 - Título Uniforme",
@@ -70,6 +103,11 @@
                 tab: 2,
             },
             {
+                id: "id_designacion_especifica_340",
+                label: "340 - Designación Específica",
+                tab: 3,
+            },
+            {
                 id: "id_medio_interpretacion_382",
                 label: "382 - Medio de Interpretación",
                 tab: 3,
@@ -77,12 +115,21 @@
             },
         ],
         obra_en_coleccion_impresa: [
-            { id: "id_num_control", label: "001 - Número de Control", tab: 0 },
+            {
+                id: "id_fuente_catalogacion_040",
+                label: "040 - Fuente de Catalogación",
+                tab: 0,
+            },
             { id: "id_compositor", label: "100 - Compositor", tab: 1 },
             {
                 id: "id_titulo_principal",
                 label: "245 - Título Principal",
                 tab: 2,
+            },
+            {
+                id: "id_designacion_especifica_340",
+                label: "340 - Designación Específica",
+                tab: 3,
             },
             {
                 id: "id_medio_interpretacion_382",
@@ -92,12 +139,21 @@
             },
         ],
         obra_impresa_individual: [
-            { id: "id_num_control", label: "001 - Número de Control", tab: 0 },
+            {
+                id: "id_fuente_catalogacion_040",
+                label: "040 - Fuente de Catalogación",
+                tab: 0,
+            },
             { id: "id_compositor", label: "100 - Compositor", tab: 1 },
             {
                 id: "id_titulo_principal",
                 label: "245 - Título Principal",
                 tab: 2,
+            },
+            {
+                id: "id_designacion_especifica_340",
+                label: "340 - Designación Específica",
+                tab: 3,
             },
             {
                 id: "id_medio_interpretacion_382",
@@ -205,10 +261,6 @@
             li.innerHTML = `
                 <div class="required-field-indicator"></div>
                 <span class="required-field-label">${field.label}</span>
-                <span class="required-field-code">${field.id.replace(
-                    "id_",
-                    ""
-                )}</span>
             `;
 
             // Click para navegar a la pestaña del campo

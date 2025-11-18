@@ -25,6 +25,7 @@
     top: 70px;
     max-height: calc(100vh - 90px);
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .form-content-area {
@@ -42,6 +43,7 @@
     border-radius: 4px;
     padding: 1rem;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    overflow-x: hidden;
 }
 
 .progress-panel-header {
@@ -173,6 +175,8 @@
     font-size: 0.75rem;
     transition: var(--transition);
     cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .required-field-item:hover {
@@ -221,6 +225,10 @@
     flex: 1;
     color: var(--text-primary);
     font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
 }
 
 .required-field-code {
