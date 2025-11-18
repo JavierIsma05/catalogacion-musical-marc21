@@ -130,8 +130,8 @@ class ObraGeneralForm(forms.ModelForm):
             'ms_imp',
             'formato',
             
-            # Medio y designación (382/383/384)
-            'solista',
+            # Medio y designación (383/384)
+            # NOTA: 382 ($a medios y $b solista) ahora usa MedioInterpretacion382Form
             'numero_obra',
             'opus',
             'tonalidad_384',
@@ -169,7 +169,6 @@ class ObraGeneralForm(forms.ModelForm):
             'arreglo_240': forms.Select(attrs={'class': 'form-select'}),
             'ms_imp': forms.Select(attrs={'class': 'form-select'}),
             'formato': forms.Select(attrs={'class': 'form-select'}),
-            'solista': forms.Select(attrs={'class': 'form-select'}),
             
             # Inputs de texto
             'centro_catalogador': forms.TextInput(attrs={
@@ -264,7 +263,6 @@ class ObraGeneralForm(forms.ModelForm):
             'material_acompanante': '300 $e - Material acompañante',
             'ms_imp': '340 $d - Técnica',
             'formato': '348 $a - Formato',
-            'solista': '382 $b - Solista',
             'numero_obra': '383 $a - Número serial de obra',
             'opus': '383 $b - Número de opus',
             'tonalidad_384': '384 $a - Tonalidad',

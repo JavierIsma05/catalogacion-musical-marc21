@@ -13,7 +13,7 @@ from catalogacion.forms.formsets import (
     # Bloque 2XX
     TituloAlternativoFormSet, EdicionFormSet, ProduccionPublicacionFormSet,
     # Bloque 3XX
-    MedioInterpretacion382_aFormSet,
+    MedioInterpretacion382FormSet,
     # Bloque 4XX
     MencionSerie490FormSet,
     # Bloque 5XX
@@ -92,7 +92,7 @@ class ObraFormsetMixin:
             'produccion_publicacion': ProduccionPublicacionFormSet(prefix='produccion', **kwargs),
             
             # Bloque 3XX - Descripción física
-            'medios_interpretacion': MedioInterpretacion382_aFormSet(prefix='medios_382', **kwargs),
+            'medios_interpretacion': MedioInterpretacion382FormSet(prefix='medios_382', **kwargs),
             
             # Bloque 4XX - Mención de serie
             'menciones_serie_490': MencionSerie490FormSet(prefix='menciones_490', **kwargs),

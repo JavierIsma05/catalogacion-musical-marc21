@@ -24,6 +24,14 @@ class MedioInterpretacion382(models.Model):
         help_text="Obra a la que pertenece"
     )
     
+    # Subcampo $b (NR) - Solista
+    solista = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="382 $b — Solista"
+    )
+    
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -36,6 +44,9 @@ class MedioInterpretacion382(models.Model):
         medios = ", ".join([m.get_medio_display() for m in self.medios.all()])
         if medios:
             partes.append(f"Medios: {medios}")
+        if self.solista:
+            partes.append(f"Solista: {self.solista}")
+        return " | ".join(partes) if partes else "382 (sin datos)"
 
 
 class MedioInterpretacion382_a(models.Model):

@@ -13,11 +13,20 @@ class MedioInterpretacion382Form(forms.ModelForm):
     
     class Meta:
         model = MedioInterpretacion382
-        fields = []  # No tiene campos propios, solo agrupa subcampos
+        fields = ['solista']  # Subcampo $b (NR)
+        widgets = {
+            'solista': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del solista'
+            }),
+        }
+        labels = {
+            'solista': '382 $b - Solista',
+        }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Este formulario actúa como contenedor para los subcampos
+        # Este formulario contiene el subcampo $b y agrupa los subcampos $a dinámicos
 
 
 class MedioInterpretacion382_aForm(forms.ModelForm):

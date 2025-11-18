@@ -397,14 +397,9 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     # ===========================================
     # CAMPOS 382/383/384 - MEDIO Y DESIGNACIÓN
     # ===========================================
-    
-    solista = models.CharField(
-        max_length=100,
-        choices=MEDIOS_INTERPRETACION,
-        blank=True,
-        null=True,
-        help_text="382 $b — Solista"
-    )
+    # NOTA: El campo 382 (Medio de Interpretación) ahora usa el modelo
+    # MedioInterpretacion382 con subcampos $a (medios, repetibles) y 
+    # $b (solista, no repetible). Ver bloque_3xx.py
     
     numero_obra = models.CharField(
         max_length=100,
