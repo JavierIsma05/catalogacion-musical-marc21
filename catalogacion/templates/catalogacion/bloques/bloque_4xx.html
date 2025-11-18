@@ -9,6 +9,7 @@
         </div>
         <div class="card-body">
             {# Campo 490 - Mención de serie (Repetible) #}
+            {% if '490' in campos_visibles and 'menciones_serie_490' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">490</span>
@@ -20,6 +21,7 @@
                 
                 {% include 'catalogacion/includes/formset_490_template.html' with formset=menciones_serie_490 %}
             </div>
+            {% endif %}
         </div>
     </div>
 </section>

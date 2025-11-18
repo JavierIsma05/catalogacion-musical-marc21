@@ -11,7 +11,11 @@ from django.db.models import Q
 
 from catalogacion.models import ObraGeneral
 from catalogacion.forms import ObraGeneralForm
-from catalogacion.views.obra_config import TIPO_OBRA_CONFIG
+from catalogacion.views.obra_config import (
+    TIPO_OBRA_CONFIG,
+    get_campos_visibles,
+    debe_mostrar_formset,
+)
 from catalogacion.views.obra_mixins import ObraFormsetMixin, ObraSuccessMessageMixin
 
 
@@ -78,6 +82,11 @@ class CrearObraView(ObraFormsetMixin, ObraSuccessMessageMixin, CreateView):
         context['tipo_obra'] = self.tipo_obra
         context['tipo_obra_titulo'] = self.config_obra['titulo']
         context['tipo_obra_descripcion'] = self.config_obra['descripcion']
+        
+        # Configuración de campos visibles según tipo de obra
+        campos_config = get_campos_visibles(self.tipo_obra)
+        context['campos_visibles'] = campos_config['campos_simples']
+        context['formsets_visibles'] = campos_config['formsets_visibles']
         
         # Obtener formsets según método HTTP
         with_post = self.request.method == 'POST'
@@ -195,6 +204,11 @@ class EditarObraView(ObraFormsetMixin, ObraSuccessMessageMixin, UpdateView):
         context['tipo_obra'] = self.tipo_obra
         context['tipo_obra_titulo'] = self.config_obra.get('titulo', 'Obra')
         context['tipo_obra_descripcion'] = self.config_obra.get('descripcion', '')
+        
+        # Configuración de campos visibles según tipo de obra
+        campos_config = get_campos_visibles(self.tipo_obra)
+        context['campos_visibles'] = campos_config['campos_simples']
+        context['formsets_visibles'] = campos_config['formsets_visibles']
         
         # Obtener formsets según método HTTP
         with_post = self.request.method == 'POST'

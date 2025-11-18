@@ -10,6 +10,7 @@
         <div class="card-body">
             
             {# Campo 300 - Descripción física #}
+            {% if '300' in campos_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">300</span>
@@ -38,8 +39,10 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             
             {# Campo 340 - Características técnicas #}
+            {% if '340' in campos_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">340</span>
@@ -53,9 +56,11 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             
             {# Campo 348 - Formato #}
-            <div class="campo-marc">
+            {% if '348' in campos_visibles %}
+                        <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">348</span>
                     <h6>Formato</h6>
@@ -68,23 +73,27 @@
                     </div>
                 </div>
             </div>
+{% endif %}
             
-<!-- Campo 382 - Medio de Interpretación (Repetible) -->
-<div class="campo-marc">
-    <div class="campo-titulo">
-        <span class="badge-marc">382</span>
-        <h6>Medio de Interpretación</h6>
-        <span class="badge-repetible">REPETIBLE</span>
-    </div>
-    
-    <p class="form-text">Instrumentos y voces para los que está escrita la obra.</p>
-    
-    {% include 'catalogacion/includes/formset_template.html' with formset=medios_interpretacion titulo="Medio de Interpretación" %}
-</div>
+{% if '382' in campos_visibles and 'medios_interpretacion' in formsets_visibles %}
+            <!-- Campo 382 - Medio de Interpretación (Repetible) -->
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">382</span>
+                    <h6>Medio de Interpretación</h6>
+                    <span class="badge-repetible">REPETIBLE</span>
+                </div>
+                
+                <p class="form-text">Instrumentos y voces para los que está escrita la obra.</p>
+                
+                {% include 'catalogacion/includes/formset_template.html' with formset=medios_interpretacion titulo="Medio de Interpretación" %}
+            </div>
+{% endif %}
 
             
-            {# Campo 383 - Designación numérica de obra musical #}
-            <div class="campo-marc">
+                        {# Campo 383 - Designación numérica de obra musical #}
+                        {% if '383' in campos_visibles %}
+                        <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">383</span>
                     <h6>Designación Numérica</h6>
@@ -102,8 +111,10 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             
             {# Campo 384 - Tonalidad #}
+            {% if '384' in campos_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">384</span>
@@ -122,6 +133,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             
         </div>
     </div>

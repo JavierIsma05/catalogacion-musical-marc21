@@ -10,6 +10,7 @@
         <div class="card-body">
             
             {# Campo 100 - Compositor #}
+            {% if '100' in campos_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">100</span>
@@ -57,6 +58,7 @@
                 </div>
                 
                 {# Subcampo repetible: 100 $e - Funciones #}
+                {% if 'funciones_compositor' in formsets_visibles %}
                 <div class="mt-3">
                     <div class="campo-titulo">
                         <span class="badge-marc">100$e</span>
@@ -65,9 +67,12 @@
                     </div>
                     {% include 'catalogacion/includes/formset_template.html' with formset=funciones_compositor titulo="Función" %}
                 </div>
+                {% endif %}
             </div>
+            {% endif %}
             
             {# Campo 130 - Título uniforme (punto de acceso principal) #}
+            {% if '130' in campos_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">130</span>
@@ -127,8 +132,10 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             
             {# Campo 240 - Título uniforme subordinado #}
+            {% if '240' in campos_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">240</span>
@@ -188,6 +195,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             
         </div>
     </div>

@@ -35,6 +35,7 @@
             </div>
             
             {# Campo 773 - Documento Fuente (Repetible) #}
+            {% if 'enlaces_documento_fuente_773' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">773</span>
@@ -46,8 +47,10 @@
                 
                 {% include 'catalogacion/includes/formset_773_template.html' with formset=enlaces_documento_fuente_773 %}
             </div>
+            {% endif %}
             
             {# Campo 774 - Unidades Constituyentes (Repetible) #}
+            {% if 'enlaces_unidad_constituyente_774' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">774</span>
@@ -58,8 +61,10 @@
                 
                 {% include 'catalogacion/includes/formset_774_template.html' with formset=enlaces_unidad_constituyente_774 %}
             </div>
+            {% endif %}
             
             {# Campo 787 - Otras Relaciones (Repetible) #}
+            {% if 'otras_relaciones_787' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">787</span>
@@ -71,6 +76,7 @@
                 
                 {% include 'catalogacion/includes/formset_787_template.html' with formset=otras_relaciones_787 %}
             </div>
+            {% endif %}
         </div>
     </div>
 </section>

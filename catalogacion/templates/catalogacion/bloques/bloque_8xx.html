@@ -9,6 +9,7 @@
         </div>
         <div class="card-body">
             {# Campo 852 - Ubicación Física (Repetible) #}
+            {% if '852' in campos_visibles and 'ubicaciones_852' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">852</span>
@@ -20,8 +21,10 @@
                 
                 {% include 'catalogacion/includes/formset_852_template.html' with formset=ubicaciones_852 %}
             </div>
+            {% endif %}
             
             {# Campo 856 - Ubicación y Acceso Electrónico (Repetible) #}
+            {% if '856' in campos_visibles and 'disponibles_856' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">856</span>
@@ -33,6 +36,7 @@
                 
                 {% include 'catalogacion/includes/formset_856_template.html' with formset=disponibles_856 %}
             </div>
+            {% endif %}
         </div>
     </div>
 </section>

@@ -9,6 +9,7 @@
         </div>
         <div class="card-body">
             {# Campo 650 - Encabezamiento de Materia (Repetible) #}
+            {% if '650' in campos_visibles and 'materias_650' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">650</span>
@@ -20,8 +21,10 @@
                 
                 {% include 'catalogacion/includes/formset_650_template.html' with formset=materias_650 %}
             </div>
+            {% endif %}
             
             {# Campo 655 - Término de Género/Forma (Repetible) #}
+            {% if '655' in campos_visibles and 'materias_genero_655' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">655</span>
@@ -33,6 +36,7 @@
                 
                 {% include 'catalogacion/includes/formset_655_template.html' with formset=materias_genero_655 %}
             </div>
+            {% endif %}
         </div>
     </div>
 </section>

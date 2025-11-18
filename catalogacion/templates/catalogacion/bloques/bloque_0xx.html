@@ -10,6 +10,7 @@
         <div class="card-body">
             
             {# Campo 020 - ISBN #}
+            {% if '020' in campos_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">020</span>
@@ -26,8 +27,10 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             
             {# Campo 024 - ISMN #}
+            {% if '024' in campos_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">024</span>
@@ -44,8 +47,10 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             
 <!-- Campo 028 - Número de Editor -->
+{% if '028' in campos_visibles %}
 <div class="campo-marc">
     <div class="campo-titulo">
         <span class="badge-marc">028</span>
@@ -78,9 +83,11 @@
         </div>
     </div>
 </div>
+{% endif %}
 
             
             {# Campo 031 - Íncipit musical (Repetible) #}
+            {% if 'incipits_musicales' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">031</span>
@@ -92,8 +99,10 @@
                 
                 {% include 'catalogacion/includes/formset_template.html' with formset=incipits_musicales titulo="Íncipit" %}
             </div>
+            {% endif %}
             
             {# Campo 040 - Fuente de catalogación #}
+            {% if '040' in campos_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">040</span>
@@ -107,8 +116,10 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             
             {# Campo 041 - Código de idioma (Repetible) con subcampo $a #}
+            {% if 'codigos_lengua' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">041</span>
@@ -120,8 +131,10 @@
                 
                 {% include 'catalogacion/includes/campo_041_template.html' with formset=codigos_lengua %}
             </div>
+            {% endif %}
             
             {# Campo 044 - País (Repetible) #}
+            {% if 'codigos_pais' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">044</span>
@@ -133,6 +146,7 @@
                 
                 {% include 'catalogacion/includes/formset_template.html' with formset=codigos_pais titulo="País" %}
             </div>
+            {% endif %}
             
         </div>
     </div>
