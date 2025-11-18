@@ -1,39 +1,32 @@
 /**
  * Sistema de Borradores para Obras MARC21
- * Maneja guardado automático y recuperación de borradores
+ * VERSION CORREGIDA - Maneja subcampos dinámicos anidados
  */
 
 (function () {
     "use strict";
 
     // Configuración
-    const AUTOSAVE_INTERVAL = 60000; // Autoguardar cada 60 segundos
-    const MIN_CHANGE_DELAY = 3000; // Esperar 3 segundos después del último cambio
+    const AUTOSAVE_INTERVAL = 60000; // 60 segundos
+    const MIN_CHANGE_DELAY = 3000; // 3 segundos después del último cambio
 
     let borradorId = null;
     let autoSaveTimer = null;
     let changeTimer = null;
     let hasUnsavedChanges = false;
-    let lastSavedData = null;
 
-    // Elementos del DOM
     const form = document.getElementById("obra-form");
-    const tipoObraElement = document.querySelector(
-        'input[name="tipo_registro"], input[name="nivel_bibliografico"]'
-    );
 
-    // Obtener URLs desde el data attribute del formulario
     const API_URLS = {
         guardar: "/api/borradores/guardar/",
         autoguardar: "/api/borradores/autoguardar/",
         verificar: "/api/borradores/verificar/",
         obtener: (id) => `/api/borradores/${id}/`,
         eliminar: (id) => `/api/borradores/${id}/eliminar/`,
-        listar: "/api/borradores/listar/",
     };
 
     /**
-     * Obtiene el CSRF token para requests AJAX
+     * Obtiene el CSRF token
      */
     function getCsrfToken() {
         const token = document.querySelector('[name="csrfmiddlewaretoken"]');
@@ -41,33 +34,126 @@
     }
 
     /**
-     * Serializa todos los datos del formulario a JSON
+     * NUEVO: Serializa TODOS los datos incluyendo subcampos dinámicos
      */
     function serializeFormData() {
         const formData = new FormData(form);
-        const data = {};
+        const data = {
+            _campos_simples: {},
+            _formsets: {},
+            _subcampos_dinamicos: {}, // NUEVO: Para idiomas, títulos, volúmenes, etc.
+        };
 
-        // Campos simples
+        // 1. Procesar campos simples y formsets normales
         for (let [key, value] of formData.entries()) {
-            if (
-                key.includes("-TOTAL_FORMS") ||
-                key.includes("-INITIAL_FORMS")
-            ) {
-                // Metadata de formsets
-                data[key] = value;
-            } else if (key.includes("-")) {
-                // Campos de formsets
-                if (!data[key]) {
-                    data[key] = [];
+            if (shouldExcludeField(key)) continue;
+
+            // Subcampos dinámicos - Dos patrones:
+            // 1. tipo_subtipo_parentIndex_timestamp (4 partes): idioma_lengua_0_1234567890
+            // 2. tipo_subtipo_campo_parentIndex_timestamp (5 partes): numero_enlace_773_0_1234567890
+            
+            // Primero intentar patrón de 5 partes
+            let subcampoMatch = key.match(/^(\w+)_(\w+)_(\d+)_(\d+)_(\d+)$/);
+            if (subcampoMatch) {
+                const [, tipo, subtipo, campo, parentIndex, timestamp] = subcampoMatch;
+                const subcampoKey = `${tipo}_${subtipo}_${campo}_${parentIndex}`;
+
+                if (!data._subcampos_dinamicos[subcampoKey]) {
+                    data._subcampos_dinamicos[subcampoKey] = [];
                 }
-                data[key].push(value);
+
+                data._subcampos_dinamicos[subcampoKey].push({
+                    value: value,
+                    tipo: tipo,
+                    subtipo: subtipo,
+                    campo: campo, // Número de campo MARC (773, 774, 787, 852)
+                    parentIndex: parentIndex,
+                });
+
+                continue;
+            }
+            
+            // Luego intentar patrón de 4 partes
+            subcampoMatch = key.match(/^(\w+)_(\w+)_(\d+)_(\d+)$/);
+            if (subcampoMatch) {
+                const [, tipo, subtipo, parentIndex, timestamp] = subcampoMatch;
+                const subcampoKey = `${tipo}_${subtipo}_${parentIndex}`;
+
+                if (!data._subcampos_dinamicos[subcampoKey]) {
+                    data._subcampos_dinamicos[subcampoKey] = [];
+                }
+
+                data._subcampos_dinamicos[subcampoKey].push({
+                    value: value,
+                    tipo: tipo,
+                    subtipo: subtipo,
+                    parentIndex: parentIndex,
+                });
+
+                continue;
+            }
+
+            // Campos normales
+            if (data._campos_simples.hasOwnProperty(key)) {
+                if (!Array.isArray(data._campos_simples[key])) {
+                    data._campos_simples[key] = [data._campos_simples[key]];
+                }
+                data._campos_simples[key].push(value);
             } else {
-                // Campos normales
-                data[key] = value;
+                data._campos_simples[key] = value;
             }
         }
 
+        // 2. Agrupar por formsets
+        for (let key in data._campos_simples) {
+            const formsetMatch = key.match(/^([a-z_]+)-(\d+)-(.+)$/);
+            if (formsetMatch) {
+                const [, prefix, index, field] = formsetMatch;
+
+                if (!data._formsets[prefix]) {
+                    data._formsets[prefix] = {};
+                }
+                if (!data._formsets[prefix][index]) {
+                    data._formsets[prefix][index] = {};
+                }
+
+                data._formsets[prefix][index][field] =
+                    data._campos_simples[key];
+            }
+        }
+
+        // 3. Incluir checkboxes no marcados
+        form.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+            if (
+                !checkbox.checked &&
+                !data._campos_simples.hasOwnProperty(checkbox.name)
+            ) {
+                data._campos_simples[checkbox.name] = "";
+            }
+        });
+
+        console.log("📦 Datos serializados:", {
+            campos: Object.keys(data._campos_simples).length,
+            formsets: Object.keys(data._formsets).length,
+            subcampos: Object.keys(data._subcampos_dinamicos).length,
+        });
+
         return data;
+    }
+
+    /**
+     * Determina si un campo debe excluirse
+     */
+    function shouldExcludeField(fieldName) {
+        if (!fieldName || fieldName === "") return true;
+
+        // NO excluir subcampos dinámicos (cambio principal)
+        // Solo excluir campos realmente inválidos
+        if (fieldName.includes("NaN") || fieldName === "undefined") {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -79,17 +165,15 @@
             "id_nivel_bibliografico"
         )?.value;
 
-        // Determinar tipo de obra basándose en tipo_registro y nivel_bibliografico
         if (tipoRegistro === "d") {
-            // Manuscrito
-            if (nivelBibliografico === "c") return "manuscrito_coleccion";
-            return "manuscrito_independiente";
+            return nivelBibliografico === "c"
+                ? "manuscrito_coleccion"
+                : "manuscrito_independiente";
         } else if (tipoRegistro === "c") {
-            // Impreso
-            if (nivelBibliografico === "c") return "impreso_coleccion";
-            return "impreso_independiente";
+            return nivelBibliografico === "c"
+                ? "impreso_coleccion"
+                : "impreso_independiente";
         }
-
         return "desconocido";
     }
 
@@ -100,15 +184,8 @@
         try {
             const datos = serializeFormData();
             const tipoObra = getTipoObra();
-            const pestanaActual = currentTabIndex; // Variable global del sistema de pestañas
-
-            console.log("📝 Guardando borrador:", {
-                esAutoguardado,
-                tipoObra,
-                borradorId,
-                pestanaActual,
-                datosCantidad: Object.keys(datos).length,
-            });
+            const pestanaActual =
+                typeof currentTabIndex !== "undefined" ? currentTabIndex : 0;
 
             const payload = {
                 tipo_obra: tipoObra,
@@ -124,8 +201,6 @@
                 ? API_URLS.autoguardar
                 : API_URLS.guardar;
 
-            console.log("🌐 Enviando a:", url);
-
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -135,13 +210,10 @@
                 body: JSON.stringify(payload),
             });
 
-            console.log("📡 Respuesta status:", response.status);
             const result = await response.json();
-            console.log("📦 Respuesta data:", result);
 
             if (result.success) {
                 borradorId = result.borrador_id;
-                lastSavedData = JSON.stringify(datos);
                 hasUnsavedChanges = false;
 
                 mostrarNotificacion(
@@ -152,8 +224,10 @@
 
                 actualizarIndicadorGuardado();
             } else {
-                console.error("Error guardando borrador:", result.error);
-                mostrarNotificacion("Error al guardar borrador", "error");
+                console.error("Error guardando:", result.error);
+                if (!esAutoguardado) {
+                    mostrarNotificacion("Error al guardar", "error");
+                }
             }
         } catch (error) {
             console.error("Error en guardarBorrador:", error);
@@ -164,7 +238,7 @@
     }
 
     /**
-     * Verifica si existe un borrador al cargar la página
+     * Verifica si existe un borrador
      */
     async function verificarBorradorExistente() {
         try {
@@ -185,23 +259,19 @@
     }
 
     /**
-     * Muestra diálogo elegante para recuperar borrador existente
+     * Muestra diálogo de recuperación
      */
     function mostrarDialogoRecuperarBorrador(borrador) {
         const dias = borrador.dias_antiguedad;
-        let tiempoGuardado;
+        let tiempoGuardado =
+            dias === 0
+                ? "Guardado hoy"
+                : dias === 1
+                ? "Guardado ayer"
+                : `Guardado hace ${dias} días`;
 
-        if (dias === 0) {
-            tiempoGuardado = "Guardado hoy";
-        } else if (dias === 1) {
-            tiempoGuardado = "Guardado ayer";
-        } else {
-            tiempoGuardado = `Guardado hace ${dias} días`;
-        }
-
-        // Crear modal
         const modalHtml = `
-            <div class="modal fade" id="modalRecuperarBorrador" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal fade" id="modalRecuperarBorrador" tabindex="-1" data-bs-backdrop="static">
                 <div class="modal-dialog modal-dialog-centered modal-sm">
                     <div class="modal-content">
                         <div class="modal-header bg-info text-white">
@@ -213,7 +283,7 @@
                             <i class="bi bi-cloud-check text-info" style="font-size: 3rem;"></i>
                             <p class="mt-3 mb-2">Tienes un borrador guardado</p>
                             <small class="text-muted">${tiempoGuardado}</small>
-                            <p class="mt-3 mb-0"><small class="text-muted">¿Deseas recuperarlo y continuar?</small></p>
+                            <p class="mt-3 mb-0"><small class="text-muted">¿Deseas recuperarlo?</small></p>
                         </div>
                         <div class="modal-footer justify-content-center">
                             <button type="button" class="btn btn-outline-danger btn-sm" id="btnEmpezarNuevo">
@@ -228,50 +298,62 @@
             </div>
         `;
 
-        // Agregar modal al DOM
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        const modalElement = document.getElementById('modalRecuperarBorrador');
+        document.body.insertAdjacentHTML("beforeend", modalHtml);
+        const modalElement = document.getElementById("modalRecuperarBorrador");
         const modal = new bootstrap.Modal(modalElement);
 
-        // Eventos de botones
-        document.getElementById('btnRecuperar').addEventListener('click', () => {
-            modal.hide();
-            cargarBorrador(borrador.id);
-            setTimeout(() => modalElement.remove(), 300);
-        });
+        document
+            .getElementById("btnRecuperar")
+            .addEventListener("click", () => {
+                modal.hide();
+                cargarBorrador(borrador.id);
+                setTimeout(() => modalElement.remove(), 300);
+            });
 
-        document.getElementById('btnEmpezarNuevo').addEventListener('click', () => {
-            modal.hide();
-            limpiarFormularioCompleto();
-            eliminarBorrador(borrador.id);
-            setTimeout(() => modalElement.remove(), 300);
-        });
+        document
+            .getElementById("btnEmpezarNuevo")
+            .addEventListener("click", () => {
+                modal.hide();
+                limpiarFormularioCompleto();
+                eliminarBorrador(borrador.id);
+                setTimeout(() => modalElement.remove(), 300);
+            });
 
-        // Mostrar modal
         modal.show();
     }
 
     /**
-     * Carga un borrador específico
+     * NUEVO: Carga un borrador con subcampos dinámicos
      */
     async function cargarBorrador(id) {
         try {
+            mostrarNotificacion("Cargando borrador...", "info", 2000);
+
             const response = await fetch(API_URLS.obtener(id));
             const result = await response.json();
 
             if (result.success) {
                 const borrador = result.borrador;
                 borradorId = borrador.id;
+                const datos = borrador.datos_formulario;
 
-                // Cargar datos en el formulario
-                cargarDatosEnFormulario(borrador.datos_formulario);
+                console.log("📥 Cargando borrador:", datos);
 
-                // Navegar a la pestaña donde se quedó
+                // 1. Preparar formsets principales
+                await prepararFormsetsPrincipales(datos);
+
+                // 2. Cargar campos simples y formsets
+                await cargarCamposYFormsets(datos);
+
+                // 3. NUEVO: Restaurar subcampos dinámicos
+                await restaurarSubcamposDinamicos(datos);
+
+                // 4. Navegar a pestaña guardada
                 if (
                     typeof switchTab === "function" &&
                     borrador.pestana_actual
                 ) {
-                    switchTab(borrador.pestana_actual);
+                    setTimeout(() => switchTab(borrador.pestana_actual), 500);
                 }
 
                 mostrarNotificacion(
@@ -289,78 +371,346 @@
     }
 
     /**
-     * Carga datos del borrador en el formulario
+     * Prepara formsets principales (crea filas necesarias)
      */
-    function cargarDatosEnFormulario(datos) {
-        for (let [key, value] of Object.entries(datos)) {
-            const input = form.querySelector(`[name="${key}"]`);
-            if (input) {
-                if (input.type === "checkbox") {
-                    input.checked = value === "on" || value === true;
-                } else if (input.type === "radio") {
-                    if (input.value === value) {
-                        input.checked = true;
-                    }
-                } else {
-                    input.value = value;
-                }
+    async function prepararFormsetsPrincipales(datos) {
+        console.log("🔨 Preparando formsets principales...");
 
-                // Trigger change event para actualizar UI
-                input.dispatchEvent(new Event("change", { bubbles: true }));
+        const formsets = datos._formsets || {};
+
+        for (let prefix in formsets) {
+            const indices = Object.keys(formsets[prefix]).filter(
+                (k) => k !== "_total"
+            );
+            const totalNeeded =
+                Math.max(...indices.map((i) => parseInt(i))) + 1;
+
+            const container = document.querySelector(
+                `[data-formset-prefix="${prefix}"]`
+            );
+            if (!container) continue;
+
+            const currentRows = container.querySelectorAll(
+                ".formset-row:not(.empty-form)"
+            ).length;
+            const rowsToAdd = totalNeeded - currentRows;
+
+            if (rowsToAdd > 0) {
+                console.log(`➕ Agregando ${rowsToAdd} filas a ${prefix}`);
+                const addButton = container.querySelector(".add-form-row");
+
+                if (addButton) {
+                    for (let i = 0; i < rowsToAdd; i++) {
+                        addButton.click();
+                        await new Promise((resolve) =>
+                            setTimeout(resolve, 100)
+                        );
+                    }
+                }
             }
         }
+
+        console.log("✅ Formsets principales preparados");
+    }
+
+    /**
+     * Carga campos simples y formsets
+     */
+    async function cargarCamposYFormsets(datos) {
+        console.log("📝 Cargando campos y formsets...");
+
+        const camposSimples = datos._campos_simples || {};
+
+        for (let [key, value] of Object.entries(camposSimples)) {
+            if (
+                key.includes("-TOTAL_FORMS") ||
+                key.includes("-INITIAL_FORMS")
+            ) {
+                const input = form.querySelector(`[name="${key}"]`);
+                if (input) input.value = value;
+                continue;
+            }
+
+            if (Array.isArray(value)) {
+                const inputs = form.querySelectorAll(`[name="${key}"]`);
+                inputs.forEach((input, index) => {
+                    if (index < value.length) {
+                        establecerValorInput(input, value[index]);
+                    }
+                });
+            } else {
+                const input = form.querySelector(`[name="${key}"]`);
+                if (input) {
+                    establecerValorInput(input, value);
+                }
+            }
+        }
+
+        console.log("✅ Campos y formsets cargados");
+    }
+
+    /**
+     * NUEVO: Restaura subcampos dinámicos (idiomas, títulos, volúmenes, etc.)
+     */
+    async function restaurarSubcamposDinamicos(datos) {
+        console.log("🎯 Restaurando subcampos dinámicos...");
+
+        const subcampos = datos._subcampos_dinamicos || {};
+
+        for (let key in subcampos) {
+            const items = subcampos[key];
+            if (!items || items.length === 0) continue;
+
+            const firstItem = items[0];
+            const { tipo, subtipo, parentIndex, campo } = firstItem;
+            
+            console.log(`📌 Restaurando ${key} (${tipo}/${subtipo}${campo ? '/'+campo : ''}): ${items.length} items`);
+
+            // Buscar el contenedor correcto según el tipo
+            let container, addButton, template;
+
+            if (tipo === "idioma" && subtipo === "lengua") {
+                // Campo 041 - Idiomas
+                container = document.querySelector(
+                    `[data-idiomas-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-idioma-btn[data-lengua-index="${parentIndex}"]`
+                );
+                template = document.querySelector(".idioma-template");
+            } else if (tipo === "titulo" && subtipo === "mencion") {
+                // Campo 490 - Títulos de serie
+                container = document.querySelector(
+                    `[data-titulos-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-titulo-btn[data-mencion-index="${parentIndex}"]`
+                );
+                template = document.querySelector(".titulo-template-490");
+            } else if (tipo === "volumen" && subtipo === "mencion") {
+                // Campo 490 - Volúmenes
+                container = document.querySelector(
+                    `[data-volumenes-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-volumen-btn[data-mencion-index="${parentIndex}"]`
+                );
+                template = document.querySelector(".volumen-template-490");
+            } else if (tipo === "texto" && subtipo === "biografico") {
+                // Campo 545 - Textos biográficos
+                container = document.querySelector(
+                    `[data-textos-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-texto-btn[data-dato-index="${parentIndex}"]`
+                );
+                template = document.querySelector(".texto-template-545");
+            } else if (tipo === "uri") {
+                // Campo 545 - URIs
+                container = document.querySelector(
+                    `[data-uris-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-uri-btn[data-dato-index="${parentIndex}"]`
+                );
+                template = document.querySelector(".uri-template-545");
+            } else if (tipo === "url" && subtipo === "disponible") {
+                // Campo 856 - URLs
+                container = document.querySelector(
+                    `[data-urls-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-url-btn[data-disponible-index="${parentIndex}"]`
+                );
+                template = document.querySelector(".url-template-856");
+            } else if (tipo === "texto" && subtipo === "disponible") {
+                // Campo 856 - Textos de enlace
+                container = document.querySelector(
+                    `[data-textos-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-texto-btn[data-disponible-index="${parentIndex}"]`
+                );
+                template = document.querySelector(".texto-template-856");
+            } else if (tipo === "numero" && subtipo === "enlace") {
+                // Campos 773/774/787 - Números de obra (diferenciar por campo)
+                // IMPORTANTE: Todos los campos están en la misma pestaña y comparten
+                // los mismos valores de data-numeros-container, así que debemos buscar
+                // dentro del .campo-marc específico que contiene el badge correcto
+                
+                // Buscar el contenedor .campo-marc que tenga el badge con el número de campo
+                const campoMarc = Array.from(document.querySelectorAll('.campo-marc'))
+                    .find(div => {
+                        const badge = div.querySelector('.badge-marc');
+                        return badge && badge.textContent.trim() === campo;
+                    });
+                
+                if (campoMarc) {
+                    container = campoMarc.querySelector(
+                        `[data-numeros-container="${parentIndex}"]`
+                    );
+                    addButton = campoMarc.querySelector(
+                        `.add-numero-btn[data-enlace-index="${parentIndex}"]`
+                    );
+                } else {
+                    console.warn(`⚠️ No se encontró .campo-marc con badge ${campo}`);
+                    container = null;
+                    addButton = null;
+                }
+                
+                // Seleccionar template correcto según el número de campo MARC
+                if (campo === "773") {
+                    template = document.querySelector(".numero-template");
+                } else if (campo === "774") {
+                    template = document.querySelector(".numero-template-774");
+                } else if (campo === "787") {
+                    template = document.querySelector(".numero-template-787");
+                }
+            } else if (tipo === "estanteria" && subtipo === "ubicacion") {
+                // Campo 852 - Estanterías
+                container = document.querySelector(
+                    `[data-estanterias-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-estanteria-btn[data-ubicacion-index="${parentIndex}"]`
+                );
+                template = document.querySelector(".estanteria-template-852");
+            }
+
+            if (!container || !addButton) {
+                console.warn(`⚠️ No se encontró contenedor para ${key}`);
+                continue;
+            }
+
+            // Crear y llenar los subcampos
+            for (let item of items) {
+                addButton.click();
+                await new Promise((resolve) => setTimeout(resolve, 50));
+
+                // Buscar el último input/select/textarea creado
+                const lastRow = container.querySelector(
+                    ":scope > div:last-child, :scope > .idioma-form-row:last-child, :scope > .titulo-form-row:last-child, :scope > .volumen-form-row:last-child, :scope > .texto-form-row:last-child, :scope > .uri-form-row:last-child, :scope > .url-form-row:last-child, :scope > .numero-form-row:last-child, :scope > .estanteria-form-row:last-child"
+                );
+
+                if (lastRow) {
+                    const input = lastRow.querySelector(
+                        "input, select, textarea"
+                    );
+                    if (input) {
+                        if (input.tagName === "SELECT") {
+                            input.value = item.value;
+                            if ($(input).data("select2")) {
+                                $(input).val(item.value).trigger("change");
+                            }
+                        } else {
+                            input.value = item.value;
+                        }
+                        console.log(`  ✓ Restaurado: ${item.value}`);
+                    }
+                }
+            }
+        }
+
+        console.log("✅ Subcampos dinámicos restaurados");
+    }
+
+    /**
+     * Establece el valor de un input
+     */
+    function establecerValorInput(input, value) {
+        if (input.type === "checkbox") {
+            input.checked =
+                value === "on" || value === true || value === "true";
+        } else if (input.type === "radio") {
+            if (input.value === value) input.checked = true;
+        } else {
+            input.value = value || "";
+            if ($(input).data("select2")) {
+                $(input).val(value).trigger("change");
+            }
+        }
+        input.dispatchEvent(new Event("change", { bubbles: true }));
     }
 
     /**
      * Limpia completamente el formulario
      */
     function limpiarFormularioCompleto() {
-        // Resetear todos los inputs de texto, textarea, select
-        form.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input[type="email"], input[type="url"], textarea, select').forEach(input => {
-            input.value = '';
-            // Limpiar Select2 si existe
-            if ($(input).data('select2')) {
-                $(input).val(null).trigger('change');
+        const camposExcluidos = [
+            "csrfmiddlewaretoken",
+            "tipo_registro",
+            "nivel_bibliografico",
+        ];
+
+        // Limpiar inputs normales
+        form.querySelectorAll(
+            'input[type="text"], input[type="number"], textarea, select'
+        ).forEach((input) => {
+            if (!camposExcluidos.includes(input.name)) {
+                input.value = "";
+                if ($(input).data("select2")) {
+                    $(input).val(null).trigger("change");
+                }
             }
         });
 
-        // Desmarcar checkboxes
-        form.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            checkbox.checked = false;
+        // Limpiar checkboxes y radios
+        form.querySelectorAll(
+            'input[type="checkbox"], input[type="radio"]'
+        ).forEach((input) => {
+            input.checked = false;
         });
 
-        // Desmarcar radios
-        form.querySelectorAll('input[type="radio"]').forEach(radio => {
-            radio.checked = false;
-        });
+        // Resetear formsets a 1 fila vacía
+        form.querySelectorAll('input[name$="-TOTAL_FORMS"]').forEach(
+            (totalInput) => {
+                totalInput.value = "1";
 
-        // Limpiar archivos
-        form.querySelectorAll('input[type="file"]').forEach(fileInput => {
-            fileInput.value = '';
-        });
+                const container = totalInput.closest(".formset-container");
+                if (container) {
+                    const rows = container.querySelectorAll(
+                        ".formset-row:not(.empty-form)"
+                    );
+                    rows.forEach((row, index) => {
+                        if (index > 0) {
+                            row.remove();
+                        } else {
+                            // Limpiar primera fila completamente
+                            row.querySelectorAll(
+                                "input, select, textarea"
+                            ).forEach((field) => {
+                                if (
+                                    field.type === "checkbox" ||
+                                    field.type === "radio"
+                                ) {
+                                    field.checked = false;
+                                } else {
+                                    field.value = "";
+                                }
+                            });
 
-        // Resetear hidden inputs (excepto CSRF y campos de tipo)
-        form.querySelectorAll('input[type="hidden"]').forEach(hidden => {
-            if (hidden.name !== 'csrfmiddlewaretoken' && 
-                hidden.name !== 'tipo_registro' && 
-                hidden.name !== 'nivel_bibliografico') {
-                hidden.value = '';
+                            // Limpiar subcampos dentro de la fila
+                            row.querySelectorAll(
+                                "[data-idiomas-container], [data-titulos-container], [data-volumenes-container], [data-textos-container], [data-uris-container], [data-urls-container]"
+                            ).forEach((subContainer) => {
+                                subContainer.innerHTML = "";
+                            });
+                        }
+                    });
+                }
             }
-        });
+        );
 
-        // Volver a la primera pestaña
-        if (typeof switchTab === 'function') {
+        if (typeof switchTab === "function") {
             switchTab(0);
         }
 
-        // Resetear variables del sistema de borradores
         borradorId = null;
         hasUnsavedChanges = false;
-        lastSavedData = null;
         actualizarIndicadorGuardado();
 
-        mostrarNotificacion('Formulario limpiado - Empezando de nuevo', 'info', 3000);
-        console.log('✓ Formulario limpiado completamente');
+        mostrarNotificacion("Formulario limpiado completamente", "info");
+        console.log("✅ Formulario limpiado (subcampos incluidos)");
     }
 
     /**
@@ -370,67 +720,44 @@
         try {
             const response = await fetch(API_URLS.eliminar(id), {
                 method: "POST",
-                headers: {
-                    "X-CSRFToken": getCsrfToken(),
-                },
+                headers: { "X-CSRFToken": getCsrfToken() },
             });
 
             const result = await response.json();
-
-            if (result.success) {
-                if (id === borradorId) {
-                    borradorId = null;
-                }
-                mostrarNotificacion("Borrador eliminado", "info", 2000);
+            if (result.success && id === borradorId) {
+                borradorId = null;
             }
         } catch (error) {
-            console.error("Error eliminando borrador:", error);
+            console.error("Error eliminando:", error);
         }
     }
 
     /**
-     * Muestra notificación toast
+     * Notificación toast
      */
     function mostrarNotificacion(mensaje, tipo = "info", duracion = 3000) {
-        // Crear elemento de notificación
         const notif = document.createElement("div");
-        notif.className = `toast-notification toast-${tipo}`;
         notif.textContent = mensaje;
-
-        // Estilos inline para la notificación
         notif.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: 4px;
-            color: white;
-            font-size: 14px;
-            font-weight: 500;
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: fixed; top: 20px; right: 20px;
+            padding: 12px 20px; border-radius: 4px;
+            color: white; font-size: 14px; font-weight: 500;
+            z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         `;
 
-        // Colores según tipo
         const colores = {
             success: "#27AE60",
             error: "#E74C3C",
             info: "#3498DB",
-            warning: "#F39C12",
         };
         notif.style.backgroundColor = colores[tipo] || colores.info;
 
         document.body.appendChild(notif);
-
-        setTimeout(() => {
-            notif.style.animation = "slideOut 0.3s ease";
-            setTimeout(() => notif.remove(), 300);
-        }, duracion);
+        setTimeout(() => notif.remove(), duracion);
     }
 
     /**
-     * Actualiza indicador visual de guardado
+     * Indicador de guardado
      */
     function actualizarIndicadorGuardado() {
         let indicador = document.getElementById("save-indicator");
@@ -439,17 +766,10 @@
             indicador = document.createElement("div");
             indicador.id = "save-indicator";
             indicador.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 20px;
-                padding: 8px 16px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: 500;
-                z-index: 9999;
-                display: flex;
-                align-items: center;
-                gap: 8px;
+                position: fixed; bottom: 20px; left: 20px;
+                padding: 8px 16px; border-radius: 20px;
+                font-size: 12px; font-weight: 500; z-index: 9999;
+                display: flex; align-items: center; gap: 8px;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             `;
             document.body.appendChild(indicador);
@@ -463,47 +783,26 @@
             indicador.style.backgroundColor = "#27AE60";
             indicador.style.color = "white";
             indicador.innerHTML = "<span>✓</span> Guardado";
-
-            // Ocultar después de 3 segundos
-            setTimeout(() => {
-                indicador.style.opacity = "0";
-                setTimeout(() => {
-                    indicador.style.opacity = "1";
-                }, 3000);
-            }, 3000);
-        } else {
-            indicador.style.display = "none";
         }
     }
 
     /**
-     * Detecta cambios en el formulario
+     * Detecta cambios
      */
     function onFormChange() {
         hasUnsavedChanges = true;
         actualizarIndicadorGuardado();
 
-        // Resetear timer de cambio
-        if (changeTimer) {
-            clearTimeout(changeTimer);
-        }
-
-        // Autoguardar después de inactividad (siempre, incluso si no hay borrador)
-        changeTimer = setTimeout(() => {
-            guardarBorrador(true);
-        }, MIN_CHANGE_DELAY);
+        if (changeTimer) clearTimeout(changeTimer);
+        changeTimer = setTimeout(() => guardarBorrador(true), MIN_CHANGE_DELAY);
     }
 
     /**
-     * Inicia el sistema de autoguardado
+     * Autoguardado periódico
      */
     function iniciarAutoguardado() {
-        // Limpiar timer existente
-        if (autoSaveTimer) {
-            clearInterval(autoSaveTimer);
-        }
+        if (autoSaveTimer) clearInterval(autoSaveTimer);
 
-        // Autoguardar periódicamente si hay borrador
         autoSaveTimer = setInterval(() => {
             if (borradorId && hasUnsavedChanges) {
                 guardarBorrador(true);
@@ -512,132 +811,48 @@
     }
 
     /**
-     * Manejo del botón "Guardar Borrador"
+     * Prevenir pérdida de datos
      */
-    function configurarBotonGuardarBorrador() {
-        // Buscar o crear botón de guardar borrador
-        const botonesAccion = document.querySelector(".tab-navigation-buttons");
-
-        if (botonesAccion && !document.getElementById("btn-guardar-borrador")) {
-            const btnGuardar = document.createElement("button");
-            btnGuardar.id = "btn-guardar-borrador";
-            btnGuardar.type = "button";
-            btnGuardar.className = "btn btn-outline-info btn-sm";
-            btnGuardar.innerHTML =
-                '<i class="bi bi-cloud-arrow-up"></i> Guardar Borrador';
-            btnGuardar.onclick = () => guardarBorrador(false);
-
-            // Insertar en la primera pestaña
-            const primeraSeccion = document.querySelector(
-                "#tab-0xx .tab-navigation-buttons"
-            );
-            if (primeraSeccion) {
-                const contenedor =
-                    primeraSeccion.querySelector("div:first-child");
-                if (contenedor) {
-                    contenedor.appendChild(btnGuardar);
-                }
-            }
+    window.addEventListener("beforeunload", (e) => {
+        if (hasUnsavedChanges) {
+            e.preventDefault();
+            e.returnValue = "";
         }
-    }
+    });
 
     /**
-     * Prevenir pérdida de datos al salir
+     * Eliminar borrador al publicar
      */
-    function configurarPrevencionPerdida() {
-        window.addEventListener("beforeunload", (e) => {
-            if (hasUnsavedChanges) {
-                e.preventDefault();
-                e.returnValue = "Tienes cambios sin guardar. ¿Deseas salir?";
-                return e.returnValue;
-            }
-        });
-    }
-
-    /**
-     * Eliminar borrador al publicar obra
-     */
-    function configurarEliminacionAlPublicar() {
-        form.addEventListener("submit", (e) => {
-            const action = e.submitter?.value;
-
-            // Si es "publish", eliminar borrador
-            if (action === "publish" && borradorId) {
-                eliminarBorrador(borradorId);
-            }
-        });
-    }
-
-    /**
-     * Agregar estilos CSS para las animaciones
-     */
-    function agregarEstilos() {
-        const style = document.createElement("style");
-        style.textContent = `
-            @keyframes slideIn {
-                from {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-            
-            @keyframes slideOut {
-                from {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
+    form.addEventListener("submit", (e) => {
+        if (e.submitter?.value === "publish" && borradorId) {
+            eliminarBorrador(borradorId);
+        }
+    });
 
     /**
      * Inicialización
      */
     function init() {
-        if (!form) {
-            console.warn("Formulario no encontrado");
-            return;
-        }
+        if (!form) return;
 
-        console.log("🚀 Iniciando sistema de borradores...");
-        console.log("📋 Formulario:", form.id);
-        console.log("🔗 API URLs:", API_URLS);
+        console.log("🚀 Sistema de borradores v2.0 inicializado");
 
-        agregarEstilos();
         verificarBorradorExistente();
-        configurarBotonGuardarBorrador();
         iniciarAutoguardado();
-        configurarPrevencionPerdida();
-        configurarEliminacionAlPublicar();
 
-        // Detectar cambios en inputs
         form.addEventListener("input", onFormChange);
         form.addEventListener("change", onFormChange);
-
-        console.log("✓ Sistema de borradores inicializado");
     }
 
-    // Inicializar cuando el DOM esté listo
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", init);
     } else {
         init();
     }
 
-    // Exponer funciones globales
     window.BorradorSystem = {
         guardar: () => guardarBorrador(false),
         cargar: cargarBorrador,
         eliminar: eliminarBorrador,
-        verificar: verificarBorradorExistente,
     };
 })();

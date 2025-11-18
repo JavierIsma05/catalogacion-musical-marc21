@@ -423,7 +423,7 @@ EnlaceDocumentoFuente773FormSet = inlineformset_factory(
     ObraGeneral,
     EnlaceDocumentoFuente773,
     form=EnlaceDocumentoFuente773Form,
-    extra=0,  # No mostrar por defecto
+    extra=1, 
     can_delete=True,
     max_num=1,  # Normalmente solo una colección padre
 )
