@@ -16,9 +16,9 @@
                     <span class="badge-repetible">REPETIBLE</span>
                 </div>
                 
-                <p class="form-text">Información de la serie a la que pertenece la obra.</p>
+                <p class="form-text">Información de la serie a la que pertenece la obra. Subcampos $a (título) y $v (volumen) repetibles.</p>
                 
-                {% include 'catalogacion/includes/formset_template.html' with formset=menciones_serie_490 titulo="Mención de Serie" %}
+                {% include 'catalogacion/includes/formset_490_template.html' with formset=menciones_serie_490 %}
             </div>
         </div>
     </div>

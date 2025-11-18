@@ -20,24 +20,11 @@ class MencionSerie490(models.Model):
     El campo es REPETIBLE para obras que pertenecen a múltiples series.
     """
     
-    RELACION_SERIE = [
-        ('0', 'No relacionado (sin entrada secundaria)'),
-        ('1', 'Relacionado (con entrada secundaria 800-830)'),
-    ]
-    
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
         related_name='menciones_serie',
         help_text="Obra a la que pertenece"
-    )
-    
-    # Primer indicador: relación de la serie
-    relacion = models.CharField(
-        max_length=1,
-        choices=RELACION_SERIE,
-        default='0',
-        help_text="490 primer indicador – Relación: 0=no relacionado, 1=relacionado con 800-830"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -57,7 +44,7 @@ class MencionSerie490(models.Model):
     
     def get_marc_format(self):
         """Retorna el campo completo en formato MARC21"""
-        marc = f"490 {self.relacion}#"
+        marc = "490 ##"
         
         # $a - Títulos de serie
         for titulo in self.titulos.all():
@@ -67,7 +54,7 @@ class MencionSerie490(models.Model):
         for volumen in self.volumenes.all():
             marc += f" $v{volumen.volumen}"
         
-        return marc if marc != f"490 {self.relacion}#" else ""
+        return marc if marc != "490 ##" else ""
 
 
 class TituloSerie490(models.Model):

@@ -78,8 +78,7 @@ from .forms_3xx import (
 )
 from .forms_4xx import (
     MencionSerie490Form,
-    TituloSerie490Form,
-    VolumenSerie490Form,
+    # TituloSerie490Form y VolumenSerie490Form ahora manejados por JavaScript
 )
 from .forms_5xx import (
     NotaGeneral500Form,
@@ -109,8 +108,7 @@ from .forms_8xx import (
     Ubicacion852Form,
     Estanteria852Form,
     Disponible856Form,
-    URL856Form,
-    TextoEnlace856Form,
+    # URL856Form y TextoEnlace856Form no son necesarios (se manejan con JavaScript)
 )
 
 
@@ -303,23 +301,11 @@ MencionSerie490FormSet = inlineformset_factory(
     form=MencionSerie490Form,
     extra=1,
     can_delete=True,
+    max_num=10,
 )
 
-TituloSerie490FormSet = inlineformset_factory(
-    MencionSerie490,
-    TituloSerie490,
-    form=TituloSerie490Form,
-    extra=1,
-    can_delete=True,
-)
-
-VolumenSerie490FormSet = inlineformset_factory(
-    MencionSerie490,
-    VolumenSerie490,
-    form=VolumenSerie490Form,
-    extra=1,
-    can_delete=True,
-)
+# TituloSerie490FormSet y VolumenSerie490FormSet no son necesarios
+# Los subcampos $a y $v se manejan con JavaScript como en 856
 
 # =====================================================
 # BLOQUE 5XX - FORMSETS
@@ -506,20 +492,8 @@ Disponible856FormSet = inlineformset_factory(
     form=Disponible856Form,
     extra=1,
     can_delete=True,
+    max_num=5,
 )
 
-URL856FormSet = inlineformset_factory(
-    Disponible856,
-    URL856,
-    form=URL856Form,
-    extra=1,
-    can_delete=True,
-)
-
-TextoEnlace856FormSet = inlineformset_factory(
-    Disponible856,
-    TextoEnlace856,
-    form=TextoEnlace856Form,
-    extra=1,
-    can_delete=True,
-)
+# URL856FormSet y TextoEnlace856FormSet no son necesarios
+# Los subcampos $u y $y se manejan con JavaScript como en 773/774/787

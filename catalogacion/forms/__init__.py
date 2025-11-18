@@ -34,8 +34,7 @@ from .forms_3xx import (
 
 from .forms_4xx import (
     MencionSerie490Form,
-    TituloSerie490Form,
-    VolumenSerie490Form,
+    # TituloSerie490Form y VolumenSerie490Form no son necesarios (se manejan con JavaScript)
 )
 
 from .forms_5xx import (
@@ -68,8 +67,7 @@ from .forms_8xx import (
     Ubicacion852Form,
     Estanteria852Form,
     Disponible856Form,
-    URL856Form,
-    TextoEnlace856Form,
+    # URL856Form y TextoEnlace856Form no son necesarios (se manejan con JavaScript)
 )
 
 # Formsets
@@ -98,8 +96,7 @@ from .formsets import (
     
     # Bloque 4XX
     MencionSerie490FormSet,
-    TituloSerie490FormSet,
-    VolumenSerie490FormSet,
+    # TituloSerie490FormSet y VolumenSerie490FormSet no son necesarios (se manejan con JavaScript)
     
     # Bloque 5XX
     NotaGeneral500FormSet,
@@ -128,8 +125,7 @@ from .formsets import (
     Ubicacion852FormSet,
     Estanteria852FormSet,
     Disponible856FormSet,
-    URL856FormSet,
-    TextoEnlace856FormSet,
+    # URL856FormSet y TextoEnlace856FormSet no son necesarios (se manejan con JavaScript)
 )
 
 # Widgets personalizados
@@ -167,8 +163,7 @@ __all__ = [
     
     # Forms bloque 4XX
     'MencionSerie490Form',
-    'TituloSerie490Form',
-    'VolumenSerie490Form',
+    # 'TituloSerie490Form' y 'VolumenSerie490Form' no son necesarios (se manejan con JavaScript)
     
     # Forms bloque 5XX
     'NotaGeneral500Form',
@@ -197,8 +192,7 @@ __all__ = [
     'Ubicacion852Form',
     'Estanteria852Form',
     'Disponible856Form',
-    'URL856Form',
-    'TextoEnlace856Form',
+    # 'URL856Form' y 'TextoEnlace856Form' no son necesarios (se manejan con JavaScript)
     
     # Formsets bloque 0XX
     'IncipitMusicalFormSet',
@@ -224,8 +218,7 @@ __all__ = [
     
     # Formsets bloque 4XX
     'MencionSerie490FormSet',
-    'TituloSerie490FormSet',
-    'VolumenSerie490FormSet',
+    # 'TituloSerie490FormSet' y 'VolumenSerie490FormSet' no son necesarios (se manejan con JavaScript)
     
     # Formsets bloque 5XX
     'NotaGeneral500FormSet',
@@ -254,8 +247,7 @@ __all__ = [
     'Ubicacion852FormSet',
     'Estanteria852FormSet',
     'Disponible856FormSet',
-    'URL856FormSet',
-    'TextoEnlace856FormSet',
+    # 'URL856FormSet' y 'TextoEnlace856FormSet' no son necesarios (se manejan con JavaScript)
     
     # Widgets
     'Select2Widget',

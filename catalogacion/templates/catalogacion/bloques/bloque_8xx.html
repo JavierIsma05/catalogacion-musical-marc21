@@ -29,9 +29,9 @@
                     <span class="badge-repetible">REPETIBLE</span>
                 </div>
                 
-                <p class="form-text">URLs y recursos electrónicos asociados a la obra. Cada recurso puede tener una URL ($u) y un texto descriptivo ($y).</p>
+                <p class="form-text">URLs y recursos electrónicos asociados a la obra. Cada recurso puede tener múltiples URLs ($u) y textos descriptivos ($y).</p>
                 
-                {% include 'catalogacion/includes/formset_template.html' with formset=disponibles_856 titulo="Recurso Electrónico" %}
+                {% include 'catalogacion/includes/formset_856_template.html' with formset=disponibles_856 %}
             </div>
         </div>
     </div>

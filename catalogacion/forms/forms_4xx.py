@@ -10,45 +10,18 @@ from catalogacion.models import (
 
 
 class MencionSerie490Form(forms.ModelForm):
-    """Formulario para campo 490 - Mención de serie"""
+    """
+    Formulario para campo 490 - Mención de serie
+    Los subcampos $a (título) y $v (volumen) se manejan con JavaScript
+    """
     
     class Meta:
         model = MencionSerie490
-        fields = ['relacion']
-        widgets = {
-            'relacion': forms.Select(attrs={
-                'class': 'form-select',
-            }),
-        }
-        labels = {
-            'relacion': '490 - Relación con entrada secundaria',
-        }
-        help_texts = {
-            'relacion': '0 = No relacionado / 1 = Relacionado con 800-830',
-        }
-
-
-class TituloSerie490Form(forms.ModelForm):
-    """Formulario para campo 490 $a - Título de serie"""
+        fields = []  # Sin campos directos, los subcampos se manejan con JavaScript
     
-    class Meta:
-        model = TituloSerie490
-        fields = ['titulo_serie']
-        widgets = {
-            'titulo_serie': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
-        }
+    def __str__(self):
+        return "490 - Mención de serie"
 
 
-class VolumenSerie490Form(forms.ModelForm):
-    """Formulario para campo 490 $v - Volumen"""
-    
-    class Meta:
-        model = VolumenSerie490
-        fields = ['volumen']
-        widgets = {
-            'volumen': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
-        }
+# Los formularios TituloSerie490Form y VolumenSerie490Form no son necesarios
+# porque los subcampos se manejan dinámicamente con JavaScript

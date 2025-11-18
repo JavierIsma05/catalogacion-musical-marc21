@@ -34,7 +34,8 @@ from catalogacion.forms.formsets import (
     OtrasRelaciones787FormSet,
     # Bloque 8XX
     Ubicacion852FormSet,
-    Disponible856FormSet, URL856FormSet, TextoEnlace856FormSet,
+    Disponible856FormSet,
+    # URL856FormSet y TextoEnlace856FormSet no son necesarios (se manejan con JavaScript)
 )
 from catalogacion.models.autoridades import AutoridadPersona
 
@@ -201,9 +202,7 @@ class CrearObraView(CreateView):
             
             # Bloque 8XX
             'ubicaciones_852': Ubicacion852FormSet(instance=None, prefix='ubicaciones_852'),
-            'disponibles_856': Disponible856FormSet(prefix='disponibles_856'),
-            'urls_856': URL856FormSet(prefix='urls_856'),
-            'textos_enlace_856': TextoEnlace856FormSet(prefix='textos_enlace_856'),
+            'disponibles_856': Disponible856FormSet(instance=None, prefix='disponibles_856'),
         }
     
     def _get_formsets_post(self):
@@ -247,9 +246,7 @@ class CrearObraView(CreateView):
             
             # Bloque 8XX
             'ubicaciones_852': Ubicacion852FormSet(self.request.POST, instance=None, prefix='ubicaciones_852'),
-            'disponibles_856': Disponible856FormSet(self.request.POST, prefix='disponibles_856'),
-            'urls_856': URL856FormSet(self.request.POST, prefix='urls_856'),
-            'textos_enlace_856': TextoEnlace856FormSet(self.request.POST, prefix='textos_enlace_856'),
+            'disponibles_856': Disponible856FormSet(self.request.POST, instance=None, prefix='disponibles_856'),
         }
     
     def _save_numeros_obra_773(self, formset):
@@ -404,6 +401,158 @@ class CrearObraView(CreateView):
                         estanteria=estanteria
                     )
     
+    def _save_urls_856(self, formset):
+        """
+        Procesar inputs de URLs generados por JavaScript.
+        Los inputs tienen nombres como: url_disponible_856_0_1234567890
+        donde 0 es el índice del disponible y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import URL856
+        
+        # Agrupar URLs por índice de disponible
+        urls_por_disponible = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('url_disponible_856_') and value.strip():
+                try:
+                    # Extraer índice del disponible: url_disponible_856_0_1234567890 -> 0
+                    parts = key.split('_')
+                    disponible_index = int(parts[3])
+                    
+                    if disponible_index not in urls_por_disponible:
+                        urls_por_disponible[disponible_index] = []
+                    
+                    urls_por_disponible[disponible_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar URLs para cada disponible
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in urls_por_disponible:
+                # Eliminar URLs existentes
+                form.instance.urls_856.all().delete()
+                
+                # Crear nuevas URLs
+                for url in urls_por_disponible[index]:
+                    URL856.objects.create(
+                        disponible=form.instance,
+                        url=url
+                    )
+    
+    def _save_textos_enlace_856(self, formset):
+        """
+        Procesar inputs de textos de enlace generados por JavaScript.
+        Los inputs tienen nombres como: texto_disponible_856_0_1234567890
+        donde 0 es el índice del disponible y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import TextoEnlace856
+        
+        # Agrupar textos por índice de disponible
+        textos_por_disponible = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('texto_disponible_856_') and value.strip():
+                try:
+                    # Extraer índice del disponible: texto_disponible_856_0_1234567890 -> 0
+                    parts = key.split('_')
+                    disponible_index = int(parts[3])
+                    
+                    if disponible_index not in textos_por_disponible:
+                        textos_por_disponible[disponible_index] = []
+                    
+                    textos_por_disponible[disponible_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar textos para cada disponible
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in textos_por_disponible:
+                # Eliminar textos existentes
+                form.instance.textos_enlace_856.all().delete()
+                
+                # Crear nuevos textos
+                for texto in textos_por_disponible[index]:
+                    TextoEnlace856.objects.create(
+                        disponible=form.instance,
+                        texto_enlace=texto
+                    )
+    
+    def _save_titulos_490(self, formset):
+        """
+        Procesar inputs de títulos de serie generados por JavaScript.
+        Los inputs tienen nombres como: titulo_mencion_490_0_1234567890
+        donde 0 es el índice de la mención y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import TituloSerie490
+        
+        # Agrupar títulos por índice de mención
+        titulos_por_mencion = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('titulo_mencion_490_') and value.strip():
+                try:
+                    # Extraer índice de la mención: titulo_mencion_490_0_1234567890 -> 0
+                    parts = key.split('_')
+                    mencion_index = int(parts[3])
+                    
+                    if mencion_index not in titulos_por_mencion:
+                        titulos_por_mencion[mencion_index] = []
+                    
+                    titulos_por_mencion[mencion_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar títulos para cada mención
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in titulos_por_mencion:
+                # Eliminar títulos existentes
+                form.instance.titulos.all().delete()
+                
+                # Crear nuevos títulos
+                for titulo in titulos_por_mencion[index]:
+                    TituloSerie490.objects.create(
+                        mencion_serie=form.instance,
+                        titulo_serie=titulo
+                    )
+    
+    def _save_volumenes_490(self, formset):
+        """
+        Procesar inputs de volúmenes generados por JavaScript.
+        Los inputs tienen nombres como: volumen_mencion_490_0_1234567890
+        donde 0 es el índice de la mención y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import VolumenSerie490
+        
+        # Agrupar volúmenes por índice de mención
+        volumenes_por_mencion = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('volumen_mencion_490_') and value.strip():
+                try:
+                    # Extraer índice de la mención: volumen_mencion_490_0_1234567890 -> 0
+                    parts = key.split('_')
+                    mencion_index = int(parts[3])
+                    
+                    if mencion_index not in volumenes_por_mencion:
+                        volumenes_por_mencion[mencion_index] = []
+                    
+                    volumenes_por_mencion[mencion_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar volúmenes para cada mención
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in volumenes_por_mencion:
+                # Eliminar volúmenes existentes
+                form.instance.volumenes.all().delete()
+                
+                # Crear nuevos volúmenes
+                for volumen in volumenes_por_mencion[index]:
+                    VolumenSerie490.objects.create(
+                        mencion_serie=form.instance,
+                        volumen=volumen
+                    )
+    
     @transaction.atomic
     def form_valid(self, form):
         """Guardar obra y todos los formsets en una transacción atómica"""
@@ -469,6 +618,11 @@ class CrearObraView(CreateView):
             formset.instance = self.object
             instances = formset.save()
             
+            # Si es el formset 490, procesar títulos y volúmenes desde inputs JavaScript
+            if key == 'menciones_serie_490':
+                self._save_titulos_490(formset)
+                self._save_volumenes_490(formset)
+            
             # Si es el formset 773, procesar números de obra desde inputs JavaScript
             if key == 'enlaces_documento_fuente_773':
                 self._save_numeros_obra_773(formset)
@@ -484,6 +638,11 @@ class CrearObraView(CreateView):
             # Si es el formset 852, procesar estanterías desde inputs JavaScript
             if key == 'ubicaciones_852':
                 self._save_estanterias_852(formset)
+            
+            # Si es el formset 856, procesar URLs y textos desde inputs JavaScript
+            if key == 'disponibles_856':
+                self._save_urls_856(formset)
+                self._save_textos_enlace_856(formset)
         
         # Mensaje de éxito
         action = self.request.POST.get('action', 'publish')
@@ -638,8 +797,6 @@ class EditarObraView(UpdateView):
             'otras_relaciones_787': OtrasRelaciones787FormSet(instance=self.object, prefix='relaciones_787'),
             'ubicaciones_852': Ubicacion852FormSet(instance=self.object, prefix='ubicaciones_852'),
             'disponibles_856': Disponible856FormSet(instance=self.object, prefix='disponibles_856'),
-            'urls_856': URL856FormSet(instance=self.object, prefix='urls_856'),
-            'textos_enlace_856': TextoEnlace856FormSet(instance=self.object, prefix='textos_enlace_856'),
         }
     
     def _get_formsets_post(self):
@@ -667,8 +824,6 @@ class EditarObraView(UpdateView):
             'otras_relaciones_787': OtrasRelaciones787FormSet(self.request.POST, instance=self.object, prefix='relaciones_787'),
             'ubicaciones_852': Ubicacion852FormSet(self.request.POST, instance=self.object, prefix='ubicaciones_852'),
             'disponibles_856': Disponible856FormSet(self.request.POST, instance=self.object, prefix='disponibles_856'),
-            'urls_856': URL856FormSet(self.request.POST, instance=self.object, prefix='urls_856'),
-            'textos_enlace_856': TextoEnlace856FormSet(self.request.POST, instance=self.object, prefix='textos_enlace_856'),
         }
     
     def _save_numeros_obra_773(self, formset):
@@ -823,6 +978,158 @@ class EditarObraView(UpdateView):
                         estanteria=estanteria
                     )
     
+    def _save_urls_856(self, formset):
+        """
+        Procesar inputs de URLs generados por JavaScript.
+        Los inputs tienen nombres como: url_disponible_856_0_1234567890
+        donde 0 es el índice del disponible y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import URL856
+        
+        # Agrupar URLs por índice de disponible
+        urls_por_disponible = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('url_disponible_856_') and value.strip():
+                try:
+                    # Extraer índice del disponible: url_disponible_856_0_1234567890 -> 0
+                    parts = key.split('_')
+                    disponible_index = int(parts[3])
+                    
+                    if disponible_index not in urls_por_disponible:
+                        urls_por_disponible[disponible_index] = []
+                    
+                    urls_por_disponible[disponible_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar URLs para cada disponible
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in urls_por_disponible:
+                # Eliminar URLs existentes
+                form.instance.urls_856.all().delete()
+                
+                # Crear nuevas URLs
+                for url in urls_por_disponible[index]:
+                    URL856.objects.create(
+                        disponible=form.instance,
+                        url=url
+                    )
+    
+    def _save_textos_enlace_856(self, formset):
+        """
+        Procesar inputs de textos de enlace generados por JavaScript.
+        Los inputs tienen nombres como: texto_disponible_856_0_1234567890
+        donde 0 es el índice del disponible y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import TextoEnlace856
+        
+        # Agrupar textos por índice de disponible
+        textos_por_disponible = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('texto_disponible_856_') and value.strip():
+                try:
+                    # Extraer índice del disponible: texto_disponible_856_0_1234567890 -> 0
+                    parts = key.split('_')
+                    disponible_index = int(parts[3])
+                    
+                    if disponible_index not in textos_por_disponible:
+                        textos_por_disponible[disponible_index] = []
+                    
+                    textos_por_disponible[disponible_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar textos para cada disponible
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in textos_por_disponible:
+                # Eliminar textos existentes
+                form.instance.textos_enlace_856.all().delete()
+                
+                # Crear nuevos textos
+                for texto in textos_por_disponible[index]:
+                    TextoEnlace856.objects.create(
+                        disponible=form.instance,
+                        texto_enlace=texto
+                    )
+    
+    def _save_titulos_490(self, formset):
+        """
+        Procesar inputs de títulos de serie generados por JavaScript.
+        Los inputs tienen nombres como: titulo_mencion_490_0_1234567890
+        donde 0 es el índice de la mención y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import TituloSerie490
+        
+        # Agrupar títulos por índice de mención
+        titulos_por_mencion = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('titulo_mencion_490_') and value.strip():
+                try:
+                    # Extraer índice de la mención: titulo_mencion_490_0_1234567890 -> 0
+                    parts = key.split('_')
+                    mencion_index = int(parts[3])
+                    
+                    if mencion_index not in titulos_por_mencion:
+                        titulos_por_mencion[mencion_index] = []
+                    
+                    titulos_por_mencion[mencion_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar títulos para cada mención
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in titulos_por_mencion:
+                # Eliminar títulos existentes
+                form.instance.titulos_serie_490.all().delete()
+                
+                # Crear nuevos títulos
+                for titulo in titulos_por_mencion[index]:
+                    TituloSerie490.objects.create(
+                        mencion_serie=form.instance,
+                        titulo_serie=titulo
+                    )
+    
+    def _save_volumenes_490(self, formset):
+        """
+        Procesar inputs de volúmenes de serie generados por JavaScript.
+        Los inputs tienen nombres como: volumen_mencion_490_0_1234567890
+        donde 0 es el índice de la mención y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import VolumenSerie490
+        
+        # Agrupar volúmenes por índice de mención
+        volumenes_por_mencion = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('volumen_mencion_490_') and value.strip():
+                try:
+                    # Extraer índice de la mención: volumen_mencion_490_0_1234567890 -> 0
+                    parts = key.split('_')
+                    mencion_index = int(parts[3])
+                    
+                    if mencion_index not in volumenes_por_mencion:
+                        volumenes_por_mencion[mencion_index] = []
+                    
+                    volumenes_por_mencion[mencion_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar volúmenes para cada mención
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in volumenes_por_mencion:
+                # Eliminar volúmenes existentes
+                form.instance.volumenes_serie_490.all().delete()
+                
+                # Crear nuevos volúmenes
+                for volumen in volumenes_por_mencion[index]:
+                    VolumenSerie490.objects.create(
+                        mencion_serie=form.instance,
+                        volumen=volumen
+                    )
+    
     @transaction.atomic
     def form_valid(self, form):
         """Similar a CrearObraView"""
@@ -874,6 +1181,16 @@ class EditarObraView(UpdateView):
             # Si es el formset 852, procesar estanterías desde inputs JavaScript
             if key == 'ubicaciones_852':
                 self._save_estanterias_852(formset)
+            
+            # Si es el formset 856, procesar URLs y textos desde inputs JavaScript
+            if key == 'disponibles_856':
+                self._save_urls_856(formset)
+                self._save_textos_enlace_856(formset)
+            
+            # Si es el formset 490, procesar títulos y volúmenes desde inputs JavaScript
+            if key == 'menciones_serie_490':
+                self._save_titulos_490(formset)
+                self._save_volumenes_490(formset)
         
         messages.success(self.request, 'Obra actualizada exitosamente.')
         return redirect(self.get_success_url())

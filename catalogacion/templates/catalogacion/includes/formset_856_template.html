@@ -1,0 +1,290 @@
+{% comment %}
+Template para campo 856 - Recursos Disponibles
+El campo 856 es repetible y contiene subcampos repetibles ($u URL y $y texto enlace)
+{% endcomment %}
+
+<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
+    {# Renderizar management_form sin mensajes de error #}
+    <div style="display: none;">
+        {% for field in formset.management_form %}
+            {{ field }}
+        {% endfor %}
+    </div>
+    
+    <button type="button" class="add-form-row mb-3" title="Agregar Recurso Electrónico">
+        <i class="bi bi-plus-circle"></i>
+        Agregar Recurso Electrónico
+    </button>
+    
+    <div class="formset-forms">
+        {% for form in formset %}
+        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
+            {% if form.instance.pk %}
+                <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
+            {% endif %}
+            
+            {% if formset.can_delete %}
+                <div class="d-none">
+                    {{ form.DELETE }}
+                </div>
+            {% endif %}
+            
+            <button type="button" class="delete-row-btn" title="Eliminar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            
+            <div class="campo-grid">
+                {# Botón para agregar URLs ($u) #}
+                <div class="col-full">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-url-btn w-100" data-disponible-index="{{ forloop.counter0 }}">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar URL ($u)
+                    </button>
+                </div>
+                
+                {# Subcampo $u - URLs (Repetible) #}
+                <div class="col-full urls-container" data-urls-container="{{ forloop.counter0 }}">
+                    {% if form.instance.pk %}
+                        {# Cargar URLs existentes #}
+                        {% for url in form.instance.urls_856.all %}
+                        <div class="url-form-row">
+                            <div class="d-flex flex-column w-100 mb-2">
+                                <label class="form-label small">856 $u - URL</label>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <input type="url" 
+                                           class="form-control url-input" 
+                                           name="url_disponible_856_{{ forloop.parentloop.counter0 }}_{{ url.pk }}"
+                                           value="{{ url.url }}"
+                                           placeholder="https://ejemplo.com/recurso" 
+                                           style="flex: 1;">
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-url-btn" title="Eliminar URL">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
+                {# Botón para agregar textos de enlace ($y) #}
+                <div class="col-full">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-texto-btn w-100" data-disponible-index="{{ forloop.counter0 }}">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar Texto de Enlace ($y)
+                    </button>
+                </div>
+                
+                {# Subcampo $y - Textos de enlace (Repetible) #}
+                <div class="col-full textos-container" data-textos-container="{{ forloop.counter0 }}">
+                    {% if form.instance.pk %}
+                        {# Cargar textos existentes #}
+                        {% for texto in form.instance.textos_enlace_856.all %}
+                        <div class="texto-form-row">
+                            <div class="d-flex flex-column w-100 mb-2">
+                                <label class="form-label small">856 $y - Texto del enlace</label>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <input type="text" 
+                                           class="form-control texto-input" 
+                                           name="texto_disponible_856_{{ forloop.parentloop.counter0 }}_{{ texto.pk }}"
+                                           value="{{ texto.texto_enlace }}"
+                                           placeholder="Texto descriptivo del enlace" 
+                                           style="flex: 1;">
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-texto-btn" title="Eliminar texto">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        {# Template vacío para clonar recursos disponibles #}
+        <div class="formset-row empty-form mb-3">
+            <button type="button" class="delete-row-btn" title="Eliminar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            
+            <div class="campo-grid">
+                <div class="col-full">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-url-btn w-100" data-disponible-index="__prefix__">
+                                <i class="bi bi-plus-circle"></i>
+                                Agregar URL ($u)
+                            </button>
+                    </button>
+                </div>
+                
+                <div class="col-full urls-container" data-urls-container="__prefix__">
+                    {# Las URLs se agregarán aquí dinámicamente #}
+                </div>
+                
+                <div class="col-full">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-texto-btn w-100" data-disponible-index="__prefix__">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar Texto de Enlace ($y)
+                    </button>
+                </div>
+                
+                <div class="col-full textos-container" data-textos-container="__prefix__">
+                    {# Los textos se agregarán aquí dinámicamente #}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Templates globales para URLs y textos (fuera del formset loop) #}
+<div class="url-form-row url-template-856 d-none">
+    <div class="d-flex flex-column w-100 mb-2">
+        <label class="form-label small">856 $u - URL</label>
+        <div class="d-flex gap-2 align-items-center">
+            <input type="url" class="form-control url-input" placeholder="https://ejemplo.com/recurso" style="flex: 1;">
+            <button type="button" class="btn btn-sm btn-outline-danger delete-url-btn" title="Eliminar URL">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="texto-form-row texto-template-856 d-none">
+    <div class="d-flex flex-column w-100 mb-2">
+        <label class="form-label small">856 $y - Texto del enlace</label>
+        <div class="d-flex gap-2 align-items-center">
+            <input type="text" class="form-control texto-input" placeholder="Texto descriptivo del enlace" style="flex: 1;">
+            <button type="button" class="btn btn-sm btn-outline-danger delete-texto-btn" title="Eliminar texto">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Script para manejar el campo 856 con URLs y textos de enlace repetibles
+(function() {
+    const prefix = '{{ formset.prefix }}';
+    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+    if (!container) return;
+    
+    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+    const addButton = container.querySelector('.add-form-row');
+    const formsContainer = container.querySelector('.formset-forms');
+    const urlTemplate = document.querySelector('.url-template-856');
+    const textoTemplate = document.querySelector('.texto-template-856');
+    
+    if (!totalFormsInput || !addButton || !formsContainer || !urlTemplate || !textoTemplate) return;
+    
+    // Agregar nuevo recurso disponible 856
+    addButton.addEventListener('click', function() {
+        const totalForms = parseInt(totalFormsInput.value);
+        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
+        
+        if (!emptyFormTemplate) return;
+        
+        const emptyForm = emptyFormTemplate.cloneNode(true);
+        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
+        emptyForm.classList.remove('empty-form');
+        emptyForm.style.display = '';
+        
+        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
+        totalFormsInput.value = totalForms + 1;
+    });
+    
+    // Eliminar recurso disponible 856
+    container.addEventListener('click', function(e) {
+        const deleteBtn = e.target.closest('.delete-row-btn');
+        if (!deleteBtn) return;
+        
+        const row = deleteBtn.closest('.formset-row');
+        if (!row || row.classList.contains('empty-form')) return;
+        
+        const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
+        
+        if (row.classList.contains('existing-form')) {
+            if (deleteCheckbox && deleteCheckbox.checked) {
+                deleteCheckbox.checked = false;
+                row.style.opacity = '1';
+                deleteBtn.classList.remove('btn-warning');
+                deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
+                deleteBtn.title = 'Eliminar';
+            } else if (deleteCheckbox) {
+                deleteCheckbox.checked = true;
+                row.style.opacity = '0.5';
+                deleteBtn.classList.add('btn-warning');
+                deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
+                deleteBtn.title = 'Cancelar eliminación';
+            }
+        } else {
+            row.remove();
+            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
+        }
+    });
+    
+    // Manejar URLs (subcampo $u repetible)
+    container.addEventListener('click', function(e) {
+        // Agregar URL
+        const addUrlBtn = e.target.closest('.add-url-btn');
+        if (addUrlBtn) {
+            const disponibleIndex = addUrlBtn.getAttribute('data-disponible-index');
+            const urlsContainer = container.querySelector(`[data-urls-container="${disponibleIndex}"]`);
+            
+            if (!urlsContainer) return;
+            
+            const newUrl = urlTemplate.cloneNode(true);
+            newUrl.classList.remove('url-template-856', 'd-none');
+            
+            // Actualizar el name del input
+            const input = newUrl.querySelector('.url-input');
+            if (input) {
+                input.name = `url_disponible_856_${disponibleIndex}_${Date.now()}`;
+            }
+            
+            urlsContainer.appendChild(newUrl);
+        }
+        
+        // Eliminar URL
+        const deleteUrlBtn = e.target.closest('.delete-url-btn');
+        if (deleteUrlBtn) {
+            const urlRow = deleteUrlBtn.closest('.url-form-row');
+            if (!urlRow.classList.contains('url-template-856')) {
+                urlRow.remove();
+            }
+        }
+    });
+    
+    // Manejar textos de enlace (subcampo $y repetible)
+    container.addEventListener('click', function(e) {
+        // Agregar texto
+        const addTextoBtn = e.target.closest('.add-texto-btn');
+        if (addTextoBtn) {
+            const disponibleIndex = addTextoBtn.getAttribute('data-disponible-index');
+            const textosContainer = container.querySelector(`[data-textos-container="${disponibleIndex}"]`);
+            
+            if (!textosContainer) return;
+            
+            const newTexto = textoTemplate.cloneNode(true);
+            newTexto.classList.remove('texto-template-856', 'd-none');
+            
+            // Actualizar el name del input
+            const input = newTexto.querySelector('.texto-input');
+            if (input) {
+                input.name = `texto_disponible_856_${disponibleIndex}_${Date.now()}`;
+            }
+            
+            textosContainer.appendChild(newTexto);
+        }
+        
+        // Eliminar texto
+        const deleteTextoBtn = e.target.closest('.delete-texto-btn');
+        if (deleteTextoBtn) {
+            const textoRow = deleteTextoBtn.closest('.texto-form-row');
+            if (!textoRow.classList.contains('texto-template-856')) {
+                textoRow.remove();
+            }
+        }
+    });
+})();
+</script>

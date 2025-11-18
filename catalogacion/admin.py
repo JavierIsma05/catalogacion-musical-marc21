@@ -1064,8 +1064,8 @@ class MedioInterpretacion382Admin(admin.ModelAdmin):
 
 @admin.register(MencionSerie490)
 class MencionSerie490Admin(admin.ModelAdmin):
-    list_display = ['__str__', 'relacion', 'obra']
-    list_filter = ['relacion']
+    list_display = ['__str__', 'obra']
+    list_filter = ['obra']
     inlines = [TituloSerie490Inline, VolumenSerie490Inline]
     
     def has_module_permission(self, request):
