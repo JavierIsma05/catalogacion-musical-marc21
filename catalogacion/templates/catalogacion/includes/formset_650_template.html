@@ -18,10 +18,12 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
     
     <div class="formset-forms">
         {% for form in formset %}
-        {% if form.instance.pk %}
-        {# Solo mostrar materias existentes #}
-        <div class="formset-row existing-form mb-3">
+        {% if form.instance.pk or forloop.counter0 == 0 %}
+        {# Mostrar materias existentes y el primer formulario vacío #}
+        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
+            {% if form.instance.pk %}
             <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
+            {% endif %}
             
             {% if formset.can_delete %}
                 <div class="d-none">

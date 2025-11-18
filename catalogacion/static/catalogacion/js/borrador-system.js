@@ -51,11 +51,12 @@
             // Subcampos dinámicos - Dos patrones:
             // 1. tipo_subtipo_parentIndex_timestamp (4 partes): idioma_lengua_0_1234567890
             // 2. tipo_subtipo_campo_parentIndex_timestamp (5 partes): numero_enlace_773_0_1234567890
-            
+
             // Primero intentar patrón de 5 partes
             let subcampoMatch = key.match(/^(\w+)_(\w+)_(\d+)_(\d+)_(\d+)$/);
             if (subcampoMatch) {
-                const [, tipo, subtipo, campo, parentIndex, timestamp] = subcampoMatch;
+                const [, tipo, subtipo, campo, parentIndex, timestamp] =
+                    subcampoMatch;
                 const subcampoKey = `${tipo}_${subtipo}_${campo}_${parentIndex}`;
 
                 if (!data._subcampos_dinamicos[subcampoKey]) {
@@ -72,7 +73,7 @@
 
                 continue;
             }
-            
+
             // Luego intentar patrón de 4 partes
             subcampoMatch = key.match(/^(\w+)_(\w+)_(\d+)_(\d+)$/);
             if (subcampoMatch) {
@@ -130,12 +131,6 @@
             ) {
                 data._campos_simples[checkbox.name] = "";
             }
-        });
-
-        console.log("📦 Datos serializados:", {
-            campos: Object.keys(data._campos_simples).length,
-            formsets: Object.keys(data._formsets).length,
-            subcampos: Object.keys(data._subcampos_dinamicos).length,
         });
 
         return data;
@@ -337,8 +332,6 @@
                 borradorId = borrador.id;
                 const datos = borrador.datos_formulario;
 
-                console.log("📥 Cargando borrador:", datos);
-
                 // 1. Preparar formsets principales
                 await prepararFormsetsPrincipales(datos);
 
@@ -374,8 +367,6 @@
      * Prepara formsets principales (crea filas necesarias)
      */
     async function prepararFormsetsPrincipales(datos) {
-        console.log("🔨 Preparando formsets principales...");
-
         const formsets = datos._formsets || {};
 
         for (let prefix in formsets) {
@@ -396,7 +387,6 @@
             const rowsToAdd = totalNeeded - currentRows;
 
             if (rowsToAdd > 0) {
-                console.log(`➕ Agregando ${rowsToAdd} filas a ${prefix}`);
                 const addButton = container.querySelector(".add-form-row");
 
                 if (addButton) {
@@ -409,16 +399,12 @@
                 }
             }
         }
-
-        console.log("✅ Formsets principales preparados");
     }
 
     /**
      * Carga campos simples y formsets
      */
     async function cargarCamposYFormsets(datos) {
-        console.log("📝 Cargando campos y formsets...");
-
         const camposSimples = datos._campos_simples || {};
 
         for (let [key, value] of Object.entries(camposSimples)) {
@@ -445,16 +431,12 @@
                 }
             }
         }
-
-        console.log("✅ Campos y formsets cargados");
     }
 
     /**
      * NUEVO: Restaura subcampos dinámicos (idiomas, títulos, volúmenes, etc.)
      */
     async function restaurarSubcamposDinamicos(datos) {
-        console.log("🎯 Restaurando subcampos dinámicos...");
-
         const subcampos = datos._subcampos_dinamicos || {};
 
         for (let key in subcampos) {
@@ -463,8 +445,6 @@
 
             const firstItem = items[0];
             const { tipo, subtipo, parentIndex, campo } = firstItem;
-            
-            console.log(`📌 Restaurando ${key} (${tipo}/${subtipo}${campo ? '/'+campo : ''}): ${items.length} items`);
 
             // Buscar el contenedor correcto según el tipo
             let container, addButton, template;
@@ -537,14 +517,15 @@
                 // IMPORTANTE: Todos los campos están en la misma pestaña y comparten
                 // los mismos valores de data-numeros-container, así que debemos buscar
                 // dentro del .campo-marc específico que contiene el badge correcto
-                
+
                 // Buscar el contenedor .campo-marc que tenga el badge con el número de campo
-                const campoMarc = Array.from(document.querySelectorAll('.campo-marc'))
-                    .find(div => {
-                        const badge = div.querySelector('.badge-marc');
-                        return badge && badge.textContent.trim() === campo;
-                    });
-                
+                const campoMarc = Array.from(
+                    document.querySelectorAll(".campo-marc")
+                ).find((div) => {
+                    const badge = div.querySelector(".badge-marc");
+                    return badge && badge.textContent.trim() === campo;
+                });
+
                 if (campoMarc) {
                     container = campoMarc.querySelector(
                         `[data-numeros-container="${parentIndex}"]`
@@ -553,11 +534,13 @@
                         `.add-numero-btn[data-enlace-index="${parentIndex}"]`
                     );
                 } else {
-                    console.warn(`⚠️ No se encontró .campo-marc con badge ${campo}`);
+                    console.warn(
+                        `⚠️ No se encontró .campo-marc con badge ${campo}`
+                    );
                     container = null;
                     addButton = null;
                 }
-                
+
                 // Seleccionar template correcto según el número de campo MARC
                 if (campo === "773") {
                     template = document.querySelector(".numero-template");
@@ -605,13 +588,10 @@
                         } else {
                             input.value = item.value;
                         }
-                        console.log(`  ✓ Restaurado: ${item.value}`);
                     }
                 }
             }
         }
-
-        console.log("✅ Subcampos dinámicos restaurados");
     }
 
     /**
@@ -710,7 +690,6 @@
         actualizarIndicadorGuardado();
 
         mostrarNotificacion("Formulario limpiado completamente", "info");
-        console.log("✅ Formulario limpiado (subcampos incluidos)");
     }
 
     /**
@@ -834,8 +813,6 @@
      */
     function init() {
         if (!form) return;
-
-        console.log("🚀 Sistema de borradores v2.0 inicializado");
 
         verificarBorradorExistente();
         iniciarAutoguardado();
