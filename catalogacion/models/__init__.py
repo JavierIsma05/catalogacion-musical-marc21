@@ -4,6 +4,11 @@ Basado en la estructura refactorizada con modelo único.
 """
 
 # ============================================
+# BORRADORES
+# ============================================
+from .borradores import BorradorObra
+
+# ============================================
 # AUTORIDADES
 # ============================================
 from .autoridades import (

@@ -1,0 +1,338 @@
+"""
+Vistas AJAX para gestión de borradores de obras MARC21
+"""
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+import json
+
+from catalogacion.models import BorradorObra
+
+
+@require_http_methods(["POST"])
+def guardar_borrador_ajax(request):
+    """
+    Guarda o actualiza un borrador vía AJAX.
+    
+    POST data esperado:
+    {
+        "tipo_obra": "manuscrito_independiente",
+        "datos_formulario": {...},
+        "pestana_actual": 0,
+        "borrador_id": 123  // opcional, si existe actualiza
+    }
+    """
+    try:
+        data = json.loads(request.body)
+        
+        tipo_obra = data.get('tipo_obra')
+        datos_formulario = data.get('datos_formulario')
+        pestana_actual = data.get('pestana_actual', 0)
+        borrador_id = data.get('borrador_id')
+        
+        if not tipo_obra or not datos_formulario:
+            return JsonResponse({
+                'success': False,
+                'error': 'Faltan datos requeridos (tipo_obra y datos_formulario)'
+            }, status=400)
+        
+        # Actualizar o crear borrador
+        if borrador_id:
+            try:
+                borrador = BorradorObra.objects.get(id=borrador_id)
+                borrador.tipo_obra = tipo_obra
+                borrador.datos_formulario = datos_formulario
+                borrador.pestana_actual = pestana_actual
+                borrador.save()
+                mensaje = 'Borrador actualizado exitosamente'
+            except BorradorObra.DoesNotExist:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Borrador no encontrado'
+                }, status=404)
+        else:
+            # Crear nuevo borrador
+            borrador = BorradorObra.objects.create(
+                tipo_obra=tipo_obra,
+                datos_formulario=datos_formulario,
+                pestana_actual=pestana_actual
+            )
+            mensaje = 'Borrador guardado exitosamente'
+        
+        return JsonResponse({
+            'success': True,
+            'message': mensaje,
+            'borrador_id': borrador.id,
+            'fecha_modificacion': borrador.fecha_modificacion.isoformat(),
+            'titulo_temporal': borrador.titulo_temporal
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'JSON inválido'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': f'Error del servidor: {str(e)}'
+        }, status=500)
+
+
+@require_http_methods(["GET"])
+def obtener_borrador_ajax(request, borrador_id):
+    """
+    Obtiene un borrador específico por ID.
+    
+    Response:
+    {
+        "success": true,
+        "borrador": {
+            "id": 123,
+            "tipo_obra": "manuscrito_independiente",
+            "datos_formulario": {...},
+            "pestana_actual": 2,
+            "titulo_temporal": "Sinfonía...",
+            "fecha_modificacion": "2024-11-17T10:30:00"
+        }
+    }
+    """
+    try:
+        borrador = get_object_or_404(BorradorObra, id=borrador_id)
+        
+        return JsonResponse({
+            'success': True,
+            'borrador': {
+                'id': borrador.id,
+                'tipo_obra': borrador.tipo_obra,
+                'datos_formulario': borrador.datos_formulario,
+                'pestana_actual': borrador.pestana_actual,
+                'titulo_temporal': borrador.titulo_temporal,
+                'num_control_temporal': borrador.num_control_temporal,
+                'tipo_registro': borrador.tipo_registro,
+                'nivel_bibliografico': borrador.nivel_bibliografico,
+                'fecha_modificacion': borrador.fecha_modificacion.isoformat(),
+                'fecha_creacion': borrador.fecha_creacion.isoformat()
+            }
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=404)
+
+
+@require_http_methods(["GET"])
+def verificar_borrador_ajax(request):
+    """
+    Verifica si existe un borrador para un tipo de obra específico.
+    
+    Query params:
+    - tipo_obra: tipo de obra a verificar
+    
+    Response:
+    {
+        "success": true,
+        "tiene_borrador": true,
+        "borrador": {...}  // último borrador encontrado
+    }
+    """
+    try:
+        tipo_obra = request.GET.get('tipo_obra')
+        
+        if not tipo_obra:
+            return JsonResponse({
+                'success': False,
+                'error': 'Tipo de obra no especificado'
+            }, status=400)
+        
+        # Buscar el borrador más reciente para este tipo de obra
+        borrador = BorradorObra.objects.filter(
+            tipo_obra=tipo_obra
+        ).first()
+        
+        if borrador:
+            return JsonResponse({
+                'success': True,
+                'tiene_borrador': True,
+                'borrador': {
+                    'id': borrador.id,
+                    'titulo_temporal': borrador.titulo_temporal,
+                    'fecha_modificacion': borrador.fecha_modificacion.isoformat(),
+                    'dias_antiguedad': borrador.dias_desde_modificacion(),
+                    'pestana_actual': borrador.pestana_actual
+                }
+            })
+        else:
+            return JsonResponse({
+                'success': True,
+                'tiene_borrador': False
+            })
+            
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@require_http_methods(["DELETE", "POST"])
+def eliminar_borrador_ajax(request, borrador_id):
+    """
+    Elimina un borrador específico.
+    Acepta DELETE o POST (para compatibilidad con navegadores antiguos)
+    """
+    try:
+        borrador = get_object_or_404(BorradorObra, id=borrador_id)
+        titulo = borrador.titulo_temporal
+        borrador.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Borrador "{titulo}" eliminado exitosamente'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@require_http_methods(["GET"])
+def listar_borradores_ajax(request):
+    """
+    Lista todos los borradores ordenados por fecha de modificación.
+    
+    Query params opcionales:
+    - tipo_obra: filtrar por tipo de obra
+    - limit: límite de resultados (default: 20)
+    
+    Response:
+    {
+        "success": true,
+        "borradores": [
+            {
+                "id": 123,
+                "tipo_obra": "manuscrito_independiente",
+                "titulo_temporal": "Sinfonía...",
+                "fecha_modificacion": "2024-11-17T10:30:00",
+                "dias_antiguedad": 0
+            },
+            ...
+        ],
+        "total": 5
+    }
+    """
+    try:
+        tipo_obra = request.GET.get('tipo_obra')
+        limit = int(request.GET.get('limit', 20))
+        
+        queryset = BorradorObra.objects.all()
+        
+        if tipo_obra:
+            queryset = queryset.filter(tipo_obra=tipo_obra)
+        
+        borradores = queryset[:limit]
+        
+        lista_borradores = []
+        for borrador in borradores:
+            lista_borradores.append({
+                'id': borrador.id,
+                'tipo_obra': borrador.tipo_obra,
+                'tipo_obra_descripcion': borrador.get_descripcion_tipo(),
+                'titulo_temporal': borrador.titulo_temporal,
+                'num_control_temporal': borrador.num_control_temporal,
+                'fecha_modificacion': borrador.fecha_modificacion.isoformat(),
+                'fecha_creacion': borrador.fecha_creacion.isoformat(),
+                'pestana_actual': borrador.pestana_actual,
+                'dias_antiguedad': borrador.dias_desde_modificacion()
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'borradores': lista_borradores,
+            'total': queryset.count()
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@require_http_methods(["POST"])
+def autoguardar_borrador_ajax(request):
+    """
+    Versión simplificada de guardar_borrador para autoguardado automático.
+    Actualiza si ya existe un borrador_id, o crea uno nuevo si no existe.
+    """
+    try:
+        data = json.loads(request.body)
+        
+        borrador_id = data.get('borrador_id')
+        tipo_obra = data.get('tipo_obra')
+        datos_formulario = data.get('datos_formulario')
+        pestana_actual = data.get('pestana_actual', 0)
+        
+        if not datos_formulario:
+            return JsonResponse({
+                'success': False,
+                'error': 'Se requiere datos_formulario'
+            }, status=400)
+        
+        # Si hay borrador_id, actualizar
+        if borrador_id:
+            try:
+                borrador = BorradorObra.objects.get(id=borrador_id)
+                borrador.datos_formulario = datos_formulario
+                borrador.pestana_actual = pestana_actual
+                if tipo_obra:
+                    borrador.tipo_obra = tipo_obra
+                borrador.save()
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Autoguardado',
+                    'borrador_id': borrador.id,
+                    'fecha_modificacion': borrador.fecha_modificacion.isoformat()
+                })
+            except BorradorObra.DoesNotExist:
+                # Si no existe, crear uno nuevo
+                pass
+        
+        # Si no hay borrador_id o no existe, crear nuevo
+        if not tipo_obra:
+            return JsonResponse({
+                'success': False,
+                'error': 'Se requiere tipo_obra para crear nuevo borrador'
+            }, status=400)
+        
+        borrador = BorradorObra.objects.create(
+            tipo_obra=tipo_obra,
+            datos_formulario=datos_formulario,
+            pestana_actual=pestana_actual
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Borrador creado',
+            'borrador_id': borrador.id,
+            'fecha_modificacion': borrador.fecha_modificacion.isoformat(),
+            'titulo_temporal': borrador.titulo_temporal
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'JSON inválido'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)

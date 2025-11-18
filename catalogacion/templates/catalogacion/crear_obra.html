@@ -298,14 +298,17 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'catalogacion/js/compositor-autocomplete.js' %}"></script>
-<script src="{% static 'catalogacion/js/titulos-formas-autocomplete.js' %}"></script>
-
 <script>
-// Sistema de pestañas
+// Sistema de pestañas - DEBE declararse ANTES de borrador-system.js
 const tabs = ['tab-0xx', 'tab-1xx', 'tab-2xx', 'tab-3xx', 'tab-4xx', 'tab-5xx', 'tab-6xx', 'tab-7xx', 'tab-8xx'];
 let currentTabIndex = 0;
+</script>
 
+<script src="{% static 'catalogacion/js/compositor-autocomplete.js' %}"></script>
+<script src="{% static 'catalogacion/js/titulos-formas-autocomplete.js' %}"></script>
+<script src="{% static 'catalogacion/js/borrador-system.js' %}"></script>
+
+<script>
 // Función para cambiar de pestaña
 function switchTab(index) {
     if (index < 0 || index >= tabs.length) return;

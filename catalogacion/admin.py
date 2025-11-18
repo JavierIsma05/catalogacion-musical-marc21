@@ -9,6 +9,7 @@ from django.urls import reverse
 from .models import (
     ObraGeneral,
     NumeroControlSecuencia,
+    BorradorObra,
     AutoridadPersona,
     AutoridadTituloUniforme,
     AutoridadFormaMusical,
@@ -1204,3 +1205,132 @@ class AutoridadMateriaAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+# ============================================
+# ADMIN DE BORRADORES
+# ============================================
+
+@admin.register(BorradorObra)
+class BorradorObraAdmin(admin.ModelAdmin):
+    """Administración de borradores de obras MARC21"""
+    
+    list_display = [
+        'titulo_temporal', 
+        'tipo_obra_display',
+        'tipo_registro_display',
+        'pestana_actual', 
+        'fecha_modificacion', 
+        'dias_antiguedad_display'
+    ]
+    list_filter = [
+        'tipo_obra', 
+        'tipo_registro',
+        'nivel_bibliografico',
+        'fecha_creacion', 
+        'fecha_modificacion'
+    ]
+    search_fields = [
+        'titulo_temporal', 
+        'num_control_temporal',
+        'datos_formulario'
+    ]
+    readonly_fields = [
+        'fecha_creacion', 
+        'fecha_modificacion',
+        'titulo_temporal',
+        'num_control_temporal',
+        'tipo_registro',
+        'nivel_bibliografico'
+    ]
+    ordering = ['-fecha_modificacion']
+    
+    fieldsets = (
+        ('Información del Borrador', {
+            'fields': (
+                'tipo_obra',
+                'titulo_temporal',
+                'num_control_temporal',
+                'tipo_registro',
+                'nivel_bibliografico',
+                'pestana_actual'
+            )
+        }),
+        ('Datos del Formulario', {
+            'fields': ('datos_formulario',),
+            'classes': ('collapse',)
+        }),
+        ('Metadatos', {
+            'fields': ('fecha_creacion', 'fecha_modificacion'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    actions = ['eliminar_borradores_antiguos', 'limpiar_borradores_sin_titulo']
+    
+    def tipo_obra_display(self, obj):
+        """Muestra el tipo de obra con icono"""
+        iconos = {
+            'manuscrito_independiente': '📜',
+            'manuscrito_coleccion': '📚',
+            'impreso_independiente': '📖',
+            'impreso_coleccion': '📚',
+        }
+        icono = iconos.get(obj.tipo_obra, '📄')
+        return format_html(
+            '{} {}', 
+            icono, 
+            obj.get_descripcion_tipo()
+        )
+    tipo_obra_display.short_description = 'Tipo de Obra'
+    
+    def tipo_registro_display(self, obj):
+        """Muestra el tipo de registro"""
+        if obj.tipo_registro == 'd':
+            return '📝 Manuscrito'
+        elif obj.tipo_registro == 'c':
+            return '🖨️ Impreso'
+        return '-'
+    tipo_registro_display.short_description = 'Tipo'
+    
+    def dias_antiguedad_display(self, obj):
+        """Muestra días desde última modificación con color"""
+        dias = obj.dias_desde_modificacion()
+        if dias == 0:
+            return format_html('<span style="color: green;">●</span> Hoy')
+        elif dias == 1:
+            return format_html('<span style="color: green;">●</span> Ayer')
+        elif dias < 7:
+            return format_html(
+                '<span style="color: orange;">●</span> Hace {} días', 
+                dias
+            )
+        else:
+            return format_html(
+                '<span style="color: red;">●</span> Hace {} días', 
+                dias
+            )
+    dias_antiguedad_display.short_description = 'Antigüedad'
+    
+    def eliminar_borradores_antiguos(self, request, queryset):
+        """Elimina borradores con más de 30 días"""
+        count = 0
+        for borrador in queryset:
+            if borrador.dias_desde_modificacion() > 30:
+                borrador.delete()
+                count += 1
+        
+        self.message_user(
+            request, 
+            f"{count} borradores antiguos (>30 días) eliminados."
+        )
+    eliminar_borradores_antiguos.short_description = "🗑️ Eliminar borradores > 30 días"
+    
+    def limpiar_borradores_sin_titulo(self, request, queryset):
+        """Elimina borradores sin título"""
+        count = queryset.filter(titulo_temporal='Sin título').delete()[0]
+        self.message_user(
+            request, 
+            f"{count} borradores sin título eliminados."
+        )
+    limpiar_borradores_sin_titulo.short_description = "🧹 Limpiar borradores sin título"
