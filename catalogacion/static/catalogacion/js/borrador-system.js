@@ -49,8 +49,14 @@
             if (shouldExcludeField(key)) continue;
 
             // Subcampos dinámicos - Dos patrones:
-            // 1. tipo_subtipo_parentIndex_timestamp (4 partes): idioma_lengua_0_1234567890
-            // 2. tipo_subtipo_campo_parentIndex_timestamp (5 partes): numero_enlace_773_0_1234567890
+            // 1. tipo_subtipo_parentIndex_timestamp (4 partes):
+            //    - idioma_lengua_0_1234567890 (campo 041)
+            //    - lugar_produccion_264_0_1234567890 (campo 264 $a)
+            //    - entidad_produccion_264_0_1234567890 (campo 264 $b)
+            //    - fecha_produccion_264_0_1234567890 (campo 264 $c)
+            //    - medio_interpretacion_382_0_1234567890 (campo 382 $a)
+            // 2. tipo_subtipo_campo_parentIndex_timestamp (5 partes):
+            //    - numero_enlace_773_0_1234567890 (campo 773)
 
             // Primero intentar patrón de 5 partes
             let subcampoMatch = key.match(/^(\w+)_(\w+)_(\d+)_(\d+)_(\d+)$/);
@@ -74,7 +80,7 @@
                 continue;
             }
 
-            // Luego intentar patrón de 4 partes
+            // Luego intentar patrón de 4 partes (incluye 264 y 382)
             subcampoMatch = key.match(/^(\w+)_(\w+)_(\d+)_(\d+)$/);
             if (subcampoMatch) {
                 const [, tipo, subtipo, parentIndex, timestamp] = subcampoMatch;
@@ -558,6 +564,38 @@
                     `.add-estanteria-btn[data-ubicacion-index="${parentIndex}"]`
                 );
                 template = document.querySelector(".estanteria-template-852");
+            } else if (tipo === "lugar" && subtipo === "produccion") {
+                // Campo 264 - Lugares de producción ($a)
+                container = document.querySelector(
+                    `[data-lugares-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-lugar-btn[data-produccion-index="${parentIndex}"]`
+                );
+            } else if (tipo === "entidad" && subtipo === "produccion") {
+                // Campo 264 - Entidades productoras ($b)
+                container = document.querySelector(
+                    `[data-entidades-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-entidad-btn[data-produccion-index="${parentIndex}"]`
+                );
+            } else if (tipo === "fecha" && subtipo === "produccion") {
+                // Campo 264 - Fechas de producción ($c)
+                container = document.querySelector(
+                    `[data-fechas-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-fecha-btn[data-produccion-index="${parentIndex}"]`
+                );
+            } else if (tipo === "medio" && subtipo === "interpretacion") {
+                // Campo 382 - Medios de interpretación ($a)
+                container = document.querySelector(
+                    `[data-medios-container="${parentIndex}"]`
+                );
+                addButton = document.querySelector(
+                    `.add-medio-btn[data-medio-index="${parentIndex}"]`
+                );
             }
 
             if (!container || !addButton) {
@@ -572,7 +610,7 @@
 
                 // Buscar el último input/select/textarea creado
                 const lastRow = container.querySelector(
-                    ":scope > div:last-child, :scope > .idioma-form-row:last-child, :scope > .titulo-form-row:last-child, :scope > .volumen-form-row:last-child, :scope > .texto-form-row:last-child, :scope > .uri-form-row:last-child, :scope > .url-form-row:last-child, :scope > .numero-form-row:last-child, :scope > .estanteria-form-row:last-child"
+                    ":scope > div:last-child, :scope > .idioma-form-row:last-child, :scope > .titulo-form-row:last-child, :scope > .volumen-form-row:last-child, :scope > .texto-form-row:last-child, :scope > .uri-form-row:last-child, :scope > .url-form-row:last-child, :scope > .numero-form-row:last-child, :scope > .estanteria-form-row:last-child, :scope > .lugar-form-row:last-child, :scope > .entidad-form-row:last-child, :scope > .fecha-form-row:last-child, :scope > .medio-form-row:last-child"
                 );
 
                 if (lastRow) {
@@ -671,7 +709,7 @@
 
                             // Limpiar subcampos dentro de la fila
                             row.querySelectorAll(
-                                "[data-idiomas-container], [data-titulos-container], [data-volumenes-container], [data-textos-container], [data-uris-container], [data-urls-container]"
+                                "[data-idiomas-container], [data-titulos-container], [data-volumenes-container], [data-textos-container], [data-uris-container], [data-urls-container], [data-numeros-container], [data-estanterias-container], [data-lugares-container], [data-entidades-container], [data-fechas-container], [data-medios-container]"
                             ).forEach((subContainer) => {
                                 subContainer.innerHTML = "";
                             });

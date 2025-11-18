@@ -1,0 +1,230 @@
+{% comment %}
+Template especializado para el campo 382 - Medio de Interpretación.
+Permite repetir el campo completo y también el subcampo $a (medios).
+{% endcomment %}
+
+<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
+    <div style="display:none;">
+        {% for hidden in formset.management_form %}
+            {{ hidden }}
+        {% endfor %}
+    </div>
+    
+    <button type="button" class="add-form-row mb-3" title="Agregar medio de interpretación">
+        <i class="bi bi-plus-circle"></i>
+        Agregar Medio de Interpretación (382)
+    </button>
+    
+    <div class="formset-forms">
+        {% for form in formset %}
+        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+            {% if formset.can_delete %}
+                <div class="d-none">
+                    {{ form.DELETE }}
+                </div>
+            {% endif %}
+            
+            <button type="button" class="delete-row-btn" title="Eliminar registro 382">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger mb-3">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+            
+            <div class="campo-grid">
+                {# Botón para agregar medios ($a) #}
+                <div class="col-full">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-medio-btn w-100" data-medio-index="{{ forloop.counter0 }}">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar Medio ($a)
+                    </button>
+                </div>
+                
+                {# Subcampo $a - Medios (Repetible) #}
+                <div class="col-full medios-container" data-medios-container="{{ forloop.counter0 }}">
+                    {% if form.instance.pk %}
+                        {# Cargar medios existentes #}
+                        {% for medio in form.instance.medios.all %}
+                        <div class="medio-form-row">
+                            <div class="d-flex flex-column w-100 mb-2">
+                                <label class="form-label small">382 $a - Medio de interpretación</label>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <select class="form-select medio-select" name="medio_interpretacion_382_{{ forloop.parentloop.counter0 }}_{{ medio.pk }}" style="flex: 1;">
+                                        {% for value, label in medio.MEDIOS %}
+                                            <option value="{{ value }}" {% if medio.medio == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-medio-btn" title="Eliminar medio">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="formset-row empty-form mb-3" style="display:none;">
+            <div style="display:none;">
+                {% for hidden in formset.empty_form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+            </div>
+            <button type="button" class="delete-row-btn" title="Eliminar registro 382">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="campo-grid">
+                <div class="col-full">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-medio-btn w-100" data-medio-index="__prefix__">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar Medio ($a)
+                    </button>
+                </div>
+                
+                <div class="col-full medios-container" data-medios-container="__prefix__">
+                    {# Los medios se agregarán aquí dinámicamente #}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Template global para medios (fuera del formset loop) #}
+<div class="medio-form-row medio-template-382 d-none">
+    <div class="d-flex flex-column w-100 mb-2">
+        <label class="form-label small">382 $a - Medio de interpretación</label>
+        <div class="d-flex gap-2 align-items-center">
+            <select class="form-select medio-select" style="flex: 1;">
+                <option value="piano">Piano</option>
+                <option value="dos pianos">Dos pianos</option>
+                <option value="piano a cuatro manos">Piano a cuatro manos</option>
+                <option value="piano con acompañamiento">Piano con acompañamiento</option>
+            </select>
+            <button type="button" class="btn btn-sm btn-outline-danger delete-medio-btn" title="Eliminar medio">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const prefix = '{{ formset.prefix }}';
+    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+    if (!container) return;
+    
+    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+    const addButton = container.querySelector('.add-form-row');
+    const formsContainer = container.querySelector('.formset-forms');
+    const medioTemplate = document.querySelector('.medio-template-382');
+    
+    if (!totalFormsInput || !addButton || !formsContainer || !medioTemplate) {
+        return;
+    }
+    
+    const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const prefixPattern = escapeRegex(prefix);
+    const prefixRegex = new RegExp(`${prefixPattern}-(\\d+)-`, 'g');
+
+    const reindexForms = () => {
+        const rows = Array.from(formsContainer.querySelectorAll('.formset-row:not(.empty-form)'));
+        rows.forEach((row, index) => {
+            row.querySelectorAll('input, select, textarea, label').forEach(element => {
+                ['name', 'id', 'for'].forEach(attr => {
+                    const value = element.getAttribute(attr);
+                    if (value && value.includes(`${prefix}-`)) {
+                        prefixRegex.lastIndex = 0;
+                        element.setAttribute(attr, value.replace(prefixRegex, `${prefix}-${index}-`));
+                    }
+                });
+            });
+            row.querySelectorAll('[data-medio-index]').forEach(btn => btn.setAttribute('data-medio-index', index));
+            row.querySelectorAll('[data-medios-container]').forEach(el => el.setAttribute('data-medios-container', index));
+            
+            const actualizarSubcampo = (selector, prefijo) => {
+                const subcampoRegex = new RegExp(`^(${escapeRegex(prefijo)})(\\d+)(_.+)$`);
+                row.querySelectorAll(selector).forEach(select => {
+                    const name = select.getAttribute('name');
+                    if (!name || !name.startsWith(prefijo)) return;
+                    select.name = name.replace(subcampoRegex, `$1${index}$3`);
+                });
+            };
+            actualizarSubcampo('select[name^="medio_interpretacion_382_"]', 'medio_interpretacion_382_');
+        });
+        totalFormsInput.value = rows.length;
+    };
+    
+    addButton.addEventListener('click', function() {
+        const totalForms = parseInt(totalFormsInput.value, 10) || 0;
+        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
+        if (!emptyFormTemplate) return;
+        const emptyForm = emptyFormTemplate.cloneNode(true);
+        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
+        emptyForm.classList.remove('empty-form');
+        emptyForm.style.display = '';
+        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
+        reindexForms();
+    });
+    
+    container.addEventListener('click', function(e) {
+        const deleteBtn = e.target.closest('.delete-row-btn');
+        if (deleteBtn) {
+            const row = deleteBtn.closest('.formset-row');
+            if (!row || row.classList.contains('empty-form')) return;
+            const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
+            if (row.classList.contains('existing-form')) {
+                if (deleteCheckbox && deleteCheckbox.checked) {
+                    deleteCheckbox.checked = false;
+                    row.style.opacity = '1';
+                    deleteBtn.classList.remove('btn-warning');
+                    deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
+                } else if (deleteCheckbox) {
+                    deleteCheckbox.checked = true;
+                    row.style.opacity = '0.5';
+                    deleteBtn.classList.add('btn-warning');
+                    deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
+                }
+            } else {
+                row.remove();
+                reindexForms();
+            }
+            return;
+        }
+        
+        const addMedioBtn = e.target.closest('.add-medio-btn');
+        if (addMedioBtn) {
+            const index = addMedioBtn.getAttribute('data-medio-index');
+            const target = container.querySelector(`[data-medios-container="${index}"]`);
+            if (target && medioTemplate) {
+                const nuevo = medioTemplate.cloneNode(true);
+                nuevo.classList.remove('medio-template-382', 'd-none');
+                const select = nuevo.querySelector('.medio-select');
+                if (select) {
+                    select.name = `medio_interpretacion_382_${index}_${Date.now()}`;
+                }
+                target.appendChild(nuevo);
+            }
+            return;
+        }
+        
+        if (e.target.closest('.delete-medio-btn')) {
+            const row = e.target.closest('.medio-form-row');
+            if (row && !row.classList.contains('medio-template-382')) {
+                row.remove();
+            }
+            return;
+        }
+    });
+    
+    reindexForms();
+})();
+</script>

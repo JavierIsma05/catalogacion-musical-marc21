@@ -222,6 +222,20 @@ def save_fechas_264(request_post, formset):
     )
 
 
+def save_medios_382(request_post, formset):
+    """Procesa medios ($a) del campo 382."""
+    from catalogacion.models import MedioInterpretacion382_a
+    
+    handler = FormsetSubcampoHandler(request_post)
+    handler.procesar_subcampo_simple(
+        formset=formset,
+        prefijo_input='medio_interpretacion_382_',
+        modelo_subcampo=MedioInterpretacion382_a,
+        campo_fk='medio_interpretacion',
+        campo_valor='medio'
+    )
+
+
 def save_titulos_490(request_post, formset):
     """Procesa títulos de serie del campo 490."""
     from catalogacion.models import TituloSerie490
@@ -317,6 +331,7 @@ SUBCAMPO_HANDLERS = {
     '_save_lugares_264': save_lugares_264,
     '_save_entidades_264': save_entidades_264,
     '_save_fechas_264': save_fechas_264,
+    '_save_medios_382': save_medios_382,
     '_save_titulos_490': save_titulos_490,
     '_save_volumenes_490': save_volumenes_490,
     '_save_textos_biograficos_545': save_textos_biograficos_545,

@@ -405,6 +405,11 @@ FORMSETS_CON_SUBCAMPOS = {
         'handler_entidad': '_save_entidades_264',
         'handler_fecha': '_save_fechas_264',
     },
+    # Campo 382 - Medio de interpretación
+    'medio_interpretacion_382_formset': {
+        'subcampos': ['medio'],
+        'handler': '_save_medios_382',
+    },
     # Campo 490 - Mención de serie
     'mencion_serie_490_formset': {
         'subcampos': ['titulo', 'volumen'],
