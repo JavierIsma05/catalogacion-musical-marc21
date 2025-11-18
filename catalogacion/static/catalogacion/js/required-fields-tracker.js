@@ -1,522 +1,469 @@
 /**
- * Sistema de validación y seguimiento de campos obligatorios MARC21
+ * Sistema de seguimiento de campos obligatorios MARC21
+ * Actualiza el sidebar de progreso en tiempo real
  */
 
 (function () {
     "use strict";
 
     // Configuración de campos obligatorios por tipo de obra
-    const REQUIRED_FIELDS = {
-        // Campos obligatorios para TODOS los tipos de obra
-        all: [
+    const REQUIRED_FIELDS_CONFIG = {
+        coleccion_manuscrita: [
+            { id: "id_num_control", label: "001 - Número de Control", tab: 0 },
             {
-                id: "id_centro_catalogador",
-                label: "040 - Centro Catalogador",
-                tab: 0,
+                id: "id_titulo_uniforme",
+                label: "130 - Título Uniforme",
+                tab: 1,
             },
             {
                 id: "id_titulo_principal",
                 label: "245 - Título Principal",
                 tab: 2,
             },
-            { id: "id_ms_imp", label: "340 - Medio Físico", tab: 3 },
+            {
+                id: "id_medio_interpretacion_382",
+                label: "382 - Medio de Interpretación",
+                tab: 3,
+                special: true,
+            },
         ],
-        // Campos obligatorios según punto de acceso principal
-        conditional: {
-            // Si tiene 100 (compositor)
-            compositor: [
-                { id: "id_compositor", label: "100 - Compositor", tab: 1 },
-            ],
-            // Si tiene 130 (título uniforme)
-            titulo_uniforme: [
-                {
-                    id: "id_titulo_uniforme_texto",
-                    label: "130 - Título Uniforme",
-                    tab: 1,
-                },
-            ],
-        },
-    };
-
-    let progressData = {
-        total: 0,
-        completed: 0,
-        fields: [],
-    };
-
-    /**
-     * Inicializa el sistema de campos obligatorios
-     */
-    function init() {
-        // Desactivar validación HTML5 nativa del navegador
-        const form = document.getElementById("obra-form");
-        if (form) {
-            form.setAttribute("novalidate", "novalidate");
-        }
-
-        identifyRequiredFields();
-        createProgressPanel();
-        markRequiredFields();
-        setupValidation();
-        updateProgress();
-
-        // Actualizar progreso cuando cambian los campos
-        document.addEventListener("input", debounce(updateProgress, 500));
-        document.addEventListener("change", updateProgress);
-
-        // NO usar MutationObserver para evitar bucles infinitos
-        // En su lugar, el sistema de borradores llamará manualmente updateProgress
-    }
-
-    /**
-     * Identifica qué campos son obligatorios según el formulario actual
-     */
-    function identifyRequiredFields() {
-        progressData.fields = [];
-
-        // Agregar campos obligatorios comunes
-        REQUIRED_FIELDS.all.forEach((field) => {
-            const element = document.getElementById(field.id);
-            if (element) {
-                progressData.fields.push({
-                    ...field,
-                    element: element,
-                    completed: false,
-                });
-            }
-        });
-
-        // Verificar si tiene compositor (100) o título uniforme (130)
-        const hasCompositor = document.getElementById("id_compositor");
-        const hasTituloUniforme = document.getElementById(
-            "id_titulo_uniforme_texto"
-        );
-
-        if (hasCompositor) {
-            progressData.fields.push({
-                id: "id_compositor",
-                label: "100 - Compositor",
-                tab: 1,
-                element: hasCompositor,
-                completed: false,
-                conditional: true,
-            });
-        }
-
-        if (hasTituloUniforme) {
-            progressData.fields.push({
-                id: "id_titulo_uniforme_texto",
+        obra_en_coleccion_manuscrita: [
+            { id: "id_num_control", label: "001 - Número de Control", tab: 0 },
+            { id: "id_compositor", label: "100 - Compositor", tab: 1 },
+            {
+                id: "id_titulo_principal",
+                label: "245 - Título Principal",
+                tab: 2,
+            },
+            {
+                id: "id_medio_interpretacion_382",
+                label: "382 - Medio de Interpretación",
+                tab: 3,
+                special: true,
+            },
+        ],
+        obra_manuscrita_individual: [
+            { id: "id_num_control", label: "001 - Número de Control", tab: 0 },
+            { id: "id_compositor", label: "100 - Compositor", tab: 1 },
+            {
+                id: "id_titulo_principal",
+                label: "245 - Título Principal",
+                tab: 2,
+            },
+            {
+                id: "id_medio_interpretacion_382",
+                label: "382 - Medio de Interpretación",
+                tab: 3,
+                special: true,
+            },
+        ],
+        coleccion_impresa: [
+            { id: "id_num_control", label: "001 - Número de Control", tab: 0 },
+            {
+                id: "id_titulo_uniforme",
                 label: "130 - Título Uniforme",
                 tab: 1,
-                element: hasTituloUniforme,
-                completed: false,
-                conditional: true,
-            });
+            },
+            {
+                id: "id_titulo_principal",
+                label: "245 - Título Principal",
+                tab: 2,
+            },
+            {
+                id: "id_medio_interpretacion_382",
+                label: "382 - Medio de Interpretación",
+                tab: 3,
+                special: true,
+            },
+        ],
+        obra_en_coleccion_impresa: [
+            { id: "id_num_control", label: "001 - Número de Control", tab: 0 },
+            { id: "id_compositor", label: "100 - Compositor", tab: 1 },
+            {
+                id: "id_titulo_principal",
+                label: "245 - Título Principal",
+                tab: 2,
+            },
+            {
+                id: "id_medio_interpretacion_382",
+                label: "382 - Medio de Interpretación",
+                tab: 3,
+                special: true,
+            },
+        ],
+        obra_impresa_individual: [
+            { id: "id_num_control", label: "001 - Número de Control", tab: 0 },
+            { id: "id_compositor", label: "100 - Compositor", tab: 1 },
+            {
+                id: "id_titulo_principal",
+                label: "245 - Título Principal",
+                tab: 2,
+            },
+            {
+                id: "id_medio_interpretacion_382",
+                label: "382 - Medio de Interpretación",
+                tab: 3,
+                special: true,
+            },
+        ],
+    };
+
+    // Estado del tracker
+    let tipoObra = null;
+    let requiredFields = [];
+    let fieldStates = {};
+
+    /**
+     * Inicializar el tracker
+     */
+    function init() {
+        // Obtener tipo de obra de la sesión o del formulario
+        tipoObra = getTipoObra();
+
+        if (!tipoObra) {
+            console.warn("No se pudo determinar el tipo de obra");
+            return;
         }
 
-        // Campo 382 - Medio de Interpretación (verificar si hay al menos uno)
-        // Agregar SIEMPRE, pero la validación determinará si está completo
-        progressData.fields.push({
-            id: "medio_interpretacion_check",
-            label: "382 - Medio de Interpretación",
-            tab: 3,
-            element: null, // Se valida de forma especial
-            completed: false,
-            isFormset: true,
-        });
+        // Obtener configuración de campos obligatorios
+        requiredFields = REQUIRED_FIELDS_CONFIG[tipoObra] || [];
 
-        progressData.total = progressData.fields.length;
-    }
-
-    /**
-     * Crea el panel de progreso en la parte superior
-     */
-    function createProgressPanel() {
-        const form = document.getElementById("obra-form");
-        if (!form) return;
-
-        const panel = document.createElement("div");
-        panel.className = "progress-panel";
-        panel.id = "progress-panel";
-        panel.innerHTML = `
-            <h6><i class="bi bi-check-circle"></i> Progreso de Campos Obligatorios</h6>
-            <div class="progress-stats">
-                <div class="progress-circle">
-                    <svg width="80" height="80">
-                        <circle class="bg-circle" cx="40" cy="40" r="36"></circle>
-                        <circle class="progress-circle-bar" cx="40" cy="40" r="36"
-                                stroke-dasharray="226" stroke-dashoffset="226"></circle>
-                    </svg>
-                    <div class="progress-text">0%</div>
-                </div>
-                <div class="progress-details">
-                    <p><strong><span id="completed-count">0</span> de <span id="total-count">0</span></strong> campos completados</p>
-                    <p class="mb-0" style="font-size: 0.85rem; opacity: 0.9;">
-                        Los campos obligatorios están marcados con 
-                        <span class="required-badge" style="font-size: 0.65rem; margin: 0 0.25rem;">OBLIGATORIO</span>
-                    </p>
-                    <div class="field-list" id="field-status-list"></div>
-                </div>
-            </div>
-        `;
-
-        form.parentElement.insertBefore(panel, form);
-    }
-
-    /**
-     * Marca visualmente los campos obligatorios
-     */
-    function markRequiredFields() {
-        progressData.fields.forEach((field) => {
-            if (!field.element) return;
-
-            const formGroup = field.element.closest(".form-group, .mb-3");
-            if (!formGroup) return;
-
-            // Agregar clase de campo obligatorio
-            formGroup.classList.add("required-field");
-
-            // Agregar badge al label
-            const label = formGroup.querySelector("label");
-            if (label && !label.querySelector(".required-badge")) {
-                const badge = document.createElement("span");
-                badge.className = "required-badge";
-                badge.textContent = "Obligatorio";
-                label.appendChild(badge);
-            }
-
-            // Marcar input visualmente (NO usar required de HTML5)
-            if (
-                field.element.tagName === "INPUT" ||
-                field.element.tagName === "SELECT" ||
-                field.element.tagName === "TEXTAREA"
-            ) {
-                field.element.classList.add("required-input");
-                // NO establecer required=true para evitar validación HTML5
-                // field.element.required = true;
-            }
-        });
-
-        // Marcar pestañas que tienen campos obligatorios
-        markRequiredTabs();
-    }
-
-    /**
-     * Marca las pestañas que contienen campos obligatorios
-     */
-    function markRequiredTabs() {
-        const tabsWithRequired = new Set();
-
-        progressData.fields.forEach((field) => {
-            tabsWithRequired.add(field.tab);
-        });
-
-        tabsWithRequired.forEach((tabIndex) => {
-            const tabButton = document.querySelector(
-                `[data-tab-index="${tabIndex}"]`
+        if (requiredFields.length === 0) {
+            console.warn(
+                "No hay campos obligatorios configurados para:",
+                tipoObra
             );
-            if (tabButton && !tabButton.querySelector(".required-indicator")) {
-                const indicator = document.createElement("span");
-                indicator.className = "required-indicator";
-                indicator.title = "Contiene campos obligatorios";
-                tabButton.appendChild(indicator);
-            }
+            return;
+        }
+
+        // Inicializar estados
+        initFieldStates();
+
+        // Renderizar UI del sidebar
+        renderProgressSidebar();
+
+        // Configurar listeners
+        setupFieldListeners();
+
+        // Primera actualización
+        updateProgress();
+    }
+
+    /**
+     * Obtener tipo de obra actual
+     */
+    function getTipoObra() {
+        // Intentar obtener del data attribute del body o del template
+        const bodyTipo = document.body.getAttribute("data-tipo-obra");
+        if (bodyTipo) return bodyTipo;
+
+        // Intentar obtener de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlTipo = urlParams.get("tipo");
+        if (urlTipo) return urlTipo;
+
+        // Intentar obtener del path
+        const pathMatch = window.location.pathname.match(
+            /\/crear-obra\/([^\/]+)/
+        );
+        if (pathMatch) return pathMatch[1];
+
+        // Fallback: buscar en el contexto del template
+        const tipoFromContext = window.TIPO_OBRA_ACTUAL;
+        if (tipoFromContext) return tipoFromContext;
+
+        return null;
+    }
+
+    /**
+     * Inicializar estados de campos
+     */
+    function initFieldStates() {
+        requiredFields.forEach((field) => {
+            fieldStates[field.id] = {
+                complete: false,
+                field: field,
+            };
         });
     }
 
     /**
-     * Configura validación en tiempo real
+     * Renderizar sidebar de progreso
      */
-    function setupValidation() {
-        progressData.fields.forEach((field) => {
-            if (!field.element) return;
+    function renderProgressSidebar() {
+        const listContainer = document.getElementById("required-fields-list");
+        if (!listContainer) return;
 
-            field.element.addEventListener("input", function () {
-                validateField(field);
-            });
+        listContainer.innerHTML = "";
 
-            field.element.addEventListener("change", function () {
-                validateField(field);
-            });
-        });
-    }
+        requiredFields.forEach((field) => {
+            const li = document.createElement("li");
+            li.className = "required-field-item incomplete";
+            li.setAttribute("data-field-id", field.id);
+            li.setAttribute("data-tab-index", field.tab);
 
-    /**
-     * Valida un campo específico
-     */
-    function validateField(field) {
-        if (field.isFormset) {
-            // Validación especial para formsets (ej: 382)
-            const validationResult = validateFormset382();
+            li.innerHTML = `
+                <div class="required-field-indicator"></div>
+                <span class="required-field-label">${field.label}</span>
+                <span class="required-field-code">${field.id.replace(
+                    "id_",
+                    ""
+                )}</span>
+            `;
 
-            if (validationResult === null) {
-                // El formset no existe en este tipo de obra - eliminarlo de campos obligatorios
-                const index = progressData.fields.findIndex(
-                    (f) => f.id === field.id
-                );
-                if (index !== -1) {
-                    progressData.fields.splice(index, 1);
-                    progressData.total = progressData.fields.length;
-                    updateProgress(); // Actualizar UI
+            // Click para navegar a la pestaña del campo
+            li.addEventListener("click", () => {
+                if (typeof switchTab === "function") {
+                    switchTab(field.tab);
+
+                    // Enfocar el campo después de cambiar de pestaña
+                    setTimeout(() => {
+                        const fieldElement = document.getElementById(field.id);
+                        if (fieldElement) {
+                            fieldElement.focus();
+                            fieldElement.scrollIntoView({
+                                behavior: "smooth",
+                                block: "center",
+                            });
+                        }
+                    }, 300);
                 }
-                return;
-            }
+            });
 
-            // true = tiene datos (completo), false = existe pero vacío (incompleto)
-            field.completed = validationResult;
-        } else if (field.element) {
-            // Validación normal
-            const value = field.element.value.trim();
-            field.completed = value.length > 0;
+            listContainer.appendChild(li);
+        });
+    }
 
-            // Actualizar clases visuales
-            const formGroup = field.element.closest(".form-group, .mb-3");
-            if (formGroup) {
-                if (field.completed) {
-                    formGroup.classList.add("field-complete");
-                    const badge = formGroup.querySelector(".required-badge");
-                    if (badge) badge.classList.add("complete");
+    /**
+     * Configurar listeners en campos obligatorios
+     */
+    function setupFieldListeners() {
+        requiredFields.forEach((field) => {
+            if (field.special) {
+                // Campos especiales como 382 que son formsets
+                setupSpecialFieldListener(field);
+            } else {
+                // Campos normales
+                const element = document.getElementById(field.id);
+                if (element) {
+                    // Input normal
+                    element.addEventListener("input", () =>
+                        checkField(field.id)
+                    );
+                    element.addEventListener("change", () =>
+                        checkField(field.id)
+                    );
+                    element.addEventListener("blur", () =>
+                        checkField(field.id)
+                    );
                 } else {
-                    formGroup.classList.remove("field-complete");
-                    const badge = formGroup.querySelector(".required-badge");
-                    if (badge) badge.classList.remove("complete");
-                }
-            }
-        }
-
-        return field.completed;
-    }
-
-    /**
-     * Valida que exista al menos un medio de interpretación (382)
-     * Retorna: true si tiene datos, false si está vacío, null si no existe en este tipo
-     */
-    function validateFormset382() {
-        // Intentar varios selectores posibles
-        let container =
-            document.querySelector(
-                '[data-formset-prefix="mediointerpretacion382_set"]'
-            ) ||
-            document.querySelector(
-                '[data-formset-prefix="medio_interpretacion_382"]'
-            ) ||
-            document.querySelector('[data-formset-prefix*="medio"]');
-
-        if (!container) {
-            // Buscar por contenido - cualquier formset que tenga "382" en el título
-            const allContainers =
-                document.querySelectorAll(".formset-container");
-            for (let cont of allContainers) {
-                const addButton = cont.querySelector(".add-form-row");
-                if (addButton && addButton.textContent.includes("382")) {
-                    container = cont;
-                    break;
-                }
-            }
-        }
-
-        if (!container) {
-            // Si no lo encuentra, el formset no existe en este tipo de obra
-            // Retornar null para indicar "no aplicable"
-            return null;
-        }
-
-        const rows = container.querySelectorAll(
-            ".formset-row:not(.empty-form)"
-        );
-        let hasValue = false;
-
-        rows.forEach((row) => {
-            // Buscar inputs/selects que contengan "medio" en el name
-            const inputs = row.querySelectorAll(
-                'input[name*="medio"], select[name*="medio"]'
-            );
-
-            inputs.forEach((input) => {
-                const value = input.value.trim();
-                if (value && value.length > 0) {
-                    hasValue = true;
-                }
-            });
-        });
-
-        return hasValue;
-    }
-
-    /**
-     * Valida campos condicionales (100 o 130)
-     */
-    function validateConditionalFields() {
-        const compositor = progressData.fields.find(
-            (f) => f.id === "id_compositor"
-        );
-        const tituloUniforme = progressData.fields.find(
-            (f) => f.id === "id_titulo_uniforme_texto"
-        );
-
-        if (compositor && tituloUniforme) {
-            // Debe tener al menos uno de los dos
-            const compositorComplete = compositor.completed;
-            const tituloComplete = tituloUniforme.completed;
-
-            if (compositorComplete || tituloComplete) {
-                // Si uno está completo, ambos cuentan como satisfechos
-                compositor.satisfied = true;
-                tituloUniforme.satisfied = true;
-                return 2; // Ambos cuentan
-            } else {
-                compositor.satisfied = false;
-                tituloUniforme.satisfied = false;
-                return 0;
-            }
-        }
-
-        return 0;
-    }
-
-    /**
-     * Actualiza el progreso general
-     */
-    function updateProgress() {
-        // Validar todos los campos
-        progressData.fields.forEach((field) => validateField(field));
-
-        // Manejar campos condicionales
-        const conditionalSatisfied = validateConditionalFields();
-
-        // Calcular progreso
-        let completed = 0;
-        progressData.fields.forEach((field) => {
-            if (field.conditional) {
-                if (field.satisfied) completed++;
-            } else {
-                if (field.completed) completed++;
-            }
-        });
-
-        progressData.completed = completed;
-
-        // Actualizar UI
-        updateProgressUI();
-        updateTabIndicators();
-    }
-
-    /**
-     * Actualiza la UI del panel de progreso
-     */
-    function updateProgressUI() {
-        const percentage = Math.round(
-            (progressData.completed / progressData.total) * 100
-        );
-
-        // Actualizar círculo de progreso
-        const progressBar = document.querySelector(".progress-circle-bar");
-        const progressText = document.querySelector(".progress-text");
-        const completedCount = document.getElementById("completed-count");
-        const totalCount = document.getElementById("total-count");
-
-        if (progressBar) {
-            const circumference = 2 * Math.PI * 36;
-            const offset = circumference - (percentage / 100) * circumference;
-            progressBar.style.strokeDashoffset = offset;
-        }
-
-        if (progressText) {
-            progressText.textContent = `${percentage}%`;
-        }
-
-        if (completedCount) {
-            completedCount.textContent = progressData.completed;
-        }
-
-        if (totalCount) {
-            totalCount.textContent = progressData.total;
-        }
-
-        // Actualizar lista de campos
-        updateFieldStatusList();
-
-        // Cambiar color del panel según progreso
-        const panel = document.getElementById("progress-panel");
-        if (panel) {
-            if (percentage === 100) {
-                panel.style.background =
-                    "linear-gradient(135deg, #10b981 0%, #059669 100%)";
-            } else {
-                panel.style.background =
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
-            }
-        }
-    }
-
-    /**
-     * Actualiza la lista de estados de campos
-     */
-    function updateFieldStatusList() {
-        const list = document.getElementById("field-status-list");
-        if (!list) return;
-
-        list.innerHTML = "";
-
-        progressData.fields.forEach((field) => {
-            const isComplete = field.conditional
-                ? field.satisfied
-                : field.completed;
-            const badge = document.createElement("span");
-            badge.className = `field-badge ${
-                isComplete ? "complete" : "incomplete"
-            }`;
-            badge.textContent = field.label;
-            badge.title = isComplete ? "Completado" : "Pendiente";
-            list.appendChild(badge);
-        });
-    }
-
-    /**
-     * Actualiza indicadores en pestañas
-     */
-    function updateTabIndicators() {
-        const tabsByIndex = {};
-
-        // Agrupar campos por pestaña
-        progressData.fields.forEach((field) => {
-            if (!tabsByIndex[field.tab]) {
-                tabsByIndex[field.tab] = { total: 0, completed: 0 };
-            }
-            tabsByIndex[field.tab].total++;
-
-            const isComplete = field.conditional
-                ? field.satisfied
-                : field.completed;
-            if (isComplete) {
-                tabsByIndex[field.tab].completed++;
-            }
-        });
-
-        // Actualizar indicadores visuales
-        Object.keys(tabsByIndex).forEach((tabIndex) => {
-            const stats = tabsByIndex[tabIndex];
-            const tabButton = document.querySelector(
-                `[data-tab-index="${tabIndex}"]`
-            );
-
-            if (tabButton) {
-                const indicator = tabButton.querySelector(
-                    ".required-indicator"
-                );
-                if (indicator) {
-                    if (stats.completed === stats.total) {
-                        tabButton.classList.add("has-required-complete");
-                    } else {
-                        tabButton.classList.remove("has-required-complete");
+                    // Buscar en select2
+                    const select2Element = document.querySelector(
+                        `[name="${field.id.replace("id_", "")}"]`
+                    );
+                    if (select2Element) {
+                        $(select2Element).on("change", () =>
+                            checkField(field.id)
+                        );
                     }
                 }
             }
         });
+
+        // Listener global para detectar cambios dinámicos
+        document.addEventListener("input", debounce(updateProgress, 300));
+        document.addEventListener("change", debounce(updateProgress, 300));
     }
 
     /**
-     * Utilidad: debounce
+     * Configurar listener para campos especiales (formsets)
+     */
+    function setupSpecialFieldListener(field) {
+        if (field.id === "id_medio_interpretacion_382") {
+            // Observar cambios en el formset de medios de interpretación
+            const formsetContainer =
+                document.querySelector('[id*="medios_382"]');
+            if (formsetContainer) {
+                // Usar MutationObserver para detectar cambios dinámicos
+                const observer = new MutationObserver(() => {
+                    checkField(field.id);
+                });
+
+                observer.observe(formsetContainer, {
+                    childList: true,
+                    subtree: true,
+                });
+
+                // También escuchar eventos de input en el contenedor
+                formsetContainer.addEventListener("input", () =>
+                    checkField(field.id)
+                );
+                formsetContainer.addEventListener("change", () =>
+                    checkField(field.id)
+                );
+            }
+        }
+    }
+
+    /**
+     * Verificar si un campo está completo
+     */
+    function checkField(fieldId) {
+        const field = requiredFields.find((f) => f.id === fieldId);
+        if (!field) return false;
+
+        let isComplete = false;
+
+        if (field.special) {
+            isComplete = checkSpecialField(field);
+        } else {
+            const element = document.getElementById(fieldId);
+            if (element) {
+                isComplete = element.value && element.value.trim() !== "";
+            } else {
+                // Buscar por name en caso de select2
+                const elementByName = document.querySelector(
+                    `[name="${fieldId.replace("id_", "")}"]`
+                );
+                if (elementByName) {
+                    isComplete =
+                        elementByName.value &&
+                        elementByName.value.trim() !== "";
+                }
+            }
+        }
+
+        // Actualizar estado
+        fieldStates[fieldId].complete = isComplete;
+
+        // Actualizar UI del campo en la lista
+        updateFieldItemUI(fieldId, isComplete);
+
+        // Actualizar progreso general
+        updateProgress();
+
+        return isComplete;
+    }
+
+    /**
+     * Verificar campos especiales (como formsets)
+     */
+    function checkSpecialField(field) {
+        if (field.id === "id_medio_interpretacion_382") {
+            // Verificar si hay al menos un medio de interpretación con subcampo $a
+
+            // Buscar inputs dinámicos de subcampos $a
+            const medioInputs = document.querySelectorAll(
+                '[id^="medio_interpretacion_382_"]'
+            );
+
+            // Verificar si alguno tiene valor
+            for (let input of medioInputs) {
+                if (input.value && input.value.trim() !== "") {
+                    return true;
+                }
+            }
+
+            // También verificar en el formset estándar
+            const formsetForms = document.querySelectorAll(
+                '[id*="medios_382"] .formset-row:not(.empty-form)'
+            );
+            for (let form of formsetForms) {
+                // Verificar si no está marcado para eliminar
+                const deleteCheckbox = form.querySelector('[name*="DELETE"]');
+                if (deleteCheckbox && deleteCheckbox.checked) {
+                    continue;
+                }
+
+                // Buscar inputs de medios dentro de este form
+                const medioInputsInForm = form.querySelectorAll(
+                    '[id^="medio_interpretacion_382_"]'
+                );
+                for (let input of medioInputsInForm) {
+                    if (input.value && input.value.trim() !== "") {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Actualizar UI de un campo en la lista del sidebar
+     */
+    function updateFieldItemUI(fieldId, isComplete) {
+        const fieldItem = document.querySelector(
+            `[data-field-id="${fieldId}"]`
+        );
+        if (!fieldItem) return;
+
+        if (isComplete) {
+            fieldItem.classList.remove("incomplete");
+            fieldItem.classList.add("complete");
+        } else {
+            fieldItem.classList.remove("complete");
+            fieldItem.classList.add("incomplete");
+        }
+    }
+
+    /**
+     * Actualizar progreso general
+     */
+    function updateProgress() {
+        // Verificar todos los campos
+        requiredFields.forEach((field) => {
+            checkField(field.id);
+        });
+
+        // Calcular estadísticas
+        const completedCount = Object.values(fieldStates).filter(
+            (state) => state.complete
+        ).length;
+        const totalCount = requiredFields.length;
+        const pendingCount = totalCount - completedCount;
+        const percentage =
+            totalCount > 0
+                ? Math.round((completedCount / totalCount) * 100)
+                : 0;
+
+        // Actualizar UI
+        updateProgressUI(completedCount, pendingCount, totalCount, percentage);
+    }
+
+    /**
+     * Actualizar UI del progreso
+     */
+    function updateProgressUI(completed, pending, total, percentage) {
+        // Actualizar porcentaje circular
+        const progressPercent = document.getElementById("progress-percent");
+        if (progressPercent) {
+            progressPercent.textContent = `${percentage}%`;
+        }
+
+        // Actualizar círculo de progreso (SVG)
+        const progressCircle = document.getElementById("progress-circle");
+        if (progressCircle) {
+            const circumference = 226.19; // 2 * PI * radius (36)
+            const offset = circumference - (percentage / 100) * circumference;
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        // Actualizar estadísticas
+        const camposCompletados = document.getElementById("campos-completados");
+        const camposPendientes = document.getElementById("campos-pendientes");
+        const camposTotales = document.getElementById("campos-totales");
+
+        if (camposCompletados) camposCompletados.textContent = completed;
+        if (camposPendientes) camposPendientes.textContent = pending;
+        if (camposTotales) camposTotales.textContent = total;
+    }
+
+    /**
+     * Debounce helper
      */
     function debounce(func, wait) {
         let timeout;
@@ -530,16 +477,33 @@
         };
     }
 
-    // Inicializar cuando el DOM esté listo
+    /**
+     * API pública
+     */
+    window.RequiredFieldsTracker = {
+        init: init,
+        updateProgress: updateProgress,
+        checkField: checkField,
+        getProgress: function () {
+            const completedCount = Object.values(fieldStates).filter(
+                (state) => state.complete
+            ).length;
+            const totalCount = requiredFields.length;
+            return {
+                completed: completedCount,
+                total: totalCount,
+                percentage:
+                    totalCount > 0
+                        ? Math.round((completedCount / totalCount) * 100)
+                        : 0,
+            };
+        },
+    };
+
+    // Auto-inicializar cuando el DOM esté listo
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", init);
     } else {
         init();
     }
-
-    // Exportar para uso externo
-    window.RequiredFieldsTracker = {
-        updateProgress: updateProgress,
-        getProgress: () => progressData,
-    };
 })();

@@ -10,7 +10,7 @@
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'catalogacion:index' %}">Inicio</a></li>
         <li class="breadcrumb-item"><a href="{% url 'catalogacion:seleccionar_tipo' %}">Tipo de Obra</a></li>
         <li class="breadcrumb-item active">{{ tipo_obra_titulo }}</li>
     </ol>
@@ -18,182 +18,232 @@
 {% endblock %}
 
 {% block content %}
-<div class="tabs-container">
-    <form method="post" id="obra-form" novalidate>
-        {% csrf_token %}
+<div class="form-with-progress-sidebar" data-tipo-obra="{{ tipo_obra }}">
+    <!-- SIDEBAR DE PROGRESO -->
+    <aside class="progress-sidebar">
+        <div class="progress-sidebar-sticky">
+            <div class="progress-panel">
+                <div class="progress-panel-header">
+                    <h6>Progreso del Formulario</h6>
+                    <p class="text-muted">Campos obligatorios completados</p>
+                </div>
 
-        <!-- Campos ocultos para tipo de registro y nivel bibliográfico -->
-        <input type="hidden" name="tipo_registro" value="{{ form.tipo_registro.value|default:'' }}" id="id_tipo_registro">
-        <input type="hidden" name="nivel_bibliografico" value="{{ form.nivel_bibliografico.value|default:'' }}" id="id_nivel_bibliografico">    
+                <!-- Indicador circular -->
+                <div class="progress-circle-container">
+                    <div class="progress-circle">
+                        <svg width="80" height="80">
+                            <circle class="bg-circle" cx="40" cy="40" r="36"></circle>
+                            <circle class="progress-circle-bar" cx="40" cy="40" r="36" 
+                                    id="progress-circle"
+                                    stroke-dasharray="226.19" 
+                                    stroke-dashoffset="226.19"></circle>
+                        </svg>
+                        <div class="progress-text" id="progress-percent">0%</div>
+                    </div>
+                </div>
 
-        <!-- Header del formulario -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="bi bi-file-earmark-plus"></i>
-                    Crear {{ tipo_obra_titulo }}
-                </h5>
-                <small class="text-muted">{{ tipo_obra_descripcion }}</small>
+                <!-- Estadísticas -->
+                <div class="progress-stats">
+                    <div class="progress-stat-row">
+                        <span class="progress-stat-label">Completados</span>
+                        <span class="progress-stat-value complete" id="campos-completados">0</span>
+                    </div>
+                    <div class="progress-stat-row">
+                        <span class="progress-stat-label">Pendientes</span>
+                        <span class="progress-stat-value incomplete" id="campos-pendientes">0</span>
+                    </div>
+                    <div class="progress-stat-row">
+                        <span class="progress-stat-label">Total</span>
+                        <span class="progress-stat-value" id="campos-totales">0</span>
+                    </div>
+                </div>
+
+                <!-- Lista de campos obligatorios -->
+                <ul class="required-fields-list" id="required-fields-list">
+                    <!-- Se llena dinámicamente con JavaScript -->
+                </ul>
             </div>
         </div>
+    </aside>
 
-        <!-- Barra de progreso -->
-        <div class="progress-indicator">
-            <div class="progress-bar-custom">
-                <div class="progress-bar-fill" id="progress-bar" style="width: 11%"></div>
-            </div>
-            <small class="text-muted mt-2 d-block">Paso <span id="current-step">1</span> de 9</small>
-        </div>
+    <!-- CONTENIDO PRINCIPAL DEL FORMULARIO -->
+    <div class="form-content-area">
+        <form method="post" id="obra-form" novalidate>
+            {% csrf_token %}
 
-        <!-- Navegación de pestañas -->
-        <div class="tabs-navigation">
-            <button type="button" class="tab-button active" data-tab="tab-0xx" data-tab-index="0">
-                <i class="bi bi-hash"></i> 0XX - Control
-            </button>
-            <button type="button" class="tab-button" data-tab="tab-1xx" data-tab-index="1">
-                <i class="bi bi-person"></i> 1XX - Principal
-            </button>
-            <button type="button" class="tab-button" data-tab="tab-2xx" data-tab-index="2">
-                <i class="bi bi-bookmark"></i> 2XX - Títulos
-            </button>
-            <button type="button" class="tab-button" data-tab="tab-3xx" data-tab-index="3">
-                <i class="bi bi-file-text"></i> 3XX - Descripción
-            </button>
-            <button type="button" class="tab-button" data-tab="tab-4xx" data-tab-index="4">
-                <i class="bi bi-collection"></i> 4XX - Series
-            </button>
-            <button type="button" class="tab-button" data-tab="tab-5xx" data-tab-index="5">
-                <i class="bi bi-journal"></i> 5XX - Notas
-            </button>
-            <button type="button" class="tab-button" data-tab="tab-6xx" data-tab-index="6">
-                <i class="bi bi-tag"></i> 6XX - Materias
-            </button>
-            <button type="button" class="tab-button" data-tab="tab-7xx" data-tab-index="7">
-                <i class="bi bi-people"></i> 7XX - Secundarias
-            </button>
-            <button type="button" class="tab-button" data-tab="tab-8xx" data-tab-index="8">
-                <i class="bi bi-geo"></i> 8XX - Ubicación
-            </button>
-        </div>
+            <!-- Campos ocultos -->
+            <input type="hidden" name="tipo_registro" value="{{ form.tipo_registro.value|default:'' }}" id="id_tipo_registro">
+            <input type="hidden" name="nivel_bibliografico" value="{{ form.nivel_bibliografico.value|default:'' }}" id="id_nivel_bibliografico">
 
-        <!-- Contenido de pestañas -->
-        <div class="tabs-content">
-            <!-- Pestaña 0XX -->
-            <div id="tab-0xx" class="tab-content active">
-                {% include 'catalogacion/bloques/bloque_0xx.html' %}
-                <div class="tab-navigation-buttons">
-                    <div></div>
-                    <button type="button" class="btn btn-primary" onclick="nextTab()">
-                        Siguiente <i class="bi bi-arrow-right"></i>
-                    </button>
+            <!-- Header del formulario -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-plus"></i>
+                        Crear {{ tipo_obra_titulo }}
+                    </h5>
+                    <small class="text-muted">{{ tipo_obra_descripcion }}</small>
                 </div>
             </div>
 
-            <!-- Pestaña 1XX -->
-            <div id="tab-1xx" class="tab-content">
-                {% include 'catalogacion/bloques/bloque_1xx.html' %}
-                <div class="tab-navigation-buttons">
-                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
-                        <i class="bi bi-arrow-left"></i> Anterior
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="nextTab()">
-                        Siguiente <i class="bi bi-arrow-right"></i>
-                    </button>
+            <!-- Barra de progreso superior -->
+            <div class="progress-indicator">
+                <div class="progress-bar-custom">
+                    <div class="progress-bar-fill" id="progress-bar" style="width: 11%"></div>
                 </div>
+                <small class="text-muted mt-2 d-block">Paso <span id="current-step">1</span> de 9</small>
             </div>
 
-            <!-- Pestaña 2XX -->
-            <div id="tab-2xx" class="tab-content">
-                {% include 'catalogacion/bloques/bloque_2xx.html' %}
-                <div class="tab-navigation-buttons">
-                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
-                        <i class="bi bi-arrow-left"></i> Anterior
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="nextTab()">
-                        Siguiente <i class="bi bi-arrow-right"></i>
-                    </button>
-                </div>
+            <!-- Navegación de pestañas -->
+            <div class="tabs-navigation">
+                <button type="button" class="tab-button active" data-tab="tab-0xx" data-tab-index="0">
+                    <i class="bi bi-hash"></i> 0XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-1xx" data-tab-index="1">
+                    <i class="bi bi-person"></i> 1XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-2xx" data-tab-index="2">
+                    <i class="bi bi-bookmark"></i> 2XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-3xx" data-tab-index="3">
+                    <i class="bi bi-file-text"></i> 3XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-4xx" data-tab-index="4">
+                    <i class="bi bi-collection"></i> 4XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-5xx" data-tab-index="5">
+                    <i class="bi bi-journal"></i> 5XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-6xx" data-tab-index="6">
+                    <i class="bi bi-tag"></i> 6XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-7xx" data-tab-index="7">
+                    <i class="bi bi-people"></i> 7XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-8xx" data-tab-index="8">
+                    <i class="bi bi-geo"></i> 8XX
+                </button>
             </div>
 
-            <!-- Pestaña 3XX -->
-            <div id="tab-3xx" class="tab-content">
-                {% include 'catalogacion/bloques/bloque_3xx.html' %}
-                <div class="tab-navigation-buttons">
-                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
-                        <i class="bi bi-arrow-left"></i> Anterior
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="nextTab()">
-                        Siguiente <i class="bi bi-arrow-right"></i>
-                    </button>
+            <!-- Contenido de pestañas -->
+            <div class="tabs-content">
+                <!-- Pestaña 0XX -->
+                <div id="tab-0xx" class="tab-content active">
+                    {% include 'catalogacion/bloques/bloque_0xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <div></div>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Pestaña 4XX -->
-            <div id="tab-4xx" class="tab-content">
-                {% include 'catalogacion/bloques/bloque_4xx.html' %}
-                <div class="tab-navigation-buttons">
-                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
-                        <i class="bi bi-arrow-left"></i> Anterior
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="nextTab()">
-                        Siguiente <i class="bi bi-arrow-right"></i>
-                    </button>
+                <!-- Pestaña 1XX -->
+                <div id="tab-1xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_1xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Pestaña 5XX -->
-            <div id="tab-5xx" class="tab-content">
-                {% include 'catalogacion/bloques/bloque_5xx.html' %}
-                <div class="tab-navigation-buttons">
-                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
-                        <i class="bi bi-arrow-left"></i> Anterior
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="nextTab()">
-                        Siguiente <i class="bi bi-arrow-right"></i>
-                    </button>
+                <!-- Pestaña 2XX -->
+                <div id="tab-2xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_2xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Pestaña 6XX -->
-            <div id="tab-6xx" class="tab-content">
-                {% include 'catalogacion/bloques/bloque_6xx.html' %}
-                <div class="tab-navigation-buttons">
-                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
-                        <i class="bi bi-arrow-left"></i> Anterior
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="nextTab()">
-                        Siguiente <i class="bi bi-arrow-right"></i>
-                    </button>
+                <!-- Pestaña 3XX -->
+                <div id="tab-3xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_3xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Pestaña 7XX -->
-            <div id="tab-7xx" class="tab-content">
-                {% include 'catalogacion/bloques/bloque_7xx.html' %}
-                <div class="tab-navigation-buttons">
-                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
-                        <i class="bi bi-arrow-left"></i> Anterior
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="nextTab()">
-                        Siguiente <i class="bi bi-arrow-right"></i>
-                    </button>
+                <!-- Pestaña 4XX -->
+                <div id="tab-4xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_4xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Pestaña 8XX (última) -->
-            <div id="tab-8xx" class="tab-content">
-                {% include 'catalogacion/bloques/bloque_8xx.html' %}
-                <div class="tab-navigation-buttons">
-                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
-                        <i class="bi bi-arrow-left"></i> Anterior
-                    </button>
-                    <button type="submit" class="btn btn-success btn-lg">
-                        <i class="bi bi-check-circle-fill"></i> Registrar Obra
-                    </button>
+                <!-- Pestaña 5XX -->
+                <div id="tab-5xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_5xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 6XX -->
+                <div id="tab-6xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_6xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 7XX -->
+                <div id="tab-7xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_7xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 8XX (última) -->
+                <div id="tab-8xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_8xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle-fill"></i> Registrar Obra
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 <!-- Modal de ayuda MARC21 -->
@@ -202,6 +252,9 @@
 
 {% block extra_js %}
 <script>
+// Pasar tipo de obra al JavaScript
+window.TIPO_OBRA_ACTUAL = '{{ tipo_obra }}';
+
 // Sistema de pestañas
 const tabs = ['tab-0xx', 'tab-1xx', 'tab-2xx', 'tab-3xx', 'tab-4xx', 'tab-5xx', 'tab-6xx', 'tab-7xx', 'tab-8xx'];
 let currentTabIndex = 0;

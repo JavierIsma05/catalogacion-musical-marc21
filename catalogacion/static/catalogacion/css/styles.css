@@ -1,42 +1,46 @@
 :root {
-    /* Paleta Minimalista Moderna */
-    --primary: #2C3E50;
-    --primary-light: #34495E;
-    --accent: #3498DB;
-    --accent-light: #5DADE2;
+    /* Paleta Minimalista Ultra Refinada */
+    --primary: #1a1a1a;
+    --primary-light: #2d2d2d;
+    --accent: #4a5568;
+    --accent-light: #718096;
     
-    /* Grises refinados */
-    --gray-50: #FAFBFC;
-    --gray-100: #F7F9FA;
-    --gray-200: #EDF2F7;
-    --gray-300: #E2E8F0;
-    --gray-400: #CBD5E0;
-    --gray-500: #A0AEC0;
-    --gray-600: #718096;
-    --gray-700: #4A5568;
-    --gray-800: #2D3748;
+    /* Grises sutiles */
+    --gray-50: #fafafa;
+    --gray-100: #f5f5f5;
+    --gray-200: #eeeeee;
+    --gray-300: #e0e0e0;
+    --gray-400: #bdbdbd;
+    --gray-500: #9e9e9e;
+    --gray-600: #757575;
+    --gray-700: #616161;
+    --gray-800: #424242;
     
-    /* Estados */
-    --success: #27AE60;
-    --warning: #F39C12;
-    --danger: #E74C3C;
+    /* Estados sutiles */
+    --success: #4caf50;
+    --success-light: #e8f5e9;
+    --warning: #ff9800;
+    --warning-light: #fff3e0;
+    --danger: #f44336;
+    --danger-light: #ffebee;
+    --info: #2196f3;
+    --info-light: #e3f2fd;
     
     /* Textos */
-    --text-primary: #2D3748;
-    --text-secondary: #718096;
-    --text-light: #A0AEC0;
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --text-light: #9e9e9e;
     
     /* Líneas y bordes */
-    --border-color: #E2E8F0;
-    --border-focus: #3498DB;
-    --border-error: #E74C3C;
+    --border-color: #e0e0e0;
+    --border-focus: #4a5568;
     
-    /* Espaciados */
+    /* Espaciados reducidos */
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
+    --spacing-md: 0.75rem;
+    --spacing-lg: 1rem;
+    --spacing-xl: 1.5rem;
     
     /* Transiciones */
     --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -55,8 +59,8 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: var(--text-primary);
     background: var(--gray-50);
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -66,10 +70,10 @@ body {
    ============================================ */
 .page-container-sidebar {
     display: flex;
-    gap: 2rem;
-    max-width: 1600px; /* Aumentado para más espacio */
+    gap: 1.5rem;
+    max-width: 1600px;
     margin: 0 auto;
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1rem;
 }
 
 .form-main-content {
@@ -84,29 +88,29 @@ body {
 .sidebar-navigation {
     width: 240px;
     position: sticky;
-    top: 80px;
+    top: 70px;
     align-self: flex-start;
-    max-height: calc(100vh - 100px);
+    max-height: calc(100vh - 90px);
     overflow-y: auto;
     flex-shrink: 0;
 }
 
 .sidebar-navigation .card {
-    border: none;
+    border: 1px solid var(--border-color);
     background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    border-radius: 4px;
 }
 
 .sidebar-navigation .card-header {
     background: white;
     border: none;
-    padding: 1rem 1.25rem;
+    padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--border-color);
 }
 
 .sidebar-navigation .card-header h6 {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -117,10 +121,10 @@ body {
 .nav-pills-vertical .nav-link {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
     margin: 0.125rem 0;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: var(--text-secondary);
     font-weight: 500;
     border-radius: 0;
@@ -143,8 +147,8 @@ body {
 }
 
 .nav-pills-vertical .nav-link i {
-    font-size: 1rem;
-    width: 20px;
+    font-size: 0.875rem;
+    width: 16px;
     opacity: 0.7;
 }
 
@@ -156,22 +160,22 @@ body {
    CARDS MINIMALISTAS
    ============================================ */
 .card {
-    border: none;
+    border: 1px solid var(--border-color);
     background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    margin-bottom: 1.5rem;
-    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    margin-bottom: 1rem;
+    border-radius: 4px;
     overflow: visible;
 }
 
 .card-header {
     background: white;
-    border-bottom: 2px solid var(--gray-200);
-    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.875rem 1rem;
 }
 
 .card-header h5 {
-    font-size: 1.125rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
@@ -181,35 +185,33 @@ body {
 }
 
 .card-header i {
-    font-size: 1.25rem;
+    font-size: 1rem;
     color: var(--accent);
 }
 
 .card-body {
-    padding: 2rem 1.5rem;
+    padding: 1.25rem 1rem;
 }
 
 /* ============================================
    BLOQUES DE CAMPOS - GRID SYSTEM
    ============================================ */
 .bloque-section {
-    scroll-margin-top: 100px;
+    scroll-margin-top: 80px;
 }
 
 .campo-marc {
-    margin-bottom: 1.75rem;
-    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    padding: 0.875rem;
     background: white;
-    border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid var(--gray-200);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     transition: var(--transition);
 }
 
 .campo-marc:hover {
-    border-color: var(--accent-light);
-    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.08);
-    transform: translateY(-1px);
+    border-color: var(--gray-300);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .campo-marc:last-child {
@@ -220,34 +222,29 @@ body {
 .campo-titulo {
     display: flex;
     align-items: center;
-    gap: 0.625rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.625rem;
-    border-bottom: 2px solid var(--gray-200);
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .badge-marc {
     font-family: 'Courier New', monospace;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     font-weight: 700;
-    padding: 0.3rem 0.625rem;
-    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    padding: 0.25rem 0.5rem;
+    background: var(--gray-800);
     color: white;
-    border-radius: 5px;
-    letter-spacing: 0.05em;
-    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
+    border-radius: 3px;
+    letter-spacing: 0.03em;
 }
 
 .campo-titulo h6 {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
     flex: 1;
-}
-
-.badge-repetible {
-    display: none;
 }
 
 /* ============================================
@@ -256,7 +253,7 @@ body {
 .campo-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    gap: 0.875rem;
+    gap: 0.75rem;
     margin-bottom: 0;
 }
 
@@ -268,19 +265,18 @@ body {
 .col-quarter { grid-column: span 3; }
 .col-three-quarters { grid-column: span 9; }
 
-/* Sistema de filas tradicional mejorado */
+/* Sistema de filas */
 .campo-row {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    gap: 0.875rem;
-    margin-bottom: 0.875rem;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
 .campo-row:last-child {
     margin-bottom: 0;
 }
 
-/* Clases para el sistema tradicional de Bootstrap adaptado a Grid */
 .campo-row .col-12 { grid-column: span 12; }
 .campo-row .col-6 { grid-column: span 6; }
 .campo-row .col-4 { grid-column: span 4; }
@@ -289,26 +285,25 @@ body {
 .campo-row .col-9 { grid-column: span 9; }
 
 /* ============================================
-   INPUTS MEJORADOS - MÁS VISIBLE
+   INPUTS COMPACTOS Y ELEGANTES
    ============================================ */
 .form-control,
 .form-select {
-    border: 2px solid var(--gray-300);
-    border-radius: 6px;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8125rem;
     color: var(--text-primary);
     background: white;
     transition: var(--transition);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     width: 100%;
     line-height: 1.4;
+    height: 32px;
 }
 
 .form-control:hover,
 .form-select:hover {
     border-color: var(--gray-400);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .form-control:focus,
@@ -316,48 +311,46 @@ body {
     border-color: var(--accent);
     background: white;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    box-shadow: 0 0 0 2px rgba(74, 85, 104, 0.1);
 }
 
 .form-control::placeholder {
     color: var(--text-light);
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 }
 
-/* Select específico */
 .form-select {
-    padding-right: 2.25rem;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23718096' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 10px;
+    background-position: right 0.625rem center;
+    background-size: 8px;
     cursor: pointer;
 }
 
-/* Textarea específico */
 textarea.form-control {
-    min-height: 80px;
+    min-height: 70px;
     resize: vertical;
+    height: auto;
 }
 
 /* ============================================
    LABELS COMPACTOS
    ============================================ */
 .form-label {
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     font-weight: 600;
     color: var(--text-secondary);
-    margin-bottom: 0.375rem;
+    margin-bottom: 0.3rem;
     display: block;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
 }
 
 .form-label.small {
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
 }
 
-/* Label con campo requerido */
 .campo-requerido::after,
 .form-label .text-danger {
     color: var(--danger);
@@ -366,12 +359,11 @@ textarea.form-control {
     margin-left: 0.25rem;
 }
 
-/* Texto de ayuda */
 .form-text {
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     color: var(--text-secondary);
     margin-top: 0.25rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     display: block;
 }
 
@@ -379,18 +371,18 @@ textarea.form-control {
    FORMSETS COMPACTOS
    ============================================ */
 .formset-container {
-    margin-top: 0.75rem;
+    margin-top: 0.625rem;
 }
 
 .formset-row {
     position: relative;
     background: var(--gray-50);
-    border: 1.5px solid var(--gray-200);
-    border-left: 3px solid var(--accent-light);
-    border-radius: 6px;
-    padding: 1rem;
-    padding-right: 50px;
-    margin-bottom: 0.875rem;
+    border: 1px solid var(--border-color);
+    border-left: 2px solid var(--gray-400);
+    border-radius: 3px;
+    padding: 0.75rem;
+    padding-right: 45px;
+    margin-bottom: 0.75rem;
     transition: var(--transition);
 }
 
@@ -398,40 +390,36 @@ textarea.form-control {
     background: white;
     border-color: var(--gray-300);
     border-left-color: var(--accent);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-    transform: translateX(2px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .formset-row.empty-form {
     display: none !important;
 }
 
-/* Contenido del formset en grid */
 .formset-row .campo-grid,
 .formset-row .campo-row {
-    gap: 0.75rem;
+    gap: 0.625rem;
 }
 
-/* Botón eliminar */
 .delete-row-btn {
     position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    width: 28px;
-    height: 28px;
+    top: 0.625rem;
+    right: 0.625rem;
+    width: 24px;
+    height: 24px;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1.5px solid var(--gray-300);
+    border: 1px solid var(--gray-300);
     background: white;
     color: var(--text-secondary);
-    border-radius: 5px;
-    font-size: 0.75rem;
+    border-radius: 3px;
+    font-size: 0.6875rem;
     transition: var(--transition);
-    opacity: 0.8;
+    opacity: 0.7;
     z-index: 10;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     cursor: pointer;
 }
 
@@ -440,21 +428,13 @@ textarea.form-control {
     color: white;
     border-color: var(--danger);
     opacity: 1;
-    transform: scale(1.08);
-    box-shadow: 0 2px 6px rgba(231, 76, 60, 0.25);
+    transform: scale(1.05);
 }
 
-/* Formset marcado para eliminar */
 .formset-row[data-marked-delete="true"] {
     opacity: 0.5;
     background: var(--gray-100);
     border-style: dashed;
-}
-
-.formset-row[data-marked-delete="true"] .delete-row-btn {
-    background: var(--warning);
-    color: white;
-    opacity: 1;
 }
 
 /* ============================================
@@ -464,70 +444,68 @@ textarea.form-control {
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    padding: 0.4rem 0.875rem;
-    font-size: 0.8125rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    color: var(--success);
-    background: transparent;
-    border: 1.5px solid var(--success);
-    border-radius: 5px;
+    color: var(--text-secondary);
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
     transition: var(--transition);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.625rem;
     cursor: pointer;
 }
 
 .add-form-row:hover {
-    background: var(--success);
+    background: var(--gray-800);
     color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(39, 174, 96, 0.2);
+    border-color: var(--gray-800);
 }
 
 .add-form-row i {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
 }
 
 /* ============================================
    BOTONES DE ACCIÓN - COMPACTOS
    ============================================ */
 .btn {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 500;
-    padding: 0.5rem 1.125rem;
-    border-radius: 5px;
+    padding: 0.4rem 1rem;
+    border-radius: 3px;
     transition: var(--transition);
     border: none;
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
     cursor: pointer;
+    height: 32px;
 }
 
 .btn-primary {
-    background: var(--accent);
+    background: var(--gray-800);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #2980B9;
-    transform: translateY(-1px);
-    box-shadow: 0 3px 6px rgba(52, 152, 219, 0.2);
+    background: var(--primary);
 }
 
 .btn-outline-primary {
     background: transparent;
-    border: 1.5px solid var(--accent);
-    color: var(--accent);
+    border: 1px solid var(--gray-800);
+    color: var(--gray-800);
 }
 
 .btn-outline-primary:hover {
-    background: var(--accent);
+    background: var(--gray-800);
     color: white;
 }
 
 .btn-outline-secondary {
     background: transparent;
-    border: 1.5px solid var(--gray-400);
+    border: 1px solid var(--gray-400);
     color: var(--text-secondary);
 }
 
@@ -545,62 +523,54 @@ textarea.form-control {
     bottom: 0;
     z-index: 100;
     background: white;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-    margin: 2rem -1.5rem -2rem;
-    padding: 1.25rem 1.5rem;
-    border-top: 2px solid var(--gray-200);
+    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+    margin: 1.5rem -1rem -1.25rem;
+    padding: 1rem 1rem;
+    border-top: 1px solid var(--border-color);
 }
 
 /* ============================================
    BADGES Y ETIQUETAS
    ============================================ */
 .badge {
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     font-weight: 600;
-    padding: 0.35rem 0.7rem;
-    border-radius: 6px;
-}
-
-.badge.bg-primary {
-    background: var(--accent) !important;
-}
-
-.badge.bg-secondary {
-    background: var(--gray-400) !important;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
 }
 
 /* ============================================
    ALERTAS Y MENSAJES
    ============================================ */
 .alert {
-    border: none;
-    border-left: 4px solid;
-    border-radius: 8px;
-    padding: 1.25rem 1.5rem;
-    font-size: 0.9375rem;
-    margin-bottom: 1.5rem;
+    border: 1px solid;
+    border-left-width: 3px;
+    border-radius: 3px;
+    padding: 0.875rem 1rem;
+    font-size: 0.8125rem;
+    margin-bottom: 1rem;
 }
 
 .alert-info {
-    background: #EBF5FB;
-    border-color: var(--accent);
+    background: var(--info-light);
+    border-color: var(--info);
     color: var(--text-primary);
 }
 
 .alert-success {
-    background: #E8F8F5;
+    background: var(--success-light);
     border-color: var(--success);
     color: var(--text-primary);
 }
 
 .alert-warning {
-    background: #FEF5E7;
+    background: var(--warning-light);
     border-color: var(--warning);
     color: var(--text-primary);
 }
 
 .alert-danger {
-    background: #FADBD8;
+    background: var(--danger-light);
     border-color: var(--danger);
     color: var(--text-primary);
 }
@@ -619,9 +589,9 @@ textarea.form-control {
 }
 
 .invalid-feedback {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     color: var(--danger);
-    margin-top: 0.5rem;
+    margin-top: 0.375rem;
     display: block;
 }
 
@@ -630,11 +600,11 @@ textarea.form-control {
    ============================================ */
 .text-muted {
     color: var(--text-secondary) !important;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
 }
 
 .small {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
 }
 
 /* ============================================
@@ -643,8 +613,8 @@ textarea.form-control {
 .breadcrumb {
     background: transparent;
     padding: 0;
-    margin-bottom: 1.5rem;
-    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    font-size: 0.8125rem;
 }
 
 .breadcrumb-item {
@@ -659,7 +629,7 @@ textarea.form-control {
 .breadcrumb-item + .breadcrumb-item::before {
     content: "›";
     color: var(--text-light);
-    font-size: 1.25rem;
+    font-size: 1.125rem;
 }
 
 .breadcrumb-item a {
@@ -673,281 +643,19 @@ textarea.form-control {
 }
 
 /* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
-@media (max-width: 1200px) {
-    .col-quarter { grid-column: span 4; }
-    .col-third { grid-column: span 6; }
-}
-
-@media (max-width: 992px) {
-    .page-container-sidebar {
-        flex-direction: column;
-    }
-    
-    .sidebar-navigation {
-        position: static;
-        width: 100%;
-        max-height: none;
-        margin-bottom: 2rem;
-    }
-    
-    .col-half { grid-column: span 12; }
-    .col-third { grid-column: span 12; }
-    .col-two-thirds { grid-column: span 12; }
-    .campo-row .col-6 { grid-column: span 12; }
-    .campo-row .col-4 { grid-column: span 12; }
-}
-
-@media (max-width: 768px) {
-    .card-body {
-        padding: 1.5rem 1rem;
-    }
-    
-    .formset-row {
-        padding: 1.25rem;
-        padding-right: 55px;
-    }
-    
-    .delete-row-btn {
-        width: 36px;
-        height: 36px;
-        top: 1rem;
-        right: 1rem;
-    }
-    
-    .col-full,
-    .col-half,
-    .col-third,
-    .col-quarter,
-    .col-two-thirds,
-    .col-three-quarters {
-        grid-column: span 12;
-    }
-}
-
-/* ============================================
-   ANIMACIONES
-   ============================================ */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.formset-row {
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* ============================================
-   SCROLLBAR PERSONALIZADA
-   ============================================ */
-.sidebar-navigation::-webkit-scrollbar {
-    width: 6px;
-}
-
-.sidebar-navigation::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.sidebar-navigation::-webkit-scrollbar-thumb {
-    background: var(--gray-300);
-    border-radius: 6px;
-}
-
-.sidebar-navigation::-webkit-scrollbar-thumb:hover {
-    background: var(--gray-400);
-}
-
-/* ============================================
-   SUBCAMPOS ANIDADOS (Campo 041, etc.)
-   ============================================ */
-.subcampo-container {
-    background: var(--gray-100);
-    border-radius: 8px;
-    border-left: 3px solid var(--accent);
-    padding: 1rem;
-}
-
-.subcampo-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 0.75rem;
-}
-
-.idiomas-list {
-    margin-bottom: 0.75rem;
-}
-
-.idioma-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    background: white;
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-}
-
-.idiomas-formset {
-    border-top: 1px solid var(--border-color);
-    padding-top: 0.75rem;
-}
-
-.idioma-form-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 0.5rem;
-    align-items: end;
-    margin-bottom: 0.5rem;
-}
-
-.idioma-form-row.idioma-template {
-    display: none;
-}
-
-.idioma-form-row .col-half {
-    display: flex;
-    flex-direction: column;
-}
-
-.idioma-form-row .col-auto {
-    display: flex;
-    align-items: center;
-    padding-bottom: 0;
-}
-
-.delete-idioma-btn {
-    height: 38px;
-    min-height: 38px;
-    padding: 0 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0;
-}
-
-.idioma-form-content {
-    flex: 1;
-}
-
-.add-idioma-btn.w-100 {
-    margin-top: 1.85rem;
-}
-
-.add-idioma-btn {
-    font-size: 0.875rem;
-    padding: 0.375rem 0.75rem;
-}
-
-/* ============================================
-   AUTOCOMPLETE EDITABLE
-   ============================================ */
-.autocomplete-suggestions {
-    position: absolute;
-    z-index: 1000;
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    max-height: 300px;
-    overflow-y: auto;
-    width: 100%;
-    display: none;
-    margin-top: 2px;
-}
-
-.autocomplete-suggestions.show {
-    display: block;
-}
-
-.autocomplete-item {
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    border-bottom: 1px solid var(--gray-200);
-    transition: background-color 0.15s ease;
-}
-
-.autocomplete-item:last-child {
-    border-bottom: none;
-}
-
-.autocomplete-item:hover,
-.autocomplete-item.selected {
-    background-color: var(--gray-100);
-}
-
-.autocomplete-item-main {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.autocomplete-item-main i {
-    font-size: 1rem;
-    color: var(--primary);
-}
-
-.autocomplete-item-new {
-    background-color: var(--gray-50);
-    border-top: 2px solid var(--primary);
-}
-
-.autocomplete-item-new:hover {
-    background-color: var(--accent-light);
-    color: white;
-}
-
-.autocomplete-item-new i {
-    color: var(--accent);
-}
-
-/* Posicionamiento relativo para el contenedor del input */
-.campo-grid > div:has(#compositor-suggestions) {
-    position: relative;
-}
-
-/* ============================================
-   PRINT STYLES
-   ============================================ */
-@media print {
-    .sidebar-navigation,
-    .sticky-bottom,
-    .add-form-row,
-    .delete-row-btn {
-        display: none !important;
-    }
-    
-    .card {
-        box-shadow: none;
-        border: 1px solid var(--gray-300);
-    }
-}
-
-/* ============================================
    SISTEMA DE PESTAÑAS (TABS)
    ============================================ */
 .tabs-container {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1rem;
 }
 
 .tabs-navigation {
     display: flex;
     gap: 0.25rem;
-    margin-bottom: 2rem;
-    border-bottom: 2px solid var(--gray-200);
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
     overflow-x: auto;
     padding-bottom: 0;
     scrollbar-width: thin;
@@ -955,7 +663,7 @@ textarea.form-control {
 }
 
 .tabs-navigation::-webkit-scrollbar {
-    height: 6px;
+    height: 4px;
 }
 
 .tabs-navigation::-webkit-scrollbar-track {
@@ -964,19 +672,19 @@ textarea.form-control {
 
 .tabs-navigation::-webkit-scrollbar-thumb {
     background: var(--gray-400);
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 .tab-button {
-    padding: 0.875rem 1.5rem;
+    padding: 0.625rem 1rem;
     border: none;
     background: transparent;
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.8125rem;
     font-weight: 500;
     cursor: pointer;
     transition: var(--transition);
-    border-bottom: 3px solid transparent;
+    border-bottom: 2px solid transparent;
     white-space: nowrap;
     display: flex;
     align-items: center;
@@ -986,7 +694,7 @@ textarea.form-control {
 }
 
 .tab-button i {
-    font-size: 1rem;
+    font-size: 0.875rem;
 }
 
 .tab-button:hover {
@@ -995,21 +703,10 @@ textarea.form-control {
 }
 
 .tab-button.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
+    color: var(--gray-800);
+    border-bottom-color: var(--gray-800);
     background: var(--gray-50);
     font-weight: 600;
-}
-
-.tab-button:focus {
-    outline: 2px solid var(--accent);
-    outline-offset: -2px;
-}
-
-/* Contenido de pestañas */
-.tabs-content {
-    position: relative;
-    min-height: 400px;
 }
 
 .tab-content {
@@ -1037,70 +734,89 @@ textarea.form-control {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
     border-top: 1px solid var(--border-color);
-}
-
-.tab-navigation-buttons .btn-group {
-    display: flex;
-    gap: 0.5rem;
 }
 
 /* Barra de progreso */
 .progress-indicator {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .progress-bar-custom {
-    height: 4px;
+    height: 3px;
     background: var(--gray-200);
     border-radius: 2px;
     overflow: hidden;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.375rem;
 }
 
 .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    background: var(--gray-800);
     transition: width 0.3s ease;
     border-radius: 2px;
 }
 
-/* Responsive: pestañas en móvil */
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1200px) {
+    .col-quarter { grid-column: span 4; }
+    .col-third { grid-column: span 6; }
+}
+
+@media (max-width: 992px) {
+    .page-container-sidebar {
+        flex-direction: column;
+    }
+    
+    .sidebar-navigation {
+        position: static;
+        width: 100%;
+        max-height: none;
+        margin-bottom: 1.5rem;
+    }
+    
+    .col-half { grid-column: span 12; }
+    .col-third { grid-column: span 12; }
+    .col-two-thirds { grid-column: span 12; }
+    .campo-row .col-6 { grid-column: span 12; }
+    .campo-row .col-4 { grid-column: span 12; }
+}
+
 @media (max-width: 768px) {
-    .tabs-navigation {
-        gap: 0;
+    body {
+        font-size: 12px;
+    }
+    
+    .card-body {
+        padding: 1rem 0.75rem;
     }
     
     .tab-button {
-        padding: 0.75rem 1rem;
-        font-size: 0.85rem;
-    }
-    
-    .tab-button i {
-        display: none;
-    }
-    
-    .tab-navigation-buttons {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .tab-navigation-buttons > * {
-        width: 100%;
-    }
-    
-    .tab-navigation-buttons .btn-group {
-        width: 100%;
-    }
-    
-    .tab-navigation-buttons .btn {
-        flex: 1;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
     }
 }
 
-/* Ajuste para que los bloques no tengan el scroll-margin */
-.bloque-section {
-    scroll-margin-top: 0;
+/* ============================================
+   SCROLLBAR PERSONALIZADA
+   ============================================ */
+.sidebar-navigation::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar-navigation::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-navigation::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 3px;
+}
+
+.sidebar-navigation::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
 }
