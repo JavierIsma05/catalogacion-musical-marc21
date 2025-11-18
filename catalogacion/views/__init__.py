@@ -5,8 +5,8 @@ Exportación centralizada de views
 # Views base
 from .base import IndexView
 
-# Views de obras
-from .obras import (
+# Views de obras (refactorizadas)
+from .obra_views import (
     SeleccionarTipoObraView,
     CrearObraView,
     EditarObraView,

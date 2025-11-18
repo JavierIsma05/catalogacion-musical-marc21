@@ -1,0 +1,253 @@
+"""
+Mixins para vistas de obras MARC21.
+Contiene funcionalidad compartida entre CrearObraView y EditarObraView.
+"""
+from django.contrib import messages
+from django.db import transaction
+
+from catalogacion.models.autoridades import AutoridadPersona
+from catalogacion.forms.formsets import (
+    # Bloque 0XX
+    IncipitMusicalFormSet, CodigoLenguaFormSet, CodigoPaisEntidadFormSet,
+    # Bloque 1XX  
+    FuncionCompositorFormSet,
+    # Bloque 2XX
+    TituloAlternativoFormSet, EdicionFormSet, ProduccionPublicacionFormSet,
+    # Bloque 3XX
+    MedioInterpretacion382_aFormSet,
+    # Bloque 4XX
+    MencionSerie490FormSet,
+    # Bloque 5XX
+    NotaGeneral500FormSet, Contenido505FormSet, Sumario520FormSet, DatosBiograficos545FormSet,
+    # Bloque 6XX
+    Materia650FormSet, MateriaGenero655FormSet,
+    # Bloque 7XX
+    NombreRelacionado700FormSet, EntidadRelacionada710FormSet,
+    EnlaceDocumentoFuente773FormSet, NumeroObraRelacionada773FormSet,
+    EnlaceUnidadConstituyente774FormSet, NumeroObraRelacionada774FormSet,
+    OtrasRelaciones787FormSet,
+    # Bloque 8XX
+    Ubicacion852FormSet,
+    Disponible856FormSet,
+)
+from catalogacion.views.obra_formset_handlers import SUBCAMPO_HANDLERS
+
+
+class ObraFormsetMixin:
+    """
+    Mixin que proporciona funcionalidad de formsets para vistas de obras.
+    Maneja la inicialización y guardado de todos los formsets MARC21.
+    """
+    
+    def _get_formsets_kwargs(self, instance=None, with_post=False):
+        """
+        Obtener kwargs comunes para todos los formsets.
+        
+        Args:
+            instance: Instancia de ObraGeneral (None para crear, self.object para editar)
+            with_post: Si True, incluye request.POST en kwargs
+        
+        Returns:
+            dict: kwargs base para formsets
+        """
+        kwargs = {}
+        if with_post:
+            kwargs['data'] = self.request.POST
+        if instance:
+            kwargs['instance'] = instance
+        return kwargs
+    
+    def _get_formsets(self, instance=None, with_post=False):
+        """
+        Obtener todos los formsets configurados.
+        
+        Args:
+            instance: Instancia de ObraGeneral (None para crear, self.object para editar)
+            with_post: Si True, incluye datos POST
+        
+        Returns:
+            dict: Diccionario con todos los formsets configurados
+        """
+        kwargs = self._get_formsets_kwargs(instance, with_post)
+        
+        # Para formsets sin instancia (crear), pasamos instance=None explícitamente
+        ubicacion_kwargs = kwargs.copy()
+        disponible_kwargs = kwargs.copy()
+        
+        if not instance:
+            ubicacion_kwargs['instance'] = None
+            disponible_kwargs['instance'] = None
+        
+        return {
+            # Bloque 0XX - Números de control e información codificada
+            'incipits_musicales': IncipitMusicalFormSet(prefix='incipits', **kwargs),
+            'codigos_lengua': CodigoLenguaFormSet(prefix='lenguas', **kwargs),
+            'codigos_pais': CodigoPaisEntidadFormSet(prefix='paises', **kwargs),
+            
+            # Bloque 1XX - Encabezamiento principal
+            'funciones_compositor': FuncionCompositorFormSet(prefix='funciones', **kwargs),
+            
+            # Bloque 2XX - Títulos y menciones de edición/publicación
+            'titulos_alternativos': TituloAlternativoFormSet(prefix='titulos_alt', **kwargs),
+            'ediciones': EdicionFormSet(prefix='ediciones', **kwargs),
+            'produccion_publicacion': ProduccionPublicacionFormSet(prefix='produccion', **kwargs),
+            
+            # Bloque 3XX - Descripción física
+            'medios_interpretacion': MedioInterpretacion382_aFormSet(prefix='medios_382', **kwargs),
+            
+            # Bloque 4XX - Mención de serie
+            'menciones_serie_490': MencionSerie490FormSet(prefix='menciones_490', **kwargs),
+            
+            # Bloque 5XX - Notas
+            'notas_generales': NotaGeneral500FormSet(prefix='notas_500', **kwargs),
+            'contenidos': Contenido505FormSet(prefix='contenidos_505', **kwargs),
+            'sumarios': Sumario520FormSet(prefix='sumarios_520', **kwargs),
+            'datos_biograficos': DatosBiograficos545FormSet(prefix='biograficos_545', **kwargs),
+            
+            # Bloque 6XX - Encabezamientos de materia
+            'materias_650': Materia650FormSet(prefix='materias_650', **kwargs),
+            'materias_genero_655': MateriaGenero655FormSet(prefix='generos_655', **kwargs),
+            
+            # Bloque 7XX - Asientos secundarios
+            'nombres_relacionados_700': NombreRelacionado700FormSet(prefix='nombres_700', **kwargs),
+            'entidades_relacionadas_710': EntidadRelacionada710FormSet(prefix='entidades_710', **kwargs),
+            'enlaces_documento_fuente_773': EnlaceDocumentoFuente773FormSet(prefix='enlaces_773', **kwargs),
+            'enlaces_unidad_constituyente_774': EnlaceUnidadConstituyente774FormSet(prefix='enlaces_774', **kwargs),
+            'otras_relaciones_787': OtrasRelaciones787FormSet(prefix='relaciones_787', **kwargs),
+            
+            # Bloque 8XX - Números y códigos alternativos
+            'ubicaciones_852': Ubicacion852FormSet(prefix='ubicaciones_852', **ubicacion_kwargs),
+            'disponibles_856': Disponible856FormSet(prefix='disponibles_856', **disponible_kwargs),
+        }
+    
+    def _get_formset_names(self):
+        """
+        Obtener lista de nombres de formsets.
+        
+        Returns:
+            list: Lista de nombres de formsets
+        """
+        return [
+            'incipits_musicales', 'codigos_lengua', 'codigos_pais',
+            'funciones_compositor', 'titulos_alternativos', 'ediciones',
+            'produccion_publicacion', 'medios_interpretacion',
+            'menciones_serie_490', 'notas_generales', 'contenidos',
+            'sumarios', 'datos_biograficos', 'materias_650',
+            'materias_genero_655', 'nombres_relacionados_700',
+            'entidades_relacionadas_710', 'enlaces_documento_fuente_773',
+            'enlaces_unidad_constituyente_774', 'otras_relaciones_787',
+            'ubicaciones_852', 'disponibles_856',
+        ]
+    
+    def _validar_formsets(self, context):
+        """
+        Validar todos los formsets en el contexto.
+        
+        Args:
+            context: Contexto con formsets
+        
+        Returns:
+            tuple: (formsets_validos: bool, formsets: dict)
+        """
+        formsets_validos = True
+        formsets = {}
+        
+        for key in self._get_formset_names():
+            formset = context.get(key)
+            if formset:
+                formsets[key] = formset
+                if not formset.is_valid():
+                    formsets_validos = False
+        
+        return formsets_validos, formsets
+    
+    def _manejar_compositor(self, form):
+        """
+        Manejar la creación/asignación del compositor.
+        Crea una nueva autoridad si no existe.
+        
+        Args:
+            form: Formulario de ObraGeneral
+        """
+        compositor_display = self.request.POST.get('compositor_display', '').strip()
+        if compositor_display and not form.instance.compositor_id:
+            # Crear nuevo compositor
+            compositor, created = AutoridadPersona.objects.get_or_create(
+                apellidos_nombres=compositor_display,
+                defaults={'fechas': ''}
+            )
+            form.instance.compositor = compositor
+            
+            if created:
+                messages.info(
+                    self.request,
+                    f'Se creó el compositor: {compositor_display}'
+                )
+    
+    def _guardar_formsets(self, formsets, instance):
+        """
+        Guardar todos los formsets y procesar subcampos dinámicos.
+        
+        Args:
+            formsets: Diccionario con formsets validados
+            instance: Instancia de ObraGeneral guardada
+        """
+        # Mapeo de claves de formset a sus handlers de subcampos
+        formset_subcampo_mapping = {
+            'menciones_serie_490': ['_save_titulos_490', '_save_volumenes_490'],
+            'enlaces_documento_fuente_773': ['_save_numeros_obra_773'],
+            'enlaces_unidad_constituyente_774': ['_save_numeros_obra_774'],
+            'otras_relaciones_787': ['_save_numeros_obra_787'],
+            'ubicaciones_852': ['_save_estanterias_852'],
+            'disponibles_856': ['_save_urls_856', '_save_textos_enlace_856'],
+            'datos_biograficos': ['_save_textos_biograficos_545', '_save_uris_545'],
+            'materias_650': ['_save_subdivisiones_650'],
+            'materias_genero_655': ['_save_subdivisiones_655'],
+        }
+        
+        for key, formset in formsets.items():
+            formset.instance = instance
+            formset.save()
+            
+            # Procesar subcampos dinámicos si el formset los tiene
+            if key in formset_subcampo_mapping:
+                for handler_name in formset_subcampo_mapping[key]:
+                    handler = SUBCAMPO_HANDLERS[handler_name]
+                    handler(self.request.POST, formset)
+
+
+class ObraSuccessMessageMixin:
+    """
+    Mixin para manejar mensajes de éxito en operaciones de obras.
+    """
+    
+    def _get_success_message(self, action='publish'):
+        """
+        Obtener mensaje de éxito según la acción.
+        
+        Args:
+            action: Acción realizada ('publish', 'draft', 'update')
+        
+        Returns:
+            str: Mensaje de éxito
+        """
+        config = getattr(self, 'config_obra', {})
+        titulo_tipo = config.get('titulo', 'Obra')
+        
+        mensajes = {
+            'draft': f'Borrador de {titulo_tipo} guardado exitosamente.',
+            'publish': f'{titulo_tipo} creada exitosamente.',
+            'update': f'{titulo_tipo} actualizada exitosamente.',
+        }
+        
+        return mensajes.get(action, 'Operación exitosa.')
+    
+    def _mostrar_mensaje_exito(self, action='publish'):
+        """
+        Mostrar mensaje de éxito.
+        
+        Args:
+            action: Acción realizada
+        """
+        mensaje = self._get_success_message(action)
+        messages.success(self.request, mensaje)
