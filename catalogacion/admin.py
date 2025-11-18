@@ -205,7 +205,7 @@ class Sumario520Inline(admin.TabularInline):
 class DatosBiograficos545Inline(admin.TabularInline):
     model = DatosBiograficos545
     extra = 0
-    fields = ['datos_biograficos', 'url']
+    fields = []
     verbose_name = "Datos Biográficos (545)"
     verbose_name_plural = "👤 Datos Biográficos (545 - R)"
 
@@ -265,7 +265,7 @@ class Funcion700Inline(admin.TabularInline):
 class NombreRelacionado700Inline(admin.StackedInline):
     model = NombreRelacionado700
     extra = 0
-    fields = ['persona', 'fechas', 'titulo_obra']
+    fields = ['persona', 'coordenadas_biograficas', 'relacion', 'autoria', 'titulo_obra']
     verbose_name = "Nombre Relacionado (700)"
     verbose_name_plural = "👥 Nombres Relacionados (700 - R)"
     show_change_link = True
@@ -282,7 +282,7 @@ class EntidadRelacionada710Inline(admin.TabularInline):
 class EnlaceDocumentoFuente773Inline(admin.TabularInline):
     model = EnlaceDocumentoFuente773
     extra = 0
-    fields = ['compositor_773', 'titulo', 'numero_obra_relacionada']
+    fields = ['compositor_773', 'titulo']
     verbose_name = "Documento Fuente (773)"
     verbose_name_plural = "📘 Documentos Fuente (773 - R)"
 
@@ -290,7 +290,7 @@ class EnlaceDocumentoFuente773Inline(admin.TabularInline):
 class EnlaceUnidadConstituyente774Inline(admin.TabularInline):
     model = EnlaceUnidadConstituyente774
     extra = 0
-    fields = ['compositor_774', 'titulo', 'numero_obra_relacionada']
+    fields = ['compositor_774', 'titulo']
     verbose_name = "Unidad Constituyente (774)"
     verbose_name_plural = "📗 Unidades Constituyentes (774 - R)"
 
@@ -298,7 +298,7 @@ class EnlaceUnidadConstituyente774Inline(admin.TabularInline):
 class OtrasRelaciones787Inline(admin.TabularInline):
     model = OtrasRelaciones787
     extra = 0
-    fields = ['encabezamiento_principal', 'titulo', 'numero_obra_relacionada']
+    fields = ['compositor_787', 'titulo']
     verbose_name = "Otra Relación (787)"
     verbose_name_plural = "🔗 Otras Relaciones (787 - R)"
 
@@ -324,7 +324,7 @@ class Estanteria852Inline(admin.TabularInline):
 class Disponible856Inline(admin.TabularInline):
     model = Disponible856
     extra = 0
-    fields = ['url', 'texto_enlace']
+    fields = []
     verbose_name = "Recurso Disponible (856)"
     verbose_name_plural = "🌐 Recursos Disponibles (856 - R)"
 
