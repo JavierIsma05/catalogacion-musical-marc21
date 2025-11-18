@@ -279,14 +279,9 @@
                     <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
                         <i class="bi bi-arrow-left"></i> Anterior
                     </button>
-                    <div class="btn-group">
-                        <button type="submit" name="action" value="draft" class="btn btn-outline-primary">
-                            <i class="bi bi-save"></i> Guardar Borrador
-                        </button>
-                        <button type="submit" name="action" value="publish" class="btn btn-primary">
-                            <i class="bi bi-check-circle"></i> Publicar Obra
-                        </button>
-                    </div>
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="bi bi-check-circle-fill"></i> Registrar Obra
+                    </button>
                 </div>
             </div>
         </div>
@@ -299,9 +294,12 @@
 
 {% block extra_js %}
 <script>
-// Sistema de pestañas - DEBE declararse ANTES de borrador-system.js
+// Sistema de pestañas
 const tabs = ['tab-0xx', 'tab-1xx', 'tab-2xx', 'tab-3xx', 'tab-4xx', 'tab-5xx', 'tab-6xx', 'tab-7xx', 'tab-8xx'];
 let currentTabIndex = 0;
+
+// Borrador a recuperar (si viene desde lista de borradores)
+const BORRADOR_A_RECUPERAR = {{ request.session.borrador_id|default:'null' }};
 </script>
 
 <script src="{% static 'catalogacion/js/compositor-autocomplete.js' %}"></script>

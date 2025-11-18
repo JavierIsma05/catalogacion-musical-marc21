@@ -16,7 +16,7 @@ from catalogacion.views.obra_config import (
     get_campos_visibles,
     debe_mostrar_formset,
 )
-from catalogacion.views.obra_mixins import ObraFormsetMixin, ObraSuccessMessageMixin
+from catalogacion.views.obra_mixins import ObraFormsetMixin
 
 
 class SeleccionarTipoObraView(TemplateView):
@@ -41,7 +41,7 @@ class SeleccionarTipoObraView(TemplateView):
         return self.get(request, *args, **kwargs)
 
 
-class CrearObraView(ObraFormsetMixin, ObraSuccessMessageMixin, CreateView):
+class CrearObraView(ObraFormsetMixin, CreateView):
     """
     Vista para crear una nueva obra MARC21.
     Maneja el formulario principal y todos los formsets anidados.
@@ -109,6 +109,44 @@ class CrearObraView(ObraFormsetMixin, ObraSuccessMessageMixin, CreateView):
             )
             return self.form_invalid(form)
         
+        # Validar campo 382 obligatorio (al menos un medio de interpretación)
+        medios_formset = formsets.get('medios_interpretacion')
+        if medios_formset:
+            tiene_medios = False
+            for medio_form in medios_formset:
+                if medio_form.cleaned_data and not medio_form.cleaned_data.get('DELETE', False):
+                    # Verificar si tiene al menos un subcampo $a
+                    medio_id = medio_form.instance.pk if medio_form.instance else None
+                    if medio_id:
+                        # Ya existe, verificar si tiene subcampos $a
+                        from catalogacion.models import MedioInterpretacion382_a
+                        tiene_medios = MedioInterpretacion382_a.objects.filter(
+                            medio_interpretacion=medio_id
+                        ).exists()
+                    else:
+                        # Nuevo registro, verificar en POST si tiene subcampos dinámicos
+                        # Los subcampos $a se envían como medio_interpretacion_382_X_timestamp
+                        pattern = 'medio_interpretacion_382_'
+                        for key in self.request.POST:
+                            if key.startswith(pattern) and self.request.POST[key]:
+                                tiene_medios = True
+                                break
+                    if tiene_medios:
+                        break
+            
+            if not tiene_medios:
+                messages.error(
+                    self.request,
+                    'Campo 382 - Medio de Interpretación: Debe especificar al menos un medio de interpretación ($a).'
+                )
+                return self.form_invalid(form)
+        else:
+            messages.error(
+                self.request,
+                'Campo 382 - Medio de Interpretación es obligatorio.'
+            )
+            return self.form_invalid(form)
+        
         # Guardar la obra principal
         self.object = form.save(commit=False)
         
@@ -124,25 +162,34 @@ class CrearObraView(ObraFormsetMixin, ObraSuccessMessageMixin, CreateView):
         # Guardar todos los formsets y sus subcampos
         self._guardar_formsets(formsets, self.object)
         
+        # Marcar borrador como convertido si existe
+        borrador_id = self.request.session.get('borrador_id')
+        if borrador_id:
+            try:
+                from catalogacion.models import BorradorObra
+                borrador = BorradorObra.objects.get(id=borrador_id, estado='activo')
+                borrador.estado = 'convertido'
+                borrador.obra_creada = self.object
+                borrador.save()
+                
+                # Limpiar sesión
+                del self.request.session['borrador_id']
+                if 'tipo_obra' in self.request.session:
+                    del self.request.session['tipo_obra']
+            except BorradorObra.DoesNotExist:
+                pass
+        
         # Mensaje de éxito
-        action = self.request.POST.get('action', 'publish')
-        self._mostrar_mensaje_exito(action)
+        messages.success(self.request, f'{self.config_obra["titulo"]} registrada exitosamente.')
         
         return redirect(self.get_success_url())
     
     def get_success_url(self):
-        """Redirigir según la acción (draft o publish)"""
-        action = self.request.POST.get('action', 'publish')
-        
-        if action == 'draft':
-            # Volver a editar
-            return reverse('catalogacion:editar_obra', kwargs={'pk': self.object.pk})
-        else:
-            # Ver detalle
-            return reverse('catalogacion:detalle_obra', kwargs={'pk': self.object.pk})
+        """Redirigir al detalle de la obra recién creada"""
+        return reverse('catalogacion:detalle_obra', kwargs={'pk': self.object.pk})
 
 
-class EditarObraView(ObraFormsetMixin, ObraSuccessMessageMixin, UpdateView):
+class EditarObraView(ObraFormsetMixin, UpdateView):
     """
     Vista para editar una obra MARC21 existente.
     Maneja el formulario principal y todos los formsets anidados.
@@ -240,7 +287,7 @@ class EditarObraView(ObraFormsetMixin, ObraSuccessMessageMixin, UpdateView):
         self._guardar_formsets(formsets, self.object)
         
         # Mensaje de éxito
-        self._mostrar_mensaje_exito('update')
+        messages.success(self.request, f'{self.config_obra["titulo"]} actualizada exitosamente.')
         
         return redirect(self.get_success_url())
     

@@ -168,14 +168,19 @@
             "id_nivel_bibliografico"
         )?.value;
 
-        if (tipoRegistro === "d") {
-            return nivelBibliografico === "c"
-                ? "manuscrito_coleccion"
-                : "manuscrito_independiente";
-        } else if (tipoRegistro === "c") {
-            return nivelBibliografico === "c"
-                ? "impreso_coleccion"
-                : "impreso_independiente";
+        // Mapeo correcto según TIPO_OBRA_CONFIG en obra_config.py
+        if (tipoRegistro === "d" && nivelBibliografico === "c") {
+            return "coleccion_manuscrita";
+        } else if (tipoRegistro === "d" && nivelBibliografico === "a") {
+            return "obra_en_coleccion_manuscrita";
+        } else if (tipoRegistro === "d" && nivelBibliografico === "m") {
+            return "obra_manuscrita_individual";
+        } else if (tipoRegistro === "c" && nivelBibliografico === "c") {
+            return "coleccion_impresa";
+        } else if (tipoRegistro === "c" && nivelBibliografico === "a") {
+            return "obra_en_coleccion_impresa";
+        } else if (tipoRegistro === "c" && nivelBibliografico === "m") {
+            return "obra_impresa_individual";
         }
         return "desconocido";
     }
@@ -870,7 +875,16 @@
     function init() {
         if (!form) return;
 
-        verificarBorradorExistente();
+        // Si hay un borrador específico a recuperar (desde lista de borradores)
+        if (
+            typeof BORRADOR_A_RECUPERAR !== "undefined" &&
+            BORRADOR_A_RECUPERAR !== null
+        ) {
+            cargarBorrador(BORRADOR_A_RECUPERAR);
+        } else {
+            verificarBorradorExistente();
+        }
+
         iniciarAutoguardado();
 
         form.addEventListener("input", onFormChange);

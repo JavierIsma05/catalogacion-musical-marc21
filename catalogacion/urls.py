@@ -18,6 +18,9 @@ from catalogacion.views.borradores import (
     eliminar_borrador_ajax,
     listar_borradores_ajax,
     autoguardar_borrador_ajax,
+    ListaBorradoresView,
+    DescartarBorradorView,
+    recuperar_borrador_view,
 )
 
 app_name = 'catalogacion'
@@ -44,5 +47,12 @@ urlpatterns = [
         path('listar/', listar_borradores_ajax, name='api_listar_borradores'),
         path('<int:borrador_id>/', obtener_borrador_ajax, name='api_obtener_borrador'),
         path('<int:borrador_id>/eliminar/', eliminar_borrador_ajax, name='api_eliminar_borrador'),
+    ])),
+    
+    # Gestión de Borradores (Web UI)
+    path('borradores/', include([
+        path('', ListaBorradoresView.as_view(), name='lista_borradores'),
+        path('<int:pk>/recuperar/', recuperar_borrador_view, name='recuperar_borrador'),
+        path('<int:pk>/descartar/', DescartarBorradorView.as_view(), name='descartar_borrador'),
     ])),
 ]

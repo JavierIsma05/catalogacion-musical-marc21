@@ -59,9 +59,7 @@
         );
 
         if (!input || !suggestionsContainer) {
-            console.warn(
-                `Autocomplete ${config.inputId}: elementos no encontrados`
-            );
+            // Debug silencioso - estos campos pueden no existir según el tipo de obra
             return;
         }
 

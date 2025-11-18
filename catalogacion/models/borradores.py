@@ -51,6 +51,26 @@ class BorradorObra(models.Model):
         help_text="a=parte, c=colección, m=monografía"
     )
     
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ('activo', 'Activo'),
+            ('convertido', 'Convertido a Obra'),
+            ('descartado', 'Descartado'),
+        ],
+        default='activo',
+        help_text="Estado del borrador: activo (en progreso), convertido (publicado como obra), descartado (eliminado por usuario)"
+    )
+    
+    obra_creada = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='borrador_origen',
+        help_text="Obra final creada a partir de este borrador"
+    )
+    
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
     
@@ -63,6 +83,7 @@ class BorradorObra(models.Model):
             models.Index(fields=['-fecha_modificacion']),
             models.Index(fields=['tipo_obra']),
             models.Index(fields=['tipo_registro']),
+            models.Index(fields=['estado']),
         ]
     
     def __str__(self):
@@ -96,6 +117,7 @@ class BorradorObra(models.Model):
         self.extraer_metadatos()
         super().save(*args, **kwargs)
     
+    @property
     def dias_desde_modificacion(self):
         """Retorna días desde última modificación"""
         diferencia = timezone.now() - self.fecha_modificacion

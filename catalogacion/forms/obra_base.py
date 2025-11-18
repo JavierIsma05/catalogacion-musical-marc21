@@ -167,12 +167,13 @@ class ObraGeneralForm(forms.ModelForm):
             'tonalidad_384': forms.Select(attrs={'class': 'form-select'}),
             'arreglo_130': forms.Select(attrs={'class': 'form-select'}),
             'arreglo_240': forms.Select(attrs={'class': 'form-select'}),
-            'ms_imp': forms.Select(attrs={'class': 'form-select'}),
+            'ms_imp': forms.Select(attrs={'class': 'form-select', 'required': True}),
             'formato': forms.Select(attrs={'class': 'form-select'}),
             
             # Inputs de texto
             'centro_catalogador': forms.TextInput(attrs={
                 'class': 'form-control',
+                'required': True,
             }),
             'termino_asociado': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -231,7 +232,7 @@ class ObraGeneralForm(forms.ModelForm):
         labels = {
             'tipo_registro': 'Tipo de registro',
             'nivel_bibliografico': 'Nivel bibliográfico',
-            'centro_catalogador': '040 $a - Centro catalogador',
+            'centro_catalogador': '040 $a - Centro catalogador *',
             'isbn': '020 $a - ISBN',
             'ismn': '024 $a - ISMN',
             'tipo_numero_028': '028 - Tipo de número',
@@ -261,7 +262,7 @@ class ObraGeneralForm(forms.ModelForm):
             'otras_caracteristicas': '300 $b - Otras características físicas',
             'dimension': '300 $c - Dimensiones',
             'material_acompanante': '300 $e - Material acompañante',
-            'ms_imp': '340 $d - Técnica',
+            'ms_imp': '340 $d - Técnica (Manuscrito/Impreso) *',
             'formato': '348 $a - Formato',
             'numero_obra': '383 $a - Número serial de obra',
             'opus': '383 $b - Número de opus',
@@ -282,12 +283,26 @@ class ObraGeneralForm(forms.ModelForm):
         
         self.fields['forma_240'].queryset = AutoridadFormaMusical.objects.all().order_by('forma')
         
-        # Hacer título principal obligatorio
+        # Hacer campos obligatorios según requisitos mínimos MARC21
         self.fields['titulo_principal'].required = True
+        self.fields['centro_catalogador'].required = True
+        self.fields['ms_imp'].required = True
     
     def clean(self):
         """Validación personalizada y creación automática de autoridades"""
         cleaned_data = super().clean()
+        
+        # Validar que exista al menos 100 (compositor) o 130 (título uniforme)
+        compositor = cleaned_data.get('compositor')
+        compositor_texto = cleaned_data.get('compositor_texto', '').strip()
+        titulo_uniforme = cleaned_data.get('titulo_uniforme')
+        titulo_uniforme_texto = cleaned_data.get('titulo_uniforme_texto', '').strip()
+        
+        if not compositor and not compositor_texto and not titulo_uniforme and not titulo_uniforme_texto:
+            raise forms.ValidationError(
+                'Debe especificar al menos un punto de acceso principal: '
+                'Campo 100 (Compositor) o Campo 130 (Título Uniforme)'
+            )
         
         # Manejar compositor autocomplete editable
         compositor_texto = cleaned_data.get('compositor_texto', '').strip()

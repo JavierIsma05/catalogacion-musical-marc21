@@ -77,6 +77,13 @@
                         </a>
                     </li>
                     
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'borradores' in request.resolver_match.url_name %}active{% endif %}" 
+                           href="{% url 'catalogacion:lista_borradores' %}">
+                            <i class="bi bi-file-earmark-text"></i> Borradores
+                        </a>
+                    </li>
+                    
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-person-badge"></i> Autoridades

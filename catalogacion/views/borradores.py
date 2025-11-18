@@ -149,9 +149,10 @@ def verificar_borrador_ajax(request):
                 'error': 'Tipo de obra no especificado'
             }, status=400)
         
-        # Buscar el borrador más reciente para este tipo de obra
+        # Buscar el borrador más reciente activo para este tipo de obra
         borrador = BorradorObra.objects.filter(
-            tipo_obra=tipo_obra
+            tipo_obra=tipo_obra,
+            estado='activo'
         ).first()
         
         if borrador:
@@ -162,7 +163,7 @@ def verificar_borrador_ajax(request):
                     'id': borrador.id,
                     'titulo_temporal': borrador.titulo_temporal,
                     'fecha_modificacion': borrador.fecha_modificacion.isoformat(),
-                    'dias_antiguedad': borrador.dias_desde_modificacion(),
+                    'dias_antiguedad': borrador.dias_desde_modificacion,
                     'pestana_actual': borrador.pestana_actual
                 }
             })
@@ -182,17 +183,20 @@ def verificar_borrador_ajax(request):
 @require_http_methods(["DELETE", "POST"])
 def eliminar_borrador_ajax(request, borrador_id):
     """
-    Elimina un borrador específico.
+    Marca un borrador como descartado (soft delete).
     Acepta DELETE o POST (para compatibilidad con navegadores antiguos)
     """
     try:
         borrador = get_object_or_404(BorradorObra, id=borrador_id)
         titulo = borrador.titulo_temporal
-        borrador.delete()
+        
+        # Soft delete: marcar como descartado
+        borrador.estado = 'descartado'
+        borrador.save()
         
         return JsonResponse({
             'success': True,
-            'message': f'Borrador "{titulo}" eliminado exitosamente'
+            'message': f'Borrador "{titulo}" descartado exitosamente'
         })
         
     except Exception as e:
@@ -231,7 +235,8 @@ def listar_borradores_ajax(request):
         tipo_obra = request.GET.get('tipo_obra')
         limit = int(request.GET.get('limit', 20))
         
-        queryset = BorradorObra.objects.all()
+        # Solo mostrar borradores activos
+        queryset = BorradorObra.objects.filter(estado='activo')
         
         if tipo_obra:
             queryset = queryset.filter(tipo_obra=tipo_obra)
@@ -336,3 +341,82 @@ def autoguardar_borrador_ajax(request):
             'success': False,
             'error': str(e)
         }, status=500)
+
+
+# ============================================================================
+# Vistas de Interfaz Web para Gestión de Borradores
+# ============================================================================
+
+from django.views.generic import ListView, DeleteView
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy, reverse
+from django.contrib import messages
+
+
+class ListaBorradoresView(ListView):
+    """Vista para listar todos los borradores activos"""
+    model = BorradorObra
+    template_name = 'catalogacion/lista_borradores.html'
+    context_object_name = 'borradores'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        """Obtener solo borradores activos ordenados por fecha de modificación"""
+        return BorradorObra.objects.filter(
+            estado='activo'
+        ).order_by('-fecha_modificacion')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_borradores'] = self.get_queryset().count()
+        return context
+
+
+class DescartarBorradorView(DeleteView):
+    """Vista para descartar un borrador (soft delete)"""
+    model = BorradorObra
+    success_url = reverse_lazy('catalogacion:lista_borradores')
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        titulo = self.object.titulo_temporal
+        
+        # Soft delete: marcar como descartado
+        self.object.estado = 'descartado'
+        self.object.save()
+        
+        messages.success(
+            request, 
+            f'Borrador "{titulo}" descartado exitosamente'
+        )
+        return redirect(self.success_url)
+
+
+def recuperar_borrador_view(request, pk):
+    """
+    Vista para recuperar un borrador y redirigir al formulario de creación
+    """
+    borrador = get_object_or_404(BorradorObra, pk=pk, estado='activo')
+    
+    # Mapeo de valores antiguos del JavaScript a los valores correctos de TIPO_OBRA_CONFIG
+    mapeo_tipos = {
+        'manuscrito_coleccion': 'coleccion_manuscrita',
+        'manuscrito_independiente': 'obra_manuscrita_individual',
+        'impreso_coleccion': 'coleccion_impresa',
+        'impreso_independiente': 'obra_impresa_individual',
+    }
+    
+    # Convertir el tipo_obra si viene en formato antiguo
+    tipo_obra_correcto = mapeo_tipos.get(borrador.tipo_obra, borrador.tipo_obra)
+    
+    # Guardar el ID del borrador en la sesión para que lo use el formulario
+    request.session['borrador_id'] = borrador.id
+    request.session['tipo_obra'] = tipo_obra_correcto
+    
+    # Redirigir al formulario de creación con el tipo de obra correcto
+    messages.info(
+        request,
+        f'Recuperando borrador: {borrador.titulo_temporal}'
+    )
+    
+    return redirect('catalogacion:crear_obra', tipo=tipo_obra_correcto)
