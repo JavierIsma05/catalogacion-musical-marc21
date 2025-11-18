@@ -342,6 +342,21 @@
 
             if (result.success) {
                 const borrador = result.borrador;
+                
+                // VALIDACIÓN: Verificar que el tipo de obra coincida
+                const tipoObraActual = getTipoObra();
+                if (borrador.tipo_obra !== tipoObraActual) {
+                    console.warn(
+                        `Tipo de obra no coincide. Borrador: ${borrador.tipo_obra}, Actual: ${tipoObraActual}`
+                    );
+                    mostrarNotificacion(
+                        "Este borrador es de otro tipo de obra. El formulario estará vacío.",
+                        "warning",
+                        4000
+                    );
+                    return;
+                }
+                
                 borradorId = borrador.id;
                 const datos = borrador.datos_formulario;
 
