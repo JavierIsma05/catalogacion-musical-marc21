@@ -1,0 +1,289 @@
+{% comment %}
+Template para campo 545 - Datos Biográficos del Compositor
+El campo 545 es repetible y contiene subcampos repetibles ($a datos biográficos y $u URI)
+{% endcomment %}
+
+<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
+    {# Renderizar management_form sin mensajes de error #}
+    <div style="display: none;">
+        {% for field in formset.management_form %}
+            {{ field }}
+        {% endfor %}
+    </div>
+    
+    <button type="button" class="add-form-row mb-3" title="Agregar Datos Biográficos">
+        <i class="bi bi-plus-circle"></i>
+        Agregar Datos Biográficos
+    </button>
+    
+    <div class="formset-forms">
+        {% for form in formset %}
+        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
+            {% if form.instance.pk %}
+                <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
+            {% endif %}
+            
+            {% if formset.can_delete %}
+                <div class="d-none">
+                    {{ form.DELETE }}
+                </div>
+            {% endif %}
+            
+            <button type="button" class="delete-row-btn" title="Eliminar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            
+            <div class="campo-grid">
+                {# Botón para agregar textos biográficos ($a) #}
+                <div class="col-full">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-texto-btn w-100" data-dato-index="{{ forloop.counter0 }}">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar Texto Biográfico ($a)
+                    </button>
+                </div>
+                
+                {# Subcampo $a - Datos biográficos (Repetible) #}
+                <div class="col-full textos-container" data-textos-container="{{ forloop.counter0 }}">
+                    {% if form.instance.pk %}
+                        {# Cargar textos existentes #}
+                        {% for texto in form.instance.textos_biograficos_545.all %}
+                        <div class="texto-form-row">
+                            <div class="d-flex flex-column w-100 mb-2">
+                                <label class="form-label small">545 $a - Datos biográficos</label>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <textarea 
+                                           class="form-control texto-input" 
+                                           name="texto_biografico_545_{{ forloop.parentloop.counter0 }}_{{ texto.pk }}"
+                                           placeholder="Datos biográficos del compositor" 
+                                           rows="3"
+                                           style="flex: 1;">{{ texto.texto }}</textarea>
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-texto-btn" title="Eliminar texto">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
+                {# Botón para agregar URIs ($u) #}
+                <div class="col-full">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-uri-btn w-100" data-dato-index="{{ forloop.counter0 }}">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar URI ($u)
+                    </button>
+                </div>
+                
+                {# Subcampo $u - URI (Repetible) #}
+                <div class="col-full uris-container" data-uris-container="{{ forloop.counter0 }}">
+                    {% if form.instance.pk %}
+                        {# Cargar URIs existentes #}
+                        {% for uri in form.instance.uris_545.all %}
+                        <div class="uri-form-row">
+                            <div class="d-flex flex-column w-100 mb-2">
+                                <label class="form-label small">545 $u - URI</label>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <input type="url" 
+                                           class="form-control uri-input" 
+                                           name="uri_545_{{ forloop.parentloop.counter0 }}_{{ uri.pk }}"
+                                           value="{{ uri.uri }}"
+                                           placeholder="https://ejemplo.com/biografia" 
+                                           style="flex: 1;">
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-uri-btn" title="Eliminar URI">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        {# Template vacío para clonar datos biográficos #}
+        <div class="formset-row empty-form mb-3">
+            <button type="button" class="delete-row-btn" title="Eliminar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            
+            <div class="campo-grid">
+                <div class="col-full">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-texto-btn w-100" data-dato-index="__prefix__">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar Texto Biográfico ($a)
+                    </button>
+                </div>
+                
+                <div class="col-full textos-container" data-textos-container="__prefix__">
+                    {# Los textos se agregarán aquí dinámicamente #}
+                </div>
+                
+                <div class="col-full">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-uri-btn w-100" data-dato-index="__prefix__">
+                        <i class="bi bi-plus-circle"></i>
+                        Agregar URI ($u)
+                    </button>
+                </div>
+                
+                <div class="col-full uris-container" data-uris-container="__prefix__">
+                    {# Los URIs se agregarán aquí dinámicamente #}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Templates globales para textos y URIs (fuera del formset loop) #}
+<div class="texto-form-row texto-template-545 d-none">
+    <div class="d-flex flex-column w-100 mb-2">
+        <label class="form-label small">545 $a - Datos biográficos</label>
+        <div class="d-flex gap-2 align-items-center">
+            <textarea class="form-control texto-input" placeholder="Datos biográficos del compositor" rows="3" style="flex: 1;"></textarea>
+            <button type="button" class="btn btn-sm btn-outline-danger delete-texto-btn" title="Eliminar texto">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="uri-form-row uri-template-545 d-none">
+    <div class="d-flex flex-column w-100 mb-2">
+        <label class="form-label small">545 $u - URI</label>
+        <div class="d-flex gap-2 align-items-center">
+            <input type="url" class="form-control uri-input" placeholder="https://ejemplo.com/biografia" style="flex: 1;">
+            <button type="button" class="btn btn-sm btn-outline-danger delete-uri-btn" title="Eliminar URI">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Script para manejar el campo 545 con textos biográficos y URIs repetibles
+(function() {
+    const prefix = '{{ formset.prefix }}';
+    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+    if (!container) return;
+    
+    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+    const addButton = container.querySelector('.add-form-row');
+    const formsContainer = container.querySelector('.formset-forms');
+    const textoTemplate = document.querySelector('.texto-template-545');
+    const uriTemplate = document.querySelector('.uri-template-545');
+    
+    if (!totalFormsInput || !addButton || !formsContainer || !textoTemplate || !uriTemplate) return;
+    
+    // Agregar nuevo dato biográfico 545
+    addButton.addEventListener('click', function() {
+        const totalForms = parseInt(totalFormsInput.value);
+        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
+        
+        if (!emptyFormTemplate) return;
+        
+        const emptyForm = emptyFormTemplate.cloneNode(true);
+        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
+        emptyForm.classList.remove('empty-form');
+        emptyForm.style.display = '';
+        
+        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
+        totalFormsInput.value = totalForms + 1;
+    });
+    
+    // Eliminar dato biográfico 545
+    container.addEventListener('click', function(e) {
+        const deleteBtn = e.target.closest('.delete-row-btn');
+        if (!deleteBtn) return;
+        
+        const row = deleteBtn.closest('.formset-row');
+        if (!row || row.classList.contains('empty-form')) return;
+        
+        const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
+        
+        if (row.classList.contains('existing-form')) {
+            if (deleteCheckbox && deleteCheckbox.checked) {
+                deleteCheckbox.checked = false;
+                row.style.opacity = '1';
+                deleteBtn.classList.remove('btn-warning');
+                deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
+                deleteBtn.title = 'Eliminar';
+            } else if (deleteCheckbox) {
+                deleteCheckbox.checked = true;
+                row.style.opacity = '0.5';
+                deleteBtn.classList.add('btn-warning');
+                deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
+                deleteBtn.title = 'Cancelar eliminación';
+            }
+        } else {
+            row.remove();
+            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
+        }
+    });
+    
+    // Manejar textos biográficos (subcampo $a repetible)
+    container.addEventListener('click', function(e) {
+        // Agregar texto
+        const addTextoBtn = e.target.closest('.add-texto-btn');
+        if (addTextoBtn) {
+            const datoIndex = addTextoBtn.getAttribute('data-dato-index');
+            const textosContainer = container.querySelector(`[data-textos-container="${datoIndex}"]`);
+            
+            if (!textosContainer) return;
+            
+            const newTexto = textoTemplate.cloneNode(true);
+            newTexto.classList.remove('texto-template-545', 'd-none');
+            
+            // Actualizar el name del textarea
+            const textarea = newTexto.querySelector('.texto-input');
+            if (textarea) {
+                textarea.name = `texto_biografico_545_${datoIndex}_${Date.now()}`;
+            }
+            
+            textosContainer.appendChild(newTexto);
+        }
+        
+        // Eliminar texto
+        const deleteTextoBtn = e.target.closest('.delete-texto-btn');
+        if (deleteTextoBtn) {
+            const textoRow = deleteTextoBtn.closest('.texto-form-row');
+            if (!textoRow.classList.contains('texto-template-545')) {
+                textoRow.remove();
+            }
+        }
+    });
+    
+    // Manejar URIs (subcampo $u repetible)
+    container.addEventListener('click', function(e) {
+        // Agregar URI
+        const addUriBtn = e.target.closest('.add-uri-btn');
+        if (addUriBtn) {
+            const datoIndex = addUriBtn.getAttribute('data-dato-index');
+            const urisContainer = container.querySelector(`[data-uris-container="${datoIndex}"]`);
+            
+            if (!urisContainer) return;
+            
+            const newUri = uriTemplate.cloneNode(true);
+            newUri.classList.remove('uri-template-545', 'd-none');
+            
+            // Actualizar el name del input
+            const input = newUri.querySelector('.uri-input');
+            if (input) {
+                input.name = `uri_545_${datoIndex}_${Date.now()}`;
+            }
+            
+            urisContainer.appendChild(newUri);
+        }
+        
+        // Eliminar URI
+        const deleteUriBtn = e.target.closest('.delete-uri-btn');
+        if (deleteUriBtn) {
+            const uriRow = deleteUriBtn.closest('.uri-form-row');
+            if (!uriRow.classList.contains('uri-template-545')) {
+                uriRow.remove();
+            }
+        }
+    });
+})();
+</script>

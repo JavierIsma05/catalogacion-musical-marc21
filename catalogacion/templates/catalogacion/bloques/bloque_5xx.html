@@ -55,9 +55,9 @@
                     <span class="badge-repetible">REPETIBLE</span>
                 </div>
                 
-                <p class="form-text">Información biográfica o histórica relevante.</p>
+                <p class="form-text">Información biográfica o histórica relevante. Subcampos $a (datos biográficos) y $u (URI) repetibles.</p>
                 
-                {% include 'catalogacion/includes/formset_template.html' with formset=datos_biograficos titulo="Datos Biográficos" %}
+                {% include 'catalogacion/includes/formset_545_template.html' with formset=datos_biograficos %}
             </div>
         </div>
     </div>

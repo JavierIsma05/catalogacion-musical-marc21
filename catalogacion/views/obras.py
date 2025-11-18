@@ -553,6 +553,82 @@ class CrearObraView(CreateView):
                         volumen=volumen
                     )
     
+    def _save_textos_biograficos_545(self, formset):
+        """
+        Procesar inputs de textos biográficos generados por JavaScript.
+        Los inputs tienen nombres como: texto_biografico_545_0_1234567890
+        donde 0 es el índice del dato biográfico y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import TextoBiografico545
+        
+        # Agrupar textos por índice de dato biográfico
+        textos_por_dato = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('texto_biografico_545_') and value.strip():
+                try:
+                    # Extraer índice del dato: texto_biografico_545_0_1234567890 -> 0
+                    parts = key.split('_')
+                    dato_index = int(parts[3])
+                    
+                    if dato_index not in textos_por_dato:
+                        textos_por_dato[dato_index] = []
+                    
+                    textos_por_dato[dato_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar textos para cada dato biográfico
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in textos_por_dato:
+                # Eliminar textos existentes
+                form.instance.textos_biograficos_545.all().delete()
+                
+                # Crear nuevos textos
+                for texto in textos_por_dato[index]:
+                    TextoBiografico545.objects.create(
+                        dato_biografico=form.instance,
+                        texto=texto
+                    )
+    
+    def _save_uris_545(self, formset):
+        """
+        Procesar inputs de URIs generados por JavaScript.
+        Los inputs tienen nombres como: uri_545_0_1234567890
+        donde 0 es el índice del dato biográfico y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import URI545
+        
+        # Agrupar URIs por índice de dato biográfico
+        uris_por_dato = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('uri_545_') and value.strip():
+                try:
+                    # Extraer índice del dato: uri_545_0_1234567890 -> 0
+                    parts = key.split('_')
+                    dato_index = int(parts[2])
+                    
+                    if dato_index not in uris_por_dato:
+                        uris_por_dato[dato_index] = []
+                    
+                    uris_por_dato[dato_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar URIs para cada dato biográfico
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in uris_por_dato:
+                # Eliminar URIs existentes
+                form.instance.uris_545.all().delete()
+                
+                # Crear nuevos URIs
+                for uri in uris_por_dato[index]:
+                    URI545.objects.create(
+                        dato_biografico=form.instance,
+                        uri=uri
+                    )
+    
     @transaction.atomic
     def form_valid(self, form):
         """Guardar obra y todos los formsets en una transacción atómica"""
@@ -643,6 +719,11 @@ class CrearObraView(CreateView):
             if key == 'disponibles_856':
                 self._save_urls_856(formset)
                 self._save_textos_enlace_856(formset)
+            
+            # Si es el formset 545, procesar textos biográficos y URIs desde inputs JavaScript
+            if key == 'datos_biograficos':
+                self._save_textos_biograficos_545(formset)
+                self._save_uris_545(formset)
         
         # Mensaje de éxito
         action = self.request.POST.get('action', 'publish')
@@ -1130,6 +1211,82 @@ class EditarObraView(UpdateView):
                         volumen=volumen
                     )
     
+    def _save_textos_biograficos_545(self, formset):
+        """
+        Procesar inputs de textos biográficos generados por JavaScript.
+        Los inputs tienen nombres como: texto_biografico_545_0_1234567890
+        donde 0 es el índice del dato biográfico y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import TextoBiografico545
+        
+        # Agrupar textos por índice de dato biográfico
+        textos_por_dato = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('texto_biografico_545_') and value.strip():
+                try:
+                    # Extraer índice del dato: texto_biografico_545_0_1234567890 -> 0
+                    parts = key.split('_')
+                    dato_index = int(parts[3])
+                    
+                    if dato_index not in textos_por_dato:
+                        textos_por_dato[dato_index] = []
+                    
+                    textos_por_dato[dato_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar textos para cada dato biográfico
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in textos_por_dato:
+                # Eliminar textos existentes
+                form.instance.textos_biograficos_545.all().delete()
+                
+                # Crear nuevos textos
+                for texto in textos_por_dato[index]:
+                    TextoBiografico545.objects.create(
+                        dato_biografico=form.instance,
+                        texto=texto
+                    )
+    
+    def _save_uris_545(self, formset):
+        """
+        Procesar inputs de URIs generados por JavaScript.
+        Los inputs tienen nombres como: uri_545_0_1234567890
+        donde 0 es el índice del dato biográfico y 1234567890 es el timestamp.
+        """
+        from catalogacion.models import URI545
+        
+        # Agrupar URIs por índice de dato biográfico
+        uris_por_dato = {}
+        
+        for key, value in self.request.POST.items():
+            if key.startswith('uri_545_') and value.strip():
+                try:
+                    # Extraer índice del dato: uri_545_0_1234567890 -> 0
+                    parts = key.split('_')
+                    dato_index = int(parts[2])
+                    
+                    if dato_index not in uris_por_dato:
+                        uris_por_dato[dato_index] = []
+                    
+                    uris_por_dato[dato_index].append(value.strip())
+                except (IndexError, ValueError):
+                    continue
+        
+        # Guardar URIs para cada dato biográfico
+        for index, form in enumerate(formset):
+            if form.instance.pk and index in uris_por_dato:
+                # Eliminar URIs existentes
+                form.instance.uris_545.all().delete()
+                
+                # Crear nuevos URIs
+                for uri in uris_por_dato[index]:
+                    URI545.objects.create(
+                        dato_biografico=form.instance,
+                        uri=uri
+                    )
+    
     @transaction.atomic
     def form_valid(self, form):
         """Similar a CrearObraView"""
@@ -1191,6 +1348,11 @@ class EditarObraView(UpdateView):
             if key == 'menciones_serie_490':
                 self._save_titulos_490(formset)
                 self._save_volumenes_490(formset)
+            
+            # Si es el formset 545, procesar textos biográficos y URIs desde inputs JavaScript
+            if key == 'datos_biograficos':
+                self._save_textos_biograficos_545(formset)
+                self._save_uris_545(formset)
         
         messages.success(self.request, 'Obra actualizada exitosamente.')
         return redirect(self.get_success_url())
