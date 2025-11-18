@@ -5,34 +5,96 @@
 
 {% block extra_css %}
 <style>
-    /* Estilos mínimos adicionales */
-    .page-container-sidebar {
+    /* Contenedor de pestañas */
+    .tabs-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+    }
+    
+    /* Navegación de pestañas horizontal */
+    .tabs-navigation {
         display: flex;
-        gap: 1.5rem;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #E2E8F0;
+        overflow-x: auto;
+        padding-bottom: 0;
     }
     
-    .sidebar-navigation {
-        width: 240px;
-        position: sticky;
-        top: 80px;
-        align-self: flex-start;
-        max-height: calc(100vh - 100px);
-        overflow-y: auto;
+    .tab-button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        background: transparent;
+        color: #718096;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-bottom: 3px solid transparent;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
     
-    .form-main-content {
-        flex: 1;
-        min-width: 0;
+    .tab-button:hover {
+        color: #3498DB;
+        background: #F7F9FA;
     }
     
-    .bloque-section {
-        scroll-margin-top: 100px;
+    .tab-button.active {
+        color: #3498DB;
+        border-bottom-color: #3498DB;
+        background: #F7F9FA;
+    }
+    
+    /* Contenido de pestañas */
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Botones de navegación */
+    .tab-navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #E2E8F0;
     }
     
     .campo-requerido::after {
         content: " *";
-        color: #B87F7F;
+        color: #E74C3C;
         font-weight: bold;
+    }
+    
+    /* Indicador de progreso */
+    .progress-indicator {
+        margin-bottom: 2rem;
+    }
+    
+    .progress-bar-custom {
+        height: 4px;
+        background: #E2E8F0;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3498DB, #5DADE2);
+        transition: width 0.3s ease;
     }
 </style>
 {% endblock %}
@@ -48,128 +110,187 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-container-sidebar">
-    <!-- Sidebar de navegación -->
-    <aside class="sidebar-navigation">
-        <div class="card">
+<div class="tabs-container">
+    <form method="post" id="obra-form" novalidate>
+        {% csrf_token %}
+
+        <!-- Campos ocultos para tipo de registro y nivel bibliográfico -->
+        <input type="hidden" name="tipo_registro" value="{{ form.tipo_registro.value|default:'' }}" id="id_tipo_registro">
+        <input type="hidden" name="nivel_bibliografico" value="{{ form.nivel_bibliografico.value|default:'' }}" id="id_nivel_bibliografico">    
+
+        <!-- Header del formulario -->
+        <div class="card mb-3">
             <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="bi bi-list-nested"></i> Navegación
-                </h6>
-            </div>
-            <div class="card-body p-0">
-                <nav class="nav nav-pills nav-pills-vertical flex-column p-2" id="bloques-nav">
-                    <a class="nav-link active" href="#bloque-0xx">
-                        <i class="bi bi-hash"></i> 0XX - Control
-                    </a>
-                    <a class="nav-link" href="#bloque-1xx">
-                        <i class="bi bi-person"></i> 1XX - Principal
-                    </a>
-                    <a class="nav-link" href="#bloque-2xx">
-                        <i class="bi bi-bookmark"></i> 2XX - Títulos
-                    </a>
-                    <a class="nav-link" href="#bloque-3xx">
-                        <i class="bi bi-file-text"></i> 3XX - Descripción
-                    </a>
-                    <a class="nav-link" href="#bloque-4xx">
-                        <i class="bi bi-collection"></i> 4XX - Series
-                    </a>
-                    <a class="nav-link" href="#bloque-5xx">
-                        <i class="bi bi-journal"></i> 5XX - Notas
-                    </a>
-                    <a class="nav-link" href="#bloque-6xx">
-                        <i class="bi bi-tags"></i> 6XX - Materias
-                    </a>
-                    <a class="nav-link" href="#bloque-7xx">
-                        <i class="bi bi-link"></i> 7XX - Enlaces
-                    </a>
-                    <a class="nav-link" href="#bloque-8xx">
-                        <i class="bi bi-geo"></i> 8XX - Ubicación
-                    </a>
-                </nav>
+                <h5 class="mb-0">
+                    <i class="bi bi-file-earmark-plus"></i>
+                    Crear {{ tipo_obra_titulo }}
+                </h5>
+                <small class="text-muted">{{ tipo_obra_descripcion }}</small>
             </div>
         </div>
-    </aside>
-    
-    <!-- Formulario principal -->
-    <main class="form-main-content">
-        <form method="post" id="obra-form" novalidate>
-            {% csrf_token %}
 
-            <!-- Campos ocultos para tipo de registro y nivel bibliográfico -->
-            <input type="hidden" name="tipo_registro" value="{{ form.tipo_registro.value|default:'' }}" id="id_tipo_registro">
-            <input type="hidden" name="nivel_bibliografico" value="{{ form.nivel_bibliografico.value|default:'' }}" id="id_nivel_bibliografico">    
-
-            {% if debug %}
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                <strong>Información técnica (solo desarrollo):</strong><br>
-                <small>
-                    Tipo de registro: <code>{{ form.tipo_registro.value }}</code><br>
-                    Nivel bibliográfico: <code>{{ form.nivel_bibliografico.value }}</code><br>
-                    Tipo de obra: <strong>{{ tipo_obra_titulo }}</strong>
-                </small>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <!-- Barra de progreso -->
+        <div class="progress-indicator">
+            <div class="progress-bar-custom">
+                <div class="progress-bar-fill" id="progress-bar" style="width: 11%"></div>
             </div>
-            {% endif %}
-            
-            <!-- Header del formulario -->
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-file-earmark-plus"></i>
-                        Crear {{ tipo_obra_titulo }}
-                    </h5>
+            <small class="text-muted mt-2 d-block">Paso <span id="current-step">1</span> de 9</small>
+        </div>
+
+        <!-- Navegación de pestañas -->
+        <div class="tabs-navigation">
+            <button type="button" class="tab-button active" data-tab="tab-0xx">
+                <i class="bi bi-hash"></i> 0XX - Control
+            </button>
+            <button type="button" class="tab-button" data-tab="tab-1xx">
+                <i class="bi bi-person"></i> 1XX - Principal
+            </button>
+            <button type="button" class="tab-button" data-tab="tab-2xx">
+                <i class="bi bi-bookmark"></i> 2XX - Títulos
+            </button>
+            <button type="button" class="tab-button" data-tab="tab-3xx">
+                <i class="bi bi-file-text"></i> 3XX - Descripción
+            </button>
+            <button type="button" class="tab-button" data-tab="tab-4xx">
+                <i class="bi bi-collection"></i> 4XX - Series
+            </button>
+            <button type="button" class="tab-button" data-tab="tab-5xx">
+                <i class="bi bi-journal"></i> 5XX - Notas
+            </button>
+            <button type="button" class="tab-button" data-tab="tab-6xx">
+                <i class="bi bi-tags"></i> 6XX - Materias
+            </button>
+            <button type="button" class="tab-button" data-tab="tab-7xx">
+                <i class="bi bi-link"></i> 7XX - Enlaces
+            </button>
+            <button type="button" class="tab-button" data-tab="tab-8xx">
+                <i class="bi bi-geo"></i> 8XX - Ubicación
+            </button>
+        </div>
+
+        <!-- Contenido de pestañas -->
+        <div class="tabs-content">
+            <!-- Pestaña 0XX -->
+            <div id="tab-0xx" class="tab-content active">
+                {% include 'catalogacion/bloques/bloque_0xx.html' %}
+                <div class="tab-navigation-buttons">
+                    <div></div>
+                    <button type="button" class="btn btn-primary" onclick="nextTab()">
+                        Siguiente <i class="bi bi-arrow-right"></i>
+                    </button>
                 </div>
             </div>
-            
-            <!-- Bloque 0XX - Control e Identificación -->
-            {% include 'catalogacion/bloques/bloque_0xx.html' %}
-            
-            <!-- Bloque 1XX - Punto de acceso principal -->
-            {% include 'catalogacion/bloques/bloque_1xx.html' %}
-            
-            <!-- Bloque 2XX - Títulos y publicación -->
-            {% include 'catalogacion/bloques/bloque_2xx.html' %}
-            
-            <!-- Bloque 3XX - Descripción física -->
-            {% include 'catalogacion/bloques/bloque_3xx.html' %}
-            
-            <!-- Bloque 4XX - Series -->
-            {% include 'catalogacion/bloques/bloque_4xx.html' %}
-            
-            <!-- Bloque 5XX - Notas -->
-            {% include 'catalogacion/bloques/bloque_5xx.html' %}
-            
-            <!-- Bloque 6XX - Materias -->
-            {% include 'catalogacion/bloques/bloque_6xx.html' %}
-            
-            <!-- Bloque 7XX - Enlaces y relaciones -->
-            {% include 'catalogacion/bloques/bloque_7xx.html' %}
-            
-            <!-- Bloque 8XX - Ubicación -->
-            {% include 'catalogacion/bloques/bloque_8xx.html' %}
-            
-            <!-- Botones de acción -->
-            <div class="card shadow-sm mt-4 mb-5 sticky-bottom">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <a href="{% url 'catalogacion:seleccionar_tipo' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Cancelar
-                        </a>
-                        
-                        <div class="btn-group" role="group">
-                            <button type="submit" name="action" value="draft" class="btn btn-outline-primary">
-                                <i class="bi bi-save"></i> Guardar Borrador
-                            </button>
-                            <button type="submit" name="action" value="publish" class="btn btn-primary">
-                                <i class="bi bi-check-circle"></i> Publicar Obra
-                            </button>
-                        </div>
+
+            <!-- Pestaña 1XX -->
+            <div id="tab-1xx" class="tab-content">
+                {% include 'catalogacion/bloques/bloque_1xx.html' %}
+                <div class="tab-navigation-buttons">
+                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                        <i class="bi bi-arrow-left"></i> Anterior
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="nextTab()">
+                        Siguiente <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pestaña 2XX -->
+            <div id="tab-2xx" class="tab-content">
+                {% include 'catalogacion/bloques/bloque_2xx.html' %}
+                <div class="tab-navigation-buttons">
+                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                        <i class="bi bi-arrow-left"></i> Anterior
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="nextTab()">
+                        Siguiente <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pestaña 3XX -->
+            <div id="tab-3xx" class="tab-content">
+                {% include 'catalogacion/bloques/bloque_3xx.html' %}
+                <div class="tab-navigation-buttons">
+                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                        <i class="bi bi-arrow-left"></i> Anterior
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="nextTab()">
+                        Siguiente <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pestaña 4XX -->
+            <div id="tab-4xx" class="tab-content">
+                {% include 'catalogacion/bloques/bloque_4xx.html' %}
+                <div class="tab-navigation-buttons">
+                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                        <i class="bi bi-arrow-left"></i> Anterior
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="nextTab()">
+                        Siguiente <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pestaña 5XX -->
+            <div id="tab-5xx" class="tab-content">
+                {% include 'catalogacion/bloques/bloque_5xx.html' %}
+                <div class="tab-navigation-buttons">
+                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                        <i class="bi bi-arrow-left"></i> Anterior
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="nextTab()">
+                        Siguiente <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pestaña 6XX -->
+            <div id="tab-6xx" class="tab-content">
+                {% include 'catalogacion/bloques/bloque_6xx.html' %}
+                <div class="tab-navigation-buttons">
+                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                        <i class="bi bi-arrow-left"></i> Anterior
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="nextTab()">
+                        Siguiente <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pestaña 7XX -->
+            <div id="tab-7xx" class="tab-content">
+                {% include 'catalogacion/bloques/bloque_7xx.html' %}
+                <div class="tab-navigation-buttons">
+                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                        <i class="bi bi-arrow-left"></i> Anterior
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="nextTab()">
+                        Siguiente <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pestaña 8XX (última) -->
+            <div id="tab-8xx" class="tab-content">
+                {% include 'catalogacion/bloques/bloque_8xx.html' %}
+                <div class="tab-navigation-buttons">
+                    <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                        <i class="bi bi-arrow-left"></i> Anterior
+                    </button>
+                    <div class="btn-group">
+                        <button type="submit" name="action" value="draft" class="btn btn-outline-primary">
+                            <i class="bi bi-save"></i> Guardar Borrador
+                        </button>
+                        <button type="submit" name="action" value="publish" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Publicar Obra
+                        </button>
                     </div>
                 </div>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
 
 <!-- Modal de ayuda MARC21 -->
@@ -181,54 +302,69 @@
 <script src="{% static 'catalogacion/js/titulos-formas-autocomplete.js' %}"></script>
 
 <script>
-$(document).ready(function() {
+// Sistema de pestañas
+const tabs = ['tab-0xx', 'tab-1xx', 'tab-2xx', 'tab-3xx', 'tab-4xx', 'tab-5xx', 'tab-6xx', 'tab-7xx', 'tab-8xx'];
+let currentTabIndex = 0;
+
+// Función para cambiar de pestaña
+function switchTab(index) {
+    if (index < 0 || index >= tabs.length) return;
+    
+    // Ocultar todas las pestañas
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Desactivar todos los botones
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Activar pestaña actual
+    const tabId = tabs[index];
+    document.getElementById(tabId).classList.add('active');
+    document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+    
+    // Actualizar índice
+    currentTabIndex = index;
+    
+    // Actualizar barra de progreso
+    const progress = ((index + 1) / tabs.length) * 100;
+    document.getElementById('progress-bar').style.width = progress + '%';
+    document.getElementById('current-step').textContent = index + 1;
+    
+    // Scroll al inicio
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Navegación siguiente
+function nextTab() {
+    switchTab(currentTabIndex + 1);
+}
+
+// Navegación anterior
+function prevTab() {
+    switchTab(currentTabIndex - 1);
+}
+
+// Eventos de botones de pestañas
+document.addEventListener('DOMContentLoaded', function() {
     // Activar Select2 en campos de autoridades
-    $('.select2').select2({
-        theme: 'bootstrap-5',
-        width: '100%',
-        placeholder: function() {
-            return $(this).data('placeholder');
-        },
-        allowClear: true
-    });
-    
-    // Scroll spy para navegación
-    const navLinks = document.querySelectorAll('#bloques-nav .nav-link');
-    const sections = document.querySelectorAll('.bloque-section');
-    
-    window.addEventListener('scroll', () => {
-        let current = '';
-        
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            
-            if (pageYOffset >= sectionTop - 100) {
-                current = section.getAttribute('id');
-            }
+    if (typeof $.fn.select2 !== 'undefined') {
+        $('.select2').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: function() {
+                return $(this).data('placeholder');
+            },
+            allowClear: true
         });
-        
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${current}`) {
-                link.classList.add('active');
-            }
-        });
-    });
+    }
     
-    // Smooth scroll al hacer click en navegación
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-            
-            if (targetSection) {
-                targetSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
+    // Click en botones de pestañas
+    document.querySelectorAll('.tab-button').forEach((button, index) => {
+        button.addEventListener('click', () => {
+            switchTab(index);
         });
     });
     
@@ -239,16 +375,41 @@ $(document).ready(function() {
             e.preventDefault();
             e.stopPropagation();
             
-            // Mostrar mensaje de error
+            // Encontrar el primer campo inválido y navegar a su pestaña
+            const firstInvalid = form.querySelector(':invalid');
+            if (firstInvalid) {
+                // Buscar en qué pestaña está
+                tabs.forEach((tabId, index) => {
+                    const tabContent = document.getElementById(tabId);
+                    if (tabContent.contains(firstInvalid)) {
+                        switchTab(index);
+                        setTimeout(() => {
+                            firstInvalid.focus();
+                        }, 300);
+                    }
+                });
+            }
+            
             alert('Por favor complete todos los campos obligatorios.');
         }
         
         form.classList.add('was-validated');
     });
+    
+    // Atajos de teclado
+    document.addEventListener('keydown', function(e) {
+        // Alt + Flecha Derecha = Siguiente
+        if (e.altKey && e.key === 'ArrowRight') {
+            e.preventDefault();
+            nextTab();
+        }
+        // Alt + Flecha Izquierda = Anterior
+        if (e.altKey && e.key === 'ArrowLeft') {
+            e.preventDefault();
+            prevTab();
+        }
+    });
 });
 </script>
 
-
 {% endblock %}
-
-
