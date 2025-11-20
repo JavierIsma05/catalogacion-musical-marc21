@@ -356,3 +356,23 @@ class AutocompletarTituloUniformeView(View):
         ]
         
         return JsonResponse({'results': results})
+    
+class AutocompletarMateriaView(View):
+    def get(self, request):
+        q = request.GET.get("q", "")
+        resultados = []
+
+        if q:
+            materias = AutoridadMateria.objects.filter(
+                termino__icontains=q
+            ).order_by("termino")
+        else:
+            materias = AutoridadMateria.objects.all().order_by("termino")[:20]
+
+        for m in materias:
+            resultados.append({
+                "id": m.id,
+                "text": m.termino,
+            })
+
+        return JsonResponse({"results": resultados})

@@ -22,10 +22,14 @@ from catalogacion.forms.formsets import (
     # Bloque 6XX
     Materia650FormSet, MateriaGenero655FormSet,
     # Bloque 7XX
-    NombreRelacionado700FormSet, EntidadRelacionada710FormSet,
-    EnlaceDocumentoFuente773FormSet, NumeroObraRelacionada773FormSet,
-    EnlaceUnidadConstituyente774FormSet, NumeroObraRelacionada774FormSet,
+    NombreRelacionado700FormSet,
+    EntidadRelacionada710FormSet,
+    EnlaceDocumentoFuente773FormSet,
+    NumeroControl773FormSet,
+    EnlaceUnidadConstituyente774FormSet,
+    NumeroControl774FormSet,
     OtrasRelaciones787FormSet,
+    NumeroControl787FormSet,
     # Bloque 8XX
     Ubicacion852FormSet,
     Disponible856FormSet,

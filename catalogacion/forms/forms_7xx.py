@@ -2,102 +2,92 @@
 Formularios para bloque 7XX - Puntos de acceso adicionales y enlaces
 """
 from django import forms
-from django.contrib.contenttypes.models import ContentType
 from catalogacion.models import (
+    # 700
     NombreRelacionado700,
     TerminoAsociado700,
     Funcion700,
+
+    # 710
     EntidadRelacionada710,
+
+    # 773, 774, 787
     EnlaceDocumentoFuente773,
-    NumeroObraRelacionada773,
+    NumeroControl773,
     EnlaceUnidadConstituyente774,
-    NumeroObraRelacionada774,
+    NumeroControl774,
     OtrasRelaciones787,
-    NumeroObraRelacionada787,
+    NumeroControl787,
+
+    # Autoridades
     AutoridadPersona,
-    AutoridadTituloUniforme,
     AutoridadEntidad,
     EncabezamientoEnlace,
 )
-from .widgets import Select2Widget, TextAreaAutosize
+from .widgets import Select2Widget
 
+
+# ========================================================================
+# 700 – Nombre relacionado
+# ========================================================================
 
 class NombreRelacionado700Form(forms.ModelForm):
-    """Formulario para campo 700 - Nombre relacionado (contenedor)"""
-    
     class Meta:
         model = NombreRelacionado700
-        fields = ['persona', 'coordenadas_biograficas', 'relacion', 'autoria', 'titulo_obra']
+        fields = [
+            'persona',
+            'coordenadas_biograficas',
+            'relacion',
+            'autoria',
+            'titulo_obra'
+        ]
         widgets = {
             'persona': Select2Widget(attrs={
                 'data-url': '/catalogacion/autocompletar/persona/',
             }),
-            'coordenadas_biograficas': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '1900-1980'
-            }),
-            'relacion': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'intérprete de, arreglista de, etc.'
-            }),
-            'autoria': forms.Select(attrs={
-                'class': 'form-select',
-            }),
-            'titulo_obra': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Título de la obra relacionada'
-            }),
+            'coordenadas_biograficas': forms.TextInput(attrs={'class': 'form-control'}),
+            'relacion': forms.TextInput(attrs={'class': 'form-control'}),
+            'autoria': forms.Select(attrs={'class': 'form-select'}),
+            'titulo_obra': forms.TextInput(attrs={'class': 'form-control'}),
         }
         labels = {
-            'persona': '700 $a - Nombre relacionado',
-            'coordenadas_biograficas': '700 $d - Coordenadas biográficas',
-            'relacion': '700 $i - Relación',
-            'autoria': '700 $j - Autoría',
-            'titulo_obra': '700 $t - Título de obra',
+            'persona': '700 $a – Nombre de persona',
+            'coordenadas_biograficas': '700 $d – Coordenadas biográficas',
+            'relacion': '700 $i – Relación',
+            'autoria': '700 $j – Autoría',
+            'titulo_obra': '700 $t – Título de la obra',
         }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['persona'].queryset = AutoridadPersona.objects.all().order_by('apellidos_nombres')
 
 
 class TerminoAsociado700Form(forms.ModelForm):
-    """Formulario para campo 700 $c - Término asociado"""
-    
     class Meta:
         model = TerminoAsociado700
         fields = ['termino']
         widgets = {
-            'termino': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
+            'termino': forms.TextInput(attrs={'class': 'form-control'})
+        }
+        labels = {
+            'termino': '700 $c – Término asociado'
         }
 
 
 class Funcion700Form(forms.ModelForm):
-    """Formulario para campo 700 $e - Función"""
-    
     class Meta:
         model = Funcion700
         fields = ['funcion']
         widgets = {
-            'funcion': forms.Select(attrs={
-                'class': 'form-select',
-            }),
+            'funcion': forms.Select(attrs={'class': 'form-select'})
         }
         labels = {
-            'funcion': '700 $e - Término de función',
+            'funcion': '700 $e – Función'
         }
 
 
-# NOTA: Los formularios Relacion700Form y Autoria700Form fueron eliminados
-# porque $i (relación) y $j (autoría) ahora son campos no repetibles
-# dentro de NombreRelacionado700Form
-
+# ========================================================================
+# 710 – Entidad relacionada
+# ========================================================================
 
 class EntidadRelacionada710Form(forms.ModelForm):
-    """Formulario para campo 710 - Entidad corporativa"""
-    
     class Meta:
         model = EntidadRelacionada710
         fields = ['entidad', 'funcion']
@@ -105,144 +95,152 @@ class EntidadRelacionada710Form(forms.ModelForm):
             'entidad': Select2Widget(attrs={
                 'data-url': '/catalogacion/autocompletar/entidad/',
             }),
-            'funcion': forms.Select(attrs={
-                'class': 'form-select',
-            }),
+            'funcion': forms.Select(attrs={'class': 'form-select'}),
         }
         labels = {
-            'entidad': '710 $a - Nombre de entidad',
-            'funcion': '710 $e - Función de la entidad',
+            'entidad': '710 $a – Entidad relacionada',
+            'funcion': '710 $e – Función institucional',
         }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['entidad'].queryset = AutoridadEntidad.objects.all().order_by('nombre')
 
 
+# ========================================================================
+# 773 – Enlace a documento fuente
+# ========================================================================
+PRIMER_INDICADOR_773 = [('1', '1 – No genera nota')]
+SEGUNDO_INDICADOR_773 = [('#', "# – Visualización 'En'")]
 class EnlaceDocumentoFuente773Form(forms.ModelForm):
-    """Formulario para campo 773 - Documento fuente"""
     
+
     class Meta:
         model = EnlaceDocumentoFuente773
-        fields = ['compositor_773', 'titulo']
+        fields = [
+            'primer_indicador',
+            'segundo_indicador',
+            'encabezamiento_principal',
+            'titulo'
+        ]
         widgets = {
-            'compositor_773': Select2Widget(attrs={
-                'data-url': '/catalogacion/autocompletar/persona/',
+            'primer_indicador': forms.Select(choices=PRIMER_INDICADOR_773, attrs={'class': 'form-select'}),
+            'segundo_indicador': forms.Select(choices=SEGUNDO_INDICADOR_773, attrs={'class': 'form-select'}),
+            'encabezamiento_principal': Select2Widget(attrs={
+                'data-url': '/catalogacion/autocompletar/encabezamiento/',
             }),
-            'titulo': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Título de la colección o documento fuente'
-            }),
+            'titulo': forms.TextInput(attrs={'class': 'form-control'}),
         }
         labels = {
-            'compositor_773': '773 $a - Compositor',
-            'titulo': '773 $t - Título',
+            'primer_indicador': '773 – Primer indicador',
+            'segundo_indicador': '773 – Segundo indicador',
+            'encabezamiento_principal': '773 $a – Encabezamiento principal',
+            'titulo': '773 $t – Título',
         }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['titulo'].required = True
-        self.fields['compositor_773'].required = True
 
 
-class NumeroObraRelacionada773Form(forms.ModelForm):
-    """Formulario para 773 $w - Número de obra en la colección"""
-    
+class NumeroControl773Form(forms.ModelForm):
     class Meta:
-        model = NumeroObraRelacionada773
-        fields = ['numero']
+        model = NumeroControl773
+        fields = ['obra_relacionada']
         widgets = {
-            'numero': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ej: 001234567'
-            }),
+            'obra_relacionada': Select2Widget(attrs={
+                'data-url': '/catalogacion/autocompletar/obra/',
+            })
         }
         labels = {
-            'numero': '773 $w - Número de obra',
+            'obra_relacionada': '773 $w – Número de control (001)',
         }
 
 
+# ========================================================================
+# 774 – Enlace a unidad constituyente
+# ========================================================================
+PRIMER_INDICADOR_774 = [('1', '1 – No genera nota')]
+SEGUNDO_INDICADOR_774 = [('#', "# – Visualización 'Contiene'")]
 class EnlaceUnidadConstituyente774Form(forms.ModelForm):
-    """Formulario para campo 774 - Unidad constituyente (obra contenida)"""
     
+
     class Meta:
         model = EnlaceUnidadConstituyente774
-        fields = ['compositor_774', 'titulo']
+        fields = [
+            'primer_indicador',
+            'segundo_indicador',
+            'encabezamiento_principal',
+            'titulo'
+        ]
         widgets = {
-            'compositor_774': Select2Widget(attrs={
-                'data-url': '/catalogacion/autocompletar/persona/',
+            'primer_indicador': forms.Select(
+                choices=PRIMER_INDICADOR_774,
+                attrs={'class': 'form-select'}
+            ),
+            'segundo_indicador': forms.Select(
+                choices=SEGUNDO_INDICADOR_774,
+                attrs={'class': 'form-select'}
+            ),
+            'encabezamiento_principal': Select2Widget(attrs={
+                'data-url': '/catalogacion/autocompletar/encabezamiento/',
             }),
-            'titulo': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Título de la obra constituyente'
-            }),
+            'titulo': forms.TextInput(attrs={'class': 'form-control'}),
         }
         labels = {
-            'compositor_774': '774 $a - Compositor',
-            'titulo': '774 $t - Título de unidad constituyente',
+            'primer_indicador': '774 – Primer indicador',
+            'segundo_indicador': '774 – Segundo indicador',
+            'encabezamiento_principal': '774 $a – Encabezamiento principal',
+            'titulo': '774 $t – Título',
         }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['titulo'].required = True
-        self.fields['compositor_774'].required = True
 
-
-class NumeroObraRelacionada774Form(forms.ModelForm):
-    """Formulario para 774 $w - Número de obra relacionada"""
-    
+class NumeroControl774Form(forms.ModelForm):
     class Meta:
-        model = NumeroObraRelacionada774
-        fields = ['numero']
-        widgets = {
-            'numero': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ej: 001234567'
-            }),
+        model = NumeroControl774
+        fields = ['obra_relacionada']
+    widgets = {
+            'obra_relacionada': Select2Widget(attrs={
+                'data-url': '/catalogacion/autocompletar/obra/',
+            })
         }
-        labels = {
-            'numero': '774 $w - Número de obra',
+    labels = {
+            'obra_relacionada': '774 $w – Número de control (001)',
         }
 
 
+# ========================================================================
+# 787 – Otras relaciones
+# ========================================================================
+
+PRIMER_INDICADOR_787 = [('1', '1 – No genera nota')]
+SEGUNDO_INDICADOR_787 = [('#', "# – Visualización 'Documento relacionado'")]
 class OtrasRelaciones787Form(forms.ModelForm):
-    """Formulario para campo 787 - Otras relaciones"""
-    
+
     class Meta:
         model = OtrasRelaciones787
-        fields = ['compositor_787', 'titulo']
+        fields = [
+            'primer_indicador',
+            'segundo_indicador',
+            'encabezamiento_principal',
+            'titulo'
+        ]
         widgets = {
-            'compositor_787': Select2Widget(attrs={
-                'data-url': '/catalogacion/autocompletar/persona/',
+            'primer_indicador': forms.Select(choices=PRIMER_INDICADOR_787, attrs={'class': 'form-select'}),
+            'segundo_indicador': forms.Select(choices=SEGUNDO_INDICADOR_787, attrs={'class': 'form-select'}),
+            'encabezamiento_principal': Select2Widget(attrs={
+                'data-url': '/catalogacion/autocompletar/encabezamiento/',
             }),
-            'titulo': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Título de la obra relacionada'
-            }),
+            'titulo': forms.TextInput(attrs={'class': 'form-control'}),
         }
         labels = {
-            'compositor_787': '787 $a - Compositor',
-            'titulo': '787 $t - Título',
+            'primer_indicador': '787 – Primer indicador',
+            'segundo_indicador': '787 – Segundo indicador',
+            'encabezamiento_principal': '787 $a – Encabezamiento principal',
+            'titulo': '787 $t – Título',
         }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['titulo'].required = True
-        self.fields['compositor_787'].required = True
 
 
-class NumeroObraRelacionada787Form(forms.ModelForm):
-    """Formulario para 787 $w - Número de obra relacionada"""
-    
+class NumeroControl787Form(forms.ModelForm):
     class Meta:
-        model = NumeroObraRelacionada787
-        fields = ['numero']
+        model = NumeroControl787
+        fields = ['obra_relacionada']
         widgets = {
-            'numero': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ej: 001234567'
-            }),
+            'obra_relacionada': Select2Widget(attrs={
+                'data-url': '/catalogacion/autocompletar/obra/',
+            })
         }
         labels = {
-            'numero': '787 $w - Número de obra',
+            'obra_relacionada': '787 $w – Número de control (001)',
         }

@@ -55,9 +55,10 @@ from .models import (
     EnlaceUnidadConstituyente774,
     OtrasRelaciones787,
     # Bloque 8xx
-    Ubicacion852,
     Estanteria852,
     Disponible856,
+    TextoEnlace856,
+    URL856,
 )
 from .formatters import MARCFormatter
 
@@ -171,13 +172,15 @@ class VolumenSerie490Inline(admin.TabularInline):
 class MencionSerie490Inline(admin.StackedInline):
     model = MencionSerie490
     extra = 0
-    fields = []  # No hay campos editables directamente, se manejan con inlines
+    fields = []
     verbose_name = "Mención de Serie (490)"
     verbose_name_plural = "📚 Menciones de Serie (490 - R)"
     show_change_link = True
 
-
+# ============================================
 # Bloque 5xx - Notas
+# ============================================
+
 class NotaGeneral500Inline(admin.TabularInline):
     model = NotaGeneral500
     extra = 0
@@ -210,7 +213,10 @@ class DatosBiograficos545Inline(admin.TabularInline):
     verbose_name_plural = "👤 Datos Biográficos (545 - R)"
 
 
+# ============================================
 # Bloque 6xx - Materias
+# ============================================
+
 class SubdivisionMateria650Inline(admin.TabularInline):
     model = SubdivisionMateria650
     extra = 1
@@ -245,7 +251,10 @@ class MateriaGenero655Inline(admin.StackedInline):
     show_change_link = True
 
 
+# ============================================
 # Bloque 7xx - Puntos de Acceso Adicionales
+# ============================================
+
 class TerminoAsociado700Inline(admin.TabularInline):
     model = TerminoAsociado700
     extra = 0
@@ -279,46 +288,43 @@ class EntidadRelacionada710Inline(admin.TabularInline):
     verbose_name_plural = "🏛️ Entidades Relacionadas (710 - R)"
 
 
+# 773 — Enlace a documento fuente
 class EnlaceDocumentoFuente773Inline(admin.TabularInline):
     model = EnlaceDocumentoFuente773
     extra = 0
-    fields = ['compositor_773', 'titulo']
+    fields = ['encabezamiento_principal', 'titulo']
     verbose_name = "Documento Fuente (773)"
     verbose_name_plural = "📘 Documentos Fuente (773 - R)"
 
 
+# 774 — Enlace a unidad constituyente
 class EnlaceUnidadConstituyente774Inline(admin.TabularInline):
     model = EnlaceUnidadConstituyente774
     extra = 0
-    fields = ['compositor_774', 'titulo']
+    fields = ['encabezamiento_principal', 'titulo']
     verbose_name = "Unidad Constituyente (774)"
     verbose_name_plural = "📗 Unidades Constituyentes (774 - R)"
 
 
+# 787 — Otras relaciones
 class OtrasRelaciones787Inline(admin.TabularInline):
     model = OtrasRelaciones787
     extra = 0
-    fields = ['compositor_787', 'titulo']
+    fields = ['encabezamiento_principal', 'titulo']
     verbose_name = "Otra Relación (787)"
     verbose_name_plural = "🔗 Otras Relaciones (787 - R)"
 
 
+# ============================================
 # Bloque 8xx - Ubicación
+# ============================================
+
 class Estanteria852Inline(admin.TabularInline):
     model = Estanteria852
     extra = 1
     fields = ['estanteria']
     verbose_name = "Estantería (852 $c)"
     verbose_name_plural = "Estanterías (852 $c - R)"
-
-
-# class Ubicacion852Inline(admin.StackedInline):
-#     model = Ubicacion852
-#     extra = 0
-#     fields = ['institucion_persona', 'signatura_original']
-#     verbose_name = "Ubicación (852)"
-#     verbose_name_plural = "📍 Ubicaciones (852 - R)"
-#     show_change_link = True
 
 
 class Disponible856Inline(admin.TabularInline):
@@ -328,6 +334,20 @@ class Disponible856Inline(admin.TabularInline):
     verbose_name = "Recurso Disponible (856)"
     verbose_name_plural = "🌐 Recursos Disponibles (856 - R)"
 
+
+class URL856Inline(admin.TabularInline):
+    model = URL856
+    extra = 1
+    fields = ['url']
+    verbose_name = "URL (856 $u)"
+    verbose_name_plural = "URLs (856 $u)"
+
+class TextoEnlace856Inline(admin.TabularInline):
+    model = TextoEnlace856
+    extra = 1
+    fields = ['texto_enlace']
+    verbose_name = "Texto del enlace (856 $y)"
+    verbose_name_plural = "Textos del enlace (856 $y)"
 
 # ============================================
 # INLINES PARA MODELOS AUXILIARES
@@ -606,21 +626,15 @@ FIELDSETS_COLECCION_IMPRESA = (
         'classes': ('collapse',)
     }),
     ('📝 Notas y Contenido (500/505/520/545)', {
-        'fields': ('sumario_520',),
+        'fields': (),
         'classes': ('collapse',)
     }),
     ('🏷️ Materias (650/655)', {
-        'fields': (
-            'materia_principal_650',
-            'materia_genero_655',
-        ),
+        'fields': (),
         'classes': ('collapse',)
     }),
     ('🔗 Puntos de Acceso Adicionales (700/710)', {
-        'fields': (
-            ('nombre_relacionado_700a', 'coordenadas_biograficas_700d', 'titulo_relacionado_700t'),
-            'entidad_relacionada_710a',
-        ),
+        'fields': (),
         'classes': ('collapse',)
     }),
     ('🏛️ Catalogación (040/092)', {
@@ -1093,6 +1107,12 @@ class NombreRelacionado700Admin(admin.ModelAdmin):
     
 #     def has_module_permission(self, request):
 #         return False  # Ocultar del menú principal
+@admin.register(Disponible856)
+class Disponible856Admin(admin.ModelAdmin):
+    inlines = [URL856Inline, TextoEnlace856Inline]
+
+    def has_module_permission(self, request):
+        return False
 
 
 # ============================================

@@ -1,6 +1,5 @@
 from django.db import models
-from .autoridades import AutoridadPersona, AutoridadEntidad
-from .auxiliares import EncabezamientoEnlace
+
 
 # =====================================================
 # ⚙️ Choices (listas controladas)
@@ -39,8 +38,7 @@ FUNCIONES_ENTIDAD = [
 
 class NombreRelacionado700(models.Model):
     """
-    700 1# – Punto de acceso adicional (Nombre de persona)
-    $a (NR), $c (R), $d (NR), $e (R), $i (NR), $j (NR), $t (NR)
+    700 1# – Nombre relacionado (Persona)
     """
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -49,23 +47,23 @@ class NombreRelacionado700(models.Model):
     )
 
     persona = models.ForeignKey(
-        AutoridadPersona,
+        'AutoridadPersona',
         on_delete=models.PROTECT,
-        help_text="700 $a – Apellidos, Nombres (controlado, NR)",
+        help_text="700 $a – Apellidos, Nombres (NR, autoridad)"
     )
 
     coordenadas_biograficas = models.CharField(
         max_length=50,
         blank=True,
         null=True,
-        help_text="700 $d – Coordenadas biográficas (NR)",
+        help_text="700 $d – Coordenadas biográficas (NR)"
     )
 
     relacion = models.CharField(
         max_length=200,
         blank=True,
         null=True,
-        help_text="700 $i – Información sobre la relación (NR)"
+        help_text="700 $i – Relación (NR)"
     )
 
     autoria = models.CharField(
@@ -73,14 +71,14 @@ class NombreRelacionado700(models.Model):
         choices=AUTORIAS_CHOICES,
         blank=True,
         null=True,
-        help_text="700 $j – Calificador de atribución (NR)"
+        help_text="700 $j – Autoría (NR)"
     )
 
     titulo_obra = models.CharField(
         max_length=250,
         blank=True,
         null=True,
-        help_text="700 $t – Título de la obra (NR)",
+        help_text="700 $t – Título de la obra (NR)"
     )
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -88,14 +86,13 @@ class NombreRelacionado700(models.Model):
     class Meta:
         verbose_name = "700 – Nombre relacionado"
         verbose_name_plural = "700 – Nombres relacionados (R)"
-        ordering = ['obra', 'id']
 
     def __str__(self):
         return str(self.persona)
 
 
 class TerminoAsociado700(models.Model):
-    """700 $c – Término asociado al nombre (R)"""
+    """700 $c – Término asociado (R)"""
     nombre_700 = models.ForeignKey(
         NombreRelacionado700,
         on_delete=models.CASCADE,
@@ -103,20 +100,16 @@ class TerminoAsociado700(models.Model):
     )
     termino = models.CharField(
         max_length=100,
-        help_text="700 $c – Término asociado al nombre (R)"
+        help_text="700 $c – Término asociado (R)"
     )
 
     class Meta:
         verbose_name = "700 $c – Término asociado"
         verbose_name_plural = "700 $c – Términos asociados (R)"
-        ordering = ['nombre_700', 'id']
-
-    def __str__(self):
-        return self.termino
 
 
 class Funcion700(models.Model):
-    """700 $e – Término indicativo de función (R)"""
+    """700 $e – Función (R)"""
     nombre_700 = models.ForeignKey(
         NombreRelacionado700,
         on_delete=models.CASCADE,
@@ -131,25 +124,17 @@ class Funcion700(models.Model):
     class Meta:
         verbose_name = "700 $e – Función"
         verbose_name_plural = "700 $e – Funciones (R)"
-        ordering = ['nombre_700', 'id']
-
-    def __str__(self):
-        return self.get_funcion_display()
-
-
-# NOTA: Los subcampos $i (relación) y $j (autoría) ahora son campos
-# no repetibles dentro de NombreRelacionado700
 
 
 # =====================================================
-# 🏛️ 710 2# Punto de acceso adicional – Entidad (R)
+# 🏛️ 710 2# Entidad relacionada (R)
 # =====================================================
 
 class EntidadRelacionada710(models.Model):
     """
-    710 2# – Punto de acceso adicional (Entidad)
-    $a (NR), $e (R)
+    710 2# – Entidad relacionada (R)
     """
+
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
@@ -157,9 +142,9 @@ class EntidadRelacionada710(models.Model):
     )
 
     entidad = models.ForeignKey(
-        AutoridadEntidad,
+        'AutoridadEntidad',
         on_delete=models.PROTECT,
-        help_text="710 $a – Entidad/Jurisdicción (controlado, NR)",
+        help_text="710 $a – Entidad relacionada (NR)"
     )
 
     funcion = models.CharField(
@@ -167,34 +152,48 @@ class EntidadRelacionada710(models.Model):
         choices=FUNCIONES_ENTIDAD,
         blank=True,
         null=True,
-        help_text="710 $e – Función institucional (R)",
+        help_text="710 $e – Función institucional (R)"
     )
 
     class Meta:
         verbose_name = "710 – Entidad relacionada"
         verbose_name_plural = "710 – Entidades relacionadas (R)"
-        ordering = ['obra', 'id']
 
     def __str__(self):
         return str(self.entidad)
 
 
 # =====================================================
-# 📘 773, 📗 774, 🔗 787 – Relaciones entre obras
+# 📘 773 – Enlace a documento fuente (R)
 # =====================================================
 
 class EnlaceDocumentoFuente773(models.Model):
-    """773 1# – Enlace a documento fuente (R)"""
+    """
+    773 1# – Enlace a documento fuente (R)
+    """
+
+    primer_indicador = models.CharField(
+        max_length=1,
+        default='1',
+        help_text="1 – No genera nota"
+    )
+
+    segundo_indicador = models.CharField(
+        max_length=1,
+        default='#',
+        help_text="# – Visualización 'En'"
+    )
+
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
         related_name='enlaces_documento_fuente_773',
     )
 
-    compositor_773 = models.ForeignKey(
-        EncabezamientoEnlace,
+    encabezamiento_principal = models.ForeignKey(
+        'AutoridadPersona',
         on_delete=models.PROTECT,
-        help_text="773 $a – Compositor (Persona, Título o Entidad)",
+        help_text="773 $a – Encabezamiento principal (NR)"
     )
 
     titulo = models.CharField(
@@ -203,48 +202,63 @@ class EnlaceDocumentoFuente773(models.Model):
     )
 
     class Meta:
-        verbose_name = "773 – Documento fuente"
-        verbose_name_plural = "773 – Documentos fuente (R)"
-        ordering = ['obra', 'id']
+        verbose_name = "773 – Enlace a documento fuente"
+        verbose_name_plural = "773 – Enlaces a documentos fuente (R)"
 
     def __str__(self):
-        return self.titulo
+        return f"En: {self.titulo}"
 
 
-class NumeroObraRelacionada773(models.Model):
-    """773 $w – Número de la obra en la colección (R)"""
+class NumeroControl773(models.Model):
+    """773 $w – Número de control del registro relacionado (R)"""
     enlace_773 = models.ForeignKey(
         EnlaceDocumentoFuente773,
         on_delete=models.CASCADE,
-        related_name='numeros_obra',
+        related_name='numeros_control',
     )
-    
-    numero = models.CharField(
-        max_length=50,
-        help_text="773 $w – Número de control 001 del registro de documento fuente"
+
+    obra_relacionada = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.PROTECT,
+        help_text="Referencia al registro cuyo 001 se usará en $w"
     )
 
     class Meta:
-        verbose_name = "773 $w – Número de obra"
-        verbose_name_plural = "773 $w – Números de obra (R)"
-        ordering = ['enlace_773', 'id']
+        verbose_name = "773 $w – Número de control"
+        verbose_name_plural = "773 $w – Números de control (R)"
 
     def __str__(self):
-        return self.numero
+        return self.obra_relacionada.num_control
 
+
+# =====================================================
+# 📗 774 – Unidad constituyente (R)
+# =====================================================
 
 class EnlaceUnidadConstituyente774(models.Model):
-    """774 1# – Enlace a unidad constituyente (R)"""
+
+    primer_indicador = models.CharField(
+        max_length=1,
+        default='1',
+        help_text="1 – No genera nota"
+    )
+
+    segundo_indicador = models.CharField(
+        max_length=1,
+        default='#',
+        help_text="# – Visualización 'Contiene'"
+    )
+
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
         related_name='enlaces_unidades_774',
     )
 
-    compositor_774 = models.ForeignKey(
-        EncabezamientoEnlace,
+    encabezamiento_principal = models.ForeignKey(
+        'AutoridadPersona',
         on_delete=models.PROTECT,
-        help_text="774 $a – Compositor (Persona, Título o Entidad)",
+        help_text="774 $a – Encabezamiento principal (NR)"
     )
 
     titulo = models.CharField(
@@ -255,46 +269,62 @@ class EnlaceUnidadConstituyente774(models.Model):
     class Meta:
         verbose_name = "774 – Unidad constituyente"
         verbose_name_plural = "774 – Unidades constituyentes (R)"
-        ordering = ['obra', 'id']
 
     def __str__(self):
-        return self.titulo
+        return f"Contiene: {self.titulo}"
 
 
-class NumeroObraRelacionada774(models.Model):
-    """774 $w – Número de obra relacionada (R)"""
+class NumeroControl774(models.Model):
+    """774 $w – Número de control (R)"""
+
     enlace_774 = models.ForeignKey(
         EnlaceUnidadConstituyente774,
         on_delete=models.CASCADE,
-        related_name='numeros_obra',
+        related_name='numeros_control',
     )
-    
-    numero = models.CharField(
-        max_length=50,
-        help_text="774 $w – Número de control de la obra constituyente"
+
+    obra_relacionada = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.PROTECT,
+        help_text="Obra cuyo 001 aparecerá en $w"
     )
 
     class Meta:
-        verbose_name = "774 $w – Número de obra"
-        verbose_name_plural = "774 $w – Números de obra (R)"
-        ordering = ['enlace_774', 'id']
+        verbose_name = "774 $w – Número de control"
+        verbose_name_plural = "774 $w – Números de control (R)"
 
     def __str__(self):
-        return self.numero
+        return self.obra_relacionada.num_control
 
+
+# =====================================================
+# 🔗 787 – Otras relaciones (R)
+# =====================================================
 
 class OtrasRelaciones787(models.Model):
-    """787 1# – Otras relaciones (R)"""
+
+    primer_indicador = models.CharField(
+        max_length=1,
+        default='1',
+        help_text="1 – No genera nota"
+    )
+
+    segundo_indicador = models.CharField(
+        max_length=1,
+        default='#',
+        help_text="# – Visualización 'Documento relacionado'"
+    )
+
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
         related_name='otras_relaciones_787',
     )
 
-    compositor_787 = models.ForeignKey(
-        EncabezamientoEnlace,
+    encabezamiento_principal = models.ForeignKey(
+        'AutoridadPersona',
         on_delete=models.PROTECT,
-        help_text="787 $a – Encabezamiento principal (Persona, Título o Entidad)",
+        help_text="787 $a – Encabezamiento principal (NR)"
     )
 
     titulo = models.CharField(
@@ -305,28 +335,29 @@ class OtrasRelaciones787(models.Model):
     class Meta:
         verbose_name = "787 – Otra relación"
         verbose_name_plural = "787 – Otras relaciones (R)"
-        ordering = ['obra', 'id']
 
     def __str__(self):
-        return self.titulo
+        return f"Documento relacionado: {self.titulo}"
 
-class NumeroObraRelacionada787(models.Model):
-    """787 $w – Número de obra relacionada (R)"""
+
+class NumeroControl787(models.Model):
+    """787 $w – Número de control del registro relacionado (R)"""
+
     enlace_787 = models.ForeignKey(
         OtrasRelaciones787,
         on_delete=models.CASCADE,
-        related_name='numeros_obra',
+        related_name='numeros_control',
     )
-    
-    numero = models.CharField(
-        max_length=50,
-        help_text="787 $w – Número de control de la obra relacionada"
+
+    obra_relacionada = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.PROTECT,
+        help_text="Obra cuyo 001 aparecerá en $w"
     )
 
     class Meta:
-        verbose_name = "787 $w – Número de obra"
-        verbose_name_plural = "787 $w – Números de obra (R)"
-        ordering = ['enlace_787', 'id']
+        verbose_name = "787 $w – Número de control"
+        verbose_name_plural = "787 $w – Números de control (R)"
 
     def __str__(self):
-        return self.numero
+        return self.obra_relacionada.num_control

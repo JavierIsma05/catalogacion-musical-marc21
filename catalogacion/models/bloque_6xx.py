@@ -5,12 +5,25 @@ from django.db import models
 # ============================================================
 
 class Materia650(models.Model):
+    """
+    650 04 — Materia (Temas)
+    Campo repetible (R)
+    Subcampos:
+      $a Materia (NR)
+      $x Subdivisión de materia (R)
+    """
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
         related_name='materias_650',
     )
-    materia = models.CharField(max_length=200, help_text="650 $a — Materia principal")
+
+    materia = models.ForeignKey(
+        'AutoridadMateria',
+        on_delete=models.PROTECT,
+        help_text="650 $a — Materia (NR)"
+    )
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -19,16 +32,24 @@ class Materia650(models.Model):
         ordering = ['obra', 'id']
 
     def __str__(self):
-        return self.materia
+        return str(self.materia)
 
 
 class SubdivisionMateria650(models.Model):
+    """
+    650 $x — Subdivisión de materia (R)
+    """
     materia650 = models.ForeignKey(
         Materia650,
         on_delete=models.CASCADE,
         related_name='subdivisiones',
     )
-    subdivision = models.CharField(max_length=200, help_text="650 $x — Subdivisión de materia")
+
+    subdivision = models.CharField(
+        max_length=200,
+        help_text="650 $x — Subdivisión de materia (R)"
+    )
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -41,12 +62,25 @@ class SubdivisionMateria650(models.Model):
 
 
 class MateriaGenero655(models.Model):
+    """
+    655 #4 — Materia (Género/Forma)
+    Campo repetible (R)
+    Subcampos:
+      $a Término género/forma (NR)
+      $x Subdivisión general (R)
+    """
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
         related_name='materias_655',
     )
-    materia = models.CharField(max_length=200, help_text="655 $a — Materia (género/forma)")
+
+    materia = models.ForeignKey(
+        'AutoridadFormaMusical',
+        on_delete=models.PROTECT,
+        help_text="655 $a — Género/Forma (NR)"
+    )
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -55,16 +89,24 @@ class MateriaGenero655(models.Model):
         ordering = ['obra', 'id']
 
     def __str__(self):
-        return self.materia
+        return str(self.materia)
 
 
 class SubdivisionGeneral655(models.Model):
+    """
+    655 $x — Subdivisión general (R)
+    """
     materia655 = models.ForeignKey(
         MateriaGenero655,
         on_delete=models.CASCADE,
         related_name='subdivisiones',
     )
-    subdivision = models.CharField(max_length=200, help_text="655 $x — Subdivisión general")
+
+    subdivision = models.CharField(
+        max_length=200,
+        help_text="655 $x — Subdivisión general (R)"
+    )
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:

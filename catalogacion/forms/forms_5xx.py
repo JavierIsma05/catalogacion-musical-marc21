@@ -56,10 +56,20 @@ class Sumario520Form(forms.ModelForm):
             'sumario': '520 $a - Sumario',
         }
 
-
 class DatosBiograficos545Form(forms.ModelForm):
-    """Formulario para campo 545 - Datos biográficos (manejado con JavaScript)"""
-    
     class Meta:
         model = DatosBiograficos545
-        fields = []  # Campos vacíos, subcampos manejados por JavaScript
+        fields = ['texto_biografico', 'uri']
+        widgets = {
+            'texto_biografico': forms.Textarea(
+                attrs={'class': 'form-control', 'rows': 3}
+            ),
+            'uri': forms.URLInput(
+                attrs={'class': 'form-control'}
+            ),
+        }
+        labels = {
+            'texto_biografico': '545 $a – Datos biográficos',
+            'uri': '545 $u – URI',
+        }
+

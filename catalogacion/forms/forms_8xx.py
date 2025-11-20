@@ -6,19 +6,20 @@ from catalogacion.models import (
     Ubicacion852,
     Estanteria852,
     Disponible856,
-    URL856,
-    TextoEnlace856,
     AutoridadEntidad,
 )
-from .widgets import TextAreaAutosize, Select2Widget
+from .widgets import Select2Widget
 
+
+# ============================================================
+# 852 – Ubicación
+# ============================================================
 
 class Ubicacion852Form(forms.ModelForm):
     """
     Formulario para campo 852 - Ubicación
     Incluye $a (institución) y $h (signatura)
     """
-    
     class Meta:
         model = Ubicacion852
         fields = ['institucion_persona', 'signatura_original']
@@ -28,14 +29,14 @@ class Ubicacion852Form(forms.ModelForm):
             }),
             'signatura_original': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ej: Ms-123'
+                'placeholder': 'Ej: Archivo Histórico – Caja 3, Carpeta 7'
             }),
         }
         labels = {
-            'institucion_persona': '852 $a - Institución o persona',
-            'signatura_original': '852 $h - Signatura original',
+            'institucion_persona': '852 $a – Institución o persona',
+            'signatura_original': '852 $h – Signatura original',
         }
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['institucion_persona'].queryset = AutoridadEntidad.objects.all().order_by('nombre')
@@ -43,35 +44,26 @@ class Ubicacion852Form(forms.ModelForm):
         self.fields['signatura_original'].required = False
 
 
+# ============================================================
+# 852 $c – Estantería (R)
+# ============================================================
+
 class Estanteria852Form(forms.ModelForm):
-    """Formulario para campo 852 $c - Estantería"""
-    
     class Meta:
         model = Estanteria852
         fields = ['estanteria']
         widgets = {
-            'estanteria': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
+            'estanteria': forms.TextInput(attrs={'class': 'form-control'}),
         }
         labels = {
-            'estanteria': '852 $c - Estantería',
+            'estanteria': '852 $c – Estantería',
         }
-
 
 class Disponible856Form(forms.ModelForm):
     """
-    Formulario para campo 856 - Disponible
-    Los subcampos $u (URL) y $y (texto enlace) se manejan con JavaScript
+    Formulario fantasma usado por el formset.
+    No tiene campos porque $u y $y se manejan por JavaScript.
     """
-    
     class Meta:
         model = Disponible856
-        fields = []  # Sin campos directos, los subcampos se manejan con JavaScript
-    
-    def __str__(self):
-        return "856 - Recurso disponible"
-
-
-# Los formularios URL856Form y TextoEnlace856Form no son necesarios
-# porque los subcampos se manejan dinámicamente con JavaScript
+        fields = []
