@@ -441,3 +441,23 @@ html {
         display: none;
     }
 }
+
+.btn-music {
+  background-color: #f7f9fc;
+  border: 1px solid #c5d0e0;
+  color: #2c3e50;
+  padding: 2px 6px;
+  margin: 1px;
+  border-radius: 4px;
+}
+
+.btn-music:hover {
+  background-color: #e3eaf5;
+  border-color: #8fa3c0;
+  color: #1f2d3d;
+}
+.btn-music:active {
+  background-color: #d0d7e8;
+  border-color: #6c7a99;
+  color: #16202b;
+}

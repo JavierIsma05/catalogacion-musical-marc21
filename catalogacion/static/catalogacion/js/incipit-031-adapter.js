@@ -134,9 +134,9 @@
     console.log("[updateCanvasHeaderFromInputs] Iniciando...");
 
     // 1. Leer valores de los inputs
-    const clefInput = document.querySelector('input[name="incipit_g_0"]');
-    const armaduraInput = document.querySelector('input[name="incipit_n_0"]');
-    const tiempoInput = document.querySelector('input[name="incipit_o_0"]');
+    const clefInput = document.getElementById('incipit_g_0');
+    const armaduraInput = document.getElementById('incipit_n_0');
+    const tiempoInput = document.getElementById('incipit_o_0');
 
     const clefValue = clefInput ? clefInput.value.trim() : "";
     const armaduraValue = armaduraInput ? armaduraInput.value.trim() : "";
