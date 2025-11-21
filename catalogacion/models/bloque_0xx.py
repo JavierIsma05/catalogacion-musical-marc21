@@ -37,10 +37,9 @@ class IncipitMusical(models.Model):
     titulo_encabezamiento = models.CharField(
         max_length=200,
         blank=True,
-        null=True,
         help_text="031 $d – Nombre del tempo o movimiento (ej: Aria, Allegro, Andante)",
     )
-    #  Subcampo$e – Personaje
+    #  Subcampo $e – Personaje
     personaje = models.CharField(
         max_length=200, blank=True, null=True, help_text="031 $e – Personaje"
     )
@@ -49,7 +48,6 @@ class IncipitMusical(models.Model):
     clave = models.CharField(
         max_length=20,
         blank=True,
-        null=True,
         help_text="031 $g – Clave musical (ej.: G-2, F-4)",
     )
 
@@ -58,18 +56,17 @@ class IncipitMusical(models.Model):
         max_length=100,
         blank=True,
         default="piano",
-        null=True,
         help_text="031 $m – Voz/instrumento",
     )
 
     # Subcampo $n – Armadura (ej. bBE)
     armadura = models.CharField(
-        max_length=20, blank=True, null=True, help_text="031 $n – Armadura"
+        max_length=20, blank=True, help_text="031 $n – Armadura"
     )
 
     # Subcampo $o – Tiempo (ej. 4/4)
     tiempo = models.CharField(
-        max_length=20, blank=True, null=True, help_text="031 $o – Tiempo"
+        max_length=20, blank=True, help_text="031 $o – Tiempo"
     )
 
     # Subcampo $p - Notación musical (PAE)
@@ -101,7 +98,6 @@ class IncipitMusical(models.Model):
     )
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-
 
     class Meta:
         verbose_name = "Íncipit Musical (031)"
