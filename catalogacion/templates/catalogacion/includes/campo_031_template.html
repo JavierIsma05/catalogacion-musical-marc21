@@ -1,0 +1,371 @@
+{% comment %}
+Template personalizado para campo 031 - Íncipit musical + canvas
+Se usa con el formset "incipits_musicales"
+{% endcomment %}
+
+
+{% load static %}
+
+<style>
+@font-face {
+  font-family: 'Maestro';
+  src: url("{% static 'catalogacion/fonts/Maestro.ttf' %}") format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Opcional: fuerza Maestro en los botones del toolbar */
+.btn-music span {
+  font-family: 'Maestro','Bravura','Music', serif;
+}
+</style>
+
+
+<div class="formset-container formset-incipit" data-formset-prefix="{{ formset.prefix }}">
+    {{ formset.management_form }}
+
+    <button type="button" class="add-form-row mb-3" title="Agregar Íncipit">
+        <i class="bi bi-plus-circle"></i>
+        Agregar Íncipit
+    </button>
+
+    <div class="formset-forms">
+        {% for form in formset %}
+        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %}">
+            {% if form.instance.pk %}
+                <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
+            {% endif %}
+
+            {% if formset.can_delete %}
+                <div class="d-none">
+                    {{ form.DELETE }}
+                </div>
+            {% endif %}
+
+            <button type="button" class="delete-row-btn" title="Eliminar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+
+            {# Fila 1: números a, b, c #}
+            <div class="campo-grid">
+                <div class="col-third">
+                    <label class="form-label" for="{{ form.numero_obra.id_for_label }}">
+                        {{ form.numero_obra.label }}
+                    </label>
+                    {{ form.numero_obra }}
+                    {% if form.numero_obra.errors %}
+                        <div class="invalid-feedback d-block">{{ form.numero_obra.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-third">
+                    <label class="form-label" for="{{ form.numero_movimiento.id_for_label }}">
+                        {{ form.numero_movimiento.label }}
+                    </label>
+                    {{ form.numero_movimiento }}
+                    {% if form.numero_movimiento.errors %}
+                        <div class="invalid-feedback d-block">{{ form.numero_movimiento.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-third">
+                    <label class="form-label" for="{{ form.numero_pasaje.id_for_label }}">
+                        {{ form.numero_pasaje.label }}
+                    </label>
+                    {{ form.numero_pasaje }}
+                    {% if form.numero_pasaje.errors %}
+                        <div class="invalid-feedback d-block">{{ form.numero_pasaje.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Fila 2: título, personaje, voz/instrumento #}
+            <div class="campo-grid mt-3">
+                <div class="col-third">
+                    <label class="form-label" for="{{ form.titulo_encabezamiento.id_for_label }}">
+                        {{ form.titulo_encabezamiento.label }}
+                    </label>
+                    {{ form.titulo_encabezamiento }}
+                    {% if form.titulo_encabezamiento.errors %}
+                        <div class="invalid-feedback d-block">{{ form.titulo_encabezamiento.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-third">
+                    <label class="form-label" for="{{ form.personaje.id_for_label }}">
+                        {{ form.personaje.label }}
+                    </label>
+                    {{ form.personaje }}
+                    {% if form.personaje.errors %}
+                        <div class="invalid-feedback d-block">{{ form.personaje.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-third">
+                    <label class="form-label" for="{{ form.voz_instrumento.id_for_label }}">
+                        {{ form.voz_instrumento.label }}
+                    </label>
+                    {{ form.voz_instrumento }}
+                    {% if form.voz_instrumento.errors %}
+                        <div class="invalid-feedback d-block">{{ form.voz_instrumento.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Fila 3: clave, armadura, tiempo (ahora como select) #}
+            <div class="campo-grid mt-3">
+                <div class="col-third">
+                    <label class="form-label" for="{{ form.clave.id_for_label }}">Clave</label>
+                    {{ form.clave }}
+                </div>
+
+                <div class="col-third">
+                    <label class="form-label" for="{{ form.armadura.id_for_label }}">Armadura</label>
+                    {{ form.armadura }}
+                </div>
+
+                <div class="col-third">
+                    <label class="form-label" for="{{ form.tiempo.id_for_label }}">Tiempo</label>
+                    {{ form.tiempo }}
+                </div>
+            </div>
+
+            {# Editor de íncipit (canvas) #}
+            <div class="campo-grid mt-3">
+                <div class="col-full">
+                    <label class="form-label">Editor de íncipit</label>
+                    <div class="incipit-editor-wrapper">
+                        <canvas
+                            id="incipit_canvas_0"
+                            class="incipit-canvas"
+                            width="800"
+                            height="240">
+                        </canvas>
+                        <small class="form-text text-muted">
+                            El contenido del canvas se sincronizará con el campo de notación musical (PAE).
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            {# Notación musical PAE (031 $p) #}
+            <div class="campo-grid mt-3">
+                <div class="col-full">
+                    <label class="form-label" for="{{ form.notacion_musical.id_for_label }}">
+                        Notación musical (PAE)
+                    </label>
+                    {{ form.notacion_musical }}
+                </div>
+            </div>
+
+            {# Nota general #}
+            <div class="campo-grid mt-3">
+                <div class="col-full">
+                    <label class="form-label" for="{{ form.nota_general.id_for_label }}">
+                        {{ form.nota_general.label }}
+                    </label>
+                    {{ form.nota_general }}
+                    {% if form.nota_general.errors %}
+                        <div class="invalid-feedback d-block">{{ form.nota_general.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Tonalidad / modo + nota de validez #}
+            <div class="campo-grid mt-3">
+                <div class="col-half">
+                    <label class="form-label" for="{{ form.tonalidad_modo.id_for_label }}">
+                        {{ form.tonalidad_modo.label }}
+                    </label>
+                    {{ form.tonalidad_modo }}
+                    {% if form.tonalidad_modo.errors %}
+                        <div class="invalid-feedback d-block">{{ form.tonalidad_modo.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-half">
+                    <label class="form-label" for="{{ form.nota_validez_codificada.id_for_label }}">
+                        {{ form.nota_validez_codificada.label }}
+                    </label>
+                    {{ form.nota_validez_codificada }}
+                    {% if form.nota_validez_codificada.errors %}
+                        <div class="invalid-feedback d-block">{{ form.nota_validez_codificada.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+
+        {# Template vacío para clonar (mismo layout, usando empty_form) #}
+        <div class="formset-row empty-form" style="display:none;">
+            <button type="button" class="delete-row-btn" title="Eliminar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+
+            <div class="campo-grid">
+                <div class="col-third">
+                    <label class="form-label">
+                        {{ formset.empty_form.numero_obra.label }}
+                    </label>
+                    {{ formset.empty_form.numero_obra }}
+                </div>
+                <div class="col-third">
+                    <label class="form-label">
+                        {{ formset.empty_form.numero_movimiento.label }}
+                    </label>
+                    {{ formset.empty_form.numero_movimiento }}
+                </div>
+                <div class="col-third">
+                    <label class="form-label">
+                        {{ formset.empty_form.numero_pasaje.label }}
+                    </label>
+                    {{ formset.empty_form.numero_pasaje }}
+                </div>
+            </div>
+
+            <div class="campo-grid mt-3">
+                <div class="col-third">
+                    <label class="form-label">
+                        {{ formset.empty_form.titulo_encabezamiento.label }}
+                    </label>
+                    {{ formset.empty_form.titulo_encabezamiento }}
+                </div>
+                <div class="col-third">
+                    <label class="form-label">
+                        {{ formset.empty_form.personaje.label }}
+                    </label>
+                    {{ formset.empty_form.personaje }}
+                </div>
+                <div class="col-third">
+                    <label class="form-label">
+                        {{ formset.empty_form.voz_instrumento.label }}
+                    </label>
+                    {{ formset.empty_form.voz_instrumento }}
+                </div>
+            </div>
+
+            <div class="campo-grid mt-3">
+                <div class="col-third">
+                    <label class="form-label">
+                        {{ formset.empty_form.clave.label }}
+                    </label>
+                    {{ formset.empty_form.clave }}
+                </div>
+                <div class="col-third">
+                    <label class="form-label">
+                        {{ formset.empty_form.armadura.label }}
+                    </label>
+                    {{ formset.empty_form.armadura }}
+                </div>
+                <div class="col-third">
+                    <label class="form-label">
+                        {{ formset.empty_form.tiempo.label }}
+                    </label>
+                    {{ formset.empty_form.tiempo }}
+                </div>
+            </div>
+
+            <div class="campo-grid mt-3">
+                <div class="col-full">
+                    <label class="form-label">
+                        {{ formset.empty_form.notacion_musical.label }}
+                    </label>
+                    {{ formset.empty_form.notacion_musical }}
+                </div>
+            </div>
+
+            <div class="campo-grid mt-3">
+                <div class="col-full">
+                    <label class="form-label">
+                        {{ formset.empty_form.nota_general.label }}
+                    </label>
+                    {{ formset.empty_form.nota_general }}
+                </div>
+            </div>
+
+            <div class="campo-grid mt-3">
+                <div class="col-half">
+                    <label class="form-label">
+                        {{ formset.empty_form.tonalidad_modo.label }}
+                    </label>
+                    {{ formset.empty_form.tonalidad_modo }}
+                </div>
+                <div class="col-half">
+                    <label class="form-label">
+                        {{ formset.empty_form.nota_validez_codificada.label }}
+                    </label>
+                    {{ formset.empty_form.nota_validez_codificada }}
+                </div>
+            </div>
+
+            <div class="campo-grid mt-3">
+                <div class="col-full">
+                    <label class="form-label">
+                        Editor de íncipit
+                    </label>
+                    <canvas
+                        id="incipit_canvas_{{ formset.empty_form.prefix }}"
+                        class="incipit-canvas"
+                        width="800"
+                        height="240">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Script para manejar agregar/eliminar formularios (similar al genérico)
+(function() {
+    const prefix = '{{ formset.prefix }}';
+    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+    if (!container) return;
+
+    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+    const addButton = container.querySelector('.add-form-row');
+    const formsContainer = container.querySelector('.formset-forms');
+
+    if (!totalFormsInput || !addButton || !formsContainer) return;
+
+    // Agregar nuevo íncipit
+    addButton.addEventListener('click', function() {
+        const totalForms = parseInt(totalFormsInput.value);
+        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
+
+        if (!emptyFormTemplate) {
+            console.error('No se encontró template vacío para el formset 031');
+            return;
+        }
+
+        const emptyForm = emptyFormTemplate.cloneNode(true);
+
+        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
+        emptyForm.classList.remove('empty-form');
+        emptyForm.style.display = '';
+
+        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
+
+        totalFormsInput.value = totalForms + 1;
+    });
+
+    // Eliminar íncipit
+    formsContainer.addEventListener('click', function(e) {
+        const deleteBtn = e.target.closest('.delete-row-btn');
+        if (!deleteBtn) return;
+
+        const row = deleteBtn.closest('.formset-row');
+        if (!row || row.classList.contains('empty-form')) return;
+
+        const deleteInput = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+        if (deleteInput) {
+            deleteInput.checked = true;
+            row.style.display = 'none';
+        } else {
+            row.remove();
+            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
+        }
+    });
+})();
+</script>
