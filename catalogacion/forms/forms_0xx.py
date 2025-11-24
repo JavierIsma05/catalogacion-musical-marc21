@@ -109,9 +109,6 @@ class IncipitMusicalForm(forms.ModelForm):
             "armadura",
             "tiempo",
             "notacion_musical",
-            "nota_general",
-            "tonalidad_modo",
-            "nota_validez_codificada",
         ]
         widgets = {
             "numero_obra": forms.NumberInput(
@@ -221,24 +218,6 @@ class IncipitMusicalForm(forms.ModelForm):
                 attrs={
                     "placeholder": "031 $p - Notación musical codificada",
                     "rows": 4,
-                }
-            ),
-            "nota_general": TextAreaAutosize(
-                attrs={
-                    "placeholder": "031 $q - Nota general",
-                    "rows": 3,
-                }
-            ),
-            "tonalidad_modo": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "031 $r - Tonalidad o modo",
-                }
-            ),
-            "nota_validez_codificada": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "031 $s - Nota de validez codificada",
                 }
             ),
         }

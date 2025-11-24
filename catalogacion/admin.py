@@ -72,7 +72,7 @@ class IncipitMusicalInline(admin.TabularInline):
     model = IncipitMusical
     extra = 0
     fields = ['numero_obra', 'numero_movimiento', 'numero_pasaje', 'titulo_encabezamiento', 'personaje', 'clave', 'voz_instrumento',
-              'armadura', 'tiempo', 'notacion_musical','nota_general', 'tonalidad_modo', 'nota_validez_codificada']
+              'armadura', 'tiempo', 'notacion_musical'  ]
     verbose_name = "Íncipit Musical (031)"
     verbose_name_plural = "📝 Íncipits Musicales (031 - R)"
 
