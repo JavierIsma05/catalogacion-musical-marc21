@@ -12,21 +12,21 @@ from catalogacion.models import (
 from .widgets import TextAreaAutosize
 
 CLAVES_PAE = [
-    ("%G-2", "Clave de Sol (G-2)"),
-    ("%C-3", "Clave de Do en 3ª (C-3)"),
-    ("%F-4", "Clave de Fa en 4ª (F-4)"),
+    ("G-2", "Clave de Sol (G-2)"),
+    ("C-3", "Clave de Do en 3ª (C-3)"),
+    ("F-4", "Clave de Fa en 4ª (F-4)"),
 
 ]
 
 ARMADURAS_PAE = [
     ("", "Sin armadura"),
-    ("F", "1 sostenido (F#)"),
-    ("FC", "2 sostenidos (F#, C#)"),
-    ("FCG", "3 sostenidos (F#, C#, G#)"),
-    ("FCGD", "4 sostenidos"),
-    ("FCGDA", "5 sostenidos"),
-    ("FCGDAE", "6 sostenidos"),
-    ("FCGDAEB", "7 sostenidos"),
+    ("xF", "1 sostenido (F#)"),
+    ("xFC", "2 sostenidos (F#, C#)"),
+    ("xFCG", "3 sostenidos (F#, C#, G#)"),
+    ("xFCGD", "4 sostenidos"),
+    ("xFCGDA", "5 sostenidos"),
+    ("xFCGDAE", "6 sostenidos"),
+    ("xFCGDAEB", "7 sostenidos"),
     ("bB", "1 bemol (Bb)"),
     ("bBE", "2 bemoles (Bb, Eb)"),
     ("bBEA", "3 bemoles"),
@@ -63,9 +63,6 @@ class IncipitMusicalForm(forms.ModelForm):
             "armadura",
             "tiempo",
             "notacion_musical",
-            "nota_general",
-            "tonalidad_modo",
-            "nota_validez_codificada",
         ]
         widgets = {
             "numero_obra": forms.NumberInput(
@@ -101,6 +98,7 @@ class IncipitMusicalForm(forms.ModelForm):
             "clave": forms.Select(
                 choices=CLAVES_PAE,
                 attrs={"class": "form-select"},
+
             ),
             "voz_instrumento": forms.TextInput(
                 attrs={
@@ -120,24 +118,6 @@ class IncipitMusicalForm(forms.ModelForm):
                 attrs={
                     "placeholder": "031 $p - Notación musical codificada",
                     "rows": 4,
-                }
-            ),
-            "nota_general": TextAreaAutosize(
-                attrs={
-                    "placeholder": "031 $q - Nota general",
-                    "rows": 3,
-                }
-            ),
-            "tonalidad_modo": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "031 $r - Tonalidad o modo",
-                }
-            ),
-            "nota_validez_codificada": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "031 $s - Nota de validez codificada",
                 }
             ),
         }

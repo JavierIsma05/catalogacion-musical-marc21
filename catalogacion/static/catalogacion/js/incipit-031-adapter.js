@@ -79,9 +79,9 @@
     // Trabajamos sobre el primer formset de incipits
     const root = document.querySelector(".formset-incipit") || document;
 
-    // Campo 031 $g (Clave) - <select> con name="incipits_musicales-0-clave"
+    // 031 $g (Clave) - select name="incipits-0-clave"
     const clefInput = root.querySelector(
-      '[name^="incipits_musicales-"][name$="-clave"]'
+      'select[name^="incipits-"][name$="-clave"]'
     );
     if (clefInput && parsed.clef) {
       clefInput.value = parsed.clef;
@@ -89,13 +89,13 @@
       clefInput.dispatchEvent(new Event("change", { bubbles: true }));
     } else {
       console.warn(
-        "[fillFieldsFromPaeCode] No se encontró campo clave o valor vacío"
+        "[fillFieldsFromPaeCode] No se encontró select clave o valor vacío"
       );
     }
 
-    // Campo 031 $n (Armadura) - name="incipits_musicales-0-armadura"
+    // 031 $n (Armadura) - select name="incipits-0-armadura"
     const armaduraInput = root.querySelector(
-      '[name^="incipits_musicales-"][name$="-armadura"]'
+      'select[name^="incipits-"][name$="-armadura"]'
     );
     if (armaduraInput && parsed.armadura) {
       armaduraInput.value = parsed.armadura;
@@ -103,13 +103,13 @@
       armaduraInput.dispatchEvent(new Event("change", { bubbles: true }));
     } else {
       console.warn(
-        "[fillFieldsFromPaeCode] No se encontró campo armadura o valor vacío"
+        "[fillFieldsFromPaeCode] No se encontró select armadura o valor vacío"
       );
     }
 
-    // Campo 031 $o (Tiempo/compás) - name="incipits_musicales-0-tiempo"
+    // 031 $o (Tiempo) - select name="incipits-0-tiempo"
     const tiempoInput = root.querySelector(
-      '[name^="incipits_musicales-"][name$="-tiempo"]'
+      'select[name^="incipits-"][name$="-tiempo"]'
     );
     if (tiempoInput && parsed.tiempo) {
       tiempoInput.value = parsed.tiempo;
@@ -117,13 +117,13 @@
       tiempoInput.dispatchEvent(new Event("change", { bubbles: true }));
     } else {
       console.warn(
-        "[fillFieldsFromPaeCode] No se encontró campo tiempo o valor vacío"
+        "[fillFieldsFromPaeCode] No se encontró select tiempo o valor vacío"
       );
     }
 
-    // Campo 031 $p (cuerpo PAE) - textarea name="incipits_musicales-0-notacion_musical"
+    // 031 $p (cuerpo PAE) - textarea name="incipits-0-notacion_musical"
     const cuerpoTextarea = root.querySelector(
-      'textarea[name^="incipits_musicales-"][name$="-notacion_musical"]'
+      'textarea[name^="incipits-"][name$="-notacion_musical"]'
     );
     if (cuerpoTextarea && parsed.cuerpo) {
       cuerpoTextarea.value = parsed.cuerpo;
@@ -134,7 +134,15 @@
         "[fillFieldsFromPaeCode] No se encontró textarea cuerpo o valor vacío"
       );
     }
+
+    // Campo visual: PAE completo (cabecera + cuerpo) solo lectura
+    var displayFull = document.getElementById("incipit_paec_display_0");
+    if (displayFull && paeCode) {
+      displayFull.value = paeCode.trim();
+    }
+    return parsed;
   }
+
 
 
   /**
@@ -142,12 +150,33 @@
    * Lee los valores de clave, armadura y tiempo, y actualiza el primer elemento del canvas
    */
   function updateCanvasHeaderFromInputs() {
-    console.log("[updateCanvasHeaderFromInputs] Iniciando...");
+    console.log("[updateCanvasHeaderFromInputs] Iniciando.");
+
+    const root = document.querySelector(".formset-incipit") || document;
+
+    // // 🔍 DEBUG: Mostrar todos los selects en la página
+    // const allSelects = document.querySelectorAll("select");
+    // console.log("[DEBUG] Total de selects en la página:", allSelects.length);
+    // allSelects.forEach((sel, idx) => {
+    //   console.log(`  [${idx}] name="${sel.name}" value="${sel.value}" options:`, sel.querySelectorAll("option").length);
+    // });
 
     // 1. Leer valores de los inputs
-    const clefInput = document.getElementById('incipit_g_0');
-    const armaduraInput = document.getElementById('incipit_n_0');
-    const tiempoInput = document.getElementById('incipit_o_0');
+    const clefInput = root.querySelector(
+      'select[name^="incipits-"][name$="-clave"]'
+    );
+    const armaduraInput = root.querySelector(
+      'select[name^="incipits-"][name$="-armadura"]'
+    );
+    const tiempoInput = root.querySelector(
+      'select[name^="incipits-"][name$="-tiempo"]'
+    );
+
+    console.log("[DEBUG] Elementos encontrados:", {
+      clef: !!clefInput,
+      armadura: !!armaduraInput,
+      tiempo: !!tiempoInput
+    });
 
     const clefValue = clefInput ? clefInput.value.trim() : "";
     const armaduraValue = armaduraInput ? armaduraInput.value.trim() : "";
@@ -310,10 +339,37 @@
       var paecInput = document.getElementById("incipitPaec");
       var paeCode = paecInput ? paecInput.value : "";
 
+      console.log("[TransformIncipitToPAEC] PAE generado:", paeCode);
+
       // Rellenar campos 031$g, 031$n, 031$o desde el paeCode
       fillFieldsFromPaeCode(paeCode);
     };
   }
+
+  // 🆕 NUEVA: Monitorear cambios en tiempo real del canvas
+  // Usa MutationObserver para detectar cuando el legacy actualiza #incipitPaec
+  document.addEventListener("DOMContentLoaded", function () {
+    var hiddenPaec = document.getElementById("incipitPaec");
+    if (hiddenPaec) {
+      var observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+          if (mutation.type === "attributes" && mutation.attributeName === "value") {
+            var paeCode = hiddenPaec.value;
+            console.log("[MutationObserver] 🔄 PAE cambió:", paeCode);
+            // Actualizar campos del formulario automáticamente
+            fillFieldsFromPaeCode(paeCode);
+          }
+        });
+      });
+
+      observer.observe(hiddenPaec, {
+        attributes: true,
+        attributeFilter: ["value"]
+      });
+
+      console.log("[DOMContentLoaded] ✅ MutationObserver configurado para #incipitPaec");
+    }
+  });
 
   // 2) Inicializar el canvas del primer incipit una vez cargado el DOM
   document.addEventListener("DOMContentLoaded", function () {
@@ -356,8 +412,21 @@
         e.preventDefault();
         console.log("[Parse Button] 🔄 Click detectado");
 
-        // NUEVA FUNCIONALIDAD: Actualizar cabecera desde inputs
+        // 1) Actualizar cabecera del canvas desde los selects (clave, armadura, tiempo)
         updateCanvasHeaderFromInputs();
+
+        // 2) Generar el PAE completo con el legacy y propagarlo al formulario
+        if (
+          typeof CanvasIncipit !== "undefined" &&
+          typeof CanvasIncipit.TransformIncipitToPAEC === "function"
+        ) {
+          console.log("[Parse Button] ▶️ Llamando a TransformIncipitToPAEC...");
+          CanvasIncipit.TransformIncipitToPAEC(CanvasIncipit);
+        } else {
+          console.warn(
+            "[Parse Button] ⚠️ CanvasIncipit.TransformIncipitToPAEC no disponible"
+          );
+        }
       });
     } else {
       console.warn(

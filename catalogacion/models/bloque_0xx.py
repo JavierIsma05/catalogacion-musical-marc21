@@ -76,27 +76,6 @@ class IncipitMusical(models.Model):
         help_text="031 $p – Íncipit musical codificado en PAE (Plaine & Easie)",
     )
 
-    # Subcampo $q – Nota general
-    nota_general = models.TextField(
-        blank=True, null=True, help_text="031 $q – Nota general"
-    )
-
-    # Subcampo $r – Tonalidad o modo
-    tonalidad_modo = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        help_text="031 $r – Tonalidad o modo (ej.: g, C mayor)",
-    )
-
-    # Subcampo $s – Nota de validez codificada
-    nota_validez_codificada = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        help_text="031 $s – Nota de validez codificada",
-    )
-
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
