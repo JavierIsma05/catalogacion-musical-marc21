@@ -865,7 +865,7 @@ function CanvasClass() {
         context.gCanvasElement.height
     );
 
-    cursor.x = Math.floor(x)+20 //+ to adjust click position
+    cursor.x = Math.floor(x) + 20; //+ to adjust click position
     cursor.y = Math.floor(y / context.stepY);
 
     if (cursor.y > context.maxStepY) {
@@ -924,16 +924,14 @@ function CanvasClass() {
     return false;
   };
 
-    this.maxNotes = function (context) {
-      var sumNote = 30; // en setDrawPosition
-      var margenInicio = 60; // clef + armadura + compás
-      var margenFin = 40; // un poco de aire al final
-      return Math.floor(
-        (context.gCanvasElement.width - margenInicio - margenFin) / sumNote
-      );
-    };
-
-
+  this.maxNotes = function (context) {
+    var sumNote = 30; // en setDrawPosition
+    var margenInicio = 60; // clef + armadura + compás
+    var margenFin = 40; // un poco de aire al final
+    return Math.floor(
+      (context.gCanvasElement.width - margenInicio - margenFin) / sumNote
+    );
+  };
 
   //Add a new note on the Incipit
   this.addNote = function (context, cursor) {
@@ -946,7 +944,10 @@ function CanvasClass() {
 
     var note = context.getCurrentNotePressed(context);
 
-    if (note != null && context.drawXPosition.length < context.maxNotes(context)) {
+    if (
+      note != null &&
+      context.drawXPosition.length < context.maxNotes(context)
+    ) {
       var alterationName = "becuadro";
       var eleCoord = context.cursorToElement(context, cursor);
 
@@ -1060,7 +1061,7 @@ function CanvasClass() {
           !context.incipit.getNoteByName(
             context.drawIncipitElements[i].noteName
           ).isRest &&
-          context.drawIncipitElements[i].yPosition + up >= 0 &&
+          context.drawIncipitElements[i].yPosition + up >= -2 &&
           context.drawIncipitElements[i].yPosition + up < 19
         ) {
           context.drawIncipitElements[i].yPosition =
@@ -1544,16 +1545,21 @@ function CanvasClass() {
 
     return { x: positionX, y: positionY };
   };
-
+  /* Draws extra lines for notes out of the pentagram */
   this.noteNeedLine = function (context, xPosition, yPosition) {
     var notePosition = context.getDrawPosition(context, xPosition, yPosition);
-    var halfScreenYpx = context.gCanvasElement.height / 2; //Half screen y pixels
+    var halfScreenYpx = context.gCanvasElement.height / 2; // Half screen y pixels
     var pixelsToAdd;
     var upOrDown = 1;
 
+    // Arriba (por encima del pentagrama) usamos -1, abajo +1
     if (yPosition < 4) upOrDown = -1;
 
-    if (yPosition < 4 || yPosition > 14) {
+    // 1ª línea auxiliar (más cercana al pentagrama)
+    if (
+      (upOrDown === -1 && yPosition <= 4) || // arriba
+      (upOrDown === 1 && yPosition >= 13) // abajo
+    ) {
       pixelsToAdd = context.stepY * 2 * 3 * upOrDown + context.stepY / 2;
       context.gDrawingContext.moveTo(
         xPosition + context.ratioX(context, -5),
@@ -1565,7 +1571,11 @@ function CanvasClass() {
       );
     }
 
-    if (yPosition < 2 || yPosition > 16) {
+    // 2ª línea auxiliar
+    if (
+      (upOrDown === -1 && yPosition <= 2) || // arriba
+      (upOrDown === 1 && yPosition >= 15) // abajo
+    ) {
       pixelsToAdd = context.stepY * 2 * 4 * upOrDown + context.stepY / 2;
       context.gDrawingContext.moveTo(
         xPosition + context.ratioX(context, -5),
@@ -1576,7 +1586,24 @@ function CanvasClass() {
         halfScreenYpx + pixelsToAdd
       );
     }
+
+    // 3ª línea auxiliar (más alejada)
+    if (
+      (upOrDown === -1 && yPosition <= 0) || // arriba
+      (upOrDown === 1 && yPosition >= 17) // abajo
+    ) {
+      pixelsToAdd = context.stepY * 2 * 5 * upOrDown + context.stepY / 2;
+      context.gDrawingContext.moveTo(
+        xPosition + context.ratioX(context, -5),
+        halfScreenYpx + pixelsToAdd
+      );
+      context.gDrawingContext.lineTo(
+        xPosition + context.ratioX(context, 18),
+        halfScreenYpx + pixelsToAdd
+      );
+    }
   };
+
   //Main function that draw incipit
   this.drawPentagram = function (context) {
     var drawingProblemYPatchAmountFix = 0; //solves Drawing problem (Chrome and Firefox)
@@ -1584,7 +1611,7 @@ function CanvasClass() {
     //Dibujo rayas pentagrama
     context.gDrawingContext.beginPath();
     context.gDrawingContext.strokeStyle = "#000000";
-    context.gDrawingContext.lineWidth = "2";
+    context.gDrawingContext.lineWidth = "1";
 
     var halfScreenYpx = context.gCanvasElement.height / 2; //Half screen y pixels
     var pixelsToAdd;
@@ -2011,7 +2038,9 @@ function CanvasClass() {
     if (clef == "alto") notePosition += 6;
     if (clef == "bass") notePosition += 12;
 
-    if (notePosition >= 0 && notePosition <= 1) {
+    // agregar al PAEC la octava
+
+    if (notePosition >= -2 && notePosition <= 1) {
       paecOctave = "'''";
     } else if (notePosition >= 2 && notePosition <= 8) {
       paecOctave = "''";
@@ -2211,8 +2240,6 @@ function CanvasClass() {
         }
       }
     }
-
-
 
     // Aqui Se cambia el valor de los campos paec (%$@Cuerpo) a var031p (cuerpo)
     $("#incipitPaec").val(paec);
