@@ -1,259 +1,285 @@
 {% comment %}
-Template para campo 773 - Enlace a Documento Fuente
-Similar al campo 041, los números de obra ($w) se manejan con JavaScript
+FORMSET 773 – Enlace a Documento Fuente
+Plantilla UNIFICADA, optimizada y estable
+Incluye:
+✔ Autocomplete usable
+✔ Diseño estable
+✔ Clonado correcto
+✔ Subcampo $w funcionando
 {% endcomment %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
     {{ formset.management_form }}
-    
-    <button type="button" class="add-form-row mb-3" title="Agregar Enlace a Colección">
-        <i class="bi bi-plus-circle"></i>
-        Agregar Enlace a Colección
+
+    <!-- Botón agregar 773 -->
+    <button type="button" class="add-form-row btn btn-outline-primary mb-3">
+        <i class="bi bi-plus-circle"></i> Agregar Enlace 773
     </button>
-    
+
     <div class="formset-forms">
+
         {% for form in formset %}
-        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %}">
-            {% if form.instance.pk %}
-                <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
-            {% endif %}
-            
+        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
+
             {% if formset.can_delete %}
-                <div class="d-none">
-                    {{ form.DELETE }}
-                </div>
+            <div class="d-none">{{ form.DELETE }}</div>
             {% endif %}
-            
-            <button type="button" class="delete-row-btn" title="Eliminar">
+
+            <!-- Botón eliminar -->
+            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger float-end">
                 <i class="bi bi-x-lg"></i>
             </button>
-            
-            <div class="card mb-3">
+
+            <div class="card mt-4">
                 <div class="card-body">
-                    <div class="campo-grid">
-                        {# Campo 773 $a - Encabezamiento principal #}
-                        <div class="col-full">
-                            <label class="form-label" for="{{ form.compositor_773.id_for_label }}">
-                                {{ form.compositor_773.label }}
-                                {% if form.compositor_773.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ form.compositor_773 }}
-                            {% if form.compositor_773.errors %}
-                                <div class="invalid-feedback d-block">{{ form.compositor_773.errors }}</div>
-                            {% endif %}
-                            {% if form.compositor_773.help_text %}
-                                <small class="form-text text-muted">{{ form.compositor_773.help_text }}</small>
-                            {% endif %}
-                        </div>
-                        
-                        {# Campo 773 $t - Título #}
-                        <div class="col-full">
-                            <label class="form-label" for="{{ form.titulo.id_for_label }}">
-                                {{ form.titulo.label }}
-                                {% if form.titulo.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ form.titulo }}
-                            {% if form.titulo.errors %}
-                                <div class="invalid-feedback d-block">{{ form.titulo.errors }}</div>
-                            {% endif %}
-                            {% if form.titulo.help_text %}
-                                <small class="form-text text-muted">{{ form.titulo.help_text }}</small>
-                            {% endif %}
-                        </div>
-                        
-                        {# Botón para agregar números de obra ($w) #}
-                        <div class="col-full">
-                            <button type="button" class="btn btn-sm btn-outline-primary add-numero-btn w-100" data-enlace-index="{{ forloop.counter0 }}">
-                                <i class="bi bi-plus-circle"></i>
-                                Agregar Número de Obra ($w)
-                            </button>
-                        </div>
-                        
-                        {# Subcampo $w - Números de obra (Repetible) #}
-                        <div class="col-full numeros-container" data-numeros-container="{{ forloop.counter0 }}">
-                            {% if form.instance.pk %}
-                                {# Cargar números existentes #}
-                                {% for numero in form.instance.numeros_obra.all %}
-                                <div class="numero-form-row">
-                                    <div class="d-flex flex-column w-100 mb-2">
-                                        <label class="form-label small">773 $w - Número de obra en la colección</label>
-                                        <div class="d-flex gap-2 align-items-center">
-                                            <input type="text" 
-                                                   class="form-control numero-input" 
-                                                   name="numero_enlace_773_{{ forloop.parentloop.counter0 }}_{{ numero.pk }}"
-                                                   value="{{ numero.numero }}"
-                                                   placeholder="Ej: 001234567" 
-                                                   style="flex: 1;">
-                                            <button type="button" class="btn btn-sm btn-outline-danger delete-numero-btn" title="Eliminar número">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            {% endif %}
+
+                    <div class="mb-3 position-relative">
+
+                        <!-- Etiqueta -->
+                        <label class="form-label">{{ form.encabezamiento_principal_texto.label }}</label>
+
+                        <!-- INPUT visible donde el usuario escribe -->
+                        <input type="text" class="form-control autocomplete-773"
+                            placeholder="Escriba para buscar o agregar…"
+                            value="{{ form.encabezamiento_principal_texto.value|default:'' }}"
+                            data-hidden-input="{{ form.encabezamiento_principal.id_for_label }}">
+
+                        <!-- INPUT oculto que guarda el ID real del compositor -->
+                        {{ form.encabezamiento_principal }}
+
+                        <!-- Contenedor donde aparecen las sugerencias -->
+                        <div class="autocomplete-suggestions" data-autocomplete-target
+                            style="border:1px solid #ddd; border-top:none; position:absolute; width:100%; z-index:20; background:white;">
                         </div>
                     </div>
+
+
+                    <!-- Título -->
+                    <div class="mb-3">
+                        <label>{{ form.titulo.label }}</label>
+                        {{ form.titulo }}
+                    </div>
+
+                    <!-- Botón agregar número $w -->
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-secondary add-numero-btn w-100"
+                            data-index="{{ forloop.counter0 }}">
+                            <i class="bi bi-plus-circle"></i> Agregar Número de Obra ($w)
+                        </button>
+                    </div>
+
+                    <!-- Contenedor de números -->
+                    <div class="numeros-container" data-numeros-container="{{ forloop.counter0 }}">
+                        {% for numero in form.instance.numeros_obra.all %}
+                        <div class="numero-form-row d-flex gap-2 mb-2">
+                            <input type="text" class="form-control"
+                                name="numero_773_{{ forloop.parentloop.counter0 }}_{{ numero.pk }}"
+                                value="{{ numero.numero }}" placeholder="Ej: 000123456">
+
+                            <button type="button" class="btn btn-outline-danger delete-numero-btn">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+
                 </div>
             </div>
         </div>
         {% endfor %}
-        
-        {# Template vacío para clonar enlaces #}
-        <div class="formset-row empty-form">
-            <button type="button" class="delete-row-btn" title="Eliminar">
+
+        <!-- ✨ TEMPLATE VACÍO PARA CLONAR -->
+        <div class="formset-row empty-form d-none">
+
+            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger float-end">
                 <i class="bi bi-x-lg"></i>
             </button>
-            
-            <div class="card mb-3">
+
+            <div class="card mt-4">
                 <div class="card-body">
-                    <div class="campo-grid">
-                        <div class="col-full">
-                            <label class="form-label">
-                                {{ formset.empty_form.compositor_773.label }}
-                                {% if formset.empty_form.compositor_773.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ formset.empty_form.compositor_773 }}
-                        </div>
-                        
-                        <div class="col-full">
-                            <label class="form-label">
-                                {{ formset.empty_form.titulo.label }}
-                                {% if formset.empty_form.titulo.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ formset.empty_form.titulo }}
-                        </div>
-                        
-                        <div class="col-full">
-                            <button type="button" class="btn btn-sm btn-outline-primary add-numero-btn w-100" data-enlace-index="__prefix__">
-                                <i class="bi bi-plus-circle"></i>
-                                Agregar Número de Obra ($w)
-                            </button>
-                        </div>
-                        
-                        <div class="col-full numeros-container" data-numeros-container="__prefix__">
-                            {# Los números se agregarán aquí dinámicamente #}
-                        </div>
+
+                    {{ formset.empty_form.encabezamiento_principal }}
+
+                    <div class="mb-3">
+                        {{ formset.empty_form.encabezamiento_principal_texto }}
+                        <div class="autocomplete-suggestions" data-autocomplete-target></div>
                     </div>
+
+                    <div class="mb-3">
+                        {{ formset.empty_form.titulo }}
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-secondary add-numero-btn w-100"
+                            data-index="__prefix__">
+                            <i class="bi bi-plus-circle"></i> Agregar Número de Obra ($w)
+                        </button>
+                    </div>
+
+                    <div class="numeros-container" data-numeros-container="__prefix__"></div>
+
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
-{# Template global para números de obra (fuera del formset loop) #}
+<!-- TEMPLATE NÚMERO DE OBRA ($w) -->
 <div class="numero-form-row numero-template d-none">
-    <div class="d-flex flex-column w-100 mb-2">
-        <label class="form-label small">773 $w - Número de obra en la colección</label>
-        <div class="d-flex gap-2 align-items-center">
-            <input type="text" class="form-control numero-input" placeholder="Ej: 001234567" style="flex: 1;">
-            <button type="button" class="btn btn-sm btn-outline-danger delete-numero-btn" title="Eliminar número">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
+    <div class="d-flex gap-2 mb-2">
+        <input type="text" class="form-control numero-w-input" placeholder="Ej: 000123456">
+        <button type="button" class="btn btn-outline-danger delete-numero-btn">
+            <i class="bi bi-trash"></i>
+        </button>
     </div>
 </div>
-
 <script>
-// Script para manejar el campo 773 con números de obra repetibles
-(function() {
-    const prefix = '{{ formset.prefix }}';
-    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-    if (!container) return;
-    
-    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-    const addButton = container.querySelector('.add-form-row');
-    const formsContainer = container.querySelector('.formset-forms');
-    const numeroTemplate = document.querySelector('.numero-template');
-    
-    if (!totalFormsInput || !addButton || !formsContainer || !numeroTemplate) return;
-    
-    // Agregar nuevo enlace 773
-    addButton.addEventListener('click', function() {
-        const totalForms = parseInt(totalFormsInput.value);
-        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
-        
-        if (!emptyFormTemplate) return;
-        
-        const emptyForm = emptyFormTemplate.cloneNode(true);
-        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
-        emptyForm.classList.remove('empty-form');
-        emptyForm.style.display = '';
-        
-        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
-        totalFormsInput.value = totalForms + 1;
-        
-        // Inicializar Select2 si existe
-        if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
-            emptyForm.querySelectorAll('.form-select:not(.numero-input)').forEach(select => {
-                $(select).select2({
-                    theme: 'bootstrap-5',
-                    width: '100%'
-                });
-            });
-        }
+// AUTOCOMPLETE DEL 773 $a — igual al del 700
+document.addEventListener("input", async function(e) {
+
+    const input = e.target.closest(".autocomplete-773");
+    if (!input) return;
+
+    const hiddenId = input.dataset.hiddenInput;
+    const hiddenField = document.getElementById(hiddenId);
+    const target = input.parentElement.querySelector("[data-autocomplete-target]");
+
+    const query = input.value.trim();
+
+    if (query.length < 2) {
+        target.innerHTML = "";
+        hiddenField.value = "";
+        return;
+    }
+
+    // Petición AJAX para buscar personas
+    const response = await fetch(`/catalogacion/api/autocompletar/persona/?q=${query}`);
+    const data = await response.json();
+
+    target.innerHTML = "";
+
+    // Sugerencias encontradas
+    data.results.forEach(item => {
+        const opt = document.createElement("div");
+        opt.classList.add("autocomplete-item");
+        opt.style.padding = "6px 10px";
+        opt.style.cursor = "pointer";
+        opt.style.borderBottom = "1px solid #efefef";
+        opt.textContent = item.text;
+
+        opt.onclick = () => {
+            input.value = item.apellidos_nombres;
+            hiddenField.value = item.id;
+            target.innerHTML = "";
+        };
+
+        target.appendChild(opt);
     });
-    
-    // Eliminar enlace 773
-    container.addEventListener('click', function(e) {
-        const deleteBtn = e.target.closest('.delete-row-btn');
-        if (!deleteBtn) return;
-        
-        const row = deleteBtn.closest('.formset-row');
-        if (!row || row.classList.contains('empty-form')) return;
-        
-        const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
-        
-        if (row.classList.contains('existing-form')) {
-            if (deleteCheckbox && deleteCheckbox.checked) {
-                deleteCheckbox.checked = false;
-                row.style.opacity = '1';
-                deleteBtn.classList.remove('btn-warning');
-                deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
-                deleteBtn.title = 'Eliminar';
-            } else if (deleteCheckbox) {
-                deleteCheckbox.checked = true;
-                row.style.opacity = '0.5';
-                deleteBtn.classList.add('btn-warning');
-                deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
-                deleteBtn.title = 'Cancelar eliminación';
+
+    // Opción "crear nuevo"
+    const crear = document.createElement("div");
+    crear.classList.add("autocomplete-item");
+    crear.style.padding = "6px 10px";
+    crear.style.cursor = "pointer";
+    crear.innerHTML = `<strong>➕ Crear nuevo:</strong> “${query}”`;
+
+    crear.onclick = () => {
+        input.value = query;
+        hiddenField.value = "";  // Sin ID → se crea al guardar
+        target.innerHTML = "";
+    };
+
+    target.appendChild(crear);
+});
+</script>
+
+<!-- ===========================
+       JAVASCRIPT FORMSET 773
+=========================== -->
+<script>
+    (function () {
+        const prefix = '{{ formset.prefix }}';
+        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+
+        if (!container) return;
+
+        const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+        const addButton = container.querySelector('.add-form-row');
+        const formsContainer = container.querySelector('.formset-forms');
+        const numeroTemplate = document.querySelector('.numero-template');
+
+        /* =========================================
+           ➕ 1. AGREGAR NUEVO FORMULARIO 773
+        ========================================= */
+        addButton.addEventListener('click', function () {
+            const total = parseInt(totalFormsInput.value);
+            const template = formsContainer.querySelector('.empty-form');
+
+            const newForm = template.cloneNode(true);
+            newForm.classList.remove('empty-form', 'd-none');
+
+            newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, total);
+
+            formsContainer.appendChild(newForm);
+
+            totalFormsInput.value = total + 1;
+        });
+
+        /* =========================================
+           🗑 2. ELIMINAR FORM 773
+        ========================================= */
+        container.addEventListener('click', function (event) {
+            const btn = event.target.closest('.delete-row-btn');
+            if (!btn) return;
+
+            const row = btn.closest('.formset-row');
+            if (!row || row.classList.contains('empty-form')) return;
+
+            const deleteField = row.querySelector('input[name*="DELETE"]');
+
+            if (deleteField) {
+                deleteField.checked = !deleteField.checked;
+                row.style.opacity = deleteField.checked ? "0.5" : "1";
+            } else {
+                row.remove();
+                totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
             }
-        } else {
-            row.remove();
-            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
-        }
-    });
-    
-    // Manejar números de obra (subcampo $w repetible)
-    container.addEventListener('click', function(e) {
-        // Agregar número
-        const addNumeroBtn = e.target.closest('.add-numero-btn');
-        if (addNumeroBtn) {
-            const enlaceIndex = addNumeroBtn.getAttribute('data-enlace-index');
-            const numerosContainer = container.querySelector(`[data-numeros-container="${enlaceIndex}"]`);
-            
-            if (!numerosContainer) return;
-            
-            const newNumero = numeroTemplate.cloneNode(true);
-            newNumero.classList.remove('numero-template', 'd-none');
-            
-            // Actualizar el name del input
-            const input = newNumero.querySelector('.numero-input');
-            if (input) {
-                input.name = `numero_enlace_773_${enlaceIndex}_${Date.now()}`;
+        });
+
+        /* =========================================
+           ➕ 3. AGREGAR NÚMERO $w
+        ========================================= */
+        container.addEventListener('click', function (event) {
+            const addBtn = event.target.closest('.add-numero-btn');
+            if (!addBtn) return;
+
+            const index = addBtn.dataset.index;
+            const target = container.querySelector(`[data-numeros-container="${index}"]`);
+
+            if (!target) return;
+
+            const newW = numeroTemplate.cloneNode(true);
+            newW.classList.remove('numero-template', 'd-none');
+
+            const input = newW.querySelector('.numero-w-input');
+            input.name = `numero_773_${index}_${Date.now()}`;
+
+            target.appendChild(newW);
+        });
+
+        /* =========================================
+           🗑 4. ELIMINAR NÚMERO $w
+        ========================================= */
+        container.addEventListener('click', function (event) {
+            const btn = event.target.closest('.delete-numero-btn');
+            if (!btn) return;
+
+            const row = btn.closest('.numero-form-row');
+            if (!row.classList.contains('numero-template')) {
+                row.remove();
             }
-            
-            numerosContainer.appendChild(newNumero);
-        }
-        
-        // Eliminar número
-        const deleteNumeroBtn = e.target.closest('.delete-numero-btn');
-        if (deleteNumeroBtn) {
-            const numeroRow = deleteNumeroBtn.closest('.numero-form-row');
-            if (!numeroRow.classList.contains('numero-template')) {
-                numeroRow.remove();
-            }
-        }
-    });
-})();
+        });
+
+    })();
 </script>
