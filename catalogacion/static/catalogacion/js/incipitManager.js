@@ -137,41 +137,41 @@ function IncipitClass() {
       {
         name: "barra1",
         value: ";",
-        font: 38,
+        font: 30,
         paec: "/",
-        yPosition: 12,
+        yPosition: 11.5,
         xPosition: 35
       },
       {
         name: "barra2",
         value: "<",
-        font: 38,
+        font: 30,
         paec: "//",
-        yPosition: 12,
+        yPosition: 11.5,
         xPosition: 35
       },
       {
         name: "barra4",
         value: ">",
-        font: 38,
+        font: 30,
         paec: "//:",
-        yPosition: 12,
+        yPosition: 11.5,
         xPosition: 35
       },
       {
         name: "barra6",
         value: "?",
-        font: 38,
+        font: 30,
         paec: "://",
-        yPosition: 12,
+        yPosition: 11.5,
         xPosition: 35
       },
       {
         name: "barra5",
         value: "@",
-        font: 38,
+        font: 30,
         paec: "://:",
-        yPosition: 12,
+        yPosition: 11.5,
         xPosition: 35
       }
     ];
@@ -182,7 +182,7 @@ function IncipitClass() {
         value: "t",
         font: 70,
         paec: "4/4",
-        yPosition: 6,
+        yPosition: 5,
         xPosition: 50
       },
       {
@@ -190,7 +190,7 @@ function IncipitClass() {
         value: "u",
         font: 70,
         paec: "2/2",
-        yPosition: 6,
+        yPosition: 5,
         xPosition: 50
       },
       {
@@ -198,7 +198,7 @@ function IncipitClass() {
         value: "v",
         font: 70,
         paec: "2/4",
-        yPosition: 6,
+        yPosition: 5,
         xPosition: 50
       },
       {
@@ -206,7 +206,7 @@ function IncipitClass() {
         value: "w",
         font: 70,
         paec: "3/4",
-        yPosition: 6,
+        yPosition: 5,
         xPosition: 50
       },
       {
@@ -214,7 +214,7 @@ function IncipitClass() {
         value: "x",
         font: 70,
         paec: "3/8",
-        yPosition: 6,
+        yPosition: 5,
         xPosition: 50
       },
       {
@@ -222,7 +222,7 @@ function IncipitClass() {
         value: "y",
         font: 70,
         paec: "6/8",
-        yPosition: 6,
+        yPosition: 5,
         xPosition: 50
       },
       {
@@ -230,7 +230,7 @@ function IncipitClass() {
         value: "z",
         font: 70,
         paec: "9/8",
-        yPosition: 6,
+        yPosition: 5,
         xPosition: 50
       },
       {
@@ -238,7 +238,7 @@ function IncipitClass() {
         value: "{",
         font: 70,
         paec: "12/8",
-        yPosition: 6,
+        yPosition: 5,
         xPosition: 50
       },
       {
@@ -246,7 +246,7 @@ function IncipitClass() {
         value: "|",
         font: 70,
         paec: "3/2",
-        yPosition: 6,
+        yPosition: 5,
         xPosition: 50
       }
     ];
@@ -256,7 +256,7 @@ function IncipitClass() {
       {
         name: "treble",
         value: "1",
-        font: 56,
+        font: 46,
         isRest: false,
         yPosition: 7,
         paec: "%G-2"
@@ -264,17 +264,17 @@ function IncipitClass() {
       {
         name: "alto",
         value: "2",
-        font: 56,
+        font: 60,
         isRest: false,
-        yPosition: 5,
+        yPosition: 3,
         paec: "%C-3"
       }, //46 for clef
       {
         name: "bass",
         value: "3",
-        font: 56,
+        font: 60,
         isRest: false,
-        yPosition: 3,
+        yPosition: 1,
         paec: "%F-4"
       }, //46 for clef
 
@@ -617,7 +617,7 @@ function CanvasClass() {
     var sumTime = 0;
     var sumBar = 0;
     var sumDot = 0;
-    var sumNote = 40;
+    var sumNote = 30;
     var value = 0;
 
     if (lastElement.isClef) sumNote = 60;
@@ -923,6 +923,18 @@ function CanvasClass() {
     positionNoteSelected = null;
     return false;
   };
+
+    this.maxNotes = function (context) {
+      var sumNote = 30; // en setDrawPosition
+      var margenInicio = 60; // clef + armadura + compás
+      var margenFin = 40; // un poco de aire al final
+      return Math.floor(
+        (context.gCanvasElement.width - margenInicio - margenFin) / sumNote
+      );
+    };
+
+
+
   //Add a new note on the Incipit
   this.addNote = function (context, cursor) {
     context.gDrawingContext.clearRect(
@@ -934,7 +946,7 @@ function CanvasClass() {
 
     var note = context.getCurrentNotePressed(context);
 
-    if (note != null && context.drawXPosition.length < 16) {
+    if (note != null && context.drawXPosition.length < context.maxNotes(context)) {
       var alterationName = "becuadro";
       var eleCoord = context.cursorToElement(context, cursor);
 
@@ -983,7 +995,7 @@ function CanvasClass() {
 
     if (
       cursor.x > context.drawXPosition.length - 1 &&
-      context.drawXPosition.length < 16 &&
+      context.drawXPosition.length < context.maxNotes(context) &&
       note != null
     ) {
       var eleCoord = context.cursorToElement(context, cursor);
@@ -1594,7 +1606,7 @@ function CanvasClass() {
       var noteDot = 0;
       context.gDrawingContext.fillStyle = "black";
       if (i == positionNoteSelected) {
-        context.gDrawingContext.fillStyle = "orange";
+        context.gDrawingContext.fillStyle = "grey";
       }
 
       var noteToDraw = context.incipit.getNoteByName(
@@ -1988,7 +2000,8 @@ function CanvasClass() {
     var notesArray = ["B", "A", "G", "F", "E", "D", "C"];
     var paecOctave = "";
     var paecNote = "";
-
+    // Corrección fina: bajamos un grado porque el dibujo quedó 1 paso corrido
+    notePosition += 1;
     // 19 notes the incipit can represent, 31 notes can mean
     //'''DC''BAGFEDC'BAGFEDC,BAG                 Treble
     //         ''EDC'BAGFEDC,BAGFEDC,,BA         Alto

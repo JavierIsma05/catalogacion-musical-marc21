@@ -46,40 +46,6 @@ TIEMPOS_MUSICALES = [
     ("12/8", "12/8"),
 ]
 
-CLAVES_PAE = [
-    ("%G-2", "Clave de Sol (G-2)"),
-    ("%C-3", "Clave de Do en 3ª (C-3)"),
-    ("%F-4", "Clave de Fa en 4ª (F-4)"),
-
-]
-
-ARMADURAS_PAE = [
-    ("", "Sin armadura"),
-    ("F", "1 sostenido (F#)"),
-    ("FC", "2 sostenidos (F#, C#)"),
-    ("FCG", "3 sostenidos (F#, C#, G#)"),
-    ("FCGD", "4 sostenidos"),
-    ("FCGDA", "5 sostenidos"),
-    ("FCGDAE", "6 sostenidos"),
-    ("FCGDAEB", "7 sostenidos"),
-    ("bB", "1 bemol (Bb)"),
-    ("bBE", "2 bemoles (Bb, Eb)"),
-    ("bBEA", "3 bemoles"),
-    ("bBEAD", "4 bemoles"),
-    ("bBEADG", "5 bemoles"),
-    ("bBEADGC", "6 bemoles"),
-    ("bBEADGCF", "7 bemoles"),
-]
-
-TIEMPOS_MUSICALES = [
-    ("2/4", "2/4"),
-    ("3/4", "3/4"),
-    ("4/4", "4/4"),
-    ("3/8", "3/8"),
-    ("6/8", "6/8"),
-    ("9/8", "9/8"),
-    ("12/8", "12/8"),
-]
 
 
 class IncipitMusicalForm(forms.ModelForm):

@@ -198,6 +198,58 @@ Se usa con el formset "incipits_musicales"
                     </div>
                     </div>
 
+                    {# COMPÁS + BARRAS #}
+                    <div>
+                    <div class="text-muted" >Compás</div>
+
+
+                    <div class="btn-group-sm"  role="group" aria-label="Compases">
+                        <button type="button" class="btn btn-outline-primary btn-music"
+                                onclick="TimePressed('t')">4/4</button>
+                        <button type="button" class="btn btn-outline-primary btn-music"
+                                onclick="TimePressed('w')">3/4</button>
+                        <button type="button" class="btn btn-outline-primary btn-music"
+                                onclick="TimePressed('v')">2/4</button>
+                    </div>
+
+
+
+
+
+                    <div class="btn-group-sm"  style="padding: 5px 0px;" role="group" aria-label="Compases">
+                        <button type="button" class="btn btn-outline-primary btn-music"
+                                onclick="TimePressed('u')">2/2</button>
+                        <button type="button" class="btn btn-outline-primary btn-music"
+                                onclick="TimePressed('|')">3/2</button>
+                        <button type="button" class="btn btn-outline-primary btn-music"
+                                    onclick="TimePressed('x')">3/8</button>
+
+                    </div>
+
+                    <div class="btn-group-sm" role="group" aria-label="Compases">
+
+                        <button type="button" class="btn btn-outline-primary btn-music"
+                                    onclick="TimePressed('y')">6/8</button>
+                        <button type="button" class="btn btn-outline-primary btn-music"
+                                    onclick="TimePressed('z')">9/8</button>
+                        <button type="button" class="btn btn-outline-primary btn-music" style="font-size: 14px;max-width: 43px; padding: 0px 7px;"
+                                    onclick="TimePressed('{')">12/8</button>
+
+                    </div>
+
+                    {# ALTURA + BORRAR #}
+                    <div>
+                    <div class="text-muted" style="margin-left:11px;">Altura</div>
+                    <div class="btn-group btn-group-sm flex-wrap" role="group">
+                        <button type="button" class="btn btn-outline-secondary btn-music"
+                                style="margin:1px;" title="Subir altura"
+                                onclick="CanvasIncipit.toneUpDown(CanvasIncipit, -1)">▲</button>
+                        <button type="button" class="btn btn-outline-secondary btn-music"
+                                style="margin:1px;" title="Bajar altura"
+                                onclick="CanvasIncipit.toneUpDown(CanvasIncipit, 1)">▼</button>
+                    </div>
+
+
                     {# FIGURAS #}
                     <div>
                     <div class="text-muted small mb-1">Figuras</div>
@@ -255,44 +307,6 @@ Se usa con el formset "incipits_musicales"
                     </div>
                     </div>
 
-                    {# COMPÁS + BARRAS #}
-                    <div>
-                    <div class="text-muted" >Compás</div>
-
-
-                    <div class="btn-group-sm"  role="group" aria-label="Compases">
-                        <button type="button" class="btn btn-outline-primary btn-music"
-                                onclick="TimePressed('t')">4/4</button>
-                        <button type="button" class="btn btn-outline-primary btn-music"
-                                onclick="TimePressed('w')">3/4</button>
-                        <button type="button" class="btn btn-outline-primary btn-music"
-                                onclick="TimePressed('v')">2/4</button>
-                    </div>
-
-
-
-
-
-                    <div class="btn-group-sm"  style="padding: 5px 0px;" role="group" aria-label="Compases">
-                        <button type="button" class="btn btn-outline-primary btn-music"
-                                onclick="TimePressed('u')">2/2</button>
-                        <button type="button" class="btn btn-outline-primary btn-music"
-                                onclick="TimePressed('|')">3/2</button>
-                        <button type="button" class="btn btn-outline-primary btn-music"
-                                    onclick="TimePressed('x')">3/8</button>
-
-                    </div>
-
-                    <div class="btn-group-sm" role="group" aria-label="Compases">
-
-                        <button type="button" class="btn btn-outline-primary btn-music"
-                                    onclick="TimePressed('y')">6/8</button>
-                        <button type="button" class="btn btn-outline-primary btn-music"
-                                    onclick="TimePressed('z')">9/8</button>
-                        <button type="button" class="btn btn-outline-primary btn-music" style="font-size: 14px;max-width: 43px; padding: 0px 7px;"
-                                    onclick="TimePressed('{')">12/8</button>
-
-                    </div>
 
                     <div class="text-muted ">Barras</div>
                     <div class="btn-group-sm flex-wrap text-align-center" role="group" aria-label="Barras">
@@ -309,17 +323,7 @@ Se usa con el formset "incipits_musicales"
                     </div>
                     </div>
 
-                    {# ALTURA + BORRAR #}
-                    <div>
-                    <div class="text-muted" style="margin-left:11px;">Altura</div>
-                    <div class="btn-group btn-group-sm flex-wrap" role="group">
-                        <button type="button" class="btn btn-outline-secondary btn-music"
-                                style="margin:1px;" title="Subir altura"
-                                onclick="CanvasIncipit.toneUpDown(CanvasIncipit, -1)">▲</button>
-                        <button type="button" class="btn btn-outline-secondary btn-music"
-                                style="margin:1px;" title="Bajar altura"
-                                onclick="CanvasIncipit.toneUpDown(CanvasIncipit, 1)">▼</button>
-                    </div>
+
 
                     <div class="btn-group btn-group-sm flex-wrap mt-1" role="group">
                         <button type="button" class="btn btn-outline-danger"
@@ -340,8 +344,8 @@ Se usa con el formset "incipits_musicales"
                 <div class="flex-grow-1">
                     <div class="position-relative d-inline-block w-100">
                     <canvas id="incipit_canvas_0"
-                            width="700"
-                            height="360"
+                            width="750"
+                            height="270"
                             style="display:block; "></canvas>
                     </div>
                 </div>
