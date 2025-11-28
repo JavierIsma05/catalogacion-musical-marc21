@@ -466,26 +466,34 @@
                 {% endfor %}
                 {% endif %}
                 
-                {% if obra.datos_biograficos_545.all %}
-                {% for dato in obra.datos_biograficos_545.all %}
-                <div class="nota-especial">
-                    <h4 class="nota-titulo">Datos biográficos (545)</h4>
-                    {% for texto in dato.textos_biograficos_545.all %}
-                    <p>{{ texto.texto }}</p>
-                    {% endfor %}
-                    {% for uri in dato.uris_545.all %}
-                    <a href="{{ uri.uri }}" class="nota-link" target="_blank">
-                        <i class="bi bi-link-45deg"></i>
-                        Ver más información
-                    </a>
-                    {% endfor %}
-                </div>
-                {% endfor %}
-                {% endif %}
+                {% with datos=obra.datos_biograficos_545 %}
+                    {% if datos %}
+                        {% if datos.texto_biografico or datos.uri %}
+                        <div class="nota-especial">
+                            <h4 class="nota-titulo">Datos biográficos (545)</h4>
+                            {% if datos.texto_biografico %}
+                            <p>{{ datos.texto_biografico }}</p>
+                            {% endif %}
+                            {% if datos.uri %}
+                            <a href="{{ datos.uri }}" class="nota-link" target="_blank">
+                                <i class="bi bi-link-45deg"></i>
+                                Ver más información
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                {% endwith %}
                 
-                {% if not obra.notas_generales_500.all and not obra.contenidos_505.all and not obra.sumarios_520.all and not obra.datos_biograficos_545.all %}
-                <p class="empty-message">No hay notas registradas.</p>
-                {% endif %}
+                {% with datos=obra.datos_biograficos_545 %}
+                    {% if not obra.notas_generales_500.all and not obra.contenidos_505.all and not obra.sumarios_520.all %}
+                        {% if not datos %}
+                        <p class="empty-message">No hay notas registradas.</p>
+                        {% elif not datos.texto_biografico and not datos.uri %}
+                        <p class="empty-message">No hay notas registradas.</p>
+                        {% endif %}
+                    {% endif %}
+                {% endwith %}
             </section>
 
             <!-- Ubicación y acceso -->

@@ -26,31 +26,47 @@ Incluye:
             {% endif %}
 
             <!-- Botón eliminar -->
-            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger float-end">
+            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger float-end" aria-label="Eliminar enlace">
                 <i class="bi bi-x-lg"></i>
             </button>
 
             <div class="card mt-4">
                 <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">{{ form.primer_indicador.label }}</label>
+                                {{ form.primer_indicador }}
+                                {% if form.primer_indicador.errors %}
+                                <div class="invalid-feedback d-block">{{ form.primer_indicador.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{{ form.segundo_indicador.label }}</label>
+                                {{ form.segundo_indicador }}
+                                {% if form.segundo_indicador.errors %}
+                                <div class="invalid-feedback d-block">{{ form.segundo_indicador.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
 
-                    <div class="mb-3 position-relative">
+                    <div class="mb-3">
 
                         <!-- Etiqueta -->
                         <label class="form-label">{{ form.encabezamiento_principal_texto.label }}</label>
 
-                        <!-- INPUT visible donde el usuario escribe -->
-                        <input type="text" class="form-control autocomplete-773"
-                            placeholder="Escriba para buscar o agregar…"
-                            value="{{ form.encabezamiento_principal_texto.value|default:'' }}"
-                            data-hidden-input="{{ form.encabezamiento_principal.id_for_label }}">
+                        <div class="autocomplete-wrapper">
+                            <!-- INPUT visible donde el usuario escribe -->
+                            <input type="text" class="form-control autocomplete-773"
+                                placeholder="Escriba para buscar o agregar…"
+                                value="{{ form.encabezamiento_principal_texto.value|default:'' }}"
+                                data-hidden-input="{{ form.encabezamiento_principal.id_for_label }}">
+
+                            <!-- Contenedor donde aparecen las sugerencias -->
+                            <div class="autocomplete-suggestions" data-autocomplete-target></div>
+                        </div>
 
                         <!-- INPUT oculto que guarda el ID real del compositor -->
                         {{ form.encabezamiento_principal }}
-
-                        <!-- Contenedor donde aparecen las sugerencias -->
-                        <div class="autocomplete-suggestions" data-autocomplete-target
-                            style="border:1px solid #ddd; border-top:none; position:absolute; width:100%; z-index:20; background:white;">
-                        </div>
                     </div>
 
 
@@ -58,6 +74,9 @@ Incluye:
                     <div class="mb-3">
                         <label>{{ form.titulo.label }}</label>
                         {{ form.titulo }}
+                            {% if form.titulo.errors %}
+                            <div class="invalid-feedback d-block">{{ form.titulo.errors }}</div>
+                            {% endif %}
                     </div>
 
                     <!-- Botón agregar número $w -->
@@ -76,7 +95,7 @@ Incluye:
                                 name="numero_773_{{ forloop.parentloop.counter0 }}_{{ numero.pk }}"
                                 value="{{ numero.numero }}" placeholder="Ej: 000123456">
 
-                            <button type="button" class="btn btn-outline-danger delete-numero-btn">
+                            <button type="button" class="btn btn-outline-danger delete-numero-btn" aria-label="Eliminar número">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>
@@ -91,7 +110,7 @@ Incluye:
         <!-- ✨ TEMPLATE VACÍO PARA CLONAR -->
         <div class="formset-row empty-form d-none">
 
-            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger float-end">
+            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger float-end" aria-label="Eliminar enlace">
                 <i class="bi bi-x-lg"></i>
             </button>
 
@@ -100,9 +119,22 @@ Incluye:
 
                     {{ formset.empty_form.encabezamiento_principal }}
 
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ formset.empty_form.primer_indicador.label }}</label>
+                            {{ formset.empty_form.primer_indicador }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ formset.empty_form.segundo_indicador.label }}</label>
+                            {{ formset.empty_form.segundo_indicador }}
+                        </div>
+                    </div>
+
                     <div class="mb-3">
-                        {{ formset.empty_form.encabezamiento_principal_texto }}
-                        <div class="autocomplete-suggestions" data-autocomplete-target></div>
+                        <div class="autocomplete-wrapper">
+                            {{ formset.empty_form.encabezamiento_principal_texto }}
+                            <div class="autocomplete-suggestions" data-autocomplete-target></div>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -129,7 +161,7 @@ Incluye:
 <div class="numero-form-row numero-template d-none">
     <div class="d-flex gap-2 mb-2">
         <input type="text" class="form-control numero-w-input" placeholder="Ej: 000123456">
-        <button type="button" class="btn btn-outline-danger delete-numero-btn">
+        <button type="button" class="btn btn-outline-danger delete-numero-btn" aria-label="Eliminar número">
             <i class="bi bi-trash"></i>
         </button>
     </div>

@@ -23,9 +23,11 @@
                     
                     <div class="col-full">
                         <label class="form-label" for="id_compositor_texto">{{ form.compositor_texto.label }}</label>
-                        {{ form.compositor_texto }}
+                        <div class="autocomplete-wrapper">
+                            {{ form.compositor_texto }}
+                            <div id="compositor-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
                         <div class="form-text">Escriba para buscar compositores existentes o ingrese un nombre nuevo</div>
-                        <div id="compositor-suggestions" class="autocomplete-suggestions"></div>
                         {% if form.compositor_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.compositor_texto.errors }}</div>
                         {% endif %}
@@ -85,9 +87,11 @@
                     
                     <div class="col-full">
                         <label class="form-label" for="id_titulo_uniforme_texto">{{ form.titulo_uniforme_texto.label }}</label>
-                        {{ form.titulo_uniforme_texto }}
+                        <div class="autocomplete-wrapper">
+                            {{ form.titulo_uniforme_texto }}
+                            <div id="titulo-uniforme-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
                         <div class="form-text">Escriba para buscar títulos existentes o ingrese uno nuevo</div>
-                        <div id="titulo-uniforme-suggestions" class="autocomplete-suggestions"></div>
                         {% if form.titulo_uniforme_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.titulo_uniforme_texto.errors }}</div>
                         {% endif %}
@@ -98,9 +102,11 @@
                     
                     <div class="col-half">
                         <label class="form-label" for="id_forma_130_texto">{{ form.forma_130_texto.label }}</label>
-                        {{ form.forma_130_texto }}
+                        <div class="autocomplete-wrapper">
+                            {{ form.forma_130_texto }}
+                            <div id="forma-130-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
                         <div class="form-text">Escriba para buscar formas musicales o ingrese una nueva</div>
-                        <div id="forma-130-suggestions" class="autocomplete-suggestions"></div>
                         {% if form.forma_130_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.forma_130_texto.errors }}</div>
                         {% endif %}
@@ -148,9 +154,11 @@
                     
                     <div class="col-full">
                         <label class="form-label" for="id_titulo_240_texto">{{ form.titulo_240_texto.label }}</label>
-                        {{ form.titulo_240_texto }}
+                        <div class="autocomplete-wrapper">
+                            {{ form.titulo_240_texto }}
+                            <div id="titulo-240-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
                         <div class="form-text">Escriba para buscar títulos existentes o ingrese uno nuevo</div>
-                        <div id="titulo-240-suggestions" class="autocomplete-suggestions"></div>
                         {% if form.titulo_240_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.titulo_240_texto.errors }}</div>
                         {% endif %}
@@ -161,9 +169,11 @@
                     
                     <div class="col-half">
                         <label class="form-label" for="id_forma_240_texto">{{ form.forma_240_texto.label }}</label>
-                        {{ form.forma_240_texto }}
+                        <div class="autocomplete-wrapper">
+                            {{ form.forma_240_texto }}
+                            <div id="forma-240-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
                         <div class="form-text">Escriba para buscar formas musicales o ingrese una nueva</div>
-                        <div id="forma-240-suggestions" class="autocomplete-suggestions"></div>
                         {% if form.forma_240_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.forma_240_texto.errors }}</div>
                         {% endif %}
