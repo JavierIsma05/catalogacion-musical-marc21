@@ -71,7 +71,8 @@ from .formatters import MARCFormatter
 class IncipitMusicalInline(admin.TabularInline):
     model = IncipitMusical
     extra = 0
-    fields = ['numero_obra', 'numero_movimiento', 'numero_pasaje', 'titulo_encabezamiento', 'voz_instrumento']
+    fields = ['numero_obra', 'numero_movimiento', 'numero_pasaje', 'titulo_encabezamiento', 'personaje', 'clave', 'voz_instrumento',
+              'armadura', 'tiempo', 'notacion_musical'  ]
     verbose_name = "Íncipit Musical (031)"
     verbose_name_plural = "📝 Íncipits Musicales (031 - R)"
 
@@ -369,7 +370,7 @@ class ObraLenguaInline(admin.TabularInline):
 
 class InlineValidationMixin:
     """Mixin para validar relaciones después de guardar todos los inlines"""
-    
+
     def save_model(self, request, obj, form, change):
         """Guardar el modelo - validar solo en edición"""
         if not change:
@@ -381,10 +382,10 @@ class InlineValidationMixin:
             # Guardado normal
             super().save_model(request, obj, form, change)
             request._obra_to_validate = obj
-    
+
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
-        
+
         if hasattr(request, '_obra_to_validate') and request._obra_to_validate:
             obj = request._obra_to_validate
             try:
@@ -777,7 +778,7 @@ FIELDSETS_OBRA_IMPRESA = (
 @admin.register(ObraGeneral)
 class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
     """Admin que cambia los fieldsets según el tipo de obra"""
-    
+
     search_fields = [
         'num_control',
         'titulo_principal',
@@ -785,14 +786,14 @@ class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
         'compositor__apellidos_nombres',
         'titulo_uniforme__titulo',
     ]
-    
+
     list_filter = [
         'tipo_registro',
         'nivel_bibliografico',
         'centro_catalogador',
         'fecha_creacion_sistema',
     ]
-    
+
     list_display = [
         'num_control_link',
         'titulo_principal_truncado',
@@ -801,9 +802,9 @@ class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
         'fecha_creacion_sistema',
         'ver_marc',
     ]
-    
+
     ordering = ['-fecha_creacion_sistema']
-    
+
     readonly_fields = [
         'num_control',
         'estado_registro',
@@ -815,9 +816,9 @@ class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
         'signatura_completa_display',
         'preview_marc',
     ]
-    
+
     actions = ['exportar_marc', 'duplicar_obras']
-    
+
     # Inlines para campos repetibles (organizados por bloque MARC)
     inlines = [
         # Modelos Auxiliares - Lenguas
@@ -851,9 +852,9 @@ class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
         # Bloque 8xx - Ubicación
         Disponible856Inline,
     ]
-    
+
     # Métodos para cambiar fieldsets dinámicamente
-    
+
     def get_fieldsets(self, request, obj=None):
         """Retorna los fieldsets según el tipo de obra"""
         if obj is None:
@@ -863,10 +864,10 @@ class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
                     'fields': ('tipo_registro', 'nivel_bibliografico')
                 }),
             )
-        
+
         # Determinar tipo de obra
         tipo = (obj.tipo_registro, obj.nivel_bibliografico)
-        
+
         fieldsets_map = {
             ('d', 'c'): FIELDSETS_COLECCION_MANUSCRITA,
             ('d', 'a'): FIELDSETS_OBRA_EN_COLECCION_MANUSCRITA,
@@ -875,45 +876,45 @@ class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
             ('c', 'a'): FIELDSETS_OBRA_EN_COLECCION_IMPRESA,
             ('c', 'm'): FIELDSETS_OBRA_IMPRESA,
         }
-        
+
         return fieldsets_map.get(tipo, FIELDSETS_OBRA_MANUSCRITA)
-    
+
     def get_readonly_fields(self, request, obj=None):
         """Campos de solo lectura según si es creación o edición"""
         if obj is None:
             # En creación, permitir seleccionar tipo y nivel
             return []
-        
+
         # En edición, todo readonly excepto los campos editables
         return self.readonly_fields + ['tipo_registro', 'nivel_bibliografico']
-    
+
     def get_form(self, request, obj=None, **kwargs):
         """Personalizar el formulario según si es creación o edición"""
         form = super().get_form(request, obj, **kwargs)
-        
+
         if obj is None:
             # En creación, hacer campos opcionales temporalmente
             for field_name in ['titulo_principal', 'compositor', 'titulo_uniforme']:
                 if field_name in form.base_fields:
                     form.base_fields[field_name].required = False
-        
+
         return form
-    
+
     # Métodos de visualización
-    
+
     def num_control_link(self, obj):
         url = reverse('admin:catalogacion_obrageneral_change', args=[obj.pk])
         return format_html('<a href="{}">{}</a>', url, obj.num_control)
     num_control_link.short_description = 'N° Control'
     num_control_link.admin_order_field = 'num_control'
-    
+
     def titulo_principal_truncado(self, obj):
         if len(obj.titulo_principal) > 50:
             return obj.titulo_principal[:50] + '...'
         return obj.titulo_principal
     titulo_principal_truncado.short_description = 'Título'
     titulo_principal_truncado.admin_order_field = 'titulo_principal'
-    
+
     def tipo_obra_badge(self, obj):
         colors = {
             'CM': '#8B4513',
@@ -931,7 +932,7 @@ class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
             obj.tipo_obra_descripcion
         )
     tipo_obra_badge.short_description = 'Tipo'
-    
+
     def punto_acceso_principal(self, obj):
         if obj.compositor:
             return f"👤 {obj.compositor}"
@@ -939,33 +940,33 @@ class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
             return f"📚 {obj.titulo_uniforme}"
         return "⚠️ Sin definir"
     punto_acceso_principal.short_description = 'Punto de Acceso'
-    
+
     def ver_marc(self, obj):
         return format_html(
             '<a class="button" href="{}#marc-preview">Ver MARC</a>',
             reverse('admin:catalogacion_obrageneral_change', args=[obj.pk])
         )
     ver_marc.short_description = 'MARC'
-    
+
     def tipo_obra_display(self, obj):
         if obj.pk:
             return f"{obj.tipo_obra} - {obj.tipo_obra_descripcion}"
         return "Se asignará al guardar"
     tipo_obra_display.short_description = 'Tipo de Obra'
-    
+
     def signatura_completa_display(self, obj):
         if obj.pk:
             return obj.signatura_completa
         return "Se generará al guardar"
     signatura_completa_display.short_description = 'Signatura (092)'
-    
+
     def preview_marc(self, obj):
         if not obj.pk:
             return "Guarde la obra para ver el registro MARC"
-        
+
         formatter = MARCFormatter(obj)
         marc_text = formatter.format_full_record()
-        
+
         return format_html(
             '<pre id="marc-preview" style="background-color: #f5f5f5; padding: 15px; '
             'border: 1px solid #ddd; border-radius: 4px; '
@@ -973,24 +974,24 @@ class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
             marc_text
         )
     preview_marc.short_description = 'Registro MARC Completo'
-    
+
     # Acciones
-    
+
     def exportar_marc(self, request, queryset):
         from django.http import HttpResponse
-        
+
         response = HttpResponse(content_type='text/plain; charset=utf-8')
         response['Content-Disposition'] = 'attachment; filename="obras_marc.txt"'
-        
+
         for obra in queryset:
             formatter = MARCFormatter(obra)
             response.write(formatter.format_full_record())
             response.write("\n\n" + "="*80 + "\n\n")
-        
+
         self.message_user(request, f"{queryset.count()} obras exportadas correctamente.")
         return response
     exportar_marc.short_description = "📥 Exportar como MARC21"
-    
+
     def duplicar_obras(self, request, queryset):
         contador = 0
         for obra in queryset:
@@ -998,25 +999,25 @@ class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
             obra.num_control = None
             obra.save()
             contador += 1
-        
+
         self.message_user(request, f"✅ {contador} obra(s) duplicada(s) correctamente.")
     duplicar_obras.short_description = "📋 Duplicar obras"
-    
+
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        
+
         total = ObraGeneral.objects.count()
         manuscritas = ObraGeneral.objects.manuscritas().count()
         impresas = ObraGeneral.objects.impresas().count()
         colecciones = ObraGeneral.objects.colecciones().count()
-        
+
         extra_context['stats'] = {
             'total': total,
             'manuscritas': manuscritas,
             'impresas': impresas,
             'colecciones': colecciones,
         }
-        
+
         return super().changelist_view(request, extra_context)
 
 
@@ -1024,14 +1025,14 @@ class ObraGeneralAdmin(InlineValidationMixin, admin.ModelAdmin):
 class NumeroControlSecuenciaAdmin(admin.ModelAdmin):
     list_display = ['tipo_registro_display', 'ultimo_numero', 'fecha_actualizacion']
     readonly_fields = ['tipo_registro', 'ultimo_numero', 'fecha_actualizacion']
-    
+
     def tipo_registro_display(self, obj):
         return obj.get_tipo_registro_display()
     tipo_registro_display.short_description = 'Tipo de Registro'
-    
+
     def has_add_permission(self, request):
         return False
-    
+
     def has_delete_permission(self, request, obj=None):
         return False
 
@@ -1045,7 +1046,7 @@ class ProduccionPublicacionAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'funcion', 'obra']
     list_filter = ['funcion']
     inlines = [Lugar264Inline, Entidad264Inline, Fecha264Inline]
-    
+
     def has_module_permission(self, request):
         return False  # Ocultar del menú principal
 
@@ -1054,7 +1055,7 @@ class ProduccionPublicacionAdmin(admin.ModelAdmin):
 class MedioInterpretacion382Admin(admin.ModelAdmin):
     list_display = ['__str__', 'obra']
     inlines = [MedioInterpretacion382_aInline]
-    
+
     def has_module_permission(self, request):
         return False  # Ocultar del menú principal
 
@@ -1064,7 +1065,7 @@ class MencionSerie490Admin(admin.ModelAdmin):
     list_display = ['__str__', 'obra']
     list_filter = ['obra']
     inlines = [TituloSerie490Inline, VolumenSerie490Inline]
-    
+
     def has_module_permission(self, request):
         return False  # Ocultar del menú principal
 
@@ -1074,7 +1075,7 @@ class Materia650Admin(admin.ModelAdmin):
     list_display = ['materia', 'obra']
     search_fields = ['materia']
     inlines = [SubdivisionMateria650Inline]
-    
+
     def has_module_permission(self, request):
         return False  # Ocultar del menú principal
 
@@ -1084,7 +1085,7 @@ class MateriaGenero655Admin(admin.ModelAdmin):
     list_display = ['materia', 'obra']
     search_fields = ['materia']
     inlines = [SubdivisionGeneral655Inline]
-    
+
     def has_module_permission(self, request):
         return False  # Ocultar del menú principal
 
@@ -1094,7 +1095,7 @@ class NombreRelacionado700Admin(admin.ModelAdmin):
     list_display = ['persona', 'relacion', 'autoria', 'titulo_obra', 'obra']
     search_fields = ['persona__apellidos_nombres', 'titulo_obra', 'relacion', 'autoria']
     inlines = [TerminoAsociado700Inline, Funcion700Inline]
-    
+
     def has_module_permission(self, request):
         return False  # Ocultar del menú principal
 
@@ -1104,7 +1105,7 @@ class NombreRelacionado700Admin(admin.ModelAdmin):
 #     list_display = ['institucion_persona', 'signatura_original', 'obra']
 #     search_fields = ['institucion_persona', 'signatura_original']
 #     inlines = [Estanteria852Inline]
-    
+
 #     def has_module_permission(self, request):
 #         return False  # Ocultar del menú principal
 @admin.register(Disponible856)
@@ -1125,7 +1126,7 @@ class AutoridadPersonaAdmin(admin.ModelAdmin):
     search_fields = ['apellidos_nombres', 'coordenadas_biograficas']
     readonly_fields = ['fecha_creacion', 'fecha_modificacion']
     ordering = ['apellidos_nombres']
-    
+
     fieldsets = (
         ('Información de la Persona', {
             'fields': ('apellidos_nombres', 'coordenadas_biograficas')
@@ -1143,7 +1144,7 @@ class AutoridadTituloUniformeAdmin(admin.ModelAdmin):
     search_fields = ['titulo']
     readonly_fields = ['fecha_creacion', 'fecha_modificacion']
     ordering = ['titulo']
-    
+
     fieldsets = (
         ('Información del Título', {
             'fields': ('titulo',)
@@ -1161,7 +1162,7 @@ class AutoridadFormaMusicalAdmin(admin.ModelAdmin):
     search_fields = ['forma']
     readonly_fields = ['fecha_creacion', 'fecha_modificacion']
     ordering = ['forma']
-    
+
     fieldsets = (
         ('Información de la Forma Musical', {
             'fields': ('forma',)
@@ -1179,7 +1180,7 @@ class AutoridadEntidadAdmin(admin.ModelAdmin):
     search_fields = ['nombre', 'pais']
     readonly_fields = ['fecha_creacion', 'fecha_modificacion']
     ordering = ['nombre']
-    
+
     fieldsets = (
         ('Información de la Entidad', {
             'fields': ('nombre', 'pais', 'descripcion')
@@ -1197,7 +1198,7 @@ class AutoridadMateriaAdmin(admin.ModelAdmin):
     search_fields = ['termino']
     readonly_fields = ['fecha_creacion', 'fecha_modificacion']
     ordering = ['termino']
-    
+
     fieldsets = (
         ('Información de la Materia', {
             'fields': ('termino',)
@@ -1216,29 +1217,29 @@ class AutoridadMateriaAdmin(admin.ModelAdmin):
 @admin.register(BorradorObra)
 class BorradorObraAdmin(admin.ModelAdmin):
     """Administración de borradores de obras MARC21"""
-    
+
     list_display = [
-        'titulo_temporal', 
+        'titulo_temporal',
         'tipo_obra_display',
         'tipo_registro_display',
-        'pestana_actual', 
-        'fecha_modificacion', 
+        'pestana_actual',
+        'fecha_modificacion',
         'dias_antiguedad_display'
     ]
     list_filter = [
-        'tipo_obra', 
+        'tipo_obra',
         'tipo_registro',
         'nivel_bibliografico',
-        'fecha_creacion', 
+        'fecha_creacion',
         'fecha_modificacion'
     ]
     search_fields = [
-        'titulo_temporal', 
+        'titulo_temporal',
         'num_control_temporal',
         'datos_formulario'
     ]
     readonly_fields = [
-        'fecha_creacion', 
+        'fecha_creacion',
         'fecha_modificacion',
         'titulo_temporal',
         'num_control_temporal',
@@ -1246,7 +1247,7 @@ class BorradorObraAdmin(admin.ModelAdmin):
         'nivel_bibliografico'
     ]
     ordering = ['-fecha_modificacion']
-    
+
     fieldsets = (
         ('Información del Borrador', {
             'fields': (
@@ -1267,9 +1268,9 @@ class BorradorObraAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-    
+
     actions = ['eliminar_borradores_antiguos', 'limpiar_borradores_sin_titulo']
-    
+
     def tipo_obra_display(self, obj):
         """Muestra el tipo de obra con icono"""
         iconos = {
@@ -1280,12 +1281,12 @@ class BorradorObraAdmin(admin.ModelAdmin):
         }
         icono = iconos.get(obj.tipo_obra, '📄')
         return format_html(
-            '{} {}', 
-            icono, 
+            '{} {}',
+            icono,
             obj.get_descripcion_tipo()
         )
     tipo_obra_display.short_description = 'Tipo de Obra'
-    
+
     def tipo_registro_display(self, obj):
         """Muestra el tipo de registro"""
         if obj.tipo_registro == 'd':
@@ -1294,7 +1295,7 @@ class BorradorObraAdmin(admin.ModelAdmin):
             return '🖨️ Impreso'
         return '-'
     tipo_registro_display.short_description = 'Tipo'
-    
+
     def dias_antiguedad_display(self, obj):
         """Muestra días desde última modificación con color"""
         dias = obj.dias_desde_modificacion()
@@ -1304,16 +1305,16 @@ class BorradorObraAdmin(admin.ModelAdmin):
             return format_html('<span style="color: green;">●</span> Ayer')
         elif dias < 7:
             return format_html(
-                '<span style="color: orange;">●</span> Hace {} días', 
+                '<span style="color: orange;">●</span> Hace {} días',
                 dias
             )
         else:
             return format_html(
-                '<span style="color: red;">●</span> Hace {} días', 
+                '<span style="color: red;">●</span> Hace {} días',
                 dias
             )
     dias_antiguedad_display.short_description = 'Antigüedad'
-    
+
     def eliminar_borradores_antiguos(self, request, queryset):
         """Elimina borradores con más de 30 días"""
         count = 0
@@ -1321,18 +1322,18 @@ class BorradorObraAdmin(admin.ModelAdmin):
             if borrador.dias_desde_modificacion() > 30:
                 borrador.delete()
                 count += 1
-        
+
         self.message_user(
-            request, 
+            request,
             f"{count} borradores antiguos (>30 días) eliminados."
         )
     eliminar_borradores_antiguos.short_description = "🗑️ Eliminar borradores > 30 días"
-    
+
     def limpiar_borradores_sin_titulo(self, request, queryset):
         """Elimina borradores sin título"""
         count = queryset.filter(titulo_temporal='Sin título').delete()[0]
         self.message_user(
-            request, 
+            request,
             f"{count} borradores sin título eliminados."
         )
     limpiar_borradores_sin_titulo.short_description = "🧹 Limpiar borradores sin título"

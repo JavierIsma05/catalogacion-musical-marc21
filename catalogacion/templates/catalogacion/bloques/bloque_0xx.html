@@ -8,7 +8,7 @@
             </h5>
         </div>
         <div class="card-body">
-            
+
             {# Campo 020 - ISBN #}
             {% if '020' in campos_visibles %}
             <div class="campo-marc">
@@ -16,7 +16,7 @@
                     <span class="badge-marc">020</span>
                     <h6>ISBN</h6>
                 </div>
-                
+
                 <div class="campo-grid">
                     <div class="col-full">
                         <label class="form-label" for="{{ form.isbn.id_for_label }}">{{ form.isbn.label }}</label>
@@ -28,7 +28,7 @@
                 </div>
             </div>
             {% endif %}
-            
+
             {# Campo 024 - ISMN #}
             {% if '024' in campos_visibles %}
             <div class="campo-marc">
@@ -36,7 +36,7 @@
                     <span class="badge-marc">024</span>
                     <h6>ISMN</h6>
                 </div>
-                
+
                 <div class="campo-grid">
                     <div class="col-full">
                         <label class="form-label" for="{{ form.ismn.id_for_label }}">{{ form.ismn.label }}</label>
@@ -48,7 +48,7 @@
                 </div>
             </div>
             {% endif %}
-            
+
 <!-- Campo 028 - Número de Editor -->
 {% if '028' in campos_visibles %}
 <div class="campo-marc">
@@ -56,7 +56,7 @@
         <span class="badge-marc">028</span>
         <h6>Número de Editor</h6>
     </div>
-    
+
     <div class="campo-grid">
         <div class="col-third">
             <label class="form-label" for="id_tipo_numero_028">{{ form.tipo_numero_028.label }}</label>
@@ -65,7 +65,7 @@
                 <div class="invalid-feedback">{{ form.tipo_numero_028.errors }}</div>
             {% endif %}
         </div>
-        
+
         <div class="col-third">
             <label class="form-label" for="id_control_nota_028">{{ form.control_nota_028.label }}</label>
             {{ form.control_nota_028 }}
@@ -73,7 +73,7 @@
                 <div class="invalid-feedback">{{ form.control_nota_028.errors }}</div>
             {% endif %}
         </div>
-        
+
         <div class="col-third">
             <label class="form-label" for="id_numero_editor">{{ form.numero_editor.label }}</label>
             {{ form.numero_editor }}
@@ -85,7 +85,7 @@
 </div>
 {% endif %}
 
-            
+
             {# Campo 031 - Íncipit musical (Repetible) #}
             {% if 'incipits_musicales' in formsets_visibles %}
             <div class="campo-marc">
@@ -94,13 +94,13 @@
                     <h6>Íncipit Musical</h6>
                     <span class="badge-repetible">REPETIBLE</span>
                 </div>
-                
+
                 <p class="form-text">Representación del comienzo de la pieza musical.</p>
-                
-                {% include 'catalogacion/includes/formset_template.html' with formset=incipits_musicales titulo="Íncipit" %}
+
+                {% include 'catalogacion/includes/campo_031_template.html' with formset=incipits_musicales %}
             </div>
             {% endif %}
-            
+
             {# Campo 040 - Fuente de catalogación #}
             {% if '040' in campos_visibles %}
             <div class="campo-marc">
@@ -108,7 +108,7 @@
                     <span class="badge-marc">040</span>
                     <h6>Fuente de Catalogación</h6>
                 </div>
-                
+
                 <div class="campo-grid">
                     <div class="col-full">
                         <label class="form-label" for="{{ form.centro_catalogador.id_for_label }}">{{ form.centro_catalogador.label }}</label>
@@ -117,7 +117,7 @@
                 </div>
             </div>
             {% endif %}
-            
+
             {# Campo 041 - Código de idioma (Repetible) con subcampo $a #}
             {% if 'codigos_lengua' in formsets_visibles %}
             <div class="campo-marc">
@@ -126,13 +126,13 @@
                     <h6>Código de Idioma</h6>
                     <span class="badge-repetible">REPETIBLE</span>
                 </div>
-                
+
                 <p class="form-text">Idioma(s) del contenido de la obra. Cada código puede tener múltiples idiomas ($a).</p>
-                
+
                 {% include 'catalogacion/includes/campo_041_template.html' with formset=codigos_lengua %}
             </div>
             {% endif %}
-            
+
             {# Campo 044 - País (Repetible) #}
             {% if 'codigos_pais' in formsets_visibles %}
             <div class="campo-marc">
@@ -141,13 +141,13 @@
                     <h6>Código de País</h6>
                     <span class="badge-repetible">REPETIBLE</span>
                 </div>
-                
+
                 <p class="form-text">País de publicación o producción.</p>
-                
+
                 {% include 'catalogacion/includes/formset_template.html' with formset=codigos_pais titulo="País" %}
             </div>
             {% endif %}
-            
+
         </div>
     </div>
 </section>

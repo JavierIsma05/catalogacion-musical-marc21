@@ -12,50 +12,72 @@ class IncipitMusical(models.Model):
     Permite múltiples íncipits para una obra
     """
     obra = models.ForeignKey(
-        'ObraGeneral',
+        "ObraGeneral",
         on_delete=models.CASCADE,
-        related_name='incipits_musicales',
-        help_text="Obra a la que pertenece este íncipit"
+        related_name="incipits_musicales",
+        help_text="Obra a la que pertenece este íncipit",
     )
-    
+
+    # Subcampo $a - Número de la obra (NR)
     numero_obra = models.PositiveIntegerField(
-        default=1,
-        help_text="031 $a — Número de la obra"
+        default=1, help_text="031 $a – Número de la obra (predeterminado: 1)"
     )
-    
+
+    # Subcampo $b - Número del movimiento (NR)
     numero_movimiento = models.PositiveIntegerField(
-        default=1,
-        help_text="031 $b — Número del movimiento"
+        default=1, help_text="031 $b – Número del movimiento (predeterminado: 1)"
     )
-    
+
+    # Subcampo $c - Número de pasaje/sistema (NR)
     numero_pasaje = models.PositiveIntegerField(
-        default=1,
-        help_text="031 $c — Número de pasaje o sistema"
+        default=1, help_text="031 $c – Número de pasaje o sistema (predeterminado: 1)"
     )
-    
+
+    # Subcampo $d - Título o encabezamiento (NR)
     titulo_encabezamiento = models.CharField(
         max_length=200,
         blank=True,
-        null=True,
-        help_text="031 $d — Nombre del tempo o movimiento"
+        help_text="031 $d – Nombre del tempo o movimiento (ej: Aria, Allegro, Andante)",
     )
-    
+    #  Subcampo $e – Personaje
+    personaje = models.CharField(
+        max_length=200, blank=True, null=True, help_text="031 $e – Personaje"
+    )
+
+    # Subcampo $g – Clave musical (ej. G-2, F-4)
+    clave = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="031 $g – Clave musical (ej.: G-2, F-4)",
+    )
+
+    # Subcampo $m - Voz/instrumento (NR)
     voz_instrumento = models.CharField(
         max_length=100,
         blank=True,
-        default='piano',
-        null=True,
-        help_text="031 $m — Voz/instrumento"
+        default="piano",
+        help_text="031 $m – Voz/instrumento",
     )
-    
+
+    # Subcampo $n – Armadura (ej. bBE)
+    armadura = models.CharField(
+        max_length=20, blank=True, help_text="031 $n – Armadura"
+    )
+
+    # Subcampo $o – Tiempo (ej. 4/4)
+    tiempo = models.CharField(
+        max_length=20, blank=True, help_text="031 $o – Tiempo"
+    )
+
+    # Subcampo $p - Notación musical (PAE)
     notacion_musical = models.TextField(
         blank=True,
         null=True,
-        help_text="031 $p — Íncipit musical codificado"
+        help_text="031 $p – Íncipit musical codificado en PAE (Plaine & Easie)",
     )
-    
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         verbose_name = "Íncipit Musical (031)"
         verbose_name_plural = "Íncipits Musicales (031)"
@@ -66,7 +88,7 @@ class IncipitMusical(models.Model):
         indexes = [
             models.Index(fields=['obra', 'numero_obra']),
         ]
-    
+
     def __str__(self):
         partes = [
             f"Obra {self.numero_obra}",
@@ -76,30 +98,30 @@ class IncipitMusical(models.Model):
         if self.titulo_encabezamiento:
             partes.append(f"- {self.titulo_encabezamiento}")
         return " ".join(partes)
-    
+
     @property
     def identificador_completo(self):
         """Retorna el identificador completo del íncipit"""
         return f"{self.numero_obra}.{self.numero_movimiento}.{self.numero_pasaje}"
-    
+
     def get_marc_format(self):
         """Retorna el campo completo en formato MARC"""
         marc = f"031 ## $a{self.numero_obra} $b{self.numero_movimiento} $c{self.numero_pasaje}"
-        
+
         if self.titulo_encabezamiento:
             marc += f" $d{self.titulo_encabezamiento}"
-        
+
         if self.voz_instrumento:
             marc += f" $m{self.voz_instrumento}"
-        
+
         if self.notacion_musical:
             notacion_preview = (
-                self.notacion_musical[:50] + "..." 
-                if len(self.notacion_musical) > 50 
+                self.notacion_musical[:50] + "..."
+                if len(self.notacion_musical) > 50
                 else self.notacion_musical
             )
             marc += f" $p{notacion_preview}"
-        
+
         return marc
 
 
@@ -114,19 +136,19 @@ class IncipitURL(models.Model):
         related_name='urls',
         help_text="Íncipit al que pertenece esta URL"
     )
-    
+
     url = models.URLField(
         max_length=500,
         help_text="031 $u — URL del íncipit codificado"
     )
-    
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         verbose_name = "URL de Íncipit (031 $u)"
         verbose_name_plural = "URLs de Íncipit (031 $u)"
         ordering = ['incipit', 'id']
-    
+
     def __str__(self):
         return self.url
 
@@ -141,12 +163,12 @@ class CodigoLengua(models.Model):
         ('0', 'El documento no es ni incluye una traducción'),
         ('1', 'El documento es o incluye una traducción'),
     ]
-    
+
     FUENTE_CODIGO = [
         ('#', 'Código MARC de lengua'),
         ('7', 'Fuente especificada en el subcampo $2'),
     ]
-    
+
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
@@ -160,16 +182,16 @@ class CodigoLengua(models.Model):
         default='0',
         help_text="Primer indicador: ¿Es traducción?"
     )
-    
+
     fuente_codigo = models.CharField(
         max_length=1,
         choices=FUENTE_CODIGO,
         default='#',
         help_text="Segundo indicador: Fuente del código"
     )
-    
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         verbose_name = "Código de Lengua (041)"
         verbose_name_plural = "Códigos de Lengua (041)"
@@ -177,17 +199,17 @@ class CodigoLengua(models.Model):
         indexes = [
             models.Index(fields=['obra']),
         ]
-    
+
     def __str__(self):
         indicadores = f"{self.indicacion_traduccion}{self.fuente_codigo}"
         idiomas = ", ".join([idioma.get_codigo_display() for idioma in self.idiomas.all()])
         return f"041 {indicadores} - {idiomas if idiomas else 'Sin idiomas'}"
-    
+
     @property
     def indicadores(self):
         """Retorna los indicadores en formato MARC"""
         return f"{self.indicacion_traduccion}{self.fuente_codigo}"
-    
+
     @property
     def es_traduccion(self):
         """Verifica si el documento es o incluye traducción"""
@@ -205,24 +227,24 @@ class IdiomaObra(models.Model):
         related_name='idiomas',
         help_text="Registro 041 al que pertenece este idioma"
     )
-    
+
     codigo_idioma = models.CharField(
         max_length=3,
         choices=CODIGOS_LENGUAJE,
         default='spa',
         help_text="041 $a — Código ISO 639-2/B del idioma"
     )
-    
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         verbose_name = "Idioma (041 $a)"
         verbose_name_plural = "Idiomas (041 $a)"
         ordering = ['codigo_lengua', 'id']
-    
+
     def __str__(self):
         return self.get_codigo_idioma_display()
-    
+
     @property
     def nombre_completo(self):
         """Retorna el nombre completo del idioma"""
@@ -240,16 +262,16 @@ class CodigoPaisEntidad(models.Model):
         related_name='codigos_pais_entidad',
         help_text="Obra a la que pertenece este código de país"
     )
-    
+
     codigo_pais = models.CharField(
         max_length=2,
         choices=CODIGOS_PAIS,
         default='ec',
         help_text="044 $a — Código ISO 3166-1 alfa-2 del país"
     )
-    
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         verbose_name = "País Editor/Productor (044 $a)"
         verbose_name_plural = "Países Editor/Productor (044 $a)"
@@ -258,15 +280,15 @@ class CodigoPaisEntidad(models.Model):
         indexes = [
             models.Index(fields=['obra']),
         ]
-    
+
     def __str__(self):
         return self.get_codigo_pais_display()
-    
+
     @property
     def nombre_completo(self):
         """Retorna el nombre completo del país"""
         return self.get_codigo_pais_display()
-    
+
     def get_marc_format(self):
         """Retorna el subcampo en formato MARC"""
         return f"$a{self.codigo_pais}"
