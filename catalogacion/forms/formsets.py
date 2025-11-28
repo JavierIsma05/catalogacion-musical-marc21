@@ -1,18 +1,23 @@
 """
 Definición de todos los formsets para campos repetibles
 """
+
 from django.forms import inlineformset_factory, BaseInlineFormSet
 from django.core.exceptions import ValidationError
+
 from catalogacion.models import (
     ObraGeneral,
+
     # Bloque 0XX
     IncipitMusical,
     IncipitURL,
     CodigoLengua,
     IdiomaObra,
     CodigoPaisEntidad,
+
     # Bloque 1XX
     FuncionCompositor,
+
     # Bloque 2XX
     TituloAlternativo,
     Edicion,
@@ -20,40 +25,43 @@ from catalogacion.models import (
     Lugar264,
     NombreEntidad264,
     Fecha264,
+
     # Bloque 3XX
     MedioInterpretacion382,
     MedioInterpretacion382_a,
+
     # Bloque 4XX
     MencionSerie490,
-    TituloSerie490,
-    VolumenSerie490,
+
     # Bloque 5XX
     NotaGeneral500,
     Contenido505,
     Sumario520,
     DatosBiograficos545,
+
     # Bloque 6XX
     Materia650,
     MateriaGenero655,
+
     # Bloque 7XX
     NombreRelacionado700,
     TerminoAsociado700,
     Funcion700,
     EntidadRelacionada710,
     EnlaceDocumentoFuente773,
-    NumeroObraRelacionada773,
+    NumeroControl773,
     EnlaceUnidadConstituyente774,
-    NumeroObraRelacionada774,
+    NumeroControl774,
     OtrasRelaciones787,
-    NumeroObraRelacionada787,
+    NumeroControl787,
+
     # Bloque 8XX
     Ubicacion852,
     Estanteria852,
     Disponible856,
-    URL856,
-    TextoEnlace856,
 )
 
+# IMPORTAR FORMULARIOS
 from .forms_0xx import (
     IncipitMusicalForm,
     IncipitURLForm,
@@ -61,7 +69,9 @@ from .forms_0xx import (
     IdiomaObraForm,
     CodigoPaisEntidadForm,
 )
+
 from .forms_1xx import FuncionCompositorForm
+
 from .forms_2xx import (
     TituloAlternativoForm,
     EdicionForm,
@@ -70,77 +80,71 @@ from .forms_2xx import (
     NombreEntidad264Form,
     Fecha264Form,
 )
+
 from .forms_3xx import (
     MedioInterpretacion382Form,
     MedioInterpretacion382_aForm,
 )
-from .forms_4xx import (
-    MencionSerie490Form,
-    # TituloSerie490Form y VolumenSerie490Form ahora manejados por JavaScript
-)
+
+from .forms_4xx import MencionSerie490Form
+
 from .forms_5xx import (
     NotaGeneral500Form,
     Contenido505Form,
     Sumario520Form,
     DatosBiograficos545Form,
 )
+
 from .forms_6xx import (
     Materia650Form,
     MateriaGenero655Form,
 )
+
 from .forms_7xx import (
     NombreRelacionado700Form,
     TerminoAsociado700Form,
     Funcion700Form,
     EntidadRelacionada710Form,
     EnlaceDocumentoFuente773Form,
-    NumeroObraRelacionada773Form,
+    NumeroControl773Form,
     EnlaceUnidadConstituyente774Form,
-    NumeroObraRelacionada774Form,
+    NumeroControl774Form,
     OtrasRelaciones787Form,
-    NumeroObraRelacionada787Form,
+    NumeroControl787Form,
 )
+
 from .forms_8xx import (
     Ubicacion852Form,
     Estanteria852Form,
     Disponible856Form,
-    # URL856Form y TextoEnlace856Form no son necesarios (se manejan con JavaScript)
 )
 
-
 # =====================================================
-# FORMSETS PERSONALIZADOS (con validaciones extras)
+# FORMSETS PERSONALIZADOS
 # =====================================================
 
 class IncipitMusicalFormSet(BaseInlineFormSet):
-    """Formset personalizado para íncipits musicales"""
-    
+    """Evita íncipits duplicados"""
     def clean(self):
-        """Validar que no haya íncipits duplicados"""
         if any(self.errors):
             return
         
         combinaciones = []
         for form in self.forms:
             if form.cleaned_data and not form.cleaned_data.get('DELETE'):
-                num_obra = form.cleaned_data.get('numero_obra')
-                num_mov = form.cleaned_data.get('numero_movimiento')
-                num_pas = form.cleaned_data.get('numero_pasaje')
-                
-                combinacion = (num_obra, num_mov, num_pas)
-                if combinacion in combinaciones:
-                    raise ValidationError(
-                        f"Íncipit duplicado: obra {num_obra}, "
-                        f"movimiento {num_mov}, pasaje {num_pas}"
-                    )
-                combinaciones.append(combinacion)
+                tup = (
+                    form.cleaned_data.get('numero_obra'),
+                    form.cleaned_data.get('numero_movimiento'),
+                    form.cleaned_data.get('numero_pasaje')
+                )
+                if tup in combinaciones:
+                    raise ValidationError("Íncipit duplicado.")
+                combinaciones.append(tup)
 
 
 class Materia650FormSet(BaseInlineFormSet):
-    """Formset personalizado para materias"""
-    
+    """Evita materias duplicadas"""
     def clean(self):
-        """Validar que no haya materias duplicadas"""
         if any(self.errors):
             return
         
@@ -149,14 +153,12 @@ class Materia650FormSet(BaseInlineFormSet):
             if form.cleaned_data and not form.cleaned_data.get('DELETE'):
                 materia = form.cleaned_data.get('materia')
                 if materia in materias:
-                    raise ValidationError(
-                        f"La materia '{materia}' está duplicada"
-                    )
+                    raise ValidationError(f"La materia '{materia}' está duplicada.")
                 materias.append(materia)
 
 
 # =====================================================
-# BLOQUE 0XX - FORMSETS
+# BLOQUE 0XX
 # =====================================================
 
 IncipitMusicalFormSet = inlineformset_factory(
@@ -166,8 +168,6 @@ IncipitMusicalFormSet = inlineformset_factory(
     formset=IncipitMusicalFormSet,
     extra=1,
     can_delete=True,
-    min_num=0,
-    validate_min=True,
 )
 
 IncipitURLFormSet = inlineformset_factory(
@@ -203,7 +203,7 @@ CodigoPaisEntidadFormSet = inlineformset_factory(
 )
 
 # =====================================================
-# BLOQUE 1XX - FORMSETS
+# BLOQUE 1XX
 # =====================================================
 
 FuncionCompositorFormSet = inlineformset_factory(
@@ -215,7 +215,7 @@ FuncionCompositorFormSet = inlineformset_factory(
 )
 
 # =====================================================
-# BLOQUE 2XX - FORMSETS
+# BLOQUE 2XX
 # =====================================================
 
 TituloAlternativoFormSet = inlineformset_factory(
@@ -224,7 +224,6 @@ TituloAlternativoFormSet = inlineformset_factory(
     form=TituloAlternativoForm,
     extra=1,
     can_delete=True,
-    max_num=10,
 )
 
 EdicionFormSet = inlineformset_factory(
@@ -268,7 +267,7 @@ Fecha264FormSet = inlineformset_factory(
 )
 
 # =====================================================
-# BLOQUE 3XX - FORMSETS
+# BLOQUE 3XX
 # =====================================================
 
 MedioInterpretacion382FormSet = inlineformset_factory(
@@ -288,7 +287,7 @@ MedioInterpretacion382_aFormSet = inlineformset_factory(
 )
 
 # =====================================================
-# BLOQUE 4XX - FORMSETS
+# BLOQUE 4XX
 # =====================================================
 
 MencionSerie490FormSet = inlineformset_factory(
@@ -297,14 +296,10 @@ MencionSerie490FormSet = inlineformset_factory(
     form=MencionSerie490Form,
     extra=1,
     can_delete=True,
-    max_num=10,
 )
 
-# TituloSerie490FormSet y VolumenSerie490FormSet no son necesarios
-# Los subcampos $a y $v se manejan con JavaScript como en 856
-
 # =====================================================
-# BLOQUE 5XX - FORMSETS
+# BLOQUE 5XX
 # =====================================================
 
 NotaGeneral500FormSet = inlineformset_factory(
@@ -336,12 +331,11 @@ DatosBiograficos545FormSet = inlineformset_factory(
     DatosBiograficos545,
     form=DatosBiograficos545Form,
     extra=1,
-    max_num=10,
     can_delete=True,
 )
 
 # =====================================================
-# BLOQUE 6XX - FORMSETS
+# BLOQUE 6XX
 # =====================================================
 
 Materia650FormSet = inlineformset_factory(
@@ -350,7 +344,6 @@ Materia650FormSet = inlineformset_factory(
     form=Materia650Form,
     formset=Materia650FormSet,
     extra=1,
-    max_num=10,
     can_delete=True,
 )
 
@@ -359,12 +352,11 @@ MateriaGenero655FormSet = inlineformset_factory(
     MateriaGenero655,
     form=MateriaGenero655Form,
     extra=1,
-    max_num=10,
     can_delete=True,
 )
 
 # =====================================================
-# BLOQUE 7XX - FORMSETS
+# BLOQUE 7XX
 # =====================================================
 
 NombreRelacionado700FormSet = inlineformset_factory(
@@ -391,10 +383,6 @@ Funcion700FormSet = inlineformset_factory(
     can_delete=True,
 )
 
-# NOTA: Relacion700FormSet y Autoria700FormSet eliminados
-# porque $i (relación) y $j (autoría) ahora son campos no repetibles
-# dentro de NombreRelacionado700
-
 EntidadRelacionada710FormSet = inlineformset_factory(
     ObraGeneral,
     EntidadRelacionada710,
@@ -407,15 +395,14 @@ EnlaceDocumentoFuente773FormSet = inlineformset_factory(
     ObraGeneral,
     EnlaceDocumentoFuente773,
     form=EnlaceDocumentoFuente773Form,
-    extra=1, 
+    extra=1,
     can_delete=True,
-    max_num=1,  # Normalmente solo una colección padre
 )
 
-NumeroObraRelacionada773FormSet = inlineformset_factory(
+NumeroControl773FormSet = inlineformset_factory(
     EnlaceDocumentoFuente773,
-    NumeroObraRelacionada773,
-    form=NumeroObraRelacionada773Form,
+    NumeroControl773,
+    form=NumeroControl773Form,
     extra=1,
     can_delete=True,
 )
@@ -428,10 +415,10 @@ EnlaceUnidadConstituyente774FormSet = inlineformset_factory(
     can_delete=True,
 )
 
-NumeroObraRelacionada774FormSet = inlineformset_factory(
+NumeroControl774FormSet = inlineformset_factory(
     EnlaceUnidadConstituyente774,
-    NumeroObraRelacionada774,
-    form=NumeroObraRelacionada774Form,
+    NumeroControl774,
+    form=NumeroControl774Form,
     extra=1,
     can_delete=True,
 )
@@ -444,16 +431,16 @@ OtrasRelaciones787FormSet = inlineformset_factory(
     can_delete=True,
 )
 
-NumeroObraRelacionada787FormSet = inlineformset_factory(
+NumeroControl787FormSet = inlineformset_factory(
     OtrasRelaciones787,
-    NumeroObraRelacionada787,
-    form=NumeroObraRelacionada787Form,
+    NumeroControl787,
+    form=NumeroControl787Form,
     extra=1,
     can_delete=True,
 )
 
 # =====================================================
-# BLOQUE 8XX - FORMSETS
+# BLOQUE 8XX
 # =====================================================
 
 Ubicacion852FormSet = inlineformset_factory(
@@ -462,7 +449,6 @@ Ubicacion852FormSet = inlineformset_factory(
     form=Ubicacion852Form,
     extra=1,
     can_delete=True,
-    max_num=5,
 )
 
 Estanteria852FormSet = inlineformset_factory(
@@ -479,8 +465,4 @@ Disponible856FormSet = inlineformset_factory(
     form=Disponible856Form,
     extra=1,
     can_delete=True,
-    max_num=5,
 )
-
-# URL856FormSet y TextoEnlace856FormSet no son necesarios
-# Los subcampos $u y $y se manejan con JavaScript como en 773/774/787

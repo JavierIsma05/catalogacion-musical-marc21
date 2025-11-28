@@ -1,259 +1,250 @@
 {% comment %}
-Template para campo 774 - Enlace a Unidad Constituyente
-Similar al campo 773, los números de obra ($w) se manejan con JavaScript
+FORMSET 774 – Enlace a Unidad Constituyente
+Incluye:
+✔ Autocomplete “Muscat” para $a
+✔ Clonado correcto del formset
+✔ Subcampos $w agregables/eliminables
+✔ Compatible con Select2/AJAX
 {% endcomment %}
 
-<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
+<div class="formset-container" data-formset-prefix="enlaces_774">
     {{ formset.management_form }}
-    
-    <button type="button" class="add-form-row mb-3" title="Agregar Obra Constituyente">
-        <i class="bi bi-plus-circle"></i>
-        Agregar Obra Constituyente
+    <p>Prefix debug: {{ formset.prefix }}</p>
+
+
+
+    <button type="button" class="add-form-row btn btn-outline-primary mb-3">
+        <i class="bi bi-plus-circle"></i> Agregar Enlace 774
     </button>
-    
+
     <div class="formset-forms">
+
         {% for form in formset %}
-        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %}">
-            {% if form.instance.pk %}
-                <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
-            {% endif %}
-            
+        <div class="formset-row mb-3 {% if form.instance.pk %}existing-form{% endif %}">
+
             {% if formset.can_delete %}
-                <div class="d-none">
-                    {{ form.DELETE }}
-                </div>
+            <div class="d-none">{{ form.DELETE }}</div>
             {% endif %}
-            
-            <button type="button" class="delete-row-btn" title="Eliminar">
+
+            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger float-end">
                 <i class="bi bi-x-lg"></i>
             </button>
-            
-            <div class="card mb-3">
+
+            <div class="card mt-4">
                 <div class="card-body">
-                    <div class="campo-grid">
-                        {# Campo 774 $a - Encabezamiento principal #}
-                        <div class="col-full">
-                            <label class="form-label" for="{{ form.compositor_774.id_for_label }}">
-                                {{ form.compositor_774.label }}
-                                {% if form.compositor_774.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ form.compositor_774 }}
-                            {% if form.compositor_774.errors %}
-                                <div class="invalid-feedback d-block">{{ form.compositor_774.errors }}</div>
-                            {% endif %}
-                            {% if form.compositor_774.help_text %}
-                                <small class="form-text text-muted">{{ form.compositor_774.help_text }}</small>
-                            {% endif %}
+
+                    <!-- Campo oculto ID real -->
+                    {{ form.encabezamiento_principal }}
+
+                    <!-- Campo visible texto con estilo amarillo e icono -->
+                    <div class="mb-3 position-relative">
+                        <label>{{ form.encabezamiento_principal_texto.label }}</label>
+
+                        <div style="position: relative;">
+                            {{ form.encabezamiento_principal_texto }}
+                            <!-- ICONO LLAVE -->
+                            <i class="bi bi-key" style="position:absolute; top:50%;right:10px;transform:translateY(-50%);font-size:18px;color:#9a8b0a;">
+                            </i>
                         </div>
-                        
-                        {# Campo 774 $t - Título #}
-                        <div class="col-full">
-                            <label class="form-label" for="{{ form.titulo.id_for_label }}">
-                                {{ form.titulo.label }}
-                                {% if form.titulo.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ form.titulo }}
-                            {% if form.titulo.errors %}
-                                <div class="invalid-feedback d-block">{{ form.titulo.errors }}</div>
-                            {% endif %}
-                            {% if form.titulo.help_text %}
-                                <small class="form-text text-muted">{{ form.titulo.help_text }}</small>
-                            {% endif %}
-                        </div>
-                        
-                        {# Botón para agregar números de obra ($w) #}
-                        <div class="col-full">
-                            <button type="button" class="btn btn-sm btn-outline-primary add-numero-btn w-100" data-enlace-index="{{ forloop.counter0 }}">
-                                <i class="bi bi-plus-circle"></i>
-                                Agregar Número de Obra ($w)
+
+                        <div class="autocomplete-suggestions" data-autocomplete-target></div>
+                    </div>
+
+
+
+                    <!-- Campo $t -->
+                    <div class="mb-3">
+                        <label>{{ form.titulo.label }}</label>
+                        {{ form.titulo }}
+                    </div>
+
+                    <!-- Botón agregar número $w -->
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-secondary add-numero-btn w-100"
+                            data-index="{{ forloop.counter0 }}">
+                            <i class="bi bi-plus-circle"></i> Agregar Número de Obra ($w)
+                        </button>
+                    </div>
+
+                    <!-- Contenido dinámico de números -->
+                    <div class="numeros-container" data-numeros-container="{{ forloop.counter0 }}">
+                        {% for numero in form.instance.numeros_obra.all %}
+                        <div class="numero-form-row d-flex gap-2 mb-2">
+                            <input type="text" class="form-control numero-w-input"
+                                name="numero_774_{{ forloop.parentloop.counter0 }}_{{ numero.pk }}"
+                                value="{{ numero.numero }}" placeholder="Ej: 000123456">
+                            <button type="button" class="btn btn-outline-danger delete-numero-btn">
+                                <i class="bi bi-trash"></i>
                             </button>
                         </div>
-                        
-                        {# Subcampo $w - Números de obra (Repetible) #}
-                        <div class="col-full numeros-container" data-numeros-container="{{ forloop.counter0 }}">
-                            {% if form.instance.pk %}
-                                {# Cargar números existentes #}
-                                {% for numero in form.instance.numeros_obra.all %}
-                                <div class="numero-form-row">
-                                    <div class="d-flex flex-column w-100 mb-2">
-                                        <label class="form-label small">774 $w - Número de obra constituyente</label>
-                                        <div class="d-flex gap-2 align-items-center">
-                                            <input type="text" 
-                                                   class="form-control numero-input" 
-                                                   name="numero_enlace_774_{{ forloop.parentloop.counter0 }}_{{ numero.pk }}"
-                                                   value="{{ numero.numero }}"
-                                                   placeholder="Ej: 001234567" 
-                                                   style="flex: 1;">
-                                            <button type="button" class="btn btn-sm btn-outline-danger delete-numero-btn" title="Eliminar número">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
+                        {% endfor %}
                     </div>
+
                 </div>
             </div>
         </div>
         {% endfor %}
-        
-        {# Template vacío para clonar enlaces #}
-        <div class="formset-row empty-form">
-            <button type="button" class="delete-row-btn" title="Eliminar">
+
+        <!-- TEMPLATE VACÍO -->
+        <div class="formset-row empty-form d-none">
+
+            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger float-end">
                 <i class="bi bi-x-lg"></i>
             </button>
-            
-            <div class="card mb-3">
+
+            <div class="card mt-4">
                 <div class="card-body">
-                    <div class="campo-grid">
-                        <div class="col-full">
-                            <label class="form-label">
-                                {{ formset.empty_form.compositor_774.label }}
-                                {% if formset.empty_form.compositor_774.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ formset.empty_form.compositor_774 }}
-                        </div>
-                        
-                        <div class="col-full">
-                            <label class="form-label">
-                                {{ formset.empty_form.titulo.label }}
-                                {% if formset.empty_form.titulo.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ formset.empty_form.titulo }}
-                        </div>
-                        
-                        <div class="col-full">
-                            <button type="button" class="btn btn-sm btn-outline-primary add-numero-btn w-100" data-enlace-index="__prefix__">
-                                <i class="bi bi-plus-circle"></i>
-                                Agregar Número de Obra ($w)
-                            </button>
-                        </div>
-                        
-                        <div class="col-full numeros-container" data-numeros-container="__prefix__">
-                            {# Los números se agregarán aquí dinámicamente #}
-                        </div>
+
+                    {{ formset.empty_form.encabezamiento_principal }}
+
+                    <div class="mb-3">
+                        {{ formset.empty_form.encabezamiento_principal_texto }}
+                        <div class="autocomplete-suggestions" data-autocomplete-target></div>
                     </div>
+
+                    <div class="mb-3">
+                        {{ formset.empty_form.titulo }}
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-secondary add-numero-btn w-100"
+                            data-index="__prefix__">
+                            <i class="bi bi-plus-circle"></i> Agregar Número de Obra ($w)
+                        </button>
+                    </div>
+
+                    <div class="numeros-container" data-numeros-container="__prefix__"></div>
+
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
-{# Template global para números de obra (fuera del formset loop) #}
+<!-- PLANTILLA $w -->
 <div class="numero-form-row numero-template-774 d-none">
-    <div class="d-flex flex-column w-100 mb-2">
-        <label class="form-label small">774 $w - Número de obra constituyente</label>
-        <div class="d-flex gap-2 align-items-center">
-            <input type="text" class="form-control numero-input" placeholder="Ej: 001234567" style="flex: 1;">
-            <button type="button" class="btn btn-sm btn-outline-danger delete-numero-btn" title="Eliminar número">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
+    <div class="d-flex gap-2 mb-2">
+        <input type="text" class="form-control numero-w-input" placeholder="Ej: 000123456">
+        <button type="button" class="btn btn-outline-danger delete-numero-btn">
+            <i class="bi bi-trash"></i>
+        </button>
     </div>
 </div>
 
+<!-- =========================== -->
+<!--         JAVASCRIPT          -->
+<!-- =========================== -->
 <script>
-// Script para manejar el campo 774 con números de obra repetibles
-(function() {
-    const prefix = '{{ formset.prefix }}';
-    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-    if (!container) return;
-    
-    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-    const addButton = container.querySelector('.add-form-row');
-    const formsContainer = container.querySelector('.formset-forms');
-    const numeroTemplate = document.querySelector('.numero-template-774');
-    
-    if (!totalFormsInput || !addButton || !formsContainer || !numeroTemplate) return;
-    
-    // Agregar nuevo enlace 774
-    addButton.addEventListener('click', function() {
-        const totalForms = parseInt(totalFormsInput.value);
-        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
-        
-        if (!emptyFormTemplate) return;
-        
-        const emptyForm = emptyFormTemplate.cloneNode(true);
-        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
-        emptyForm.classList.remove('empty-form');
-        emptyForm.style.display = '';
-        
-        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
-        totalFormsInput.value = totalForms + 1;
-        
-        // Inicializar Select2 si existe
-        if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
-            emptyForm.querySelectorAll('.form-select:not(.numero-input)').forEach(select => {
-                $(select).select2({
-                    theme: 'bootstrap-5',
-                    width: '100%'
+    (function () {
+        const prefix = '{{ formset.prefix }}';
+        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+        if (!container) return;
+
+        const totalInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+        const addButton = container.querySelector('.add-form-row');
+        const formsContainer = container.querySelector('.formset-forms');
+        const templateNumero = document.querySelector('.numero-template-774');
+
+        /* Clonar formulario */
+        addButton.addEventListener('click', () => {
+            const total = parseInt(totalInput.value);
+            const template = formsContainer.querySelector('.empty-form');
+
+            const newForm = template.cloneNode(true);
+            newForm.classList.remove('empty-form', 'd-none');
+            newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, total);
+
+            formsContainer.appendChild(newForm);
+            totalInput.value = total + 1;
+
+            inicializarAutocomplete(newForm);
+        });
+
+        /* Eliminar fila */
+        container.addEventListener('click', e => {
+            const btn = e.target.closest('.delete-row-btn');
+            if (!btn) return;
+
+            const row = btn.closest('.formset-row');
+            if (row.classList.contains('empty-form')) return;
+
+            const del = row.querySelector('input[name*="DELETE"]');
+            if (del) {
+                del.checked = !del.checked;
+                row.style.opacity = del.checked ? "0.5" : "1";
+            } else {
+                row.remove();
+                totalInput.value--;
+            }
+        });
+
+        /* Agregar número $w */
+        container.addEventListener('click', e => {
+            const btn = e.target.closest('.add-numero-btn');
+            if (!btn) return;
+
+            const index = btn.dataset.index;
+            const target = container.querySelector(`[data-numeros-container="${index}"]`);
+            if (!target) return;
+
+            const newNumero = templateNumero.cloneNode(true);
+            newNumero.classList.remove('numero-template-774', 'd-none');
+
+            newNumero.querySelector('.numero-w-input').name =
+                `numero_774_${index}_${Date.now()}`;
+
+            target.appendChild(newNumero);
+        });
+
+        /* Eliminar número $w */
+        container.addEventListener('click', e => {
+            const btn = e.target.closest('.delete-numero-btn');
+            if (btn) {
+                const row = btn.closest('.numero-form-row');
+                if (!row.classList.contains('numero-template-774'))
+                    row.remove();
+            }
+        });
+
+        /* ============================= */
+        /* AUTOCOMPLETE 774 ($a)         */
+        /* ============================= */
+        function inicializarAutocomplete(scope) {
+            scope.querySelectorAll('.autocomplete-774').forEach(input => {
+                const hiddenInput = scope.querySelector('input[name$="encabezamiento_principal"]');
+                const suggestionsBox = scope.querySelector('[data-autocomplete-target]');
+
+                input.addEventListener('input', async () => {
+                    const q = input.value.trim();
+                    if (q.length < 2) {
+                        suggestionsBox.innerHTML = "";
+                        return;
+                    }
+
+                    const response = await fetch(`/catalogacion/api/autocompletar/persona/?q=${encodeURIComponent(q)}`);
+                    const data = await response.json();
+
+                    suggestionsBox.innerHTML = data.results
+                        .map(r => `<div class="suggestion" data-id="${r.id}" data-name="${r.text}">${r.text}</div>`)
+                        .join("");
+
+                    suggestionsBox.querySelectorAll('.suggestion').forEach(item => {
+                        item.addEventListener('click', () => {
+                            hiddenInput.value = item.dataset.id;
+                            input.value = item.dataset.name;
+                            suggestionsBox.innerHTML = "";
+                        });
+                    });
                 });
             });
         }
-    });
-    
-    // Eliminar enlace 774
-    container.addEventListener('click', function(e) {
-        const deleteBtn = e.target.closest('.delete-row-btn');
-        if (!deleteBtn) return;
-        
-        const row = deleteBtn.closest('.formset-row');
-        if (!row || row.classList.contains('empty-form')) return;
-        
-        const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
-        
-        if (row.classList.contains('existing-form')) {
-            if (deleteCheckbox && deleteCheckbox.checked) {
-                deleteCheckbox.checked = false;
-                row.style.opacity = '1';
-                deleteBtn.classList.remove('btn-warning');
-                deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
-                deleteBtn.title = 'Eliminar';
-            } else if (deleteCheckbox) {
-                deleteCheckbox.checked = true;
-                row.style.opacity = '0.5';
-                deleteBtn.classList.add('btn-warning');
-                deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
-                deleteBtn.title = 'Cancelar eliminación';
-            }
-        } else {
-            row.remove();
-            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
-        }
-    });
-    
-    // Manejar números de obra (subcampo $w repetible)
-    container.addEventListener('click', function(e) {
-        // Agregar número
-        const addNumeroBtn = e.target.closest('.add-numero-btn');
-        if (addNumeroBtn) {
-            const enlaceIndex = addNumeroBtn.getAttribute('data-enlace-index');
-            const numerosContainer = container.querySelector(`[data-numeros-container="${enlaceIndex}"]`);
-            
-            if (!numerosContainer) return;
-            
-            const newNumero = numeroTemplate.cloneNode(true);
-            newNumero.classList.remove('numero-template-774', 'd-none');
-            
-            // Actualizar el name del input
-            const input = newNumero.querySelector('.numero-input');
-            if (input) {
-                input.name = `numero_enlace_774_${enlaceIndex}_${Date.now()}`;
-            }
-            
-            numerosContainer.appendChild(newNumero);
-        }
-        
-        // Eliminar número
-        const deleteNumeroBtn = e.target.closest('.delete-numero-btn');
-        if (deleteNumeroBtn) {
-            const numeroRow = deleteNumeroBtn.closest('.numero-form-row');
-            if (!numeroRow.classList.contains('numero-template-774')) {
-                numeroRow.remove();
-            }
-        }
-    });
-})();
+
+        inicializarAutocomplete(container);
+
+    })();
 </script>
+
+<!-- =========================== -->
+<!--         ESTILOS CSS         -->
+<!-- =========================== -->

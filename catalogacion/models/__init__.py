@@ -1,6 +1,6 @@
 """
-Exportación centralizada de modelos MARC21.
-Basado en la estructura refactorizada con modelo único.
+Exportación centralizada de modelos MARC21
+Estructura refactorizada y coherente con los modelos actuales.
 """
 
 # ============================================
@@ -103,8 +103,6 @@ from .bloque_5xx import (
     Contenido505,
     Sumario520,
     DatosBiograficos545,
-    TextoBiografico545,
-    URI545,
 )
 
 # ============================================
@@ -124,18 +122,15 @@ from .bloque_7xx import (
     NombreRelacionado700,
     TerminoAsociado700,
     Funcion700,
-    # Relacion700 y Autoria700 eliminados - ahora son campos no repetibles en NombreRelacionado700
     EntidadRelacionada710,
     EnlaceDocumentoFuente773,
-    NumeroObraRelacionada773,
+    NumeroControl773,
     EnlaceUnidadConstituyente774,
-    NumeroObraRelacionada774,
+    NumeroControl774,
     OtrasRelaciones787,
-    NumeroObraRelacionada787
+    NumeroControl787,
 )
 
-# ============================================
-# BLOQUE 8XX
 # ============================================
 # BLOQUE 8XX
 # ============================================
@@ -148,99 +143,134 @@ from .bloque_8xx import (
 )
 
 # ============================================
-# UTILIDADES
+# UTILIDADES / MANAGERS
 # ============================================
 from .managers import ObraGeneralManager
 
 # ============================================
-# ACTIVAR SIGNALS DE AUDITORÍA
+# ACTIVAR SIGNALS
 # ============================================
 from . import signals_auditoria  # noqa: F401
+
 
 # ============================================
 # __all__ para import *
 # ============================================
 __all__ = [
-    # Autoridades
+
+    # -------------------------------
+    # AUTORIDADES
+    # -------------------------------
     'AutoridadPersona',
     'AutoridadTituloUniforme',
     'AutoridadFormaMusical',
     'AutoridadEntidad',
     'AutoridadMateria',
-    
-    # Modelo principal
+
+    # -------------------------------
+    # MODELO PRINCIPAL
+    # -------------------------------
     'ObraGeneral',
     'NumeroControlSecuencia',
-    
-    # Modelos auxiliares
+
+    # -------------------------------
+    # AUXILIARES
+    # -------------------------------
     'SoftDeleteMixin',
     'HistorialCambio',
     'EncabezamientoEnlace',
     'ObraLengua',
-    
-    # Validadores
+
+    # -------------------------------
+    # VALIDADORES
+    # -------------------------------
     'ValidadorBase',
     'ValidadorColeccion',
     'ValidadorObraEnColeccion',
     'ValidadorObraIndependiente',
     'obtener_validador',
-    
-    # Bloque 0XX
+
+    # -------------------------------
+    # 0XX
+    # -------------------------------
     'IncipitMusical',
     'IncipitURL',
     'CodigoLengua',
     'IdiomaObra',
     'CodigoPaisEntidad',
-    
-    # Bloque 1XX
+
+    # -------------------------------
+    # 1XX
+    # -------------------------------
     'FuncionCompositor',
-    
-    # Bloque 2XX
+
+    # -------------------------------
+    # 2XX
+    # -------------------------------
     'TituloAlternativo',
     'Edicion',
     'ProduccionPublicacion',
     'Lugar264',
     'NombreEntidad264',
     'Fecha264',
-    
-    # Bloque 3XX
+
+    # -------------------------------
+    # 3XX
+    # -------------------------------
     'MedioInterpretacion382',
     'MedioInterpretacion382_a',
-    
-    # Bloque 4XX
+
+    # -------------------------------
+    # 4XX
+    # -------------------------------
     'MencionSerie490',
     'TituloSerie490',
     'VolumenSerie490',
-    
-    # Bloque 5XX
+
+    # -------------------------------
+    # 5XX
+    # -------------------------------
     'NotaGeneral500',
     'Contenido505',
     'Sumario520',
     'DatosBiograficos545',
-    
-    # Bloque 6XX
+
+    # -------------------------------
+    # 6XX
+    # -------------------------------
     'Materia650',
     'SubdivisionMateria650',
     'MateriaGenero655',
     'SubdivisionGeneral655',
-    
-    # Bloque 7XX
+
+    # -------------------------------
+    # 7XX
+    # -------------------------------
     'NombreRelacionado700',
     'TerminoAsociado700',
     'Funcion700',
-    # 'Relacion700' y 'Autoria700' eliminados
     'EntidadRelacionada710',
+
     'EnlaceDocumentoFuente773',
+    'NumeroControl773',
+
     'EnlaceUnidadConstituyente774',
+    'NumeroControl774',
+
     'OtrasRelaciones787',
-    
-    # Bloque 8XX
+    'NumeroControl787',
+
+    # -------------------------------
+    # 8XX
+    # -------------------------------
     'Ubicacion852',
     'Estanteria852',
     'Disponible856',
     'URL856',
     'TextoEnlace856',
-    
-    # Utilidades
+
+    # -------------------------------
+    # UTILIDADES
+    # -------------------------------
     'ObraGeneralManager',
 ]

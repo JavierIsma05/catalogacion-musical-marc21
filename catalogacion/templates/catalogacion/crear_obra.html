@@ -33,9 +33,9 @@
                     <div class="progress-circle">
                         <svg width="80" height="80">
                             <circle class="bg-circle" cx="40" cy="40" r="36"></circle>
-                            <circle class="progress-circle-bar" cx="40" cy="40" r="36" 
+                            <circle class="progress-circle-bar" cx="40" cy="40" r="36"
                                     id="progress-circle"
-                                    stroke-dasharray="226.19" 
+                                    stroke-dasharray="226.19"
                                     stroke-dashoffset="226.19"></circle>
                         </svg>
                         <div class="progress-text" id="progress-percent">0%</div>
@@ -267,35 +267,39 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
 <script src="{% static 'catalogacion/js/titulos-formas-autocomplete.js' %}"></script>
 <script src="{% static 'catalogacion/js/required-fields-tracker.js' %}"></script>
 <script src="{% static 'catalogacion/js/borrador-system.js' %}"></script>
+<script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>
+<script src="{% static 'catalogacion/js/incipit-031-adapter.js' %}"></script>
+
+
 
 <script>
 // Función para cambiar de pestaña
 function switchTab(index) {
     if (index < 0 || index >= tabs.length) return;
-    
+
     // Ocultar todas las pestañas
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
     });
-    
+
     // Desactivar todos los botones
     document.querySelectorAll('.tab-button').forEach(btn => {
         btn.classList.remove('active');
     });
-    
+
     // Activar pestaña actual
     const tabId = tabs[index];
     document.getElementById(tabId).classList.add('active');
     document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-    
+
     // Actualizar índice
     currentTabIndex = index;
-    
+
     // Actualizar barra de progreso
     const progress = ((index + 1) / tabs.length) * 100;
     document.getElementById('progress-bar').style.width = progress + '%';
     document.getElementById('current-step').textContent = index + 1;
-    
+
     // Scroll al inicio
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -313,7 +317,7 @@ function prevTab() {
 // Eventos de botones de pestañas
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ DOM cargado, inicializando formulario...');
-    
+
     // Activar Select2 en campos de autoridades
     if (typeof $.fn.select2 !== 'undefined') {
         $('.select2').select2({
@@ -325,34 +329,34 @@ document.addEventListener('DOMContentLoaded', function() {
             allowClear: true
         });
     }
-    
+
     // Click en botones de pestañas
     document.querySelectorAll('.tab-button').forEach((button, index) => {
         button.addEventListener('click', () => {
             switchTab(index);
         });
     });
-    
+
     // Validación de formulario
     const form = document.getElementById('obra-form');
-    
+
     if (!form) {
         console.error('❌ ERROR: No se encontró el formulario #obra-form');
         return;
     }
-    
+
     console.log('✅ Formulario encontrado, agregando listener de submit...');
-    
+
     form.addEventListener('submit', function(e) {
         // SIEMPRE prevenir el comportamiento por defecto
         e.preventDefault();
         e.stopPropagation();
-        
+
         console.log('\n\n');
         console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥');
         console.log('🚀 EVENTO SUBMIT CAPTURADO');
         console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥');
-        
+
         // LOG: SIEMPRE mostrar datos antes de validar
         console.log('\n=== DATOS DEL FORMULARIO ===');
         const formData = new FormData(form);
@@ -364,14 +368,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log(`  ✅ ${key}: "${value}"`);
             }
         });
-        
+
         // Verificar validación HTML5
         const isValid = form.checkValidity();
         console.log('\n🔍 Validación HTML5:', isValid ? '✅ VÁLIDO' : '❌ INVÁLIDO');
-        
+
         if (!isValid) {
             console.log('\n❌❌❌ FORMULARIO BLOQUEADO - Validación HTML5 falló ❌❌❌');
-            
+
             // Encontrar TODOS los campos inválidos
             const invalidFields = form.querySelectorAll(':invalid');
             console.log(`\n⚠️ Se encontraron ${invalidFields.length} campos inválidos:`);
@@ -384,7 +388,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log(`     ⚡ Required: ${field.required}`);
                 console.log(`     💬 Mensaje: ${field.validationMessage}`);
             });
-            
+
             // Navegar al primer campo inválido
             const firstInvalid = invalidFields[0];
             if (firstInvalid) {
@@ -400,20 +404,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
             }
-            
+
             alert('⚠️ Por favor complete todos los campos obligatorios antes de enviar.');
             console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥\n\n');
             return;
         }
-        
+
         // Si llegamos aquí, el formulario es válido según HTML5
         console.log('\n✅✅✅ FORMULARIO VÁLIDO - Enviando al servidor vía AJAX ✅✅✅');
-        
+
         // Enviar por AJAX para no recargar la página
         console.log('\n🌐 Enviando petición AJAX...');
         console.log('   URL:', form.action);
         console.log('   Método: POST');
-        
+
         fetch(form.action, {
             method: 'POST',
             body: formData,
@@ -428,39 +432,39 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('   OK:', response.ok);
             console.log('   URL final:', response.url);
             console.log('   Redirected:', response.redirected);
-            
+
             // Si hubo redirección, la obra se creó exitosamente
             if (response.redirected) {
                 console.log('\n🎉🎉🎉 ¡OBRA CREADA EXITOSAMENTE! 🎉🎉🎉');
                 console.log('   Redirigiendo a:', response.url);
-                
+
                 // Mostrar alerta de éxito y redirigir
                 alert('✅ ¡Obra creada exitosamente!\n\nSerás redirigido a la página de detalle.');
                 window.location.href = response.url;
                 return; // No procesar más
             }
-            
+
             return response.text();
         })
         .then(html => {
             // Si ya hubo redirección, no procesar
             if (!html) return;
-            
+
             console.log('\n📄 HTML RECIBIDO (primeros 500 caracteres):');
             console.log(html.substring(0, 500));
-            
+
             // Buscar mensajes de error en el HTML
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const alerts = doc.querySelectorAll('.alert, .error, .invalid-feedback');
-            
+
             if (alerts.length > 0) {
                 console.log('\n⚠️ MENSAJES/ERRORES ENCONTRADOS EN LA RESPUESTA:');
                 alerts.forEach((alert, i) => {
                     console.log(`  ${i + 1}. ${alert.textContent.trim()}`);
                 });
             }
-            
+
             // Si hay un redirect (obra creada exitosamente), ir allá
             const successMessage = doc.querySelector('.alert-success');
             if (successMessage) {
@@ -481,12 +485,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .finally(() => {
             console.log('\n🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥\n\n');
         });
-        
+
         form.classList.add('was-validated');
     }, { capture: true }); // Captura temprana del evento
-    
+
     console.log('✅ Listener de submit agregado correctamente');
-    
+
     // Atajos de teclado
     document.addEventListener('keydown', function(e) {
         // Alt + Flecha Derecha = Siguiente

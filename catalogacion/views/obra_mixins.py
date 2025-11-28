@@ -22,10 +22,14 @@ from catalogacion.forms.formsets import (
     # Bloque 6XX
     Materia650FormSet, MateriaGenero655FormSet,
     # Bloque 7XX
-    NombreRelacionado700FormSet, EntidadRelacionada710FormSet,
-    EnlaceDocumentoFuente773FormSet, NumeroObraRelacionada773FormSet,
-    EnlaceUnidadConstituyente774FormSet, NumeroObraRelacionada774FormSet,
+    NombreRelacionado700FormSet,
+    EntidadRelacionada710FormSet,
+    EnlaceDocumentoFuente773FormSet,
+    NumeroControl773FormSet,
+    EnlaceUnidadConstituyente774FormSet,
+    NumeroControl774FormSet,
     OtrasRelaciones787FormSet,
+    NumeroControl787FormSet,
     # Bloque 8XX
     Ubicacion852FormSet,
     Disponible856FormSet,
@@ -161,6 +165,7 @@ class ObraFormsetMixin:
             'incipits_musicales': 'incipits-TOTAL_FORMS',
             'menciones_serie_490': 'menciones_490-TOTAL_FORMS',
             'enlaces_documento_fuente_773': 'enlaces_773-TOTAL_FORMS',
+            'enlaces_unidad_constituyente_774': 'enlaces_774-TOTAL_FORMS',   # ← AGREGA ESTO
             'otras_relaciones_787': 'relaciones_787-TOTAL_FORMS',
         }
         
