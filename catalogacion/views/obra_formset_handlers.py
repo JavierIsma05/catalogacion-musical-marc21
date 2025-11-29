@@ -74,7 +74,7 @@ def save_subdivisiones_650(request_post, formset):
         formset=formset,
         prefijo_input="subdivision_materia_650_",
         modelo_subcampo=SubdivisionMateria650,
-        campo_fk="materia",
+        campo_fk="materia650",
         campo_valor="subdivision",
     )
 

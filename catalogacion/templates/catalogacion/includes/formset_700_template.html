@@ -48,13 +48,15 @@ Permite:
                     <label class="form-label" for="{{ form.persona_texto.id_for_label }}">
                         {{ form.persona_texto.label }}
                     </label>
-                    {{ form.persona_texto }}
+                    <div class="autocomplete-wrapper">
+                        {{ form.persona_texto }}
+                        <div class="autocomplete-suggestions persona700-suggestions"></div>
+                    </div>
                     
                     <div class="form-text">
                         
                         Escriba para buscar personas existentes o ingrese un nombre nuevo.
                     </div>
-                    <div class="autocomplete-suggestions persona700-suggestions"></div>
                     {% if form.persona_texto.errors %}
                         <div class="invalid-feedback d-block">{{ form.persona_texto.errors }}</div>
                     {% endif %}
@@ -76,7 +78,10 @@ Permite:
                 {# 700 $t – Título de obra (NR) #}
                 <div class="col-half">
                     <label class="form-label" for="{{ form.titulo_obra.id_for_label }}">{{ form.titulo_obra.label }}</label>
-                    {{ form.titulo_obra }}
+                    <div class="autocomplete-wrapper">
+                        {{ form.titulo_obra }}
+                        <div class="autocomplete-suggestions"></div>
+                    </div>
                     {% if form.titulo_obra.errors %}
                         <div class="invalid-feedback d-block">{{ form.titulo_obra.errors }}</div>
                     {% endif %}
@@ -202,11 +207,13 @@ Permite:
                            for="{{ formset.empty_form.persona_texto.id_for_label }}">
                         {{ formset.empty_form.persona_texto.label }}
                     </label>
-                    {{ formset.empty_form.persona_texto }}
+                    <div class="autocomplete-wrapper">
+                        {{ formset.empty_form.persona_texto }}
+                        <div class="autocomplete-suggestions persona700-suggestions"></div>
+                    </div>
                     <div class="form-text">
                         Escriba para buscar personas existentes o ingrese un nombre nuevo.
                     </div>
-                    <div class="autocomplete-suggestions persona700-suggestions"></div>
                 </div>
 
                 <div class="col-half">
@@ -230,7 +237,10 @@ Permite:
                            for="{{ formset.empty_form.titulo_obra.id_for_label }}">
                         {{ formset.empty_form.titulo_obra.label }}
                     </label>
-                    {{ formset.empty_form.titulo_obra }}
+                    <div class="autocomplete-wrapper">
+                        {{ formset.empty_form.titulo_obra }}
+                        <div class="autocomplete-suggestions"></div>
+                    </div>
                 </div>
 
                 <div class="col-half">

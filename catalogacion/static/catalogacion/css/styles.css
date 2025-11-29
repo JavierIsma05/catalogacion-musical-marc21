@@ -843,7 +843,8 @@ textarea.form-control {
     display: none;
 }
 
-.autocomplete-suggestions.is-visible {
+.autocomplete-suggestions.is-visible,
+.autocomplete-suggestions.show {
     display: block;
 }
 

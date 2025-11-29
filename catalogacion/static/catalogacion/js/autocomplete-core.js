@@ -50,7 +50,7 @@
 
             if (query.length < opts.minChars) {
                 hideSuggestions();
-                if (typeof opts.onClear === "function") {
+                if (query.length === 0 && typeof opts.onClear === "function") {
                     opts.onClear(elements());
                 }
                 return;
