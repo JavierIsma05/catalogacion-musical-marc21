@@ -165,6 +165,7 @@ class ObraFormsetMixin:
             'incipits_musicales': 'incipits-TOTAL_FORMS',
             'menciones_serie_490': 'menciones_490-TOTAL_FORMS',
             'enlaces_documento_fuente_773': 'enlaces_773-TOTAL_FORMS',
+            'enlaces_unidad_constituyente_774': 'enlaces_774-TOTAL_FORMS',   # ← AGREGA ESTO
             'otras_relaciones_787': 'relaciones_787-TOTAL_FORMS',
         }
         

@@ -1,6 +1,9 @@
 {% comment %}
 Template especializado para el campo 700 - Nombres Relacionados.
-Permite repetir el campo completo y también los subcampos $c (término asociado) y $e (función).
+Permite:
+- Autocomplete editable para 700 $a (AutoridadPersona)
+- Campo 700 $d separado
+- Subcampos repetibles $c (término asociado) y $e (función)
 {% endcomment %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
@@ -9,12 +12,13 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
             {{ hidden }}
         {% endfor %}
     </div>
-    
+
     <button type="button" class="add-form-row mb-3" title="Agregar nombre relacionado">
         <i class="bi bi-plus-circle"></i>
         Agregar Nombre Relacionado (700)
     </button>
     
+
     <div class="formset-forms">
         {% for form in formset %}
         <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
@@ -26,37 +30,51 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
                     {{ form.DELETE }}
                 </div>
             {% endif %}
-            
+
             <button type="button" class="delete-row-btn" title="Eliminar registro 700">
                 <i class="bi bi-x-lg"></i>
             </button>
-            
+
             {% if form.non_field_errors %}
             <div class="alert alert-danger mb-3">
                 {{ form.non_field_errors }}
             </div>
             {% endif %}
-            
+
             <div class="campo-grid">
-                {# Subcampo $a - Nombre (NR) #}
+
+                {# 700 $a – persona (autocomplete + hidden FK) #}
                 <div class="col-full">
-                    <label class="form-label" for="{{ form.persona.id_for_label }}">{{ form.persona.label }}</label>
-                    {{ form.persona }}
-                    {% if form.persona.errors %}
-                        <div class="invalid-feedback d-block">{{ form.persona.errors }}</div>
+                    {{ form.persona }} {# HIDDEN con class persona700-id #}
+                    <label class="form-label" for="{{ form.persona_texto.id_for_label }}">
+                        {{ form.persona_texto.label }}
+                    </label>
+                    {{ form.persona_texto }}
+                    
+                    <div class="form-text">
+                        
+                        Escriba para buscar personas existentes o ingrese un nombre nuevo.
+                    </div>
+                    <div class="autocomplete-suggestions persona700-suggestions"></div>
+                    {% if form.persona_texto.errors %}
+                        <div class="invalid-feedback d-block">{{ form.persona_texto.errors }}</div>
                     {% endif %}
                 </div>
-                
-                {# Subcampo $d - Coordenadas biográficas (NR) #}
+
+                {# 700 $d – coordenadas biográficas (campo separado, pero también tenemos coordenadas_biograficas en el modelo) #}
                 <div class="col-half">
-                    <label class="form-label" for="{{ form.coordenadas_biograficas.id_for_label }}">{{ form.coordenadas_biograficas.label }}</label>
-                    {{ form.coordenadas_biograficas }}
-                    {% if form.coordenadas_biograficas.errors %}
-                        <div class="invalid-feedback d-block">{{ form.coordenadas_biograficas.errors }}</div>
+                    <label class="form-label" for="{{ form.persona_coordenadas.id_for_label }}">
+                        {{ form.persona_coordenadas.label }}
+                    </label>
+                    {{ form.persona_coordenadas }}
+                    {% if form.persona_coordenadas.errors %}
+                        <div class="invalid-feedback d-block">{{ form.persona_coordenadas.errors }}</div>
                     {% endif %}
                 </div>
+
                 
-                {# Subcampo $t - Título de obra (NR) #}
+
+                {# 700 $t – Título de obra (NR) #}
                 <div class="col-half">
                     <label class="form-label" for="{{ form.titulo_obra.id_for_label }}">{{ form.titulo_obra.label }}</label>
                     {{ form.titulo_obra }}
@@ -64,8 +82,8 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
                         <div class="invalid-feedback d-block">{{ form.titulo_obra.errors }}</div>
                     {% endif %}
                 </div>
-                
-                {# Subcampo $i - Relación (NR) #}
+
+                {# 700 $i – Relación (NR) #}
                 <div class="col-half">
                     <label class="form-label" for="{{ form.relacion.id_for_label }}">{{ form.relacion.label }}</label>
                     {{ form.relacion }}
@@ -73,35 +91,44 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
                         <div class="invalid-feedback d-block">{{ form.relacion.errors }}</div>
                     {% endif %}
                 </div>
-                
-                {# Subcampo $j - Autoría (NR) #}
-                <div class="col-half">
+
+                {# 700 $j – Autoría (NR) #}
+                <div class="col-full">
                     <label class="form-label" for="{{ form.autoria.id_for_label }}">{{ form.autoria.label }}</label>
                     {{ form.autoria }}
                     {% if form.autoria.errors %}
                         <div class="invalid-feedback d-block">{{ form.autoria.errors }}</div>
                     {% endif %}
                 </div>
-                
+
                 {# Botón para agregar términos asociados ($c) #}
                 <div class="col-full mt-2">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-termino-btn w-100" data-nombre-index="{{ forloop.counter0 }}">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-primary add-termino-btn w-100"
+                            data-nombre-index="{{ forloop.counter0 }}">
                         <i class="bi bi-plus-circle"></i>
                         Agregar Término Asociado ($c)
                     </button>
                 </div>
-                
-                {# Subcampo $c - Términos asociados (Repetible) #}
-                <div class="col-full terminos-container" data-terminos-container="{{ forloop.counter0 }}">
+
+                {# Subcampo $c – Términos asociados (Repetible) #}
+                <div class="col-full terminos-container"
+                     data-terminos-container="{{ forloop.counter0 }}">
                     {% if form.instance.pk %}
-                        {# Cargar términos existentes #}
                         {% for termino in form.instance.terminos_asociados.all %}
                         <div class="termino-form-row">
                             <div class="d-flex flex-column w-100 mb-2">
                                 <label class="form-label small">700 $c - Término asociado</label>
                                 <div class="d-flex gap-2 align-items-center">
-                                    <input type="text" class="form-control termino-input" name="termino_asociado_700_{{ forloop.parentloop.counter0 }}_{{ termino.pk }}" value="{{ termino.termino }}" placeholder="Dr., Lic., etc." style="flex: 1;">
-                                    <button type="button" class="btn btn-sm btn-outline-danger delete-termino-btn" title="Eliminar término">
+                                    <input type="text"
+                                           class="form-control termino-input"
+                                           name="termino_asociado_700_{{ forloop.parentloop.counter0 }}_{{ termino.pk }}"
+                                           value="{{ termino.termino }}"
+                                           placeholder="Dr., Lic., etc."
+                                           style="flex: 1;">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger delete-termino-btn"
+                                            title="Eliminar término">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -110,30 +137,39 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
                         {% endfor %}
                     {% endif %}
                 </div>
-                
+
                 {# Botón para agregar funciones ($e) #}
                 <div class="col-full mt-2">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-funcion-btn w-100" data-nombre-index="{{ forloop.counter0 }}">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-primary add-funcion-btn w-100"
+                            data-nombre-index="{{ forloop.counter0 }}">
                         <i class="bi bi-plus-circle"></i>
                         Agregar Función ($e)
                     </button>
                 </div>
-                
-                {# Subcampo $e - Funciones (Repetible) #}
-                <div class="col-full funciones-container" data-funciones-container="{{ forloop.counter0 }}">
+
+                {# Subcampo $e – Funciones (Repetible) #}
+                <div class="col-full funciones-container"
+                     data-funciones-container="{{ forloop.counter0 }}">
                     {% if form.instance.pk %}
-                        {# Cargar funciones existentes #}
                         {% for funcion in form.instance.funciones.all %}
                         <div class="funcion-form-row">
                             <div class="d-flex flex-column w-100 mb-2">
                                 <label class="form-label small">700 $e - Función</label>
                                 <div class="d-flex gap-2 align-items-center">
-                                    <select class="form-select funcion-select" name="funcion_700_{{ forloop.parentloop.counter0 }}_{{ funcion.pk }}" style="flex: 1;">
+                                    <select class="form-select funcion-select"
+                                            name="funcion_700_{{ forloop.parentloop.counter0 }}_{{ funcion.pk }}"
+                                            style="flex: 1;">
                                         {% for value, label in funcion.FUNCIONES_PERSONA %}
-                                            <option value="{{ value }}" {% if funcion.funcion == value %}selected{% endif %}>{{ label }}</option>
+                                            <option value="{{ value }}"
+                                                {% if funcion.funcion == value %}selected{% endif %}>
+                                                {{ label }}
+                                            </option>
                                         {% endfor %}
                                     </select>
-                                    <button type="button" class="btn btn-sm btn-outline-danger delete-funcion-btn" title="Eliminar función">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger delete-funcion-btn"
+                                            title="Eliminar función">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -142,83 +178,117 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
                         {% endfor %}
                     {% endif %}
                 </div>
+
             </div>
         </div>
         {% endfor %}
-        
+
+        {# TEMPLATE vacío #}
         <div class="formset-row empty-form mb-3" style="display:none;">
             <div style="display:none;">
                 {% for hidden in formset.empty_form.hidden_fields %}
                     {{ hidden }}
                 {% endfor %}
             </div>
+
             <button type="button" class="delete-row-btn" title="Eliminar registro 700">
                 <i class="bi bi-x-lg"></i>
             </button>
+
             <div class="campo-grid">
-                {# Subcampo $a - Nombre (NR) #}
+
                 <div class="col-full">
-                    <label class="form-label" for="{{ formset.empty_form.persona.id_for_label }}">{{ formset.empty_form.persona.label }}</label>
                     {{ formset.empty_form.persona }}
+                    <label class="form-label"
+                           for="{{ formset.empty_form.persona_texto.id_for_label }}">
+                        {{ formset.empty_form.persona_texto.label }}
+                    </label>
+                    {{ formset.empty_form.persona_texto }}
+                    <div class="form-text">
+                        Escriba para buscar personas existentes o ingrese un nombre nuevo.
+                    </div>
+                    <div class="autocomplete-suggestions persona700-suggestions"></div>
                 </div>
-                
-                {# Subcampo $d - Coordenadas biográficas (NR) #}
+
                 <div class="col-half">
-                    <label class="form-label" for="{{ formset.empty_form.coordenadas_biograficas.id_for_label }}">{{ formset.empty_form.coordenadas_biograficas.label }}</label>
+                    <label class="form-label"
+                           for="{{ formset.empty_form.persona_coordenadas.id_for_label }}">
+                        {{ formset.empty_form.persona_coordenadas.label }}
+                    </label>
+                    {{ formset.empty_form.persona_coordenadas }}
+                </div>
+
+                <div class="col-half">
+                    <label class="form-label"
+                           for="{{ formset.empty_form.coordenadas_biograficas.id_for_label }}">
+                        {{ formset.empty_form.coordenadas_biograficas.label }}
+                    </label>
                     {{ formset.empty_form.coordenadas_biograficas }}
                 </div>
-                
-                {# Subcampo $t - Título de obra (NR) #}
+
                 <div class="col-half">
-                    <label class="form-label" for="{{ formset.empty_form.titulo_obra.id_for_label }}">{{ formset.empty_form.titulo_obra.label }}</label>
+                    <label class="form-label"
+                           for="{{ formset.empty_form.titulo_obra.id_for_label }}">
+                        {{ formset.empty_form.titulo_obra.label }}
+                    </label>
                     {{ formset.empty_form.titulo_obra }}
                 </div>
-                
-                {# Subcampo $i - Relación (NR) #}
+
                 <div class="col-half">
-                    <label class="form-label" for="{{ formset.empty_form.relacion.id_for_label }}">{{ formset.empty_form.relacion.label }}</label>
+                    <label class="form-label"
+                           for="{{ formset.empty_form.relacion.id_for_label }}">
+                        {{ formset.empty_form.relacion.label }}
+                    </label>
                     {{ formset.empty_form.relacion }}
                 </div>
-                
-                {# Subcampo $j - Autoría (NR) #}
-                <div class="col-half">
-                    <label class="form-label" for="{{ formset.empty_form.autoria.id_for_label }}">{{ formset.empty_form.autoria.label }}</label>
+
+                <div class="col-full">
+                    <label class="form-label"
+                           for="{{ formset.empty_form.autoria.id_for_label }}">
+                        {{ formset.empty_form.autoria.label }}
+                    </label>
                     {{ formset.empty_form.autoria }}
                 </div>
-                
+
                 <div class="col-full mt-2">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-termino-btn w-100" data-nombre-index="__prefix__">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-primary add-termino-btn w-100"
+                            data-nombre-index="__prefix__">
                         <i class="bi bi-plus-circle"></i>
                         Agregar Término Asociado ($c)
                     </button>
                 </div>
-                
-                <div class="col-full terminos-container" data-terminos-container="__prefix__">
-                    {# Los términos se agregarán aquí dinámicamente #}
-                </div>
-                
+
+                <div class="col-full terminos-container"
+                     data-terminos-container="__prefix__"></div>
+
                 <div class="col-full mt-2">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-funcion-btn w-100" data-nombre-index="__prefix__">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-primary add-funcion-btn w-100"
+                            data-nombre-index="__prefix__">
                         <i class="bi bi-plus-circle"></i>
                         Agregar Función ($e)
                     </button>
                 </div>
-                
-                <div class="col-full funciones-container" data-funciones-container="__prefix__">
-                    {# Las funciones se agregarán aquí dinámicamente #}
-                </div>
+
+                <div class="col-full funciones-container"
+                     data-funciones-container="__prefix__"></div>
+
             </div>
         </div>
     </div>
 </div>
 
-{# Templates globales para términos y funciones (fuera del formset loop) #}
+{# Templates globales para términos y funciones #}
 <div class="termino-form-row termino-template-700 d-none">
     <div class="d-flex flex-column w-100 mb-2">
         <label class="form-label small">700 $c - Término asociado</label>
         <div class="d-flex gap-2 align-items-center">
-            <input type="text" class="form-control termino-input" placeholder="Dr., Lic., etc." style="flex: 1;">
-            <button type="button" class="btn btn-sm btn-outline-danger delete-termino-btn" title="Eliminar término">
+            <input type="text" class="form-control termino-input"
+                   placeholder="Dr., Lic., etc." style="flex: 1;">
+            <button type="button"
+                    class="btn btn-sm btn-outline-danger delete-termino-btn"
+                    title="Eliminar término">
                 <i class="bi bi-trash"></i>
             </button>
         </div>
@@ -239,7 +309,9 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
                 <option value="editor">Editor</option>
                 <option value="prologuista">Prologuista</option>
             </select>
-            <button type="button" class="btn btn-sm btn-outline-danger delete-funcion-btn" title="Eliminar función">
+            <button type="button"
+                    class="btn btn-sm btn-outline-danger delete-funcion-btn"
+                    title="Eliminar función">
                 <i class="bi bi-trash"></i>
             </button>
         </div>
@@ -250,66 +322,232 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
 (function() {
     const container = document.querySelector('[data-formset-prefix="{{ formset.prefix }}"]');
     if (!container) return;
-    
+
     const terminoTemplate = document.querySelector('.termino-template-700');
     const funcionTemplate = document.querySelector('.funcion-template-700');
-    
+
+    function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // -------- AUTOCOMPLETE PERSONA 700 (similar a compositor, pero por fila) ----------
+    function initPersonaAutocompleteForRow(row) {
+        if (row.dataset.persona700Init === "1") return;
+        row.dataset.persona700Init = "1";
+
+        const input = row.querySelector('.persona700-input');
+        const hiddenId = row.querySelector('.persona700-id');
+        const coordInput = row.querySelector('.persona700-coord-input');
+        const suggestionsBox = row.querySelector('.persona700-suggestions');
+
+        if (!input || !hiddenId || !suggestionsBox) return;
+
+        let debounceTimer = null;
+        let selectedIndex = -1;
+
+        function hideSuggestions() {
+            suggestionsBox.classList.remove("show");
+            suggestionsBox.innerHTML = "";
+            selectedIndex = -1;
+        }
+
+        function updateSelection(items) {
+            items.forEach((item, idx) => {
+                if (idx === selectedIndex) {
+                    item.classList.add("selected");
+                    item.scrollIntoView({ block: "nearest" });
+                } else {
+                    item.classList.remove("selected");
+                }
+            });
+        }
+
+        function selectPersona(data) {
+            if (data.isNew) {
+                input.value = data.apellidos_nombres;
+                hiddenId.value = "";
+                if (coordInput) coordInput.value = "";
+            } else {
+                input.value = data.apellidos_nombres;
+                hiddenId.value = data.id;
+                if (coordInput) coordInput.value = data.coordenadas_biograficas || "";
+            }
+            hideSuggestions();
+        }
+
+        function createSuggestionItem(data) {
+            const item = document.createElement("div");
+            item.className = "autocomplete-item";
+
+            if (data.isNew) {
+                item.classList.add("autocomplete-item-new");
+                item.innerHTML = `
+                    <i class="bi bi-plus-circle me-2"></i>
+                    <strong>Crear nuevo:</strong> "${escapeHtml(data.apellidos_nombres)}"
+                `;
+            } else {
+                item.innerHTML = `
+                    <div><strong>${escapeHtml(data.apellidos_nombres)}</strong></div>
+                    ${
+                        data.coordenadas_biograficas
+                            ? `<small class="text-muted">${escapeHtml(data.coordenadas_biograficas)}</small>`
+                            : ""
+                    }
+                `;
+            }
+
+            item.addEventListener("click", function () {
+                selectPersona(data);
+            });
+
+            return item;
+        }
+
+        function showSuggestions(list, query) {
+            suggestionsBox.innerHTML = "";
+            selectedIndex = -1;
+
+            if (!list.length) {
+                const nuevo = createSuggestionItem({
+                    apellidos_nombres: query,
+                    coordenadas_biograficas: "",
+                    isNew: true
+                });
+                suggestionsBox.appendChild(nuevo);
+            } else {
+                list.forEach(p => {
+                    const item = createSuggestionItem({
+                        id: p.id,
+                        apellidos_nombres: p.apellidos_nombres,
+                        coordenadas_biograficas: p.coordenadas_biograficas || "",
+                        isNew: false
+                    });
+                    suggestionsBox.appendChild(item);
+                });
+
+                const nuevo = createSuggestionItem({
+                    apellidos_nombres: query,
+                    coordenadas_biograficas: "",
+                    isNew: true
+                });
+                suggestionsBox.appendChild(nuevo);
+            }
+
+            suggestionsBox.classList.add("show");
+        }
+
+        function searchPersonas(query) {
+            fetch(`/catalogacion/api/autocompletar/persona/?q=${encodeURIComponent(query)}`)
+                .then(r => r.json())
+                .then(data => {
+                    const results = data.results || [];
+                    showSuggestions(results, query);
+                })
+                .catch(err => console.error("Error al buscar personas 700:", err));
+        }
+
+        input.addEventListener("input", function() {
+            const q = input.value.trim();
+            if (q.length < 2) {
+                hideSuggestions();
+                return;
+            }
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => searchPersonas(q), 300);
+        });
+
+        input.addEventListener("keydown", function(e) {
+            if (!suggestionsBox.classList.contains("show")) return;
+
+            const items = suggestionsBox.querySelectorAll(".autocomplete-item");
+            if (!items.length) return;
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                updateSelection(items);
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                selectedIndex = Math.max(selectedIndex - 1, 0);
+                updateSelection(items);
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                if (selectedIndex >= 0 && items[selectedIndex]) {
+                    items[selectedIndex].click();
+                }
+            } else if (e.key === "Escape") {
+                e.preventDefault();
+                hideSuggestions();
+            }
+        });
+
+        document.addEventListener("click", function(ev) {
+            if (!row.contains(ev.target)) {
+                hideSuggestions();
+            }
+        });
+    }
+
     // Reindexar formularios después de agregar/eliminar
     function reindexForms() {
         const rows = container.querySelectorAll('.formset-row:not(.empty-form)');
         const totalInput = container.querySelector('[name="{{ formset.prefix }}-TOTAL_FORMS"]');
         if (totalInput) totalInput.value = rows.length;
-        
+
         rows.forEach((row, index) => {
-            // Actualizar atributos de campos del formulario principal
             row.querySelectorAll('input, select, textarea').forEach(field => {
                 ['name', 'id'].forEach(attr => {
                     const val = field.getAttribute(attr);
-                    if (val && val.includes('__prefix__')) {
-                        field.setAttribute(attr, val.replace('__prefix__', index));
-                    } else if (val && /-\d+-/.test(val)) {
+                    if (!val) return;
+
+                    if (val.includes('__prefix__')) {
+                        field.setAttribute(attr, val.replace(/__prefix__/, index));
+                    } else if (/-\d+-/.test(val)) {
                         field.setAttribute(attr, val.replace(/-\d+-/, `-${index}-`));
                     }
                 });
             });
-            
-            // Actualizar labels
+
             row.querySelectorAll('label').forEach(label => {
                 const forAttr = label.getAttribute('for');
-                if (forAttr && forAttr.includes('__prefix__')) {
-                    label.setAttribute('for', forAttr.replace('__prefix__', index));
-                } else if (forAttr && /-\d+-/.test(forAttr)) {
+                if (!forAttr) return;
+
+                if (forAttr.includes('__prefix__')) {
+                    label.setAttribute('for', forAttr.replace(/__prefix__/, index));
+                } else if (/-\d+-/.test(forAttr)) {
                     label.setAttribute('for', forAttr.replace(/-\d+-/, `-${index}-`));
                 }
             });
-            
-            // Actualizar data-nombre-index en botones
+
             row.querySelectorAll('[data-nombre-index]').forEach(btn => {
                 btn.setAttribute('data-nombre-index', index);
             });
-            
-            // Actualizar data-terminos-container y data-funciones-container
+
             const terminosContainer = row.querySelector('[data-terminos-container]');
             const funcionesContainer = row.querySelector('[data-funciones-container]');
             if (terminosContainer) terminosContainer.setAttribute('data-terminos-container', index);
             if (funcionesContainer) funcionesContainer.setAttribute('data-funciones-container', index);
-            
-            // Actualizar nombres de subcampos dinámicos
+
             function actualizarSubcampo(selector, prefix) {
                 row.querySelectorAll(selector).forEach(input => {
+                    if (!input.name) return;
                     const match = input.name.match(new RegExp(`${prefix}(\\d+)_(\\d+)`));
                     if (match) {
                         input.name = `${prefix}${index}_${match[2]}`;
                     }
                 });
             }
-            
+
             actualizarSubcampo('input[name^="termino_asociado_700_"]', 'termino_asociado_700_');
             actualizarSubcampo('select[name^="funcion_700_"]', 'funcion_700_');
+
+            // asegurarnos de que siga funcionando el autocomplete en cada fila
+            initPersonaAutocompleteForRow(row);
         });
     }
-    
-    // Event delegation para todos los botones
+
     container.addEventListener('click', (e) => {
         const addBtn = e.target.closest('.add-form-row');
         if (addBtn) {
@@ -323,15 +561,15 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
             }
             return;
         }
-        
+
         const deleteBtn = e.target.closest('.delete-row-btn');
         if (deleteBtn) {
             const row = deleteBtn.closest('.formset-row');
             if (row && !row.classList.contains('empty-form')) {
                 const deleteCheckbox = row.querySelector('[name$="-DELETE"]');
                 if (deleteCheckbox && row.classList.contains('existing-form')) {
-                    deleteCheckbox.checked = true;
-                    row.style.opacity = '0.5';
+                    deleteCheckbox.checked = !deleteCheckbox.checked;
+                    row.style.opacity = deleteCheckbox.checked ? "0.5" : "1";
                     deleteBtn.classList.add('btn-warning');
                     deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
                 } else {
@@ -341,7 +579,7 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
             }
             return;
         }
-        
+
         const addTerminoBtn = e.target.closest('.add-termino-btn');
         if (addTerminoBtn) {
             const index = addTerminoBtn.getAttribute('data-nombre-index');
@@ -357,7 +595,7 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
             }
             return;
         }
-        
+
         const addFuncionBtn = e.target.closest('.add-funcion-btn');
         if (addFuncionBtn) {
             const index = addFuncionBtn.getAttribute('data-nombre-index');
@@ -373,7 +611,7 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
             }
             return;
         }
-        
+
         if (e.target.closest('.delete-termino-btn')) {
             const row = e.target.closest('.termino-form-row');
             if (row && !row.classList.contains('termino-template-700')) {
@@ -381,7 +619,7 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
             }
             return;
         }
-        
+
         if (e.target.closest('.delete-funcion-btn')) {
             const row = e.target.closest('.funcion-form-row');
             if (row && !row.classList.contains('funcion-template-700')) {
@@ -390,7 +628,11 @@ Permite repetir el campo completo y también los subcampos $c (término asociado
             return;
         }
     });
-    
+
+    // Inicializar al cargar
+    container.querySelectorAll('.formset-row:not(.empty-form)').forEach(row => {
+        initPersonaAutocompleteForRow(row);
+    });
     reindexForms();
 })();
 </script>

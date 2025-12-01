@@ -247,15 +247,30 @@ class EliminarEntidadView(DeleteView):
 class AutocompletarPersonaView(View):
     """
     API para autocompletar nombres de personas
-    Retorna sugerencias basadas en el texto ingresado
+    Retorna sugerencias basadas en el texto ingresado o por ID
     """
     def get(self, request):
+        persona_id = request.GET.get('id')
         query = request.GET.get('q', '').strip()
-        
+
+        # ---- Buscar por ID ----
+        if persona_id:
+            try:
+                persona = AutoridadPersona.objects.get(id=persona_id)
+                result = {
+                    'id': persona.id,
+                    'text': persona.apellidos_nombres,
+                    'apellidos_nombres': persona.apellidos_nombres,
+                    'coordenadas_biograficas': persona.coordenadas_biograficas or '',
+                }
+                return JsonResponse({'results': [result]})
+            except AutoridadPersona.DoesNotExist:
+                return JsonResponse({'results': []})
+
+        # ---- Buscar por texto ----
         if len(query) < 2:
             return JsonResponse({'results': []})
-        
-        # Buscar en apellidos_nombres y coordenadas_biograficas
+
         personas = AutoridadPersona.objects.filter(
             Q(apellidos_nombres__icontains=query) |
             Q(coordenadas_biograficas__icontains=query)
@@ -263,23 +278,23 @@ class AutocompletarPersonaView(View):
             'id',
             'apellidos_nombres',
             'coordenadas_biograficas'
-        )[:10]  # Limitar a 10 resultados
-        
-        # Formatear resultados
+        )[:10]
+
         results = []
         for persona in personas:
             nombre_completo = persona['apellidos_nombres']
             if persona['coordenadas_biograficas']:
                 nombre_completo += f" ({persona['coordenadas_biograficas']})"
-            
+
             results.append({
                 'id': persona['id'],
                 'text': nombre_completo,
                 'apellidos_nombres': persona['apellidos_nombres'],
-                'coordenadas_biograficas': persona['coordenadas_biograficas'] or ''
+                'coordenadas_biograficas': persona['coordenadas_biograficas'] or '',
             })
-        
+
         return JsonResponse({'results': results})
+
 
 
 class AutocompletarEntidadView(View):
