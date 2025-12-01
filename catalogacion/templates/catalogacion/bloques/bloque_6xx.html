@@ -8,35 +8,56 @@
             </h5>
         </div>
         <div class="card-body">
+
             {# Campo 650 - Encabezamiento de Materia (Repetible) #}
             {% if '650' in campos_visibles and 'materias_650' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">650</span>
                     <h6>Encabezamiento de Materia</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
+                    <!-- Botón agregar materia -->
+                    <button type="button" class="campo-add-btn" data-formset-target="{{ materias_650.prefix }}"
+                        title="Agregar Materia (Tema)">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="650" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
-                
+
                 <p class="form-text">Materias temáticas de la obra. Subcampo $x (subdivisión de materia) repetible.</p>
-                
+
                 {% include 'catalogacion/includes/formset_650_template.html' with formset=materias_650 %}
             </div>
             {% endif %}
-            
+
             {# Campo 655 - Término de Género/Forma (Repetible) #}
             {% if '655' in campos_visibles and 'materias_genero_655' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">655</span>
                     <h6>Género/Forma</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
+                    <button type="button" class="campo-add-btn" data-formset-target="{{ materias_genero_655.prefix }}"
+                        title="Agregar Género/Forma">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="655" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
-                
+
                 <p class="form-text">Género musical o forma de la obra. Subcampo $x (subdivisión general) repetible.</p>
-                
+
                 {% include 'catalogacion/includes/formset_655_template.html' with formset=materias_genero_655 %}
             </div>
             {% endif %}
+
         </div>
     </div>
 </section>

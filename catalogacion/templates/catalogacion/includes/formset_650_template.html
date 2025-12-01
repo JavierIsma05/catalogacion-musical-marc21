@@ -12,10 +12,7 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
         {% endfor %}
     </div>
 
-    <!-- Botón agregar materia -->
-    <button type="button" class="add-form-row mb-3">
-        <i class="bi bi-plus-circle"></i> Agregar Materia (Tema)
-    </button>
+    
 
     <div class="formset-forms">
 
@@ -273,64 +270,63 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
 
 <!-- SCRIPT SUBDIVISIONES -->
 <script>
-    (function () {
-        const prefix = '{{ formset.prefix }}';
-        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-        if (!container) return;
+(function () {
+    const prefix = '{{ formset.prefix }}';
+    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+    if (!container) return;
 
-        const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-        const addButton = container.querySelector('.add-form-row');
-        const formsContainer = container.querySelector('.formset-forms');
-        const subdivisionTemplate = document.querySelector('.subdivision-template-650');
+    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+    const formsContainer = container.querySelector('.formset-forms');
+    const emptyForm = formsContainer.querySelector('.empty-form');
+    const subdivisionTemplate = document.querySelector('.subdivision-template-650');
 
-        addButton.addEventListener('click', function () {
+    // 🔹 Agregar fila 650 (Materia)
+    container.addEventListener("click", function(e) {
+
+        // ➕ Agregar materia
+        if (e.target.closest('.add-form-row')) {
             const total = parseInt(totalFormsInput.value);
-            const empty = formsContainer.querySelector('.empty-form');
-
-            const newForm = empty.cloneNode(true);
+            const newForm = emptyForm.cloneNode(true);
             newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, total);
             newForm.classList.remove('empty-form');
             newForm.style.display = '';
 
-            formsContainer.insertBefore(newForm, empty);
+            // Reinicializar autocomplete en la nueva fila
+            setTimeout(() => {
+                newForm.querySelectorAll('.materia-input').forEach(i => initMateriaAutocomplete(i));
+            }, 50);
+
+            formsContainer.insertBefore(newForm, emptyForm);
             totalFormsInput.value = total + 1;
-        });
+        }
 
-        container.addEventListener('click', function (e) {
-            const del = e.target.closest('.delete-row-btn');
-            if (del) {
-                const row = del.closest('.formset-row');
-                if (!row.classList.contains('empty-form')) {
-                    const deleteInput = row.querySelector('input[name*="DELETE"]');
-                    if (row.classList.contains('existing-form')) {
-                        deleteInput.checked = !deleteInput.checked;
-                        row.style.opacity = deleteInput.checked ? "0.4" : "1";
-                    } else {
-                        row.remove();
-                        totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
-                    }
-                }
-            }
-
+        // ➕ Agregar subdivisión ($x)
+        if (e.target.closest('.add-subdivision-btn')) {
             const btn = e.target.closest('.add-subdivision-btn');
-            if (btn) {
-                const index = btn.dataset.materiaIndex;
-                const cont = container.querySelector(`[data-subdivisiones-container="${index}"]`);
+            const index = btn.dataset.materiaIndex;
+            const cont = container.querySelector(`[data-subdivisiones-container="${index}"]`);
 
-                const sub = subdivisionTemplate.cloneNode(true);
-                sub.classList.remove('subdivision-template-650', 'd-none');
-                const input = sub.querySelector('.subdivision-input');
-                input.name = `subdivision_materia_650_${index}_${Date.now()}`;
+            const sub = subdivisionTemplate.cloneNode(true);
+            sub.classList.remove('subdivision-template-650', 'd-none');
+            sub.querySelector('.subdivision-input')
+               .name = `subdivision_materia_650_${index}_${Date.now()}`;
 
-                cont.appendChild(sub);
+            cont.appendChild(sub);
+        }
+
+        // ❌ Eliminar subdivisión
+        if (e.target.closest('.delete-subdivision-btn')) {
+            e.target.closest('.subdivision-form-row').remove();
+        }
+
+        // ❌ Eliminar fila completa
+        if (e.target.closest('.delete-row-btn')) {
+            const row = e.target.closest('.formset-row');
+            if (!row.classList.contains('empty-form')) {
+                row.remove();
+                totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
             }
-
-            const delSub = e.target.closest('.delete-subdivision-btn');
-            if (delSub) {
-                delSub.closest('.subdivision-form-row').remove();
-            }
-
-        });
-
-    })();
+        }
+    });
+})();
 </script>

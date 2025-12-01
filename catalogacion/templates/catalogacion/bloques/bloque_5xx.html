@@ -17,6 +17,11 @@
                     <span class="badge-marc">500</span>
                     <h6>Nota General</h6>
                     <span class="badge-repetible">REPETIBLE</span>
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="500" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
 
                 <p class="form-text">Información general que no encaja en otros campos.</p>
@@ -25,6 +30,7 @@
             </div>
             {% endif %}
 
+
             {# Campo 505 - Nota de Contenido (Repetible) #}
             {% if '505' in campos_visibles and 'contenidos' in formsets_visibles %}
             <div class="campo-marc">
@@ -32,6 +38,11 @@
                     <span class="badge-marc">505</span>
                     <h6>Contenido</h6>
                     <span class="badge-repetible">REPETIBLE</span>
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="505" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
 
                 <p class="form-text">Listado de contenidos de la obra.</p>
@@ -40,6 +51,7 @@
             </div>
             {% endif %}
 
+
             {# Campo 520 - Sumario/Resumen (Repetible) #}
             {% if '520' in campos_visibles and 'sumarios' in formsets_visibles %}
             <div class="campo-marc">
@@ -47,6 +59,11 @@
                     <span class="badge-marc">520</span>
                     <h6>Sumario</h6>
                     <span class="badge-repetible">REPETIBLE</span>
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="520" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
 
                 <p class="form-text">Resumen o sumario del contenido.</p>
@@ -55,6 +72,7 @@
             </div>
             {% endif %}
 
+
             {# Campo 545 - Datos biográficos del compositor (R) #}
             {% if '545' in campos_visibles and 'datos_biograficos' in formsets_visibles %}
             <div class="campo-marc">
@@ -62,6 +80,11 @@
                     <span class="badge-marc">545</span>
                     <h6>Datos biográficos del compositor</h6>
                     <span class="badge-repetible">NO REPETIBLE</span>
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="545" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
 
                 <p class="form-text">
@@ -100,6 +123,7 @@
                 </div>
             </div>
             {% endif %}
+
 
         </div>
     </div>

@@ -12,10 +12,7 @@ Mismo diseño, colores y JS que el 650.
         {% endfor %}
     </div>
 
-    <!-- Botón agregar -->
-    <button type="button" class="add-form-row mb-3">
-        <i class="bi bi-plus-circle"></i> Agregar Género/Forma
-    </button>
+    
 
     <div class="formset-forms">
 
@@ -166,148 +163,129 @@ Mismo diseño, colores y JS que el 650.
 
 <!-- JS GENERO/AUTOCOMPLETE + SUBDIVISIONES -->
 <script>
-    (function () {
+(function () {
 
-        /* === AUTOCOMPLETE 655 === */
-        function initGeneroAutocomplete(input) {
-            const box = input.parentElement.querySelector('.genero-suggestions');
-            const hidden = input.parentElement.querySelector('.genero-id');
+    /* === AUTOCOMPLETE 655 === */
+    function initGeneroAutocomplete(input) {
+        const box = input.parentElement.querySelector('.genero-suggestions');
+        const hidden = input.parentElement.querySelector('.genero-id');
 
-            let timer = null;
-            let index = -1;
+        let timer = null;
 
-            input.addEventListener("input", function () {
-                const q = input.value.trim();
-                if (q.length < 2) return hide();
+        input.addEventListener("input", function () {
+            const q = input.value.trim();
+            if (q.length < 2) return hide();
 
-                clearTimeout(timer);
-                timer = setTimeout(() => buscar(q), 250);
-            });
-
-            function buscar(q) {
-                fetch(`/catalogacion/api/autocompletar/forma-musical/?q=${encodeURIComponent(q)}`)
-                    .then(r => r.json())
-                    .then(data => mostrar(data.results, q));
-            }
-
-            function mostrar(results, query) {
-                box.innerHTML = "";
-                index = -1;
-
-                if (results.length === 0) {
-                    box.innerHTML = `
-                        <div class="autocomplete-item autocomplete-item-new">
-                             <i class="bi bi-plus-circle me-2"></i> Crear: "${query}"
-                        </div>`;
-                } else {
-                    results.forEach(r => {
-                        const d = document.createElement("div");
-                        d.className = "autocomplete-item";
-                        d.innerHTML = `<strong>${r.text}</strong>`;
-                        d.addEventListener("click", () => seleccionar(r));
-                        box.appendChild(d);
-                    });
-
-                    const nuevo = document.createElement("div");
-                    nuevo.className = "autocomplete-item autocomplete-item-new";
-                    nuevo.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${query}"`;
-                    nuevo.addEventListener("click", () => seleccionar({
-                        id: "",
-                        text: query,
-                        nuevo: true
-                    }));
-                    box.appendChild(nuevo);
-                }
-
-                box.classList.add("show");
-            }
-
-            function seleccionar(item) {
-                input.value = item.text;
-                hidden.value = item.id || "";
-                hide();
-            }
-
-            function hide() {
-                box.classList.remove("show");
-                box.innerHTML = "";
-                index = -1;
-            }
-        }
-
-        document.querySelectorAll('.genero-input').forEach(initGeneroAutocomplete);
-
-        /* === REINICIALIZAR AUTOCOMPLETE AL AGREGAR === */
-        document.addEventListener("click", function (e) {
-            if (e.target.closest('.add-form-row')) {
-                setTimeout(() => {
-                    document.querySelectorAll('.genero-input').forEach(initGeneroAutocomplete);
-                }, 120);
-            }
+            clearTimeout(timer);
+            timer = setTimeout(() => buscar(q), 250);
         });
 
-        /* === SUBDIVISIONES 655 === */
-        const prefix = '{{ formset.prefix }}';
-        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-        const totalForms = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-        const addBtn = container.querySelector('.add-form-row');
-        const formsCont = container.querySelector('.formset-forms');
-        const subTpl = document.querySelector('.subdivision-template-655');
+        function buscar(q) {
+            fetch(`/catalogacion/api/autocompletar/forma-musical/?q=${encodeURIComponent(q)}`)
+                .then(r => r.json())
+                .then(data => mostrar(data.results, q));
+        }
 
-        addBtn.addEventListener('click', () => {
-            const total = parseInt(totalForms.value);
-            const empty = formsCont.querySelector('.empty-form');
+        function mostrar(results, query) {
+            box.innerHTML = "";
 
-            const newForm = empty.cloneNode(true);
+            if (results.length === 0) {
+                box.innerHTML = `
+                    <div class="autocomplete-item autocomplete-item-new">
+                        <i class="bi bi-plus-circle me-2"></i> Crear: "${query}"
+                    </div>`;
+            } else {
+                results.forEach(r => {
+                    const d = document.createElement("div");
+                    d.className = "autocomplete-item";
+                    d.innerHTML = `<strong>${r.text}</strong>`;
+                    d.addEventListener("click", () => seleccionar(r));
+                    box.appendChild(d);
+                });
+
+                const nuevo = document.createElement("div");
+                nuevo.className = "autocomplete-item autocomplete-item-new";
+                nuevo.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${query}"`;
+                nuevo.addEventListener("click", () => seleccionar({ id: "", text: query, nuevo: true }));
+                box.appendChild(nuevo);
+            }
+
+            box.classList.add("show");
+        }
+
+        function seleccionar(item) {
+            input.value = item.text;
+            hidden.value = item.id || "";
+            hide();
+        }
+
+        function hide() {
+            box.classList.remove("show");
+            box.innerHTML = "";
+        }
+    }
+
+    document.querySelectorAll('.genero-input').forEach(initGeneroAutocomplete);
+
+    /* === SUBDIVISIONES & NUEVAS FILAS === */
+    const prefix = '{{ formset.prefix }}';
+    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+    if (!container) return;
+
+    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+    const formsContainer = container.querySelector('.formset-forms');
+    const emptyForm = formsContainer.querySelector('.empty-form');
+    const subdivisionTemplate = document.querySelector('.subdivision-template-655');
+
+    container.addEventListener('click', function (e) {
+
+        /* ➕ NUEVA FILA 655 */
+        if (e.target.closest('.add-form-row')) {
+            const total = parseInt(totalFormsInput.value);
+            const newForm = emptyForm.cloneNode(true);
             newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, total);
             newForm.classList.remove('empty-form');
-            newForm.style.display = "";
+            newForm.style.display = '';
 
+            // Set new index for subdivisiones
             newForm.querySelector('.add-subdivision-btn').dataset.generoIndex = total;
             newForm.querySelector('.subdivisiones-container').dataset.subdivisionesContainer = total;
 
-            formsCont.insertBefore(newForm, empty);
-            totalForms.value = total + 1;
-        });
+            // Reactivar autocomplete
+            setTimeout(() => {
+                newForm.querySelectorAll('.genero-input').forEach(initGeneroAutocomplete);
+            }, 50);
 
-        container.addEventListener('click', function (e) {
+            formsContainer.insertBefore(newForm, emptyForm);
+            totalFormsInput.value = total + 1;
+        }
 
-            /* eliminar subdivisión */
-            const delSub = e.target.closest('.delete-subdivision-btn');
-            if (delSub) return delSub.closest('.subdivision-form-row').remove();
-
-            /* eliminar fila */
-            const del = e.target.closest('.delete-row-btn');
-            if (del) {
-                const row = del.closest('.formset-row');
-                const deleteInput = row.querySelector('input[name*="DELETE"]');
-
-                if (row.classList.contains('existing-form')) {
-                    deleteInput.checked = !deleteInput.checked;
-                    row.style.opacity = deleteInput.checked ? "0.4" : "1";
-                } else {
-                    row.remove();
-                    totalForms.value = parseInt(totalForms.value) - 1;
-                }
-
-                return;
-            }
-
-            /* agregar subdivisión */
+        /* ➕ AGREGAR SUBDIVISIÓN ($x) */
+        if (e.target.closest('.add-subdivision-btn')) {
             const btn = e.target.closest('.add-subdivision-btn');
-            if (btn) {
-                const idx = btn.dataset.generoIndex;
-                const cont = container.querySelector(`[data-subdivisiones-container="${idx}"]`);
+            const index = btn.dataset.generoIndex;
+            const cont = container.querySelector(`[data-subdivisiones-container="${index}"]`);
 
-                const sub = subTpl.cloneNode(true);
-                sub.classList.remove('d-none', 'subdivision-template-655');
+            const sub = subdivisionTemplate.cloneNode(true);
+            sub.classList.remove('subdivision-template-655', 'd-none');
+            sub.querySelector('.subdivision-input')
+               .name = `subdivision_genero_655_${index}_${Date.now()}`;
 
-                sub.querySelector('.subdivision-input')
-                    .name = `subdivision_genero_655_${idx}_${Date.now()}`;
+            cont.appendChild(sub);
+        }
 
-                cont.appendChild(sub);
-            }
-        });
+        /* ❌ ELIMINAR SUBDIVISION */
+        if (e.target.closest('.delete-subdivision-btn')) {
+            e.target.closest('.subdivision-form-row').remove();
+        }
 
-    })();
+        /* ❌ ELIMINAR FILA */
+        if (e.target.closest('.delete-row-btn')) {
+            const row = e.target.closest('.formset-row');
+            row.remove();
+            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
+        }
+    });
+
+})();
 </script>
