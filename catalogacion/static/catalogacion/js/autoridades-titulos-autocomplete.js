@@ -111,7 +111,8 @@
 
         const endings = [`[name$="-${fieldName}"]`, `[name="${fieldName}"]`];
         for (const ending of endings) {
-            const found = scope.querySelector(ending) || document.querySelector(ending);
+            const found =
+                scope.querySelector(ending) || document.querySelector(ending);
             if (found) {
                 return found;
             }
