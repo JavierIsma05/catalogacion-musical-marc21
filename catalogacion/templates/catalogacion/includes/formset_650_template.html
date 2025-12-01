@@ -44,16 +44,18 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
                 <div class="col-full">
                     <label class="form-label">650 $a – Encabezamiento de materia</label>
 
-                    <!-- campo visible -->
-                    <input type="text" class="form-control materia-input" name="{{ form.prefix }}-materia_texto"
-                        placeholder="Escriba materia…" autocomplete="off"
-                        value="{% if form.instance.pk %}{{ form.materia.termino }}{% endif %}">
+                    <div class="autocomplete-wrapper">
+                        <!-- campo visible -->
+                        <input type="text" class="form-control materia-input" name="{{ form.prefix }}-materia_texto"
+                            placeholder="Escriba materia…" autocomplete="off"
+                            value="{% if form.instance.pk %}{{ form.materia.termino }}{% endif %}">
 
-                    <!-- campo oculto para guardar ID -->
-                    <input type="hidden" name="{{ form.prefix }}-materia" class="materia-id"
-                        value="{% if form.instance.pk %}{{ form.materia.id }}{% endif %}">
+                        <!-- campo oculto para guardar ID -->
+                        <input type="hidden" name="{{ form.prefix }}-materia" class="materia-id"
+                            value="{% if form.instance.pk %}{{ form.materia.id }}{% endif %}">
 
-                    <div class="materia-suggestions autocomplete-suggestions"></div>
+                        <div class="materia-suggestions autocomplete-suggestions"></div>
+                    </div>
 
                     {% if form.materia.errors %}
                     <div class="invalid-feedback d-block">
@@ -113,13 +115,15 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
                 <div class="col-full">
                     <label class="form-label">650 $a – Encabezamiento de materia</label>
 
-                    <input type="text" class="form-control materia-input"
-                        name="{{ formset.prefix }}-__prefix__-materia_texto" placeholder="Escriba materia…"
-                        autocomplete="off">
+                    <div class="autocomplete-wrapper">
+                        <input type="text" class="form-control materia-input"
+                            name="{{ formset.prefix }}-__prefix__-materia_texto" placeholder="Escriba materia…"
+                            autocomplete="off">
 
-                    <input type="hidden" class="materia-id" name="{{ formset.prefix }}-__prefix__-materia">
+                        <input type="hidden" class="materia-id" name="{{ formset.prefix }}-__prefix__-materia">
 
-                    <div class="materia-suggestions autocomplete-suggestions"></div>
+                        <div class="materia-suggestions autocomplete-suggestions"></div>
+                    </div>
                 </div>
 
                 <div class="col-full mt-2">

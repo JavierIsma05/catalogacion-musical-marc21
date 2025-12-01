@@ -42,24 +42,26 @@ Mismo diseño, colores y JS que el 650.
             <div class="campo-grid">
 
                 <!-- 655 $a – AUTOCOMPLETE -->
-                <div class="col-full">
-                    <label class="form-label">655 $a – Término Género/Forma</label>
+                  <div class="col-full">
+                      <label class="form-label">655 $a – Término Género/Forma</label>
 
-                    <!-- visible -->
-                    <input type="text" class="form-control genero-input"
+                      <div class="autocomplete-wrapper">
+                       <!-- visible -->
+                       <input type="text" class="form-control genero-input"
                            name="{{ form.prefix }}-materia_texto"
                            placeholder="Escriba género/forma…"
                            autocomplete="off"
                            value="{% if form.instance.pk %}{{ form.materia.forma }}{% endif %}">
 
-                    <!-- oculto -->
-                    <input type="hidden"
+                       <!-- oculto -->
+                       <input type="hidden"
                            name="{{ form.prefix }}-materia"
                            class="genero-id"
                            value="{% if form.instance.pk %}{{ form.materia.id }}{% endif %}">
 
-                    <div class="genero-suggestions autocomplete-suggestions"></div>
-                </div>
+                       <div class="genero-suggestions autocomplete-suggestions"></div>
+                      </div>
+                  </div>
 
                 <!-- botón añadir subdivisión -->
                 <div class="col-full mt-2">
@@ -114,19 +116,21 @@ Mismo diseño, colores y JS que el 650.
 
             <div class="campo-grid">
 
-                <div class="col-full">
-                    <label class="form-label">655 $a – Término Género/Forma</label>
+                  <div class="col-full">
+                      <label class="form-label">655 $a – Término Género/Forma</label>
 
-                    <input type="text" class="form-control genero-input"
+                      <div class="autocomplete-wrapper">
+                       <input type="text" class="form-control genero-input"
                            name="{{ formset.prefix }}-__prefix__-materia_texto"
                            placeholder="Género o forma…" autocomplete="off">
 
-                    <input type="hidden"
+                       <input type="hidden"
                            class="genero-id"
                            name="{{ formset.prefix }}-__prefix__-materia">
 
-                    <div class="genero-suggestions autocomplete-suggestions"></div>
-                </div>
+                       <div class="genero-suggestions autocomplete-suggestions"></div>
+                      </div>
+                  </div>
 
                 <div class="col-full mt-2">
                     <button type="button"

@@ -86,10 +86,10 @@ class MateriaGenero655Form(forms.ModelForm):
             ).first()
 
             if existente:
-                cleaned["materia"] = existente.id
+                cleaned["materia"] = existente
             else:
                 # crear un nuevo término
                 nuevo = AutoridadFormaMusical.objects.create(forma=texto)
-                cleaned["materia"] = nuevo.id
+                cleaned["materia"] = nuevo
 
         return cleaned

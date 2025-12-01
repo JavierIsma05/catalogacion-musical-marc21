@@ -820,3 +820,61 @@ textarea.form-control {
 .sidebar-navigation::-webkit-scrollbar-thumb:hover {
     background: var(--gray-400);
 }
+
+/* ============================================
+   AUTOCOMPLETE DROPDOWNS
+   ============================================ */
+.autocomplete-wrapper {
+    position: relative;
+}
+
+.autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    background: white;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+    z-index: 25;
+    max-height: 240px;
+    overflow-y: auto;
+    display: none;
+}
+
+.autocomplete-suggestions.is-visible,
+.autocomplete-suggestions.show {
+    display: block;
+}
+
+.autocomplete-item {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--gray-100);
+    background: white;
+    transition: var(--transition);
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.selected {
+    background: var(--gray-100);
+}
+
+.autocomplete-item-new {
+    color: var(--accent);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.autocomplete-item-new::before {
+    content: '+';
+    font-weight: 700;
+}
