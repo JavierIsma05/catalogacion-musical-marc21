@@ -11,18 +11,22 @@ from catalogacion.views import (
     ListaObrasView,
     EliminarObraView,
 )
-from catalogacion.views.borradores import (
-    guardar_borrador_ajax,
-    obtener_borrador_ajax,
-    verificar_borrador_ajax,
-    eliminar_borrador_ajax,
-    listar_borradores_ajax,
-    autoguardar_borrador_ajax,
-    limpiar_sesion_borrador_ajax,
-    ListaBorradoresView,
-    DescartarBorradorView,
-    recuperar_borrador_view,
-)
+
+# ============================================================================
+# SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
+# ============================================================================
+# from catalogacion.views.borradores import (
+#     guardar_borrador_ajax,
+#     obtener_borrador_ajax,
+#     verificar_borrador_ajax,
+#     eliminar_borrador_ajax,
+#     listar_borradores_ajax,
+#     autoguardar_borrador_ajax,
+#     limpiar_sesion_borrador_ajax,
+#     ListaBorradoresView,
+#     DescartarBorradorView,
+#     recuperar_borrador_view,
+# )
 
 app_name = 'catalogacion'
 
@@ -40,21 +44,24 @@ urlpatterns = [
         path('<int:pk>/eliminar/', EliminarObraView.as_view(), name='eliminar_obra'),
     ])),
     
+    # ============================================================================
+    # SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
+    # ============================================================================
     # API de Borradores (AJAX)
-    path('api/borradores/', include([
-        path('guardar/', guardar_borrador_ajax, name='api_guardar_borrador'),
-        path('autoguardar/', autoguardar_borrador_ajax, name='api_autoguardar_borrador'),
-        path('verificar/', verificar_borrador_ajax, name='api_verificar_borrador'),
-        path('listar/', listar_borradores_ajax, name='api_listar_borradores'),
-        path('limpiar-sesion/', limpiar_sesion_borrador_ajax, name='api_limpiar_sesion_borrador'),
-        path('<int:borrador_id>/', obtener_borrador_ajax, name='api_obtener_borrador'),
-        path('<int:borrador_id>/eliminar/', eliminar_borrador_ajax, name='api_eliminar_borrador'),
-    ])),
-    
-    # Gestión de Borradores (Web UI)
-    path('borradores/', include([
-        path('', ListaBorradoresView.as_view(), name='lista_borradores'),
-        path('<int:pk>/recuperar/', recuperar_borrador_view, name='recuperar_borrador'),
-        path('<int:pk>/descartar/', DescartarBorradorView.as_view(), name='descartar_borrador'),
-    ])),
+    # path('api/borradores/', include([
+    #     path('guardar/', guardar_borrador_ajax, name='api_guardar_borrador'),
+    #     path('autoguardar/', autoguardar_borrador_ajax, name='api_autoguardar_borrador'),
+    #     path('verificar/', verificar_borrador_ajax, name='api_verificar_borrador'),
+    #     path('listar/', listar_borradores_ajax, name='api_listar_borradores'),
+    #     path('limpiar-sesion/', limpiar_sesion_borrador_ajax, name='api_limpiar_sesion_borrador'),
+    #     path('<int:borrador_id>/', obtener_borrador_ajax, name='api_obtener_borrador'),
+    #     path('<int:borrador_id>/eliminar/', eliminar_borrador_ajax, name='api_eliminar_borrador'),
+    # ])),
+    # 
+    # # Gestión de Borradores (Web UI)
+    # path('borradores/', include([
+    #     path('', ListaBorradoresView.as_view(), name='lista_borradores'),
+    #     path('<int:pk>/recuperar/', recuperar_borrador_view, name='recuperar_borrador'),
+    #     path('<int:pk>/descartar/', DescartarBorradorView.as_view(), name='descartar_borrador'),
+    # ])),
 ]

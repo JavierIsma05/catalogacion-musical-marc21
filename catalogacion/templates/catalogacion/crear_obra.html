@@ -246,8 +246,6 @@
     </div>
 </div>
 
-<!-- Modal de ayuda MARC21 -->
-<!-- {% include 'catalogacion/includes/help_modal.html' %} -->
 {% endblock %}
 
 {% block extra_js %}
@@ -259,15 +257,21 @@ window.TIPO_OBRA_ACTUAL = '{{ tipo_obra }}';
 const tabs = ['tab-0xx', 'tab-1xx', 'tab-2xx', 'tab-3xx', 'tab-4xx', 'tab-5xx', 'tab-6xx', 'tab-7xx', 'tab-8xx'];
 let currentTabIndex = 0;
 
+// ============================================================================
+// SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
+// ============================================================================
 // Borrador a recuperar (si viene desde lista de borradores)
-const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
+// const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
+const BORRADOR_A_RECUPERAR = null; // Borradores deshabilitados
 </script>
 
 <script src="{% static 'catalogacion/js/autocomplete-core.js' %}"></script>
 <script src="{% static 'catalogacion/js/compositor-autocomplete.js' %}"></script>
 <script src="{% static 'catalogacion/js/titulos-formas-autocomplete.js' %}"></script>
 <script src="{% static 'catalogacion/js/required-fields-tracker.js' %}"></script>
+<!-- BORRADOR SYSTEM DESHABILITADO
 <script src="{% static 'catalogacion/js/borrador-system.js' %}"></script>
+-->
 <script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>
 <script src="{% static 'catalogacion/js/incipit-031-adapter.js' %}"></script>
 <script src="{% static 'catalogacion/js/autoridades-titulos-autocomplete.js' %}"></script>

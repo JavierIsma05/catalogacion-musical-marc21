@@ -107,15 +107,18 @@ class CrearObraView(ObraFormsetMixin, CreateView):
         with_post = self.request.method == 'POST'
         context.update(self._get_formsets(instance=None, with_post=with_post))
         
+        # ============================================================================
+        # SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
+        # ============================================================================
         # Pasar borrador_id SOLO si viene de recuperar_borrador_view
         # y luego limpiar inmediatamente la sesión
-        if 'borrador_id' in self.request.session:
-            context['borrador_id_recuperar'] = self.request.session.get('borrador_id')
-            # Limpiar la sesión inmediatamente para que no persista
-            del self.request.session['borrador_id']
-            if 'tipo_obra' in self.request.session:
-                del self.request.session['tipo_obra']
-            self.request.session.modified = True
+        # if 'borrador_id' in self.request.session:
+        #     context['borrador_id_recuperar'] = self.request.session.get('borrador_id')
+        #     # Limpiar la sesión inmediatamente para que no persista
+        #     del self.request.session['borrador_id']
+        #     if 'tipo_obra' in self.request.session:
+        #         del self.request.session['tipo_obra']
+        #     self.request.session.modified = True
         
         return context
     
@@ -194,22 +197,25 @@ class CrearObraView(ObraFormsetMixin, CreateView):
         # Guardar todos los formsets y sus subcampos
         self._guardar_formsets(formsets, self.object)
         
+        # ============================================================================
+        # SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
+        # ============================================================================
         # Marcar borrador como convertido si existe
-        borrador_id = self.request.session.get('borrador_id')
-        if borrador_id:
-            try:
-                from catalogacion.models import BorradorObra
-                borrador = BorradorObra.objects.get(id=borrador_id, estado='activo')
-                borrador.estado = 'convertido'
-                borrador.obra_creada = self.object
-                borrador.save()
-                
-                # Limpiar sesión
-                del self.request.session['borrador_id']
-                if 'tipo_obra' in self.request.session:
-                    del self.request.session['tipo_obra']
-            except BorradorObra.DoesNotExist:
-                pass
+        # borrador_id = self.request.session.get('borrador_id')
+        # if borrador_id:
+        #     try:
+        #         from catalogacion.models import BorradorObra
+        #         borrador = BorradorObra.objects.get(id=borrador_id, estado='activo')
+        #         borrador.estado = 'convertido'
+        #         borrador.obra_creada = self.object
+        #         borrador.save()
+        #         
+        #         # Limpiar sesión
+        #         del self.request.session['borrador_id']
+        #         if 'tipo_obra' in self.request.session:
+        #             del self.request.session['tipo_obra']
+        #     except BorradorObra.DoesNotExist:
+        #         pass
         
         # Mensaje de éxito
         messages.success(self.request, f'{self.config_obra["titulo"]} registrada exitosamente.')
