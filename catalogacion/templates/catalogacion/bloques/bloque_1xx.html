@@ -65,7 +65,9 @@
                     <div class="campo-titulo">
                         <span class="badge-marc">100$e</span>
                         <h6>Funciones</h6>
-                        <span class="badge-repetible">REPETIBLE</span>
+                        <span class="campo-help-btn" data-field-code="100e" tabindex="0" title="Ayuda">
+                            <i class="bi bi-question-circle"></i>
+                        </span>
                     </div>
                     {% include 'catalogacion/includes/formset_template.html' with formset=funciones_compositor titulo="Función" %}
                 </div>

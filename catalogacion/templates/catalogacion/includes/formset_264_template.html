@@ -12,7 +12,6 @@ Permite repetir el campo completo y también cada uno de sus subcampos ($a, $b, 
     
     <button type="button" class="add-form-row mb-3" title="Agregar producción/publicación">
         <i class="bi bi-plus-circle"></i>
-        Agregar Producción/Publicación (264)
     </button>
     
     <div class="formset-forms">
@@ -48,9 +47,8 @@ Permite repetir el campo completo y también cada uno de sus subcampos ($a, $b, 
                 
                 {# Botón para agregar lugares ($a) #}
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-lugar-btn w-100" data-produccion-index="{{ forloop.counter0 }}">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-lugar-btn w-100" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Lugar ($a)">
                         <i class="bi bi-plus-circle"></i>
-                        Agregar Lugar ($a)
                     </button>
                 </div>
                 
@@ -76,9 +74,8 @@ Permite repetir el campo completo y también cada uno de sus subcampos ($a, $b, 
                 
                 {# Botón para agregar entidades ($b) #}
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-entidad-btn w-100" data-produccion-index="{{ forloop.counter0 }}">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-entidad-btn w-100" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Entidad ($b)">
                         <i class="bi bi-plus-circle"></i>
-                        Agregar Entidad ($b)
                     </button>
                 </div>
                 
@@ -104,9 +101,8 @@ Permite repetir el campo completo y también cada uno de sus subcampos ($a, $b, 
                 
                 {# Botón para agregar fechas ($c) #}
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-fecha-btn w-100" data-produccion-index="{{ forloop.counter0 }}">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-fecha-btn w-100" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Fecha ($c)">
                         <i class="bi bi-plus-circle"></i>
-                        Agregar Fecha ($c)
                     </button>
                 </div>
                 
@@ -148,9 +144,8 @@ Permite repetir el campo completo y también cada uno de sus subcampos ($a, $b, 
                     {{ formset.empty_form.funcion }}
                 </div>
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-lugar-btn w-100" data-produccion-index="__prefix__">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-lugar-btn w-100" data-produccion-index="__prefix__" title="Agregar Lugar ($a)">
                         <i class="bi bi-plus-circle"></i>
-                        Agregar Lugar ($a)
                     </button>
                 </div>
                 
@@ -159,9 +154,8 @@ Permite repetir el campo completo y también cada uno de sus subcampos ($a, $b, 
                 </div>
                 
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-entidad-btn w-100" data-produccion-index="__prefix__">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-entidad-btn w-100" data-produccion-index="__prefix__" title="Agregar Entidad ($b)">
                         <i class="bi bi-plus-circle"></i>
-                        Agregar Entidad ($b)
                     </button>
                 </div>
                 
@@ -170,9 +164,8 @@ Permite repetir el campo completo y también cada uno de sus subcampos ($a, $b, 
                 </div>
                 
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-fecha-btn w-100" data-produccion-index="__prefix__">
+                    <button type="button" class="btn btn-sm btn-outline-primary add-fecha-btn w-100" data-produccion-index="__prefix__" title="Agregar Fecha ($c)">
                         <i class="bi bi-plus-circle"></i>
-                        Agregar Fecha ($c)
                     </button>
                 </div>
                 

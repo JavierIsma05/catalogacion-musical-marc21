@@ -878,3 +878,78 @@ textarea.form-control {
     content: '+';
     font-weight: 700;
 }
+
+/* ============================================
+   BOTÓN DE AYUDA DE CAMPO
+   ============================================ */
+.campo-help-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-left: auto;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-radius: 50%;
+    transition: var(--transition);
+    position: relative;
+}
+
+.campo-help-btn:hover,
+.campo-help-btn:focus {
+    color: var(--accent);
+    background: var(--gray-100);
+    outline: none;
+}
+
+.campo-help-btn i {
+    font-size: 0.875rem;
+}
+
+/* Tooltip de ayuda */
+.campo-help-tooltip {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    min-width: 280px;
+    max-width: 400px;
+    padding: 0.75rem 1rem;
+    background: var(--gray-800);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.5;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: all 0.2s ease;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.campo-help-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 8px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid var(--gray-800);
+}
+
+.campo-help-btn:hover .campo-help-tooltip,
+.campo-help-btn:focus .campo-help-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.campo-help-tooltip-empty {
+    color: var(--gray-400);
+    font-style: italic;
+}
