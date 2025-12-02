@@ -222,8 +222,16 @@ class ObraFormsetMixin:
         }
         
         for key, formset in formsets.items():
-            formset.instance = instance
-            formset.save()
+            for form in formset:
+                if form.cleaned_data and not form.cleaned_data.get("DELETE", False):
+                    obj = form.save(commit=False)
+                    # 🔥 Asignar FK a la obra si existe ese campo
+                    if hasattr(obj, 'obra_general'):
+                        obj.obra_general = instance
+                    
+                    obj.save()
+                    logger.info(f"📝 Guardado formset {key}: {obj.pk}")
+
 
             if key == 'incipits_musicales':
                 incipits_guardados = list(instance.incipits_musicales.all())
