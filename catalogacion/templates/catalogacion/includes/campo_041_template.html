@@ -148,6 +148,23 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
             opcionesHTML += `<option value="${item.codigo}">${item.nombre}</option>`;
         });
         
+        // Función para inicializar Select2 en un elemento
+        function initSelect2(selectElement) {
+            if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
+                // Destruir Select2 existente si lo hay
+                if ($(selectElement).hasClass('select2-hidden-accessible')) {
+                    $(selectElement).select2('destroy');
+                }
+                // Inicializar Select2
+                $(selectElement).select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    placeholder: 'Seleccione un idioma...',
+                    allowClear: false
+                });
+            }
+        }
+        
         // Función para actualizar visibilidad de botones de eliminar en subcampos
         function updateDeleteButtonsVisibility(idiomasContainer) {
             const rows = idiomasContainer.querySelectorAll('.subcampo-row');
@@ -173,7 +190,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 if (!idiomasContainer) return;
                 
                 const existingRows = idiomasContainer.querySelectorAll('.subcampo-row');
-                const newIndex = existingRows.length;
+                const newIndex = Date.now(); // Usar timestamp para evitar duplicados
                 
                 // Crear nueva fila desde cero
                 const newRow = document.createElement('div');
@@ -191,15 +208,11 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 idiomasContainer.appendChild(newRow);
                 updateDeleteButtonsVisibility(idiomasContainer);
                 
-                // Inicializar Select2 en el nuevo select
+                // Inicializar Select2 en el nuevo select después de agregarlo al DOM
                 const select = newRow.querySelector('.idioma-select');
-                if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
-                    $(select).select2({
-                        theme: 'bootstrap-5',
-                        width: '100%',
-                        placeholder: 'Seleccione un idioma...'
-                    });
-                }
+                setTimeout(function() {
+                    initSelect2(select);
+                }, 10);
             }
             
             // Eliminar idioma (solo filas sin botón +)
@@ -210,9 +223,21 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 if (row.querySelector('.subcampo-add-btn')) return;
                 
                 const idiomasContainer = row.closest('.subcampo-repetible-container');
+                
+                // Destruir Select2 antes de eliminar
+                const select = row.querySelector('.idioma-select');
+                if (select && typeof $ !== 'undefined' && $(select).hasClass('select2-hidden-accessible')) {
+                    $(select).select2('destroy');
+                }
+                
                 row.remove();
                 updateDeleteButtonsVisibility(idiomasContainer);
             }
+        });
+        
+        // Inicializar Select2 en todos los selects existentes
+        container.querySelectorAll('.idioma-select').forEach(function(select) {
+            initSelect2(select);
         });
         
         // Inicializar visibilidad de botones en carga
@@ -223,7 +248,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initSubcamposIdiomas);
     } else {
-        setTimeout(initSubcamposIdiomas, 10);
+        setTimeout(initSubcamposIdiomas, 100);
     }
 })();
 </script>

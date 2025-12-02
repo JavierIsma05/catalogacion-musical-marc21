@@ -1120,3 +1120,55 @@ textarea.form-control {
     background: var(--danger);
     border-color: var(--danger);
 }
+
+/* ============================================
+   SELECT2 - ESTILOS PARA SUBCAMPOS DINÁMICOS
+   ============================================ */
+/* Asegurar que Select2 se vea bien en subcampos */
+.subcampo-row .select2-container {
+    flex: 1;
+    min-width: 0;
+}
+
+.subcampo-row .select2-container--bootstrap-5 .select2-selection {
+    min-height: 32px;
+    height: 32px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8125rem;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    background-color: white;
+}
+
+.subcampo-row .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    line-height: 1.4;
+    padding-left: 0;
+    color: var(--text-primary);
+}
+
+.subcampo-row .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    height: 30px;
+}
+
+/* Estilo para selects nativos (fallback si Select2 no carga) */
+.subcampo-row select.form-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 10px;
+    padding-right: 2rem;
+    cursor: pointer;
+}
+
+.subcampo-row select.form-select:hover {
+    border-color: var(--gray-400);
+}
+
+.subcampo-row select.form-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(74, 85, 104, 0.1);
+    outline: none;
+}
