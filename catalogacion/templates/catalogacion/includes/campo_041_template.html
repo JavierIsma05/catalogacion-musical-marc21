@@ -6,6 +6,9 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 {% endcomment %}
 {% load catalogacion_tags %}
 
+{# Cargar las opciones de idiomas una sola vez al inicio #}
+{% get_codigos_lenguaje as codigos_idioma %}
+
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
     {{ formset.management_form }}
     
@@ -59,7 +62,6 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             </button>
                             <select class="form-select idioma-select" name="idioma_lengua_{{ forloop.counter0 }}_0">
                                 <option value="">Seleccione un idioma...</option>
-                                {% get_codigos_lenguaje as codigos_idioma %}
                                 {% for codigo, nombre in codigos_idioma %}
                                 <option value="{{ codigo }}">{{ nombre }}</option>
                                 {% endfor %}
@@ -126,12 +128,10 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 // Script para manejar subcampos de idiomas del campo 041
 // El formset principal es manejado por formset-manager.js
 (function() {
-    function initSubcamposIdiomas() {
-        const prefix = '{{ formset.prefix }}';
-        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-        if (!container) return;
-        
-        // Obtener las opciones de idiomas desde el elemento oculto
+    const prefix = '{{ formset.prefix }}';
+    
+    // Obtener las opciones de idiomas desde el elemento oculto
+    function getOpcionesIdioma() {
         const opcionesData = document.getElementById('idiomas-options-data');
         let opcionesIdioma = [];
         if (opcionesData && opcionesData.dataset.opciones) {
@@ -141,45 +141,69 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 console.error('Error parsing idiomas options:', e);
             }
         }
-        
-        // Construir HTML de opciones
-        let opcionesHTML = '<option value="">Seleccione un idioma...</option>';
-        opcionesIdioma.forEach(function(item) {
-            opcionesHTML += `<option value="${item.codigo}">${item.nombre}</option>`;
+        return opcionesIdioma;
+    }
+    
+    // Construir HTML de opciones
+    function buildOpcionesHTML() {
+        let html = '<option value="">Seleccione un idioma...</option>';
+        getOpcionesIdioma().forEach(function(item) {
+            html += `<option value="${item.codigo}">${item.nombre}</option>`;
         });
-        
-        // Función para inicializar Select2 en un elemento
-        function initSelect2(selectElement) {
-            if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
-                // Destruir Select2 existente si lo hay
-                if ($(selectElement).hasClass('select2-hidden-accessible')) {
-                    $(selectElement).select2('destroy');
-                }
-                // Inicializar Select2
-                $(selectElement).select2({
-                    theme: 'bootstrap-5',
-                    width: '100%',
-                    placeholder: 'Seleccione un idioma...',
-                    allowClear: false
-                });
+        return html;
+    }
+    
+    // Función para inicializar Select2 en un elemento
+    function initSelect2(selectElement) {
+        if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
+            // Destruir Select2 existente si lo hay (para evitar duplicados)
+            if ($(selectElement).hasClass('select2-hidden-accessible')) {
+                $(selectElement).select2('destroy');
             }
-        }
-        
-        // Función para actualizar visibilidad de botones de eliminar en subcampos
-        function updateDeleteButtonsVisibility(idiomasContainer) {
-            const rows = idiomasContainer.querySelectorAll('.subcampo-row');
-            rows.forEach((row) => {
-                const deleteBtn = row.querySelector('.subcampo-delete-btn');
-                const hasAddButton = row.querySelector('.subcampo-add-btn');
-                if (deleteBtn) {
-                    // La primera fila (con botón +) NUNCA se puede eliminar
-                    // Las demás filas siempre se pueden eliminar
-                    deleteBtn.style.visibility = hasAddButton ? 'hidden' : 'visible';
-                }
+            // Inicializar Select2
+            $(selectElement).select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Seleccione un idioma...',
+                allowClear: false
             });
         }
+    }
+    
+    // Función para actualizar visibilidad de botones de eliminar en subcampos
+    function updateDeleteButtonsVisibility(idiomasContainer) {
+        const rows = idiomasContainer.querySelectorAll('.subcampo-row');
+        rows.forEach((row) => {
+            const deleteBtn = row.querySelector('.subcampo-delete-btn');
+            const hasAddButton = row.querySelector('.subcampo-add-btn');
+            if (deleteBtn) {
+                // La primera fila (con botón +) NUNCA se puede eliminar
+                // Las demás filas siempre se pueden eliminar
+                deleteBtn.style.visibility = hasAddButton ? 'hidden' : 'visible';
+            }
+        });
+    }
+    
+    // Inicializar todos los selects de idioma en un contenedor específico
+    function initSelectsInContainer(container) {
+        container.querySelectorAll('.idioma-select').forEach(function(select) {
+            // Solo inicializar si no está dentro de empty-form
+            if (!select.closest('.empty-form')) {
+                initSelect2(select);
+            }
+        });
         
-        // Manejar idiomas (subcampo $a repetible)
+        // Inicializar visibilidad de botones
+        container.querySelectorAll('.subcampo-repetible-container').forEach(updateDeleteButtonsVisibility);
+    }
+    
+    function initSubcamposIdiomas() {
+        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+        if (!container) return;
+        
+        const opcionesHTML = buildOpcionesHTML();
+        
+        // Manejar idiomas (subcampo $a repetible) - delegación de eventos
         container.addEventListener('click', function(e) {
             // Agregar idioma
             const addIdiomaBtn = e.target.closest('.add-idioma-btn');
@@ -189,7 +213,6 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 
                 if (!idiomasContainer) return;
                 
-                const existingRows = idiomasContainer.querySelectorAll('.subcampo-row');
                 const newIndex = Date.now(); // Usar timestamp para evitar duplicados
                 
                 // Crear nueva fila desde cero
@@ -235,20 +258,48 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
             }
         });
         
-        // Inicializar Select2 en todos los selects existentes
-        container.querySelectorAll('.idioma-select').forEach(function(select) {
-            initSelect2(select);
-        });
+        // Inicializar Select2 en todos los selects existentes (excluyendo empty-form)
+        // Esperar a que Select2 esté listo
+        setTimeout(function() {
+            initSelectsInContainer(container);
+        }, 200);
         
-        // Inicializar visibilidad de botones en carga
-        container.querySelectorAll('.subcampo-repetible-container').forEach(updateDeleteButtonsVisibility);
+        // Observar cuando se agregan nuevos formularios (clonados del empty-form)
+        const formsContainer = container.querySelector('.formset-forms');
+        if (formsContainer) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('formset-row') && !node.classList.contains('empty-form')) {
+                            // Nuevo formulario agregado, inicializar sus selects
+                            setTimeout(function() {
+                                initSelectsInContainer(node);
+                            }, 100);
+                        }
+                    });
+                });
+            });
+            
+            observer.observe(formsContainer, { childList: true });
+        }
     }
     
-    // Ejecutar cuando el DOM esté listo
+    // Ejecutar cuando el DOM esté listo Y Select2 esté cargado
+    function waitForSelect2AndInit() {
+        if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
+            initSubcamposIdiomas();
+        } else {
+            // Esperar un poco más y reintentar
+            setTimeout(waitForSelect2AndInit, 100);
+        }
+    }
+    
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initSubcamposIdiomas);
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(waitForSelect2AndInit, 100);
+        });
     } else {
-        setTimeout(initSubcamposIdiomas, 100);
+        setTimeout(waitForSelect2AndInit, 100);
     }
 })();
 </script>
