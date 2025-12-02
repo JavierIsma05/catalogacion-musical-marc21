@@ -102,23 +102,23 @@ function IncipitClass() {
     ];
 
     context.AlterationClefPositionSostenido = [
-      { xPosition: 50, yPosition: -6 },
-      { xPosition: 60, yPosition: 20 },
-      { xPosition: 70, yPosition: -14 },
-      { xPosition: 80, yPosition: 10 },
-      { xPosition: 90, yPosition: 36 },
-      { xPosition: 100, yPosition: 2 },
-      { xPosition: 110, yPosition: 28 }
+      { xPosition: 50, yPosition: -12 }, // antes -6
+      { xPosition: 60, yPosition: 14 }, // antes 20
+      { xPosition: 70, yPosition: -20 }, // antes -14
+      { xPosition: 80, yPosition: 4 }, // antes 10
+      { xPosition: 90, yPosition: 30 }, // antes 36
+      { xPosition: 100, yPosition: -4 }, // antes 2
+      { xPosition: 110, yPosition: 20 } // antes 28
     ];
 
     context.AlterationClefPositionBemol = [
-      { xPosition: 50, yPosition: 22 },
-      { xPosition: 60, yPosition: -2 },
-      { xPosition: 70, yPosition: 30 },
-      { xPosition: 80, yPosition: 6 },
-      { xPosition: 90, yPosition: 38 },
-      { xPosition: 100, yPosition: 14 },
-      { xPosition: 110, yPosition: 45 }
+      { xPosition: 50, yPosition: 14 }, //antes 22
+      { xPosition: 60, yPosition: -10 }, //antes -2
+      { xPosition: 70, yPosition: 22 }, //antes 30
+      { xPosition: 80, yPosition: -2 },  //antes 6
+      { xPosition: 90, yPosition: 30 }, //antes 38
+      { xPosition: 100, yPosition: 6 }, //antes 14
+      { xPosition: 110, yPosition: 37 } //antes 45
     ];
 
     context.DotNote = [
@@ -1557,8 +1557,8 @@ function CanvasClass() {
 
     // 1ª línea auxiliar (más cercana al pentagrama)
     if (
-      (upOrDown === -1 && yPosition <= 4) || // arriba
-      (upOrDown === 1 && yPosition >= 13) // abajo
+      (upOrDown === -1 && yPosition <= 2) || // arriba
+      (upOrDown === 1 && yPosition >= 14) // abajo
     ) {
       pixelsToAdd = context.stepY * 2 * 3 * upOrDown + context.stepY / 2;
       context.gDrawingContext.moveTo(
@@ -1573,7 +1573,7 @@ function CanvasClass() {
 
     // 2ª línea auxiliar
     if (
-      (upOrDown === -1 && yPosition <= 2) || // arriba
+      (upOrDown === -1 && yPosition <= 1) || // arriba
       (upOrDown === 1 && yPosition >= 15) // abajo
     ) {
       pixelsToAdd = context.stepY * 2 * 4 * upOrDown + context.stepY / 2;
