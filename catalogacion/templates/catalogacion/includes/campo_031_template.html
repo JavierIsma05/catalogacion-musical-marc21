@@ -175,7 +175,29 @@ Se usa con el formset "incipits_musicales"
                     </div>
                     </div>
 
-                    {# COMPÁS + BARRAS #}
+                    {# ALTERACIONES #}
+                    <div>
+                    <div class="text-muted small mb-1">Alteraciones</div>
+                    <div class="btn-group btn-group-sm flex-wrap" role="group" aria-label="Alteraciones">
+                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
+                                style="border-radius: 10% 0 0 10%;" title="Doble sostenido"
+                                onclick="alterationPressed('l')">𝄪</button>
+                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
+                                style="margin: 0px 5px;" title="Sostenido"
+                                onclick="alterationPressed('p')">♯</button>
+                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
+                                style="" title="Becuadro"
+                                onclick="alterationPressed('o')">♮</button>
+                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
+                                style="margin: 0px 5px;" title="Bemol"
+                                onclick="alterationPressed('m')">♭</button>
+                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
+                                style="border-radius: 0 10% 10% 0%;" title="Doble bemol"
+                                onclick="alterationPressed('n')">𝄫</button>
+                    </div>
+                    </div>
+
+                    {# COMPÁS #}
                     <div>
                     <div class="text-muted" >Compás</div>
 
@@ -214,17 +236,7 @@ Se usa con el formset "incipits_musicales"
 
                     </div>
 
-                    {# ALTURA + BORRAR #}
-                    <div>
-                    <div class="text-muted" style="margin-left:11px;">Altura</div>
-                    <div class="btn-group btn-group-sm flex-wrap" role="group">
-                        <button type="button" class="btn btn-incipit btn-music"
-                                style="margin:1px;" title="Subir altura"
-                                onclick="CanvasIncipit.toneUpDown(CanvasIncipit, -1)">▲</button>
-                        <button type="button" class="btn btn-incipit btn-music"
-                                style="margin:1px;" title="Bajar altura"
-                                onclick="CanvasIncipit.toneUpDown(CanvasIncipit, 1)">▼</button>
-                    </div>
+
 
 
                     {# FIGURAS #}
@@ -262,29 +274,20 @@ Se usa con el formset "incipits_musicales"
                     </div>
                     </div>
 
-                    {# ALTERACIONES #}
+                    {# ALTURA #}
                     <div>
-                    <div class="text-muted small mb-1">Alteraciones</div>
-                    <div class="btn-group btn-group-sm flex-wrap" role="group" aria-label="Alteraciones">
-                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
-                                style="border-radius: 10% 0 0 10%;" title="Doble sostenido"
-                                onclick="alterationPressed('l')">𝄪</button>
-                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
-                                style="margin: 0px 5px;" title="Sostenido"
-                                onclick="alterationPressed('p')">♯</button>
-                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
-                                style="" title="Becuadro"
-                                onclick="alterationPressed('o')">♮</button>
-                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
-                                style="margin: 0px 5px;" title="Bemol"
-                                onclick="alterationPressed('m')">♭</button>
-                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
-                                style="border-radius: 0 10% 10% 0%;" title="Doble bemol"
-                                onclick="alterationPressed('n')">𝄫</button>
-                    </div>
+                    <div class="text-muted" style="margin-left:11px;">Altura</div>
+                    <div class="btn-group btn-group-sm flex-wrap" role="group">
+                        <button type="button" class="btn btn-incipit btn-music"
+                                style="margin:1px;" title="Subir altura"
+                                onclick="CanvasIncipit.toneUpDown(CanvasIncipit, -1)">▲</button>
+                        <button type="button" class="btn btn-incipit btn-music"
+                                style="margin:1px;" title="Bajar altura"
+                                onclick="CanvasIncipit.toneUpDown(CanvasIncipit, 1)">▼</button>
                     </div>
 
 
+                    {# BARRA #}
                     <div class="text-muted ">Barras</div>
                     <div class="btn-group-sm flex-wrap text-align-center" role="group" aria-label="Barras">
                         <button type="button" class="btn btn-incipit btn-music"
