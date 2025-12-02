@@ -11,10 +11,7 @@ El campo 856 es repetible y contiene subcampos repetibles ($u URL y $y texto enl
         {% endfor %}
     </div>
     
-    <button type="button" class="add-form-row mb-3" title="Agregar Recurso Electrónico">
-        <i class="bi bi-plus-circle"></i>
-        Agregar Recurso Electrónico
-    </button>
+    
     
     <div class="formset-forms">
         {% for form in formset %}
@@ -163,127 +160,98 @@ El campo 856 es repetible y contiene subcampos repetibles ($u URL y $y texto enl
 </div>
 
 <script>
-// Script para manejar el campo 856 con URLs y textos de enlace repetibles
 (function() {
-    const prefix = '{{ formset.prefix }}';
-    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+    const container = document.querySelector(`[data-formset-prefix="{{ formset.prefix }}"]`);
     if (!container) return;
-    
-    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-    const addButton = container.querySelector('.add-form-row');
+
+    const totalFormsInput = container.querySelector(`#id_{{ formset.prefix }}-TOTAL_FORMS`);
+    const addButton = container.querySelector(`[data-formset-target="{{ formset.prefix }}"]`);
     const formsContainer = container.querySelector('.formset-forms');
+
+    if (!totalFormsInput || !addButton || !formsContainer) return;
+
     const urlTemplate = document.querySelector('.url-template-856');
     const textoTemplate = document.querySelector('.texto-template-856');
-    
-    if (!totalFormsInput || !addButton || !formsContainer || !urlTemplate || !textoTemplate) return;
-    
-    // Agregar nuevo recurso disponible 856
-    addButton.addEventListener('click', function() {
-        const totalForms = parseInt(totalFormsInput.value);
-        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
-        
-        if (!emptyFormTemplate) return;
-        
-        const emptyForm = emptyFormTemplate.cloneNode(true);
-        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
-        emptyForm.classList.remove('empty-form');
-        emptyForm.style.display = '';
-        
-        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
-        totalFormsInput.value = totalForms + 1;
+
+    // ➕ Agregar Recurso Electrónico (nuevo 856)
+    addButton.addEventListener('click', () => {
+        const total = parseInt(totalFormsInput.value);
+        const template = formsContainer.querySelector('.empty-form');
+
+        if (!template) return;
+
+        const newForm = template.cloneNode(true);
+        newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, total);
+        newForm.classList.remove('empty-form');
+        newForm.style.display = '';
+
+        formsContainer.insertBefore(newForm, template);
+        totalFormsInput.value = total + 1;
     });
-    
-    // Eliminar recurso disponible 856
+
+    // 🗑 Manejo de eliminaciones
     container.addEventListener('click', function(e) {
         const deleteBtn = e.target.closest('.delete-row-btn');
-        if (!deleteBtn) return;
-        
-        const row = deleteBtn.closest('.formset-row');
-        if (!row || row.classList.contains('empty-form')) return;
-        
-        const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
-        
-        if (row.classList.contains('existing-form')) {
-            if (deleteCheckbox && deleteCheckbox.checked) {
-                deleteCheckbox.checked = false;
-                row.style.opacity = '1';
-                deleteBtn.classList.remove('btn-warning');
-                deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
-                deleteBtn.title = 'Eliminar';
-            } else if (deleteCheckbox) {
-                deleteCheckbox.checked = true;
-                row.style.opacity = '0.5';
-                deleteBtn.classList.add('btn-warning');
-                deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
-                deleteBtn.title = 'Cancelar eliminación';
+        if (deleteBtn) {
+            const row = deleteBtn.closest('.formset-row');
+            if (!row || row.classList.contains('empty-form')) return;
+
+            const deleteInput = row.querySelector('[name$="-DELETE"]');
+            if (deleteInput) {
+                deleteInput.checked = !deleteInput.checked;
+                row.style.opacity = deleteInput.checked ? "0.5" : "1";
+            } else {
+                row.remove();
+                totalFormsInput.value = Math.max(0, parseInt(totalFormsInput.value) - 1);
             }
-        } else {
-            row.remove();
-            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
+            return;
         }
-    });
-    
-    // Manejar URLs (subcampo $u repetible)
-    container.addEventListener('click', function(e) {
-        // Agregar URL
-        const addUrlBtn = e.target.closest('.add-url-btn');
-        if (addUrlBtn) {
-            const disponibleIndex = addUrlBtn.getAttribute('data-disponible-index');
-            const urlsContainer = container.querySelector(`[data-urls-container="${disponibleIndex}"]`);
-            
-            if (!urlsContainer) return;
-            
-            const newUrl = urlTemplate.cloneNode(true);
-            newUrl.classList.remove('url-template-856', 'd-none');
-            
-            // Actualizar el name del input
-            const input = newUrl.querySelector('.url-input');
-            if (input) {
-                input.name = `url_disponible_856_${disponibleIndex}_${Date.now()}`;
+
+        // ➕ Agregar URL $u
+        if (e.target.closest('.add-url-btn')) {
+            const index = e.target.closest('.add-url-btn').dataset.disponibleIndex;
+            const target = container.querySelector(`[data-urls-container="${index}"]`);
+
+            if (target && urlTemplate) {
+                const clone = urlTemplate.cloneNode(true);
+                clone.classList.remove('url-template-856', 'd-none');
+
+                const input = clone.querySelector('.url-input');
+                if (input) input.name = `url_856_${index}_${Date.now()}`;
+
+                target.appendChild(clone);
             }
-            
-            urlsContainer.appendChild(newUrl);
+            return;
         }
-        
-        // Eliminar URL
-        const deleteUrlBtn = e.target.closest('.delete-url-btn');
-        if (deleteUrlBtn) {
-            const urlRow = deleteUrlBtn.closest('.url-form-row');
-            if (!urlRow.classList.contains('url-template-856')) {
-                urlRow.remove();
-            }
+
+        // 🗑 Eliminar URL
+        if (e.target.closest('.delete-url-btn')) {
+            const urlRow = e.target.closest('.url-form-row');
+            if (!urlRow.classList.contains('url-template-856')) urlRow.remove();
+            return;
         }
-    });
-    
-    // Manejar textos de enlace (subcampo $y repetible)
-    container.addEventListener('click', function(e) {
-        // Agregar texto
-        const addTextoBtn = e.target.closest('.add-texto-btn');
-        if (addTextoBtn) {
-            const disponibleIndex = addTextoBtn.getAttribute('data-disponible-index');
-            const textosContainer = container.querySelector(`[data-textos-container="${disponibleIndex}"]`);
-            
-            if (!textosContainer) return;
-            
-            const newTexto = textoTemplate.cloneNode(true);
-            newTexto.classList.remove('texto-template-856', 'd-none');
-            
-            // Actualizar el name del input
-            const input = newTexto.querySelector('.texto-input');
-            if (input) {
-                input.name = `texto_disponible_856_${disponibleIndex}_${Date.now()}`;
+
+        // ➕ Agregar Texto enlace $y
+        if (e.target.closest('.add-texto-btn')) {
+            const index = e.target.closest('.add-texto-btn').dataset.disponibleIndex;
+            const target = container.querySelector(`[data-textos-container="${index}"]`);
+
+            if (target && textoTemplate) {
+                const clone = textoTemplate.cloneNode(true);
+                clone.classList.remove('texto-template-856', 'd-none');
+
+                const input = clone.querySelector('.texto-input');
+                if (input) input.name = `texto_856_${index}_${Date.now()}`;
+
+                target.appendChild(clone);
             }
-            
-            textosContainer.appendChild(newTexto);
+            return;
         }
-        
-        // Eliminar texto
-        const deleteTextoBtn = e.target.closest('.delete-texto-btn');
-        if (deleteTextoBtn) {
-            const textoRow = deleteTextoBtn.closest('.texto-form-row');
-            if (!textoRow.classList.contains('texto-template-856')) {
-                textoRow.remove();
-            }
+
+        // 🗑 Eliminar Texto
+        if (e.target.closest('.delete-texto-btn')) {
+            const textoRow = e.target.closest('.texto-form-row');
+            if (!textoRow.classList.contains('texto-template-856')) textoRow.remove();
         }
     });
 })();

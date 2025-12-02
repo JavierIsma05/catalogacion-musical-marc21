@@ -368,27 +368,7 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
 
             formsContainer.insertBefore(newForm, emptyForm);
             totalFormsInput.value = total + 1;
-<<<<<<< HEAD
         }
-=======
-        });
-
-        container.addEventListener('click', function (e) {
-            const del = e.target.closest('.delete-row-btn');
-            if (del) {
-                const row = del.closest('.formset-row');
-                if (!row.classList.contains('empty-form')) {
-                    const deleteInput = row.querySelector('input[name*="DELETE"]');
-                    if (row.classList.contains('existing-form') && deleteInput) {
-                        deleteInput.checked = !deleteInput.checked;
-                        row.style.opacity = deleteInput.checked ? "0.4" : "1";
-                    } else {
-                        row.remove();
-                        totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
-                    }
-                }
-            }
->>>>>>> 8c58871 (modificando archivos de fromset.)
 
         // ➕ Agregar subdivisión ($x)
         if (e.target.closest('.add-subdivision-btn')) {
@@ -416,19 +396,7 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
                 row.remove();
                 totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
             }
-<<<<<<< HEAD
         }
     });
 })();
-=======
-
-            const delSub = e.target.closest('.delete-subdivision-btn');
-            if (delSub) {
-                delSub.closest('.subdivision-form-row').remove();
-            }
-
-        });
-
-    })();
->>>>>>> 8c58871 (modificando archivos de fromset.)
 </script>

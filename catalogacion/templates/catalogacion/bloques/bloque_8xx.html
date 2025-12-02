@@ -14,6 +14,7 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">852</span>
                     <h6>Ubicación Física</h6>
+
                     <!-- Botón de ayuda -->
                     <span class="campo-help-btn" data-field-code="852" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
@@ -33,6 +34,12 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">856</span>
                     <h6>Ubicación Electrónica</h6>
+                    <button type="button" class="campo-add-btn"
+                        data-formset-target="{{ recursos_electronicos_856.prefix }}"
+                        title="Agregar Recurso Electrónico (856)">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
                     <!-- Botón de ayuda -->
                     <span class="campo-help-btn" data-field-code="856" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
