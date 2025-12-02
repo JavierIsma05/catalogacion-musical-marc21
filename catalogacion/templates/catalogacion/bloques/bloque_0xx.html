@@ -92,12 +92,13 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">031</span>
                     <h6>Íncipit Musical</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="incipits" title="Agregar Íncipit">
+                        <i class="bi bi-plus"></i>
+                    </button>
                     <span class="campo-help-btn" data-field-code="031" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
                     </span>
                 </div>
-
-                <p class="form-text">Representación del comienzo de la pieza musical.</p>
 
                 {% include 'catalogacion/includes/campo_031_template.html' with formset=incipits_musicales %}
             </div>
@@ -126,12 +127,13 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">041</span>
                     <h6>Código de Idioma</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="lenguas" title="Agregar Código de Lengua">
+                        <i class="bi bi-plus"></i>
+                    </button>
                     <span class="campo-help-btn" data-field-code="041" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
                     </span>
                 </div>
-
-                <p class="form-text">Idioma(s) del contenido de la obra. Cada código puede tener múltiples idiomas ($a).</p>
 
                 {% include 'catalogacion/includes/campo_041_template.html' with formset=codigos_lengua %}
             </div>
@@ -143,12 +145,13 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">044</span>
                     <h6>Código de País</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="paises" title="Agregar País">
+                        <i class="bi bi-plus"></i>
+                    </button>
                     <span class="campo-help-btn" data-field-code="044" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
                     </span>
                 </div>
-
-                <p class="form-text">País de publicación o producción.</p>
 
                 {% include 'catalogacion/includes/formset_template.html' with formset=codigos_pais titulo="País" %}
             </div>

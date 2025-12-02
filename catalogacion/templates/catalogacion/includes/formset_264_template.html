@@ -1,6 +1,7 @@
 {% comment %}
 Template especializado para el campo 264.
 Permite repetir el campo completo y también cada uno de sus subcampos ($a, $b, $c).
+El botón de agregar campo completo está en el header del campo (campo-add-btn)
 {% endcomment %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
@@ -9,10 +10,6 @@ Permite repetir el campo completo y también cada uno de sus subcampos ($a, $b, 
             {{ hidden }}
         {% endfor %}
     </div>
-    
-    <button type="button" class="add-form-row mb-3" title="Agregar producción/publicación">
-        <i class="bi bi-plus-circle"></i>
-    </button>
     
     <div class="formset-forms">
         {% for form in formset %}
@@ -45,85 +42,139 @@ Permite repetir el campo completo y también cada uno de sus subcampos ($a, $b, 
                     {% endif %}
                 </div>
                 
-                {# Botón para agregar lugares ($a) #}
+                {# Subcampo $a - Lugares (Repetible) con botón + a la izquierda #}
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-lugar-btn w-100" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Lugar ($a)">
-                        <i class="bi bi-plus-circle"></i>
-                    </button>
-                </div>
-                
-                {# Subcampo $a - Lugares (Repetible) #}
-                <div class="col-full lugares-container" data-lugares-container="{{ forloop.counter0 }}">
-                    {% if form.instance.pk %}
-                        {# Cargar lugares existentes #}
-                        {% for lugar in form.instance.lugares.all %}
-                        <div class="lugar-form-row">
-                            <div class="d-flex flex-column w-100 mb-2">
-                                <label class="form-label small">264 $a - Lugar</label>
-                                <div class="d-flex gap-2 align-items-center">
-                                    <input type="text" class="form-control lugar-input" name="lugar_produccion_264_{{ forloop.parentloop.counter0 }}_{{ lugar.pk }}" value="{{ lugar.lugar }}" placeholder="Ciudad, País" style="flex: 1;">
-                                    <button type="button" class="btn btn-sm btn-outline-danger delete-lugar-btn" title="Eliminar lugar">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
+                    <label class="form-label small">264 $a - Lugar</label>
+                    <div class="subcampo-repetible-container lugares-container" data-lugares-container="{{ forloop.counter0 }}">
+                        {% if form.instance.pk %}
+                            {# Cargar lugares existentes #}
+                            {% for lugar in form.instance.lugares.all %}
+                            <div class="subcampo-row lugar-form-row">
+                                {% if forloop.first %}
+                                <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="{{ forloop.parentloop.counter0 }}" title="Agregar Lugar">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                {% else %}
+                                <div class="subcampo-placeholder"></div>
+                                {% endif %}
+                                <input type="text" class="form-control lugar-input" name="lugar_produccion_264_{{ forloop.parentloop.counter0 }}_{{ lugar.pk }}" value="{{ lugar.lugar }}" placeholder="Ciudad, País">
+                                <button type="button" class="subcampo-delete-btn delete-lugar-btn" title="Eliminar" {% if forloop.first and forloop.last %}style="visibility: hidden;"{% endif %}>
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
                             </div>
+                            {% empty %}
+                            <div class="subcampo-row lugar-form-row">
+                                <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Lugar">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                <input type="text" class="form-control lugar-input" name="lugar_produccion_264_{{ forloop.counter0 }}_0" placeholder="Ciudad, País">
+                                <button type="button" class="subcampo-delete-btn delete-lugar-btn" title="Eliminar" style="visibility: hidden;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="subcampo-row lugar-form-row">
+                            <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Lugar">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <input type="text" class="form-control lugar-input" name="lugar_produccion_264_{{ forloop.counter0 }}_0" placeholder="Ciudad, País">
+                            <button type="button" class="subcampo-delete-btn delete-lugar-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
                         </div>
-                        {% endfor %}
-                    {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
                 
-                {# Botón para agregar entidades ($b) #}
+                {# Subcampo $b - Entidades (Repetible) con botón + a la izquierda #}
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-entidad-btn w-100" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Entidad ($b)">
-                        <i class="bi bi-plus-circle"></i>
-                    </button>
-                </div>
-                
-                {# Subcampo $b - Entidades (Repetible) #}
-                <div class="col-full entidades-container" data-entidades-container="{{ forloop.counter0 }}">
-                    {% if form.instance.pk %}
-                        {# Cargar entidades existentes #}
-                        {% for entidad in form.instance.entidades.all %}
-                        <div class="entidad-form-row">
-                            <div class="d-flex flex-column w-100 mb-2">
-                                <label class="form-label small">264 $b - Nombre de entidad</label>
-                                <div class="d-flex gap-2 align-items-center">
-                                    <input type="text" class="form-control entidad-input" name="entidad_produccion_264_{{ forloop.parentloop.counter0 }}_{{ entidad.pk }}" value="{{ entidad.nombre }}" placeholder="Nombre del editor o productor" style="flex: 1;">
-                                    <button type="button" class="btn btn-sm btn-outline-danger delete-entidad-btn" title="Eliminar entidad">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
+                    <label class="form-label small">264 $b - Nombre de entidad</label>
+                    <div class="subcampo-repetible-container entidades-container" data-entidades-container="{{ forloop.counter0 }}">
+                        {% if form.instance.pk %}
+                            {# Cargar entidades existentes #}
+                            {% for entidad in form.instance.entidades.all %}
+                            <div class="subcampo-row entidad-form-row">
+                                {% if forloop.first %}
+                                <button type="button" class="subcampo-add-btn add-entidad-btn" data-produccion-index="{{ forloop.parentloop.counter0 }}" title="Agregar Entidad">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                {% else %}
+                                <div class="subcampo-placeholder"></div>
+                                {% endif %}
+                                <input type="text" class="form-control entidad-input" name="entidad_produccion_264_{{ forloop.parentloop.counter0 }}_{{ entidad.pk }}" value="{{ entidad.nombre }}" placeholder="Nombre del editor o productor">
+                                <button type="button" class="subcampo-delete-btn delete-entidad-btn" title="Eliminar" {% if forloop.first and forloop.last %}style="visibility: hidden;"{% endif %}>
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
                             </div>
+                            {% empty %}
+                            <div class="subcampo-row entidad-form-row">
+                                <button type="button" class="subcampo-add-btn add-entidad-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Entidad">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                <input type="text" class="form-control entidad-input" name="entidad_produccion_264_{{ forloop.counter0 }}_0" placeholder="Nombre del editor o productor">
+                                <button type="button" class="subcampo-delete-btn delete-entidad-btn" title="Eliminar" style="visibility: hidden;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="subcampo-row entidad-form-row">
+                            <button type="button" class="subcampo-add-btn add-entidad-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Entidad">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <input type="text" class="form-control entidad-input" name="entidad_produccion_264_{{ forloop.counter0 }}_0" placeholder="Nombre del editor o productor">
+                            <button type="button" class="subcampo-delete-btn delete-entidad-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
                         </div>
-                        {% endfor %}
-                    {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
                 
-                {# Botón para agregar fechas ($c) #}
+                {# Subcampo $c - Fechas (Repetible) con botón + a la izquierda #}
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-fecha-btn w-100" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Fecha ($c)">
-                        <i class="bi bi-plus-circle"></i>
-                    </button>
-                </div>
-                
-                {# Subcampo $c - Fechas (Repetible) #}
-                <div class="col-full fechas-container" data-fechas-container="{{ forloop.counter0 }}">
-                    {% if form.instance.pk %}
-                        {# Cargar fechas existentes #}
-                        {% for fecha in form.instance.fechas.all %}
-                        <div class="fecha-form-row">
-                            <div class="d-flex flex-column w-100 mb-2">
-                                <label class="form-label small">264 $c - Fecha</label>
-                                <div class="d-flex gap-2 align-items-center">
-                                    <input type="text" class="form-control fecha-input" name="fecha_produccion_264_{{ forloop.parentloop.counter0 }}_{{ fecha.pk }}" value="{{ fecha.fecha }}" placeholder="2024, [2024], ©2024" style="flex: 1;">
-                                    <button type="button" class="btn btn-sm btn-outline-danger delete-fecha-btn" title="Eliminar fecha">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
+                    <label class="form-label small">264 $c - Fecha</label>
+                    <div class="subcampo-repetible-container fechas-container" data-fechas-container="{{ forloop.counter0 }}">
+                        {% if form.instance.pk %}
+                            {# Cargar fechas existentes #}
+                            {% for fecha in form.instance.fechas.all %}
+                            <div class="subcampo-row fecha-form-row">
+                                {% if forloop.first %}
+                                <button type="button" class="subcampo-add-btn add-fecha-btn" data-produccion-index="{{ forloop.parentloop.counter0 }}" title="Agregar Fecha">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                {% else %}
+                                <div class="subcampo-placeholder"></div>
+                                {% endif %}
+                                <input type="text" class="form-control fecha-input" name="fecha_produccion_264_{{ forloop.parentloop.counter0 }}_{{ fecha.pk }}" value="{{ fecha.fecha }}" placeholder="2024, [2024], ©2024">
+                                <button type="button" class="subcampo-delete-btn delete-fecha-btn" title="Eliminar" {% if forloop.first and forloop.last %}style="visibility: hidden;"{% endif %}>
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
                             </div>
+                            {% empty %}
+                            <div class="subcampo-row fecha-form-row">
+                                <button type="button" class="subcampo-add-btn add-fecha-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Fecha">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                <input type="text" class="form-control fecha-input" name="fecha_produccion_264_{{ forloop.counter0 }}_0" placeholder="2024, [2024], ©2024">
+                                <button type="button" class="subcampo-delete-btn delete-fecha-btn" title="Eliminar" style="visibility: hidden;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="subcampo-row fecha-form-row">
+                            <button type="button" class="subcampo-add-btn add-fecha-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Fecha">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <input type="text" class="form-control fecha-input" name="fecha_produccion_264_{{ forloop.counter0 }}_0" placeholder="2024, [2024], ©2024">
+                            <button type="button" class="subcampo-delete-btn delete-fecha-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
                         </div>
-                        {% endfor %}
-                    {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -143,34 +194,50 @@ Permite repetir el campo completo y también cada uno de sus subcampos ($a, $b, 
                     <label class="form-label" for="{{ formset.empty_form.funcion.id_for_label }}">{{ formset.empty_form.funcion.label }}</label>
                     {{ formset.empty_form.funcion }}
                 </div>
-                <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-lugar-btn w-100" data-produccion-index="__prefix__" title="Agregar Lugar ($a)">
-                        <i class="bi bi-plus-circle"></i>
-                    </button>
-                </div>
-                
-                <div class="col-full lugares-container" data-lugares-container="__prefix__">
-                    {# Los lugares se agregarán aquí dinámicamente #}
-                </div>
                 
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-entidad-btn w-100" data-produccion-index="__prefix__" title="Agregar Entidad ($b)">
-                        <i class="bi bi-plus-circle"></i>
-                    </button>
-                </div>
-                
-                <div class="col-full entidades-container" data-entidades-container="__prefix__">
-                    {# Las entidades se agregarán aquí dinámicamente #}
+                    <label class="form-label small">264 $a - Lugar</label>
+                    <div class="subcampo-repetible-container lugares-container" data-lugares-container="__prefix__">
+                        <div class="subcampo-row lugar-form-row">
+                            <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="__prefix__" title="Agregar Lugar">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <input type="text" class="form-control lugar-input" name="lugar_produccion_264___prefix___0" placeholder="Ciudad, País">
+                            <button type="button" class="subcampo-delete-btn delete-lugar-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-fecha-btn w-100" data-produccion-index="__prefix__" title="Agregar Fecha ($c)">
-                        <i class="bi bi-plus-circle"></i>
-                    </button>
+                    <label class="form-label small">264 $b - Nombre de entidad</label>
+                    <div class="subcampo-repetible-container entidades-container" data-entidades-container="__prefix__">
+                        <div class="subcampo-row entidad-form-row">
+                            <button type="button" class="subcampo-add-btn add-entidad-btn" data-produccion-index="__prefix__" title="Agregar Entidad">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <input type="text" class="form-control entidad-input" name="entidad_produccion_264___prefix___0" placeholder="Nombre del editor o productor">
+                            <button type="button" class="subcampo-delete-btn delete-entidad-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="col-full fechas-container" data-fechas-container="__prefix__">
-                    {# Las fechas se agregarán aquí dinámicamente #}
+                <div class="col-full">
+                    <label class="form-label small">264 $c - Fecha</label>
+                    <div class="subcampo-repetible-container fechas-container" data-fechas-container="__prefix__">
+                        <div class="subcampo-row fecha-form-row">
+                            <button type="button" class="subcampo-add-btn add-fecha-btn" data-produccion-index="__prefix__" title="Agregar Fecha">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <input type="text" class="form-control fecha-input" name="fecha_produccion_264___prefix___0" placeholder="2024, [2024], ©2024">
+                            <button type="button" class="subcampo-delete-btn delete-fecha-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -178,200 +245,164 @@ Permite repetir el campo completo y también cada uno de sus subcampos ($a, $b, 
 </div>
 
 {# Templates globales para lugares, entidades y fechas (fuera del formset loop) #}
-<div class="lugar-form-row lugar-template-264 d-none">
-    <div class="d-flex flex-column w-100 mb-2">
-        <label class="form-label small">264 $a - Lugar</label>
-        <div class="d-flex gap-2 align-items-center">
-            <input type="text" class="form-control lugar-input" placeholder="Ciudad, País" style="flex: 1;">
-            <button type="button" class="btn btn-sm btn-outline-danger delete-lugar-btn" title="Eliminar lugar">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
-    </div>
+<div class="subcampo-row lugar-form-row lugar-template-264 d-none">
+    <div class="subcampo-placeholder"></div>
+    <input type="text" class="form-control lugar-input" placeholder="Ciudad, País">
+    <button type="button" class="subcampo-delete-btn delete-lugar-btn" title="Eliminar">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 
-<div class="entidad-form-row entidad-template-264 d-none">
-    <div class="d-flex flex-column w-100 mb-2">
-        <label class="form-label small">264 $b - Nombre de entidad</label>
-        <div class="d-flex gap-2 align-items-center">
-            <input type="text" class="form-control entidad-input" placeholder="Nombre del editor o productor" style="flex: 1;">
-            <button type="button" class="btn btn-sm btn-outline-danger delete-entidad-btn" title="Eliminar entidad">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
-    </div>
+<div class="subcampo-row entidad-form-row entidad-template-264 d-none">
+    <div class="subcampo-placeholder"></div>
+    <input type="text" class="form-control entidad-input" placeholder="Nombre del editor o productor">
+    <button type="button" class="subcampo-delete-btn delete-entidad-btn" title="Eliminar">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 
-<div class="fecha-form-row fecha-template-264 d-none">
-    <div class="d-flex flex-column w-100 mb-2">
-        <label class="form-label small">264 $c - Fecha</label>
-        <div class="d-flex gap-2 align-items-center">
-            <input type="text" class="form-control fecha-input" placeholder="2024, [2024], ©2024" style="flex: 1;">
-            <button type="button" class="btn btn-sm btn-outline-danger delete-fecha-btn" title="Eliminar fecha">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
-    </div>
+<div class="subcampo-row fecha-form-row fecha-template-264 d-none">
+    <div class="subcampo-placeholder"></div>
+    <input type="text" class="form-control fecha-input" placeholder="2024, [2024], ©2024">
+    <button type="button" class="subcampo-delete-btn delete-fecha-btn" title="Eliminar">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 
 <script>
+/**
+ * Script para subcampos repetibles del campo 264 (Lugares, Entidades, Fechas)
+ * La gestión del formset principal está en formset-manager.js
+ */
 (function() {
-    const prefix = '{{ formset.prefix }}';
-    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-    if (!container) return;
-    
-    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-    const addButton = container.querySelector('.add-form-row');
-    const formsContainer = container.querySelector('.formset-forms');
-    const lugarTemplate = document.querySelector('.lugar-template-264');
-    const entidadTemplate = document.querySelector('.entidad-template-264');
-    const fechaTemplate = document.querySelector('.fecha-template-264');
-    
-    if (!totalFormsInput || !addButton || !formsContainer || !lugarTemplate || !entidadTemplate || !fechaTemplate) {
-        return;
-    }
-    const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const prefixPattern = escapeRegex(prefix);
-    const prefixRegex = new RegExp(`${prefixPattern}-(\\d+)-`, 'g');
-
-    const reindexForms = () => {
-        const rows = Array.from(formsContainer.querySelectorAll('.formset-row:not(.empty-form)'));
-        rows.forEach((row, index) => {
-            row.querySelectorAll('input, select, textarea, label').forEach(element => {
-                ['name', 'id', 'for'].forEach(attr => {
-                    const value = element.getAttribute(attr);
-                    if (value && value.includes(`${prefix}-`)) {
-                        prefixRegex.lastIndex = 0;
-                        element.setAttribute(attr, value.replace(prefixRegex, `${prefix}-${index}-`));
+    function init264Subcampos() {
+        const prefix = '{{ formset.prefix }}';
+        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+        if (!container || container.dataset.subcampos264Initialized) return;
+        container.dataset.subcampos264Initialized = 'true';
+        
+        const lugarTemplate = document.querySelector('.lugar-template-264');
+        const entidadTemplate = document.querySelector('.entidad-template-264');
+        const fechaTemplate = document.querySelector('.fecha-template-264');
+        
+        if (!lugarTemplate || !entidadTemplate || !fechaTemplate) return;
+        
+        // Función para actualizar visibilidad de botones de eliminar
+        // La primera fila (con .subcampo-add-btn) NUNCA se puede eliminar
+        function updateDeleteButtonsVisibility(subcampoContainer) {
+            const rows = subcampoContainer.querySelectorAll('.subcampo-row:not(.d-none)');
+            rows.forEach((row) => {
+                const deleteBtn = row.querySelector('.subcampo-delete-btn');
+                if (deleteBtn) {
+                    // Si es la primera fila (tiene el botón +), ocultar siempre
+                    if (row.querySelector('.subcampo-add-btn')) {
+                        deleteBtn.style.visibility = 'hidden';
+                    } else {
+                        // Las demás filas siempre pueden eliminarse
+                        deleteBtn.style.visibility = 'visible';
                     }
-                });
+                }
             });
-            row.querySelectorAll('[data-produccion-index]').forEach(btn => btn.setAttribute('data-produccion-index', index));
-            row.querySelectorAll('[data-lugares-container]').forEach(el => el.setAttribute('data-lugares-container', index));
-            row.querySelectorAll('[data-entidades-container]').forEach(el => el.setAttribute('data-entidades-container', index));
-            row.querySelectorAll('[data-fechas-container]').forEach(el => el.setAttribute('data-fechas-container', index));
-            const actualizarSubcampo = (selector, prefijo) => {
-                const subcampoRegex = new RegExp(`^(${escapeRegex(prefijo)})(\\d+)(_.+)$`);
-                row.querySelectorAll(selector).forEach(input => {
-                    const name = input.getAttribute('name');
-                    if (!name || !name.startsWith(prefijo)) return;
-                    input.name = name.replace(subcampoRegex, `$1${index}$3`);
-                });
-            };
-            actualizarSubcampo('input[name^="lugar_produccion_264_"]', 'lugar_produccion_264_');
-            actualizarSubcampo('input[name^="entidad_produccion_264_"]', 'entidad_produccion_264_');
-            actualizarSubcampo('input[name^="fecha_produccion_264_"]', 'fecha_produccion_264_');
+        }
+        
+        container.addEventListener('click', function(e) {
+            // Agregar Lugar
+            const addLugarBtn = e.target.closest('.add-lugar-btn');
+            if (addLugarBtn) {
+                const index = addLugarBtn.getAttribute('data-produccion-index');
+                const target = container.querySelector(`[data-lugares-container="${index}"]`);
+                if (target && lugarTemplate) {
+                    const nuevo = lugarTemplate.cloneNode(true);
+                    nuevo.classList.remove('lugar-template-264', 'd-none');
+                    const input = nuevo.querySelector('.lugar-input');
+                    if (input) {
+                        input.name = `lugar_produccion_264_${index}_${Date.now()}`;
+                    }
+                    target.appendChild(nuevo);
+                    updateDeleteButtonsVisibility(target);
+                }
+                return;
+            }
+            
+            // Agregar Entidad
+            const addEntidadBtn = e.target.closest('.add-entidad-btn');
+            if (addEntidadBtn) {
+                const index = addEntidadBtn.getAttribute('data-produccion-index');
+                const target = container.querySelector(`[data-entidades-container="${index}"]`);
+                if (target && entidadTemplate) {
+                    const nuevo = entidadTemplate.cloneNode(true);
+                    nuevo.classList.remove('entidad-template-264', 'd-none');
+                    const input = nuevo.querySelector('.entidad-input');
+                    if (input) {
+                        input.name = `entidad_produccion_264_${index}_${Date.now()}`;
+                    }
+                    target.appendChild(nuevo);
+                    updateDeleteButtonsVisibility(target);
+                }
+                return;
+            }
+            
+            // Agregar Fecha
+            const addFechaBtn = e.target.closest('.add-fecha-btn');
+            if (addFechaBtn) {
+                const index = addFechaBtn.getAttribute('data-produccion-index');
+                const target = container.querySelector(`[data-fechas-container="${index}"]`);
+                if (target && fechaTemplate) {
+                    const nuevo = fechaTemplate.cloneNode(true);
+                    nuevo.classList.remove('fecha-template-264', 'd-none');
+                    const input = nuevo.querySelector('.fecha-input');
+                    if (input) {
+                        input.name = `fecha_produccion_264_${index}_${Date.now()}`;
+                    }
+                    target.appendChild(nuevo);
+                    updateDeleteButtonsVisibility(target);
+                }
+                return;
+            }
+            
+            // Eliminar Lugar (solo si NO tiene el botón +)
+            if (e.target.closest('.delete-lugar-btn')) {
+                const row = e.target.closest('.lugar-form-row');
+                if (row && !row.classList.contains('lugar-template-264') && !row.querySelector('.subcampo-add-btn')) {
+                    const subcampoContainer = row.closest('.subcampo-repetible-container');
+                    row.remove();
+                    updateDeleteButtonsVisibility(subcampoContainer);
+                }
+                return;
+            }
+            
+            // Eliminar Entidad (solo si NO tiene el botón +)
+            if (e.target.closest('.delete-entidad-btn')) {
+                const row = e.target.closest('.entidad-form-row');
+                if (row && !row.classList.contains('entidad-template-264') && !row.querySelector('.subcampo-add-btn')) {
+                    const subcampoContainer = row.closest('.subcampo-repetible-container');
+                    row.remove();
+                    updateDeleteButtonsVisibility(subcampoContainer);
+                }
+                return;
+            }
+            
+            // Eliminar Fecha (solo si NO tiene el botón +)
+            if (e.target.closest('.delete-fecha-btn')) {
+                const row = e.target.closest('.fecha-form-row');
+                if (row && !row.classList.contains('fecha-template-264') && !row.querySelector('.subcampo-add-btn')) {
+                    const subcampoContainer = row.closest('.subcampo-repetible-container');
+                    row.remove();
+                    updateDeleteButtonsVisibility(subcampoContainer);
+                }
+                return;
+            }
         });
-        totalFormsInput.value = rows.length;
-    };
+        
+        // Inicializar visibilidad de todos los contenedores de subcampos
+        container.querySelectorAll('.subcampo-repetible-container').forEach(updateDeleteButtonsVisibility);
+    }
     
-    addButton.addEventListener('click', function() {
-        const totalForms = parseInt(totalFormsInput.value, 10) || 0;
-        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
-        if (!emptyFormTemplate) return;
-        const emptyForm = emptyFormTemplate.cloneNode(true);
-        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
-        emptyForm.classList.remove('empty-form');
-        emptyForm.style.display = '';
-        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
-        reindexForms();
-    });
-    
-    container.addEventListener('click', function(e) {
-        const deleteBtn = e.target.closest('.delete-row-btn');
-        if (deleteBtn) {
-            const row = deleteBtn.closest('.formset-row');
-            if (!row || row.classList.contains('empty-form')) return;
-            const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
-            if (row.classList.contains('existing-form')) {
-                if (deleteCheckbox && deleteCheckbox.checked) {
-                    deleteCheckbox.checked = false;
-                    row.style.opacity = '1';
-                    deleteBtn.classList.remove('btn-warning');
-                    deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
-                } else if (deleteCheckbox) {
-                    deleteCheckbox.checked = true;
-                    row.style.opacity = '0.5';
-                    deleteBtn.classList.add('btn-warning');
-                    deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
-                }
-            } else {
-                row.remove();
-                reindexForms();
-            }
-            return;
-        }
-        
-        const addLugarBtn = e.target.closest('.add-lugar-btn');
-        if (addLugarBtn) {
-            const index = addLugarBtn.getAttribute('data-produccion-index');
-            const target = container.querySelector(`[data-lugares-container="${index}"]`);
-            if (target && lugarTemplate) {
-                const nuevo = lugarTemplate.cloneNode(true);
-                nuevo.classList.remove('lugar-template-264', 'd-none');
-                const input = nuevo.querySelector('.lugar-input');
-                if (input) {
-                    input.name = `lugar_produccion_264_${index}_${Date.now()}`;
-                }
-                target.appendChild(nuevo);
-            }
-            return;
-        }
-        
-        const addEntidadBtn = e.target.closest('.add-entidad-btn');
-        if (addEntidadBtn) {
-            const index = addEntidadBtn.getAttribute('data-produccion-index');
-            const target = container.querySelector(`[data-entidades-container="${index}"]`);
-            if (target && entidadTemplate) {
-                const nuevo = entidadTemplate.cloneNode(true);
-                nuevo.classList.remove('entidad-template-264', 'd-none');
-                const input = nuevo.querySelector('.entidad-input');
-                if (input) {
-                    input.name = `entidad_produccion_264_${index}_${Date.now()}`;
-                }
-                target.appendChild(nuevo);
-            }
-            return;
-        }
-        
-        const addFechaBtn = e.target.closest('.add-fecha-btn');
-        if (addFechaBtn) {
-            const index = addFechaBtn.getAttribute('data-produccion-index');
-            const target = container.querySelector(`[data-fechas-container="${index}"]`);
-            if (target && fechaTemplate) {
-                const nuevo = fechaTemplate.cloneNode(true);
-                nuevo.classList.remove('fecha-template-264', 'd-none');
-                const input = nuevo.querySelector('.fecha-input');
-                if (input) {
-                    input.name = `fecha_produccion_264_${index}_${Date.now()}`;
-                }
-                target.appendChild(nuevo);
-            }
-            return;
-        }
-        
-        if (e.target.closest('.delete-lugar-btn')) {
-            const row = e.target.closest('.lugar-form-row');
-            if (row && !row.classList.contains('lugar-template-264')) {
-                row.remove();
-            }
-            return;
-        }
-        if (e.target.closest('.delete-entidad-btn')) {
-            const row = e.target.closest('.entidad-form-row');
-            if (row && !row.classList.contains('entidad-template-264')) {
-                row.remove();
-            }
-            return;
-        }
-        if (e.target.closest('.delete-fecha-btn')) {
-            const row = e.target.closest('.fecha-form-row');
-            if (row && !row.classList.contains('fecha-template-264')) {
-                row.remove();
-            }
-            return;
-        }
-    });
-    reindexForms();
+    // Ejecutar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init264Subcampos);
+    } else {
+        setTimeout(init264Subcampos, 0);
+    }
 })();
 </script>

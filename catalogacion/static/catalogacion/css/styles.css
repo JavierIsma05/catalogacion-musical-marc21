@@ -886,14 +886,16 @@ textarea.form-control {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
-    margin-left: auto;
+    width: 26px;
+    height: 26px;
+    margin-left: 0.25rem;
     cursor: pointer;
     color: var(--text-secondary);
     border-radius: 50%;
     transition: var(--transition);
     position: relative;
+    background: white;
+    border: 1px solid var(--border-color);
 }
 
 .campo-help-btn:hover,
@@ -904,7 +906,7 @@ textarea.form-control {
 }
 
 .campo-help-btn i {
-    font-size: 0.875rem;
+    font-size: 1rem;
 }
 
 /* Tooltip de ayuda */
@@ -952,4 +954,112 @@ textarea.form-control {
 .campo-help-tooltip-empty {
     color: var(--gray-400);
     font-style: italic;
+}
+
+/* ============================================
+   BOTÓN + EN HEADER DE CAMPOS
+   ============================================ */
+.campo-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.campo-add-btn:hover {
+    color: white;
+    background: var(--gray-800);
+    border-color: var(--gray-800);
+}
+
+.campo-add-btn i {
+    font-size: 1rem;
+}
+
+/* ============================================
+   SUBCAMPOS REPETIBLES (layout [+] [input] [x])
+   ============================================ */
+.subcampo-repetible-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.subcampo-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Botón + a la izquierda del subcampo */
+.subcampo-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text-secondary);
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.subcampo-add-btn:hover {
+    color: white;
+    background: var(--gray-800);
+    border-color: var(--gray-800);
+}
+
+.subcampo-add-btn i {
+    font-size: 1rem;
+}
+
+/* Placeholder para mantener el espaciado cuando no hay botón + */
+.subcampo-placeholder {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+}
+
+/* Input del subcampo - ocupa el espacio restante */
+.subcampo-row .form-control,
+.subcampo-row .form-select {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Botón eliminar a la derecha del subcampo */
+.subcampo-delete-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text-secondary);
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.subcampo-delete-btn:hover {
+    color: white;
+    background: var(--danger);
+    border-color: var(--danger);
 }

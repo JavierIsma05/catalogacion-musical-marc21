@@ -2,14 +2,11 @@
 Template personalizado para campo 041 - Código de Lengua
 Incluye indicadores y visualización del subcampo $a (idiomas)
 Los idiomas se gestionan mediante un formset separado después de guardar
+El botón de agregar campo completo está en el header del campo (campo-add-btn)
 {% endcomment %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
     {{ formset.management_form }}
-    
-    <button type="button" class="add-form-row mb-3" title="Agregar Código de Lengua">
-        <i class="bi bi-plus-circle"></i>
-    </button>
     
     <div class="formset-forms">
         {% for form in formset %}
@@ -30,7 +27,7 @@ Los idiomas se gestionan mediante un formset separado después de guardar
             
             <div class="campo-grid">
                 {# Indicadores del campo 041 #}
-                <div class="col-third">
+                <div class="col-half">
                     <label class="form-label" for="{{ form.indicacion_traduccion.id_for_label }}">
                         {{ form.indicacion_traduccion.label }}
                     </label>
@@ -40,7 +37,7 @@ Los idiomas se gestionan mediante un formset separado después de guardar
                     {% endif %}
                 </div>
                 
-                <div class="col-third">
+                <div class="col-half">
                     <label class="form-label" for="{{ form.fuente_codigo.id_for_label }}">
                         {{ form.fuente_codigo.label }}
                     </label>
@@ -50,15 +47,29 @@ Los idiomas se gestionan mediante un formset separado después de guardar
                     {% endif %}
                 </div>
                 
-                <div class="col-third">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-idioma-btn w-100" data-lengua-index="{{ forloop.counter0 }}" style="margin-top: 1.85rem;" title="Agregar Idioma ($a)">
-                        <i class="bi bi-plus-circle"></i>
-                    </button>
-                </div>
-                
-                {# Subcampo $a - Idiomas (Repetible) #}
-                <div class="col-full idiomas-container" data-idiomas-container="{{ forloop.counter0 }}">
-                    {# Los idiomas se agregarán aquí dinámicamente #}
+                {# Subcampo $a - Idiomas (Repetible) con botón + a la izquierda #}
+                <div class="col-full">
+                    <label class="form-label small">041 $a - Código de idioma</label>
+                    <div class="subcampo-repetible-container" data-idiomas-container="{{ forloop.counter0 }}">
+                        {# Fila inicial vacía para que siempre exista al menos una #}
+                        <div class="subcampo-row">
+                            <button type="button" class="subcampo-add-btn add-idioma-btn" data-lengua-index="{{ forloop.counter0 }}" title="Agregar Idioma">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <select class="form-select idioma-select" name="idioma_lengua_{{ forloop.counter0 }}_0">
+                                <option value="">Seleccione un idioma...</option>
+                                <option value="ger">Alemán</option>
+                                <option value="spa">Español</option>
+                                <option value="fre">Francés</option>
+                                <option value="eng">Inglés</option>
+                                <option value="ita">Italiano</option>
+                                <option value="por">Portugués</option>
+                            </select>
+                            <button type="button" class="subcampo-delete-btn delete-idioma-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -71,162 +82,138 @@ Los idiomas se gestionan mediante un formset separado después de guardar
             </button>
             
             <div class="campo-grid">
-                <div class="col-third">
+                <div class="col-half">
                     <label class="form-label">
                         {{ formset.empty_form.indicacion_traduccion.label }}
                     </label>
                     {{ formset.empty_form.indicacion_traduccion }}
                 </div>
                 
-                <div class="col-third">
+                <div class="col-half">
                     <label class="form-label">
                         {{ formset.empty_form.fuente_codigo.label }}
                     </label>
                     {{ formset.empty_form.fuente_codigo }}
                 </div>
                 
-                <div class="col-third">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-idioma-btn w-100" data-lengua-index="__prefix__" style="margin-top: 1.85rem;" title="Agregar Idioma ($a)">
-                        <i class="bi bi-plus-circle"></i>
-                    </button>
-                </div>
-                
-                <div class="col-full idiomas-container" data-idiomas-container="__prefix__">
-                    {# Los idiomas se agregarán aquí dinámicamente #}
+                <div class="col-full">
+                    <label class="form-label small">041 $a - Código de idioma</label>
+                    <div class="subcampo-repetible-container" data-idiomas-container="__prefix__">
+                        <div class="subcampo-row">
+                            <button type="button" class="subcampo-add-btn add-idioma-btn" data-lengua-index="__prefix__" title="Agregar Idioma">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <select class="form-select idioma-select" name="idioma_lengua___prefix___0">
+                                <option value="">Seleccione un idioma...</option>
+                                <option value="ger">Alemán</option>
+                                <option value="spa">Español</option>
+                                <option value="fre">Francés</option>
+                                <option value="eng">Inglés</option>
+                                <option value="ita">Italiano</option>
+                                <option value="por">Portugués</option>
+                            </select>
+                            <button type="button" class="subcampo-delete-btn delete-idioma-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-{# Template global para idiomas (fuera del formset loop) #}
-<div class="idioma-form-row idioma-template" style="display: none;">
-    <div style="display: flex; flex-direction: column; width: 100%;">
-        <label class="form-label small">041 $a - Código de idioma</label>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <select class="form-select idioma-select" style="flex: 1;">
-                <option value="">Seleccione un idioma...</option>
-                <option value="ger">Alemán</option>
-                <option value="spa">Español</option>
-                <option value="fre">Francés</option>
-                <option value="eng">Inglés</option>
-                <option value="ita">Italiano</option>
-                <option value="por">Portugués</option>
-            </select>
-            <button type="button" class="btn btn-sm btn-outline-danger delete-idioma-btn" title="Eliminar idioma" style="height: 38px;">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
-    </div>
-</div>
-
 <script>
-// Script para manejar el campo 041 con idiomas repetibles
+// Script para manejar subcampos de idiomas del campo 041
+// El formset principal es manejado por formset-manager.js
 (function() {
-    const prefix = '{{ formset.prefix }}';
-    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-    if (!container) return;
-    
-    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-    const addButton = container.querySelector('.add-form-row');
-    const formsContainer = container.querySelector('.formset-forms');
-    const idiomaTemplate = document.querySelector('.idioma-template');
-    
-    if (!totalFormsInput || !addButton || !formsContainer || !idiomaTemplate) return;
-    
-    // Agregar nuevo código de lengua
-    addButton.addEventListener('click', function() {
-        const totalForms = parseInt(totalFormsInput.value);
-        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
+    function initSubcamposIdiomas() {
+        const prefix = '{{ formset.prefix }}';
+        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+        if (!container) return;
         
-        if (!emptyFormTemplate) return;
-        
-        const emptyForm = emptyFormTemplate.cloneNode(true);
-        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
-        emptyForm.classList.remove('empty-form');
-        emptyForm.style.display = '';
-        
-        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
-        totalFormsInput.value = totalForms + 1;
-        
-        if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
-            emptyForm.querySelectorAll('.form-select:not(.idioma-select)').forEach(select => {
-                $(select).select2({
-                    theme: 'bootstrap-5',
-                    width: '100%'
-                });
+        // Función para actualizar visibilidad de botones de eliminar en subcampos
+        function updateDeleteButtonsVisibility(idiomasContainer) {
+            const rows = idiomasContainer.querySelectorAll('.subcampo-row');
+            rows.forEach((row) => {
+                const deleteBtn = row.querySelector('.subcampo-delete-btn');
+                const hasAddButton = row.querySelector('.subcampo-add-btn');
+                if (deleteBtn) {
+                    // La primera fila (con botón +) NUNCA se puede eliminar
+                    // Las demás filas siempre se pueden eliminar
+                    deleteBtn.style.visibility = hasAddButton ? 'hidden' : 'visible';
+                }
             });
         }
-    });
+        
+        // Manejar idiomas (subcampo $a repetible)
+        container.addEventListener('click', function(e) {
+            // Agregar idioma
+            const addIdiomaBtn = e.target.closest('.add-idioma-btn');
+            if (addIdiomaBtn) {
+                const lenguaIndex = addIdiomaBtn.getAttribute('data-lengua-index');
+                const idiomasContainer = container.querySelector(`[data-idiomas-container="${lenguaIndex}"]`);
+                
+                if (!idiomasContainer) return;
+                
+                const existingRows = idiomasContainer.querySelectorAll('.subcampo-row');
+                const newIndex = existingRows.length;
+                
+                // Crear nueva fila desde cero
+                const newRow = document.createElement('div');
+                newRow.className = 'subcampo-row';
+                newRow.innerHTML = `
+                    <div class="subcampo-placeholder"></div>
+                    <select class="form-select idioma-select" name="idioma_lengua_${lenguaIndex}_${newIndex}">
+                        <option value="">Seleccione un idioma...</option>
+                        <option value="ger">Alemán</option>
+                        <option value="spa">Español</option>
+                        <option value="fre">Francés</option>
+                        <option value="eng">Inglés</option>
+                        <option value="ita">Italiano</option>
+                        <option value="por">Portugués</option>
+                    </select>
+                    <button type="button" class="subcampo-delete-btn delete-idioma-btn" title="Eliminar">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                `;
+                
+                idiomasContainer.appendChild(newRow);
+                updateDeleteButtonsVisibility(idiomasContainer);
+                
+                // Inicializar Select2 en el nuevo select
+                const select = newRow.querySelector('.idioma-select');
+                if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
+                    $(select).select2({
+                        theme: 'bootstrap-5',
+                        width: '100%',
+                        placeholder: 'Seleccione un idioma...'
+                    });
+                }
+            }
+            
+            // Eliminar idioma (solo filas sin botón +)
+            const deleteIdiomaBtn = e.target.closest('.delete-idioma-btn');
+            if (deleteIdiomaBtn) {
+                const row = deleteIdiomaBtn.closest('.subcampo-row');
+                // NO eliminar si tiene el botón de agregar
+                if (row.querySelector('.subcampo-add-btn')) return;
+                
+                const idiomasContainer = row.closest('.subcampo-repetible-container');
+                row.remove();
+                updateDeleteButtonsVisibility(idiomasContainer);
+            }
+        });
+        
+        // Inicializar visibilidad de botones en carga
+        container.querySelectorAll('.subcampo-repetible-container').forEach(updateDeleteButtonsVisibility);
+    }
     
-    // Eliminar código de lengua
-    container.addEventListener('click', function(e) {
-        const deleteBtn = e.target.closest('.delete-row-btn');
-        if (!deleteBtn) return;
-        
-        const row = deleteBtn.closest('.formset-row');
-        const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
-        
-        if (row.classList.contains('existing-form')) {
-            if (deleteCheckbox.checked) {
-                deleteCheckbox.checked = false;
-                row.style.opacity = '1';
-                deleteBtn.classList.remove('btn-warning');
-                deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
-                deleteBtn.title = 'Eliminar';
-            } else {
-                deleteCheckbox.checked = true;
-                row.style.opacity = '0.5';
-                deleteBtn.classList.add('btn-warning');
-                deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
-                deleteBtn.title = 'Cancelar eliminación';
-            }
-        } else {
-            row.remove();
-            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
-        }
-    });
-    
-    // Manejar idiomas (subcampo $a repetible)
-    container.addEventListener('click', function(e) {
-        // Agregar idioma
-        const addIdiomaBtn = e.target.closest('.add-idioma-btn');
-        if (addIdiomaBtn) {
-            const lenguaIndex = addIdiomaBtn.getAttribute('data-lengua-index');
-            const idiomasContainer = container.querySelector(`[data-idiomas-container="${lenguaIndex}"]`);
-            
-            if (!idiomasContainer) return;
-            
-            const newIdioma = idiomaTemplate.cloneNode(true);
-            newIdioma.classList.remove('idioma-template');
-            newIdioma.style.display = '';
-            
-            // Actualizar el name del select
-            const select = newIdioma.querySelector('.idioma-select');
-            if (select) {
-                select.name = `idioma_lengua_${lenguaIndex}_${Date.now()}`;
-            }
-            
-            idiomasContainer.appendChild(newIdioma);
-            
-            // Inicializar Select2 en el nuevo select
-            if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
-                $(select).select2({
-                    theme: 'bootstrap-5',
-                    width: '100%',
-                    placeholder: 'Seleccione un idioma...'
-                });
-            }
-        }
-        
-        // Eliminar idioma
-        const deleteIdiomaBtn = e.target.closest('.delete-idioma-btn');
-        if (deleteIdiomaBtn) {
-            const idiomaRow = deleteIdiomaBtn.closest('.idioma-form-row');
-            if (!idiomaRow.classList.contains('idioma-template')) {
-                idiomaRow.remove();
-            }
-        }
-    });
+    // Ejecutar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSubcamposIdiomas);
+    } else {
+        setTimeout(initSubcamposIdiomas, 10);
+    }
 })();
 </script>

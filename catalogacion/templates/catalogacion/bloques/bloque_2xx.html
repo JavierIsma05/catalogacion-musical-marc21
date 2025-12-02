@@ -43,12 +43,13 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">246</span>
                     <h6>Títulos Alternativos</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="titulos_alt" title="Agregar Título Alternativo">
+                        <i class="bi bi-plus"></i>
+                    </button>
                     <span class="campo-help-btn" data-field-code="246" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
                     </span>
                 </div>
-                
-                <p class="form-text">Títulos variantes o alternativos de la obra.</p>
                 
                 {% include 'catalogacion/includes/formset_template.html' with formset=titulos_alternativos titulo="Título Alternativo" %}
             </div>
@@ -58,12 +59,13 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">250</span>
                     <h6>Edición</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="ediciones" title="Agregar Edición">
+                        <i class="bi bi-plus"></i>
+                    </button>
                     <span class="campo-help-btn" data-field-code="250" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
                     </span>
                 </div>
-                
-                <p class="form-text">Información sobre la edición de la obra.</p>
                 
                 {% include 'catalogacion/includes/formset_template.html' with formset=ediciones titulo="Edición" %}
             </div>
@@ -73,12 +75,13 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">264</span>
                     <h6>Producción/Publicación</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="produccion" title="Agregar Producción/Publicación">
+                        <i class="bi bi-plus"></i>
+                    </button>
                     <span class="campo-help-btn" data-field-code="264" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
                     </span>
                 </div>
-                
-                <p class="form-text">Información del editor, lugar y fecha de publicación.</p>
                 
                 {% include 'catalogacion/includes/formset_264_template.html' with formset=produccion_publicacion %}
             </div>
