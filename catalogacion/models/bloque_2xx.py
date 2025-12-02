@@ -140,8 +140,8 @@ class ProduccionPublicacion(models.Model):
     funcion = models.CharField(
         max_length=1,
         choices=FUNCIONES,
-        default='1',
-        help_text="264 segundo indicador – Función de la entidad"
+        default='0',
+        help_text="264 segundo indicador – Función de la entidad (predeterminado: Producción para manuscritos)"
     )
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)

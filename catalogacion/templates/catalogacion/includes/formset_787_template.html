@@ -40,7 +40,6 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
                         <div class="col-full">
                             <label class="form-label" for="{{ form.compositor_787.id_for_label }}">
                                 {{ form.compositor_787.label }}
-                                {% if form.compositor_787.field.required %}<span class="text-danger">*</span>{% endif %}
                             </label>
                             {{ form.compositor_787 }}
                             {% if form.compositor_787.errors %}
@@ -55,7 +54,6 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
                         <div class="col-full">
                             <label class="form-label" for="{{ form.titulo.id_for_label }}">
                                 {{ form.titulo.label }}
-                                {% if form.titulo.field.required %}<span class="text-danger">*</span>{% endif %}
                             </label>
                             <div class="autocomplete-wrapper">
                                 {{ form.titulo }}
@@ -119,7 +117,6 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
                         <div class="col-full">
                             <label class="form-label">
                                 {{ formset.empty_form.compositor_787.label }}
-                                {% if formset.empty_form.compositor_787.field.required %}<span class="text-danger">*</span>{% endif %}
                             </label>
                             {{ formset.empty_form.compositor_787 }}
                         </div>
@@ -127,7 +124,6 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
                         <div class="col-full">
                             <label class="form-label">
                                 {{ formset.empty_form.titulo.label }}
-                                {% if formset.empty_form.titulo.field.required %}<span class="text-danger">*</span>{% endif %}
                             </label>
                             <div class="autocomplete-wrapper">
                                 {{ formset.empty_form.titulo }}

@@ -134,9 +134,10 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
             ('4', 'Número de videograbación'),
             ('5', 'Otro número de editor'),
         ],
+        default='2',
         blank=True,
         null=True,
-        help_text="028 Primer indicador — Tipo de número de editor"
+        help_text="028 Primer indicador — Tipo de número de editor (predeterminado: Número de plancha)"
     )
     
     control_nota_028 = models.CharField(
@@ -147,9 +148,10 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
             ('2', 'Nota, no hay punto de acceso adicional'),
             ('3', 'No hay nota, hay punto de acceso adicional'),
         ],
+        default='0',
         blank=True,
         null=True,
-        help_text="028 Segundo indicador — Control de nota/punto de acceso adicional"
+        help_text="028 Segundo indicador — Control de nota (predeterminado: No hay nota ni punto de acceso adicional)"
     )
     
     numero_editor = models.CharField(
@@ -227,9 +229,10 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     medio_interpretacion_130 = models.CharField(
         max_length=200,
         choices=MEDIOS_INTERPRETACION,
+        default='piano',
         blank=True,
         null=True,
-        help_text="130 $m — Medio de interpretación"
+        help_text="130 $m — Medio de interpretación (predeterminado: piano)"
     )
     
     numero_parte_130 = models.CharField(
@@ -241,10 +244,11 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     
     arreglo_130 = models.CharField(
         max_length=10,
-        choices=[("arreglo", "arreglo")],
+        choices=[("arreglo", "Arreglo")],
+        default='arreglo',
         blank=True,
         null=True,
-        help_text="130 $o — Arreglo"
+        help_text="130 $o — Arreglo (predeterminado: Arreglo)"
     )
     
     nombre_parte_130 = models.CharField(
@@ -284,9 +288,10 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     medio_interpretacion_240 = models.CharField(
         max_length=200,
         choices=MEDIOS_INTERPRETACION,
+        default='piano',
         blank=True,
         null=True,
-        help_text="240 $m — Medio de interpretación"
+        help_text="240 $m — Medio de interpretación (predeterminado: piano)"
     )
     
     numero_parte_240 = models.CharField(
@@ -305,10 +310,11 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     
     arreglo_240 = models.CharField(
         max_length=10,
-        choices=[("arreglo", "arreglo")],
+        choices=[("arreglo", "Arreglo")],
+        default='arreglo',
         blank=True,
         null=True,
-        help_text="240 $o — Arreglo"
+        help_text="240 $o — Arreglo (predeterminado: Arreglo)"
     )
     
     tonalidad_240 = models.CharField(

@@ -3,6 +3,7 @@ Template especializado para el campo 382 - Medio de Interpretación.
 Permite repetir el campo completo y también el subcampo $a (medios).
 El botón de agregar campo completo está en el header del campo (campo-add-btn)
 {% endcomment %}
+{% load catalogacion_tags %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
     <div style="display:none;">
@@ -12,6 +13,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
     </div>
     
     <div class="formset-forms">
+        {% get_medios_interpretacion as medios_list %}
         {% for form in formset %}
         <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
             {% for hidden in form.hidden_fields %}
@@ -59,7 +61,8 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                                 <div class="subcampo-placeholder"></div>
                                 {% endif %}
                                 <select class="form-select medio-select" name="medio_interpretacion_382_{{ forloop.parentloop.counter0 }}_{{ medio.pk }}">
-                                    {% for value, label in medio.MEDIOS %}
+                                    <option value="">Seleccione un medio...</option>
+                                    {% for value, label in medios_list %}
                                         <option value="{{ value }}" {% if medio.medio == value %}selected{% endif %}>{{ label }}</option>
                                     {% endfor %}
                                 </select>
@@ -73,10 +76,10 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                                     <i class="bi bi-plus"></i>
                                 </button>
                                 <select class="form-select medio-select" name="medio_interpretacion_382_{{ forloop.counter0 }}_0">
-                                    <option value="piano">Piano</option>
-                                    <option value="dos pianos">Dos pianos</option>
-                                    <option value="piano a cuatro manos">Piano a cuatro manos</option>
-                                    <option value="piano con acompañamiento">Piano con acompañamiento</option>
+                                    <option value="">Seleccione un medio...</option>
+                                    {% for value, label in medios_list %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
                                 </select>
                                 <button type="button" class="subcampo-delete-btn delete-medio-btn" title="Eliminar" style="visibility: hidden;">
                                     <i class="bi bi-x-lg"></i>
@@ -89,10 +92,10 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                                 <i class="bi bi-plus"></i>
                             </button>
                             <select class="form-select medio-select" name="medio_interpretacion_382_{{ forloop.counter0 }}_0">
-                                <option value="piano">Piano</option>
-                                <option value="dos pianos">Dos pianos</option>
-                                <option value="piano a cuatro manos">Piano a cuatro manos</option>
-                                <option value="piano con acompañamiento">Piano con acompañamiento</option>
+                                <option value="">Seleccione un medio...</option>
+                                {% for value, label in medios_list %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
                             </select>
                             <button type="button" class="subcampo-delete-btn delete-medio-btn" title="Eliminar" style="visibility: hidden;">
                                 <i class="bi bi-x-lg"></i>
@@ -129,10 +132,10 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                                 <i class="bi bi-plus"></i>
                             </button>
                             <select class="form-select medio-select" name="medio_interpretacion_382___prefix___0">
-                                <option value="piano">Piano</option>
-                                <option value="dos pianos">Dos pianos</option>
-                                <option value="piano a cuatro manos">Piano a cuatro manos</option>
-                                <option value="piano con acompañamiento">Piano con acompañamiento</option>
+                                <option value="">Seleccione un medio...</option>
+                                {% for value, label in medios_list %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
                             </select>
                             <button type="button" class="subcampo-delete-btn delete-medio-btn" title="Eliminar" style="visibility: hidden;">
                                 <i class="bi bi-x-lg"></i>
@@ -145,14 +148,17 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
     </div>
 </div>
 
+{# Almacenar opciones de medios en un elemento oculto para JavaScript #}
+<div id="medios-options-data" style="display:none;" data-opciones='{% get_medios_interpretacion_json %}'></div>
+
 {# Template global para medios (fuera del formset loop) #}
 <div class="subcampo-row medio-form-row medio-template-382 d-none">
     <div class="subcampo-placeholder"></div>
     <select class="form-select medio-select">
-        <option value="piano">Piano</option>
-        <option value="dos pianos">Dos pianos</option>
-        <option value="piano a cuatro manos">Piano a cuatro manos</option>
-        <option value="piano con acompañamiento">Piano con acompañamiento</option>
+        <option value="">Seleccione un medio...</option>
+        {% for value, label in medios_list %}
+            <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
     </select>
     <button type="button" class="subcampo-delete-btn delete-medio-btn" title="Eliminar">
         <i class="bi bi-x-lg"></i>
@@ -173,6 +179,23 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
         
         const medioTemplate = document.querySelector('.medio-template-382');
         if (!medioTemplate) return;
+        
+        // Obtener las opciones de medios desde el elemento oculto
+        const opcionesData = document.getElementById('medios-options-data');
+        let opcionesMedio = [];
+        if (opcionesData && opcionesData.dataset.opciones) {
+            try {
+                opcionesMedio = JSON.parse(opcionesData.dataset.opciones);
+            } catch(e) {
+                console.error('Error parsing medios options:', e);
+            }
+        }
+        
+        // Construir HTML de opciones
+        let opcionesHTML = '<option value="">Seleccione un medio...</option>';
+        opcionesMedio.forEach(function(item) {
+            opcionesHTML += `<option value="${item.codigo}">${item.nombre}</option>`;
+        });
         
         // Función para actualizar visibilidad de botones de eliminar
         // La primera fila (con .subcampo-add-btn) NUNCA se puede eliminar
@@ -198,15 +221,30 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
             if (addMedioBtn) {
                 const index = addMedioBtn.getAttribute('data-medio-index');
                 const target = container.querySelector(`[data-medios-container="${index}"]`);
-                if (target && medioTemplate) {
-                    const nuevo = medioTemplate.cloneNode(true);
-                    nuevo.classList.remove('medio-template-382', 'd-none');
-                    const select = nuevo.querySelector('.medio-select');
-                    if (select) {
-                        select.name = `medio_interpretacion_382_${index}_${Date.now()}`;
-                    }
+                if (target) {
+                    const nuevo = document.createElement('div');
+                    nuevo.className = 'subcampo-row medio-form-row';
+                    nuevo.innerHTML = `
+                        <div class="subcampo-placeholder"></div>
+                        <select class="form-select medio-select" name="medio_interpretacion_382_${index}_${Date.now()}">
+                            ${opcionesHTML}
+                        </select>
+                        <button type="button" class="subcampo-delete-btn delete-medio-btn" title="Eliminar">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    `;
                     target.appendChild(nuevo);
                     updateDeleteButtonsVisibility(target);
+                    
+                    // Inicializar Select2 en el nuevo select
+                    const select = nuevo.querySelector('.medio-select');
+                    if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
+                        $(select).select2({
+                            theme: 'bootstrap-5',
+                            width: '100%',
+                            placeholder: 'Seleccione un medio...'
+                        });
+                    }
                 }
                 return;
             }

@@ -63,6 +63,12 @@ class ProduccionPublicacionForm(forms.ModelForm):
         labels = {
             'funcion': '264 - Función de la entidad',
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Establecer valor inicial para manuscritos (Producción = 0)
+        if not self.instance.pk and not self.initial.get('funcion'):
+            self.initial['funcion'] = '0'
 
 
 class Lugar264Form(forms.ModelForm):

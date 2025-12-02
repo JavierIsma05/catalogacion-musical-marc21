@@ -232,7 +232,7 @@ class ObraGeneralForm(forms.ModelForm):
         labels = {
             'tipo_registro': 'Tipo de registro',
             'nivel_bibliografico': 'Nivel bibliográfico',
-            'centro_catalogador': '040 $a - Centro catalogador *',
+            'centro_catalogador': '040 $a - Centro catalogador',
             'isbn': '020 $a - ISBN',
             'ismn': '024 $a - ISMN',
             'tipo_numero_028': '028 - Tipo de número',
@@ -255,14 +255,14 @@ class ObraGeneralForm(forms.ModelForm):
             'nombre_parte_240': '240 $p - Nombre de parte',
             'arreglo_240': '240 $o - Arreglo',
             'tonalidad_240': '240 $r - Tonalidad',
-            'titulo_principal': '245 $a - Título principal *',
+            'titulo_principal': '245 $a - Título principal',
             'subtitulo': '245 $b - Subtítulo',
             'mencion_responsabilidad': '245 $c - Nombres en fuente',
             'extension': '300 $a - Extensión',
             'otras_caracteristicas': '300 $b - Otras características físicas',
             'dimension': '300 $c - Dimensiones',
             'material_acompanante': '300 $e - Material acompañante',
-            'ms_imp': '340 $d - Técnica (Manuscrito/Impreso) *',
+            'ms_imp': '340 $d - Técnica (Manuscrito/Impreso)',
             'formato': '348 $a - Formato',
             'numero_obra': '383 $a - Número serial de obra',
             'opus': '383 $b - Número de opus',
@@ -287,6 +287,26 @@ class ObraGeneralForm(forms.ModelForm):
         self.fields['titulo_principal'].required = True
         self.fields['centro_catalogador'].required = True
         self.fields['ms_imp'].required = True
+        
+        # Establecer valores iniciales solo cuando es una instancia nueva (creación)
+        if not self.instance.pk:
+            # 028 - Número de editor
+            if not self.initial.get('tipo_numero_028'):
+                self.initial['tipo_numero_028'] = '2'  # Número de plancha
+            if not self.initial.get('control_nota_028'):
+                self.initial['control_nota_028'] = '0'  # No hay nota ni punto de acceso
+            
+            # 130 - Título uniforme (medio y arreglo)
+            if not self.initial.get('medio_interpretacion_130'):
+                self.initial['medio_interpretacion_130'] = 'piano'
+            if not self.initial.get('arreglo_130'):
+                self.initial['arreglo_130'] = 'arreglo'
+            
+            # 240 - Título uniforme (medio y arreglo)
+            if not self.initial.get('medio_interpretacion_240'):
+                self.initial['medio_interpretacion_240'] = 'piano'
+            if not self.initial.get('arreglo_240'):
+                self.initial['arreglo_240'] = 'arreglo'
     
     def clean(self):
         """Validación personalizada y creación automática de autoridades"""
