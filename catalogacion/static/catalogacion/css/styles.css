@@ -4,7 +4,7 @@
     --primary-light: #2d2d2d;
     --accent: #4a5568;
     --accent-light: #718096;
-    
+
     /* Grises sutiles */
     --gray-50: #fafafa;
     --gray-100: #f5f5f5;
@@ -15,7 +15,7 @@
     --gray-600: #757575;
     --gray-700: #616161;
     --gray-800: #424242;
-    
+
     /* Estados sutiles */
     --success: #4caf50;
     --success-light: #e8f5e9;
@@ -25,23 +25,23 @@
     --danger-light: #ffebee;
     --info: #2196f3;
     --info-light: #e3f2fd;
-    
+
     /* Textos */
     --text-primary: #212121;
     --text-secondary: #757575;
     --text-light: #9e9e9e;
-    
+
     /* Líneas y bordes */
     --border-color: #e0e0e0;
     --border-focus: #4a5568;
-    
+
     /* Espaciados reducidos */
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 0.75rem;
     --spacing-lg: 1rem;
     --spacing-xl: 1.5rem;
-    
+
     /* Transiciones */
     --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -539,6 +539,19 @@ textarea.form-control {
     border-radius: 3px;
 }
 
+/* Badge REPETIBLE en campos MARC */
+.badge-repetible {
+    font-size: 0.5625rem;
+    font-weight: 600;
+    padding: 0.2rem 0.4rem;
+    background: var(--info-light);
+    color: var(--info);
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-left: 0.5rem;
+}
+
 /* ============================================
    ALERTAS Y MENSAJES
    ============================================ */
@@ -719,13 +732,13 @@ textarea.form-control {
 }
 
 @keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(10px); 
+    from {
+        opacity: 0;
+        transform: translateY(10px);
     }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -771,14 +784,14 @@ textarea.form-control {
     .page-container-sidebar {
         flex-direction: column;
     }
-    
+
     .sidebar-navigation {
         position: static;
         width: 100%;
         max-height: none;
         margin-bottom: 1.5rem;
     }
-    
+
     .col-half { grid-column: span 12; }
     .col-third { grid-column: span 12; }
     .col-two-thirds { grid-column: span 12; }
@@ -790,11 +803,11 @@ textarea.form-control {
     body {
         font-size: 12px;
     }
-    
+
     .card-body {
         padding: 1rem 0.75rem;
     }
-    
+
     .tab-button {
         padding: 0.5rem 0.75rem;
         font-size: 0.75rem;
@@ -822,62 +835,266 @@ textarea.form-control {
 }
 
 /* ============================================
-   AUTOCOMPLETE DROPDOWNS
+   Botones del incipit (toolbar + cabecera)
+   ============================================ */
+.btn-incipit {
+  background: var(--gray-50);
+  color: black;
+  border: 1px solid var(--gray-800);
+  padding: .5rem .9rem;
+  font-weight: 600;
+  transition: filter .15s ease, transform .02s ease;
+}
+
+
+.btn-incipit:hover {
+  filter: brightness(0.92);
+
+  background-color: var(--gray-800);
+  color: rgb(255, 255, 255);
+}
+
+
+/* Accesibilidad: SOLO cuando se navega con teclado mostramos un ring sutil */
+.btn-incipit:focus-visible {
+  outline: 2px solid var(--gray-400);
+  outline-offset: 2px;
+}
+
+/* Estado activo corto (click) */
+.btn-incipit:active {
+  transform: translateY(1px);
+}
+
+/* Mantener la fuente para glifos musicales */
+.btn-music span {
+  font-family: 'Maestro','Bravura','Music', serif;
+}
+
+/* ----normalizar tamaño de los botones del toolbar ---- */
+
+.btn-music {
+  font-size: 14px;
+  min-width: 20px;
+  padding: 0px 10px;
+  text-align: left
+}
+
+.btn-music-gliphos {
+  font-size: 23px;   /* glifos musicales*/
+  max-height: 40px;
+}
+
+/* fuerza Maestro en los botones del toolbar */
+.btn-music span {
+  font-family: 'Maestro','Bravura','Music', serif;
+}
+
+/* ============================================
+   AUTOCOMPLETE DROPDOWNS - AUTORIDADES
    ============================================ */
 .autocomplete-wrapper {
     position: relative;
 }
 
+/* Input con icono de búsqueda */
+.autocomplete-wrapper .form-control {
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%239e9e9e' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 14px;
+}
+
+.autocomplete-wrapper .form-control:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%234a5568' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+}
+
+/* Lista de sugerencias */
 .autocomplete-suggestions {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 4px);
     left: 0;
     width: 100%;
     border: 1px solid var(--border-color);
-    border-top: none;
     background: white;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
-    z-index: 25;
-    max-height: 240px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 1050;
+    max-height: 280px;
     overflow-y: auto;
     display: none;
+    border-radius: 6px;
+    padding: 0.25rem 0;
 }
 
 .autocomplete-suggestions.is-visible,
 .autocomplete-suggestions.show {
     display: block;
+    animation: dropdownFadeIn 0.15s ease-out;
 }
 
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scrollbar personalizada para el dropdown */
+.autocomplete-suggestions::-webkit-scrollbar {
+    width: 6px;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar-track {
+    background: var(--gray-50);
+    border-radius: 0 6px 6px 0;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 3px;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+}
+
+/* Items de sugerencia */
 .autocomplete-item {
-    padding: 0.5rem 0.75rem;
+    padding: 0.4rem 0.875rem;
     cursor: pointer;
-    font-size: 0.8rem;
-    border-bottom: 1px solid var(--gray-100);
+    font-size: 0.8125rem;
+    color: var(--text-primary);
     background: white;
-    transition: var(--transition);
-}
-
-.autocomplete-item:last-child {
-    border-bottom: none;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-left: 3px solid transparent;
+    margin: 0 0.25rem;
+    border-radius: 4px;
 }
 
 .autocomplete-item:hover,
 .autocomplete-item.selected {
     background: var(--gray-100);
+    border-left-color: var(--accent);
 }
 
+.autocomplete-item:active {
+    background: var(--gray-200);
+}
+
+/* Icono para items existentes */
+.autocomplete-item::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--gray-400);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.autocomplete-item:hover::before,
+.autocomplete-item.selected::before {
+    background: var(--accent);
+}
+
+/* Item para crear nuevo registro */
 .autocomplete-item-new {
     color: var(--accent);
     font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    margin-top: 0.125rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-radius: 0 0 4px 4px;
 }
 
 .autocomplete-item-new::before {
     content: '+';
+    width: auto;
+    height: auto;
+    background: none;
+    font-size: 0.9375rem;
     font-weight: 700;
+    color: var(--accent);
+    border-radius: 0;
 }
+
+.autocomplete-item-new:hover {
+    background: var(--accent);
+    color: white;
+    border-left-color: var(--accent);
+}
+
+.autocomplete-item-new:hover::before {
+    color: white;
+}
+
+/* Estado de carga */
+.autocomplete-loading {
+    padding: 1rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+}
+
+.autocomplete-loading::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--gray-300);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Sin resultados */
+.autocomplete-no-results {
+    padding: 1rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    font-style: italic;
+}
+
+/* Header de sección en dropdown (si aplica) */
+.autocomplete-header {
+    padding: 0.5rem 1rem 0.375rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+/* Texto secundario en items (ej: fechas, tipo) */
+.autocomplete-item-meta {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.autocomplete-item:hover .autocomplete-item-meta {
+    color: var(--text-primary);
+}
+
 
 /* ============================================
    BOTÓN DE AYUDA DE CAMPO
@@ -1062,4 +1279,56 @@ textarea.form-control {
     color: white;
     background: var(--danger);
     border-color: var(--danger);
+}
+
+/* ============================================
+   SELECT2 - ESTILOS PARA SUBCAMPOS DINÁMICOS
+   ============================================ */
+/* Asegurar que Select2 se vea bien en subcampos */
+.subcampo-row .select2-container {
+    flex: 1;
+    min-width: 0;
+}
+
+.subcampo-row .select2-container--bootstrap-5 .select2-selection {
+    min-height: 32px;
+    height: 32px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8125rem;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    background-color: white;
+}
+
+.subcampo-row .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    line-height: 1.4;
+    padding-left: 0;
+    color: var(--text-primary);
+}
+
+.subcampo-row .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    height: 30px;
+}
+
+/* Estilo para selects nativos (fallback si Select2 no carga) */
+.subcampo-row select.form-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 10px;
+    padding-right: 2rem;
+    cursor: pointer;
+}
+
+.subcampo-row select.form-select:hover {
+    border-color: var(--gray-400);
+}
+
+.subcampo-row select.form-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(74, 85, 104, 0.1);
+    outline: none;
 }
