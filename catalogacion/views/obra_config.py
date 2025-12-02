@@ -372,21 +372,6 @@ FORMSETS_CONFIG = {
 
 # Formsets que requieren procesamiento especial de subcampos
 FORMSETS_CON_SUBCAMPOS = {
-    # Campo 773 - Entrada del documento fuente
-    'enlace_documento_fuente_773_formset': {
-        'subcampos': ['numero'],
-        'handler': '_save_numeros_obra_773',
-    },
-    # Campo 774 - Entrada de la unidad constituyente
-    'enlace_unidad_constituyente_774_formset': {
-        'subcampos': ['numero'],
-        'handler': '_save_numeros_obra_774',
-    },
-    # Campo 787 - Otras relaciones
-    'otras_relaciones_787_formset': {
-        'subcampos': ['numero'],
-        'handler': '_save_numeros_obra_787',
-    },
     # Campo 852 - Ubicación
     'ubicacion_852_formset': {
         'subcampos': ['estanteria'],
@@ -415,12 +400,6 @@ FORMSETS_CON_SUBCAMPOS = {
         'subcampos': ['titulo', 'volumen'],
         'handler_titulo': '_save_titulos_490',
         'handler_volumen': '_save_volumenes_490',
-    },
-    # Campo 545 - Datos biográficos o históricos
-    'datos_biograficos_545_formset': {
-        'subcampos': ['texto_biografico', 'uri'],
-        'handler_texto': '_save_textos_biograficos_545',
-        'handler_uri': '_save_uris_545',
     },
     # Campo 650 - Encabezamiento de materia
     'materia_650_formset': {

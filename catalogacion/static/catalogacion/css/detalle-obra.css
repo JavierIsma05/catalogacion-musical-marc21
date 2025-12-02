@@ -1,30 +1,31 @@
 /**
- * Estilos para la página de detalle de obra
- * Diseño minimalista y elegante
+ * Estilos mejorados para detalle de obra
+ * Diseño profesional siguiendo especificaciones del documento
  */
 
 /* ============================================
    CONTENEDOR PRINCIPAL
    ============================================ */
 .detalle-container {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
     background: var(--gray-50);
 }
 
 /* ============================================
-   HEADER DE DETALLE
+   HEADER COMPACTO Y ELEGANTE
    ============================================ */
 .detalle-header {
     background: white;
     border-bottom: 1px solid var(--border-color);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    margin-bottom: 1.5rem;
 }
 
 .header-content {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
-    padding: 1.5rem 2rem;
+    padding: 1.25rem 2rem;
 }
 
 .header-breadcrumb {
@@ -48,7 +49,6 @@
 
 .header-breadcrumb .separator {
     color: var(--text-light);
-    font-size: 1rem;
 }
 
 .header-breadcrumb .current {
@@ -67,66 +67,131 @@
     flex: 1;
 }
 
+/* Signatura Badge */
 .signatura-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.375rem 0.875rem;
-    background: var(--gray-100);
-    border: 1px solid var(--border-color);
+    background: var(--gray-800);
+    color: white;
     border-radius: 3px;
     font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 1rem;
+    margin-bottom: 0.875rem;
     font-family: 'Courier New', monospace;
 }
 
 .signatura-badge i {
-    font-size: 1rem;
-    color: var(--accent);
+    font-size: 0.875rem;
 }
 
-.obra-titulo {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0 0 0.5rem 0;
-    line-height: 1.3;
+/* Metadata compacta */
+.obra-metadata {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    margin-bottom: 0.875rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.obra-subtitulo {
-    font-size: 1.25rem;
-    font-weight: 400;
-    color: var(--text-secondary);
-    margin: 0 0 1rem 0;
+.metadata-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
     line-height: 1.4;
 }
 
-.compositor-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
+.metadata-label {
+    font-weight: 600;
     color: var(--text-secondary);
+    white-space: nowrap;
 }
 
-.compositor-nombre {
-    font-weight: 500;
+.metadata-value {
     color: var(--text-primary);
 }
 
-.compositor-fechas {
+.metadata-item.compositor .metadata-value {
+    font-weight: 500;
+    color: var(--gray-800);
+}
+
+.metadata-value .fechas {
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+/* Títulos jerárquicos */
+.obra-titulo {
+    font-size: 1.625rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+    margin: 0 0 0.25rem 0;
+}
+
+.obra-titulo.titulo-130,
+.obra-titulo.titulo-240 {
+    margin-bottom: 0.25rem;
+}
+
+.titulo-referencia {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-family: 'Courier New', monospace;
+    margin-bottom: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.obra-titulo-fuente {
+    font-size: 1.375rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    line-height: 1.3;
+    margin: 0 0 0.25rem 0;
+}
+
+.mencion-responsabilidad {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    margin: 0.625rem 0;
+    font-style: italic;
+}
+
+.tipo-material-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.625rem;
+    font-size: 0.8125rem;
+}
+
+.tipo-material-badge .badge-label {
+    font-weight: 600;
     color: var(--text-secondary);
 }
 
+.tipo-material-badge .badge-value {
+    padding: 0.25rem 0.625rem;
+    background: var(--accent);
+    color: white;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+/* Acciones del header */
 .header-actions {
     display: flex;
     gap: 0.625rem;
     flex-shrink: 0;
 }
 
-.btn-outline {
+.btn-action {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -142,14 +207,10 @@
     text-decoration: none;
 }
 
-.btn-outline:hover {
+.btn-action:hover {
     background: var(--gray-800);
     color: white;
     border-color: var(--gray-800);
-}
-
-.btn-outline i {
-    font-size: 0.9375rem;
 }
 
 /* ============================================
@@ -158,9 +219,9 @@
 .detalle-body {
     display: flex;
     gap: 2rem;
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 0 2rem 2rem;
 }
 
 /* ============================================
@@ -180,29 +241,33 @@
     background: white;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    padding: 1rem;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
 }
 
-.nav-title {
+.nav-header {
+    padding: 0.875rem 1rem;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-header h6 {
     font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text-secondary);
-    margin: 0 0 0.75rem 0;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border-color);
+    margin: 0;
 }
 
 .nav-list {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 0.5rem;
 }
 
 .nav-list li {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.125rem;
 }
 
 .nav-link {
@@ -222,7 +287,6 @@
 .nav-link:hover {
     background: var(--gray-100);
     color: var(--text-primary);
-    border-left-color: var(--gray-300);
 }
 
 .nav-link.active {
@@ -258,19 +322,19 @@
     border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-    scroll-margin-top: 1.5rem;
+    scroll-margin-top: 80px;
 }
 
 .section-header {
     margin-bottom: 1.25rem;
-    padding-bottom: 0.75rem;
+    padding-bottom: 0.875rem;
     border-bottom: 1px solid var(--border-color);
 }
 
 .section-title {
-    font-size: 1.125rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
@@ -279,84 +343,277 @@
     gap: 0.5rem;
 }
 
+.section-title i {
+    color: var(--accent);
+    font-size: 1rem;
+}
+
 .subsection-title {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     margin: 1.5rem 0 0.875rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
 /* ============================================
-   GRILLA DE DATOS
+   CAMPO TAG - Etiqueta MARC
    ============================================ */
-.data-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
-}
-
-.data-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-}
-
-.data-item.full-width {
-    grid-column: span 2;
-}
-
-.data-label {
+.campo-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 20px;
+    padding: 0 0.375rem;
+    background: var(--gray-800);
+    color: white;
+    font-family: 'Courier New', monospace;
     font-size: 0.6875rem;
-    font-weight: 600;
-    text-transform: uppercase;
+    font-weight: 700;
+    border-radius: 3px;
     letter-spacing: 0.03em;
-    color: var(--text-secondary);
+    flex-shrink: 0;
 }
 
-.data-value {
-    font-size: 0.9375rem;
-    color: var(--text-primary);
-    line-height: 1.5;
-}
-
+/* ============================================
+   DATA LISTS - Listas de información
+   ============================================ */
 .data-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
 }
 
-.data-value-item {
-    font-size: 0.9375rem;
-    color: var(--text-primary);
-    padding: 0.5rem 0.75rem;
+.data-item-alt {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
     background: var(--gray-50);
     border-left: 2px solid var(--gray-300);
     border-radius: 3px;
 }
 
-.data-subitem {
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    margin-top: 0.25rem;
-}
-
-.font-mono {
-    font-family: 'Courier New', monospace;
+.data-content {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.375rem;
     font-size: 0.875rem;
 }
 
-.badge-tipo {
-    display: inline-block;
-    padding: 0.25rem 0.625rem;
-    background: var(--gray-800);
-    color: white;
+.indicador-tipo {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.valor-principal {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.valor-secundario {
+    color: var(--text-secondary);
+}
+
+/* ============================================
+   COLABORADORES
+   ============================================ */
+.colaboradores-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.colaborador-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.875rem;
+    background: var(--gray-50);
+    border-left: 3px solid var(--accent);
     border-radius: 3px;
+    transition: var(--transition);
+}
+
+.colaborador-item.entidad {
+    border-left-color: var(--info);
+}
+
+.colaborador-item:hover {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.colaborador-info {
+    flex: 1;
+}
+
+.colaborador-nombre {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.colaborador-fechas {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.375rem;
+}
+
+.colaborador-detalles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
     font-size: 0.75rem;
+}
+
+.detalle-item {
+    color: var(--text-secondary);
+}
+
+.detalle-item.autoria {
+    color: var(--accent);
+    font-weight: 500;
+}
+
+/* ============================================
+   DATA GRID COMPACTO
+   ============================================ */
+.data-grid-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.data-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 0.875rem;
+}
+
+.data-row:last-child {
+    border-bottom: none;
+}
+
+.data-row.full {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.data-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 140px;
+}
+
+.data-value {
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.data-value.codigo {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8125rem;
+}
+
+.data-value-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+}
+
+.medio-item {
+    color: var(--text-primary);
+}
+
+/* ============================================
+   DESCRIPCIÓN FÍSICA
+   ============================================ */
+.data-row-fisica {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.875rem;
+    background: var(--gray-50);
+    border-radius: 3px;
+}
+
+.descripcion-fisica {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.fisica-parte {
+    color: var(--text-primary);
+}
+
+.fisica-separador {
+    color: var(--text-secondary);
     font-weight: 600;
 }
 
 /* ============================================
-   ÍNCIPIT
+   MATERIAS Y GÉNEROS
+   ============================================ */
+.materias-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.materia-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.875rem;
+    border-radius: 3px;
+    transition: var(--transition);
+}
+
+.materia-tag.tag-650 {
+    background: var(--success-light);
+    border: 1px solid var(--success);
+}
+
+.materia-tag.tag-655 {
+    background: var(--info-light);
+    border: 1px solid var(--info);
+}
+
+.materia-tag:hover {
+    transform: translateX(3px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.materia-texto {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.series-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* ============================================
+   ÍNCIPIT MUSICAL
    ============================================ */
 .incipit-section {
     margin-top: 1.5rem;
@@ -367,7 +624,7 @@
     border: 1px solid var(--border-color);
     border-radius: 3px;
     padding: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.875rem;
 }
 
 .incipit-card:last-child {
@@ -376,7 +633,7 @@
 
 .incipit-header {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 0.75rem;
     margin-bottom: 0.75rem;
     padding-bottom: 0.625rem;
@@ -384,152 +641,42 @@
 }
 
 .incipit-id {
-    font-family: 'Courier New', monospace;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 0.25rem 0.5rem;
-    background: var(--gray-800);
-    color: white;
-    border-radius: 3px;
-}
-
-.incipit-label {
     font-size: 0.875rem;
+    color: var(--text-primary);
     font-weight: 500;
+    flex: 1;
+}
+
+.incipit-datos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.375rem;
+    margin-bottom: 0.625rem;
+    font-size: 0.875rem;
+}
+
+.incipit-dato {
     color: var(--text-primary);
 }
 
-.incipit-data {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.incipit-item {
-    display: flex;
-    gap: 0.5rem;
-    font-size: 0.8125rem;
-}
-
-.incipit-key {
-    font-weight: 600;
+.incipit-separador {
     color: var(--text-secondary);
+    font-weight: 600;
 }
 
-.incipit-value {
-    color: var(--text-primary);
-}
-
-.incipit-notation {
-    margin-top: 0.5rem;
+.incipit-codigo {
     padding: 0.75rem;
     background: white;
     border: 1px solid var(--border-color);
     border-radius: 3px;
 }
 
-.incipit-notation code {
+.incipit-codigo code {
     font-family: 'Courier New', monospace;
     font-size: 0.8125rem;
     color: var(--text-primary);
     word-wrap: break-word;
-}
-
-/* ============================================
-   TAGS
-   ============================================ */
-.tags-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.625rem;
-}
-
-.tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.75rem;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    border-radius: 3px;
-    transition: var(--transition);
-}
-
-.tag i {
-    font-size: 0.75rem;
-}
-
-.tag-genero {
-    background: var(--info-light);
-    color: var(--info);
-    border: 1px solid var(--info);
-}
-
-.tag-materia {
-    background: var(--success-light);
-    color: var(--success);
-    border: 1px solid var(--success);
-}
-
-.tag:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* ============================================
-   NOMBRES RELACIONADOS
-   ============================================ */
-.relacionados-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
-}
-
-.relacionado-card {
-    padding: 1rem;
-    background: var(--gray-50);
-    border: 1px solid var(--border-color);
-    border-left: 3px solid var(--accent);
-    border-radius: 3px;
-    transition: var(--transition);
-}
-
-.relacionado-card.entidad {
-    border-left-color: var(--info);
-}
-
-.relacionado-card:hover {
-    background: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-}
-
-.relacionado-nombre {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.375rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.relacionado-fechas {
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.25rem;
-}
-
-.relacionado-rol {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    font-style: italic;
-    margin-bottom: 0.25rem;
-}
-
-.relacionado-atributo {
-    font-size: 0.75rem;
-    color: var(--accent);
-    font-weight: 500;
 }
 
 /* ============================================
@@ -543,6 +690,7 @@
 
 .nota-item {
     display: flex;
+    align-items: flex-start;
     gap: 0.75rem;
     padding: 0.875rem;
     background: var(--gray-50);
@@ -550,49 +698,22 @@
     border-radius: 3px;
 }
 
-.nota-item i {
-    font-size: 1rem;
-    color: var(--accent);
-    margin-top: 0.125rem;
-    flex-shrink: 0;
-}
-
-.nota-item p {
+.nota-texto {
     margin: 0;
     font-size: 0.875rem;
     color: var(--text-primary);
     line-height: 1.6;
 }
 
-.nota-especial {
-    margin-top: 1.25rem;
-    padding: 1rem;
-    background: var(--gray-50);
-    border: 1px solid var(--border-color);
-    border-radius: 3px;
-}
-
-.nota-titulo {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: var(--text-secondary);
-    margin: 0 0 0.625rem 0;
-}
-
-.nota-especial p {
-    margin: 0;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-    line-height: 1.6;
+.nota-content {
+    flex: 1;
 }
 
 .nota-link {
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    margin-top: 0.75rem;
+    margin-top: 0.625rem;
     font-size: 0.8125rem;
     font-weight: 500;
     color: var(--accent);
@@ -605,122 +726,137 @@
 }
 
 /* ============================================
-   UBICACIÓN
+   RELACIONES
    ============================================ */
-.ubicacion-card {
-    display: flex;
-    gap: 1rem;
-    padding: 1.25rem;
-    background: var(--gray-50);
-    border: 1px solid var(--border-color);
-    border-radius: 3px;
-}
-
-.ubicacion-icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--accent);
-    color: white;
-    border-radius: 3px;
-    flex-shrink: 0;
-}
-
-.ubicacion-icon i {
-    font-size: 1.5rem;
-}
-
-.ubicacion-info {
-    flex: 1;
+.relaciones-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-}
-
-.ubicacion-item {
-    display: flex;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-}
-
-.ubicacion-label {
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.ubicacion-value {
-    color: var(--text-primary);
-}
-
-.acceso-online {
-    margin-top: 1.5rem;
-}
-
-.acceso-link {
-    display: inline-flex;
-    align-items: center;
     gap: 0.625rem;
-    padding: 0.875rem 1.25rem;
-    background: var(--accent);
-    color: white;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    text-decoration: none;
-    border-radius: 3px;
-    transition: var(--transition);
-}
-
-.acceso-link:hover {
-    background: var(--gray-800);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.acceso-link i:first-child {
-    font-size: 1.125rem;
-}
-
-.acceso-link i:last-child {
-    font-size: 0.875rem;
-}
-
-.relaciones-obras {
-    margin-top: 1.5rem;
 }
 
 .relacion-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.75rem;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem;
     background: var(--gray-50);
-    border: 1px solid var(--border-color);
+    border-left: 2px solid var(--accent);
     border-radius: 3px;
-    margin-bottom: 0.625rem;
+}
+
+.relacion-content {
+    flex: 1;
     font-size: 0.875rem;
+}
+
+.relacion-tipo {
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-right: 0.375rem;
+}
+
+.relacion-titulo {
     color: var(--text-primary);
-    transition: var(--transition);
-}
-
-.relacion-item:hover {
-    background: white;
-    border-color: var(--accent);
-}
-
-.relacion-item i {
-    font-size: 1rem;
-    color: var(--accent);
 }
 
 /* ============================================
-   MENSAJES VACÍOS
+   UBICACIÓN Y ACCESO
    ============================================ */
-.empty-message {
-    padding: 2rem;
+.ubicaciones-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.ubicacion-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.875rem;
+    background: var(--gray-50);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+}
+
+.ubicacion-datos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.ubicacion-parte {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.ubicacion-separador {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.acceso-section {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.acceso-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--gray-50);
+    border-radius: 3px;
+    margin-bottom: 0.625rem;
+}
+
+.acceso-link {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.acceso-link:hover {
+    color: var(--gray-800);
+}
+
+.acceso-link i {
+    font-size: 0.875rem;
+}
+
+.acceso-texto {
+    flex: 1;
+}
+
+/* ============================================
+   ESTADO VACÍO
+   ============================================ */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
     text-align: center;
     color: var(--text-secondary);
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+    color: var(--gray-300);
+    margin-bottom: 0.875rem;
+}
+
+.empty-state p {
+    margin: 0;
     font-size: 0.875rem;
     font-style: italic;
 }
@@ -731,7 +867,7 @@
 @media (max-width: 992px) {
     .detalle-body {
         flex-direction: column;
-        padding: 1.5rem;
+        padding: 0 1.5rem 1.5rem;
     }
     
     .detalle-sidebar {
@@ -744,80 +880,40 @@
     
     .header-main {
         flex-direction: column;
-        align-items: flex-start;
     }
     
     .header-actions {
         width: 100%;
-        justify-content: flex-start;
-    }
-    
-    .data-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .data-item.full-width {
-        grid-column: span 1;
-    }
-    
-    .relacionados-grid {
-        grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 768px) {
-    .header-content {
-        padding: 1rem;
-    }
-    
+    .header-content,
     .detalle-body {
-        padding: 1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
     
     .obra-titulo {
         font-size: 1.375rem;
     }
     
-    .obra-subtitulo {
-        font-size: 1.0625rem;
-    }
-    
-    .header-actions {
-        flex-wrap: wrap;
-    }
-    
-    .btn-outline {
-        font-size: 0.75rem;
-        padding: 0.375rem 0.75rem;
+    .obra-titulo-fuente {
+        font-size: 1.125rem;
     }
     
     .detalle-section {
         padding: 1rem;
     }
-}
-
-/* ============================================
-   IMPRESIÓN
-   ============================================ */
-@media print {
-    .detalle-sidebar,
-    .header-actions,
-    .header-breadcrumb {
-        display: none !important;
+    
+    .data-label {
+        min-width: 100px;
+        font-size: 0.75rem;
     }
     
-    .detalle-body {
-        display: block;
-    }
-    
-    .detalle-section {
-        page-break-inside: avoid;
-        box-shadow: none;
-        border: 1px solid #ddd;
-    }
-    
-    .section-title {
-        page-break-after: avoid;
+    .data-row {
+        flex-direction: column;
+        gap: 0.375rem;
     }
 }
 
@@ -841,6 +937,23 @@
     background: var(--gray-400);
 }
 
-.mt-3 {
-    margin-top: 1rem;
+/* ============================================
+   IMPRESIÓN
+   ============================================ */
+@media print {
+    .detalle-sidebar,
+    .header-actions,
+    .header-breadcrumb {
+        display: none !important;
+    }
+    
+    .detalle-body {
+        display: block;
+    }
+    
+    .detalle-section {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
 }

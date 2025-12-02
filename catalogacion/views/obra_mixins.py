@@ -159,19 +159,26 @@ class ObraFormsetMixin:
         logger.info("🔍 Iniciando validación de formsets...")
         formsets_validos = True
         formsets = {}
-        
+
+        formsets_visibles = context.get('formsets_visibles') or self._get_formset_names()
+
         # Formsets opcionales que NO deben validarse si no tienen datos POST
         formsets_opcionales = {
             'incipits_musicales': 'incipits-TOTAL_FORMS',
             'menciones_serie_490': 'menciones_490-TOTAL_FORMS',
+            'contenidos': 'contenidos_505-TOTAL_FORMS',
             'enlaces_documento_fuente_773': 'enlaces_773-TOTAL_FORMS',
-            'enlaces_unidad_constituyente_774': 'enlaces_774-TOTAL_FORMS',   # ← AGREGA ESTO
+            'enlaces_unidad_constituyente_774': 'enlaces_774-TOTAL_FORMS',
             'otras_relaciones_787': 'relaciones_787-TOTAL_FORMS',
         }
-        
+
         for key in self._get_formset_names():
             formset = context.get(key)
             
+            if key not in formsets_visibles:
+                logger.debug(f"  ⏭️  {key}: SALTADO (no está habilitado para este tipo de obra)")
+                continue
+
             # Si es formset opcional y NO tiene ManagementForm en POST, saltarlo
             if key in formsets_opcionales:
                 mgmt_field = formsets_opcionales[key]
@@ -208,19 +215,40 @@ class ObraFormsetMixin:
             'produccion_publicacion': ['_save_lugares_264', '_save_entidades_264', '_save_fechas_264'],
             'medios_interpretacion': ['_save_medios_382'],
             'menciones_serie_490': ['_save_titulos_490', '_save_volumenes_490'],
-            'enlaces_documento_fuente_773': ['_save_numeros_obra_773'],
-            'enlaces_unidad_constituyente_774': ['_save_numeros_obra_774'],
-            'otras_relaciones_787': ['_save_numeros_obra_787'],
             'ubicaciones_852': ['_save_estanterias_852'],
             'disponibles_856': ['_save_urls_856', '_save_textos_enlace_856'],
-            'datos_biograficos': ['_save_textos_biograficos_545', '_save_uris_545'],
             'materias_650': ['_save_subdivisiones_650'],
             'materias_genero_655': ['_save_subdivisiones_655'],
         }
         
         for key, formset in formsets.items():
-            formset.instance = instance
-            formset.save()
+            for form in formset:
+                if form.cleaned_data and not form.cleaned_data.get("DELETE", False):
+                    obj = form.save(commit=False)
+                    # 🔥 Asignar FK a la obra si existe ese campo
+                    if hasattr(obj, 'obra_general'):
+                        obj.obra_general = instance
+                    
+                    obj.save()
+                    logger.info(f"📝 Guardado formset {key}: {obj.pk}")
+
+
+            if key == 'incipits_musicales':
+                incipits_guardados = list(instance.incipits_musicales.all())
+                logger.info(
+                    "🎼 Campo 031: %s íncipit(s) guardado(s) para la obra %s",
+                    len(incipits_guardados),
+                    instance.pk,
+                )
+                for incipit in incipits_guardados:
+                    logger.debug(
+                        "   · Íncipit ID=%s | %s | Clave=%s | Armadura=%s | Tiempo=%s",
+                        incipit.id,
+                        incipit.identificador_completo,
+                        incipit.clave or '-',
+                        incipit.armadura or '-',
+                        incipit.tiempo or '-',
+                    )
             
             # Procesar subcampos dinámicos si el formset los tiene
             if key in formset_subcampo_mapping:

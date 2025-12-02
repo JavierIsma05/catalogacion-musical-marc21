@@ -196,8 +196,13 @@ class EnlaceDocumentoFuente773(models.Model):
         help_text="773 $a – Encabezamiento principal (NR)"
     )
 
-    titulo = models.CharField(
-        max_length=250,
+    # titulo = models.CharField(
+    #     max_length=250,
+    #     help_text="773 $t – Título (NR)"
+    # )
+    titulo = models.ForeignKey(
+        'AutoridadTituloUniforme',
+        on_delete=models.PROTECT,
         help_text="773 $t – Título (NR)"
     )
 
@@ -261,8 +266,9 @@ class EnlaceUnidadConstituyente774(models.Model):
         help_text="774 $a – Encabezamiento principal (NR)"
     )
 
-    titulo = models.CharField(
-        max_length=250,
+    titulo = models.ForeignKey(
+        'AutoridadTituloUniforme',
+        on_delete=models.PROTECT,
         help_text="774 $t – Título (NR)"
     )
 

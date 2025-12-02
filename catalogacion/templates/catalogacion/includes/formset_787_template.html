@@ -57,7 +57,10 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
                                 {{ form.titulo.label }}
                                 {% if form.titulo.field.required %}<span class="text-danger">*</span>{% endif %}
                             </label>
-                            {{ form.titulo }}
+                            <div class="autocomplete-wrapper">
+                                {{ form.titulo }}
+                                <div class="autocomplete-suggestions"></div>
+                            </div>
                             {% if form.titulo.errors %}
                                 <div class="invalid-feedback d-block">{{ form.titulo.errors }}</div>
                             {% endif %}
@@ -126,7 +129,10 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
                                 {{ formset.empty_form.titulo.label }}
                                 {% if formset.empty_form.titulo.field.required %}<span class="text-danger">*</span>{% endif %}
                             </label>
-                            {{ formset.empty_form.titulo }}
+                            <div class="autocomplete-wrapper">
+                                {{ formset.empty_form.titulo }}
+                                <div class="autocomplete-suggestions"></div>
+                            </div>
                         </div>
                         
                         <div class="col-full">

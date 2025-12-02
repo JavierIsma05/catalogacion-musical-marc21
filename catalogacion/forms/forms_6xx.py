@@ -12,29 +12,54 @@ from .widgets import Select2Widget
 
 
 class Materia650Form(forms.ModelForm):
-    """Formulario para campo 650 – Materia (Tema)"""
 
-    materia = forms.ModelChoiceField(
+    materia_texto = forms.CharField(
         label="650 $a – Encabezamiento de materia",
-        queryset=AutoridadMateria.objects.all().order_by("termino"),
-        widget=Select2Widget(attrs={
-            "class": "materia-autocomplete",
-            "data-url": "/catalogacion/api/autocompletar/materia/",
-            "placeholder": "Buscar o crear materia…"
-        }),
         required=False,
+        widget=forms.TextInput(attrs={
+            "class": "form-control materia-input",
+            "placeholder": "Escriba materia…",
+            "autocomplete": "off",
+        })
     )
 
     class Meta:
         model = Materia650
         fields = ["materia"]
+        widgets = {
+            "materia": forms.HiddenInput(attrs={"class": "materia-id"}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        # IF editing an existing Materia650, ensure the current one appears preloaded
+
         if self.instance.pk and self.instance.materia:
-            self.fields["materia"].initial = self.instance.materia
+            self.fields["materia_texto"].initial = self.instance.materia.termino
+
+    def clean(self):
+        cleaned = super().clean()
+        texto = cleaned.get("materia_texto", "").strip()
+        materia_id = cleaned.get("materia")
+
+        # Si ya hay un ID → todo bien
+        if materia_id:
+            return cleaned
+
+        # Si solo hay texto → buscarlo o crearlo
+        if texto:
+            existente = AutoridadMateria.objects.filter(
+                termino__iexact=texto
+            ).first()
+
+            if existente:
+                cleaned["materia"] = existente
+            else:
+                nuevo = AutoridadMateria.objects.create(termino=texto)
+                cleaned["materia"] = nuevo
+
+        return cleaned
+
+
 
 
 class MateriaGenero655Form(forms.ModelForm):
@@ -86,10 +111,10 @@ class MateriaGenero655Form(forms.ModelForm):
             ).first()
 
             if existente:
-                cleaned["materia"] = existente.id
+                cleaned["materia"] = existente
             else:
                 # crear un nuevo término
                 nuevo = AutoridadFormaMusical.objects.create(forma=texto)
-                cleaned["materia"] = nuevo.id
+                cleaned["materia"] = nuevo
 
         return cleaned
