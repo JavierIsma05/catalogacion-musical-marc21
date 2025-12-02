@@ -53,7 +53,6 @@ FORMATOS = [
 
 CODIGOS_LENGUAJE = [
     ('ger', 'Alemán'),
-    ('lat', 'Latín'),
     ('spa', 'Español'),
     ('fre', 'Francés'),
     ('eng', 'Inglés'),

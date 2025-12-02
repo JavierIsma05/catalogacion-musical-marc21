@@ -4,6 +4,7 @@ Incluye indicadores y visualización del subcampo $a (idiomas)
 Los idiomas se gestionan mediante un formset separado después de guardar
 El botón de agregar campo completo está en el header del campo (campo-add-btn)
 {% endcomment %}
+{% load catalogacion_tags %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
     {{ formset.management_form }}
@@ -58,12 +59,10 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             </button>
                             <select class="form-select idioma-select" name="idioma_lengua_{{ forloop.counter0 }}_0">
                                 <option value="">Seleccione un idioma...</option>
-                                <option value="ger">Alemán</option>
-                                <option value="spa">Español</option>
-                                <option value="fre">Francés</option>
-                                <option value="eng">Inglés</option>
-                                <option value="ita">Italiano</option>
-                                <option value="por">Portugués</option>
+                                {% get_codigos_lenguaje as codigos_idioma %}
+                                {% for codigo, nombre in codigos_idioma %}
+                                <option value="{{ codigo }}">{{ nombre }}</option>
+                                {% endfor %}
                             </select>
                             <button type="button" class="subcampo-delete-btn delete-idioma-btn" title="Eliminar" style="visibility: hidden;">
                                 <i class="bi bi-x-lg"></i>
@@ -105,12 +104,9 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             </button>
                             <select class="form-select idioma-select" name="idioma_lengua___prefix___0">
                                 <option value="">Seleccione un idioma...</option>
-                                <option value="ger">Alemán</option>
-                                <option value="spa">Español</option>
-                                <option value="fre">Francés</option>
-                                <option value="eng">Inglés</option>
-                                <option value="ita">Italiano</option>
-                                <option value="por">Portugués</option>
+                                {% for codigo, nombre in codigos_idioma %}
+                                <option value="{{ codigo }}">{{ nombre }}</option>
+                                {% endfor %}
                             </select>
                             <button type="button" class="subcampo-delete-btn delete-idioma-btn" title="Eliminar" style="visibility: hidden;">
                                 <i class="bi bi-x-lg"></i>
@@ -123,6 +119,9 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
     </div>
 </div>
 
+{# Almacenar opciones de idioma en un elemento oculto para JavaScript #}
+<div id="idiomas-options-data" style="display:none;" data-opciones='{% get_codigos_lenguaje_json %}'></div>
+
 <script>
 // Script para manejar subcampos de idiomas del campo 041
 // El formset principal es manejado por formset-manager.js
@@ -131,6 +130,23 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
         const prefix = '{{ formset.prefix }}';
         const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
         if (!container) return;
+        
+        // Obtener las opciones de idiomas desde el elemento oculto
+        const opcionesData = document.getElementById('idiomas-options-data');
+        let opcionesIdioma = [];
+        if (opcionesData && opcionesData.dataset.opciones) {
+            try {
+                opcionesIdioma = JSON.parse(opcionesData.dataset.opciones);
+            } catch(e) {
+                console.error('Error parsing idiomas options:', e);
+            }
+        }
+        
+        // Construir HTML de opciones
+        let opcionesHTML = '<option value="">Seleccione un idioma...</option>';
+        opcionesIdioma.forEach(function(item) {
+            opcionesHTML += `<option value="${item.codigo}">${item.nombre}</option>`;
+        });
         
         // Función para actualizar visibilidad de botones de eliminar en subcampos
         function updateDeleteButtonsVisibility(idiomasContainer) {
@@ -165,13 +181,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 newRow.innerHTML = `
                     <div class="subcampo-placeholder"></div>
                     <select class="form-select idioma-select" name="idioma_lengua_${lenguaIndex}_${newIndex}">
-                        <option value="">Seleccione un idioma...</option>
-                        <option value="ger">Alemán</option>
-                        <option value="spa">Español</option>
-                        <option value="fre">Francés</option>
-                        <option value="eng">Inglés</option>
-                        <option value="ita">Italiano</option>
-                        <option value="por">Portugués</option>
+                        ${opcionesHTML}
                     </select>
                     <button type="button" class="subcampo-delete-btn delete-idioma-btn" title="Eliminar">
                         <i class="bi bi-x-lg"></i>
