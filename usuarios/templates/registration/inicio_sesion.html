@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<!-- Cargar estilos base de catalogación para heredar variables y botones -->
+<link rel="stylesheet" href="{% static 'catalogacion/css/styles.css' %}">
+<link rel="stylesheet" href="{% static 'usuarios/css/login.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h2>Bienvenido</h2>
+            <p>Ingresa a tu cuenta para continuar</p>
+        </div>
+        
+        <div class="login-body">
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                
+                <!-- Manejo de Errores -->
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Credenciales incorrectas. Intenta de nuevo.
+                    </div>
+                {% endif %}
+
+                <!-- Campo Email -->
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}">Email</label>
+                    <!-- Reutilizamos tu clase .form-control -->
+                    <input type="email" 
+                           name="username" 
+                           class="form-control" 
+                           placeholder="nombre@ejemplo.com" 
+                           required 
+                           autofocus>
+                </div>
+
+                <!-- Campo Password -->
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}">Contraseña</label>
+                    <input type="password" 
+                           name="password" 
+                           class="form-control" 
+                           placeholder="••••••••" 
+                           required>
+                </div>
+
+                <!-- Botón Submit -->
+                <button type="submit" class="btn btn-primary btn-block">
+                    Iniciar Sesión
+                </button>
+                
+                <!-- Input oculto para redirección segura -->
+                <input type="hidden" name="next" value="{{ next }}">
+            </form>
+        </div>
+        
+        <div class="card-footer" style="text-align: center; padding: 1rem; background: var(--gray-50); border-top: 1px solid var(--border-color);">
+            <small class="text-muted">
+                ¿No tienes cuenta? <a href="#" style="color: var(--accent); font-weight: 600;">Regístrate</a>
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}

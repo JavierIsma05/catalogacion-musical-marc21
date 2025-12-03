@@ -16,6 +16,8 @@ urlpatterns = [
     # Autoridades y APIs de autocomplete
     path('catalogacion/', include('catalogacion.urls_autoridades')),
     
+    path('usuarios/', include('usuarios.urls')),
+    
     # Handlers de error personalizados (pendiente de implementar)
 ]
 

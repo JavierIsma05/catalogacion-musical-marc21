@@ -161,3 +161,12 @@ LOGGING = {
         },
     },
 }
+
+# A dónde redirigir tras un login exitoso (puede ser tu 'home' o 'index')
+LOGIN_REDIRECT_URL = '/'  
+
+# A dónde redirigir tras hacer logout (usualmente al mismo login)
+LOGOUT_REDIRECT_URL = '/usuarios/login/' 
+
+# URL del login (para que el decorador @login_required sepa a dónde mandarte)
+LOGIN_URL = '/usuarios/login/'
