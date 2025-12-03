@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'catalogacion',  # Aqui llamamos a la aplicacion catalogacion
+    'catalogacion',  
+    'usuarios',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +50,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AUTH_USER_MODEL = 'usuarios.CustomUser'
 
 ROOT_URLCONF = 'marc21_project.urls'
 import os
@@ -117,7 +120,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "catalogacion" / "static",
+    BASE_DIR / "static",  # Carpeta global de estáticos
+    BASE_DIR / "catalogacion" / "static",  # Estáticos específicos de catalogación
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
