@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'catalogacion',  
     'usuarios',
+    'catalogo_publico',
 ]
 
 MIDDLEWARE = [
@@ -162,11 +163,11 @@ LOGGING = {
     },
 }
 
-# A dónde redirigir tras un login exitoso (puede ser tu 'home' o 'index')
+# A dónde redirigir tras un login exitoso (se maneja en la vista CustomLoginView)
 LOGIN_REDIRECT_URL = '/'  
 
-# A dónde redirigir tras hacer logout (usualmente al mismo login)
-LOGOUT_REDIRECT_URL = '/usuarios/login/' 
+# A dónde redirigir tras hacer logout
+LOGOUT_REDIRECT_URL = '/' 
 
 # URL del login (para que el decorador @login_required sepa a dónde mandarte)
 LOGIN_URL = '/usuarios/login/'

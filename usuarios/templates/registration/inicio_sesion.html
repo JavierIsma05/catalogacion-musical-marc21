@@ -17,7 +17,7 @@
         </div>
         
         <div class="login-body">
-            <form method="post" action="{% url 'login' %}">
+            <form method="post" action="{% url 'usuarios:login' %}">
                 {% csrf_token %}
                 
                 <!-- Manejo de Errores -->

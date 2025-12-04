@@ -1,0 +1,110 @@
+{% extends 'catalogo_publico/base_publico.html' %}
+
+{% block title %}{{ obra }} - Catálogo Musical MARC21{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'catalogo_publico:home' %}">Inicio</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'catalogo_publico:lista_obras' %}">Catálogo</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Detalle</li>
+        </ol>
+    </nav>
+
+    <!-- Header de la obra -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="h3">
+                        <i class="bi bi-file-earmark-music text-primary"></i>
+                        {{ obra.titulo_principal }}
+                    </h1>
+                    {% if obra.compositor %}
+                    <p class="lead text-muted mb-2">
+                        <i class="bi bi-person"></i> {{ obra.compositor }}
+                    </p>
+                    {% endif %}
+                    <span class="badge bg-primary">
+                        {% if obra.tipo_registro == 'd' %}Manuscrito{% else %}Impreso{% endif %}
+                    </span>
+                </div>
+                <a href="{% url 'catalogo_publico:lista_obras' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información de la obra -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Información General</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tbody>
+                            {% if obra.titulo_uniforme %}
+                            <tr>
+                                <th class="text-muted" width="200">Título Uniforme</th>
+                                <td>{{ obra.titulo_uniforme }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if obra.titulo_principal %}
+                            <tr>
+                                <th class="text-muted">Título Principal</th>
+                                <td>{{ obra.titulo_principal }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if obra.compositor %}
+                            <tr>
+                                <th class="text-muted">Compositor</th>
+                                <td>{{ obra.compositor }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th class="text-muted">Tipo de Material</th>
+                                <td>{% if obra.tipo_registro == 'd' %}Manuscrito{% else %}Impreso{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Fecha de Catalogación</th>
+                                <td>{{ obra.fecha_creacion_sistema|date:"d/m/Y" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="bi bi-tag"></i> Metadatos</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-2">
+                        <strong>ID de Registro:</strong> {{ obra.pk }}
+                    </p>
+                    {% if obra.num_control %}
+                    <p class="text-muted small mb-2">
+                        <strong>Número de Control:</strong> {{ obra.num_control }}
+                    </p>
+                    {% endif %}
+                    <p class="text-muted small mb-0">
+                        <strong>Última actualización:</strong><br>
+                        {{ obra.fecha_actualizacion|date:"d/m/Y H:i" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

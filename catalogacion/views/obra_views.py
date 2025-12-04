@@ -18,12 +18,13 @@ from catalogacion.views.obra_config import (
     debe_mostrar_formset,
 )
 from catalogacion.views.obra_mixins import ObraFormsetMixin
+from usuarios.mixins import CatalogadorRequiredMixin
 
 # Configurar logger
 logger = logging.getLogger('catalogacion')
 
 
-class SeleccionarTipoObraView(TemplateView):
+class SeleccionarTipoObraView(CatalogadorRequiredMixin, TemplateView):
     """
     Vista para seleccionar el tipo de obra a catalogar.
     Presenta las opciones disponibles según la configuración MARC21.
@@ -45,7 +46,7 @@ class SeleccionarTipoObraView(TemplateView):
         return self.get(request, *args, **kwargs)
 
 
-class CrearObraView(ObraFormsetMixin, CreateView):
+class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
     """
     Vista para crear una nueva obra MARC21.
     Maneja el formulario principal y todos los formsets anidados.
@@ -227,7 +228,7 @@ class CrearObraView(ObraFormsetMixin, CreateView):
         return reverse('catalogacion:detalle_obra', kwargs={'pk': self.object.pk})
 
 
-class EditarObraView(ObraFormsetMixin, UpdateView):
+class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
     """
     Vista para editar una obra MARC21 existente.
     Maneja el formulario principal y todos los formsets anidados.
@@ -334,7 +335,7 @@ class EditarObraView(ObraFormsetMixin, UpdateView):
         return reverse('catalogacion:detalle_obra', kwargs={'pk': self.object.pk})
 
 
-class DetalleObraView(DetailView):
+class DetalleObraView(CatalogadorRequiredMixin, DetailView):
     """
     Vista de detalle de una obra.
     Muestra toda la información catalogada de una obra MARC21.
@@ -344,7 +345,7 @@ class DetalleObraView(DetailView):
     context_object_name = 'obra'
 
 
-class ListaObrasView(ListView):
+class ListaObrasView(CatalogadorRequiredMixin, ListView):
     """
     Vista de listado de obras con paginación y búsqueda.
     Permite filtrar obras por título, número de control o compositor.
@@ -373,7 +374,7 @@ class ListaObrasView(ListView):
         return queryset
 
 
-class EliminarObraView(DeleteView):
+class EliminarObraView(CatalogadorRequiredMixin, DeleteView):
     """
     Vista para eliminar (soft delete) una obra.
     No elimina físicamente, solo marca como inactiva.

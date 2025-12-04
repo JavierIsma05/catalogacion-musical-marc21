@@ -10,15 +10,17 @@ urlpatterns = [
     # Admin de Django
     path('admin/', admin.site.urls),
     
-    # Aplicación de catalogación (incluye index)
-    path('', include('catalogacion.urls')),
+    # Interfaz Pública (home principal)
+    path('', include('catalogo_publico.urls')),
+    
+    # Aplicación de catalogación (para catalogadores autenticados)
+    path('catalogacion/', include('catalogacion.urls')),
     
     # Autoridades y APIs de autocomplete
     path('catalogacion/', include('catalogacion.urls_autoridades')),
     
+    # Sistema de usuarios (login, gestión de catalogadores, dashboards)
     path('usuarios/', include('usuarios.urls')),
-    
-    # Handlers de error personalizados (pendiente de implementar)
 ]
 
 # Servir archivos estáticos y media en desarrollo

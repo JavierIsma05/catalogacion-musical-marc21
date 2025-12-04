@@ -1,0 +1,99 @@
+{% extends 'usuarios/catalogador/base_catalogador.html' %}
+
+{% block title %}Panel del Catalogador{% endblock %}
+{% block page_title %}Panel del Catalogador{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Card: Nueva Obra -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="bg-primary bg-opacity-10 p-4 rounded-circle d-inline-block mb-3">
+                    <i class="bi bi-plus-circle text-primary display-4"></i>
+                </div>
+                <h5 class="card-title">Nueva Obra</h5>
+                <p class="card-text text-muted">
+                    Comienza a catalogar una nueva obra musical
+                </p>
+                <a href="{% url 'catalogacion:seleccionar_tipo' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i> Crear Obra
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card: Ver Obras -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="bg-success bg-opacity-10 p-4 rounded-circle d-inline-block mb-3">
+                    <i class="bi bi-collection text-success display-4"></i>
+                </div>
+                <h5 class="card-title">Mis Obras</h5>
+                <p class="card-text text-muted">
+                    Revisa y edita las obras catalogadas
+                </p>
+                <a href="{% url 'catalogacion:lista_obras' %}" class="btn btn-success">
+                    <i class="bi bi-list"></i> Ver Obras
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card: Autoridades -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="bg-info bg-opacity-10 p-4 rounded-circle d-inline-block mb-3">
+                    <i class="bi bi-person-badge text-info display-4"></i>
+                </div>
+                <h5 class="card-title">Autoridades</h5>
+                <p class="card-text text-muted">
+                    Gestiona personas, entidades y títulos
+                </p>
+                <a href="{% url 'lista_personas' %}" class="btn btn-info">
+                    <i class="bi bi-people"></i> Ver Autoridades
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Accesos Rápidos -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-lightning"></i> Accesos Rápidos</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'catalogacion:crear_obra' tipo='coleccion_manuscrita' %}" 
+                           class="btn btn-outline-primary w-100">
+                            <i class="bi bi-file-earmark-plus"></i> Colección Manuscrita
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'catalogacion:crear_obra' tipo='obra_manuscrita_individual' %}" 
+                           class="btn btn-outline-primary w-100">
+                            <i class="bi bi-file-earmark-plus"></i> Obra Individual
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'lista_personas' %}" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-person-plus"></i> Nueva Persona
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'catalogo_publico:lista_obras' %}" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-globe"></i> Ver Catálogo Público
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
