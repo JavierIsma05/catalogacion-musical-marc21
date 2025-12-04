@@ -5,451 +5,173 @@
 {% block page_title %}Nueva Obra{% endblock %}
 
 {% block catalogacion_css %}
-<style>
-.tipo-selection-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1.5rem 1rem;
-}
-
-.selection-header {
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-
-.selection-header h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-}
-
-.selection-header p {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin: 0;
-}
-
-.info-banner {
-    background: linear-gradient(135deg, var(--info-light) 0%, #e3f2fd 100%);
-    border: 1px solid var(--info);
-    border-radius: 4px;
-    padding: 0.75rem 1rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.info-banner-icon {
-    width: 32px;
-    height: 32px;
-    background: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.info-banner-icon i {
-    font-size: 1rem;
-    color: var(--info);
-}
-
-.info-banner-content {
-    flex: 1;
-    font-size: 0.75rem;
-    color: var(--text-primary);
-    line-height: 1.5;
-}
-
-.info-banner-content strong {
-    font-weight: 600;
-    color: var(--gray-800);
-}
-
-.info-item {
-    display: inline;
-    margin-right: 1rem;
-}
-
-.tipos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.tipo-card {
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    padding: 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-}
-
-.tipo-card:hover {
-    border-color: var(--gray-400);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-    transform: translateY(-1px);
-}
-
-.tipo-card.selected {
-    border-color: var(--gray-800);
-    border-width: 2px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.tipo-card-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.875rem;
-    margin-bottom: 1rem;
-}
-
-.tipo-card-icon {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--gray-100);
-    border-radius: 4px;
-    flex-shrink: 0;
-}
-
-.tipo-card-icon i {
-    font-size: 1.25rem;
-    color: var(--gray-700);
-}
-
-.tipo-card-title h3 {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0 0 0.25rem 0;
-}
-
-.tipo-card-badge {
-    display: inline-block;
-    font-family: 'Courier New', monospace;
-    font-size: 0.6875rem;
-    font-weight: 600;
-    padding: 0.125rem 0.375rem;
-    background: var(--gray-200);
-    color: var(--text-secondary);
-    border-radius: 2px;
-}
-
-.tipo-card-description {
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    margin-bottom: 1rem;
-}
-
-.tipo-card-details {
-    background: var(--gray-50);
-    border-radius: 3px;
-    padding: 0.75rem;
-    font-size: 0.75rem;
-}
-
-.tipo-card-detail {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.25rem 0;
-}
-
-.tipo-card-detail:not(:last-child) {
-    border-bottom: 1px solid var(--border-color);
-}
-
-.tipo-card-detail-label {
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.tipo-card-detail-value {
-    color: var(--text-primary);
-    font-weight: 600;
-    font-family: 'Courier New', monospace;
-}
-
-.tipo-radio {
-    position: absolute;
-    opacity: 0;
-}
-
-.tipo-radio-custom {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--border-color);
-    border-radius: 50%;
-    background: white;
-    transition: all 0.2s ease;
-}
-
-.tipo-card.selected .tipo-radio-custom {
-    border-color: var(--gray-800);
-    background: var(--gray-800);
-}
-
-.tipo-card.selected .tipo-radio-custom::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 8px;
-    height: 8px;
-    background: white;
-    border-radius: 50%;
-}
-
-.action-buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border-color);
-}
-</style>
+<link rel="stylesheet" href="{% static 'catalogacion/css/tipo-obra.css' %}">
 {% endblock %}
 
 {% block catalogacion_content %}
 <div class="tipo-selection-container">
     <div class="selection-header">
         <h2>Crear Nueva Obra MARC21</h2>
-        <p>Seleccione el tipo de obra musical que desea catalogar según el estándar MARC21</p>
+        <p>Seleccione el tipo de obra musical que desea catalogar</p>
     </div>
 
-    <!-- Banner de información compacto -->
-    <div class="info-banner">
-        <div class="info-banner-icon">
-            <i class="bi bi-info-circle-fill"></i>
-        </div>
-        <div class="info-banner-content">
-            <span class="info-item"><strong>Nivel:</strong> c=Colección, a=Analítica, m=Monografía</span>
-            <span class="info-item"><strong>Tipo:</strong> d=Manuscrito, c=Impreso</span>
-            <span class="info-item"><strong>Acceso:</strong> 100=Compositor, 130=Título uniforme</span>
-        </div>
+    <div class="selection-info">
+        <i class="bi bi-lightbulb"></i>
+        Haga clic en una categoría para ver las opciones disponibles
     </div>
 
     <form method="post" action="{% url 'catalogacion:seleccionar_tipo' %}" id="tipo-form">
         {% csrf_token %}
         
-        <div class="tipos-grid">
-            <!-- Colección Manuscrita -->
-            <div class="tipo-card" data-tipo="coleccion_manuscrita">
-                <input type="radio" name="tipo_obra" value="coleccion_manuscrita" 
-                       id="tipo_coleccion_manuscrita" class="tipo-radio">
-                <div class="tipo-radio-custom"></div>
-                
-                <div class="tipo-card-header">
-                    <div class="tipo-card-icon">
-                        <i class="bi bi-collection"></i>
+        <div class="categoria-accordion">
+            <!-- Obras Manuscritas -->
+            <div class="categoria-item" data-categoria="manuscrita">
+                <div class="categoria-header">
+                    <div class="categoria-header-left">
+                        <div class="categoria-icon">
+                            <i class="bi bi-pen"></i>
+                        </div>
+                        <div class="categoria-info">
+                            <h3>Obras Manuscritas</h3>
+                            <p>Partituras escritas a mano, borradores y copias manuscritas</p>
+                        </div>
                     </div>
-                    <div class="tipo-card-title">
-                        <h3>Colección Manuscrita</h3>
-                        <span class="tipo-card-badge">Nivel c / Tipo d</span>
-                    </div>
+                    <i class="bi bi-chevron-down categoria-arrow"></i>
                 </div>
                 
-                <p class="tipo-card-description">
-                    Conjunto de obras musicales manuscritas agrupadas bajo un título uniforme. 
-                    Sin compositor único definido.
-                </p>
-                
-                <div class="tipo-card-details">
-                    <div class="tipo-card-detail">
-                        <span class="tipo-card-detail-label">Punto de acceso</span>
-                        <span class="tipo-card-detail-value">130</span>
-                    </div>
-                    <div class="tipo-card-detail">
-                        <span class="tipo-card-detail-label">Enlaces</span>
-                        <span class="tipo-card-detail-value">774</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Obra en Colección Manuscrita -->
-            <div class="tipo-card" data-tipo="obra_en_coleccion_manuscrita">
-                <input type="radio" name="tipo_obra" value="obra_en_coleccion_manuscrita" 
-                       id="tipo_obra_coleccion_ms" class="tipo-radio">
-                <div class="tipo-radio-custom"></div>
-                
-                <div class="tipo-card-header">
-                    <div class="tipo-card-icon">
-                        <i class="bi bi-file-earmark-music"></i>
-                    </div>
-                    <div class="tipo-card-title">
-                        <h3>Obra en Colección Manuscrita</h3>
-                        <span class="tipo-card-badge">Nivel a / Tipo d</span>
-                    </div>
-                </div>
-                
-                <p class="tipo-card-description">
-                    Obra individual manuscrita que forma parte de una colección mayor. 
-                    Tiene compositor y título propios.
-                </p>
-                
-                <div class="tipo-card-details">
-                    <div class="tipo-card-detail">
-                        <span class="tipo-card-detail-label">Punto de acceso</span>
-                        <span class="tipo-card-detail-value">100</span>
-                    </div>
-                    <div class="tipo-card-detail">
-                        <span class="tipo-card-detail-label">Enlaces</span>
-                        <span class="tipo-card-detail-value">773</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Obra Manuscrita Individual -->
-            <div class="tipo-card" data-tipo="obra_manuscrita_individual">
-                <input type="radio" name="tipo_obra" value="obra_manuscrita_individual" 
-                       id="tipo_manuscrita_individual" class="tipo-radio">
-                <div class="tipo-radio-custom"></div>
-                
-                <div class="tipo-card-header">
-                    <div class="tipo-card-icon">
-                        <i class="bi bi-file-earmark"></i>
-                    </div>
-                    <div class="tipo-card-title">
-                        <h3>Obra Manuscrita Individual</h3>
-                        <span class="tipo-card-badge">Nivel m / Tipo d</span>
-                    </div>
-                </div>
-                
-                <p class="tipo-card-description">
-                    Obra musical manuscrita completa e independiente. 
-                    No forma parte de ninguna colección.
-                </p>
-                
-                <div class="tipo-card-details">
-                    <div class="tipo-card-detail">
-                        <span class="tipo-card-detail-label">Punto de acceso</span>
-                        <span class="tipo-card-detail-value">100</span>
-                    </div>
-                    <div class="tipo-card-detail">
-                        <span class="tipo-card-detail-label">Enlaces</span>
-                        <span class="tipo-card-detail-value">787</span>
+                <div class="categoria-content">
+                    <div class="tipos-list">
+                        <!-- Colección Manuscrita -->
+                        <label class="tipo-option" data-tipo="coleccion_manuscrita">
+                            <input type="radio" name="tipo_obra" value="coleccion_manuscrita" class="tipo-radio-input">
+                            <div class="tipo-option-radio"></div>
+                            <div class="tipo-option-icon">
+                                <i class="bi bi-collection"></i>
+                            </div>
+                            <div class="tipo-option-content">
+                                <div class="tipo-option-title">Colección Manuscrita</div>
+                                <div class="tipo-option-desc">Conjunto de obras manuscritas agrupadas bajo un título uniforme</div>
+                            </div>
+                            <div class="tipo-option-badge">
+                                <span class="badge-tag">Nivel c</span>
+                                <span class="badge-tag">130</span>
+                            </div>
+                        </label>
+                        
+                        <!-- Obra en Colección Manuscrita -->
+                        <label class="tipo-option" data-tipo="obra_en_coleccion_manuscrita">
+                            <input type="radio" name="tipo_obra" value="obra_en_coleccion_manuscrita" class="tipo-radio-input">
+                            <div class="tipo-option-radio"></div>
+                            <div class="tipo-option-icon">
+                                <i class="bi bi-file-earmark-music"></i>
+                            </div>
+                            <div class="tipo-option-content">
+                                <div class="tipo-option-title">Obra en Colección Manuscrita</div>
+                                <div class="tipo-option-desc">Obra individual que forma parte de una colección manuscrita mayor</div>
+                            </div>
+                            <div class="tipo-option-badge">
+                                <span class="badge-tag">Nivel a</span>
+                                <span class="badge-tag">100</span>
+                            </div>
+                        </label>
+                        
+                        <!-- Obra Manuscrita Individual -->
+                        <label class="tipo-option" data-tipo="obra_manuscrita_individual">
+                            <input type="radio" name="tipo_obra" value="obra_manuscrita_individual" class="tipo-radio-input">
+                            <div class="tipo-option-radio"></div>
+                            <div class="tipo-option-icon">
+                                <i class="bi bi-file-earmark"></i>
+                            </div>
+                            <div class="tipo-option-content">
+                                <div class="tipo-option-title">Obra Manuscrita Individual</div>
+                                <div class="tipo-option-desc">Obra manuscrita completa e independiente, no forma parte de colección</div>
+                            </div>
+                            <div class="tipo-option-badge">
+                                <span class="badge-tag">Nivel m</span>
+                                <span class="badge-tag">100</span>
+                            </div>
+                        </label>
                     </div>
                 </div>
             </div>
 
-            <!-- Colección Impresa -->
-            <div class="tipo-card" data-tipo="coleccion_impresa">
-                <input type="radio" name="tipo_obra" value="coleccion_impresa" 
-                       id="tipo_coleccion_impresa" class="tipo-radio">
-                <div class="tipo-radio-custom"></div>
-                
-                <div class="tipo-card-header">
-                    <div class="tipo-card-icon">
-                        <i class="bi bi-collection-fill"></i>
+            <!-- Obras Impresas -->
+            <div class="categoria-item" data-categoria="impresa">
+                <div class="categoria-header">
+                    <div class="categoria-header-left">
+                        <div class="categoria-icon">
+                            <i class="bi bi-printer"></i>
+                        </div>
+                        <div class="categoria-info">
+                            <h3>Obras Impresas</h3>
+                            <p>Partituras publicadas con ISBN/ISMN y datos de edición</p>
+                        </div>
                     </div>
-                    <div class="tipo-card-title">
-                        <h3>Colección Impresa</h3>
-                        <span class="tipo-card-badge">Nivel c / Tipo c</span>
-                    </div>
+                    <i class="bi bi-chevron-down categoria-arrow"></i>
                 </div>
                 
-                <p class="tipo-card-description">
-                    Conjunto de obras musicales publicadas agrupadas. 
-                    Incluye ISBN/ISMN, editor y serie.
-                </p>
-                
-                <div class="tipo-card-details">
-                    <div class="tipo-card-detail">
-                        <span class="tipo-card-detail-label">Identificadores</span>
-                        <span class="tipo-card-detail-value">020, 024</span>
-                    </div>
-                    <div class="tipo-card-detail">
-                        <span class="tipo-card-detail-label">Series</span>
-                        <span class="tipo-card-detail-value">490</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Obra en Colección Impresa -->
-            <div class="tipo-card" data-tipo="obra_en_coleccion_impresa">
-                <input type="radio" name="tipo_obra" value="obra_en_coleccion_impresa" 
-                       id="tipo_obra_coleccion_impresa" class="tipo-radio">
-                <div class="tipo-radio-custom"></div>
-                
-                <div class="tipo-card-header">
-                    <div class="tipo-card-icon">
-                        <i class="bi bi-file-music"></i>
-                    </div>
-                    <div class="tipo-card-title">
-                        <h3>Obra en Colección Impresa</h3>
-                        <span class="tipo-card-badge">Nivel a / Tipo c</span>
-                    </div>
-                </div>
-                
-                <p class="tipo-card-description">
-                    Obra individual publicada dentro de una colección impresa mayor.
-                </p>
-                
-                <div class="tipo-card-details">
-                    <div class="tipo-card-detail">
-                        <span class="tipo-card-detail-label">Punto de acceso</span>
-                        <span class="tipo-card-detail-value">100</span>
-                    </div>
-                    <div class="tipo-card-detail">
-                        <span class="tipo-card-detail-label">Enlaces</span>
-                        <span class="tipo-card-detail-value">773</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Obra Impresa Individual -->
-            <div class="tipo-card" data-tipo="obra_impresa_individual">
-                <input type="radio" name="tipo_obra" value="obra_impresa_individual" 
-                       id="tipo_impresa_individual" class="tipo-radio">
-                <div class="tipo-radio-custom"></div>
-                
-                <div class="tipo-card-header">
-                    <div class="tipo-card-icon">
-                        <i class="bi bi-file-text"></i>
-                    </div>
-                    <div class="tipo-card-title">
-                        <h3>Obra Impresa Individual</h3>
-                        <span class="tipo-card-badge">Nivel m / Tipo c</span>
-                    </div>
-                </div>
-                
-                <p class="tipo-card-description">
-                    Obra musical publicada completa e independiente. 
-                    Partitura impresa con identificadores estándar.
-                </p>
-                
-                <div class="tipo-card-details">
-                    <div class="tipo-card-detail">
-                        <span class="tipo-card-detail-label">Identificadores</span>
-                        <span class="tipo-card-detail-value">020, 024</span>
-                    </div>
-                    <div class="tipo-card-detail">
-                        <span class="tipo-card-detail-label">Publicación</span>
-                        <span class="tipo-card-detail-value">264</span>
+                <div class="categoria-content">
+                    <div class="tipos-list">
+                        <!-- Colección Impresa -->
+                        <label class="tipo-option" data-tipo="coleccion_impresa">
+                            <input type="radio" name="tipo_obra" value="coleccion_impresa" class="tipo-radio-input">
+                            <div class="tipo-option-radio"></div>
+                            <div class="tipo-option-icon">
+                                <i class="bi bi-collection-fill"></i>
+                            </div>
+                            <div class="tipo-option-content">
+                                <div class="tipo-option-title">Colección Impresa</div>
+                                <div class="tipo-option-desc">Conjunto de obras publicadas agrupadas, incluye ISBN/ISMN y serie</div>
+                            </div>
+                            <div class="tipo-option-badge">
+                                <span class="badge-tag">Nivel c</span>
+                                <span class="badge-tag">020</span>
+                            </div>
+                        </label>
+                        
+                        <!-- Obra en Colección Impresa -->
+                        <label class="tipo-option" data-tipo="obra_en_coleccion_impresa">
+                            <input type="radio" name="tipo_obra" value="obra_en_coleccion_impresa" class="tipo-radio-input">
+                            <div class="tipo-option-radio"></div>
+                            <div class="tipo-option-icon">
+                                <i class="bi bi-file-music"></i>
+                            </div>
+                            <div class="tipo-option-content">
+                                <div class="tipo-option-title">Obra en Colección Impresa</div>
+                                <div class="tipo-option-desc">Obra individual publicada dentro de una colección impresa mayor</div>
+                            </div>
+                            <div class="tipo-option-badge">
+                                <span class="badge-tag">Nivel a</span>
+                                <span class="badge-tag">100</span>
+                            </div>
+                        </label>
+                        
+                        <!-- Obra Impresa Individual -->
+                        <label class="tipo-option" data-tipo="obra_impresa_individual">
+                            <input type="radio" name="tipo_obra" value="obra_impresa_individual" class="tipo-radio-input">
+                            <div class="tipo-option-radio"></div>
+                            <div class="tipo-option-icon">
+                                <i class="bi bi-file-text"></i>
+                            </div>
+                            <div class="tipo-option-content">
+                                <div class="tipo-option-title">Obra Impresa Individual</div>
+                                <div class="tipo-option-desc">Partitura publicada completa e independiente con identificadores estándar</div>
+                            </div>
+                            <div class="tipo-option-badge">
+                                <span class="badge-tag">Nivel m</span>
+                                <span class="badge-tag">264</span>
+                            </div>
+                        </label>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="action-buttons">
-            <a href="{% url 'usuarios:catalogador_dashboard' %}" class="btn btn-outline-secondary">
+            <a href="{% url 'usuarios:catalogador_dashboard' %}" class="btn-cancelar">
                 <i class="bi bi-arrow-left"></i> Cancelar
             </a>
-            <button type="submit" class="btn btn-primary" id="btn-continuar" disabled>
+            <button type="submit" class="btn-continuar" id="btn-continuar" disabled>
                 Continuar <i class="bi bi-arrow-right"></i>
             </button>
         </div>
@@ -460,19 +182,41 @@
 {% block catalogacion_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const cards = document.querySelectorAll('.tipo-card');
+    const categorias = document.querySelectorAll('.categoria-item');
+    const tipoOptions = document.querySelectorAll('.tipo-option');
     const btnContinuar = document.getElementById('btn-continuar');
     
-    cards.forEach(card => {
-        card.addEventListener('click', function() {
-            // Remover selección previa
-            cards.forEach(c => c.classList.remove('selected'));
+    // Toggle categorías (acordeón)
+    categorias.forEach(categoria => {
+        const header = categoria.querySelector('.categoria-header');
+        
+        header.addEventListener('click', function() {
+            const wasActive = categoria.classList.contains('active');
             
-            // Seleccionar card actual
+            // Cerrar todas las categorías
+            categorias.forEach(c => c.classList.remove('active'));
+            
+            // Si no estaba activa, abrirla
+            if (!wasActive) {
+                categoria.classList.add('active');
+            }
+        });
+    });
+    
+    // Selección de tipo de obra
+    tipoOptions.forEach(option => {
+        option.addEventListener('click', function(e) {
+            // Prevenir que el click cierre el acordeón
+            e.stopPropagation();
+            
+            // Remover selección previa
+            tipoOptions.forEach(o => o.classList.remove('selected'));
+            
+            // Seleccionar opción actual
             this.classList.add('selected');
             
             // Marcar radio
-            const radio = this.querySelector('.tipo-radio');
+            const radio = this.querySelector('.tipo-radio-input');
             radio.checked = true;
             
             // Habilitar botón
@@ -481,10 +225,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Verificar si ya hay selección al cargar
-    const checkedRadio = document.querySelector('.tipo-radio:checked');
+    const checkedRadio = document.querySelector('.tipo-radio-input:checked');
     if (checkedRadio) {
-        const card = checkedRadio.closest('.tipo-card');
-        card.classList.add('selected');
+        const option = checkedRadio.closest('.tipo-option');
+        const categoria = option.closest('.categoria-item');
+        
+        option.classList.add('selected');
+        categoria.classList.add('active');
         btnContinuar.disabled = false;
     }
 });
