@@ -4,71 +4,48 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="row">
-    <!-- Card: Total Catalogadores -->
-    <div class="col-md-4 mb-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Total Catalogadores</h6>
-                        <h2 class="mb-0">{{ total_catalogadores }}</h2>
-                    </div>
-                    <div class="bg-primary bg-opacity-10 p-3 rounded">
-                        <i class="bi bi-people text-primary fs-3"></i>
-                    </div>
-                </div>
+<!-- Estadísticas -->
+<div class="admin-stats">
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <div class="stat-card-icon">
+                <i class="bi bi-people"></i>
             </div>
         </div>
+        <div class="stat-card-value">{{ total_catalogadores }}</div>
+        <div class="stat-card-label">Total Catalogadores</div>
     </div>
 
-    <!-- Card: Catalogadores Activos -->
-    <div class="col-md-4 mb-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Catalogadores Activos</h6>
-                        <h2 class="mb-0">{{ catalogadores_activos }}</h2>
-                    </div>
-                    <div class="bg-success bg-opacity-10 p-3 rounded">
-                        <i class="bi bi-person-check text-success fs-3"></i>
-                    </div>
-                </div>
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <div class="stat-card-icon">
+                <i class="bi bi-person-check"></i>
             </div>
         </div>
+        <div class="stat-card-value">{{ catalogadores_activos }}</div>
+        <div class="stat-card-label">Activos</div>
     </div>
 
-    <!-- Card: Acciones Rápidas -->
-    <div class="col-md-4 mb-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <h6 class="text-muted mb-3">Acciones Rápidas</h6>
-                <a href="{% url 'usuarios:crear_catalogador' %}" class="btn btn-primary btn-sm w-100 mb-2">
-                    <i class="bi bi-person-plus"></i> Nuevo Catalogador
-                </a>
-                <a href="{% url 'usuarios:lista_catalogadores' %}" class="btn btn-outline-secondary btn-sm w-100">
-                    <i class="bi bi-list"></i> Ver Todos
-                </a>
-            </div>
+    <div class="stat-card">
+        <div class="stat-card-label stat-card-actions-title">Acciones</div>
+        <div class="quick-actions">
+            <a href="{% url 'usuarios:crear_catalogador' %}" class="quick-action-btn primary">
+                <i class="bi bi-plus"></i> Nuevo
+            </a>
+            <a href="{% url 'usuarios:lista_catalogadores' %}" class="quick-action-btn">
+                <i class="bi bi-list"></i> Ver todos
+            </a>
         </div>
     </div>
 </div>
 
-<!-- Sección: Información -->
-<div class="row">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-transparent">
-                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Bienvenido al Panel de Administración</h5>
-            </div>
-            <div class="card-body">
-                <p class="mb-0">
-                    Desde aquí puedes gestionar los catalogadores del sistema. 
-                    Utiliza el menú lateral para navegar entre las diferentes secciones.
-                </p>
-            </div>
-        </div>
+<div class="admin-info-card">
+    <div class="admin-info-card-title">
+        <i class="bi bi-info-circle"></i>
+        Panel de Administración
     </div>
+    <p class="admin-info-card-text">
+        Gestiona los catalogadores del sistema. Utiliza el menú lateral para navegar.
+    </p>
 </div>
 {% endblock %}

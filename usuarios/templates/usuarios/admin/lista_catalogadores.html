@@ -1,106 +1,118 @@
 {% extends 'usuarios/admin/base_admin.html' %}
 
-{% block title %}Gestión de Catalogadores - Admin{% endblock %}
-{% block page_title %}Gestión de Catalogadores{% endblock %}
+{% block title %}Catalogadores - Admin{% endblock %}
+{% block page_title %}Catalogadores{% endblock %}
 
 {% block content %}
-<div class="card border-0 shadow-sm">
-    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-people"></i> Lista de Catalogadores</h5>
-        <a href="{% url 'usuarios:crear_catalogador' %}" class="btn btn-primary btn-sm">
-            <i class="bi bi-person-plus"></i> Nuevo Catalogador
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2 class="admin-card-title">
+            <i class="bi bi-people"></i>
+            Catalogadores
+        </h2>
+        <a href="{% url 'usuarios:crear_catalogador' %}" class="admin-btn admin-btn-primary admin-btn-sm">
+            <i class="bi bi-plus"></i> Nuevo
         </a>
     </div>
-    <div class="card-body">
-        {% if catalogadores %}
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Email</th>
-                        <th>Estado</th>
-                        <th>Fecha Registro</th>
-                        <th class="text-end">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for catalogador in catalogadores %}
-                    <tr>
-                        <td>
-                            <i class="bi bi-person-circle text-muted"></i>
-                            {{ catalogador.nombre_completo|default:"Sin nombre" }}
-                        </td>
-                        <td>{{ catalogador.email }}</td>
-                        <td>
-                            {% if catalogador.activo %}
-                            <span class="badge bg-success">Activo</span>
-                            {% else %}
-                            <span class="badge bg-secondary">Inactivo</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ catalogador.fecha_creacion|date:"d/m/Y" }}</td>
-                        <td class="text-end">
+    
+    {% if catalogadores %}
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Registro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for catalogador in catalogadores %}
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar">
+                                {{ catalogador.email|slice:":1"|upper }}
+                            </div>
+                            <span class="user-name">{{ catalogador.nombre_completo|default:"—" }}</span>
+                        </div>
+                    </td>
+                    <td class="user-email-cell">{{ catalogador.email }}</td>
+                    <td>
+                        <span class="role-badge">{{ catalogador.rol|default:"catalogador" }}</span>
+                    </td>
+                    <td>
+                        <span class="status-badge {% if catalogador.activo %}active{% else %}inactive{% endif %}">
+                            {% if catalogador.activo %}Activo{% else %}Inactivo{% endif %}
+                        </span>
+                    </td>
+                    <td class="date-cell">{{ catalogador.fecha_creacion|date:"d/m/Y" }}</td>
+                    <td>
+                        <div class="action-buttons">
                             <a href="{% url 'usuarios:editar_catalogador' catalogador.pk %}" 
-                               class="btn btn-sm btn-outline-primary" title="Editar">
+                               class="action-btn edit" title="Editar">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <form action="{% url 'usuarios:toggle_activo_catalogador' catalogador.pk %}" 
-                                  method="post" class="d-inline">
+                                  method="post" class="toggle-form">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-warning"
+                                <button type="submit" class="action-btn toggle"
                                         title="{% if catalogador.activo %}Desactivar{% else %}Activar{% endif %}">
                                     <i class="bi bi-{% if catalogador.activo %}pause{% else %}play{% endif %}"></i>
                                 </button>
                             </form>
                             <a href="{% url 'usuarios:eliminar_catalogador' catalogador.pk %}" 
-                               class="btn btn-sm btn-outline-danger" title="Eliminar">
+                               class="action-btn delete" title="Eliminar">
                                 <i class="bi bi-trash"></i>
                             </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-        <!-- Paginación -->
-        {% if page_obj.has_other_pages %}
-        <nav aria-label="Paginación">
-            <ul class="pagination justify-content-center mb-0">
-                {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
-                        <i class="bi bi-chevron-left"></i>
-                    </a>
-                </li>
-                {% endif %}
-                <li class="page-item disabled">
-                    <span class="page-link">
-                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                    </span>
-                </li>
-                {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
-                        <i class="bi bi-chevron-right"></i>
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
+    <!-- Paginación -->
+    {% if page_obj.has_other_pages %}
+    <div class="admin-pagination">
+        {% if page_obj.has_previous %}
+        <a class="admin-pagination-btn" href="?page=1" title="Primera página">
+            <i class="bi bi-chevron-double-left"></i>
+        </a>
+        <a class="admin-pagination-btn" href="?page={{ page_obj.previous_page_number }}" title="Página anterior">
+            <i class="bi bi-chevron-left"></i>
+        </a>
         {% endif %}
-
-        {% else %}
-        <div class="text-center py-5">
-            <i class="bi bi-people display-4 text-muted"></i>
-            <h5 class="mt-3">No hay catalogadores registrados</h5>
-            <p class="text-muted">Crea el primer catalogador para comenzar.</p>
-            <a href="{% url 'usuarios:crear_catalogador' %}" class="btn btn-primary">
-                <i class="bi bi-person-plus"></i> Crear Catalogador
-            </a>
-        </div>
+        <span class="admin-pagination-info">
+            {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+        <a class="admin-pagination-btn" href="?page={{ page_obj.next_page_number }}" title="Página siguiente">
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a class="admin-pagination-btn" href="?page={{ page_obj.paginator.num_pages }}" title="Última página">
+            <i class="bi bi-chevron-double-right"></i>
+        </a>
         {% endif %}
     </div>
+    {% endif %}
+
+    {% else %}
+    <div class="admin-card-body">
+        <div class="admin-empty-state">
+            <div class="admin-empty-icon">
+                <i class="bi bi-people"></i>
+            </div>
+            <h3 class="admin-empty-title">Sin catalogadores</h3>
+            <p class="admin-empty-text">Crea el primer catalogador para comenzar.</p>
+            <a href="{% url 'usuarios:crear_catalogador' %}" class="admin-btn admin-btn-primary">
+                <i class="bi bi-plus"></i> Crear
+            </a>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

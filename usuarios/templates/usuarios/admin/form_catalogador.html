@@ -4,77 +4,107 @@
 {% block page_title %}{{ titulo }}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-transparent">
-                <h5 class="mb-0">
-                    <i class="bi bi-person-{% if accion == 'Crear' %}plus{% else %}gear{% endif %}"></i>
-                    {{ titulo }}
-                </h5>
-            </div>
-            <div class="card-body">
-                <form method="post" novalidate>
-                    {% csrf_token %}
-                    
-                    <div class="mb-3">
-                        <label for="id_email" class="form-label">Email *</label>
-                        {{ form.email }}
-                        {% if form.email.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.email.errors.0 }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="id_nombre_completo" class="form-label">Nombre Completo</label>
-                        {{ form.nombre_completo }}
-                        {% if form.nombre_completo.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.nombre_completo.errors.0 }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    {% if form.password1 %}
-                    <div class="mb-3">
-                        <label for="id_password1" class="form-label">Contraseña *</label>
-                        {{ form.password1 }}
-                        {% if form.password1.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.password1.errors.0 }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="id_password2" class="form-label">Confirmar Contraseña *</label>
-                        {{ form.password2 }}
-                        {% if form.password2.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.password2.errors.0 }}
-                        </div>
-                        {% endif %}
+<div class="admin-form">
+    <div class="admin-form-section">
+        <div class="admin-form-header">
+            <h2 class="admin-form-title">
+                <i class="bi bi-person-{% if accion == 'Crear' %}plus{% else %}gear{% endif %}"></i>
+                {{ titulo }}
+            </h2>
+        </div>
+        
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <div class="admin-form-body">
+                <div class="admin-form-group">
+                    <label for="id_email" class="admin-form-label required">Email</label>
+                    <input type="email" 
+                           name="email" 
+                           id="id_email" 
+                           class="admin-form-input {% if form.email.errors %}is-invalid{% endif %}"
+                           value="{{ form.email.value|default:'' }}"
+                           placeholder="correo@ejemplo.com"
+                           autocomplete="email">
+                    {% if form.email.errors %}
+                    <div class="admin-form-error">
+                        <i class="bi bi-exclamation-circle"></i>
+                        {{ form.email.errors.0 }}
                     </div>
                     {% endif %}
+                </div>
 
-                    <div class="mb-3 form-check">
-                        {{ form.activo }}
-                        <label class="form-check-label" for="id_activo">Usuario Activo</label>
+                <div class="admin-form-group">
+                    <label for="id_nombre_completo" class="admin-form-label">Nombre Completo</label>
+                    <input type="text" 
+                           name="nombre_completo" 
+                           id="id_nombre_completo" 
+                           class="admin-form-input {% if form.nombre_completo.errors %}is-invalid{% endif %}"
+                           value="{{ form.nombre_completo.value|default:'' }}"
+                           placeholder="Nombre y apellido del catalogador"
+                           autocomplete="name">
+                    {% if form.nombre_completo.errors %}
+                    <div class="admin-form-error">
+                        <i class="bi bi-exclamation-circle"></i>
+                        {{ form.nombre_completo.errors.0 }}
                     </div>
+                    {% endif %}
+                </div>
 
-                    <div class="d-flex justify-content-between">
-                        <a href="{% url 'usuarios:lista_catalogadores' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Cancelar
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-lg"></i> {{ accion }}
-                        </button>
+                {% if form.password1 %}
+                <div class="admin-form-group">
+                    <label for="id_password1" class="admin-form-label required">Contraseña</label>
+                    <input type="password" 
+                           name="password1" 
+                           id="id_password1" 
+                           class="admin-form-input {% if form.password1.errors %}is-invalid{% endif %}"
+                           placeholder="Mínimo 8 caracteres"
+                           autocomplete="new-password">
+                    {% if form.password1.errors %}
+                    <div class="admin-form-error">
+                        <i class="bi bi-exclamation-circle"></i>
+                        {{ form.password1.errors.0 }}
                     </div>
-                </form>
+                    {% endif %}
+                </div>
+
+                <div class="admin-form-group">
+                    <label for="id_password2" class="admin-form-label required">Confirmar Contraseña</label>
+                    <input type="password" 
+                           name="password2" 
+                           id="id_password2" 
+                           class="admin-form-input {% if form.password2.errors %}is-invalid{% endif %}"
+                           placeholder="Repite la contraseña"
+                           autocomplete="new-password">
+                    {% if form.password2.errors %}
+                    <div class="admin-form-error">
+                        <i class="bi bi-exclamation-circle"></i>
+                        {{ form.password2.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="admin-form-group">
+                    <label class="admin-form-check">
+                        <input type="checkbox" 
+                               name="activo" 
+                               id="id_activo"
+                               {% if form.activo.value %}checked{% endif %}>
+                        <span>Usuario Activo</span>
+                    </label>
+                </div>
             </div>
-        </div>
+
+            <div class="admin-form-footer">
+                <a href="{% url 'usuarios:lista_catalogadores' %}" class="admin-btn admin-btn-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="admin-btn admin-btn-primary">
+                    {{ accion }}
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}
