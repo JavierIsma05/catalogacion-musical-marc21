@@ -1,0 +1,382 @@
+/* ==========================================================================
+   CSS ESPECÍFICO PARA CATÁLOGO PÚBLICO
+   Estilos adicionales para la interfaz pública de consulta
+   ========================================================================== */
+
+/* Variables de colores para el tema público */
+:root {
+    --color-primary: #1a5f7a;
+    --color-secondary: #159895;
+    --color-accent: #57c5b6;
+    --color-text: #212121;
+    --color-text-light: #757575;
+    --color-border: #e0e0e0;
+    --color-surface: #f5f5f5;
+    --color-background: #fafafa;
+    --border-radius: 8px;
+    --border-radius-sm: 4px;
+    --border-radius-lg: 12px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --transition-base: all 0.2s ease;
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: white;
+    padding: 4rem 2rem;
+    text-align: center;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 2rem;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.125rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Cards de Estadísticas */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid var(--color-border);
+    transition: var(--transition-base);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-card .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    display: block;
+}
+
+.stat-card .stat-label {
+    font-size: 0.875rem;
+    color: var(--color-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Cards de Obras */
+.obras-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.obra-card {
+    background: white;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    transition: var(--transition-base);
+}
+
+.obra-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+}
+
+.obra-card-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+}
+
+.obra-card-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.obra-card-body {
+    padding: 1.25rem;
+}
+
+.obra-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.obra-meta-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.obra-meta-item .meta-label {
+    color: var(--color-text-light);
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.obra-meta-item .meta-value {
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.obra-card-footer {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface);
+}
+
+/* Badges de Tipo de Obra */
+.obra-tipo-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.obra-tipo-badge.general {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.obra-tipo-badge.musical {
+    background: #fce7f3;
+    color: #9d174d;
+}
+
+.obra-tipo-badge.coleccion {
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* Filtros y Búsqueda */
+.search-section {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--color-border);
+}
+
+.search-form {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.search-form .form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-form .btn {
+    align-self: flex-end;
+}
+
+/* Detalle de Obra */
+.obra-detalle {
+    background: white;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+}
+
+.obra-detalle-header {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: white;
+    padding: 2rem;
+}
+
+.obra-detalle-header h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.obra-detalle-header .obra-subtitulo {
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+.obra-detalle-body {
+    padding: 2rem;
+}
+
+.obra-seccion {
+    margin-bottom: 2rem;
+}
+
+.obra-seccion:last-child {
+    margin-bottom: 0;
+}
+
+.obra-seccion h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--color-primary);
+}
+
+.obra-campos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.campo-item {
+    padding: 0.75rem;
+    background: var(--color-surface);
+    border-radius: var(--border-radius-sm);
+}
+
+.campo-item .campo-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-light);
+    margin-bottom: 0.25rem;
+}
+
+.campo-item .campo-valor {
+    font-size: 0.9375rem;
+    color: var(--color-text);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--color-text-light);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+}
+
+.empty-state p {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Paginación */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.pagination {
+    display: flex;
+    gap: 0.25rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.pagination li a,
+.pagination li span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 0.75rem;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border);
+    background: white;
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: var(--transition-base);
+}
+
+.pagination li a:hover {
+    background: var(--color-surface);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.pagination li.active span {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+.pagination li.disabled span {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero {
+        padding: 2rem 1rem;
+    }
+    
+    .hero h1 {
+        font-size: 1.75rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .obras-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .search-form {
+        flex-direction: column;
+    }
+    
+    .search-form .form-group {
+        width: 100%;
+    }
+    
+    .obra-detalle-header {
+        padding: 1.5rem;
+    }
+    
+    .obra-detalle-body {
+        padding: 1.5rem;
+    }
+    
+    .obra-campos {
+        grid-template-columns: 1fr;
+    }
+}

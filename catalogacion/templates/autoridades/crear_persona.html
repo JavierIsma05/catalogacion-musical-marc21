@@ -1,21 +1,10 @@
-{% extends 'base.html' %}
+{% extends 'catalogacion/base_catalogacion.html' %}
 {% load static %}
 
 {% block title %}{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Persona - MARC21{% endblock %}
+{% block page_title %}{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Persona{% endblock %}
 
-{% block breadcrumb %}
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'index' %}">Inicio</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'autoridades:lista_personas' %}">Personas</a></li>
-        <li class="breadcrumb-item active">
-            {% if form.instance.pk %}Editar{% else %}Crear{% endif %}
-        </li>
-    </ol>
-</nav>
-{% endblock %}
-
-{% block content %}
+{% block catalogacion_content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <div class="card shadow-sm">
@@ -145,8 +134,8 @@
         {% endif %}
     </div>
 </div>
-{% endblock %}
+{% endblock catalogacion_content %}
 
-{% block extra_js %}
+{% block catalogacion_js %}
 <script src="{% static 'catalogacion/js/field-validation.js' %}"></script>
 {% endblock %}

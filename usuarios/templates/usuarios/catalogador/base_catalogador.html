@@ -14,109 +14,51 @@
     <!-- Select2 CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.3.1/select2-bootstrap-5-theme.min.css">
-    <!-- Custom CSS -->
+    <!-- CSS Base Global -->
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    <!-- CSS Catalogación -->
     <link href="{% static 'catalogacion/css/styles.css' %}" rel="stylesheet">
+    <!-- CSS Catalogador específico -->
+    <link href="{% static 'usuarios/css/catalogador.css' %}" rel="stylesheet">
 
-    <style>
-        :root {
-            --sidebar-width: 250px;
-            --catalogador-primary: #1a5f7a;
-            --catalogador-secondary: #247291;
-        }
-        
-        body {
-            min-height: 100vh;
-        }
-        
-        .sidebar {
-            width: var(--sidebar-width);
-            min-height: 100vh;
-            background: var(--catalogador-primary);
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 100;
-        }
-        
-        .sidebar .nav-link {
-            color: rgba(255,255,255,0.8);
-            padding: 0.75rem 1rem;
-            border-left: 3px solid transparent;
-        }
-        
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            color: white;
-            background: var(--catalogador-secondary);
-            border-left-color: #57c5b6;
-        }
-        
-        .sidebar .nav-link i {
-            margin-right: 0.5rem;
-        }
-        
-        .main-content {
-            margin-left: var(--sidebar-width);
-            min-height: 100vh;
-            background: #f8f9fa;
-        }
-        
-        .top-bar {
-            background: white;
-            border-bottom: 1px solid #dee2e6;
-            padding: 1rem;
-        }
-        
-        .content-area {
-            padding: 1.5rem;
-        }
-    </style>
     {% block extra_css %}{% endblock %}
 </head>
 
 <body>
     <!-- Sidebar -->
-    <nav class="sidebar d-flex flex-column">
-        <div class="p-3 border-bottom border-secondary">
-            <a href="{% url 'usuarios:catalogador_dashboard' %}" class="text-white text-decoration-none">
-                <i class="bi bi-pencil-square fs-4"></i>
-                <span class="fs-5 ms-2">Catalogador</span>
+    <nav class="layout-sidebar catalogador-theme">
+        <div class="sidebar-header">
+            <a href="{% url 'usuarios:catalogador_dashboard' %}">
+                <i class="bi bi-pencil-square"></i>
+                <span>Catalogador</span>
             </a>
         </div>
         
-        <ul class="nav flex-column flex-grow-1 pt-3">
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'catalogador_dashboard' %}active{% endif %}" 
-                   href="{% url 'usuarios:catalogador_dashboard' %}">
-                    <i class="bi bi-house-door"></i> Inicio
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'seleccionar_tipo' %}active{% endif %}" 
-                   href="{% url 'catalogacion:seleccionar_tipo' %}">
-                    <i class="bi bi-plus-circle"></i> Nueva Obra
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'lista_obras' %}active{% endif %}" 
-                   href="{% url 'catalogacion:lista_obras' %}">
-                    <i class="bi bi-collection"></i> Mis Obras
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'lista_personas' %}">
-                    <i class="bi bi-person-badge"></i> Autoridades
-                </a>
-            </li>
-        </ul>
+        <div class="sidebar-nav">
+            <a class="nav-link {% if request.resolver_match.url_name == 'catalogador_dashboard' %}active{% endif %}" 
+               href="{% url 'usuarios:catalogador_dashboard' %}">
+                <i class="bi bi-house-door"></i> Inicio
+            </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'seleccionar_tipo' %}active{% endif %}" 
+               href="{% url 'catalogacion:seleccionar_tipo' %}">
+                <i class="bi bi-plus-circle"></i> Nueva Obra
+            </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_obras' %}active{% endif %}" 
+               href="{% url 'catalogacion:lista_obras' %}">
+                <i class="bi bi-collection"></i> Mis Obras
+            </a>
+            <a class="nav-link" href="{% url 'lista_personas' %}">
+                <i class="bi bi-person-badge"></i> Autoridades
+            </a>
+        </div>
         
-        <div class="border-top border-secondary p-3">
-            <a href="{% url 'catalogo_publico:home' %}" class="nav-link text-white-50">
+        <div class="sidebar-footer">
+            <a href="{% url 'catalogo_publico:home' %}" class="nav-link">
                 <i class="bi bi-globe"></i> Ver Sitio Público
             </a>
-            <form method="post" action="{% url 'usuarios:logout' %}" class="d-inline">
+            <form method="post" action="{% url 'usuarios:logout' %}">
                 {% csrf_token %}
-                <button type="submit" class="nav-link text-white-50 border-0 bg-transparent w-100 text-start">
+                <button type="submit" class="nav-link border-0 bg-transparent w-100 text-start">
                     <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
                 </button>
             </form>
@@ -124,21 +66,21 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="layout-main">
         <!-- Top Bar -->
-        <div class="top-bar d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">{% block page_title %}Inicio{% endblock %}</h4>
-            <div class="d-flex align-items-center">
-                <span class="text-muted me-3">
+        <header class="layout-topbar">
+            <h1>{% block page_title %}Inicio{% endblock %}</h1>
+            <div class="layout-topbar-user">
+                <span class="user-name">
                     <i class="bi bi-person-circle"></i>
                     {{ user.nombre_completo|default:user.email }}
                 </span>
-                <span class="badge bg-info">Catalogador</span>
+                <span class="role-badge catalogador">Catalogador</span>
             </div>
-        </div>
+        </header>
 
         <!-- Content Area -->
-        <div class="content-area">
+        <main class="layout-content">
             {% if messages %}
                 {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -149,7 +91,7 @@
             {% endif %}
             
             {% block content %}{% endblock %}
-        </div>
+        </main>
     </div>
 
     <!-- jQuery -->

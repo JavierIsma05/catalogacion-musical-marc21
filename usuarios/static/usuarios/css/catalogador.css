@@ -1,0 +1,207 @@
+/* ==========================================================================
+   CSS ESPECÍFICO PARA PANEL DE CATALOGADOR
+   Estilos adicionales para la interfaz de catalogadores
+   ========================================================================== */
+
+/* Override del tema de sidebar para catalogador */
+.layout-sidebar.catalogador-theme {
+    background: linear-gradient(180deg, #1a5f7a 0%, #134b5f 100%);
+}
+
+.layout-sidebar.catalogador-theme .nav-link:hover,
+.layout-sidebar.catalogador-theme .nav-link.active {
+    background: rgba(87, 197, 182, 0.15);
+    border-left-color: #57c5b6;
+}
+
+/* Dashboard del catalogador */
+.catalogador-welcome {
+    background: linear-gradient(135deg, #1a5f7a 0%, #247291 100%);
+    color: white;
+    border-radius: var(--radius-lg, 12px);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.catalogador-welcome h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.catalogador-welcome p {
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+/* Cards de acciones rápidas */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.quick-action-card {
+    background: white;
+    border-radius: var(--radius-lg, 12px);
+    padding: 1.5rem;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    border-color: #57c5b6;
+    color: inherit;
+}
+
+.quick-action-card .action-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: #e0f2fe;
+    color: #0284c7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.quick-action-card.new-obra .action-icon {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.quick-action-card.list-obras .action-icon {
+    background: #e0e7ff;
+    color: #4f46e5;
+}
+
+.quick-action-card.autoridades .action-icon {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.quick-action-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--gray-800, #1f2937);
+}
+
+.quick-action-card p {
+    font-size: 0.875rem;
+    color: var(--gray-500, #6b7280);
+    margin: 0;
+}
+
+/* Stats del catalogador */
+.catalogador-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.catalogador-stat {
+    background: white;
+    border-radius: var(--radius-lg, 12px);
+    padding: 1.25rem;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    text-align: center;
+}
+
+.catalogador-stat .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a5f7a;
+    line-height: 1;
+}
+
+.catalogador-stat .stat-label {
+    font-size: 0.875rem;
+    color: var(--gray-500, #6b7280);
+    margin-top: 0.25rem;
+}
+
+/* Lista de obras recientes */
+.obras-recientes {
+    background: white;
+    border-radius: var(--radius-lg, 12px);
+    border: 1px solid var(--gray-200, #e5e7eb);
+    overflow: hidden;
+}
+
+.obras-recientes-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--gray-200, #e5e7eb);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.obras-recientes-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--gray-800, #1f2937);
+}
+
+.obra-item {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--gray-100, #f3f4f6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.2s ease;
+}
+
+.obra-item:last-child {
+    border-bottom: none;
+}
+
+.obra-item:hover {
+    background: var(--gray-50, #f9fafb);
+}
+
+.obra-item-info h4 {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--gray-800, #1f2937);
+    margin: 0 0 0.25rem 0;
+}
+
+.obra-item-info p {
+    font-size: 0.8125rem;
+    color: var(--gray-500, #6b7280);
+    margin: 0;
+}
+
+.obra-item-date {
+    font-size: 0.75rem;
+    color: var(--gray-400, #9ca3af);
+    white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .catalogador-welcome {
+        padding: 1.5rem;
+    }
+    
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .catalogador-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

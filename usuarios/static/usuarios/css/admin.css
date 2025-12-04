@@ -1,0 +1,241 @@
+/* ==========================================================================
+   CSS ESPECÍFICO PARA PANEL DE ADMINISTRACIÓN
+   Estilos adicionales para la interfaz de administradores
+   ========================================================================== */
+
+/* Override del tema de sidebar para admin */
+.layout-sidebar.admin-theme {
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+}
+
+.layout-sidebar.admin-theme .nav-link:hover,
+.layout-sidebar.admin-theme .nav-link.active {
+    background: rgba(59, 130, 246, 0.15);
+    border-left-color: #3b82f6;
+}
+
+/* Cards de estadísticas del dashboard */
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.admin-stat-card {
+    background: white;
+    border-radius: var(--radius-lg, 12px);
+    padding: 1.5rem;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+}
+
+.admin-stat-card .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.admin-stat-card .stat-icon.blue {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.admin-stat-card .stat-icon.green {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.admin-stat-card .stat-icon.purple {
+    background: #f3e8ff;
+    color: #9333ea;
+}
+
+.admin-stat-card .stat-icon.orange {
+    background: #ffedd5;
+    color: #ea580c;
+}
+
+.admin-stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gray-900, #111827);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.admin-stat-card .stat-label {
+    font-size: 0.875rem;
+    color: var(--gray-500, #6b7280);
+}
+
+/* Tabla de catalogadores */
+.table-catalogadores {
+    background: white;
+    border-radius: var(--radius-lg, 12px);
+    overflow: hidden;
+    border: 1px solid var(--gray-200, #e5e7eb);
+}
+
+.table-catalogadores thead {
+    background: var(--gray-50, #f9fafb);
+}
+
+.table-catalogadores th {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-600, #4b5563);
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-200, #e5e7eb);
+}
+
+.table-catalogadores td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--gray-100, #f3f4f6);
+}
+
+.table-catalogadores tbody tr:hover {
+    background: var(--gray-50, #f9fafb);
+}
+
+.table-catalogadores .user-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.table-catalogadores .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--gray-200, #e5e7eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--gray-600, #4b5563);
+    font-size: 0.875rem;
+}
+
+.table-catalogadores .user-info .user-name {
+    font-weight: 600;
+    color: var(--gray-900, #111827);
+}
+
+.table-catalogadores .user-info .user-email {
+    font-size: 0.875rem;
+    color: var(--gray-500, #6b7280);
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-badge.active::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+}
+
+.status-badge.inactive {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.status-badge.inactive::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ef4444;
+}
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-600, #4b5563);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    background: var(--gray-50, #f9fafb);
+    color: var(--gray-900, #111827);
+}
+
+.action-btn.edit:hover {
+    background: #dbeafe;
+    color: #2563eb;
+    border-color: #93c5fd;
+}
+
+.action-btn.delete:hover {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+/* Empty state */
+.admin-empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: var(--radius-lg, 12px);
+    border: 2px dashed var(--gray-200, #e5e7eb);
+}
+
+.admin-empty-state i {
+    font-size: 3rem;
+    color: var(--gray-300, #d1d5db);
+    margin-bottom: 1rem;
+}
+
+.admin-empty-state h3 {
+    font-size: 1.125rem;
+    color: var(--gray-700, #374151);
+    margin-bottom: 0.5rem;
+}
+
+.admin-empty-state p {
+    color: var(--gray-500, #6b7280);
+    margin-bottom: 1.5rem;
+}

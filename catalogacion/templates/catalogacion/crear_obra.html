@@ -1,23 +1,14 @@
-{% extends 'base.html' %}
+{% extends 'catalogacion/base_catalogacion.html' %}
 {% load static %}
 
 {% block title %}Crear {{ tipo_obra_titulo }} - MARC21{% endblock %}
+{% block page_title %}Crear {{ tipo_obra_titulo }}{% endblock %}
 
-{% block extra_css %}
+{% block catalogacion_css %}
 <link rel="stylesheet" href="{% static 'catalogacion/css/crear-obra.css' %}">
 {% endblock %}
 
-{% block breadcrumb %}
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'catalogacion:index' %}">Inicio</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'catalogacion:seleccionar_tipo' %}">Tipo de Obra</a></li>
-        <li class="breadcrumb-item active">{{ tipo_obra_titulo }}</li>
-    </ol>
-</nav>
-{% endblock %}
-
-{% block content %}
+{% block catalogacion_content %}
 <div class="form-with-progress-sidebar" data-tipo-obra="{{ tipo_obra }}">
     <!-- SIDEBAR DE PROGRESO -->
     <aside class="progress-sidebar">
@@ -246,9 +237,9 @@
     </div>
 </div>
 
-{% endblock %}
+{% endblock catalogacion_content %}
 
-{% block extra_js %}
+{% block catalogacion_js %}
 <script>
 // Pasar tipo de obra al JavaScript
 window.TIPO_OBRA_ACTUAL = '{{ tipo_obra }}';
@@ -517,4 +508,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-{% endblock %}
+{% endblock catalogacion_js %}

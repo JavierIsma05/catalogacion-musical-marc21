@@ -1,0 +1,23 @@
+{% extends 'usuarios/catalogador/base_catalogador.html' %}
+{% load static %}
+
+{# 
+   Template base para las páginas de catalogación que necesitan el sidebar.
+   Hereda del layout de catalogador con sidebar.
+   Usado por: seleccionar_tipo_obra, lista_obras, detalle_obra, etc.
+#}
+
+{% block extra_css %}
+{{ block.super }}
+{% block catalogacion_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+{% block breadcrumb %}{% endblock %}
+{% block catalogacion_content %}{% endblock %}
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+{% block catalogacion_js %}{% endblock %}
+{% endblock %}

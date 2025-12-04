@@ -1,70 +1,305 @@
-{% extends "base.html" %}
 {% load static %}
-
-{% block extra_css %}
-<!-- Cargar estilos base de catalogación para heredar variables y botones -->
-<link rel="stylesheet" href="{% static 'catalogacion/css/styles.css' %}">
-<link rel="stylesheet" href="{% static 'usuarios/css/login.css' %}">
-
-{% endblock %}
-
-{% block content %}
-<div class="login-container">
-    <div class="login-card">
-        <div class="login-header">
-            <h2>Bienvenido</h2>
-            <p>Ingresa a tu cuenta para continuar</p>
-        </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Catalogación Musical MARC21</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- CSS Base -->
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    <!-- CSS Login -->
+    <link href="{% static 'usuarios/css/login.css' %}" rel="stylesheet">
+    
+    <style>
+        :root {
+            --login-primary: #1a5f7a;
+            --login-secondary: #159895;
+            --login-accent: #57c5b6;
+        }
         
-        <div class="login-body">
-            <form method="post" action="{% url 'usuarios:login' %}">
-                {% csrf_token %}
-                
-                <!-- Manejo de Errores -->
-                {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle"></i>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+        }
+        
+        .login-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, var(--login-primary) 0%, var(--login-secondary) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .login-header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-header p {
+            opacity: 0.9;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+        
+        .login-body {
+            padding: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--login-primary);
+            box-shadow: 0 0 0 3px rgba(26, 95, 122, 0.15);
+            outline: none;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, var(--login-primary) 0%, var(--login-secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 95, 122, 0.35);
+        }
+        
+        .login-footer {
+            text-align: center;
+            padding: 1.25rem 2rem;
+            background: var(--gray-50);
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .login-footer a {
+            color: var(--login-primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .alert-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Footer del sitio */
+        .site-footer {
+            background: linear-gradient(135deg, var(--login-primary) 0%, #0d3d4d 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .footer-brand i {
+            font-size: 1.5rem;
+            color: var(--login-accent);
+        }
+        
+        .footer-brand span {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .footer-info {
+            text-align: right;
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        
+        .footer-info p {
+            margin: 0;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 0.25rem;
+        }
+        
+        .footer-links a {
+            color: var(--login-accent);
+            text-decoration: none;
+            font-size: 0.8125rem;
+            transition: opacity 0.2s;
+        }
+        
+        .footer-links a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 576px) {
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-info {
+                text-align: center;
+            }
+            
+            .footer-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form -->
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <h2><i class="bi bi-music-note-list me-2"></i>Bienvenido</h2>
+                <p>Ingresa a tu cuenta para continuar</p>
+            </div>
+            
+            <div class="login-body">
+                <form method="post" action="{% url 'usuarios:login' %}">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert-danger">
+                        <i class="bi bi-exclamation-circle"></i>
                         Credenciales incorrectas. Intenta de nuevo.
                     </div>
-                {% endif %}
+                    {% endif %}
 
-                <!-- Campo Email -->
-                <div class="form-group">
-                    <label for="{{ form.username.id_for_label }}">Email</label>
-                    <!-- Reutilizamos tu clase .form-control -->
-                    <input type="email" 
-                           name="username" 
-                           class="form-control" 
-                           placeholder="nombre@ejemplo.com" 
-                           required 
-                           autofocus>
-                </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" 
+                               name="username" 
+                               id="email"
+                               class="form-control" 
+                               placeholder="nombre@ejemplo.com" 
+                               required 
+                               autofocus>
+                    </div>
 
-                <!-- Campo Password -->
-                <div class="form-group">
-                    <label for="{{ form.password.id_for_label }}">Contraseña</label>
-                    <input type="password" 
-                           name="password" 
-                           class="form-control" 
-                           placeholder="••••••••" 
-                           required>
-                </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" 
+                               name="password" 
+                               id="password"
+                               class="form-control" 
+                               placeholder="••••••••" 
+                               required>
+                    </div>
 
-                <!-- Botón Submit -->
-                <button type="submit" class="btn btn-primary btn-block">
-                    Iniciar Sesión
-                </button>
-                
-                <!-- Input oculto para redirección segura -->
-                <input type="hidden" name="next" value="{{ next }}">
-            </form>
-        </div>
-        
-        <div class="card-footer" style="text-align: center; padding: 1rem; background: var(--gray-50); border-top: 1px solid var(--border-color);">
-            <small class="text-muted">
-                ¿No tienes cuenta? <a href="#" style="color: var(--accent); font-weight: 600;">Regístrate</a>
-            </small>
+                    <button type="submit" class="btn-login">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Iniciar Sesión
+                    </button>
+                    
+                    <input type="hidden" name="next" value="{{ next }}">
+                </form>
+            </div>
+            
+            <div class="login-footer">
+                <small class="text-muted">
+                    ¿No tienes cuenta? <a href="#">Regístrate</a>
+                </small>
+            </div>
         </div>
     </div>
-</div>
-{% endblock %}
+
+    <!-- Footer Mejorado -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <i class="bi bi-music-note-beamed"></i>
+                <span>Catalogación Musical MARC21</span>
+            </div>
+            <div class="footer-info">
+                <p>&copy; 2025 Universidad Nacional de Loja</p>
+                <div class="footer-links">
+                    <a href="{% url 'catalogo_publico:home' %}">Ver Catálogo Público</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
