@@ -83,7 +83,28 @@ class DetalleObraPublicaView(DetailView):
     context_object_name = 'obra'
     
     def get_queryset(self):
-        return ObraGeneral.objects.activos()
+        return (
+            ObraGeneral.objects.activos()
+            .select_related(
+                'compositor',
+                'titulo_uniforme',
+                'titulo_240',
+                'forma_130',
+                'forma_240',
+            )
+            .prefetch_related(
+                'medios_interpretacion_382__medios',
+                'materias_650__subdivisiones',
+                'materias_655__subdivisiones',
+                'producciones_publicaciones__lugares',
+                'producciones_publicaciones__entidades',
+                'producciones_publicaciones__fechas',
+                'enlaces_documento_fuente_773__titulo',
+                'enlaces_documento_fuente_773__encabezamiento_principal',
+                'incipits_musicales',
+                'notas_generales_500',
+            )
+        )
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

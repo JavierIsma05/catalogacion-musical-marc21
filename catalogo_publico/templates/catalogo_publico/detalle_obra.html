@@ -1,6 +1,11 @@
 {% extends 'catalogo_publico/base_publico.html' %}
+{% load static %}
 
 {% block title %}{{ obra }} - Catálogo Musical MARC21{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'catalogo_publico/css/resumen_obra.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -19,128 +24,261 @@
                     Catálogo
                 </a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">Detalle</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ obra.signatura_publica_display }}</li>
         </ol>
     </nav>
 
-    <!-- Header de la obra -->
-    <div class="card border-0 shadow-sm mb-3">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-                <div class="flex-grow-1">
-                    <h1 class="h4 mb-2">
-                        <i class="bi bi-file-earmark-music text-primary"></i>
-                        {{ obra.titulo_principal }}
-                    </h1>
-                    {% if obra.compositor %}
-                    <p class="lead text-muted mb-2" style="font-size: 1rem;">
-                        <i class="bi bi-person"></i>
-                        {{ obra.compositor }}
-                    </p>
-                    {% endif %}
-                    <span class="badge bg-primary">
-                        {% if obra.tipo_registro == 'd' %}
-                            <i class="bi bi-pen"></i> Manuscrito
-                        {% else %}
-                            <i class="bi bi-file-text"></i> Impreso
-                        {% endif %}
-                    </span>
-                </div>
-                <a href="{% url 'catalogo_publico:lista_obras' %}" 
-                   class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-arrow-left"></i>
-                    Volver
-                </a>
+    <!-- Header Principal -->
+    <div class="detalle-hero mb-3">
+        <div class="detalle-hero-overlay"></div>
+        <div class="detalle-hero-content">
+            <div class="detalle-badge-group">
+                <span class="detalle-badge detalle-badge-primary">
+                    <i class="bi bi-hash"></i>
+                    {{ obra.signatura_publica_display }}
+                </span>
+                <span class="detalle-badge detalle-badge-secondary">
+                    {{ obra.tecnica_340_publica_display }}
+                </span>
             </div>
+            <h1 class="detalle-hero-title">{{ obra.titulo_destacado_display }}</h1>
+            <p class="detalle-hero-subtitle">{{ obra.autor_publico_principal }}</p>
+        </div>
+        <div class="detalle-hero-actions">
+            <a href="{% url 'catalogo_publico:lista_obras' %}" class="btn btn-light btn-sm">
+                <i class="bi bi-arrow-left"></i>
+                Volver al catálogo
+            </a>
         </div>
     </div>
 
-    <!-- Información de la obra -->
     <div class="row g-3">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-transparent">
-                    <h5 class="mb-0">
-                        <i class="bi bi-info-circle"></i>
-                        Información General
-                    </h5>
+        <!-- Contenido Principal -->
+        <div class="col-lg-9">
+            
+            <!-- Vista Resumida -->
+            <section class="detalle-section mb-3">
+                <div class="detalle-section-header">
+                    <h2>
+                        <i class="bi bi-card-checklist"></i>
+                        Vista resumida
+                    </h2>
                 </div>
-                <div class="card-body">
-                    <table class="table table-borderless table-sm mb-0">
-                        <tbody>
-                            {% if obra.titulo_uniforme %}
-                            <tr>
-                                <th class="text-muted" width="180">Título Uniforme</th>
-                                <td>{{ obra.titulo_uniforme }}</td>
-                            </tr>
+                <div class="detalle-section-body">
+                    <div class="detalle-campo-marc">
+                        <div class="detalle-campo-item">
+                            <span class="campo-etiqueta">Signatura (092):</span>
+                            <span class="campo-valor">{{ obra.signatura_publica_display }}</span>
+                        </div>
+                        
+                        <div class="detalle-campo-item">
+                            <span class="campo-etiqueta">Colección (773):</span>
+                            {% if obra.coleccion_publica_display %}
+                                <span class="campo-valor">{{ obra.coleccion_publica_display }}</span>
+                            {% else %}
+                                <span class="campo-valor campo-vacio">Sin colección asociada</span>
                             {% endif %}
-                            {% if obra.titulo_principal %}
-                            <tr>
-                                <th class="text-muted">Título Principal</th>
-                                <td>{{ obra.titulo_principal }}</td>
-                            </tr>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Compositor -->
+            <section class="detalle-section mb-3">
+                <div class="detalle-section-header">
+                    <h2>
+                        <i class="bi bi-person"></i>
+                        Compositor (100)
+                    </h2>
+                </div>
+                <div class="detalle-section-body">
+                    <div class="detalle-campo-marc">
+                        <div class="detalle-campo-item-single">
+                            <span class="campo-valor">{{ obra.autor_publico_principal }}</span>
+                            {% if obra.autor_publico_nota %}
+                                <span class="campo-nota">{{ obra.autor_publico_nota }}</span>
                             {% endif %}
-                            {% if obra.compositor %}
-                            <tr>
-                                <th class="text-muted">Compositor</th>
-                                <td>{{ obra.compositor }}</td>
-                            </tr>
-                            {% endif %}
-                            <tr>
-                                <th class="text-muted">Tipo de Material</th>
-                                <td>
-                                    {% if obra.tipo_registro == 'd' %}
-                                        <span class="badge bg-secondary">
-                                            <i class="bi bi-pen"></i> Manuscrito
-                                        </span>
-                                    {% else %}
-                                        <span class="badge bg-secondary">
-                                            <i class="bi bi-file-text"></i> Impreso
-                                        </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Títulos -->
+            <section class="detalle-section mb-3">
+                <div class="detalle-section-header">
+                    <h2>
+                        <i class="bi bi-fonts"></i>
+                        Títulos
+                    </h2>
+                </div>
+                <div class="detalle-section-body">
+                    <div class="detalle-campo-marc">
+                        {% if obra.titulo_uniforme_130_display %}
+                            <div class="detalle-campo-item">
+                                <span class="campo-etiqueta">Título uniforme (punto de acceso principal) (130):</span>
+                                <span class="campo-valor">{{ obra.titulo_uniforme_130_display }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% if obra.titulo_uniforme_240_display %}
+                            <div class="detalle-campo-item">
+                                <span class="campo-etiqueta">Título uniforme (240):</span>
+                                <span class="campo-valor">{{ obra.titulo_uniforme_240_display }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% if obra.titulo_245_display %}
+                            <div class="detalle-campo-item">
+                                <span class="campo-etiqueta">Título en fuente (245):</span>
+                                <span class="campo-valor">{{ obra.titulo_245_display }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% if not obra.titulo_uniforme_130_display and not obra.titulo_uniforme_240_display and not obra.titulo_245_display %}
+                            <p class="campo-vacio mb-0">Sin títulos registrados</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Producción y Descripción Física -->
+            <section class="detalle-section mb-3">
+                <div class="detalle-section-header">
+                    <h2>
+                        <i class="bi bi-file-earmark-text"></i>
+                        Producción y Descripción Física
+                    </h2>
+                </div>
+                <div class="detalle-section-body">
+                    <div class="detalle-campo-marc">
+                        <div class="detalle-campo-item">
+                            <span class="campo-etiqueta">Manuscrito/Impreso (340):</span>
+                            <span class="campo-valor">{{ obra.tecnica_340_publica_display }}</span>
+                        </div>
+                        
+                        <div class="detalle-campo-item">
+                            <span class="campo-etiqueta">Producción de la obra (264):</span>
+                            <span class="campo-valor">{{ obra.publicacion_publica_display }}</span>
+                        </div>
+                        
+                        <div class="detalle-campo-item">
+                            <span class="campo-etiqueta">Descripción física (300):</span>
+                            <span class="campo-valor">{{ obra.descripcion_fisica_publica_display }}</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Características Musicales -->
+            <section class="detalle-section mb-3">
+                <div class="detalle-section-header">
+                    <h2>
+                        <i class="bi bi-music-note-beamed"></i>
+                        Características Musicales
+                    </h2>
+                </div>
+                <div class="detalle-section-body">
+                    <div class="detalle-campo-marc">
+                        <div class="detalle-campo-item">
+                            <span class="campo-etiqueta">Materia (Género/Forma) (655):</span>
+                            <span class="campo-valor">{{ obra.temas_publico_display }}</span>
+                        </div>
+                        
+                        <div class="detalle-campo-item">
+                            <span class="campo-etiqueta">Medio de interpretación (382):</span>
+                            <div>
+                                {% with medios=obra.medios_interpretacion_resumen %}
+                                    <span class="campo-valor">{{ medios.0 }}</span>
+                                    {% if medios.1 %}
+                                        <span class="campo-nota">Solista: {{ medios.1 }}</span>
                                     {% endif %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Fecha de Catalogación</th>
-                                <td>{{ obra.fecha_creacion_sistema|date:"d/m/Y" }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                {% endwith %}
+                            </div>
+                        </div>
+                        
+                        <div class="detalle-campo-item">
+                            <span class="campo-etiqueta">Tonalidad (384):</span>
+                            {% if obra.tonalidad_publica_display %}
+                                <span class="campo-valor">{{ obra.tonalidad_publica_display }}</span>
+                            {% else %}
+                                <span class="campo-valor campo-vacio">Sin tonalidad registrada</span>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- Íncipit Musical -->
+            <section class="detalle-section detalle-section-highlight mb-3">
+                <div class="detalle-section-header">
+                    <h2>
+                        <i class="bi bi-music-note-list"></i>
+                        Íncipit musical (031)
+                    </h2>
+                </div>
+                <div class="detalle-section-body">
+                    {% with detalle=obra.primer_incipit_detalle %}
+                        {% if detalle.0 %}
+                            <div class="detalle-incipit">
+                                <p class="detalle-incipit-text">{{ detalle.0 }}</p>
+                                {% if detalle.1 %}
+                                    <p class="detalle-incipit-code">{{ detalle.1 }}</p>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p class="campo-vacio mb-0">Sin íncipit registrado</p>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </section>
+
+            <!-- Notas Generales -->
+            <section class="detalle-section mb-3">
+                <div class="detalle-section-header">
+                    <h2>
+                        <i class="bi bi-journal-text"></i>
+                        Nota general (500)
+                    </h2>
+                </div>
+                <div class="detalle-section-body">
+                    {% if obra.nota_general_resumen %}
+                        <div class="detalle-campo-marc">
+                            <div class="detalle-campo-item-single">
+                                <span class="campo-valor">{{ obra.nota_general_resumen }}</span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="campo-vacio mb-0">Sin notas generales registradas</p>
+                    {% endif %}
+                </div>
+            </section>
+
         </div>
 
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-transparent">
-                    <h5 class="mb-0">
-                        <i class="bi bi-tag"></i>
-                        Metadatos
-                    </h5>
+        <!-- Sidebar Derecho -->
+        <div class="col-lg-3">
+            <div class="detalle-sidebar-card sticky-sidebar">
+                <h5 class="detalle-sidebar-title">
+                    <i class="bi bi-gear-fill"></i>
+                    Acciones
+                </h5>
+                <div class="detalle-actions-grid">
+                    <button class="btn btn-outline-secondary btn-sm w-100" type="button" disabled>
+                        <i class="bi bi-code-square"></i>
+                        Ver formato MARC21
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm w-100" type="button" disabled>
+                        <i class="bi bi-download"></i>
+                        Descargar documento
+                    </button>
+                    <button class="btn btn-primary btn-sm w-100" type="button" disabled>
+                        <i class="bi bi-eye"></i>
+                        Ver más detalles
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div class="mb-2 pb-2 border-bottom">
-                        <small class="text-muted d-block mb-1">ID de Registro</small>
-                        <span class="badge bg-light text-dark border">
-                            <i class="bi bi-hash"></i>
-                            {{ obra.pk }}
-                        </span>
-                    </div>
-                    
-                    {% if obra.num_control %}
-                    <div class="mb-2 pb-2 border-bottom">
-                        <small class="text-muted d-block mb-1">Número de Control</small>
-                        <code style="font-size: 0.8125rem;">{{ obra.num_control }}</code>
-                    </div>
-                    {% endif %}
-                    
-                    <div>
-                        <small class="text-muted d-block mb-1">Última actualización</small>
-                        <small class="text-dark">
-                            <i class="bi bi-clock"></i>
-                            {{ obra.fecha_actualizacion|date:"d/m/Y H:i" }}
-                        </small>
-                    </div>
+                <div class="detalle-sidebar-note">
+                    <i class="bi bi-info-circle"></i>
+                    <span>Algunas funciones estarán disponibles en próximas actualizaciones</span>
                 </div>
             </div>
         </div>

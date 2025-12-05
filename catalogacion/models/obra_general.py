@@ -713,6 +713,12 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
         return 'Manuscrito' if self.tipo_registro == 'd' else 'Impreso'
 
     @property
+    def tecnica_340_publica_display(self):
+        if self.ms_imp:
+            return dict(TECNICAS).get(self.ms_imp, self.ms_imp)
+        return self.tipo_soporte_publico_display
+
+    @property
     def primer_incipit_detalle(self):
         """Formato detallado para el 031 según especificación."""
         incipit = next(iter(self.incipits_musicales.all()), None)
@@ -722,17 +728,54 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
         def formato(valor):
             return valor if valor else '—'
 
+        firma = incipit.tiempo or incipit.clave or incipit.armadura
         linea_superior = (
             f"{formato(incipit.numero_obra)}."
             f"{formato(incipit.numero_movimiento)}."
             f"{formato(incipit.numero_pasaje)}; "
             f"{formato(incipit.titulo_encabezamiento)}; "
             f"{formato(incipit.voz_instrumento)}; "
-            f"{formato(incipit.clave or incipit.armadura)}"
+            f"{formato(firma)}"
         )
 
         linea_inferior = formato(incipit.notacion_musical)
         return linea_superior, linea_inferior
+
+    @property
+    def descripcion_fisica_publica_display(self):
+        texto = self.extension or ''
+        if self.otras_caracteristicas:
+            texto = f"{texto} : {self.otras_caracteristicas}" if texto else self.otras_caracteristicas
+        if self.dimension:
+            texto = f"{texto} ; {self.dimension}" if texto else self.dimension
+        if self.material_acompanante:
+            texto = f"{texto} + {self.material_acompanante}" if texto else self.material_acompanante
+        return texto or "Sin descripción física"
+
+    @property
+    def tonalidad_publica_display(self):
+        return self.get_tonalidad_384_display() if self.tonalidad_384 else ''
+
+    @property
+    def medios_interpretacion_resumen(self):
+        medios = []
+        solistas = []
+        for registro in self.medios_interpretacion_382.all():
+            nombres = ", ".join(filter(None, [m.get_medio_display() for m in registro.medios.all()]))
+            if nombres:
+                medios.append(nombres)
+            if registro.solista:
+                solistas.append(registro.solista)
+        medios_texto = "; ".join(medios) if medios else "Sin medios registrados"
+        solistas_texto = "; ".join(solistas)
+        return medios_texto, solistas_texto
+
+    @property
+    def nota_general_resumen(self):
+        nota = next(iter(self.notas_generales_500.all()), None)
+        if nota and nota.nota_general:
+            return nota.nota_general.strip()
+        return ""
 
     # ===========================================
     # MÉTODOS DE PREPARACIÓN

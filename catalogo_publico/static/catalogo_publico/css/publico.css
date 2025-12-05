@@ -779,6 +779,126 @@ section h2 i {
 .obra-meta-note {
     font-size: 0.78rem;
     color: var(--public-text-light);
+
+/* ============================================
+   DETALLE RESUMIDO DE OBRAS
+   ============================================ */
+.obra-resumen-card {
+    border: 1px solid var(--public-border-light);
+    border-radius: var(--public-radius-lg);
+    background: var(--public-background);
+    padding: 1.5rem;
+}
+
+.obra-resumen-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+}
+
+.resumen-pill {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--public-text-light);
+    margin-bottom: 0.25rem;
+}
+
+.resumen-signatura {
+    font-family: 'PT Mono', 'Fira Code', Consolas, monospace;
+    font-size: 0.85rem;
+    color: var(--public-text-light);
+    margin-bottom: 0.35rem;
+}
+
+.obra-resumen-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--public-text);
+    margin: 0;
+}
+
+.obra-resumen-chip {
+    border: 1px solid var(--public-border-light);
+    border-radius: var(--public-radius);
+    background: var(--public-surface);
+    padding: 0.75rem 1rem;
+    min-width: 180px;
+}
+
+.chip-label {
+    display: block;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--public-text-muted);
+    margin-bottom: 0.15rem;
+}
+
+.chip-value {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--public-text);
+}
+
+.resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.resumen-block {
+    border: 1px solid var(--public-border-light);
+    border-radius: var(--public-radius);
+    background: var(--public-surface);
+    padding: 0.9rem 1rem;
+}
+
+.resumen-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--public-text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.resumen-label-sub {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--public-text-light);
+    margin-bottom: 0.1rem;
+}
+
+.resumen-value {
+    margin: 0;
+    color: var(--public-text);
+    font-size: 0.92rem;
+    font-weight: 500;
+}
+
+.resumen-hint {
+    margin: 0.2rem 0 0;
+    font-size: 0.8rem;
+    color: var(--public-text-light);
+}
+
+.resumen-block--wide {
+    grid-column: span 2;
+}
+
+.resumen-incipit {
+    border: 1px dashed var(--public-border-light);
+    border-radius: var(--public-radius);
+    background: var(--public-background);
+    padding: 0.75rem;
+}
+
+.resumen-actions-card .btn {
+    font-weight: 500;
+}
     margin: 0;
 }
 
@@ -934,6 +1054,14 @@ section h2 i {
 }
 
 .card-header h5 {
+    
+    .obra-resumen-head {
+        flex-direction: column;
+    }
+
+    .obra-resumen-chip {
+        width: 100%;
+    }
     margin: 0;
     font-size: 0.9375rem;
     font-weight: 600;
@@ -1175,13 +1303,25 @@ footer small {
         min-width: unset;
         width: 100%;
     }
+
+    .obra-resumen-head {
+        flex-direction: column;
+    }
+
+    .obra-resumen-chip {
+        width: 100%;
+    }
+
+    .resumen-block--wide {
+        grid-column: span 1;
+    }
 }
 
 @media (max-width: 576px) {
     body.navbar-fixed {
         padding-top: 60px;
     }
-    
+
     .navbar {
         padding: 0.5rem 0;
     }
@@ -1204,6 +1344,10 @@ footer small {
 
     .obra-tag {
         width: 100%;
+    }
+
+    .resumen-block--wide {
+        grid-column: span 1;
     }
 }
 
