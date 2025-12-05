@@ -692,6 +692,48 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
             partes.append(incipit.voz_instrumento)
         return " · ".join(partes)
 
+    @property
+    def signatura_publica_display(self):
+        from .utils import obtener_pais_principal
+
+        if not self.centro_catalogador or not self.num_control:
+            return "Sin signatura"
+
+        pais = obtener_pais_principal(self)
+        ms_imp = 'Ms' if self.tipo_registro == 'd' else 'Imp'
+        return (
+            f"{self.centro_catalogador}. "
+            f"BLMP. "
+            f"{pais}. "
+            f"{ms_imp}.{self.num_control}"
+        )
+
+    @property
+    def tipo_soporte_publico_display(self):
+        return 'Manuscrito' if self.tipo_registro == 'd' else 'Impreso'
+
+    @property
+    def primer_incipit_detalle(self):
+        """Formato detallado para el 031 según especificación."""
+        incipit = next(iter(self.incipits_musicales.all()), None)
+        if not incipit:
+            return "", ""
+
+        def formato(valor):
+            return valor if valor else '—'
+
+        linea_superior = (
+            f"{formato(incipit.numero_obra)}."
+            f"{formato(incipit.numero_movimiento)}."
+            f"{formato(incipit.numero_pasaje)}; "
+            f"{formato(incipit.titulo_encabezamiento)}; "
+            f"{formato(incipit.voz_instrumento)}; "
+            f"{formato(incipit.clave or incipit.armadura)}"
+        )
+
+        linea_inferior = formato(incipit.notacion_musical)
+        return linea_superior, linea_inferior
+
     # ===========================================
     # MÉTODOS DE PREPARACIÓN
     # ===========================================

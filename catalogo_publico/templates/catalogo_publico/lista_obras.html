@@ -80,86 +80,82 @@
                 <a href="{% url 'catalogo_publico:detalle_obra' obra.pk %}" class="btn btn-outline-secondary btn-sm w-100 mt-2">Ver</a>
             </div>
             <div class="obra-details">
-                <div class="obra-info-head">
-                    <div>
-                        <p class="obra-signatura-label">Signatura</p>
-                        <p class="obra-signatura-value">{{ obra.signatura_completa }}</p>
-                        <p class="obra-coleccion">
-                            <span class="obra-field-label">Colección:</span>
+                <div class="obra-header">
+                    <div class="obra-header-text">
+                        <h2 class="obra-main-title">{{ obra.titulo_destacado_display }}</h2>
+                    </div>
+                    <div class="obra-top-tags">
+                        <div class="obra-tag">
+                            <span class="tag-label">Signatura</span>
+                            <span class="tag-value">{{ obra.signatura_publica_display }}</span>
+                        </div>
+                        <div class="obra-tag">
+                            <span class="tag-label">Colección</span>
                             {% if obra.coleccion_publica_display %}
-                                {{ obra.coleccion_publica_display }}
+                                <span class="tag-value">{{ obra.coleccion_publica_display }}</span>
                             {% else %}
-                                <span class="meta-empty">Sin colección asociada</span>
+                                <span class="tag-value meta-empty">Sin colección asociada</span>
                             {% endif %}
-                        </p>
-                    </div>
-                    <span class="obra-type-chip">
-                        {% if obra.tipo_registro == 'd' %}
-                            Manuscrito
-                        {% else %}
-                            Impreso
-                        {% endif %}
-                    </span>
-                </div>
-
-                <h2 class="obra-main-title">{{ obra.titulo_destacado_display }}</h2>
-
-                <div class="obra-titles">
-                    {% if obra.titulo_uniforme_130_display %}
-                    <div class="obra-meta-line">
-                        <span class="obra-field-label">Título uniforme (130):</span>
-                        <span class="obra-field-value">{{ obra.titulo_uniforme_130_display }}</span>
-                    </div>
-                    {% endif %}
-                    {% if obra.titulo_uniforme_240_display and obra.titulo_uniforme_240_display != obra.titulo_destacado_display %}
-                    <div class="obra-meta-line">
-                        <span class="obra-field-label">Título uniforme (240):</span>
-                        <span class="obra-field-value">{{ obra.titulo_uniforme_240_display }}</span>
-                    </div>
-                    {% endif %}
-                    {% if obra.titulo_245_display %}
-                    <div class="obra-meta-line">
-                        <span class="obra-field-label">Título en fuente (245):</span>
-                        <span class="obra-field-value">{{ obra.titulo_245_display }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="obra-meta-grid">
-                    <div class="obra-meta-item">
-                        <span class="obra-field-label">Autor:</span>
-                        <span class="obra-field-value">{{ obra.autor_publico_principal }}</span>
-                        {% if obra.autor_publico_nota %}
-                        <span class="obra-meta-note">{{ obra.autor_publico_nota }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="obra-meta-item">
-                        <span class="obra-field-label">Publicación:</span>
-                        <span class="obra-field-value">{{ obra.publicacion_publica_display }}</span>
-                    </div>
-                    <div class="obra-meta-item">
-                        <span class="obra-field-label">Instrumento:</span>
-                        <span class="obra-field-value">{{ obra.instrumento_publico_display }}</span>
-                    </div>
-                    <div class="obra-meta-item">
-                        <span class="obra-field-label">Materia:</span>
-                        <span class="obra-field-value">{{ obra.materia_publica_display }}</span>
-                    </div>
-                    <div class="obra-meta-item">
-                        <span class="obra-field-label">Temas:</span>
-                        <span class="obra-field-value">{{ obra.temas_publico_display }}</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="obra-incipit-block">
-                    <div class="obra-field-label">Íncipit musical (031)</div>
-                    <div class="obra-incipit-placeholder {% if obra.tiene_incipit %}has-data{% endif %}">
-                        {% if obra.tiene_incipit %}
-                            <span>{{ obra.primer_incipit_resumen }}</span>
-                        {% else %}
-                            <span>Espacio reservado para notación</span>
-                        {% endif %}
+                <div class="obra-info-stack">
+                    <div class="obra-info-row">
+                        <section class="obra-info-card mini">
+                            <p class="obra-card-label">Compositor</p>
+                            <div class="obra-card-body">
+                                <p class="obra-line">{{ obra.autor_publico_principal }}</p>
+                                {% if obra.autor_publico_nota %}
+                                <p class="obra-subline">{{ obra.autor_publico_nota }}</p>
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        <section class="obra-info-card mini">
+                            <p class="obra-card-label">Título</p>
+                            <div class="obra-card-body">
+                                {% if obra.titulo_uniforme_130_display %}
+                                    <p class="obra-line">
+                                        <span class="obra-inline-label">Uniforme · acceso principal</span>
+                                        {{ obra.titulo_uniforme_130_display }}
+                                    </p>
+                                {% else %}
+                                    {% if obra.titulo_uniforme_240_display %}
+                                        <p class="obra-line">
+                                            <span class="obra-inline-label">Uniforme complementario</span>
+                                            {{ obra.titulo_uniforme_240_display }}
+                                        </p>
+                                    {% elif obra.titulo_245_display %}
+                                        <p class="obra-line">{{ obra.titulo_245_display }}</p>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        <section class="obra-info-card mini">
+                            <p class="obra-card-label">Manuscrito/Impreso</p>
+                            <div class="obra-card-body">
+                                <p class="obra-line">{{ obra.tipo_soporte_publico_display }}</p>
+                            </div>
+                        </section>
                     </div>
+
+                    <section class="obra-info-card obra-incipit-card">
+                        <p class="obra-card-label">Íncipit musical</p>
+                        <div class="obra-card-body">
+                            {% with detalle=obra.primer_incipit_detalle %}
+                                {% if detalle.0 %}
+                                    <p class="obra-inline-line">{{ detalle.0 }}</p>
+                                    {% if detalle.1 %}
+                                        <p class="obra-inline-line code">{{ detalle.1 }}</p>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="meta-empty">Sin íncipit registrado</p>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </section>
                 </div>
 
                 <div class="obra-actions">

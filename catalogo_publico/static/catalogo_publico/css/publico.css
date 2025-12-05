@@ -606,21 +606,22 @@ section h2 i {
 .catalogo-listado {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .obra-catalog-card {
     display: flex;
-    gap: 1.5rem;
-    padding: 1.75rem;
+    gap: 1rem;
+    padding: 0.9rem 1.2rem;
     border: 1px solid var(--public-border-light);
     border-radius: var(--public-radius-lg);
     background: var(--public-background);
     box-shadow: var(--public-shadow);
+    align-items: stretch;
 }
 
 .obra-cover {
-    width: 180px;
+    width: 150px;
     flex-shrink: 0;
 }
 
@@ -628,11 +629,11 @@ section h2 i {
     border: 1px solid var(--public-border);
     border-radius: var(--public-radius);
     background: var(--public-surface);
-    height: 220px;
+    height: 180px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.75rem;
+    padding: 0.6rem;
 }
 
 .cover-placeholder {
@@ -654,110 +655,136 @@ section h2 i {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.9rem;
 }
 
-.obra-info-head {
+.obra-header {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-}
-
-.obra-signatura-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--public-text-muted);
-    margin-bottom: 0.25rem;
-}
-
-.obra-signatura-value {
-    font-weight: 600;
-    color: var(--public-primary);
-    margin-bottom: 0.35rem;
-}
-
-.obra-coleccion {
-    margin: 0;
-    font-size: 0.875rem;
-    color: var(--public-text-light);
-}
-
-.obra-type-chip {
-    align-self: flex-start;
-    padding: 0.35rem 0.9rem;
-    border-radius: 999px;
-    background: rgba(58, 193, 161, 0.12);
-    color: var(--public-accent);
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    border: 1px solid rgba(58, 193, 161, 0.2);
+    align-items: flex-start;
 }
 
 .obra-main-title {
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 600;
     color: var(--public-text);
-    margin-bottom: 0.25rem;
+    margin: 0;
 }
 
-.obra-titles {
+.obra-top-tags {
     display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-}
-
-.obra-meta-line {
-    display: flex;
-    gap: 0.35rem;
-    align-items: baseline;
     flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: flex-end;
 }
 
-.obra-meta-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1rem;
-}
-
-.obra-meta-item {
+.obra-tag {
     background: var(--public-surface);
     border: 1px solid var(--public-border-light);
     border-radius: var(--public-radius);
-    padding: 0.75rem 0.9rem;
+    padding: 0.35rem 0.75rem;
+    min-width: 160px;
 }
 
-.obra-field-label {
-    font-size: 0.78rem;
-    text-transform: uppercase;
+.tag-label {
+    display: block;
+    font-size: 0.68rem;
     letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--public-text-muted);
-    margin-right: 0.35rem;
+    margin-bottom: 0.15rem;
 }
 
-.obra-field-value {
-    color: var(--public-text);
+.tag-value {
+    font-size: 0.85rem;
     font-weight: 500;
+    color: var(--public-text);
+}
+
+.obra-info-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.obra-info-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 0.75rem;
+}
+
+.obra-info-card {
+    border: 1px solid var(--public-border-light);
+    border-radius: var(--public-radius);
+    background: var(--public-surface);
+    padding: 0.65rem 0.85rem;
+    height: 100%;
+}
+
+.obra-info-card.mini {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.obra-incipit-card {
+    padding: 0.7rem 1rem;
+}
+
+.obra-card-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--public-text-muted);
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+}
+
+
+.obra-line,
+.obra-subline {
+    margin: 0 0 0.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    color: var(--public-text);
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+
+.obra-subline {
+    font-size: 0.8rem;
+    color: var(--public-text-light);
+}
+
+.obra-inline-label {
+    font-weight: 500;
+    color: var(--public-text-light);
+    margin-right: 0.15rem;
+}
+
+.obra-inline-line {
+    margin: 0 0 0.2rem;
+    font-family: 'PT Mono', 'Fira Code', Consolas, monospace;
+    font-size: 0.8rem;
+    color: var(--public-text);
+    letter-spacing: 0.02em;
+}
+
+.obra-inline-line.code {
+    color: var(--public-text-light);
 }
 
 .obra-meta-note {
-    display: block;
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     color: var(--public-text-light);
-    margin-top: 0.25rem;
+    margin: 0;
 }
 
 .meta-empty {
     font-style: italic;
     color: var(--public-text-muted);
-}
-
-.obra-incipit-block {
-    border: 1px dashed var(--public-border);
-    border-radius: var(--public-radius);
-    padding: 1rem;
-    background: var(--public-surface);
 }
 
 .obra-incipit-placeholder {
@@ -1123,16 +1150,30 @@ footer small {
         flex-direction: column;
     }
 
+    .obra-info-row {
+        grid-template-columns: 1fr;
+    }
+
     .obra-cover {
         width: 100%;
     }
 
-    .obra-info-head {
+    .obra-header {
         flex-direction: column;
     }
 
     .obra-actions {
         justify-content: flex-start;
+    }
+
+    .obra-top-tags {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .obra-tag {
+        min-width: unset;
+        width: 100%;
     }
 }
 
@@ -1161,8 +1202,8 @@ footer small {
         font-size: 1.75rem;
     }
 
-    .obra-meta-grid {
-        grid-template-columns: 1fr;
+    .obra-tag {
+        width: 100%;
     }
 }
 
