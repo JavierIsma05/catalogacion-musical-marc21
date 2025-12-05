@@ -67,38 +67,109 @@
 
     <!-- Resultados -->
     {% if obras %}
-    <div class="row g-3 mb-4">
+    <div class="catalogo-listado">
         {% for obra in obras %}
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-obra h-100">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-file-earmark-music"></i>
-                        <span>{{ obra.titulo_principal|truncatechars:55 }}</span>
-                    </h5>
-                    {% if obra.compositor %}
-                    <p class="card-text mb-2">
-                        <i class="bi bi-person"></i>
-                        {{ obra.compositor }}
-                    </p>
-                    {% endif %}
-                    <span class="badge bg-secondary">
+        <article class="obra-catalog-card">
+            <div class="obra-cover">
+                <div class="cover-frame">
+                    <div class="cover-placeholder">
+                        <i class="bi bi-image"></i>
+                        <span>Portada pendiente</span>
+                    </div>
+                </div>
+                <a href="{% url 'catalogo_publico:detalle_obra' obra.pk %}" class="btn btn-outline-secondary btn-sm w-100 mt-2">Ver</a>
+            </div>
+            <div class="obra-details">
+                <div class="obra-info-head">
+                    <div>
+                        <p class="obra-signatura-label">Signatura</p>
+                        <p class="obra-signatura-value">{{ obra.signatura_completa }}</p>
+                        <p class="obra-coleccion">
+                            <span class="obra-field-label">Colección:</span>
+                            {% if obra.coleccion_publica_display %}
+                                {{ obra.coleccion_publica_display }}
+                            {% else %}
+                                <span class="meta-empty">Sin colección asociada</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <span class="obra-type-chip">
                         {% if obra.tipo_registro == 'd' %}
-                            <i class="bi bi-pen"></i> Manuscrito
+                            Manuscrito
                         {% else %}
-                            <i class="bi bi-file-text"></i> Impreso
+                            Impreso
                         {% endif %}
                     </span>
                 </div>
-                <div class="card-footer bg-transparent">
-                    <a href="{% url 'catalogo_publico:detalle_obra' obra.pk %}" 
-                       class="btn btn-outline-primary btn-sm w-100">
-                        <i class="bi bi-eye"></i>
-                        Ver Detalle
+
+                <h2 class="obra-main-title">{{ obra.titulo_destacado_display }}</h2>
+
+                <div class="obra-titles">
+                    {% if obra.titulo_uniforme_130_display %}
+                    <div class="obra-meta-line">
+                        <span class="obra-field-label">Título uniforme (130):</span>
+                        <span class="obra-field-value">{{ obra.titulo_uniforme_130_display }}</span>
+                    </div>
+                    {% endif %}
+                    {% if obra.titulo_uniforme_240_display and obra.titulo_uniforme_240_display != obra.titulo_destacado_display %}
+                    <div class="obra-meta-line">
+                        <span class="obra-field-label">Título uniforme (240):</span>
+                        <span class="obra-field-value">{{ obra.titulo_uniforme_240_display }}</span>
+                    </div>
+                    {% endif %}
+                    {% if obra.titulo_245_display %}
+                    <div class="obra-meta-line">
+                        <span class="obra-field-label">Título en fuente (245):</span>
+                        <span class="obra-field-value">{{ obra.titulo_245_display }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="obra-meta-grid">
+                    <div class="obra-meta-item">
+                        <span class="obra-field-label">Autor:</span>
+                        <span class="obra-field-value">{{ obra.autor_publico_principal }}</span>
+                        {% if obra.autor_publico_nota %}
+                        <span class="obra-meta-note">{{ obra.autor_publico_nota }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="obra-meta-item">
+                        <span class="obra-field-label">Publicación:</span>
+                        <span class="obra-field-value">{{ obra.publicacion_publica_display }}</span>
+                    </div>
+                    <div class="obra-meta-item">
+                        <span class="obra-field-label">Instrumento:</span>
+                        <span class="obra-field-value">{{ obra.instrumento_publico_display }}</span>
+                    </div>
+                    <div class="obra-meta-item">
+                        <span class="obra-field-label">Materia:</span>
+                        <span class="obra-field-value">{{ obra.materia_publica_display }}</span>
+                    </div>
+                    <div class="obra-meta-item">
+                        <span class="obra-field-label">Temas:</span>
+                        <span class="obra-field-value">{{ obra.temas_publico_display }}</span>
+                    </div>
+                </div>
+
+                <div class="obra-incipit-block">
+                    <div class="obra-field-label">Íncipit musical (031)</div>
+                    <div class="obra-incipit-placeholder {% if obra.tiene_incipit %}has-data{% endif %}">
+                        {% if obra.tiene_incipit %}
+                            <span>{{ obra.primer_incipit_resumen }}</span>
+                        {% else %}
+                            <span>Espacio reservado para notación</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="obra-actions">
+                    <a href="{% url 'catalogo_publico:detalle_obra' obra.pk %}" class="btn btn-outline-primary btn-sm">
+                        Ver ficha completa
+                        <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
             </div>
-        </div>
+        </article>
         {% endfor %}
     </div>
 

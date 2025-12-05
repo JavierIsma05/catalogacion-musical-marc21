@@ -601,6 +601,189 @@ section h2 i {
 }
 
 /* ============================================
+   LISTADO DETALLADO DE OBRAS
+   ============================================ */
+.catalogo-listado {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.obra-catalog-card {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.75rem;
+    border: 1px solid var(--public-border-light);
+    border-radius: var(--public-radius-lg);
+    background: var(--public-background);
+    box-shadow: var(--public-shadow);
+}
+
+.obra-cover {
+    width: 180px;
+    flex-shrink: 0;
+}
+
+.cover-frame {
+    border: 1px solid var(--public-border);
+    border-radius: var(--public-radius);
+    background: var(--public-surface);
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+}
+
+.cover-placeholder {
+    text-align: center;
+    color: var(--public-text-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.cover-placeholder i {
+    font-size: 1.75rem;
+    opacity: 0.6;
+}
+
+.obra-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.obra-info-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.obra-signatura-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--public-text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.obra-signatura-value {
+    font-weight: 600;
+    color: var(--public-primary);
+    margin-bottom: 0.35rem;
+}
+
+.obra-coleccion {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--public-text-light);
+}
+
+.obra-type-chip {
+    align-self: flex-start;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(58, 193, 161, 0.12);
+    color: var(--public-accent);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border: 1px solid rgba(58, 193, 161, 0.2);
+}
+
+.obra-main-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--public-text);
+    margin-bottom: 0.25rem;
+}
+
+.obra-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.obra-meta-line {
+    display: flex;
+    gap: 0.35rem;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
+.obra-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.obra-meta-item {
+    background: var(--public-surface);
+    border: 1px solid var(--public-border-light);
+    border-radius: var(--public-radius);
+    padding: 0.75rem 0.9rem;
+}
+
+.obra-field-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--public-text-muted);
+    margin-right: 0.35rem;
+}
+
+.obra-field-value {
+    color: var(--public-text);
+    font-weight: 500;
+}
+
+.obra-meta-note {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--public-text-light);
+    margin-top: 0.25rem;
+}
+
+.meta-empty {
+    font-style: italic;
+    color: var(--public-text-muted);
+}
+
+.obra-incipit-block {
+    border: 1px dashed var(--public-border);
+    border-radius: var(--public-radius);
+    padding: 1rem;
+    background: var(--public-surface);
+}
+
+.obra-incipit-placeholder {
+    margin-top: 0.5rem;
+    padding: 1.25rem;
+    background: white;
+    border-radius: var(--public-radius);
+    border: 1px solid var(--public-border-light);
+    text-align: center;
+    color: var(--public-text-light);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+}
+
+.obra-incipit-placeholder.has-data {
+    border-style: solid;
+    color: var(--public-primary);
+    font-weight: 600;
+}
+
+.obra-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* ============================================
    BOTONES MEJORADOS Y COMPACTOS
    ============================================ */
 .btn {
@@ -935,6 +1118,22 @@ footer small {
         align-items: flex-start;
         gap: 0.25rem;
     }
+
+    .obra-catalog-card {
+        flex-direction: column;
+    }
+
+    .obra-cover {
+        width: 100%;
+    }
+
+    .obra-info-head {
+        flex-direction: column;
+    }
+
+    .obra-actions {
+        justify-content: flex-start;
+    }
 }
 
 @media (max-width: 576px) {
@@ -960,6 +1159,10 @@ footer small {
     
     .card-body h2.display-5 {
         font-size: 1.75rem;
+    }
+
+    .obra-meta-grid {
+        grid-template-columns: 1fr;
     }
 }
 

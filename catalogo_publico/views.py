@@ -25,7 +25,28 @@ class ListaObrasPublicaView(ListView):
     paginate_by = 12
     
     def get_queryset(self):
-        queryset = ObraGeneral.objects.activos().order_by('-fecha_creacion_sistema')
+        queryset = (
+            ObraGeneral.objects.activos()
+            .select_related(
+                'compositor',
+                'titulo_uniforme',
+                'titulo_240',
+                'forma_130',
+                'forma_240',
+            )
+            .prefetch_related(
+                'medios_interpretacion_382__medios',
+                'materias_650__subdivisiones',
+                'materias_655__subdivisiones',
+                'producciones_publicaciones__lugares',
+                'producciones_publicaciones__entidades',
+                'producciones_publicaciones__fechas',
+                'enlaces_documento_fuente_773__titulo',
+                'enlaces_documento_fuente_773__encabezamiento_principal',
+                'incipits_musicales',
+            )
+            .order_by('-fecha_creacion_sistema')
+        )
         
         # Búsqueda por texto
         busqueda = self.request.GET.get('q', '')
