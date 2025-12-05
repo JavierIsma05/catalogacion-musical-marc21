@@ -5,56 +5,72 @@
 {% block content %}
 <div class="container py-4">
     <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
+    <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
-                <a href="{% url 'catalogo_publico:home' %}">Inicio</a>
+                <a href="{% url 'catalogo_publico:home' %}">
+                    <i class="bi bi-house-door"></i>
+                    Inicio
+                </a>
             </li>
             <li class="breadcrumb-item">
-                <a href="{% url 'catalogo_publico:lista_obras' %}">Catálogo</a>
+                <a href="{% url 'catalogo_publico:lista_obras' %}">
+                    <i class="bi bi-collection"></i>
+                    Catálogo
+                </a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">Detalle</li>
         </ol>
     </nav>
 
     <!-- Header de la obra -->
-    <div class="card border-0 shadow-sm mb-4">
+    <div class="card border-0 shadow-sm mb-3">
         <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <h1 class="h3">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div class="flex-grow-1">
+                    <h1 class="h4 mb-2">
                         <i class="bi bi-file-earmark-music text-primary"></i>
                         {{ obra.titulo_principal }}
                     </h1>
                     {% if obra.compositor %}
-                    <p class="lead text-muted mb-2">
-                        <i class="bi bi-person"></i> {{ obra.compositor }}
+                    <p class="lead text-muted mb-2" style="font-size: 1rem;">
+                        <i class="bi bi-person"></i>
+                        {{ obra.compositor }}
                     </p>
                     {% endif %}
                     <span class="badge bg-primary">
-                        {% if obra.tipo_registro == 'd' %}Manuscrito{% else %}Impreso{% endif %}
+                        {% if obra.tipo_registro == 'd' %}
+                            <i class="bi bi-pen"></i> Manuscrito
+                        {% else %}
+                            <i class="bi bi-file-text"></i> Impreso
+                        {% endif %}
                     </span>
                 </div>
-                <a href="{% url 'catalogo_publico:lista_obras' %}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Volver
+                <a href="{% url 'catalogo_publico:lista_obras' %}" 
+                   class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i>
+                    Volver
                 </a>
             </div>
         </div>
     </div>
 
     <!-- Información de la obra -->
-    <div class="row">
+    <div class="row g-3">
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4">
+            <div class="card border-0 shadow-sm">
                 <div class="card-header bg-transparent">
-                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Información General</h5>
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        Información General
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <table class="table table-borderless">
+                    <table class="table table-borderless table-sm mb-0">
                         <tbody>
                             {% if obra.titulo_uniforme %}
                             <tr>
-                                <th class="text-muted" width="200">Título Uniforme</th>
+                                <th class="text-muted" width="180">Título Uniforme</th>
                                 <td>{{ obra.titulo_uniforme }}</td>
                             </tr>
                             {% endif %}
@@ -72,7 +88,17 @@
                             {% endif %}
                             <tr>
                                 <th class="text-muted">Tipo de Material</th>
-                                <td>{% if obra.tipo_registro == 'd' %}Manuscrito{% else %}Impreso{% endif %}</td>
+                                <td>
+                                    {% if obra.tipo_registro == 'd' %}
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-pen"></i> Manuscrito
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-file-text"></i> Impreso
+                                        </span>
+                                    {% endif %}
+                                </td>
                             </tr>
                             <tr>
                                 <th class="text-muted">Fecha de Catalogación</th>
@@ -85,23 +111,36 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm mb-4">
+            <div class="card border-0 shadow-sm">
                 <div class="card-header bg-transparent">
-                    <h5 class="mb-0"><i class="bi bi-tag"></i> Metadatos</h5>
+                    <h5 class="mb-0">
+                        <i class="bi bi-tag"></i>
+                        Metadatos
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted small mb-2">
-                        <strong>ID de Registro:</strong> {{ obra.pk }}
-                    </p>
+                    <div class="mb-2 pb-2 border-bottom">
+                        <small class="text-muted d-block mb-1">ID de Registro</small>
+                        <span class="badge bg-light text-dark border">
+                            <i class="bi bi-hash"></i>
+                            {{ obra.pk }}
+                        </span>
+                    </div>
+                    
                     {% if obra.num_control %}
-                    <p class="text-muted small mb-2">
-                        <strong>Número de Control:</strong> {{ obra.num_control }}
-                    </p>
+                    <div class="mb-2 pb-2 border-bottom">
+                        <small class="text-muted d-block mb-1">Número de Control</small>
+                        <code style="font-size: 0.8125rem;">{{ obra.num_control }}</code>
+                    </div>
                     {% endif %}
-                    <p class="text-muted small mb-0">
-                        <strong>Última actualización:</strong><br>
-                        {{ obra.fecha_actualizacion|date:"d/m/Y H:i" }}
-                    </p>
+                    
+                    <div>
+                        <small class="text-muted d-block mb-1">Última actualización</small>
+                        <small class="text-dark">
+                            <i class="bi bi-clock"></i>
+                            {{ obra.fecha_actualizacion|date:"d/m/Y H:i" }}
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>
