@@ -12,12 +12,6 @@ Template definitivo para el campo 700 – Nombres Relacionados
             {{ hidden }}
         {% endfor %}
     </div>
-
-    <!-- Botón para agregar nuevo 700 -->
-    <button type="button" class="add-form-row mb-3 btn btn-outline-primary btn-sm" title="Agregar nombre relacionado">
-        <i class="bi bi-plus-circle"></i>
-        Agregar Nombre Relacionado (700)
-    </button>
     
 
     <div class="formset-forms">
@@ -571,23 +565,39 @@ Template definitivo para el campo 700 – Nombres Relacionados
     }
 
     /* ============================
-       EVENTOS CLICK
+       BOTÓN EXTERNO (HEADER) 700
+       ============================ */
+    const headerAddBtn = document.querySelector(`.campo-add-btn[data-formset-target="${prefix}"]`);
+    if (headerAddBtn) {
+        headerAddBtn.addEventListener('click', function () {
+            const emptyForm = container.querySelector('.empty-form');
+            const formsContainer = container.querySelector('.formset-forms');
+            const totalInput = container.querySelector(`[name="${prefix}-TOTAL_FORMS"]`);
+
+            if (!emptyForm || !formsContainer || !totalInput) return;
+
+            const total = parseInt(totalInput.value, 10) || 0;
+
+            const nuevo = emptyForm.cloneNode(true);
+            nuevo.innerHTML = nuevo.innerHTML.replace(/__prefix__/g, total);
+            nuevo.classList.remove('empty-form');
+            nuevo.style.display = '';
+
+            formsContainer.appendChild(nuevo);
+
+            // Autocomplete en $a para la nueva fila
+            initPersonaAutocomplete(nuevo);
+
+            totalInput.value = total + 1;
+           // reindexForms();
+        });
+    }
+
+    /* ============================
+       EVENTOS CLICK DENTRO DEL 700
        ============================ */
     container.addEventListener('click', (e) => {
-        // Agregar fila 700
-        if (e.target.closest('.add-form-row')) {
-            const emptyForm = container.querySelector('.empty-form');
-            if (emptyForm) {
-                const nuevo = emptyForm.cloneNode(true);
-                nuevo.classList.remove('empty-form');
-                nuevo.style.display = '';
-                container.querySelector('.formset-forms').appendChild(nuevo);
-                reindexForms();
-            }
-            return;
-        }
-
-        // Eliminar fila 700
+        // ❌ Eliminar fila 700
         const deleteBtn = e.target.closest('.delete-row-btn');
         if (deleteBtn) {
             const row = deleteBtn.closest('.formset-row');
@@ -604,7 +614,7 @@ Template definitivo para el campo 700 – Nombres Relacionados
             return;
         }
 
-        // Agregar término $c
+        // ➕ Agregar término $c
         const addTerminoBtn = e.target.closest('.add-termino-btn');
         if (addTerminoBtn) {
             const index = addTerminoBtn.getAttribute('data-nombre-index');
@@ -621,7 +631,7 @@ Template definitivo para el campo 700 – Nombres Relacionados
             return;
         }
 
-        // Agregar función $e
+        // ➕ Agregar función $e
         const addFuncionBtn = e.target.closest('.add-funcion-btn');
         if (addFuncionBtn) {
             const index = addFuncionBtn.getAttribute('data-nombre-index');
@@ -638,7 +648,7 @@ Template definitivo para el campo 700 – Nombres Relacionados
             return;
         }
 
-        // Borrar término $c
+        // ❌ Borrar término $c
         if (e.target.closest('.delete-termino-btn')) {
             const row = e.target.closest('.termino-form-row');
             if (row && !row.classList.contains('termino-template-700')) {
@@ -647,7 +657,7 @@ Template definitivo para el campo 700 – Nombres Relacionados
             return;
         }
 
-        // Borrar función $e
+        // ❌ Borrar función $e
         if (e.target.closest('.delete-funcion-btn')) {
             const row = e.target.closest('.funcion-form-row');
             if (row && !row.classList.contains('funcion-template-700')) {

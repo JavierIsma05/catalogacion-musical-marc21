@@ -303,33 +303,26 @@ class AutocompletarEntidadView(View):
     """
     def get(self, request):
         query = request.GET.get('q', '').strip()
-        
+
         if len(query) < 2:
             return JsonResponse({'results': []})
-        
+
         entidades = AutoridadEntidad.objects.filter(
-            nombre_entidad__icontains=query
+            nombre__icontains=query
         ).values(
             'id',
-            'nombre_entidad',
-            'lugar'
+            'nombre',
+            'pais'
         )[:10]
-        
-        results = []
-        for entidad in entidades:
-            nombre_completo = entidad['nombre_entidad']
-            if entidad['lugar']:
-                nombre_completo += f" ({entidad['lugar']})"
-            
-            results.append({
-                'id': entidad['id'],
-                'text': nombre_completo,
-                'nombre_entidad': entidad['nombre_entidad'],
-                'lugar': entidad['lugar'] or ''
-            })
-        
-        return JsonResponse({'results': results})
 
+        results = [{
+            'id': entidad['id'],
+            'text': entidad['nombre'] + (f" ({entidad['pais']})" if entidad['pais'] else ""),
+            'nombre': entidad['nombre'],
+            'pais': entidad['pais'] or ''
+        } for entidad in entidades]
+
+        return JsonResponse({'results': results})
 
 class AutocompletarTituloUniformeView(View):
     """
@@ -391,3 +384,4 @@ class AutocompletarMateriaView(View):
             })
 
         return JsonResponse({"results": resultados})
+

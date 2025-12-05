@@ -595,8 +595,8 @@
                     <div class="ubicacion-item">
                         <span class="campo-tag">852</span>
                         <div class="ubicacion-datos">
-                            {% if ubicacion.institucion_persona %}
-                            <span class="ubicacion-parte">{{ ubicacion.institucion_persona.nombre_completo }}</span>
+                            {% if ubicacion.codigo_o_nombre  %}
+                            <span class="ubicacion-parte">{{ ubicacion.codigo_o_nombre .nombre_completo }}</span>
                             {% endif %}
                             {% if ubicacion.signatura_original %}
                             <span class="ubicacion-separador">.</span>

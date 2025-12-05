@@ -214,17 +214,6 @@ class EnlaceDocumentoFuente773(models.Model):
       $t Título (AutoridadTituloUniforme)
     """
 
-    primer_indicador = models.CharField(
-        max_length=1,
-        default='1',
-        help_text="1 – No genera nota"
-    )
-
-    segundo_indicador = models.CharField(
-        max_length=1,
-        default='#',
-        help_text="# – Visualización 'En'"
-    )
 
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -293,18 +282,6 @@ class EnlaceUnidadConstituyente774(models.Model):
       $t Título (AutoridadTituloUniforme)
     """
 
-    primer_indicador = models.CharField(
-        max_length=1,
-        default='1',
-        help_text="1 – No genera nota"
-    )
-
-    segundo_indicador = models.CharField(
-        max_length=1,
-        default='#',
-        help_text="# – Visualización 'Contiene'"
-    )
-
     obra = models.ForeignKey(
         'ObraGeneral',
         on_delete=models.CASCADE,
@@ -368,18 +345,6 @@ class OtrasRelaciones787(models.Model):
       $a Encabezamiento principal (persona)
       $t Título libre
     """
-
-    primer_indicador = models.CharField(
-        max_length=1,
-        default='1',
-        help_text="1 – No genera nota"
-    )
-
-    segundo_indicador = models.CharField(
-        max_length=1,
-        default='#',
-        help_text="# – Visualización 'Documento relacionado'"
-    )
 
     obra = models.ForeignKey(
         'ObraGeneral',

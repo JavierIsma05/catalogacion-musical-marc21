@@ -1,0 +1,157 @@
+<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
+    <div style="display:none;">
+        {% for hidden in formset.management_form %}
+        {{ hidden }}
+        {% endfor %}
+    </div>
+
+    <div class="formset-forms">
+
+        {% for form in formset %}
+        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3 position-relative">
+
+            {% if formset.can_delete %}
+            <div class="d-none">{{ form.DELETE }}</div>
+            {% endif %}
+
+            <!-- Botón delete -->
+            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger position-absolute"
+                style="right: 8px; top: 8px;" title="Eliminar 710">
+                <i class="bi bi-x-lg"></i>
+            </button>
+
+            <div class="campo-grid">
+
+                <!-- AUTOCOMPLETE 710 $a -->
+                <div class="col-full">
+                    {{ form.entidad }} {# hidden FK #}
+                    <label class="form-label" for="{{ form.entidad_texto.id_for_label }}">
+                        710 $a – Entidad relacionada
+                    </label>
+
+                    <div class="autocomplete-wrapper">
+                        <input type="text" class="form-control entidad-autocomplete"
+                            id="{{ form.entidad_texto.id_for_label }}" name="{{ form.entidad_texto.name }}"
+                            value="{{ form.entidad_texto.value|default:'' }}" placeholder="Escriba para buscar o crear…"
+                            autocomplete="off">
+
+                        <div class="autocomplete-suggestions entidad710-suggestions"></div>
+
+                        {{ form.entidad }} {# hidden ID #}
+
+
+                        <div class="autocomplete-suggestions entidad710-suggestions"></div>
+                    </div>
+
+                    <div class="form-text">
+                        Escriba para buscar una entidad existente o crear una nueva.
+                    </div>
+                </div>
+
+                <!-- 710 $e -->
+                <div class="col-full">
+                    {{ form.funcion.label_tag }}
+                    {{ form.funcion }}
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Empty Form -->
+        <div class="formset-row empty-form mb-3 d-none position-relative">
+
+            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger position-absolute"
+                style="right: 8px; top: 8px;" title="Eliminar 710">
+                <i class="bi bi-x-lg"></i>
+            </button>
+
+            <div class="campo-grid">
+
+                <div class="col-full">
+                    <input type="hidden" name="__prefix__-entidad">
+                    <label class="form-label">710 $a – Entidad relacionada</label>
+
+                    <div class="autocomplete-wrapper">
+                        <input type="text" class="form-control entidad-autocomplete" name="__prefix__-entidad_texto"
+                            placeholder="Escriba para buscar o crear…" autocomplete="off">
+
+                        <button type="button" class="search-btn btn btn-outline-secondary">
+                            <i class="bi bi-search"></i>
+                        </button>
+                        <div class="autocomplete-suggestions entidad710-suggestions"></div>
+                    </div>
+                </div>
+
+                <div class="col-full">
+                    <label class="form-label">710 $e – Función institucional</label>
+                    <select name="__prefix__-funcion" class="form-select">
+                        {% for value, label in formset.empty_form.fields.funcion.choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    document.addEventListener("input", function (e) {
+        const input = e.target.closest(".entidad-autocomplete");
+        if (!input) return;
+
+        const row = input.closest(".formset-row");
+        const hiddenId = row.querySelector('input[type="hidden"]');
+        const box = row.querySelector(".entidad710-suggestions");
+
+        const query = input.value.trim();
+        hiddenId.value = "";
+
+        if (query.length < 2) {
+            box.innerHTML = "";
+            box.classList.remove("show");
+            return;
+        }
+
+        fetch(`/catalogacion/api/autocompletar/entidad/?q=${encodeURIComponent(query)}`)
+            .then(r => r.json())
+            .then(data => {
+                box.innerHTML = "";
+
+                data.results.forEach(ent => {
+                    const div = document.createElement("div");
+                    div.className = "autocomplete-item";
+                    div.innerHTML = ent.text;
+                    div.addEventListener("click", () => {
+                        input.value = ent.nombre_entidad || ent.text;
+                        hiddenId.value = ent.id;
+                        box.innerHTML = "";
+                        box.classList.remove("show");
+                    });
+                    box.appendChild(div);
+                });
+
+                const nuevo = document.createElement("div");
+                nuevo.className = "autocomplete-item new-item";
+                nuevo.innerHTML = `<strong>+ Crear nuevo:</strong> "${query}"`;
+                nuevo.addEventListener("click", () => {
+                    input.value = query;
+                    hiddenId.value = "";
+                    box.innerHTML = "";
+                    box.classList.remove("show");
+                });
+                box.appendChild(nuevo);
+
+                box.classList.add("show");
+            });
+    });
+
+    document.addEventListener("click", function (e) {
+        document.querySelectorAll(".entidad710-suggestions.show")
+            .forEach(box => {
+                if (!box.contains(e.target)) box.classList.remove("show");
+            });
+    });
+</script>
