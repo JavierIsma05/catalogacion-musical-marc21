@@ -55,6 +55,12 @@ class CrearObraView(ObraFormsetMixin, CreateView):
     template_name = 'catalogacion/crear_obra.html'
     
     def post(self, request, *args, **kwargs):
+        logger.info("=" * 70)
+        logger.info(f"📨 POST RECIBIDO: {len(request.POST)} campos en request.POST")
+        logger.info(f"tipo_obra: {kwargs.get('tipo')}")
+        logger.info("=" * 70)
+        
+        # Debug file
         try:
             with open('debug_post.txt', 'a', encoding='utf-8') as f:
                 f.write(f"\n\n{'='*60}\n")
@@ -63,7 +69,21 @@ class CrearObraView(ObraFormsetMixin, CreateView):
         except:
             pass
         
-        return super().post(request, *args, **kwargs)
+        # Obtener el formulario
+        form = self.get_form()
+        logger.info(f"📝 Formulario obtenido: {form.__class__.__name__}")
+        logger.info(f"   is_bound={form.is_bound}, errors={bool(form.errors)}")
+        
+        if form.errors:
+            logger.error(f"❌ Errores en formulario principal:")
+            for field, errs in form.errors.items():
+                logger.error(f"   - {field}: {errs}")
+        
+        # Llamar al parent
+        result = super().post(request, *args, **kwargs)
+        
+        logger.info(f"✅ Resultado de post(): {result.status_code if hasattr(result, 'status_code') else type(result).__name__}")
+        return result
     
     def dispatch(self, request, *args, **kwargs):
         """Validar que el tipo de obra sea válido"""
@@ -91,6 +111,8 @@ class CrearObraView(ObraFormsetMixin, CreateView):
     
     def get_context_data(self, **kwargs):
         """Agregar formsets y contexto de tipo de obra"""
+        logger.info(f"🔧 get_context_data() llamado (method={self.request.method})")
+        
         context = super().get_context_data(**kwargs)
         
         # Información del tipo de obra
@@ -105,7 +127,9 @@ class CrearObraView(ObraFormsetMixin, CreateView):
         
         # Obtener formsets según método HTTP
         with_post = self.request.method == 'POST'
+        logger.debug(f"   Obteniendo formsets con with_post={with_post}")
         context.update(self._get_formsets(instance=None, with_post=with_post))
+        logger.debug(f"   Formsets obtenidos: {len([k for k in context.keys() if '_formset' in k])} formsets")
         
         # Formsets anidados para 382 (si estamos en POST, las instancias vienen del formset)
         medios_formset = context.get('medios_interpretacion')
@@ -139,13 +163,28 @@ class CrearObraView(ObraFormsetMixin, CreateView):
     
     @transaction.atomic
     def form_valid(self, form):
+        logger.info("=" * 60)
+        logger.info("🚀 INICIANDO form_valid()")
+        logger.info("=" * 60)
+        
         context = self.get_context_data()
+        logger.debug(f"Contexto obtenido, claves: {list(context.keys())[:10]}...")
         
         # Validar formsets
+        logger.info("📋 Validando formsets...")
         formsets_validos, formsets = self._validar_formsets(context)
+        
         if not formsets_validos:
-            messages.error(self.request, 'Por favor corrija los errores.')
+            logger.error("❌ Validación de formsets FALLÓ")
+            # Mensaje más informativo
+            error_msg = (
+                'Hay errores en los formsets. Revisa la consola del navegador (F12) '
+                'para ver los detalles específicos de qué campo(s) tienen problemas.'
+            )
+            messages.error(self.request, error_msg)
             return self.form_invalid(form)
+        
+        logger.info("✅ TODOS LOS FORMSETS VÁLIDOS - Procediendo a guardar")
 
         # Guardar la obra principal
         self.object = form.save(commit=False)
@@ -200,14 +239,16 @@ class EditarObraView(ObraFormsetMixin, UpdateView):
     
     def dispatch(self, request, *args, **kwargs):
         """Obtener configuración según tipo de obra"""
-        response = super().dispatch(request, *args, **kwargs)
+        # Obtener la obra ANTES de llamar a super().dispatch()
+        # para que self.object esté disponible en get_context_data()
+        self.object = self.get_object()
         
         # Determinar tipo de obra basado en sus características
-        obra = self.get_object()
-        self.tipo_obra = self._determinar_tipo_obra(obra)
+        self.tipo_obra = self._determinar_tipo_obra(self.object)
         self.config_obra = TIPO_OBRA_CONFIG.get(self.tipo_obra, {})
         
-        return response
+        # Ahora sí llamar a super().dispatch()
+        return super().dispatch(request, *args, **kwargs)
     
     def _determinar_tipo_obra(self, obra):
         """

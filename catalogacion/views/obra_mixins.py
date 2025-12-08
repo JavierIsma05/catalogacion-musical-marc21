@@ -204,6 +204,8 @@ class ObraFormsetMixin:
             'enlaces_documento_fuente_773': 'enlaces_773-TOTAL_FORMS',
             'enlaces_unidad_constituyente_774': 'enlaces_774-TOTAL_FORMS',
             'otras_relaciones_787': 'relaciones_787-TOTAL_FORMS',
+            'titulos_alternativos': 'titulos_alt-TOTAL_FORMS',
+            'ediciones': 'ediciones-TOTAL_FORMS',
         }
 
         for key in self._get_formset_names():
@@ -217,7 +219,7 @@ class ObraFormsetMixin:
             if key in formsets_opcionales:
                 mgmt_field = formsets_opcionales[key]
                 if mgmt_field not in self.request.POST:
-                    logger.debug(f"  ⏭️  {key}: SALTADO (no está en el template)")
+                    logger.debug(f"  ⏭️  {key}: SALTADO (no está en el POST/template)")
                     continue
             
             if formset:
@@ -227,10 +229,21 @@ class ObraFormsetMixin:
                 if is_valid:
                     logger.debug(f"  ✅ {key}: VÁLIDO")
                 else:
-                    logger.error(f"  ❌ {key}: INVÁLIDO")
-                    logger.error(f"     Errores: {formset.errors}")
+                    # Obtener el prefijo del formset para logs más claros
+                    prefix = getattr(formset, 'prefix', 'unknown')
+                    logger.error(f"  ❌ {key} (prefix: {prefix}): INVÁLIDO")
+                    logger.error(f"     Errores formset: {formset.errors}")
+                    logger.error(f"     Total forms: {formset.total_form_count()}")
+                    # Algunos formsets personalizados NO tienen deleted_objects
+                    if hasattr(formset, 'deleted_objects'):
+                        logger.error(f"     Deleted objects: {len(formset.deleted_objects)}")
                     if hasattr(formset, 'non_form_errors') and formset.non_form_errors():
                         logger.error(f"     Errores no-form: {formset.non_form_errors()}")
+                    # Mostrar detalles de cada formulario del formset
+                    for i, form in enumerate(formset.forms):
+                        if form.errors:
+                            logger.error(f"     Form[{i}] errores: {form.errors}")
+                            logger.error(f"     Form[{i}] cleaned_data: {form.cleaned_data}")
                     formsets_validos = False
         
         logger.info(f"✅ Resultado final: {'TODOS VÁLIDOS' if formsets_validos else 'HAY ERRORES'}")

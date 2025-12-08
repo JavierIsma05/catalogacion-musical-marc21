@@ -105,7 +105,39 @@
 
 ---
 
-#### 6. 📊 **ANALISIS_FINAL.md** (opcional)
+#### 6. 📘 **GUIA_FORMULARIOS_REQUISITOS.md** ⭐ NUEVO
+**Propósito**: Guía de requisitos y troubleshooting de formularios
+- ✅ Lista completa de campos obligatorios
+- ✅ Valores válidos para cada campo
+- ✅ Mapeo MARC21 de cada campo
+- ✅ Solución de 5 problemas comunes
+- ✅ Prefijos correctos de formsets (API)
+- ✅ Ejemplos de datos válidos mínimos
+- ✅ Cómo ver errores detallados
+
+**¿Cuándo usar?**: Usuario no logra guardar una obra, necesita entender qué campos llenar
+
+**Acceso rápido**: Para formularios → Leer GUIA_FORMULARIOS_REQUISITOS.md
+
+---
+
+#### 7. 🔧 **SOLUCION_GUARDADO_OBRAS.md** ⭐ NUEVO
+**Propósito**: Resumen ejecutivo de resolución del problema de guardado
+- ✅ Descripción del problema original
+- ✅ Causa raíz identificada
+- ✅ 5 soluciones implementadas
+- ✅ Evidencia de resolución (tests exitosos)
+- ✅ Tabla de mejoras en UX
+- ✅ Aprendizajes clave
+- ✅ Mejoras futuras opcionales
+
+**¿Cuándo usar?**: Necesitas entender qué se arregló en esta iteración, auditoría del sistema
+
+**Estado**: ✅ LISTO PARA PRODUCCIÓN
+
+---
+
+#### 8. 📊 **ANALISIS_FINAL.md** (opcional)
 **Propósito**: Análisis completo del sistema después de testing
 - ✅ Conclusiones de testing
 - ✅ Funcionalidades confirmadas

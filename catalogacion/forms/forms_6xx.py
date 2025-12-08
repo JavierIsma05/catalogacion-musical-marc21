@@ -32,6 +32,8 @@ class Materia650Form(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Hacer materia no requerido para permitir filas vacías en el formset
+        self.fields["materia"].required = False
 
         if self.instance.pk and self.instance.materia:
             self.fields["materia_texto"].initial = self.instance.materia.termino
@@ -41,8 +43,8 @@ class Materia650Form(forms.ModelForm):
         texto = cleaned.get("materia_texto", "").strip()
         materia_id = cleaned.get("materia")
 
-        # Si ya hay un ID → todo bien
-        if materia_id:
+        # Si no hay texto ni ID → fila vacía, permitir
+        if not texto and not materia_id:
             return cleaned
 
         # Si solo hay texto → buscarlo o crearlo
@@ -87,6 +89,8 @@ class MateriaGenero655Form(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Hacer materia no requerido para permitir filas vacías en el formset
+        self.fields['materia'].required = False
 
         # si ya existe, mostrar el texto en el input visible
         if self.instance.pk and self.instance.materia:
@@ -98,8 +102,8 @@ class MateriaGenero655Form(forms.ModelForm):
         texto = cleaned.get("materia_texto")
         materia_id = cleaned.get("materia")
 
-        if materia_id:
-            # ya seleccionado — ok
+        # Si no hay texto ni ID → fila vacía, permitir
+        if not texto and not materia_id:
             return cleaned
 
         if texto and texto.strip():
