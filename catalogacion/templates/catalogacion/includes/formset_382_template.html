@@ -1,170 +1,169 @@
-{% load catalogacion_tags %}
 {% comment %}
-Campo 382 - Medio de interpretación (R)
-Formset anidado de dos niveles con Django FormSets
+Template especializado para el campo 382 - Medio de Interpretación.
+Permite repetir el campo completo y también el subcampo $a (medios).
+El botón de agregar campo completo está en el header del campo (campo-add-btn)
 {% endcomment %}
+{% load catalogacion_tags %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
-    <!-- Formulario de gestión del formset principal -->
     <div style="display:none;">
         {% for hidden in formset.management_form %}
             {{ hidden }}
         {% endfor %}
     </div>
-
+    
     <div class="formset-forms">
+        {% get_medios_interpretacion as medios_list %}
         {% for form in formset %}
-        <div class="formset-row mb-4 p-3 border rounded" data-form-index="{{ forloop.counter0 }}">
-            <!-- Campos ocultos del formulario principal -->
+        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
             {% for hidden in form.hidden_fields %}
                 {{ hidden }}
             {% endfor %}
-
-            <!-- Campo DELETE (oculto) -->
             {% if formset.can_delete %}
                 <div class="d-none">
                     {{ form.DELETE }}
                 </div>
             {% endif %}
-
-            <!-- Botón para eliminar todo el 382 -->
-            <button type="button" class="btn btn-sm btn-danger delete-382-btn mb-2" title="Eliminar campo 382">
-                ✖ Eliminar 382
+            
+            <button type="button" class="delete-row-btn" title="Eliminar registro 382">
+                <i class="bi bi-x-lg"></i>
             </button>
-
-            <div class="campo-grid mt-3">
-                <!-- Subcampo $b: Solista -->
-                <div class="col-full mb-3">
-                    <label class="form-label fw-bold">382 $b — Solista</label>
+            
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger mb-3">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+            
+            <div class="campo-grid">
+                {# Subcampo $b - Solista (No Repetible) #}
+                <div class="col-full">
+                    <label class="form-label" for="{{ form.solista.id_for_label }}">{{ form.solista.label }}</label>
                     {{ form.solista }}
                     {% if form.solista.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.solista.errors.0 }}
-                        </div>
+                        <div class="invalid-feedback d-block">{{ form.solista.errors }}</div>
                     {% endif %}
                 </div>
-
-                <!-- Subcampo $a: Medios de interpretación (anidado) -->
+                
+                {# Subcampo $a - Medios (Repetible) con botón + a la izquierda #}
                 <div class="col-full">
-                    <label class="form-label fw-bold">382 $a — Medios de interpretación</label>
-                    
-                    <!-- Formset anidado para medios -->
-                    <div class="nested-formset-container" data-parent-form="{{ forloop.counter0 }}" data-formset-prefix="medios_interpretacion382_set">
-                        {% if medios_formsets %}
-                            {% with medios_formset=medios_formsets|get_item:forloop.counter0 %}
-                                <div style="display:none;">
-                                    {% for hidden in medios_formset.management_form %}
-                                        {{ hidden }}
+                    <label class="form-label small">382 $a - Medio de interpretación</label>
+                    <div class="subcampo-repetible-container medios-container" data-medios-container="{{ forloop.counter0 }}">
+                        {% if form.instance.pk %}
+                            {# Cargar medios existentes #}
+                            {% for medio in form.instance.medios.all %}
+                            <div class="subcampo-row medio-form-row">
+                                {% if forloop.first %}
+                                <button type="button" class="subcampo-add-btn add-medio-btn" data-medio-index="{{ forloop.parentloop.counter0 }}" title="Agregar Medio">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                {% else %}
+                                <div class="subcampo-placeholder"></div>
+                                {% endif %}
+                                <select class="form-select medio-select" name="medio_interpretacion_382_{{ forloop.parentloop.counter0 }}_{{ medio.pk }}">
+                                    <option value="">Seleccione un medio...</option>
+                                    {% for value, label in medios_list %}
+                                        <option value="{{ value }}" {% if medio.medio == value %}selected{% endif %}>{{ label }}</option>
                                     {% endfor %}
-                                </div>
-
-                                <!-- Filas de medios existentes -->
-                                <div class="medios-rows-container">
-                                    {% for medio_form in medios_formset %}
-                                        <div class="subcampo-row mb-2 d-flex gap-2 align-items-center" data-medio-index="{{ forloop.counter0 }}">
-                                            <!-- Campos ocultos -->
-                                            {% for hidden in medio_form.hidden_fields %}
-                                                {{ hidden }}
-                                            {% endfor %}
-
-                                            <!-- Select de medio -->
-                                            <div class="flex-grow-1">
-                                                {{ medio_form.medio }}
-                                                {% if medio_form.medio.errors %}
-                                                    <div class="invalid-feedback d-block">
-                                                        {{ medio_form.medio.errors.0 }}
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-
-                                            <!-- Botón agregar (solo en primera fila) -->
-                                            {% if forloop.first %}
-                                                <button type="button" class="btn btn-sm btn-success add-medio-btn" title="Agregar otro medio">
-                                                    ➕
-                                                </button>
-                                            {% else %}
-                                                <button type="button" class="btn btn-sm btn-success add-medio-btn d-none" title="Agregar otro medio">
-                                                    ➕
-                                                </button>
-                                            {% endif %}
-
-                                            <!-- Botón eliminar -->
-                                            {% if forloop.first %}
-                                                <button type="button" class="btn btn-sm btn-danger delete-medio-btn d-none" title="Eliminar medio">
-                                                    ✖
-                                                </button>
-                                            {% else %}
-                                                <button type="button" class="btn btn-sm btn-danger delete-medio-btn" title="Eliminar medio">
-                                                    ✖
-                                                </button>
-                                            {% endif %}
-
-                                            <!-- Checkbox DELETE (oculto) -->
-                                            {% if medios_formset.can_delete %}
-                                                <div class="d-none">
-                                                    {{ medio_form.DELETE }}
-                                                </div>
-                                            {% endif %}
-                                        </div>
+                                </select>
+                                <button type="button" class="subcampo-delete-btn delete-medio-btn" title="Eliminar" {% if forloop.first and forloop.last %}style="visibility: hidden;"{% endif %}>
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            {% empty %}
+                            <div class="subcampo-row medio-form-row">
+                                <button type="button" class="subcampo-add-btn add-medio-btn" data-medio-index="{{ forloop.counter0 }}" title="Agregar Medio">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                <select class="form-select medio-select" name="medio_interpretacion_382_{{ forloop.counter0 }}_0">
+                                    <option value="">Seleccione un medio...</option>
+                                    {% for value, label in medios_list %}
+                                        <option value="{{ value }}">{{ label }}</option>
                                     {% endfor %}
-                                </div>
-                            {% endwith %}
+                                </select>
+                                <button type="button" class="subcampo-delete-btn delete-medio-btn" title="Eliminar" style="visibility: hidden;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="subcampo-row medio-form-row">
+                            <button type="button" class="subcampo-add-btn add-medio-btn" data-medio-index="{{ forloop.counter0 }}" title="Agregar Medio">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <select class="form-select medio-select" name="medio_interpretacion_382_{{ forloop.counter0 }}_0">
+                                <option value="">Seleccione un medio...</option>
+                                {% for value, label in medios_list %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" class="subcampo-delete-btn delete-medio-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
             </div>
         </div>
         {% endfor %}
+        
+        <div class="formset-row empty-form mb-3" style="display:none;">
+            <div style="display:none;">
+                {% for hidden in formset.empty_form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+            </div>
+            <button type="button" class="delete-row-btn" title="Eliminar registro 382">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="campo-grid">
+                {# Subcampo $b - Solista (No Repetible) #}
+                <div class="col-full">
+                    <label class="form-label" for="{{ formset.empty_form.solista.id_for_label }}">{{ formset.empty_form.solista.label }}</label>
+                    {{ formset.empty_form.solista }}
+                </div>
+                
+                <div class="col-full">
+                    <label class="form-label small">382 $a - Medio de interpretación</label>
+                    <div class="subcampo-repetible-container medios-container" data-medios-container="__prefix__">
+                        <div class="subcampo-row medio-form-row">
+                            <button type="button" class="subcampo-add-btn add-medio-btn" data-medio-index="__prefix__" title="Agregar Medio">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <select class="form-select medio-select" name="medio_interpretacion_382___prefix___0">
+                                <option value="">Seleccione un medio...</option>
+                                {% for value, label in medios_list %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" class="subcampo-delete-btn delete-medio-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<script>
-(function() {
-    const MEDIOS_CONTAINER_CLASS = 'medios-rows-container';
-    const SUBCAMPO_ROW_CLASS = 'subcampo-row';
-    const NESTED_FORMSET_CLASS = 'nested-formset-container';
+{# Almacenar opciones de medios en un elemento oculto para JavaScript #}
+<div id="medios-options-data" style="display:none;" data-opciones='{% get_medios_interpretacion_json %}'></div>
 
-    // Crear plantilla HTML para nuevas filas de medios
-    function createMedioTemplate(parentForm, medioIndex) {
-        const container = document.querySelector(
-            `.${NESTED_FORMSET_CLASS}[data-parent-form="${parentForm}"]`
-        );
-        
-        if (!container) return '';
-
-        const select = container.querySelector('select[name*="-medio"]');
-        if (!select) return '';
-
-        // Obtener el nombre del select existente para sacar el prefijo
-        const existingName = select.getAttribute('name');
-        const match = existingName.match(/^(.*?)-\d+-medio$/);
-        const prefix = match ? match[1] : 'medios_interpretacion382_set';
-
-        const selectName = `${prefix}-${medioIndex}-medio`;
-        const deleteCheckboxName = `${prefix}-${medioIndex}-DELETE`;
-        const idInputName = `${prefix}-${medioIndex}-id`;
-        const parentInputName = `${prefix}-${medioIndex}-medio_interpretacion`;
-
-        const selectOptions = select.innerHTML;
-
-        return `
-            <div class="${SUBCAMPO_ROW_CLASS} mb-2 d-flex gap-2 align-items-center" data-medio-index="${medioIndex}">
-                <input type="hidden" name="${idInputName}">
-                <input type="hidden" name="${parentInputName}">
-                
-                <div class="flex-grow-1">
-                    <select name="${selectName}" class="form-select">
-                        ${selectOptions}
-                    </select>
-                </div>
-
-                <button type="button" class="btn btn-sm btn-success add-medio-btn" title="Agregar otro medio">
-                    ➕
-                </button>
-
-                <button type="button" class="btn btn-sm btn-danger delete-medio-btn" title="Eliminar medio">
-                    ✖
-                </button>
+{# Template global para medios (fuera del formset loop) #}
+<div class="subcampo-row medio-form-row medio-template-382 d-none">
+    <div class="subcampo-placeholder"></div>
+    <select class="form-select medio-select">
+        <option value="">Seleccione un medio...</option>
+        {% for value, label in medios_list %}
+            <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+    </select>
+    <button type="button" class="subcampo-delete-btn delete-medio-btn" title="Eliminar">
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>
 
 <script>
 /**
@@ -178,25 +177,25 @@ Formset anidado de dos niveles con Django FormSets
         if (!container || container.dataset.subcampos382Initialized) return;
         container.dataset.subcampos382Initialized = 'true';
         
-        visibleRows.forEach((row, index) => {
-            const addBtn = row.querySelector('.add-medio-btn');
-            const delBtn = row.querySelector('.delete-medio-btn');
-
-            if (index === 0) {
-                addBtn?.classList.remove('d-none');
-                delBtn?.classList.add('d-none');
-            } else {
-                addBtn?.classList.add('d-none');
-                delBtn?.classList.remove('d-none');
+        const medioTemplate = document.querySelector('.medio-template-382');
+        if (!medioTemplate) return;
+        
+        // Obtener las opciones de medios desde el elemento oculto
+        const opcionesData = document.getElementById('medios-options-data');
+        let opcionesMedio = [];
+        if (opcionesData && opcionesData.dataset.opciones) {
+            try {
+                opcionesMedio = JSON.parse(opcionesData.dataset.opciones);
+            } catch(e) {
+                console.error('Error parsing medios options:', e);
             }
+        }
+        
+        // Construir HTML de opciones
+        let opcionesHTML = '<option value="">Seleccione un medio...</option>';
+        opcionesMedio.forEach(function(item) {
+            opcionesHTML += `<option value="${item.codigo}">${item.nombre}</option>`;
         });
-    }
-
-    // Agregar nuevo medio
-    function addMedio(btn) {
-        const row = btn.closest(`.${SUBCAMPO_ROW_CLASS}`);
-        const container = row.closest(`.${MEDIOS_CONTAINER_CLASS}`);
-        const parentForm = container.closest(`.${NESTED_FORMSET_CLASS}`).getAttribute('data-parent-form');
         
         // Función para actualizar visibilidad de botones de eliminar
         function updateDeleteButtonsVisibility(subcampoContainer) {

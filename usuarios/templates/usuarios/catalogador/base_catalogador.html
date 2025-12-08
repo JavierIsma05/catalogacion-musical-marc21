@@ -58,17 +58,41 @@
                 <i class="bi bi-plus-circle"></i>
                 <span>Nueva Obra</span>
             </a>
-            <a class="nav-link {% if request.resolver_match.url_name == 'lista_obras' %}active{% endif %}" 
+            <!-- <a class="nav-link {% if request.resolver_match.url_name == 'lista_obras' %}active{% endif %}" 
                href="{% url 'catalogacion:lista_obras' %}"
                data-tooltip="Mis Obras">
                 <i class="bi bi-collection"></i>
                 <span>Mis Obras</span>
-            </a>
-            <a class="nav-link" 
-               href="{% url 'lista_personas' %}"
-               data-tooltip="Autoridades">
+            </a> -->
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_personas' %}active{% endif %}" 
+               href="{% url 'autoridades:lista_personas' %}"
+               data-tooltip="Personas">
                 <i class="bi bi-person-badge"></i>
-                <span>Autoridades</span>
+                <span>Personas</span>
+            </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_entidades' %}active{% endif %}" 
+               href="{% url 'autoridades:lista_entidades' %}"
+               data-tooltip="Entidades">
+                <i class="bi bi-building"></i>
+                <span>Entidades</span>
+            </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_formas_musicales' %}active{% endif %}" 
+               href="{% url 'autoridades:lista_formas_musicales' %}"
+               data-tooltip="Formas Musicales">
+                <i class="bi bi-music-note-list"></i>
+                <span>Formas Musicales</span>
+            </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_materias' %}active{% endif %}" 
+               href="{% url 'autoridades:lista_materias' %}"
+               data-tooltip="Materias">
+                <i class="bi bi-tags"></i>
+                <span>Materias</span>
+            </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_titulos_uniformes' %}active{% endif %}" 
+               href="{% url 'autoridades:lista_titulos_uniformes' %}"
+               data-tooltip="Títulos Uniformes">
+                <i class="bi bi-journal-music"></i>
+                <span>Títulos Uniformes</span>
             </a>
         </div>
         
@@ -144,10 +168,16 @@
             const expandBtn = document.getElementById('expandBtn');
             const tooltip = document.getElementById('sidebarTooltip');
             
-            // Recuperar estado guardado (solo para desktop)
+            // Aplicar estado guardado SIN transición para evitar flash visual
             const savedState = localStorage.getItem('sidebarCollapsed');
             if (savedState === 'true' && window.innerWidth > 992) {
-                sidebar.classList.add('collapsed');
+                sidebar.classList.add('no-transition', 'collapsed');
+                // Remover no-transition después de un frame para habilitar animaciones futuras
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        sidebar.classList.remove('no-transition');
+                    });
+                });
             }
             
             // Toggle sidebar en desktop (contraer)

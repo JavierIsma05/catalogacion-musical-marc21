@@ -80,10 +80,11 @@
                             <i class="bi bi-person-badge"></i> Autoridades
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'lista_personas' %}">Personas</a></li>
-                            <li><a class="dropdown-item" href="#">Entidades</a></li>
-                            <li><a class="dropdown-item" href="#">Títulos Uniformes</a></li>
-                            <li><a class="dropdown-item" href="#">Materias</a></li>
+                            <li><a class="dropdown-item" href="{% url 'autoridades:lista_personas' %}">Personas</a></li>
+                            <li><a class="dropdown-item" href="{% url 'autoridades:lista_entidades' %}">Entidades</a></li>
+                            <li><a class="dropdown-item" href="{% url 'autoridades:lista_titulos_uniformes' %}">Títulos Uniformes</a></li>
+                            <li><a class="dropdown-item" href="{% url 'autoridades:lista_formas_musicales' %}">Formas Musicales</a></li>
+                            <li><a class="dropdown-item" href="{% url 'autoridades:lista_materias' %}">Materias</a></li>
                         </ul>
                     </li>
                 </ul>

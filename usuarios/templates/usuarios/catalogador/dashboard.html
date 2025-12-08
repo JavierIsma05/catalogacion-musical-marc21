@@ -37,7 +37,7 @@
         <h3>Mis Obras</h3>
         <p>Revisa y edita las obras catalogadas.</p>
     </a>
-    <a href="{% url 'lista_personas' %}" class="quick-action-card autoridades">
+    <a href="{% url 'autoridades:lista_personas' %}" class="quick-action-card autoridades">
         <div class="action-icon">
             <i class="bi bi-person-badge"></i>
         </div>
@@ -66,7 +66,7 @@
                 </a>
             </div>
             <div class="col-md-3">
-                <a href="{% url 'lista_personas' %}" class="btn btn-outline-secondary w-100">
+                <a href="{% url 'autoridades:crear_persona' %}" class="btn btn-outline-secondary w-100">
                     <i class="bi bi-person-plus"></i> Nueva Persona
                 </a>
             </div>

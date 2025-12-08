@@ -4,6 +4,13 @@ Exportación centralizada de formularios MARC21
 
 # Formulario principal
 from .obra_base import ObraGeneralForm
+from .autoridades import (
+    AutoridadPersonaForm,
+    AutoridadEntidadForm,
+    AutoridadFormaMusicalForm,
+    AutoridadMateriaForm,
+    AutoridadTituloUniformeForm,
+)
 
 # Forms por bloque
 from .forms_0xx import (
@@ -133,6 +140,13 @@ from .widgets import (
 __all__ = [
     # Form principal
     'ObraGeneralForm',
+
+    # Autoridades
+    'AutoridadPersonaForm',
+    'AutoridadEntidadForm',
+    'AutoridadFormaMusicalForm',
+    'AutoridadMateriaForm',
+    'AutoridadTituloUniformeForm',
 
     # Forms bloque 0XX
     'IncipitMusicalForm',

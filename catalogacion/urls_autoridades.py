@@ -15,12 +15,30 @@ from catalogacion.views.autoridades import (
     EditarEntidadView,
     VerEntidadView,
     EliminarEntidadView,
+    # Formas musicales
+    ListaFormasMusicalesView,
+    CrearFormaMusicalView,
+    EditarFormaMusicalView,
+    EliminarFormaMusicalView,
+    # Materias
+    ListaMateriasView,
+    CrearMateriaView,
+    EditarMateriaView,
+    EliminarMateriaView,
+    # Títulos uniformes
+    ListaTitulosUniformesView,
+    CrearTituloUniformeView,
+    EditarTituloUniformeView,
+    EliminarTituloUniformeView,
+    # Autocomplete APIs
     AutocompletarPersonaView,
     AutocompletarEntidadView,
     AutocompletarTituloUniformeView,
     AutocompletarMateriaView,
 )
 from catalogacion.views.utils import autocompletar_forma_musical
+
+app_name = 'autoridades'
 
 urlpatterns = [
     # Personas
@@ -36,6 +54,24 @@ urlpatterns = [
     path('entidades/<int:pk>/', VerEntidadView.as_view(), name='ver_entidad'),
     path('entidades/<int:pk>/editar/', EditarEntidadView.as_view(), name='editar_entidad'),
     path('entidades/<int:pk>/eliminar/', EliminarEntidadView.as_view(), name='eliminar_entidad'),
+
+    # Formas musicales
+    path('formas-musicales/', ListaFormasMusicalesView.as_view(), name='lista_formas_musicales'),
+    path('formas-musicales/crear/', CrearFormaMusicalView.as_view(), name='crear_forma_musical'),
+    path('formas-musicales/<int:pk>/editar/', EditarFormaMusicalView.as_view(), name='editar_forma_musical'),
+    path('formas-musicales/<int:pk>/eliminar/', EliminarFormaMusicalView.as_view(), name='eliminar_forma_musical'),
+
+    # Materias
+    path('materias/', ListaMateriasView.as_view(), name='lista_materias'),
+    path('materias/crear/', CrearMateriaView.as_view(), name='crear_materia'),
+    path('materias/<int:pk>/editar/', EditarMateriaView.as_view(), name='editar_materia'),
+    path('materias/<int:pk>/eliminar/', EliminarMateriaView.as_view(), name='eliminar_materia'),
+
+    # Títulos uniformes
+    path('titulos-uniformes/', ListaTitulosUniformesView.as_view(), name='lista_titulos_uniformes'),
+    path('titulos-uniformes/crear/', CrearTituloUniformeView.as_view(), name='crear_titulo_uniforme'),
+    path('titulos-uniformes/<int:pk>/editar/', EditarTituloUniformeView.as_view(), name='editar_titulo_uniforme'),
+    path('titulos-uniformes/<int:pk>/eliminar/', EliminarTituloUniformeView.as_view(), name='eliminar_titulo_uniforme'),
     
     # APIs de autocomplete
     path(

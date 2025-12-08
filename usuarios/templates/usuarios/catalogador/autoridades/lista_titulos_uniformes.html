@@ -1,0 +1,119 @@
+{% extends 'usuarios/catalogador/base_catalogador.html' %}
+{% load static %}
+
+{% block title %}Títulos Uniformes{% endblock %}
+{% block page_title %}Autoridades · Títulos Uniformes{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usuarios/css/admin.css' %}">
+<link rel="stylesheet" href="{% static 'usuarios/css/autoridades.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-card autoridad-card">
+    <div class="admin-card-header">
+        <h2 class="admin-card-title">
+            <i class="bi bi-journal-music"></i>
+            Títulos uniformes
+        </h2>
+        <a href="{% url 'autoridades:crear_titulo_uniforme' %}" class="admin-btn admin-btn-primary admin-btn-sm">
+            <i class="bi bi-plus"></i> Nuevo título
+        </a>
+    </div>
+    <div class="admin-card-body">
+        <div class="row g-3 align-items-center mb-3">
+            <div class="col-lg-8">
+                <form method="get" class="autoridad-search" role="search">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar título uniforme" value="{{ request.GET.q }}">
+                    <button type="submit" class="admin-btn admin-btn-secondary admin-btn-sm" aria-label="Buscar"><i class="bi bi-search"></i></button>
+                    {% if request.GET.q %}
+                    <a href="{% url 'autoridades:lista_titulos_uniformes' %}" class="admin-btn admin-btn-light admin-btn-sm" aria-label="Limpiar"><i class="bi bi-x"></i></a>
+                    {% endif %}
+                </form>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <span class="autoridad-meta">Total: {{ titulos.paginator.count }} título{{ titulos.paginator.count|pluralize }}</span>
+            </div>
+        </div>
+
+        {% if titulos %}
+        <div class="admin-table-wrapper autoridad-table">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for titulo in titulos %}
+                    <tr>
+                        <td class="fw-semibold">{{ titulo.titulo }}</td>
+                        <td class="text-end">
+                            <div class="autoridad-actions">
+                                <a href="{% url 'autoridades:editar_titulo_uniforme' pk=titulo.pk %}" class="action-btn" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <button type="button" class="action-btn delete" title="Eliminar" onclick="confirmarEliminacion('{{ titulo.pk }}', '{{ titulo.titulo }}')"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if titulos.has_other_pages %}
+        <div class="admin-pagination">
+            {% if titulos.has_previous %}
+            <a class="admin-pagination-btn" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" title="Primera página"><i class="bi bi-chevron-double-left"></i></a>
+            <a class="admin-pagination-btn" href="?page={{ titulos.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" title="Página anterior"><i class="bi bi-chevron-left"></i></a>
+            {% endif %}
+            <span class="admin-pagination-info">{{ titulos.number }} / {{ titulos.paginator.num_pages }}</span>
+            {% if titulos.has_next %}
+            <a class="admin-pagination-btn" href="?page={{ titulos.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" title="Página siguiente"><i class="bi bi-chevron-right"></i></a>
+            <a class="admin-pagination-btn" href="?page={{ titulos.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" title="Última página"><i class="bi bi-chevron-double-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="autoridad-empty">
+            <div class="icon"><i class="bi bi-journal-music"></i></div>
+            <p>No hay títulos uniformes registrados{% if request.GET.q %} para "{{ request.GET.q }}"{% endif %}.</p>
+            <a href="{% url 'autoridades:crear_titulo_uniforme' %}" class="admin-btn admin-btn-primary admin-btn-sm"><i class="bi bi-plus"></i> Crear título</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Confirmar eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Eliminar el título uniforme <strong id="titulo-nombre"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="delete-form" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmarEliminacion(tituloId, tituloNombre) {
+    document.getElementById('titulo-nombre').textContent = tituloNombre;
+    const deleteBase = "{% url 'autoridades:eliminar_titulo_uniforme' pk=0 %}".replace('0/', `${tituloId}/`);
+    document.getElementById('delete-form').action = deleteBase;
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

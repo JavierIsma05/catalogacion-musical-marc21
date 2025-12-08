@@ -17,7 +17,7 @@ urlpatterns = [
     path('catalogacion/', include('catalogacion.urls')),
     
     # Autoridades y APIs de autocomplete
-    path('catalogacion/', include('catalogacion.urls_autoridades')),
+    path('catalogacion/', include(('catalogacion.urls_autoridades', 'autoridades'), namespace='autoridades')),
     
     # Sistema de usuarios (login, gestión de catalogadores, dashboards)
     path('usuarios/', include('usuarios.urls')),
