@@ -1,0 +1,221 @@
+{% extends 'catalogo_publico/base_publico.html' %}
+{% load static %}
+
+{% block title %}{{ obra }} - Catálogo Musical MARC21{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'catalogo_publico/css/resumen_obra.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'catalogo_publico:home' %}">
+                    <i class="bi bi-house-door"></i>
+                    Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'catalogo_publico:lista_obras' %}">
+                    <i class="bi bi-collection"></i>
+                    Catálogo
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ obra.signatura_publica_display }}</li>
+        </ol>
+    </nav>
+
+    <!-- Encabezado resumido compacto -->
+    <div class="resumen-header d-flex flex-column flex-lg-row align-items-lg-start justify-content-between gap-2 mb-4">
+        <div>
+            <h1 class="resumen-title mt-2 mb-1">Detalles de la obra</h1>
+            <a href="{% url 'catalogo_publico:lista_obras' %}" class="btn btn-outline-secondary btn-sm resumen-back-btn">
+                <i class="bi bi-arrow-left"></i>
+                Volver al catálogo
+            </a>
+        </div>
+        <div class="resumen-top-tags">
+            <div class="detalle-top-tag neutral">
+                <small>Signatura</small>
+                <span>{{ obra.signatura_publica_display }}</span>
+            </div>
+            <div class="detalle-top-tag neutral">
+                <small>Colección</small>
+                {% if obra.coleccion_publica_display %}
+                    <span>{{ obra.coleccion_publica_display }}</span>
+                {% else %}
+                    <span class="text-muted">Sin colección asociada</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 align-items-start">
+        <div class="col-lg-9">
+            <div class="resumen-unified-card">
+                <!-- Compositor -->
+                <div class="resumen-section">
+                    <div class="resumen-section-title">
+                        <i class="bi bi-person"></i>
+                        Compositor
+                    </div>
+                    <div class="resumen-item">
+                        <div class="resumen-label">Nombre</div>
+                        <div class="resumen-value">{{ obra.autor_publico_principal }}</div>
+                    </div>
+                    {% if obra.autor_publico_nota %}
+                    <div class="resumen-item">
+                        <div class="resumen-label">Nota</div>
+                        <div class="resumen-value text-muted">{{ obra.autor_publico_nota }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Títulos -->
+                <div class="resumen-section">
+                    <div class="resumen-section-title">
+                        <i class="bi bi-fonts"></i>
+                        Títulos
+                    </div>
+                    {% if obra.titulo_uniforme_130_display %}
+                        <div class="resumen-item">
+                            <div class="resumen-label">Título uniforme</div>
+                            <div class="resumen-value">{{ obra.titulo_uniforme_130_display }}</div>
+                        </div>
+                    {% else %}
+                        {% if obra.titulo_uniforme_240_display %}
+                        <div class="resumen-item">
+                            <div class="resumen-label">Título uniforme</div>
+                            <div class="resumen-value">{{ obra.titulo_uniforme_240_display }}</div>
+                        </div>
+                        {% endif %}
+                        {% if obra.titulo_245_display %}
+                        <div class="resumen-item">
+                            <div class="resumen-label">Título en fuente</div>
+                            <div class="resumen-value">{{ obra.titulo_245_display }}</div>
+                        </div>
+                        {% endif %}
+                        {% if not obra.titulo_uniforme_240_display and not obra.titulo_245_display %}
+                        <p class="campo-vacio mb-0">Sin títulos registrados</p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Producción y descripción física -->
+                <div class="resumen-section">
+                    <div class="resumen-section-title">
+                        <i class="bi bi-file-earmark-text"></i>
+                        Producción y descripción física
+                    </div>
+                    <div class="resumen-item">
+                        <div class="resumen-label">Manuscrito/Impreso</div>
+                        <div class="resumen-value">{{ obra.tecnica_340_publica_display }}</div>
+                    </div>
+                    <div class="resumen-item">
+                        <div class="resumen-label">Producción de la obra</div>
+                        <div class="resumen-value">{{ obra.publicacion_publica_display }}</div>
+                    </div>
+                    <div class="resumen-item">
+                        <div class="resumen-label">Descripción física</div>
+                        <div class="resumen-value">{{ obra.descripcion_fisica_publica_display }}</div>
+                    </div>
+                </div>
+
+                <!-- Características musicales -->
+                <div class="resumen-section">
+                    <div class="resumen-section-title">
+                        <i class="bi bi-music-note-beamed"></i>
+                        Características musicales
+                    </div>
+                    <div class="resumen-item">
+                        <div class="resumen-label">Materia (Género/Forma)</div>
+                        <div class="resumen-value">{{ obra.temas_publico_display }}</div>
+                    </div>
+                    <div class="resumen-item">
+                        <div class="resumen-label">Medio de interpretación</div>
+                        <div class="resumen-value">
+                            {% with medios=obra.medios_interpretacion_resumen %}
+                                <span>{{ medios.0 }}</span>
+                                {% if medios.1 %}
+                                    <span class="resumen-meta">Solista: {{ medios.1 }}</span>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="resumen-item">
+                        <div class="resumen-label">Tonalidad</div>
+                        {% if obra.tonalidad_publica_display %}
+                            <div class="resumen-value">{{ obra.tonalidad_publica_display }}</div>
+                        {% else %}
+                            <div class="resumen-value text-muted">Sin tonalidad registrada</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Nota general -->
+                <div class="resumen-section">
+                    <div class="resumen-section-title">
+                        <i class="bi bi-journal-text"></i>
+                        Nota general
+                    </div>
+                    {% if obra.nota_general_resumen %}
+                        <div class="resumen-item">
+                            <div class="resumen-label">Primera nota</div>
+                            <div class="resumen-value">{{ obra.nota_general_resumen }}</div>
+                        </div>
+                    {% else %}
+                        <p class="campo-vacio mb-0">Sin notas generales registradas</p>
+                    {% endif %}
+                </div>
+
+                <!-- Íncipit musical -->
+                <div class="resumen-section resumen-section-incipit">
+                    <div class="resumen-section-title">
+                        <i class="bi bi-music-note-list"></i>
+                        Íncipit musical
+                    </div>
+                    {% with detalle=obra.primer_incipit_detalle %}
+                        {% if detalle.0 %}
+                            <div class="detalle-incipit">
+                                <p class="detalle-incipit-text">{{ detalle.0 }}</p>
+                                {% if detalle.1 %}
+                                    <p class="detalle-incipit-code">{{ detalle.1 }}</p>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p class="campo-vacio mb-0">Sin íncipit registrado</p>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <div class="detalle-sidebar-card sticky-sidebar">
+                <h5 class="detalle-sidebar-title">
+                    <i class="bi bi-gear-fill"></i>
+                    Acciones
+                </h5>
+                <div class="detalle-actions-grid mb-3">
+                    <button class="btn btn-outline-secondary btn-sm w-100" type="button" disabled>
+                        <i class="bi bi-code-square"></i>
+                        Ver formato MARC21
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm w-100" type="button" disabled>
+                        <i class="bi bi-download"></i>
+                        Descargar documento
+                    </button>
+                    <button class="btn btn-primary btn-sm w-100" type="button">
+                        <i class="bi bi-eye"></i>
+                        Ver más detalles
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

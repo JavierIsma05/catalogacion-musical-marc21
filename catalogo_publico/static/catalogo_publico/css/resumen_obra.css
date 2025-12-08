@@ -3,88 +3,57 @@
    Sistema de Catalogación Musical MARC21
    ========================================================================== */
 
-/* ============================================
-   HERO SECTION COMPACTO
-   ============================================ */
-.detalle-hero {
-    background: linear-gradient(135deg, var(--public-primary) 0%, var(--public-secondary) 100%);
-    border-radius: var(--public-radius-lg);
-    padding: 1.5rem 2rem;
-    box-shadow: var(--public-shadow-lg);
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1.5rem;
-    position: relative;
-    overflow: hidden;
+.resumen-header {
+    margin-bottom: 0.9rem;
 }
 
-.detalle-hero-overlay {
-    position: absolute;
-    top: -50%;
-    right: -5%;
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 65%);
-    border-radius: 50%;
-    pointer-events: none;
+.resumen-title {
+    font-size: 1.75rem;
+    font-weight: 1000;
+    color: var(--public-primary);
+    letter-spacing: -0.02em;
 }
 
-.detalle-hero-content {
-    flex: 1;
-    position: relative;
-    z-index: 1;
-}
-
-.detalle-badge-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-}
-
-.detalle-badge {
+.resumen-back-btn {
+    font-weight: 700;
+    gap: 0.35rem;
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
-    padding: 0.3rem 0.75rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
+    padding: 0.35rem 0.7rem;
+}
+
+.resumen-top-tags {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.detalle-top-tag {
+    background: #f4f6fa;
+    color: #2f3545;
+    border: 1px solid #dfe3ea;
+    border-radius: 10px;
+    padding: 0.45rem 0.8rem;
+    min-width: 150px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.detalle-top-tag small {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 0.15rem;
+    color: #6b7280;
 }
 
-.detalle-badge-primary {
-    background: rgba(255, 255, 255, 0.25);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.detalle-badge-secondary {
-    background: rgba(58, 193, 161, 0.25);
-    color: white;
-    border: 1px solid rgba(58, 193, 161, 0.5);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.detalle-hero-title {
-    font-size: 1.5rem;
+.detalle-top-tag span {
     font-weight: 700;
-    color: white;
-    margin-bottom: 0.5rem;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-}
-
-.detalle-hero-subtitle {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.95);
-    margin: 0;
-    font-weight: 500;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font-size: 0.95rem;
+    color: #2f3545;
 }
 
 .detalle-hero-actions {
@@ -132,7 +101,7 @@
 
 .detalle-section-header {
     background: linear-gradient(135deg, var(--public-surface) 0%, #fafbfc 100%);
-    padding: 0.75rem 1.25rem;
+    padding: 0.6rem 1rem;
     border-bottom: 1px solid var(--public-border-light);
 }
 
@@ -152,7 +121,108 @@
 }
 
 .detalle-section-body {
-    padding: 1rem 1.25rem;
+    padding: 0.85rem 1rem;
+}
+
+/* ============================================
+   TARJETA UNIFICADA
+   ============================================ */
+.resumen-unified-card {
+    background: #ffffff;
+    border: 1px solid var(--public-border-light);
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 4px 14px rgba(23, 27, 33, 0.05);
+    overflow: hidden;
+}
+
+.resumen-section {
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--public-border-light);
+}
+
+.resumen-section:last-child {
+    border-bottom: none;
+}
+
+.resumen-section-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--public-text);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.resumen-section-title i {
+    color: var(--public-accent);
+    font-size: 0.9rem;
+}
+
+.resumen-section-incipit {
+    background: linear-gradient(135deg, rgba(58, 193, 161, 0.03) 0%, #fff 100%);
+}
+
+/* Deprecated grid (keep for compat) */
+.resumen-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.resumen-card {
+    background: #ffffff;
+    border: 1px solid var(--public-border-light);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    box-shadow: 0 4px 12px rgba(23, 27, 33, 0.04);
+}
+
+.resumen-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    color: var(--public-text);
+    margin-bottom: 0.45rem;
+    letter-spacing: -0.01em;
+}
+
+.resumen-card-header i {
+    color: var(--public-accent);
+}
+
+.resumen-item {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 0.6rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--public-border-light);
+}
+
+.resumen-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.resumen-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #4b556f;
+}
+
+.resumen-value {
+    font-size: 0.88rem;
+    color: var(--public-text);
+    line-height: 1.55;
+}
+
+.resumen-meta {
+    display: inline-block;
+    margin-left: 0.35rem;
+    color: #6b7280;
+    font-size: 0.85rem;
 }
 
 /* ============================================
@@ -251,7 +321,7 @@
    ============================================ */
 .sticky-sidebar {
     position: sticky;
-    top: 80px;
+    top: 12px;
 }
 
 .detalle-sidebar-card {

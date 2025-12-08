@@ -79,7 +79,7 @@ class ListaObrasPublicaView(ListView):
 class DetalleObraPublicaView(DetailView):
     """Vista pública de detalle de una obra"""
     model = ObraGeneral
-    template_name = 'catalogo_publico/detalle_obra.html'
+    template_name = 'catalogo_publico/resumen_obra.html'
     context_object_name = 'obra'
     
     def get_queryset(self):
