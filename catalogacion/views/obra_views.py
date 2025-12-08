@@ -107,6 +107,21 @@ class CrearObraView(ObraFormsetMixin, CreateView):
         with_post = self.request.method == 'POST'
         context.update(self._get_formsets(instance=None, with_post=with_post))
         
+        # Formsets anidados para 382 (si estamos en POST, las instancias vienen del formset)
+        medios_formset = context.get('medios_interpretacion')
+        if medios_formset:
+            if with_post:
+                # En POST, obtener instancias del formset sin guardar
+                try:
+                    # Las instancias sin PK no tienen formsets anidados
+                    parent_instances = [form.instance for form in medios_formset if form.instance.pk]
+                except:
+                    parent_instances = []
+            else:
+                parent_instances = []
+            
+            context.update(self._get_nested_formsets(parent_instances=parent_instances, with_post=with_post))
+        
         # ============================================================================
         # SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
         # ============================================================================
@@ -124,104 +139,51 @@ class CrearObraView(ObraFormsetMixin, CreateView):
     
     @transaction.atomic
     def form_valid(self, form):
-        """Guardar obra y todos los formsets en una transacción atómica"""
-        
         context = self.get_context_data()
         
-        # Validar todos los formsets
+        # Validar formsets
         formsets_validos, formsets = self._validar_formsets(context)
-        
         if not formsets_validos:
-            for nombre, formset in formsets.items():
-                if hasattr(formset, 'errors') and formset.errors:
-                    for i, errors in enumerate(formset.errors):
-                        if errors:
-                            logger.error(f"     Form {i}: {errors}")
-            
-            messages.error(
-                self.request,
-                'Por favor corrija los errores en los formularios.'
-            )
+            messages.error(self.request, 'Por favor corrija los errores.')
             return self.form_invalid(form)
-        
-        # Validar campo 382 obligatorio (al menos un medio de interpretación)
-        medios_formset = formsets.get('medios_interpretacion')
-        if medios_formset:
-            tiene_medios = False
-            for medio_form in medios_formset:
-                if medio_form.cleaned_data and not medio_form.cleaned_data.get('DELETE', False):
-                    # Verificar si tiene al menos un subcampo $a
-                    medio_id = medio_form.instance.pk if medio_form.instance else None
-                    if medio_id:
-                        # Ya existe, verificar si tiene subcampos $a
-                        from catalogacion.models import MedioInterpretacion382_a
-                        tiene_medios = MedioInterpretacion382_a.objects.filter(
-                            medio_interpretacion=medio_id
-                        ).exists()
-                    else:
-                        # Nuevo registro, verificar en POST si tiene subcampos dinámicos
-                        # Los subcampos $a se envían como medio_interpretacion_382_X_timestamp
-                        pattern = 'medio_interpretacion_382_'
-                        for key in self.request.POST:
-                            if key.startswith(pattern) and self.request.POST[key]:
-                                tiene_medios = True
-                                break
-                    if tiene_medios:
-                        break
-            
-            if not tiene_medios:
-                messages.error(
-                    self.request,
-                    'Campo 382 - Medio de Interpretación: Debe especificar al menos un medio de interpretación ($a).'
-                )
-                return self.form_invalid(form)
-        else:
-            messages.error(
-                self.request,
-                'Campo 382 - Medio de Interpretación es obligatorio.'
-            )
-            return self.form_invalid(form)
-        
+
         # Guardar la obra principal
         self.object = form.save(commit=False)
-        
-        # Asegurar tipo_registro y nivel_bibliografico
-        if not self.object.tipo_registro:
-            self.object.tipo_registro = self.config_obra['tipo_registro']
-        
-        if not self.object.nivel_bibliografico:
-            self.object.nivel_bibliografico = self.config_obra['nivel_bibliografico']
-        
-        self.object.save()
-        
-        # Guardar todos los formsets y sus subcampos
-        self._guardar_formsets(formsets, self.object)
-        
-        # ============================================================================
-        # SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
-        # ============================================================================
-        # Marcar borrador como convertido si existe
-        # borrador_id = self.request.session.get('borrador_id')
-        # if borrador_id:
-        #     try:
-        #         from catalogacion.models import BorradorObra
-        #         borrador = BorradorObra.objects.get(id=borrador_id, estado='activo')
-        #         borrador.estado = 'convertido'
-        #         borrador.obra_creada = self.object
-        #         borrador.save()
-        #         
-        #         # Limpiar sesión
-        #         del self.request.session['borrador_id']
-        #         if 'tipo_obra' in self.request.session:
-        #             del self.request.session['tipo_obra']
-        #     except BorradorObra.DoesNotExist:
-        #         pass
-        
-        # Mensaje de éxito
-        messages.success(self.request, f'{self.config_obra["titulo"]} registrada exitosamente.')
-        
+        self.object.save()  # Ahora ya tenemos PK
+
+        # 1️⃣ Guardar el formset principal del 382
+        medios_formset = formsets.get('medios_interpretacion')
+        if medios_formset:
+            medios = medios_formset.save(commit=False)
+            for medio in medios:
+                medio.obra = self.object  # Asignar FK
+                medio.save()  # Ahora tiene PK
+
+            # Borrar los marcados para eliminar
+            for medio in medios_formset.deleted_objects:
+                medio.delete()
+
+        # 2️⃣ Guardar los formsets anidados del 382_a
+        medios_formsets = context.get('medios_formsets', [])
+        if medios_formsets:
+            for idx, medios_anidado in enumerate(medios_formsets):
+                # Validar cada formset anidado
+                if medios_anidado.is_valid():
+                    medios_anidado.save()
+                    logger.info(f"✅ Formset anidado 382_a[{idx}] guardado correctamente")
+                else:
+                    logger.warning(f"⚠️ Formset anidado 382_a[{idx}] tiene errores: {medios_anidado.errors}")
+
+        # 3️⃣ Guardar los demás formsets normalmente
+        for nombre, formset in formsets.items():
+            if nombre != 'medios_interpretacion':
+                formset.instance = self.object
+                formset.save()
+                logger.info(f"✅ Formset {nombre} guardado")
+
+        messages.success(self.request, 'Obra registrada exitosamente.')
         return redirect(self.get_success_url())
-    
+
     def get_success_url(self):
         """Redirigir al detalle de la obra recién creada"""
         return reverse('catalogacion:detalle_obra', kwargs={'pk': self.object.pk})
@@ -298,6 +260,21 @@ class EditarObraView(ObraFormsetMixin, UpdateView):
         # Obtener formsets según método HTTP
         with_post = self.request.method == 'POST'
         context.update(self._get_formsets(instance=self.object, with_post=with_post))
+        
+        # Formsets anidados para 382
+        medios_formset = context.get('medios_interpretacion')
+        if medios_formset:
+            if with_post:
+                # En POST, obtener instancias del formset sin guardar
+                try:
+                    parent_instances = [form.instance for form in medios_formset if form.instance.pk]
+                except:
+                    parent_instances = []
+            else:
+                # En GET, obtener todas las instancias existentes
+                parent_instances = list(self.object.medios_interpretacion_382.all())
+            
+            context.update(self._get_nested_formsets(parent_instances=parent_instances, with_post=with_post))
         
         return context
     

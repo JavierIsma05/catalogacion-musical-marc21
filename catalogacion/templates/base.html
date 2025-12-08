@@ -1,7 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,12 +12,11 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Select2 CSS: VERSIÓN FUNCIONAL -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css" />
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.3.1/select2-bootstrap-5-theme.min.css" />
+    <!-- Select2 + Bootstrap 5 Theme -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 
-    <!-- Custom CSS -->
+    <!-- Custom Styles -->
     <link href="{% static 'catalogacion/css/styles.css' %}" rel="stylesheet">
 
     {% block extra_css %}{% endblock %}
@@ -40,8 +38,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
-                            href="#">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="#">
                             <i class="bi bi-house-door"></i> Inicio
                         </a>
                     </li>
@@ -51,29 +48,23 @@
                             <i class="bi bi-plus-circle"></i> Nueva Obra
                         </a>
                         <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item" href="{% url 'catalogacion:seleccionar_tipo' %}">
-                                    <i class="bi bi-file-earmark-plus"></i> Crear Obra
-                                </a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <h6 class="dropdown-header">Accesos rápidos</h6>
-                            </li>
-                            <li>
-                                <a class="dropdown-item"
-                                    href="{% url 'catalogacion:crear_obra' tipo='coleccion_manuscrita' %}">
-                                    Colección Manuscrita
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item"
-                                    href="{% url 'catalogacion:crear_obra' tipo='obra_manuscrita_individual' %}">
-                                    Obra Manuscrita Individual
-                                </a>
-                            </li>
+                            <li><a class="dropdown-item" href="{% url 'catalogacion:seleccionar_tipo' %}">
+                                <i class="bi bi-file-earmark-plus"></i> Crear Obra
+                            </a></li>
+
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li><h6 class="dropdown-header">Accesos rápidos</h6></li>
+
+                            <li><a class="dropdown-item"
+                                href="{% url 'catalogacion:crear_obra' tipo='coleccion_manuscrita' %}">
+                                Colección Manuscrita
+                            </a></li>
+
+                            <li><a class="dropdown-item"
+                                href="{% url 'catalogacion:crear_obra' tipo='obra_manuscrita_individual' %}">
+                                Obra Manuscrita Individual
+                            </a></li>
                         </ul>
                     </li>
 
@@ -83,34 +74,16 @@
                             <i class="bi bi-list-ul"></i> Ver Obras
                         </a>
                     </li>
-                    
 
-                    
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-person-badge"></i> Autoridades
                         </a>
                         <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item" href="{% url 'lista_personas' %}">
-                                    Personas
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    Entidades
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    Títulos Uniformes
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    Materias
-                                </a>
-                            </li>
+                            <li><a class="dropdown-item" href="{% url 'lista_personas' %}">Personas</a></li>
+                            <li><a class="dropdown-item" href="#">Entidades</a></li>
+                            <li><a class="dropdown-item" href="#">Títulos Uniformes</a></li>
+                            <li><a class="dropdown-item" href="#">Materias</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -119,7 +92,7 @@
         </div>
     </nav>
 
-    <!-- Contenido -->
+    <!-- Main content -->
     <main class="container-fluid mt-4">
         {% include 'catalogacion/includes/messages.html' %}
         {% block breadcrumb %}{% endblock %}
@@ -133,15 +106,15 @@
         </div>
     </footer>
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <!-- jQuery (primero, obligatorio para Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
-    <!-- Bootstrap JS Bundle (incluye Popper para dropdowns) -->
+    <!-- Bootstrap Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Select2 JS: VERSIÓN FUNCIONAL -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.full.min.js"></script>
-    
+    <!-- Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 

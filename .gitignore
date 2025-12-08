@@ -48,6 +48,17 @@ coverage.xml
 *.cover
 *.py.cover
 .hypothesis/
+# Archivos de prueba y depuración (NO subir a GitHub)
+crear_obra_prueba.py
+prueba_completa.py
+prueba_navegador.py
+prueba_navegador_auto.py
+verificar_bd.py
+debug_formularios.py
+debug_form_response.html
+debug_navegador.html
+debug_post.txt
+extraer_selects.py
 .pytest_cache/
 cover/
 
@@ -222,3 +233,7 @@ db.sqlite3
 # Configuraciones privadas
 .env
 staticfiles/
+
+# Archivos de análisis y reportes (análisis de validación)
+ANALISIS_VALIDACION_TIPOS.md
+

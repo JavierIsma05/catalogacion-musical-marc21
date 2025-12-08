@@ -15,6 +15,7 @@ from catalogacion.forms.formsets import (
     TituloAlternativoFormSet, EdicionFormSet, ProduccionPublicacionFormSet,
     # Bloque 3XX
     MedioInterpretacion382FormSet,
+    MedioInterpretacion382_aFormSet,
     # Bloque 4XX
     MencionSerie490FormSet,
     # Bloque 5XX
@@ -64,7 +65,40 @@ class ObraFormsetMixin:
             kwargs['instance'] = instance
         return kwargs
     
+    def _get_nested_formsets(self, parent_instances=None, with_post=False):
+        """
+        Obtener formsets anidados (formsets dentro de otros formsets).
+        Actualmente solo el 382 tiene formsets anidados (el 382_a dentro del 382).
+        
+        Args:
+            parent_instances: Lista de instancias padre (ej: instancias de MedioInterpretacion382)
+            with_post: Si True, incluye datos POST
+        
+        Returns:
+            dict: {'medios_formsets': [formset_382_a_0, formset_382_a_1, ...]}
+        """
+        nested = {}
+        
+        if parent_instances:
+            medios_formsets = []
+            for parent_instance in parent_instances:
+                kwargs = {}
+                if with_post:
+                    kwargs['data'] = self.request.POST
+                kwargs['instance'] = parent_instance
+                
+                formset = MedioInterpretacion382_aFormSet(
+                    prefix=f'medios_interpretacion382_set-{parent_instance.pk}',
+                    **kwargs
+                )
+                medios_formsets.append(formset)
+            
+            nested['medios_formsets'] = medios_formsets
+        
+        return nested
+    
     def _get_formsets(self, instance=None, with_post=False):
+
         """
         Obtener todos los formsets configurados.
         
