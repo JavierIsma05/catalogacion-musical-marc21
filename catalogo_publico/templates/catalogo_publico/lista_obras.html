@@ -1,6 +1,12 @@
+
 {% extends 'catalogo_publico/base_publico.html' %}
+{% load static %}
 
 {% block title %}Explorar Catálogo - Catálogo Musical MARC21{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'catalogo_publico/css/lista-obras.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -158,12 +164,6 @@
                     </section>
                 </div>
 
-                <div class="obra-actions">
-                    <a href="{% url 'catalogo_publico:detalle_obra' obra.pk %}" class="btn btn-outline-primary btn-sm">
-                        Ver ficha completa
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
             </div>
         </article>
         {% endfor %}
