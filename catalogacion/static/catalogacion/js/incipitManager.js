@@ -2,7 +2,8 @@ var currenteNotePressed = "f";
 var positionNoteSelected = null;
 var CanvasIncipit = new CanvasClass(); //Define the object Canvas
 
-var isFirefox = typeof InstallTrigger !== "undefined"; // Firefox 1.0+
+// Detector de navegador mejorado (InstallTrigger es obsoleto)
+var isFirefox = navigator.userAgent.indexOf('Firefox') > -1; // Firefox
 var isChrome = false;
 // Chrome 1 - 71
 // please note,

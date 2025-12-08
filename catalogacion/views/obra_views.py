@@ -56,6 +56,12 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
     template_name = 'catalogacion/crear_obra.html'
     
     def post(self, request, *args, **kwargs):
+        logger.info("=" * 70)
+        logger.info(f"📨 POST RECIBIDO: {len(request.POST)} campos en request.POST")
+        logger.info(f"tipo_obra: {kwargs.get('tipo')}")
+        logger.info("=" * 70)
+        
+        # Debug file
         try:
             with open('debug_post.txt', 'a', encoding='utf-8') as f:
                 f.write(f"\n\n{'='*60}\n")
@@ -64,7 +70,21 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
         except:
             pass
         
-        return super().post(request, *args, **kwargs)
+        # Obtener el formulario
+        form = self.get_form()
+        logger.info(f"📝 Formulario obtenido: {form.__class__.__name__}")
+        logger.info(f"   is_bound={form.is_bound}, errors={bool(form.errors)}")
+        
+        if form.errors:
+            logger.error(f"❌ Errores en formulario principal:")
+            for field, errs in form.errors.items():
+                logger.error(f"   - {field}: {errs}")
+        
+        # Llamar al parent
+        result = super().post(request, *args, **kwargs)
+        
+        logger.info(f"✅ Resultado de post(): {result.status_code if hasattr(result, 'status_code') else type(result).__name__}")
+        return result
     
     def dispatch(self, request, *args, **kwargs):
         """Validar que el tipo de obra sea válido"""
@@ -92,6 +112,8 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
     
     def get_context_data(self, **kwargs):
         """Agregar formsets y contexto de tipo de obra"""
+        logger.info(f"🔧 get_context_data() llamado (method={self.request.method})")
+        
         context = super().get_context_data(**kwargs)
         
         # Información del tipo de obra
@@ -106,7 +128,24 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
         
         # Obtener formsets según método HTTP
         with_post = self.request.method == 'POST'
+        logger.debug(f"   Obteniendo formsets con with_post={with_post}")
         context.update(self._get_formsets(instance=None, with_post=with_post))
+        logger.debug(f"   Formsets obtenidos: {len([k for k in context.keys() if '_formset' in k])} formsets")
+        
+        # Formsets anidados para 382 (si estamos en POST, las instancias vienen del formset)
+        medios_formset = context.get('medios_interpretacion')
+        if medios_formset:
+            if with_post:
+                # En POST, obtener instancias del formset sin guardar
+                try:
+                    # Las instancias sin PK no tienen formsets anidados
+                    parent_instances = [form.instance for form in medios_formset if form.instance.pk]
+                except:
+                    parent_instances = []
+            else:
+                parent_instances = []
+            
+            context.update(self._get_nested_formsets(parent_instances=parent_instances, with_post=with_post))
         
         # ============================================================================
         # SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
@@ -125,104 +164,66 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
     
     @transaction.atomic
     def form_valid(self, form):
-        """Guardar obra y todos los formsets en una transacción atómica"""
+        logger.info("=" * 60)
+        logger.info("🚀 INICIANDO form_valid()")
+        logger.info("=" * 60)
         
         context = self.get_context_data()
+        logger.debug(f"Contexto obtenido, claves: {list(context.keys())[:10]}...")
         
-        # Validar todos los formsets
+        # Validar formsets
+        logger.info("📋 Validando formsets...")
         formsets_validos, formsets = self._validar_formsets(context)
         
         if not formsets_validos:
-            for nombre, formset in formsets.items():
-                if hasattr(formset, 'errors') and formset.errors:
-                    for i, errors in enumerate(formset.errors):
-                        if errors:
-                            logger.error(f"     Form {i}: {errors}")
-            
-            messages.error(
-                self.request,
-                'Por favor corrija los errores en los formularios.'
+            logger.error("❌ Validación de formsets FALLÓ")
+            # Mensaje más informativo
+            error_msg = (
+                'Hay errores en los formsets. Revisa la consola del navegador (F12) '
+                'para ver los detalles específicos de qué campo(s) tienen problemas.'
             )
+            messages.error(self.request, error_msg)
             return self.form_invalid(form)
         
-        # Validar campo 382 obligatorio (al menos un medio de interpretación)
-        medios_formset = formsets.get('medios_interpretacion')
-        if medios_formset:
-            tiene_medios = False
-            for medio_form in medios_formset:
-                if medio_form.cleaned_data and not medio_form.cleaned_data.get('DELETE', False):
-                    # Verificar si tiene al menos un subcampo $a
-                    medio_id = medio_form.instance.pk if medio_form.instance else None
-                    if medio_id:
-                        # Ya existe, verificar si tiene subcampos $a
-                        from catalogacion.models import MedioInterpretacion382_a
-                        tiene_medios = MedioInterpretacion382_a.objects.filter(
-                            medio_interpretacion=medio_id
-                        ).exists()
-                    else:
-                        # Nuevo registro, verificar en POST si tiene subcampos dinámicos
-                        # Los subcampos $a se envían como medio_interpretacion_382_X_timestamp
-                        pattern = 'medio_interpretacion_382_'
-                        for key in self.request.POST:
-                            if key.startswith(pattern) and self.request.POST[key]:
-                                tiene_medios = True
-                                break
-                    if tiene_medios:
-                        break
-            
-            if not tiene_medios:
-                messages.error(
-                    self.request,
-                    'Campo 382 - Medio de Interpretación: Debe especificar al menos un medio de interpretación ($a).'
-                )
-                return self.form_invalid(form)
-        else:
-            messages.error(
-                self.request,
-                'Campo 382 - Medio de Interpretación es obligatorio.'
-            )
-            return self.form_invalid(form)
-        
+        logger.info("✅ TODOS LOS FORMSETS VÁLIDOS - Procediendo a guardar")
+
         # Guardar la obra principal
         self.object = form.save(commit=False)
-        
-        # Asegurar tipo_registro y nivel_bibliografico
-        if not self.object.tipo_registro:
-            self.object.tipo_registro = self.config_obra['tipo_registro']
-        
-        if not self.object.nivel_bibliografico:
-            self.object.nivel_bibliografico = self.config_obra['nivel_bibliografico']
-        
-        self.object.save()
-        
-        # Guardar todos los formsets y sus subcampos
-        self._guardar_formsets(formsets, self.object)
-        
-        # ============================================================================
-        # SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
-        # ============================================================================
-        # Marcar borrador como convertido si existe
-        # borrador_id = self.request.session.get('borrador_id')
-        # if borrador_id:
-        #     try:
-        #         from catalogacion.models import BorradorObra
-        #         borrador = BorradorObra.objects.get(id=borrador_id, estado='activo')
-        #         borrador.estado = 'convertido'
-        #         borrador.obra_creada = self.object
-        #         borrador.save()
-        #         
-        #         # Limpiar sesión
-        #         del self.request.session['borrador_id']
-        #         if 'tipo_obra' in self.request.session:
-        #             del self.request.session['tipo_obra']
-        #     except BorradorObra.DoesNotExist:
-        #         pass
-        
-        # Mensaje de éxito
-        messages.success(self.request, f'{self.config_obra["titulo"]} registrada exitosamente.')
-        
+        self.object.save()  # Ahora ya tenemos PK
+
+        # 1️⃣ Guardar el formset principal del 382
+        medios_formset = formsets.get('medios_interpretacion')
+        if medios_formset:
+            medios = medios_formset.save(commit=False)
+            for medio in medios:
+                medio.obra = self.object  # Asignar FK
+                medio.save()  # Ahora tiene PK
+
+            # Borrar los marcados para eliminar
+            for medio in medios_formset.deleted_objects:
+                medio.delete()
+
+        # 2️⃣ Guardar los formsets anidados del 382_a
+        medios_formsets = context.get('medios_formsets', [])
+        if medios_formsets:
+            for idx, medios_anidado in enumerate(medios_formsets):
+                # Validar cada formset anidado
+                if medios_anidado.is_valid():
+                    medios_anidado.save()
+                    logger.info(f"✅ Formset anidado 382_a[{idx}] guardado correctamente")
+                else:
+                    logger.warning(f"⚠️ Formset anidado 382_a[{idx}] tiene errores: {medios_anidado.errors}")
+
+        # 3️⃣ Guardar los demás formsets normalmente
+        for nombre, formset in formsets.items():
+            if nombre != 'medios_interpretacion':
+                formset.instance = self.object
+                formset.save()
+                logger.info(f"✅ Formset {nombre} guardado")
+
+        messages.success(self.request, 'Obra registrada exitosamente.')
         return redirect(self.get_success_url())
-    
+
     def get_success_url(self):
         """Redirigir al detalle de la obra recién creada"""
         return reverse('catalogacion:detalle_obra', kwargs={'pk': self.object.pk})
@@ -239,14 +240,16 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
     
     def dispatch(self, request, *args, **kwargs):
         """Obtener configuración según tipo de obra"""
-        response = super().dispatch(request, *args, **kwargs)
+        # Obtener la obra ANTES de llamar a super().dispatch()
+        # para que self.object esté disponible en get_context_data()
+        self.object = self.get_object()
         
         # Determinar tipo de obra basado en sus características
-        obra = self.get_object()
-        self.tipo_obra = self._determinar_tipo_obra(obra)
+        self.tipo_obra = self._determinar_tipo_obra(self.object)
         self.config_obra = TIPO_OBRA_CONFIG.get(self.tipo_obra, {})
         
-        return response
+        # Ahora sí llamar a super().dispatch()
+        return super().dispatch(request, *args, **kwargs)
     
     def _determinar_tipo_obra(self, obra):
         """
@@ -299,6 +302,21 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
         # Obtener formsets según método HTTP
         with_post = self.request.method == 'POST'
         context.update(self._get_formsets(instance=self.object, with_post=with_post))
+        
+        # Formsets anidados para 382
+        medios_formset = context.get('medios_interpretacion')
+        if medios_formset:
+            if with_post:
+                # En POST, obtener instancias del formset sin guardar
+                try:
+                    parent_instances = [form.instance for form in medios_formset if form.instance.pk]
+                except:
+                    parent_instances = []
+            else:
+                # En GET, obtener todas las instancias existentes
+                parent_instances = list(self.object.medios_interpretacion_382.all())
+            
+            context.update(self._get_nested_formsets(parent_instances=parent_instances, with_post=with_post))
         
         return context
     

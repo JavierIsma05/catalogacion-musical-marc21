@@ -11,7 +11,7 @@ FUNCIONES_PERSONA = [
     ('compilador', 'Compilador'),
     ('compositor', 'Compositor'),
     ('copista', 'Copista'),
-    ('dedicatario', 'Dedicatorio'),
+    ('dedicatario', 'Dedicatorio'),  # ojo: aquí el label es "Dedicatorio" como pusiste
     ('editor', 'Editor'),
     ('prologuista', 'Prologuista'),
 ]
@@ -39,6 +39,11 @@ FUNCIONES_ENTIDAD = [
 class NombreRelacionado700(models.Model):
     """
     700 1# – Nombre relacionado (Persona)
+      $a persona (AutoridadPersona)
+      $d coordenadas biográficas
+      $i relación
+      $j autoría
+      $t título de la obra
     """
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -88,11 +93,31 @@ class NombreRelacionado700(models.Model):
         verbose_name_plural = "700 – Nombres relacionados (R)"
 
     def __str__(self):
-        return str(self.persona)
+        """
+        IMPORTANTÍSIMO: aquí NUNCA usamos relaciones reverse
+        (terminos_asociados, funciones, etc.), solo campos directos.
+        Eso evita problemas con instancias sin pk en el admin/formsets.
+        """
+        partes = []
+        if getattr(self, "persona", None):
+            partes.append(str(self.persona))
+        if self.titulo_obra:
+            partes.append(f"«{self.titulo_obra}»")
+        if self.relacion:
+            partes.append(f"({self.relacion})")
+
+        if partes:
+            return " - ".join(partes)
+
+        # fallback seguro
+        return f"Nombre relacionado 700 (id={self.pk or 'nuevo'})"
 
 
 class TerminoAsociado700(models.Model):
-    """700 $c – Término asociado (R)"""
+    """
+    700 $c – Término asociado (R)
+    Ej: Dr., Lic., etc.
+    """
     nombre_700 = models.ForeignKey(
         NombreRelacionado700,
         on_delete=models.CASCADE,
@@ -107,9 +132,14 @@ class TerminoAsociado700(models.Model):
         verbose_name = "700 $c – Término asociado"
         verbose_name_plural = "700 $c – Términos asociados (R)"
 
+    def __str__(self):
+        return self.termino or f"Término asociado 700 (id={self.pk or 'nuevo'})"
+
 
 class Funcion700(models.Model):
-    """700 $e – Función (R)"""
+    """
+    700 $e – Función (R)
+    """
     nombre_700 = models.ForeignKey(
         NombreRelacionado700,
         on_delete=models.CASCADE,
@@ -125,6 +155,10 @@ class Funcion700(models.Model):
         verbose_name = "700 $e – Función"
         verbose_name_plural = "700 $e – Funciones (R)"
 
+    def __str__(self):
+        # devuelve la etiqueta legible si existe
+        return dict(FUNCIONES_PERSONA).get(self.funcion, self.funcion)
+
 
 # =====================================================
 # 🏛️ 710 2# Entidad relacionada (R)
@@ -133,6 +167,8 @@ class Funcion700(models.Model):
 class EntidadRelacionada710(models.Model):
     """
     710 2# – Entidad relacionada (R)
+      $a entidad (AutoridadEntidad)
+      $e función institucional
     """
 
     obra = models.ForeignKey(
@@ -160,7 +196,11 @@ class EntidadRelacionada710(models.Model):
         verbose_name_plural = "710 – Entidades relacionadas (R)"
 
     def __str__(self):
-        return str(self.entidad)
+        if getattr(self, "entidad", None):
+            if self.funcion:
+                return f"{self.entidad} ({self.get_funcion_display()})"
+            return str(self.entidad)
+        return f"Entidad relacionada 710 (id={self.pk or 'nuevo'})"
 
 
 # =====================================================
@@ -170,19 +210,10 @@ class EntidadRelacionada710(models.Model):
 class EnlaceDocumentoFuente773(models.Model):
     """
     773 1# – Enlace a documento fuente (R)
+      $a Encabezamiento principal (persona)
+      $t Título (AutoridadTituloUniforme)
     """
 
-    primer_indicador = models.CharField(
-        max_length=1,
-        default='1',
-        help_text="1 – No genera nota"
-    )
-
-    segundo_indicador = models.CharField(
-        max_length=1,
-        default='#',
-        help_text="# – Visualización 'En'"
-    )
 
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -196,10 +227,6 @@ class EnlaceDocumentoFuente773(models.Model):
         help_text="773 $a – Encabezamiento principal (NR)"
     )
 
-    # titulo = models.CharField(
-    #     max_length=250,
-    #     help_text="773 $t – Título (NR)"
-    # )
     titulo = models.ForeignKey(
         'AutoridadTituloUniforme',
         on_delete=models.PROTECT,
@@ -211,11 +238,16 @@ class EnlaceDocumentoFuente773(models.Model):
         verbose_name_plural = "773 – Enlaces a documentos fuente (R)"
 
     def __str__(self):
-        return f"En: {self.titulo}"
+        if getattr(self, "titulo", None):
+            return f"En: {self.titulo}"
+        return f"Enlace 773 (id={self.pk or 'nuevo'})"
 
 
 class NumeroControl773(models.Model):
-    """773 $w – Número de control del registro relacionado (R)"""
+    """
+    773 $w – Número de control del registro relacionado (R)
+    Apunta a otra ObraGeneral cuyo 001 (num_control) se mostrará.
+    """
     enlace_773 = models.ForeignKey(
         EnlaceDocumentoFuente773,
         on_delete=models.CASCADE,
@@ -233,7 +265,10 @@ class NumeroControl773(models.Model):
         verbose_name_plural = "773 $w – Números de control (R)"
 
     def __str__(self):
-        return self.obra_relacionada.num_control
+        # evitamos romper si la obra_relacionada no tiene num_control aún
+        if getattr(self, "obra_relacionada", None) and getattr(self.obra_relacionada, "num_control", None):
+            return self.obra_relacionada.num_control
+        return f"Número de control 773 (id={self.pk or 'nuevo'})"
 
 
 # =====================================================
@@ -241,18 +276,11 @@ class NumeroControl773(models.Model):
 # =====================================================
 
 class EnlaceUnidadConstituyente774(models.Model):
-
-    primer_indicador = models.CharField(
-        max_length=1,
-        default='1',
-        help_text="1 – No genera nota"
-    )
-
-    segundo_indicador = models.CharField(
-        max_length=1,
-        default='#',
-        help_text="# – Visualización 'Contiene'"
-    )
+    """
+    774 – Unidad constituyente (R)
+      $a Encabezamiento principal (persona)
+      $t Título (AutoridadTituloUniforme)
+    """
 
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -277,7 +305,9 @@ class EnlaceUnidadConstituyente774(models.Model):
         verbose_name_plural = "774 – Unidades constituyentes (R)"
 
     def __str__(self):
-        return f"Contiene: {self.titulo}"
+        if getattr(self, "titulo", None):
+            return f"Contiene: {self.titulo}"
+        return f"Unidad constituyente 774 (id={self.pk or 'nuevo'})"
 
 
 class NumeroControl774(models.Model):
@@ -300,7 +330,9 @@ class NumeroControl774(models.Model):
         verbose_name_plural = "774 $w – Números de control (R)"
 
     def __str__(self):
-        return self.obra_relacionada.num_control
+        if getattr(self, "obra_relacionada", None) and getattr(self.obra_relacionada, "num_control", None):
+            return self.obra_relacionada.num_control
+        return f"Número de control 774 (id={self.pk or 'nuevo'})"
 
 
 # =====================================================
@@ -308,18 +340,11 @@ class NumeroControl774(models.Model):
 # =====================================================
 
 class OtrasRelaciones787(models.Model):
-
-    primer_indicador = models.CharField(
-        max_length=1,
-        default='1',
-        help_text="1 – No genera nota"
-    )
-
-    segundo_indicador = models.CharField(
-        max_length=1,
-        default='#',
-        help_text="# – Visualización 'Documento relacionado'"
-    )
+    """
+    787 – Otras relaciones (R)
+      $a Encabezamiento principal (persona)
+      $t Título libre
+    """
 
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -343,7 +368,9 @@ class OtrasRelaciones787(models.Model):
         verbose_name_plural = "787 – Otras relaciones (R)"
 
     def __str__(self):
-        return f"Documento relacionado: {self.titulo}"
+        if self.titulo:
+            return f"Documento relacionado: {self.titulo}"
+        return f"Otra relación 787 (id={self.pk or 'nuevo'})"
 
 
 class NumeroControl787(models.Model):
@@ -366,4 +393,6 @@ class NumeroControl787(models.Model):
         verbose_name_plural = "787 $w – Números de control (R)"
 
     def __str__(self):
-        return self.obra_relacionada.num_control
+        if getattr(self, "obra_relacionada", None) and getattr(self.obra_relacionada, "num_control", None):
+            return self.obra_relacionada.num_control
+        return f"Número de control 787 (id={self.pk or 'nuevo'})"

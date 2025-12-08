@@ -25,7 +25,7 @@
                         <label class="form-label" for="{{ form.isbn.id_for_label }}">{{ form.isbn.label }}</label>
                         {{ form.isbn }}
                         {% if form.isbn.errors %}
-                            <div class="invalid-feedback">{{ form.isbn.errors }}</div>
+                        <div class="invalid-feedback">{{ form.isbn.errors }}</div>
                         {% endif %}
                     </div>
                 </div>
@@ -48,51 +48,51 @@
                         <label class="form-label" for="{{ form.ismn.id_for_label }}">{{ form.ismn.label }}</label>
                         {{ form.ismn }}
                         {% if form.ismn.errors %}
-                            <div class="invalid-feedback">{{ form.ismn.errors }}</div>
+                        <div class="invalid-feedback">{{ form.ismn.errors }}</div>
                         {% endif %}
                     </div>
                 </div>
             </div>
             {% endif %}
 
-<!-- Campo 028 - Número de Editor -->
-{% if '028' in campos_visibles %}
-<div class="campo-marc">
-    <div class="campo-titulo">
-        <span class="badge-marc">028</span>
-        <h6>Número de Editor</h6>
-        <span class="campo-help-btn" data-field-code="028" tabindex="0" title="Ayuda">
-            <i class="bi bi-question-circle"></i>
-        </span>
-    </div>
+            <!-- Campo 028 - Número de Editor -->
+            {% if '028' in campos_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">028</span>
+                    <h6>Número de Editor</h6>
+                    <span class="campo-help-btn" data-field-code="028" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
 
-    <div class="campo-grid">
-        <div class="col-third">
-            <label class="form-label" for="id_tipo_numero_028">{{ form.tipo_numero_028.label }}</label>
-            {{ form.tipo_numero_028 }}
-            {% if form.tipo_numero_028.errors %}
-                <div class="invalid-feedback">{{ form.tipo_numero_028.errors }}</div>
-            {% endif %}
-        </div>
+                <div class="campo-grid">
+                    <div class="col-third">
+                        <label class="form-label" for="id_tipo_numero_028">{{ form.tipo_numero_028.label }}</label>
+                        {{ form.tipo_numero_028 }}
+                        {% if form.tipo_numero_028.errors %}
+                        <div class="invalid-feedback">{{ form.tipo_numero_028.errors }}</div>
+                        {% endif %}
+                    </div>
 
-        <div class="col-third">
-            <label class="form-label" for="id_control_nota_028">{{ form.control_nota_028.label }}</label>
-            {{ form.control_nota_028 }}
-            {% if form.control_nota_028.errors %}
-                <div class="invalid-feedback">{{ form.control_nota_028.errors }}</div>
-            {% endif %}
-        </div>
+                    <div class="col-third">
+                        <label class="form-label" for="id_control_nota_028">{{ form.control_nota_028.label }}</label>
+                        {{ form.control_nota_028 }}
+                        {% if form.control_nota_028.errors %}
+                        <div class="invalid-feedback">{{ form.control_nota_028.errors }}</div>
+                        {% endif %}
+                    </div>
 
-        <div class="col-third">
-            <label class="form-label" for="id_numero_editor">{{ form.numero_editor.label }}</label>
-            {{ form.numero_editor }}
-            {% if form.numero_editor.errors %}
-                <div class="invalid-feedback">{{ form.numero_editor.errors }}</div>
+                    <div class="col-third">
+                        <label class="form-label" for="id_numero_editor">{{ form.numero_editor.label }}</label>
+                        {{ form.numero_editor }}
+                        {% if form.numero_editor.errors %}
+                        <div class="invalid-feedback">{{ form.numero_editor.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
             {% endif %}
-        </div>
-    </div>
-</div>
-{% endif %}
 
 
             {# Campo 031 - Íncipit musical (Repetible) #}
@@ -126,7 +126,8 @@
 
                 <div class="campo-grid">
                     <div class="col-full">
-                        <label class="form-label" for="{{ form.centro_catalogador.id_for_label }}">{{ form.centro_catalogador.label }}</label>
+                        <label class="form-label" for="{{ form.centro_catalogador.id_for_label }}">{{
+                            form.centro_catalogador.label }}</label>
                         {{ form.centro_catalogador }}
                     </div>
                 </div>
@@ -139,7 +140,8 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">041</span>
                     <h6>Código de Idioma</h6>
-                    <button type="button" class="campo-add-btn" data-formset-target="lenguas" title="Agregar Código de Lengua">
+                    <button type="button" class="campo-add-btn" data-formset-target="lenguas"
+                        title="Agregar Código de Lengua">
                         <i class="bi bi-plus"></i>
                     </button>
                     <span class="campo-help-btn" data-field-code="041" tabindex="0" title="Ayuda">

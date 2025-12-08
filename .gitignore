@@ -48,6 +48,17 @@ coverage.xml
 *.cover
 *.py.cover
 .hypothesis/
+# Archivos de prueba y depuración (NO subir a GitHub)
+crear_obra_prueba.py
+prueba_completa.py
+prueba_navegador.py
+prueba_navegador_auto.py
+verificar_bd.py
+debug_formularios.py
+debug_form_response.html
+debug_navegador.html
+debug_post.txt
+extraer_selects.py
 .pytest_cache/
 cover/
 
@@ -222,3 +233,39 @@ db.sqlite3
 # Configuraciones privadas
 .env
 staticfiles/
+
+# Archivos de análisis y reportes (análisis de validación)
+ANALISIS_VALIDACION_TIPOS.md
+ANALISIS_FINAL.md
+FIX_JAVASCRIPT_ERRORS.md
+
+
+# ============================================================================
+# ARCHIVOS DE PRUEBA Y DEBUG (NO SUBIR A GITHUB)
+# ============================================================================
+# Scripts de prueba local
+prueba_*.py
+analisis_campos.py
+verificar_*.py
+test_*.py
+debug_*.py
+debug_*.txt
+debug_*.html
+
+# Archivos de análisis específicos (dejar en local)
+analisis_*.py
+analizar_*.py
+extraer_*.py
+verificar_*.py
+crear_obra_prueba.py
+
+# Reportes de debug
+debug_post.txt
+debug_formularios.py
+debug_navegador.py
+debug_navegador_auto.py
+debug_form_response.html
+
+# Backup de BD
+*.bak
+

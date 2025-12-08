@@ -14,32 +14,41 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">852</span>
                     <h6>Ubicación Física</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
+
+                    <!-- Botón de ayuda -->
                     <span class="campo-help-btn" data-field-code="852" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
                     </span>
                 </div>
-                
-                <p class="form-text">Información de ubicación física de la obra. Puede agregar múltiples ubicaciones, cada una con su institución ($a), signatura ($h) y estanterías ($c).</p>
-                
+
+                <p class="form-text">Información de ubicación física de la obra. Puede agregar múltiples ubicaciones,
+                    cada una con su institución ($a), signatura ($h) y estanterías ($c).</p>
+
                 {% include 'catalogacion/includes/formset_852_template.html' with formset=ubicaciones_852 %}
             </div>
             {% endif %}
-            
+
             {# Campo 856 - Ubicación y Acceso Electrónico (Repetible) #}
             {% if '856' in campos_visibles and 'disponibles_856' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">856</span>
                     <h6>Ubicación Electrónica</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
+                    <button type="button" class="campo-add-btn"
+                        data-formset-target="{{ recursos_electronicos_856.prefix }}"
+                        title="Agregar Recurso Electrónico (856)">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
+                    <!-- Botón de ayuda -->
                     <span class="campo-help-btn" data-field-code="856" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
                     </span>
                 </div>
-                
-                <p class="form-text">URLs y recursos electrónicos asociados a la obra. Cada recurso puede tener múltiples URLs ($u) y textos descriptivos ($y).</p>
-                
+
+                <p class="form-text">URLs y recursos electrónicos asociados a la obra. Cada recurso puede tener
+                    múltiples URLs ($u) y textos descriptivos ($y).</p>
+
                 {% include 'catalogacion/includes/formset_856_template.html' with formset=disponibles_856 %}
             </div>
             {% endif %}

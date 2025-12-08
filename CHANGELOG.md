@@ -1,12 +1,78 @@
 
-# ------------------------------------------------------------
-#    2. CHANGELOG.md COMPLETO
-# ------------------------------------------------------------
-
-Copia y pega esto:
-
-```markdown
 # 📜 CHANGELOG – Catalogación Musical MARC21
+
+Este documento registra los cambios realizados en el sistema.
+
+---
+
+## [1.2.0] – 2025-12-07 ⭐ NUEVA VERSIÓN
+### ✨ Solución Integral del Sistema de Guardado de Obras
+
+#### Problema Resuelto
+- ❌ Usuarios no entendían por qué no se guardaban obras
+- ❌ Falta de validación pre-envío en JavaScript
+- ❌ Mensajes de error genéricos del servidor
+- ❌ Documentación insuficiente de campos obligatorios
+
+#### Soluciones Implementadas
+
+**1. Validación Pre-Envío en JavaScript** ✨
+- Nuevo archivo: `catalogacion/static/catalogacion/js/form-validator.js`
+- Valida campos obligatorios ANTES de enviar
+- Muestra modal flotante con errores específicos
+- Verifica punto de acceso (100 o 130)
+- Previene POST inválidos
+
+**2. Documentación Completa** 📚
+- Nuevo: `GUIA_FORMULARIOS_REQUISITOS.md`
+  - Lista campos obligatorios con valores válidos
+  - Mapeo MARC21
+  - 5 soluciones de problemas comunes
+  - Prefijos correctos de formsets
+  - Ejemplos con datos mínimos válidos
+  
+- Nuevo: `SOLUCION_GUARDADO_OBRAS.md` (Resumen ejecutivo)
+  - Descripción de problema y soluciones
+  - Evidencia de resolución con tests
+  - Tabla comparativa antes/después
+  - Aprendizajes clave
+
+**3. Logging Mejorado** 📊
+- Archivo: `catalogacion/views/obra_mixins.py`
+- Ahora muestra prefijo del formset en errores
+- Protección contra atributos faltantes
+- Detalles de ManagementForm y formas fallidas
+
+**4. Mensajes de Error Mejorados** 💬
+- Archivo: `catalogacion/views/obra_views.py`
+- Nuevo mensaje guía al usuario a consola (F12)
+- Más informativo que antes
+
+**5. Template Actualizado** 🎨
+- Archivo: `catalogacion/templates/catalogacion/crear_obra.html`
+- Incluye nuevo script form-validator.js
+- Orden correcto de carga
+
+#### Tests Exitosos
+- ✅ Test completo con datos válidos: Obra ID 16 creada (M000013)
+- ✅ Validación JavaScript funciona
+- ✅ Formsets con prefijos correctos validados
+- ✅ Sistema listo para producción
+
+#### Cambios en Índice de Documentación
+- `INDICE_DOCUMENTACION.md` actualizado
+- Nuevas secciones para guías de formularios
+- Links a documentación nueva
+
+#### Status Final
+✅ Sistema de Guardado: **FUNCIONA CORRECTAMENTE**
+✅ UX Mejorada: **Mensajes claros al usuario**
+✅ Documentación: **Completa**
+✅ Listo para: **PRODUCCIÓN**
+
+---
+
+## [1.1.0] – 2025-02
 
 Este documento registra los cambios realizados en el sistema.
 

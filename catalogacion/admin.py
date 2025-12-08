@@ -1100,14 +1100,7 @@ class NombreRelacionado700Admin(admin.ModelAdmin):
         return False  # Ocultar del menú principal
 
 
-# @admin.register(Ubicacion852)
-# class Ubicacion852Admin(admin.ModelAdmin):
-#     list_display = ['institucion_persona', 'signatura_original', 'obra']
-#     search_fields = ['institucion_persona', 'signatura_original']
-#     inlines = [Estanteria852Inline]
 
-#     def has_module_permission(self, request):
-#         return False  # Ocultar del menú principal
 @admin.register(Disponible856)
 class Disponible856Admin(admin.ModelAdmin):
     inlines = [URL856Inline, TextoEnlace856Inline]

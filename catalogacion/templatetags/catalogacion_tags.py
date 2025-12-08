@@ -92,3 +92,12 @@ def get_funciones_entidad():
 def get_autorias():
     """Retorna la lista de tipos de autoría"""
     return AUTORIAS_CHOICES
+
+
+@register.filter
+def get_item(list_obj, index):
+    """Obtiene un item de una lista por índice"""
+    try:
+        return list_obj[int(index)]
+    except (IndexError, ValueError, TypeError):
+        return None

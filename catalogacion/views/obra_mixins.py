@@ -15,6 +15,7 @@ from catalogacion.forms.formsets import (
     TituloAlternativoFormSet, EdicionFormSet, ProduccionPublicacionFormSet,
     # Bloque 3XX
     MedioInterpretacion382FormSet,
+    MedioInterpretacion382_aFormSet,
     # Bloque 4XX
     MencionSerie490FormSet,
     # Bloque 5XX
@@ -64,7 +65,40 @@ class ObraFormsetMixin:
             kwargs['instance'] = instance
         return kwargs
     
+    def _get_nested_formsets(self, parent_instances=None, with_post=False):
+        """
+        Obtener formsets anidados (formsets dentro de otros formsets).
+        Actualmente solo el 382 tiene formsets anidados (el 382_a dentro del 382).
+        
+        Args:
+            parent_instances: Lista de instancias padre (ej: instancias de MedioInterpretacion382)
+            with_post: Si True, incluye datos POST
+        
+        Returns:
+            dict: {'medios_formsets': [formset_382_a_0, formset_382_a_1, ...]}
+        """
+        nested = {}
+        
+        if parent_instances:
+            medios_formsets = []
+            for parent_instance in parent_instances:
+                kwargs = {}
+                if with_post:
+                    kwargs['data'] = self.request.POST
+                kwargs['instance'] = parent_instance
+                
+                formset = MedioInterpretacion382_aFormSet(
+                    prefix=f'medios_interpretacion382_set-{parent_instance.pk}',
+                    **kwargs
+                )
+                medios_formsets.append(formset)
+            
+            nested['medios_formsets'] = medios_formsets
+        
+        return nested
+    
     def _get_formsets(self, instance=None, with_post=False):
+
         """
         Obtener todos los formsets configurados.
         
@@ -170,6 +204,8 @@ class ObraFormsetMixin:
             'enlaces_documento_fuente_773': 'enlaces_773-TOTAL_FORMS',
             'enlaces_unidad_constituyente_774': 'enlaces_774-TOTAL_FORMS',
             'otras_relaciones_787': 'relaciones_787-TOTAL_FORMS',
+            'titulos_alternativos': 'titulos_alt-TOTAL_FORMS',
+            'ediciones': 'ediciones-TOTAL_FORMS',
         }
 
         for key in self._get_formset_names():
@@ -183,7 +219,7 @@ class ObraFormsetMixin:
             if key in formsets_opcionales:
                 mgmt_field = formsets_opcionales[key]
                 if mgmt_field not in self.request.POST:
-                    logger.debug(f"  ⏭️  {key}: SALTADO (no está en el template)")
+                    logger.debug(f"  ⏭️  {key}: SALTADO (no está en el POST/template)")
                     continue
             
             if formset:
@@ -193,10 +229,21 @@ class ObraFormsetMixin:
                 if is_valid:
                     logger.debug(f"  ✅ {key}: VÁLIDO")
                 else:
-                    logger.error(f"  ❌ {key}: INVÁLIDO")
-                    logger.error(f"     Errores: {formset.errors}")
+                    # Obtener el prefijo del formset para logs más claros
+                    prefix = getattr(formset, 'prefix', 'unknown')
+                    logger.error(f"  ❌ {key} (prefix: {prefix}): INVÁLIDO")
+                    logger.error(f"     Errores formset: {formset.errors}")
+                    logger.error(f"     Total forms: {formset.total_form_count()}")
+                    # Algunos formsets personalizados NO tienen deleted_objects
+                    if hasattr(formset, 'deleted_objects'):
+                        logger.error(f"     Deleted objects: {len(formset.deleted_objects)}")
                     if hasattr(formset, 'non_form_errors') and formset.non_form_errors():
                         logger.error(f"     Errores no-form: {formset.non_form_errors()}")
+                    # Mostrar detalles de cada formulario del formset
+                    for i, form in enumerate(formset.forms):
+                        if form.errors:
+                            logger.error(f"     Form[{i}] errores: {form.errors}")
+                            logger.error(f"     Form[{i}] cleaned_data: {form.cleaned_data}")
                     formsets_validos = False
         
         logger.info(f"✅ Resultado final: {'TODOS VÁLIDOS' if formsets_validos else 'HAY ERRORES'}")

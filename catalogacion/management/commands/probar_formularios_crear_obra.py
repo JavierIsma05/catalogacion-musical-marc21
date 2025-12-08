@@ -419,15 +419,13 @@ class CrearObraPayloadBuilder:
     def _build_enlaces_773(self):
         entries = [
             {
-                "primer_indicador": "1",
-                "segundo_indicador": "#",
+                
                 "encabezamiento_principal": str(self.sample["personas"][2].pk),
                 "encabezamiento_principal_texto": "",
                 "titulo": "Documento fuente A",
             },
             {
-                "primer_indicador": "1",
-                "segundo_indicador": "#",
+                
                 "encabezamiento_principal": str(self.sample["personas"][3].pk),
                 "encabezamiento_principal_texto": self.sample["personas"][3].apellidos_nombres,
                 "titulo": "Documento fuente B",
@@ -438,15 +436,12 @@ class CrearObraPayloadBuilder:
     def _build_enlaces_774(self):
         entries = [
             {
-                "primer_indicador": "1",
-                "segundo_indicador": "#",
                 "encabezamiento_principal": str(self.sample["personas"][3].pk),
                 "encabezamiento_principal_texto": "",
                 "titulo": "Unidad constituyente A",
             },
             {
-                "primer_indicador": "1",
-                "segundo_indicador": "#",
+
                 "encabezamiento_principal": str(self.sample["personas"][4].pk),
                 "encabezamiento_principal_texto": self.sample["personas"][4].apellidos_nombres,
                 "titulo": "Unidad constituyente B",
@@ -457,15 +452,11 @@ class CrearObraPayloadBuilder:
     def _build_enlaces_787(self):
         entries = [
             {
-                "primer_indicador": "1",
-                "segundo_indicador": "#",
                 "encabezamiento_principal": str(self.sample["personas"][4].pk),
                 "encabezamiento_principal_texto": "",
                 "titulo": "Relacionada A",
             },
             {
-                "primer_indicador": "1",
-                "segundo_indicador": "#",
                 "encabezamiento_principal": str(self.sample["personas"][0].pk),
                 "encabezamiento_principal_texto": self.sample["personas"][0].apellidos_nombres,
                 "titulo": "Relacionada B",
@@ -476,11 +467,11 @@ class CrearObraPayloadBuilder:
     def _build_ubicaciones_852(self):
         entries = [
             {
-                "institucion_persona": str(self.sample["entidades"][2].pk),
+                "codigo_o_nombre ": "EC-UNL",
                 "signatura_original": "Caja 1-23",
             },
             {
-                "institucion_persona": str(self.sample["entidades"][0].pk),
+                "codigo_o_nombre ": "Archivo José Pérez",
                 "signatura_original": "Caja 2-11",
             },
         ]

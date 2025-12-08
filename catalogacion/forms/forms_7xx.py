@@ -191,26 +191,32 @@ class Funcion700Form(forms.ModelForm):
 # ========================================================================
 
 class EntidadRelacionada710Form(forms.ModelForm):
+
+    entidad_texto = forms.CharField(
+        required=False,
+        label="710 $a – Entidad relacionada",
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control autocomplete-entidad-710",
+                "placeholder": "Escriba para buscar o agregar entidad…",
+                "autocomplete": "off",
+            }
+        ),
+    )
+
     class Meta:
         model = EntidadRelacionada710
-        fields = ['entidad', 'funcion']
+        fields = ["entidad", "funcion"]
         widgets = {
-            'entidad': Select2Widget(attrs={
-                'data-url': '/catalogacion/autocompletar/entidad/',
-            }),
-            'funcion': forms.Select(attrs={'class': 'form-select'}),
+            "entidad": forms.HiddenInput(),  # 👉 Escondido como en 700/787
+            "funcion": forms.Select(attrs={"class": "form-select"}),
         }
-        labels = {
-            'entidad': '710 $a – Entidad relacionada',
-            'funcion': '710 $e – Función institucional',
-        }
+
 
 
 # ========================================================================
 # 773 – Enlace a documento fuente
 # ========================================================================
-PRIMER_INDICADOR_773 = [('1', '1 – No genera nota')]
-SEGUNDO_INDICADOR_773 = [('#', "# – Visualización 'En'")]
 
 class EnlaceDocumentoFuente773Form(forms.ModelForm):
 
@@ -242,29 +248,18 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
     class Meta:
         model = EnlaceDocumentoFuente773
         fields = [
-            "primer_indicador",
-            "segundo_indicador",
+        
             "encabezamiento_principal",
             "titulo",
         ]
         widgets = {
-            "primer_indicador": forms.Select(
-                choices=PRIMER_INDICADOR_773,
-                attrs={"class": "form-select"}
-            ),
-            "segundo_indicador": forms.Select(
-                choices=SEGUNDO_INDICADOR_773,
-                attrs={"class": "form-select"}
-            ),
-
             # 👇 YA NO ES SELECT2 → ahora es hidden
             "encabezamiento_principal": forms.HiddenInput(),
 
             "titulo": forms.HiddenInput(),
         }
         labels = {
-            "primer_indicador": "773 – Primer indicador",
-            "segundo_indicador": "773 – Segundo indicador",
+       
             "encabezamiento_principal": "773 $a – Encabezamiento principal",
             "titulo": "773 $t – Título",
         }
@@ -361,10 +356,6 @@ class NumeroControl773Form(forms.ModelForm):
 # ========================================================================
 # 774 – Enlace a unidad constituyente
 # ========================================================================
-
-PRIMER_INDICADOR_774 = [('1', '1 – No genera nota')]
-SEGUNDO_INDICADOR_774 = [('#', "# – Visualización 'Contiene'")]
-
 class EnlaceUnidadConstituyente774Form(forms.ModelForm):
 
     # Campo visible tipo "Muscat"
@@ -395,20 +386,11 @@ class EnlaceUnidadConstituyente774Form(forms.ModelForm):
     class Meta:
         model = EnlaceUnidadConstituyente774
         fields = [
-            'primer_indicador',
-            'segundo_indicador',
+           
             'encabezamiento_principal',
             'titulo'
         ]
         widgets = {
-            'primer_indicador': forms.Select(
-                choices=PRIMER_INDICADOR_774,
-                attrs={'class': 'form-select'}
-            ),
-            'segundo_indicador': forms.Select(
-                choices=SEGUNDO_INDICADOR_774,
-                attrs={'class': 'form-select'}
-            ),
             # Campo real oculto
             'encabezamiento_principal': forms.HiddenInput(),
 
@@ -503,9 +485,6 @@ class NumeroControl774Form(forms.ModelForm):
 # 787 – Otras relaciones
 # ========================================================================
 
-PRIMER_INDICADOR_787 = [('1', '1 – No genera nota')]
-SEGUNDO_INDICADOR_787 = [('#', "# – Visualización 'Documento relacionado'")]
-
 class OtrasRelaciones787Form(forms.ModelForm):
 
     encabezamiento_principal_texto = forms.CharField(
@@ -521,20 +500,12 @@ class OtrasRelaciones787Form(forms.ModelForm):
     class Meta:
         model = OtrasRelaciones787
         fields = [
-            'primer_indicador',
-            'segundo_indicador',
+            
             'encabezamiento_principal',
             'titulo'
         ]
         widgets = {
-            'primer_indicador': forms.Select(
-                choices=PRIMER_INDICADOR_787,
-                attrs={'class': 'form-select'}
-            ),
-            'segundo_indicador': forms.Select(
-                choices=SEGUNDO_INDICADOR_787,
-                attrs={'class': 'form-select'}
-            ),
+            
 
             'encabezamiento_principal': forms.HiddenInput(),
 

@@ -38,17 +38,25 @@ El campo 852 es repetible y contiene subcampos repetibles ($c estantería)
                     <div class="campo-grid">
                         {# Campo 852 $a - Institución o persona #}
                         <div class="col-half">
-                            <label class="form-label" for="{{ form.institucion_persona.id_for_label }}">
-                                {{ form.institucion_persona.label }}
+                            <label class="form-label" for="{{ form.codigo_o_nombre.id_for_label }}">
+                                {{ form.codigo_o_nombre.label }}
                             </label>
-                            {{ form.institucion_persona }}
-                            {% if form.institucion_persona.errors %}
-                                <div class="invalid-feedback d-block">{{ form.institucion_persona.errors }}</div>
+
+                            <div class="autocomplete-wrapper">
+                                {{ form.codigo_o_nombre }}
+
+                                <div class="autocomplete-suggestions autoridad852-suggestions"></div>
+                            </div>
+
+                            {% if form.codigo_o_nombre.errors %}
+                                <div class="invalid-feedback d-block">{{ form.codigo_o_nombre.errors }}</div>
                             {% endif %}
-                            {% if form.institucion_persona.help_text %}
-                                <small class="form-text text-muted">{{ form.institucion_persona.help_text }}</small>
-                            {% endif %}
+
+                            <small class="form-text text-muted">
+                                Código o nombre de institución o persona (si no está en Autoridades)
+                            </small>
                         </div>
+
                         
                         {# Campo 852 $h - Signatura original #}
                         <div class="col-half">
@@ -113,9 +121,9 @@ El campo 852 es repetible y contiene subcampos repetibles ($c estantería)
                     <div class="campo-grid">
                         <div class="col-half">
                             <label class="form-label">
-                                {{ formset.empty_form.institucion_persona.label }}
+                                {{ formset.empty_form.codigo_o_nombre.label }}
                             </label>
-                            {{ formset.empty_form.institucion_persona }}
+                            {{ formset.empty_form.codigo_o_nombre }}
                         </div>
                         
                         <div class="col-half">
@@ -257,4 +265,59 @@ El campo 852 es repetible y contiene subcampos repetibles ($c estantería)
         }
     });
 })();
+document.addEventListener("input", function(e) {
+    const input = e.target.closest(".autoridad852-autocomplete");
+    if (!input) return;
+
+    const row = input.closest(".formset-row");
+    const box = row.querySelector(".autoridad852-suggestions");
+    const query = input.value.trim();
+
+    if (query.length < 2) {
+        box.innerHTML = "";
+        box.classList.remove("show");
+        return;
+    }
+
+    fetch(`/catalogacion/api/autocompletar/entidad/?q=${encodeURIComponent(query)}`)
+        .then(r => r.json())
+        .then(data => {
+            box.innerHTML = "";
+
+            data.results.forEach(ent => {
+                const div = document.createElement("div");
+                div.className = "autocomplete-item";
+                div.innerHTML = ent.text;
+
+                div.addEventListener("click", () => {
+                    input.value = ent.text;
+                    box.innerHTML = "";
+                    box.classList.remove("show");
+                });
+
+                box.appendChild(div);
+            });
+
+            // Opción para escribir libre
+            const nuevo = document.createElement("div");
+            nuevo.className = "autocomplete-item new-item";
+            nuevo.innerHTML = `<i class="bi bi-plus-circle"></i> Usar texto: "${query}"`;
+            nuevo.addEventListener("click", () => {
+                input.value = query;
+                box.innerHTML = "";
+                box.classList.remove("show");
+            });
+            box.appendChild(nuevo);
+
+            box.classList.add("show");
+        });
+});
+
+document.addEventListener("click", function(e) {
+    document.querySelectorAll(".autoridad852-suggestions.show")
+        .forEach(box => {
+            if (!box.contains(e.target)) box.classList.remove("show");
+        });
+});
+
 </script>

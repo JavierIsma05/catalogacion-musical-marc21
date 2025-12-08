@@ -8,7 +8,6 @@ from catalogacion.models import (
     AutoridadPersona,
     AutoridadTituloUniforme,
     AutoridadFormaMusical,
-    AutoridadEntidad,
 )
 from .widgets import Select2Widget, TextAreaAutosize
 
