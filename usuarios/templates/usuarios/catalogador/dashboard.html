@@ -15,9 +15,6 @@
             <a href="{% url 'catalogacion:seleccionar_tipo' %}" class="btn btn-light btn-sm fw-semibold">
                 <i class="bi bi-plus-lg"></i> Nueva obra
             </a>
-            <a href="{% url 'catalogacion:lista_obras' %}" class="btn btn-outline-light btn-sm fw-semibold">
-                <i class="bi bi-collection"></i> Ver obras
-            </a>
         </div>
     </div>
 </div>
@@ -29,13 +26,6 @@
         </div>
         <h3>Nueva Obra</h3>
         <p>Comienza a catalogar una nueva obra musical.</p>
-    </a>
-    <a href="{% url 'catalogacion:lista_obras' %}" class="quick-action-card list-obras">
-        <div class="action-icon">
-            <i class="bi bi-collection"></i>
-        </div>
-        <h3>Mis Obras</h3>
-        <p>Revisa y edita las obras catalogadas.</p>
     </a>
     <a href="{% url 'autoridades:lista_personas' %}" class="quick-action-card autoridades">
         <div class="action-icon">

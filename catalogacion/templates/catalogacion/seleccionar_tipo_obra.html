@@ -10,172 +10,181 @@
 
 {% block catalogacion_content %}
 <div class="tipo-selection-container">
-    <div class="selection-header">
-        <h2>Crear Nueva Obra MARC21</h2>
-        <p>Seleccione el tipo de obra musical que desea catalogar</p>
-    </div>
+    <div class="selection-card">
+        <div class="selection-header">
+            <div>
+                <p class="eyebrow">Nueva obra</p>
+                <h2>Crear Nueva Obra MARC21</h2>
+                <p class="subtitle">Selecciona el tipo de obra musical que deseas catalogar</p>
+            </div>
+            <div class="selection-pill">
+                <i class="bi bi-music-note-list"></i>
+                Flujo guiado
+            </div>
+        </div>
 
-    <div class="selection-info">
-        <i class="bi bi-lightbulb"></i>
-        Haga clic en una categoría para ver las opciones disponibles
-    </div>
+        <div class="selection-info">
+            <i class="bi bi-lightbulb"></i>
+            Haga clic en una categoría para ver las opciones disponibles
+        </div>
 
-    <form method="post" action="{% url 'catalogacion:seleccionar_tipo' %}" id="tipo-form">
-        {% csrf_token %}
-        
-        <div class="categoria-accordion">
-            <!-- Obras Manuscritas -->
-            <div class="categoria-item" data-categoria="manuscrita">
-                <div class="categoria-header">
-                    <div class="categoria-header-left">
-                        <div class="categoria-icon">
-                            <i class="bi bi-pen"></i>
+        <form method="post" action="{% url 'catalogacion:seleccionar_tipo' %}" id="tipo-form">
+            {% csrf_token %}
+            
+            <div class="categoria-accordion">
+                <!-- Obras Manuscritas -->
+                <div class="categoria-item" data-categoria="manuscrita">
+                    <div class="categoria-header">
+                        <div class="categoria-header-left">
+                            <div class="categoria-icon">
+                                <i class="bi bi-pen"></i>
+                            </div>
+                            <div class="categoria-info">
+                                <h3>Obras Manuscritas</h3>
+                                <p>Partituras escritas a mano, borradores y copias manuscritas</p>
+                            </div>
                         </div>
-                        <div class="categoria-info">
-                            <h3>Obras Manuscritas</h3>
-                            <p>Partituras escritas a mano, borradores y copias manuscritas</p>
+                        <i class="bi bi-chevron-down categoria-arrow"></i>
+                    </div>
+                    
+                    <div class="categoria-content">
+                        <div class="tipos-list">
+                            <!-- Colección Manuscrita -->
+                            <label class="tipo-option" data-tipo="coleccion_manuscrita">
+                                <input type="radio" name="tipo_obra" value="coleccion_manuscrita" class="tipo-radio-input">
+                                <div class="tipo-option-radio"></div>
+                                <div class="tipo-option-icon">
+                                    <i class="bi bi-collection"></i>
+                                </div>
+                                <div class="tipo-option-content">
+                                    <div class="tipo-option-title">Colección Manuscrita</div>
+                                    <div class="tipo-option-desc">Conjunto de obras manuscritas agrupadas bajo un título uniforme</div>
+                                </div>
+                                <div class="tipo-option-badge">
+                                    <span class="badge-tag">Nivel c</span>
+                                    <span class="badge-tag">130</span>
+                                </div>
+                            </label>
+                            
+                            <!-- Obra en Colección Manuscrita -->
+                            <label class="tipo-option" data-tipo="obra_en_coleccion_manuscrita">
+                                <input type="radio" name="tipo_obra" value="obra_en_coleccion_manuscrita" class="tipo-radio-input">
+                                <div class="tipo-option-radio"></div>
+                                <div class="tipo-option-icon">
+                                    <i class="bi bi-file-earmark-music"></i>
+                                </div>
+                                <div class="tipo-option-content">
+                                    <div class="tipo-option-title">Obra en Colección Manuscrita</div>
+                                    <div class="tipo-option-desc">Obra individual que forma parte de una colección manuscrita mayor</div>
+                                </div>
+                                <div class="tipo-option-badge">
+                                    <span class="badge-tag">Nivel a</span>
+                                    <span class="badge-tag">100</span>
+                                </div>
+                            </label>
+                            
+                            <!-- Obra Manuscrita Individual -->
+                            <label class="tipo-option" data-tipo="obra_manuscrita_individual">
+                                <input type="radio" name="tipo_obra" value="obra_manuscrita_individual" class="tipo-radio-input">
+                                <div class="tipo-option-radio"></div>
+                                <div class="tipo-option-icon">
+                                    <i class="bi bi-file-earmark"></i>
+                                </div>
+                                <div class="tipo-option-content">
+                                    <div class="tipo-option-title">Obra Manuscrita Individual</div>
+                                    <div class="tipo-option-desc">Obra manuscrita completa e independiente, no forma parte de colección</div>
+                                </div>
+                                <div class="tipo-option-badge">
+                                    <span class="badge-tag">Nivel m</span>
+                                    <span class="badge-tag">100</span>
+                                </div>
+                            </label>
                         </div>
                     </div>
-                    <i class="bi bi-chevron-down categoria-arrow"></i>
                 </div>
-                
-                <div class="categoria-content">
-                    <div class="tipos-list">
-                        <!-- Colección Manuscrita -->
-                        <label class="tipo-option" data-tipo="coleccion_manuscrita">
-                            <input type="radio" name="tipo_obra" value="coleccion_manuscrita" class="tipo-radio-input">
-                            <div class="tipo-option-radio"></div>
-                            <div class="tipo-option-icon">
-                                <i class="bi bi-collection"></i>
+
+                <!-- Obras Impresas -->
+                <div class="categoria-item" data-categoria="impresa">
+                    <div class="categoria-header">
+                        <div class="categoria-header-left">
+                            <div class="categoria-icon">
+                                <i class="bi bi-printer"></i>
                             </div>
-                            <div class="tipo-option-content">
-                                <div class="tipo-option-title">Colección Manuscrita</div>
-                                <div class="tipo-option-desc">Conjunto de obras manuscritas agrupadas bajo un título uniforme</div>
+                            <div class="categoria-info">
+                                <h3>Obras Impresas</h3>
+                                <p>Partituras publicadas con ISBN/ISMN y datos de edición</p>
                             </div>
-                            <div class="tipo-option-badge">
-                                <span class="badge-tag">Nivel c</span>
-                                <span class="badge-tag">130</span>
-                            </div>
-                        </label>
-                        
-                        <!-- Obra en Colección Manuscrita -->
-                        <label class="tipo-option" data-tipo="obra_en_coleccion_manuscrita">
-                            <input type="radio" name="tipo_obra" value="obra_en_coleccion_manuscrita" class="tipo-radio-input">
-                            <div class="tipo-option-radio"></div>
-                            <div class="tipo-option-icon">
-                                <i class="bi bi-file-earmark-music"></i>
-                            </div>
-                            <div class="tipo-option-content">
-                                <div class="tipo-option-title">Obra en Colección Manuscrita</div>
-                                <div class="tipo-option-desc">Obra individual que forma parte de una colección manuscrita mayor</div>
-                            </div>
-                            <div class="tipo-option-badge">
-                                <span class="badge-tag">Nivel a</span>
-                                <span class="badge-tag">100</span>
-                            </div>
-                        </label>
-                        
-                        <!-- Obra Manuscrita Individual -->
-                        <label class="tipo-option" data-tipo="obra_manuscrita_individual">
-                            <input type="radio" name="tipo_obra" value="obra_manuscrita_individual" class="tipo-radio-input">
-                            <div class="tipo-option-radio"></div>
-                            <div class="tipo-option-icon">
-                                <i class="bi bi-file-earmark"></i>
-                            </div>
-                            <div class="tipo-option-content">
-                                <div class="tipo-option-title">Obra Manuscrita Individual</div>
-                                <div class="tipo-option-desc">Obra manuscrita completa e independiente, no forma parte de colección</div>
-                            </div>
-                            <div class="tipo-option-badge">
-                                <span class="badge-tag">Nivel m</span>
-                                <span class="badge-tag">100</span>
-                            </div>
-                        </label>
+                        </div>
+                        <i class="bi bi-chevron-down categoria-arrow"></i>
+                    </div>
+                    
+                    <div class="categoria-content">
+                        <div class="tipos-list">
+                            <!-- Colección Impresa -->
+                            <label class="tipo-option" data-tipo="coleccion_impresa">
+                                <input type="radio" name="tipo_obra" value="coleccion_impresa" class="tipo-radio-input">
+                                <div class="tipo-option-radio"></div>
+                                <div class="tipo-option-icon">
+                                    <i class="bi bi-collection-fill"></i>
+                                </div>
+                                <div class="tipo-option-content">
+                                    <div class="tipo-option-title">Colección Impresa</div>
+                                    <div class="tipo-option-desc">Conjunto de obras publicadas agrupadas, incluye ISBN/ISMN y serie</div>
+                                </div>
+                                <div class="tipo-option-badge">
+                                    <span class="badge-tag">Nivel c</span>
+                                    <span class="badge-tag">020</span>
+                                </div>
+                            </label>
+                            
+                            <!-- Obra en Colección Impresa -->
+                            <label class="tipo-option" data-tipo="obra_en_coleccion_impresa">
+                                <input type="radio" name="tipo_obra" value="obra_en_coleccion_impresa" class="tipo-radio-input">
+                                <div class="tipo-option-radio"></div>
+                                <div class="tipo-option-icon">
+                                    <i class="bi bi-file-music"></i>
+                                </div>
+                                <div class="tipo-option-content">
+                                    <div class="tipo-option-title">Obra en Colección Impresa</div>
+                                    <div class="tipo-option-desc">Obra individual publicada dentro de una colección impresa mayor</div>
+                                </div>
+                                <div class="tipo-option-badge">
+                                    <span class="badge-tag">Nivel a</span>
+                                    <span class="badge-tag">100</span>
+                                </div>
+                            </label>
+                            
+                            <!-- Obra Impresa Individual -->
+                            <label class="tipo-option" data-tipo="obra_impresa_individual">
+                                <input type="radio" name="tipo_obra" value="obra_impresa_individual" class="tipo-radio-input">
+                                <div class="tipo-option-radio"></div>
+                                <div class="tipo-option-icon">
+                                    <i class="bi bi-file-text"></i>
+                                </div>
+                                <div class="tipo-option-content">
+                                    <div class="tipo-option-title">Obra Impresa Individual</div>
+                                    <div class="tipo-option-desc">Partitura publicada completa e independiente con identificadores estándar</div>
+                                </div>
+                                <div class="tipo-option-badge">
+                                    <span class="badge-tag">Nivel m</span>
+                                    <span class="badge-tag">264</span>
+                                </div>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Obras Impresas -->
-            <div class="categoria-item" data-categoria="impresa">
-                <div class="categoria-header">
-                    <div class="categoria-header-left">
-                        <div class="categoria-icon">
-                            <i class="bi bi-printer"></i>
-                        </div>
-                        <div class="categoria-info">
-                            <h3>Obras Impresas</h3>
-                            <p>Partituras publicadas con ISBN/ISMN y datos de edición</p>
-                        </div>
-                    </div>
-                    <i class="bi bi-chevron-down categoria-arrow"></i>
-                </div>
-                
-                <div class="categoria-content">
-                    <div class="tipos-list">
-                        <!-- Colección Impresa -->
-                        <label class="tipo-option" data-tipo="coleccion_impresa">
-                            <input type="radio" name="tipo_obra" value="coleccion_impresa" class="tipo-radio-input">
-                            <div class="tipo-option-radio"></div>
-                            <div class="tipo-option-icon">
-                                <i class="bi bi-collection-fill"></i>
-                            </div>
-                            <div class="tipo-option-content">
-                                <div class="tipo-option-title">Colección Impresa</div>
-                                <div class="tipo-option-desc">Conjunto de obras publicadas agrupadas, incluye ISBN/ISMN y serie</div>
-                            </div>
-                            <div class="tipo-option-badge">
-                                <span class="badge-tag">Nivel c</span>
-                                <span class="badge-tag">020</span>
-                            </div>
-                        </label>
-                        
-                        <!-- Obra en Colección Impresa -->
-                        <label class="tipo-option" data-tipo="obra_en_coleccion_impresa">
-                            <input type="radio" name="tipo_obra" value="obra_en_coleccion_impresa" class="tipo-radio-input">
-                            <div class="tipo-option-radio"></div>
-                            <div class="tipo-option-icon">
-                                <i class="bi bi-file-music"></i>
-                            </div>
-                            <div class="tipo-option-content">
-                                <div class="tipo-option-title">Obra en Colección Impresa</div>
-                                <div class="tipo-option-desc">Obra individual publicada dentro de una colección impresa mayor</div>
-                            </div>
-                            <div class="tipo-option-badge">
-                                <span class="badge-tag">Nivel a</span>
-                                <span class="badge-tag">100</span>
-                            </div>
-                        </label>
-                        
-                        <!-- Obra Impresa Individual -->
-                        <label class="tipo-option" data-tipo="obra_impresa_individual">
-                            <input type="radio" name="tipo_obra" value="obra_impresa_individual" class="tipo-radio-input">
-                            <div class="tipo-option-radio"></div>
-                            <div class="tipo-option-icon">
-                                <i class="bi bi-file-text"></i>
-                            </div>
-                            <div class="tipo-option-content">
-                                <div class="tipo-option-title">Obra Impresa Individual</div>
-                                <div class="tipo-option-desc">Partitura publicada completa e independiente con identificadores estándar</div>
-                            </div>
-                            <div class="tipo-option-badge">
-                                <span class="badge-tag">Nivel m</span>
-                                <span class="badge-tag">264</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
+            <div class="action-buttons">
+                <a href="{% url 'usuarios:catalogador_dashboard' %}" class="btn-cancelar">
+                    <i class="bi bi-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn-continuar" id="btn-continuar" disabled>
+                    Continuar <i class="bi bi-arrow-right"></i>
+                </button>
             </div>
-        </div>
-
-        <div class="action-buttons">
-            <a href="{% url 'usuarios:catalogador_dashboard' %}" class="btn-cancelar">
-                <i class="bi bi-arrow-left"></i> Cancelar
-            </a>
-            <button type="submit" class="btn-continuar" id="btn-continuar" disabled>
-                Continuar <i class="bi bi-arrow-right"></i>
-            </button>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 {% endblock %}
 
