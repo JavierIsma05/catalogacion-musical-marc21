@@ -11,54 +11,42 @@
     // Los campos 001, 005 y 008 son automáticos y no se rastrean
     const REQUIRED_FIELDS_CONFIG = {
         coleccion_manuscrita: [
+            { id: "id_centro_catalogador", label: "040", tab: 6 },
+            { id: "id_titulo_uniforme_texto", label: "130", tab: 0, hidden: true },
+            { id: "id_titulo_principal", label: "245", tab: 0 },
+            { id: "id_ms_imp", label: "340", tab: 1 },
             {
-                id: "id_fuente_catalogacion_040",
-                label: "040 - Fuente de Catalogación",
-                tab: 0,
-            },
-            {
-                id: "id_titulo_uniforme",
-                label: "130 - Título Uniforme",
-                tab: 1,
-            },
-            {
-                id: "id_titulo_principal",
-                label: "245 - Título Principal",
-                tab: 2,
-            },
-            {
-                id: "id_designacion_especifica_340",
-                label: "340 - Designación Específica",
-                tab: 3,
-            },
-            {
-                id: "id_medio_interpretacion_382",
-                label: "382 - Medio de Interpretación",
-                tab: 3,
-                special: true,
-            },
+            formsetPrefix: "medios_382", // ← FORMSET, no input
+            label: "382",
+            tab: 2,
+            special: true,
+        },
         ],
         obra_en_coleccion_manuscrita: [
             {
                 id: "id_fuente_catalogacion_040",
                 label: "040 - Fuente de Catalogación",
+                tab: 6,
+            },
+            {
+                id: "id_compositor",
+                label: "100 - Compositor",
                 tab: 0,
             },
-            { id: "id_compositor", label: "100 - Compositor", tab: 1 },
             {
                 id: "id_titulo_principal",
                 label: "245 - Título Principal",
-                tab: 2,
+                tab: 0,
             },
             {
                 id: "id_designacion_especifica_340",
                 label: "340 - Designación Específica",
-                tab: 3,
+                tab: 1,
             },
             {
                 id: "id_medio_interpretacion_382",
                 label: "382 - Medio de Interpretación",
-                tab: 3,
+                tab: 2,
                 special: true,
             },
         ],
@@ -66,23 +54,27 @@
             {
                 id: "id_fuente_catalogacion_040",
                 label: "040 - Fuente de Catalogación",
+                tab: 6,
+            },
+            {
+                id: "id_compositor",
+                label: "100 - Compositor",
                 tab: 0,
             },
-            { id: "id_compositor", label: "100 - Compositor", tab: 1 },
             {
                 id: "id_titulo_principal",
                 label: "245 - Título Principal",
-                tab: 2,
+                tab: 0,
             },
             {
                 id: "id_designacion_especifica_340",
                 label: "340 - Designación Específica",
-                tab: 3,
+                tab: 1,
             },
             {
                 id: "id_medio_interpretacion_382",
                 label: "382 - Medio de Interpretación",
-                tab: 3,
+                tab: 2,
                 special: true,
             },
         ],
@@ -90,27 +82,27 @@
             {
                 id: "id_fuente_catalogacion_040",
                 label: "040 - Fuente de Catalogación",
-                tab: 0,
+                tab: 6,
             },
             {
                 id: "id_titulo_uniforme",
                 label: "130 - Título Uniforme",
-                tab: 1,
+                tab: 0,
             },
             {
                 id: "id_titulo_principal",
                 label: "245 - Título Principal",
-                tab: 2,
+                tab: 0,
             },
             {
                 id: "id_designacion_especifica_340",
                 label: "340 - Designación Específica",
-                tab: 3,
+                tab: 1,
             },
             {
                 id: "id_medio_interpretacion_382",
                 label: "382 - Medio de Interpretación",
-                tab: 3,
+                tab: 2,
                 special: true,
             },
         ],
@@ -118,23 +110,27 @@
             {
                 id: "id_fuente_catalogacion_040",
                 label: "040 - Fuente de Catalogación",
+                tab: 6,
+            },
+            {
+                id: "id_compositor",
+                label: "100 - Compositor",
                 tab: 0,
             },
-            { id: "id_compositor", label: "100 - Compositor", tab: 1 },
             {
                 id: "id_titulo_principal",
                 label: "245 - Título Principal",
-                tab: 2,
+                tab: 0,
             },
             {
                 id: "id_designacion_especifica_340",
                 label: "340 - Designación Específica",
-                tab: 3,
+                tab: 1,
             },
             {
                 id: "id_medio_interpretacion_382",
                 label: "382 - Medio de Interpretación",
-                tab: 3,
+                tab: 2,
                 special: true,
             },
         ],
@@ -142,27 +138,32 @@
             {
                 id: "id_fuente_catalogacion_040",
                 label: "040 - Fuente de Catalogación",
+                tab: 6,
+            },
+            {
+                id: "id_compositor",
+                label: "100 - Compositor",
                 tab: 0,
             },
-            { id: "id_compositor", label: "100 - Compositor", tab: 1 },
             {
                 id: "id_titulo_principal",
                 label: "245 - Título Principal",
-                tab: 2,
+                tab: 0,
             },
             {
                 id: "id_designacion_especifica_340",
                 label: "340 - Designación Específica",
-                tab: 3,
+                tab: 1,
             },
             {
                 id: "id_medio_interpretacion_382",
                 label: "382 - Medio de Interpretación",
-                tab: 3,
+                tab: 2,
                 special: true,
             },
         ],
     };
+
 
     // Estado del tracker
     let tipoObra = null;
@@ -258,29 +259,43 @@
             li.setAttribute("data-field-id", field.id);
             li.setAttribute("data-tab-index", field.tab);
 
+            // Extraer solo el número antes del guión → ej: "040"
+            const fieldCode = field.label.split(" - ")[0];
+
+            // Tooltip con el label completo
+            li.title = field.label;
+
+            // Nuevo HTML reducido en pantalla
             li.innerHTML = `
                 <div class="required-field-indicator"></div>
-                <span class="required-field-label">${field.label}</span>
+                <span class="required-field-code">${fieldCode}</span>
             `;
+
 
             // Click para navegar a la pestaña del campo
             li.addEventListener("click", () => {
-                if (typeof switchTab === "function") {
-                    switchTab(field.tab);
+                const tabIndex = field.tab;
 
-                    // Enfocar el campo después de cambiar de pestaña
+                if (typeof switchTab === "function") {
+                    switchTab(tabIndex);
+
+                    // Le damos un tiempo para que la transición visual termine
                     setTimeout(() => {
                         const fieldElement = document.getElementById(field.id);
+
                         if (fieldElement) {
-                            fieldElement.focus();
                             fieldElement.scrollIntoView({
                                 behavior: "smooth",
                                 block: "center",
                             });
+                            fieldElement.focus({ preventScroll: true });
+                        } else {
+                            console.warn("⚠ No se encontró el input de campo:", field.id);
                         }
-                    }, 300);
+                    }, 350);
                 }
             });
+
 
             listContainer.appendChild(li);
         });

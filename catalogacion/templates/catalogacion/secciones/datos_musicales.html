@@ -1,0 +1,116 @@
+{# Bloque 3XX - Descripción física y características técnicas #}
+<section id="bloque-3xx" class="bloque-section">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-file-text"></i>
+                Bloque 3XX - Descripción Física
+            </h5>
+        </div>
+        <div class="card-body">
+            
+            
+            {# Campo 348 - Formato #}
+            {% if '348' in campos_visibles %}
+                        <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">348</span>
+                    <h6>Formato</h6>
+                    <span class="campo-help-btn" data-field-code="348" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="campo-grid">
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.formato.id_for_label }}">{{ form.formato.label }}</label>
+                        {{ form.formato }}
+                    </div>
+                </div>
+            </div>
+{% endif %}
+            
+{% if '382' in campos_visibles and 'medios_interpretacion' in formsets_visibles %}
+            <!-- Campo 382 - Medio de Interpretación (Repetible) -->
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">382</span>
+                    <h6>Medio de Interpretación</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="medios_382" title="Agregar Medio de Interpretación">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                    <span class="campo-help-btn" data-field-code="382" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+                
+                {% include 'catalogacion/includes/formset_382_template.html' with formset=medios_interpretacion %}
+            </div>
+{% endif %}
+
+            
+                        {# Campo 383 - Designación numérica de obra musical #}
+                        {% if '383' in campos_visibles %}
+                        <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">383</span>
+                    <h6>Designación Numérica</h6>
+                    <span class="campo-help-btn" data-field-code="383" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="campo-grid">
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.numero_obra.id_for_label }}">{{ form.numero_obra.label }}</label>
+                        {{ form.numero_obra }}
+                    </div>
+                    
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.opus.id_for_label }}">{{ form.opus.label }}</label>
+                        {{ form.opus }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {# Campo 384 - Tonalidad #}
+            {% if '384' in campos_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">384</span>
+                    <h6>Tonalidad</h6>
+                    <span class="campo-help-btn" data-field-code="384" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="campo-grid">
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.tonalidad_384.id_for_label }}">{{ form.tonalidad_384.label }}</label>
+                        {{ form.tonalidad_384 }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {# Campo 031 - Íncipit musical (Repetible) #}
+            {% if 'incipits_musicales' in formsets_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">031</span>
+                    <h6>Íncipit Musical</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="incipits" title="Agregar Íncipit">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                    <span class="campo-help-btn" data-field-code="031" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                {% include 'catalogacion/includes/campo_031_template.html' with formset=incipits_musicales %}
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</section>

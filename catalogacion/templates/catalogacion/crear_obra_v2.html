@@ -23,7 +23,7 @@
                 </div>
 
                 <!-- Indicador circular (opcional, sigue comentado) -->
-                
+                {#
                 <div class="progress-circle-container">
                     <div class="progress-circle">
                         <svg width="80" height="80">
@@ -36,7 +36,7 @@
                         <div class="progress-text" id="progress-percent">0%</div>
                     </div>
                 </div>
-                
+                #}
 
                 <!-- Estadísticas -->
                 <div class="progress-stats">
@@ -113,12 +113,41 @@
                 <button type="button" class="tab-button" data-tab="tab-relaciones" data-tab-index="5">
                     <i class="bi bi-diagram-3"></i> Relaciones
                 </button>
-                <button type="button" class="tab-button" data-tab="tab-admin" data-tab-index="6">
-                    <i class="bi bi-exclamation-circle"></i> Administración
-                </button>
             </div>
 
+            <!-- ==================== NAVEGACIÓN ORIGINAL 0XX–8XX (COMENTADA) ==================== 
             
+            <div class="tabs-navigation tabs-navigation-legacy">
+                <button type="button" class="tab-button active" data-tab="tab-0xx" data-tab-index="0">
+                    <i class="bi bi-hash"></i> 0XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-1xx" data-tab-index="1">
+                    <i class="bi bi-person"></i> 1XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-2xx" data-tab-index="2">
+                    <i class="bi bi-bookmark"></i> 2XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-3xx" data-tab-index="3">
+                    <i class="bi bi-file-text"></i> 3XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-4xx" data-tab-index="4">
+                    <i class="bi bi-collection"></i> 4XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-5xx" data-tab-index="5">
+                    <i class="bi bi-journal"></i> 5XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-6xx" data-tab-index="6">
+                    <i class="bi bi-tag"></i> 6XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-7xx" data-tab-index="7">
+                    <i class="bi bi-people"></i> 7XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-8xx" data-tab-index="8">
+                    <i class="bi bi-geo"></i> 8XX
+                </button>
+            </div> 
+-->
+            <!-- ==================== CONTENIDO DE PESTAÑAS (NUEVA UI) ==================== -->
             <div class="tabs-content">
 
                 <!-- 1️⃣ NOMBRES Y TÍTULOS -->
@@ -191,17 +220,6 @@
                         <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
                             <i class="bi bi-arrow-left"></i> Anterior
                         </button>
-                        <button type="button" class="btn btn-primary" onclick="nextTab()">
-                            Siguiente <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-                <div id="tab-admin" class="tab-content">
-                    {% include 'catalogacion/secciones/administracion.html' %}
-                    <div class="tab-navigation-buttons">
-                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
-                            <i class="bi bi-arrow-left"></i> Anterior
-                        </button>
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-circle-fill"></i> Registrar Obra
                         </button>
@@ -232,8 +250,7 @@ const tabs = [
     'tab-datos-musicales',
     'tab-materias',
     'tab-notas',
-    'tab-relaciones',
-    'tab-admin'
+    'tab-relaciones'
 ];
 let currentTabIndex = 0;
 
