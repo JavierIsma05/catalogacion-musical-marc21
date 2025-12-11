@@ -63,6 +63,10 @@ class ObraFormsetMixin:
             kwargs['data'] = self.request.POST
         if instance:
             kwargs['instance'] = instance
+        # =======================================================
+        # 🔥 PASAR COMPOSITOR A TODOS LOS FORMSETS 7XX
+        # =======================================================
+        
         return kwargs
     
     def _get_nested_formsets(self, parent_instances=None, with_post=False):
@@ -81,14 +85,14 @@ class ObraFormsetMixin:
         
         if parent_instances:
             medios_formsets = []
-            for parent_instance in parent_instances:
+            for idx, parent_instance in enumerate(parent_instances):
                 kwargs = {}
                 if with_post:
                     kwargs['data'] = self.request.POST
                 kwargs['instance'] = parent_instance
                 
                 formset = MedioInterpretacion382_aFormSet(
-                    prefix=f'medios_interpretacion382_set-{parent_instance.pk}',
+                    prefix=f'medios_interpretacion382_set-{idx}',
                     **kwargs
                 )
                 medios_formsets.append(formset)
@@ -98,7 +102,6 @@ class ObraFormsetMixin:
         return nested
     
     def _get_formsets(self, instance=None, with_post=False):
-
         """
         Obtener todos los formsets configurados.
         
@@ -183,20 +186,29 @@ class ObraFormsetMixin:
     def _validar_formsets(self, context):
         """
         Validar todos los formsets en el contexto.
-        
-        Args:
-            context: Contexto con formsets
-        
+
         Returns:
             tuple: (formsets_validos: bool, formsets: dict)
         """
         logger.info("🔍 Iniciando validación de formsets...")
+
         formsets_validos = True
         formsets = {}
 
-        formsets_visibles = context.get('formsets_visibles') or self._get_formset_names()
+        formsets_inhabilitados = {
+            'codigos_pais',
+            'codigos_lengua',
+            'ubicaciones_852',
+            'disponibles_856',
+        }
 
-        # Formsets opcionales que NO deben validarse si no tienen datos POST
+        formsets_visibles = context.get('formsets_visibles')
+        if not formsets_visibles:
+            formsets_visibles = [
+                name for name in self._get_formset_names()
+                if name not in formsets_inhabilitados
+            ]
+
         formsets_opcionales = {
             'incipits_musicales': 'incipits-TOTAL_FORMS',
             'menciones_serie_490': 'menciones_490-TOTAL_FORMS',
@@ -209,46 +221,50 @@ class ObraFormsetMixin:
         }
 
         for key in self._get_formset_names():
-            formset = context.get(key)
-            
-            if key not in formsets_visibles:
-                logger.debug(f"  ⏭️  {key}: SALTADO (no está habilitado para este tipo de obra)")
+
+            if key in formsets_inhabilitados:
+                logger.debug(f"  ⏭️  {key}: SALTADO (inhabilitado en UI V2)")
                 continue
 
-            # Si es formset opcional y NO tiene ManagementForm en POST, saltarlo
+            formset = context.get(key)
+
+    # 🚨 IGNORAR FORMSETS NO VISIBLES (aunque tengan datos en POST)
+            if key not in formsets_visibles:
+                logger.debug(f"  ⏭️  {key}: SALTADO COMPLETAMENTE (no visible en este tipo de obra)")
+                continue
+
             if key in formsets_opcionales:
                 mgmt_field = formsets_opcionales[key]
                 if mgmt_field not in self.request.POST:
                     logger.debug(f"  ⏭️  {key}: SALTADO (no está en el POST/template)")
                     continue
-            
-            if formset:
-                formsets[key] = formset
-                is_valid = formset.is_valid()
-                
-                if is_valid:
-                    logger.debug(f"  ✅ {key}: VÁLIDO")
-                else:
-                    # Obtener el prefijo del formset para logs más claros
-                    prefix = getattr(formset, 'prefix', 'unknown')
-                    logger.error(f"  ❌ {key} (prefix: {prefix}): INVÁLIDO")
-                    logger.error(f"     Errores formset: {formset.errors}")
-                    logger.error(f"     Total forms: {formset.total_form_count()}")
-                    # Algunos formsets personalizados NO tienen deleted_objects
-                    if hasattr(formset, 'deleted_objects'):
-                        logger.error(f"     Deleted objects: {len(formset.deleted_objects)}")
-                    if hasattr(formset, 'non_form_errors') and formset.non_form_errors():
-                        logger.error(f"     Errores no-form: {formset.non_form_errors()}")
-                    # Mostrar detalles de cada formulario del formset
-                    for i, form in enumerate(formset.forms):
-                        if form.errors:
-                            logger.error(f"     Form[{i}] errores: {form.errors}")
-                            logger.error(f"     Form[{i}] cleaned_data: {form.cleaned_data}")
-                    formsets_validos = False
-        
+
+            if not formset:
+                continue
+
+            if all(not form.has_changed() for form in formset.forms):
+                logger.debug(f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)")
+                continue
+
+            formsets[key] = formset
+
+            if formset.is_valid():
+                logger.debug(f"  ✅ {key}: VÁLIDO")
+            else:
+                logger.error(f"  ❌ FORMSET INVÁLIDO: {key}")
+                formsets_validos = False
+
+                for i, form in enumerate(formset.forms):
+                    if form.errors:
+                        logger.error(f"     ➤ Formulario #{i}: {form.errors}")
+
+                if hasattr(formset, 'deleted_objects'):
+                    logger.debug(f"     Deleted objects: {len(formset.deleted_objects)}")
+
+        # 🔥 RETURN ÚNICO Y SEGURO
         logger.info(f"✅ Resultado final: {'TODOS VÁLIDOS' if formsets_validos else 'HAY ERRORES'}")
         return formsets_validos, formsets
-    
+
     def _guardar_formsets(self, formsets, instance):
         """
         Guardar todos los formsets y procesar subcampos dinámicos.
@@ -270,7 +286,7 @@ class ObraFormsetMixin:
         
         for key, formset in formsets.items():
             for form in formset:
-                if form.cleaned_data and not form.cleaned_data.get("DELETE", False):
+                if getattr(form, 'cleaned_data', None) and not form.cleaned_data.get("DELETE", False):
                     obj = form.save(commit=False)
                     # 🔥 Asignar FK a la obra si existe ese campo
                     if hasattr(obj, 'obra_general'):
@@ -278,7 +294,6 @@ class ObraFormsetMixin:
                     
                     obj.save()
                     logger.info(f"📝 Guardado formset {key}: {obj.pk}")
-
 
             if key == 'incipits_musicales':
                 incipits_guardados = list(instance.incipits_musicales.all())

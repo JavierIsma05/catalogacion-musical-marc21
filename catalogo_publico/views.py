@@ -44,6 +44,10 @@ class ListaObrasPublicaView(ListView):
                 'enlaces_documento_fuente_773__titulo',
                 'enlaces_documento_fuente_773__encabezamiento_principal',
                 'incipits_musicales',
+                # 🆕 NUEVO para mostrar 852 y 856
+                'ubicaciones_852__estanterias',
+                'disponibles_856__urls_856',
+                'disponibles_856__textos_enlace_856',
             )
             .order_by('-fecha_creacion_sistema')
         )
@@ -103,6 +107,12 @@ class DetalleObraPublicaView(DetailView):
                 'enlaces_documento_fuente_773__encabezamiento_principal',
                 'incipits_musicales',
                 'notas_generales_500',
+                # 🆕 NUEVO para mostrar 852 y 856
+                'ubicaciones_852',
+                'ubicaciones_852__estanterias',
+                'disponibles_856',
+                'disponibles_856__urls_856',
+                'disponibles_856__textos_enlace_856',
             )
         )
     

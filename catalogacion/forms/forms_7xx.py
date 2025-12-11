@@ -124,40 +124,61 @@ class NombreRelacionado700Form(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        persona_texto = cleaned_data.get('persona_texto', '').strip()
-        persona_coord = cleaned_data.get('persona_coordenadas', '').strip()
+        persona = cleaned_data.get("persona")
+        persona_texto = cleaned_data.get("persona_texto", "").strip()
+        coords = cleaned_data.get("persona_coordenadas", "").strip()
+        relacion = cleaned_data.get("relacion", "")
+        autoria = cleaned_data.get("autoria", "")
+        titulo = cleaned_data.get("titulo_obra", "")
 
-        # Si el usuario escribió algo en el nombre, resolvemos/creamos la autoridad
-        if persona_texto:
-            from catalogacion.models import AutoridadPersona
+        # ============================================================
+        # 1️⃣ SI EL FORM ESTÁ VACÍO → MARCAR COMO DELETE
+        # ============================================================
+        if not (persona or persona_texto or coords or relacion or autoria or titulo):
+            cleaned_data["DELETE"] = True
+            return cleaned_data
 
+        # ============================================================
+        # 2️⃣ CREAR AUTORIDAD PERSONA SI SE ESCRIBIÓ TEXTO
+        # ============================================================
+        if persona_texto and not persona:
             try:
                 persona = AutoridadPersona.objects.get(
                     apellidos_nombres__iexact=persona_texto
                 )
-                # Actualizar coordenadas si cambiaron
-                if persona_coord and persona.coordenadas_biograficas != persona_coord:
-                    persona.coordenadas_biograficas = persona_coord
-                    persona.save()
-                cleaned_data['persona'] = persona
             except AutoridadPersona.DoesNotExist:
                 persona = AutoridadPersona.objects.create(
                     apellidos_nombres=persona_texto,
-                    coordenadas_biograficas=persona_coord
+                    coordenadas_biograficas=coords or None
                 )
-                cleaned_data['persona'] = persona
-            except AutoridadPersona.MultipleObjectsReturned:
-                persona = AutoridadPersona.objects.filter(
-                    apellidos_nombres__iexact=persona_texto
-                ).first()
-                cleaned_data['persona'] = persona
+            cleaned_data["persona"] = persona
 
-        titulo_obra = cleaned_data.get('titulo_obra', '')
-        if titulo_obra:
-            ensure_titulo_uniforme_registrado(titulo_obra)
+        # ============================================================
+        # 3️⃣ REGISTRAR TÍTULO UNIFORME AUTOMÁTICAMENTE
+        # ============================================================
+        if titulo:
+            ensure_titulo_uniforme_registrado(titulo)
 
-        # Si no escribió nada y persona viene vacío → se tratará como formulario vacío,
-        # el inlineformset no lo guardará si todos los campos están vacíos.
+        # ============================================================
+        # 4️⃣ VALIDACIÓN NUEVA: 100 vs 700
+        #    Evita duplicados o doble compositor
+        # ============================================================
+        compositor_100 = self.compositor_100
+
+        if compositor_100 and persona:
+            # Caso 1: son iguales → no se debe repetir en 700
+            if compositor_100.apellidos_nombres.lower() == persona.apellidos_nombres.lower():
+                raise forms.ValidationError(
+                    "El compositor del campo 700 es el mismo que el del campo 100. "
+                    "No debe repetirse."
+                )
+
+            # Caso 2: son diferentes → tampoco permitido
+            raise forms.ValidationError(
+                "No puedes tener dos compositores diferentes: uno en el 100 y otro en el 700. "
+                "Debe existir solo un compositor principal."
+            )
+
         return cleaned_data
 
 
@@ -211,6 +232,25 @@ class EntidadRelacionada710Form(forms.ModelForm):
             "entidad": forms.HiddenInput(),  # 👉 Escondido como en 700/787
             "funcion": forms.Select(attrs={"class": "form-select"}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        entidad = cleaned_data.get("entidad")
+        texto = cleaned_data.get("entidad_texto", "").strip()
+        funcion = cleaned_data.get("funcion", "")
+
+        # 🟩 1. SI EL FORM ESTÁ COMPLETAMENTE VACÍO → borrar
+        if not (entidad or texto or funcion):
+            self.cleaned_data["DELETE"] = True
+            return cleaned_data
+
+        # 🟩 2. SI EL USUARIO ESCRIBIÓ TEXTO PERO NO SELECCIONÓ NADA → crear
+        if texto and not entidad:
+            entidad = AutoridadEntidad.objects.create(nombre=texto)
+            cleaned_data["entidad"] = entidad
+
+        return cleaned_data
 
 
 
@@ -285,58 +325,60 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
     def clean(self):
         data = super().clean()
 
-        if not self.has_changed():
-            return data
+        encabez = data.get("encabezamiento_principal")
+        encabez_texto = data.get("encabezamiento_principal_texto", "").strip()
 
-        texto = data.get("encabezamiento_principal_texto", "").strip()
+        titulo_value = data.get("titulo")
 
-        if texto:
-            obj = AutoridadPersona.objects.filter(
-                apellidos_nombres__iexact=texto
-            ).first()
+        # 👉 Normalizamos el valor del título
+        if hasattr(titulo_value, "pk"):
+            # Es un objeto AutoridadTituloUniforme
+            titulo_field = titulo_value.titulo
+        else:
+            # Es string o None
+            titulo_field = (titulo_value or "").strip()
 
-            if not obj:
-                obj = AutoridadPersona.objects.create(
-                    apellidos_nombres=texto
-                )
-
-            data["encabezamiento_principal"] = obj
-        elif not data.get("encabezamiento_principal"):
-            self.add_error(
-                "encabezamiento_principal_texto",
-                "Debe ingresar o seleccionar un encabezamiento principal.",
-            )
-
-        titulo_actual = (data.get("titulo") or "").strip()
         titulo_texto = data.get("titulo_texto", "").strip()
 
+        # 🟥 1. Formulario vacío → ELIMINAR
+        if not (encabez or encabez_texto or titulo_field or titulo_texto):
+            self.cleaned_data["DELETE"] = True
+            return data
+
+        # 🟦 2. Resolver encabezamiento principal
+        if encabez_texto and not encabez:
+            persona = AutoridadPersona.objects.filter(
+                apellidos_nombres__iexact=encabez_texto
+            ).first()
+            if not persona:
+                persona = AutoridadPersona.objects.create(
+                    apellidos_nombres=encabez_texto
+                )
+            data["encabezamiento_principal"] = persona
+
+        # 🟦 3. Resolver título uniforme
         titulo_obj = None
-        if titulo_actual:
-            try:
-                titulo_obj = AutoridadTituloUniforme.objects.filter(
-                    pk=int(titulo_actual)
-                ).first()
-            except (TypeError, ValueError):
-                titulo_obj = AutoridadTituloUniforme.objects.filter(
-                    titulo__iexact=titulo_actual
-                ).first()
 
-            if not titulo_obj:
-                titulo_obj = ensure_titulo_uniforme_registrado(titulo_actual)
+        # Si vino ID o string que parece ID
+        if titulo_value and hasattr(titulo_value, "pk"):
+            titulo_obj = titulo_value
+        elif titulo_field.isdigit():
+            titulo_obj = AutoridadTituloUniforme.objects.filter(pk=int(titulo_field)).first()
 
+        # Si no existe, buscar por texto
         if not titulo_obj and titulo_texto:
-            titulo_obj = ensure_titulo_uniforme_registrado(titulo_texto)
+            titulo_obj = AutoridadTituloUniforme.objects.filter(
+                titulo__iexact=titulo_texto
+            ).first()
+            if not titulo_obj:
+                titulo_obj = AutoridadTituloUniforme.objects.create(titulo=titulo_texto)
 
         if titulo_obj:
             data["titulo"] = titulo_obj
         else:
-            self.add_error(
-                "titulo_texto",
-                "Debe ingresar o seleccionar un título para 773 $t.",
-            )
+            self.add_error("titulo_texto", "Debe ingresar o seleccionar un título válido.")
 
         return data
-
 
 
 class NumeroControl773Form(forms.ModelForm):
@@ -400,10 +442,8 @@ class EnlaceUnidadConstituyente774Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['encabezamiento_principal'].required = False
-        self.fields['titulo'] = forms.CharField(
-            required=False,
-            widget=forms.HiddenInput(),
-        )
+        self.fields['titulo'].required = False
+
 
         if self.instance.pk:
             if self.instance.encabezamiento_principal_id:
@@ -417,54 +457,75 @@ class EnlaceUnidadConstituyente774Form(forms.ModelForm):
     def clean(self):
         data = super().clean()
 
-        if not self.has_changed():
+        encabez = data.get("encabezamiento_principal")
+        encabez_texto = data.get("encabezamiento_principal_texto", "").strip()
+
+        # --- Normalizar valor de título ---
+        titulo_value = data.get("titulo")  # puede ser objeto, string o None
+
+        if hasattr(titulo_value, "pk"):
+            # Es un objeto AutoridadTituloUniforme
+            titulo_field = titulo_value.titulo
+        else:
+            # Es string o None
+            titulo_field = (titulo_value or "").strip()
+
+        titulo_texto = data.get("titulo_texto", "").strip()
+
+        # 🟩 1. Formulario completamente vacío → eliminar
+        # Si está totalmente vacío → eliminarlo
+        if not (encabez or encabez_texto or titulo_field or titulo_texto):
+            self.cleaned_data["DELETE"] = True
             return data
 
-        texto = data.get('encabezamiento_principal_texto', '').strip()
-        if texto:
+        # Si hay título pero no encabezamiento → ERROR
+        if (titulo_field or titulo_texto) and not (encabez or encabez_texto):
+            self.add_error(
+                "encabezamiento_principal_texto",
+                "Debe ingresar un encabezamiento para 774 $a si incluye un título."
+            )
+            return data
+
+
+        # 🟩 2. Resolver encabezamiento principal
+        if encabez_texto and not encabez:
             persona = AutoridadPersona.objects.filter(
-                apellidos_nombres__iexact=texto
+                apellidos_nombres__iexact=encabez_texto
             ).first()
             if not persona:
                 persona = AutoridadPersona.objects.create(
-                    apellidos_nombres=texto
+                    apellidos_nombres=encabez_texto
                 )
-            data['encabezamiento_principal'] = persona
-        elif not data.get('encabezamiento_principal'):
-            self.add_error(
-                'encabezamiento_principal_texto',
-                'Debe ingresar o seleccionar un encabezamiento principal.',
-            )
+            data["encabezamiento_principal"] = persona
 
-        titulo_actual = (data.get('titulo') or '').strip()
-        titulo_texto = data.get('titulo_texto', '').strip()
-
+        # 🟩 3. Resolver título uniforme
         titulo_obj = None
-        if titulo_actual:
-            try:
-                titulo_obj = AutoridadTituloUniforme.objects.filter(
-                    pk=int(titulo_actual)
-                ).first()
-            except (TypeError, ValueError):
-                titulo_obj = AutoridadTituloUniforme.objects.filter(
-                    titulo__iexact=titulo_actual
-                ).first()
 
-            if not titulo_obj:
-                titulo_obj = ensure_titulo_uniforme_registrado(titulo_actual)
+        # Caso 1: ya vino como objeto FK
+        if hasattr(titulo_value, "pk"):
+            titulo_obj = titulo_value
 
+        # Caso 2: vino como ID string
+        elif titulo_field.isdigit():
+            titulo_obj = AutoridadTituloUniforme.objects.filter(pk=int(titulo_field)).first()
+
+        # Caso 3: buscar por texto
         if not titulo_obj and titulo_texto:
-            titulo_obj = ensure_titulo_uniforme_registrado(titulo_texto)
+            titulo_obj = AutoridadTituloUniforme.objects.filter(
+                titulo__iexact=titulo_texto
+            ).first()
+            if not titulo_obj:
+                titulo_obj = AutoridadTituloUniforme.objects.create(titulo=titulo_texto)
 
+        # Validar que sí exista título
         if titulo_obj:
-            data['titulo'] = titulo_obj
+            data["titulo"] = titulo_obj
         else:
-            self.add_error(
-                'titulo_texto',
-                'Debe ingresar o seleccionar un título para 774 $t.',
-            )
+            self.add_error("titulo_texto", "Debe ingresar o seleccionar un título para 774 $t.")
 
         return data
+
+    
 
 
 class NumeroControl774Form(forms.ModelForm):
@@ -519,20 +580,32 @@ class OtrasRelaciones787Form(forms.ModelForm):
     def clean(self):
         data = super().clean()
 
-        texto = data.get('encabezamiento_principal_texto', '').strip()
-        if texto:
+        encabez = data.get("encabezamiento_principal")
+        encabez_texto = data.get("encabezamiento_principal_texto", "").strip()
+        titulo = data.get("titulo", "").strip()
+
+        # 🟥 1. Form vacío → eliminarlo
+        if not (encabez or encabez_texto or titulo):
+            self.cleaned_data["DELETE"] = True
+            return data
+
+        # 🟥 2. Resolver/crear encabezamiento principal
+        if encabez_texto and not encabez:
             persona = AutoridadPersona.objects.filter(
-                apellidos_nombres__iexact=texto
+                apellidos_nombres__iexact=encabez_texto
             ).first()
             if not persona:
                 persona = AutoridadPersona.objects.create(
-                    apellidos_nombres=texto
+                    apellidos_nombres=encabez_texto
                 )
-            data['encabezamiento_principal'] = persona
+            data["encabezamiento_principal"] = persona
 
-        ensure_titulo_uniforme_registrado(data.get('titulo', ''))
+        # 🟥 3. Registrar título si existe
+        if titulo:
+            ensure_titulo_uniforme_registrado(titulo)
 
         return data
+
 
 class NumeroControl787Form(forms.ModelForm):
     class Meta:

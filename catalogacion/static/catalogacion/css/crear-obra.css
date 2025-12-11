@@ -537,3 +537,19 @@
         min-width: calc(100% - 2rem);
     }
 }
+
+/* Campos obligatorios más compactos */
+.required-field-item {
+    padding: 0.35rem 0.45rem;
+    font-size: 0.68rem;
+}
+
+.required-field-label {
+    display: none; /* Oculta el texto largo */
+}
+
+.required-field-code {
+    font-size: 0.78rem;
+    font-weight: bold;
+    color: var(--gray-900);
+}

@@ -54,7 +54,10 @@ class NombreRelacionado700(models.Model):
     persona = models.ForeignKey(
         'AutoridadPersona',
         on_delete=models.PROTECT,
+        blank=True,
+        null=True,
         help_text="700 $a – Apellidos, Nombres (NR, autoridad)"
+        
     )
 
     coordenadas_biograficas = models.CharField(
@@ -122,10 +125,12 @@ class TerminoAsociado700(models.Model):
         NombreRelacionado700,
         on_delete=models.CASCADE,
         related_name='terminos_asociados',
+        
     )
     termino = models.CharField(
         max_length=100,
         help_text="700 $c – Término asociado (R)"
+       
     )
 
     class Meta:
@@ -144,11 +149,13 @@ class Funcion700(models.Model):
         NombreRelacionado700,
         on_delete=models.CASCADE,
         related_name='funciones',
+        
     )
     funcion = models.CharField(
         max_length=30,
         choices=FUNCIONES_PERSONA,
         help_text="700 $e – Función (R)"
+       
     )
 
     class Meta:
@@ -175,11 +182,17 @@ class EntidadRelacionada710(models.Model):
         'ObraGeneral',
         on_delete=models.CASCADE,
         related_name='entidades_relacionadas_710',
+        blank=True,
+        null=True,
+        help_text="710 $a – Entidad relacionada (NR)"
     )
+    
 
     entidad = models.ForeignKey(
         'AutoridadEntidad',
         on_delete=models.PROTECT,
+        blank=True,
+        null=True,
         help_text="710 $a – Entidad relacionada (NR)"
     )
 

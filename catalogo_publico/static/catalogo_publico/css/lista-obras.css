@@ -271,6 +271,19 @@
     color: #8b93a4;
     font-size: 0.8125rem;
 }
+.obra-link {
+    color: var(--accent);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.obra-link:hover {
+    color: var(--gray-800);
+    text-decoration: underline;
+}
+
 
 /* ============================================
    ACCIONES - REFINADAS
