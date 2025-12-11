@@ -198,8 +198,7 @@ class ObraFormsetMixin:
         formsets_inhabilitados = {
             'codigos_pais',
             'codigos_lengua',
-            'ubicaciones_852',
-            'disponibles_856',
+            
         }
 
         formsets_visibles = context.get('formsets_visibles')
@@ -285,15 +284,59 @@ class ObraFormsetMixin:
         }
         
         for key, formset in formsets.items():
+
+            # ⭐⭐⭐ CREAR PADRES 856 ANTES DE SUBCAMPOS ⭐⭐⭐
+            # 🔥 1) GUARDAR PADRES 856 ANTES QUE NADA
+            if key == 'disponibles_856':
+                objs_856 = formset.save(commit=False)
+                for obj in objs_856:
+                    obj.obra = instance
+                    obj.save()
+                formset.save_m2m()
+                logger.info(f"🟢 856 padre(s) creados: {len(objs_856)}")
+                # 👇 IMPORTANTE: continuar sin ejecutar el ciclo inferior
+                continue
+
+            # ---------------------------
+            # Guardado NORMAL para otros formsets
+            # ---------------------------
             for form in formset:
                 if getattr(form, 'cleaned_data', None) and not form.cleaned_data.get("DELETE", False):
                     obj = form.save(commit=False)
-                    # 🔥 Asignar FK a la obra si existe ese campo
+
+                    # 🔥 Asignar FK a la obra
                     if hasattr(obj, 'obra_general'):
                         obj.obra_general = instance
-                    
+                    elif hasattr(obj, 'obra'):
+                        obj.obra = instance
+
                     obj.save()
                     logger.info(f"📝 Guardado formset {key}: {obj.pk}")
+
+                    # ------------------------------
+                    # 🔥 Subcampos 852$c
+                    # ------------------------------
+                    if hasattr(obj, "estanterias"):
+                        for sub in obj.estanterias.all():
+                            if sub.ubicacion_id is None:
+                                sub.ubicacion = obj
+                                sub.save()
+
+                    # ------------------------------
+                    # 🔥 Subcampos 856$u y 856$y
+                    # ------------------------------
+                    if hasattr(obj, "urls_856"):
+                        for sub in obj.urls_856.all():
+                            if sub.disponible_id is None:
+                                sub.disponible = obj
+                                sub.save()
+
+                    if hasattr(obj, "textos_enlace_856"):
+                        for sub in obj.textos_enlace_856.all():
+                            if sub.disponible_id is None:
+                                sub.disponible = obj
+                                sub.save()
+
 
             if key == 'incipits_musicales':
                 incipits_guardados = list(instance.incipits_musicales.all())

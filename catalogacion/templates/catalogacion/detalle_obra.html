@@ -551,8 +551,9 @@
                 {% endif %}
 
                 {# 856 – Recursos en línea #}
-                {% if obra.disponibles_856.all %}
+                {% if obra.disponibles_856.exists %}
                 <h4 class="subsection-title mt-4">Disponible en línea</h4>
+
                 {% for disponible in obra.disponibles_856.all %}
                     {% for url in disponible.urls_856.all %}
                     <div class="acceso-item">
@@ -570,7 +571,9 @@
                 {% endfor %}
                 {% endif %}
 
+
             </section>
+
 
         </main>
     </div>

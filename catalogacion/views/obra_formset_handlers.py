@@ -41,8 +41,15 @@ class FormsetSubcampoHandler:
         valores = self._agrupar_subcampos_por_indice(prefijo_input, indice_posicion)
 
         for index, form in enumerate(formset):
+            # 1. Asegurar que el form padre exista
             if not form.instance.pk:
-                continue
+                parent = form.save(commit=False)
+                obra = formset.instance  # La obra que contiene este 856
+                parent.obra = obra
+                parent.save()
+
+            # 2. Ahora SÍ tiene pk
+            instance = form.instance
 
             if index not in valores:
                 continue

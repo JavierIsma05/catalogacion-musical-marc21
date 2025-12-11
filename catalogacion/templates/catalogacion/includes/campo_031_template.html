@@ -16,6 +16,8 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 }
 
 
+
+
 </style>
 
 
@@ -29,15 +31,6 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
             {% endif %}
 
-            {% if formset.can_delete %}
-                <div class="d-none">
-                    {{ form.DELETE }}
-                </div>
-            {% endif %}
-
-            <button type="button" class="delete-row-btn" title="Eliminar">
-                <i class="bi bi-x-lg"></i>
-            </button>
 
             {# Fila 1: números a, b, c #}
             <div class="campo-grid">
@@ -323,7 +316,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 <div class="flex-grow-1">
                     <div class="position-relative d-inline-block w-100">
                     <canvas id="incipit_canvas_0"
-                            width="750"
+                            width="600"
                             height="270"
                             style="display:block; "></canvas>
                     </div>
