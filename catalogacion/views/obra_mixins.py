@@ -224,8 +224,9 @@ class ObraFormsetMixin:
 
             formset = context.get(key)
 
+    # 🚨 IGNORAR FORMSETS NO VISIBLES (aunque tengan datos en POST)
             if key not in formsets_visibles:
-                logger.debug(f"  ⏭️  {key}: SALTADO (no está habilitado para este tipo de obra)")
+                logger.debug(f"  ⏭️  {key}: SALTADO COMPLETAMENTE (no visible en este tipo de obra)")
                 continue
 
             if key in formsets_opcionales:

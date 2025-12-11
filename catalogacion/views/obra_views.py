@@ -349,6 +349,17 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
         
         return redirect(self.get_success_url())
     
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+
+        if form.errors:
+            logger.error("❌ Errores en formulario de EDICIÓN:")
+            for field, errs in form.errors.items():
+                logger.error(f"   - {field}: {errs}")
+
+        return super().post(request, *args, **kwargs)
+
+    
     def get_success_url(self):
         """Redirigir al detalle de la obra"""
         return reverse('catalogacion:detalle_obra', kwargs={'pk': self.object.pk})

@@ -31,19 +31,19 @@
                 id: "id_medios_382-0-solista", // ← FORMSET, no input
                 label: "382",
                 tab: 2,
-                special: true,
+                hidden: true,
             },
         ],
         obra_manuscrita_individual: [
             { id: "id_centro_catalogador", label: "040", tab: 6 },
-            { id: "id_compositor", label: "100 - Compositor", tab: 0 },
+            { id: "id_compositor", label: "100", tab: 0 },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
-                formsetPrefix: "medios_382",
+                id: "id_medios_382-0-solista", // ← FORMSET, no input
                 label: "382",
                 tab: 2,
-                special: true,
+                hidden: true,
             },
         ],
 
@@ -56,7 +56,7 @@
             id: "id_medios_382-0-solista", // ← FORMSET, no input
             label: "382",
             tab: 2,
-            special: true,
+            hidden: true,
         },
         ],
         obra_en_coleccion_impresa: [
@@ -68,7 +68,7 @@
                 id: "id_medios_382-0-solista", // ← FORMSET, no input
                 label: "382",
                 tab: 2,
-                special: true,
+                hidden: true,
             },
         ],
         obra_impresa_individual: [
@@ -80,7 +80,7 @@
                 id: "id_medios_382-0-solista", // ← FORMSET, no input
                 label: "382",
                 tab: 2,
-                special: true,
+                hidden: true,
             },
         ],
     };
