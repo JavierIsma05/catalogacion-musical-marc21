@@ -63,6 +63,24 @@ class ObraFormsetMixin:
             kwargs['data'] = self.request.POST
         if instance:
             kwargs['instance'] = instance
+        # =======================================================
+        # 🔥 PASAR COMPOSITOR A TODOS LOS FORMSETS 7XX
+        # =======================================================
+        try:
+            compositor_100 = None
+
+            # Si estamos en edición → la instancia ya tiene compositor asignado
+            if instance:
+                compositor_100 = instance.compositor
+
+            # Si estamos en creación → leer compositor desde el formulario principal
+            else:
+                compositor_100 = self.request.POST.get("compositor")
+
+            kwargs["form_kwargs"] = {"compositor_100": compositor_100}
+
+        except Exception as e:
+            logger.error(f"Error set form_kwargs for 7XX: {e}")
         return kwargs
     
     def _get_nested_formsets(self, parent_instances=None, with_post=False):

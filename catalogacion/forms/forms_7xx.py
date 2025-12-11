@@ -131,22 +131,53 @@ class NombreRelacionado700Form(forms.ModelForm):
         autoria = cleaned_data.get("autoria", "")
         titulo = cleaned_data.get("titulo_obra", "")
 
-        # 🟦 1. SI EL FORMULARIO ESTÁ VACÍO → MARCARLO COMO DELETE
+        # ============================================================
+        # 1️⃣ SI EL FORM ESTÁ VACÍO → MARCAR COMO DELETE
+        # ============================================================
         if not (persona or persona_texto or coords or relacion or autoria or titulo):
-            self.cleaned_data["DELETE"] = True
+            cleaned_data["DELETE"] = True
             return cleaned_data
 
-        # 🟦 2. SI ESCRIBIÓ PERSONA PERO NO SELECCIONÓ → CREAR AUTORIDAD
+        # ============================================================
+        # 2️⃣ CREAR AUTORIDAD PERSONA SI SE ESCRIBIÓ TEXTO
+        # ============================================================
         if persona_texto and not persona:
-            persona = AutoridadPersona.objects.create(
-                apellidos_nombres=persona_texto,
-                coordenadas_biograficas=coords or None
-            )
+            try:
+                persona = AutoridadPersona.objects.get(
+                    apellidos_nombres__iexact=persona_texto
+                )
+            except AutoridadPersona.DoesNotExist:
+                persona = AutoridadPersona.objects.create(
+                    apellidos_nombres=persona_texto,
+                    coordenadas_biograficas=coords or None
+                )
             cleaned_data["persona"] = persona
 
-        # 🟦 3. Registrar título uniforme automáticamente si existe
+        # ============================================================
+        # 3️⃣ REGISTRAR TÍTULO UNIFORME AUTOMÁTICAMENTE
+        # ============================================================
         if titulo:
             ensure_titulo_uniforme_registrado(titulo)
+
+        # ============================================================
+        # 4️⃣ VALIDACIÓN NUEVA: 100 vs 700
+        #    Evita duplicados o doble compositor
+        # ============================================================
+        compositor_100 = self.compositor_100
+
+        if compositor_100 and persona:
+            # Caso 1: son iguales → no se debe repetir en 700
+            if compositor_100.apellidos_nombres.lower() == persona.apellidos_nombres.lower():
+                raise forms.ValidationError(
+                    "El compositor del campo 700 es el mismo que el del campo 100. "
+                    "No debe repetirse."
+                )
+
+            # Caso 2: son diferentes → tampoco permitido
+            raise forms.ValidationError(
+                "No puedes tener dos compositores diferentes: uno en el 100 y otro en el 700. "
+                "Debe existir solo un compositor principal."
+            )
 
         return cleaned_data
 
