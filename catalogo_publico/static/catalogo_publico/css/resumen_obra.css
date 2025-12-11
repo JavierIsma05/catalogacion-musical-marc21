@@ -1,144 +1,81 @@
 /* ==========================================================================
-   ESTILOS PARA PÁGINA DE DETALLE DE OBRA - VERSIÓN COMPACTA
-   Sistema de Catalogación Musical MARC21
+   ESTILOS PROFESIONALES PARA RESUMEN DE OBRA
+   Diseño Minimalista, Elegante y Compacto
    ========================================================================== */
 
+:root {
+    --pro-primary: #1a1d29;
+    --pro-secondary: #2d3142;
+    --pro-accent: #0066cc;
+    --pro-text: #1a1d29;
+    --pro-text-secondary: #4a5568;
+    --pro-text-muted: #718096;
+    --pro-border: #e2e8f0;
+    --pro-border-light: #f1f5f9;
+    --pro-surface: #f8fafc;
+    --pro-white: #ffffff;
+    --pro-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --pro-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+/* ============================================
+   HEADER COMPACTO
+   ============================================ */
 .resumen-header {
-    margin-bottom: 0.9rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--pro-border);
 }
 
-.resumen-title {
-    font-size: 1.75rem;
-    font-weight: 1000;
-    color: var(--public-primary);
-    letter-spacing: -0.02em;
-}
-
-.resumen-back-btn {
-    font-weight: 700;
-    gap: 0.35rem;
-    display: inline-flex;
-    align-items: center;
-    padding: 0.35rem 0.7rem;
+.resumen-header h1 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--pro-text);
+    margin: 0;
+    letter-spacing: -0.01em;
 }
 
 .resumen-top-tags {
     display: flex;
-    gap: 0.5rem;
+    gap: 1rem;
     align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-end;
 }
 
 .detalle-top-tag {
-    background: #f4f6fa;
-    color: #2f3545;
-    border: 1px solid #dfe3ea;
-    border-radius: 10px;
-    padding: 0.45rem 0.8rem;
-    min-width: 150px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    background: var(--pro-white);
+    border: 1px solid var(--pro-border);
+    padding: 0.5rem 0.875rem;
+    min-width: 140px;
 }
 
 .detalle-top-tag small {
     display: block;
-    font-size: 0.7rem;
-    letter-spacing: 0.08em;
+    font-size: 0.625rem;
     text-transform: uppercase;
-    opacity: 0.8;
-    margin-bottom: 0.15rem;
-    color: #6b7280;
+    letter-spacing: 0.05em;
+    color: var(--pro-text-muted);
+    margin-bottom: 0.25rem;
+    font-weight: 500;
 }
 
 .detalle-top-tag span {
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: #2f3545;
-}
-
-.detalle-hero-actions {
-    position: relative;
-    z-index: 1;
-}
-
-.detalle-hero-actions .btn-light {
-    background: white;
-    color: var(--public-primary);
-    border: none;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-    font-weight: 600;
-    padding: 0.4rem 0.875rem;
     font-size: 0.8125rem;
-}
-
-.detalle-hero-actions .btn-light:hover {
-    background: rgba(255, 255, 255, 0.95);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
-}
-
-/* ============================================
-   SECCIONES COMPACTAS
-   ============================================ */
-.detalle-section {
-    background: var(--public-background);
-    border: 1px solid var(--public-border-light);
-    border-radius: var(--public-radius);
-    overflow: hidden;
-    box-shadow: var(--public-shadow-sm);
-    transition: var(--public-transition);
-}
-
-.detalle-section:hover {
-    box-shadow: var(--public-shadow);
-    border-color: var(--public-border);
-}
-
-.detalle-section-highlight {
-    border-color: rgba(58, 193, 161, 0.3);
-    background: linear-gradient(135deg, rgba(58, 193, 161, 0.02) 0%, var(--public-background) 100%);
-}
-
-.detalle-section-header {
-    background: linear-gradient(135deg, var(--public-surface) 0%, #fafbfc 100%);
-    padding: 0.6rem 1rem;
-    border-bottom: 1px solid var(--public-border-light);
-}
-
-.detalle-section-header h2 {
-    font-size: 0.9375rem;
     font-weight: 600;
-    color: var(--public-text);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.detalle-section-header h2 i {
-    color: var(--public-accent);
-    font-size: 0.9375rem;
-}
-
-.detalle-section-body {
-    padding: 0.85rem 1rem;
+    color: var(--pro-text);
 }
 
 /* ============================================
-   TARJETA UNIFICADA
+   TARJETA UNIFICADA - DISEÑO COMPACTO
    ============================================ */
 .resumen-unified-card {
-    background: #ffffff;
-    border: 1px solid var(--public-border-light);
-    border-radius: 12px;
-    padding: 0;
-    box-shadow: 0 4px 14px rgba(23, 27, 33, 0.05);
-    overflow: hidden;
+    background: var(--pro-white);
+    border: 1px solid var(--pro-border);
+    box-shadow: var(--pro-shadow);
 }
 
 .resumen-section {
-    padding: 0.85rem 1.1rem;
-    border-bottom: 1px solid var(--public-border-light);
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--pro-border-light);
 }
 
 .resumen-section:last-child {
@@ -146,353 +83,326 @@
 }
 
 .resumen-section-title {
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: var(--public-text);
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-}
-
-.resumen-section-title i {
-    color: var(--public-accent);
-    font-size: 0.9rem;
-}
-
-.resumen-section-incipit {
-    background: linear-gradient(135deg, rgba(58, 193, 161, 0.03) 0%, #fff 100%);
-}
-
-/* Deprecated grid (keep for compat) */
-.resumen-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.9rem;
-}
-
-.resumen-card {
-    background: #ffffff;
-    border: 1px solid var(--public-border-light);
-    border-radius: 10px;
-    padding: 0.8rem 1rem;
-    box-shadow: 0 4px 12px rgba(23, 27, 33, 0.04);
-}
-
-.resumen-card-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--pro-text-secondary);
+    margin-bottom: 0.75rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-weight: 700;
-    color: var(--public-text);
-    margin-bottom: 0.45rem;
-    letter-spacing: -0.01em;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--pro-border-light);
 }
 
-.resumen-card-header i {
-    color: var(--public-accent);
+.resumen-section-title i {
+    color: var(--pro-accent);
+    font-size: 0.875rem;
 }
 
-.resumen-item {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    gap: 0.6rem;
-    padding: 0.35rem 0;
-    border-bottom: 1px solid var(--public-border-light);
-}
-
-.resumen-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.resumen-label {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: #4b556f;
-}
-
-.resumen-value {
-    font-size: 0.88rem;
-    color: var(--public-text);
-    line-height: 1.55;
-}
-
-.resumen-meta {
-    display: inline-block;
-    margin-left: 0.35rem;
-    color: #6b7280;
-    font-size: 0.85rem;
+.resumen-section-incipit {
+    background: var(--pro-surface);
 }
 
 /* ============================================
-   CAMPOS MARC COMPACTOS
+   ITEMS COMPACTOS
    ============================================ */
-.detalle-campo-marc {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.detalle-campo-item {
+.resumen-item {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 160px 1fr;
     gap: 1rem;
     padding: 0.625rem 0;
-    border-bottom: 1px solid var(--public-border-light);
-    align-items: start;
 }
 
-.detalle-campo-item:last-child {
-    border-bottom: none;
+.resumen-item:last-child {
     padding-bottom: 0;
 }
 
-.detalle-campo-item:first-child {
+.resumen-item:first-child {
     padding-top: 0;
 }
 
-.detalle-campo-item-single {
-    padding: 0;
+.resumen-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--pro-text-secondary);
+    line-height: 1.5;
 }
 
-.campo-etiqueta {
+.resumen-value {
     font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--public-text);
-    line-height: 1.4;
-}
-
-.campo-valor {
-    font-size: 0.875rem;
-    color: var(--public-text);
+    color: var(--pro-text);
     line-height: 1.5;
     font-weight: 400;
 }
 
-.campo-nota {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--public-text-light);
-    margin-top: 0.25rem;
+.resumen-value.text-muted {
+    color: var(--pro-text-muted);
     font-style: italic;
-    line-height: 1.4;
+}
+
+.resumen-meta {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--pro-text-muted);
 }
 
 .campo-vacio {
-    color: var(--public-text-muted);
+    font-size: 0.75rem;
+    color: var(--pro-text-muted);
     font-style: italic;
-    font-size: 0.8125rem;
 }
 
 /* ============================================
-   ÍNCIPIT MUSICAL COMPACTO
+   ÍNCIPIT MUSICAL
    ============================================ */
 .detalle-incipit {
-    background: white;
-    border: 2px dashed rgba(58, 193, 161, 0.3);
-    border-radius: var(--public-radius-sm);
-    padding: 1rem;
+    background: var(--pro-white);
+    border: 1px solid var(--pro-border);
+    border-left: 3px solid var(--pro-accent);
+    padding: 0.875rem 1rem;
 }
 
 .detalle-incipit-text {
-    font-size: 0.875rem;
-    color: var(--public-text);
+    font-size: 0.8125rem;
+    color: var(--pro-text);
     margin-bottom: 0.625rem;
     font-weight: 500;
     line-height: 1.5;
 }
 
 .detalle-incipit-code {
-    font-family: 'Courier New', 'Monaco', 'Consolas', monospace;
-    font-size: 0.8125rem;
-    color: var(--public-primary);
-    background: var(--public-surface);
-    padding: 0.625rem;
-    border-radius: var(--public-radius-sm);
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    font-size: 0.75rem;
+    color: var(--pro-text-secondary);
+    background: var(--pro-surface);
+    padding: 0.625rem 0.75rem;
     margin: 0;
     overflow-x: auto;
-    border: 1px solid var(--public-border-light);
-    line-height: 1.5;
+    border: 1px solid var(--pro-border-light);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
 /* ============================================
-   SIDEBAR COMPACTO Y STICKY
+   SIDEBAR PROFESIONAL
    ============================================ */
 .sticky-sidebar {
     position: sticky;
-    top: 12px;
+    top: 1rem;
 }
 
 .detalle-sidebar-card {
-    background: var(--public-background);
-    border: 1px solid var(--public-border-light);
-    border-radius: var(--public-radius);
+    background: var(--pro-white);
+    border: 1px solid var(--pro-border);
     padding: 1.25rem;
-    box-shadow: var(--public-shadow-sm);
+    box-shadow: var(--pro-shadow);
 }
 
 .detalle-sidebar-title {
-    font-size: 0.9375rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    color: var(--public-text);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--pro-text-secondary);
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding-bottom: 0.75rem;
-    border-bottom: 2px solid var(--public-border-light);
+    border-bottom: 1px solid var(--pro-border-light);
 }
 
 .detalle-sidebar-title i {
-    color: var(--public-accent);
-    font-size: 0.9375rem;
+    color: var(--pro-accent);
+    font-size: 0.875rem;
 }
 
 .detalle-actions-grid {
     display: flex;
     flex-direction: column;
     gap: 0.625rem;
-    margin-bottom: 1rem;
 }
 
 .detalle-actions-grid .btn {
-    justify-content: center;
+    font-size: 0.75rem;
+    padding: 0.625rem 0.875rem;
     font-weight: 500;
-    transition: var(--public-transition);
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8125rem;
+    border: 1px solid var(--pro-border);
+    transition: all 0.2s ease;
+}
+
+.detalle-actions-grid .btn-outline-secondary {
+    color: var(--pro-text-secondary);
+    background: var(--pro-white);
+}
+
+.detalle-actions-grid .btn-outline-secondary:hover:not(:disabled) {
+    background: var(--pro-surface);
+    border-color: var(--pro-text-secondary);
+    color: var(--pro-text);
+}
+
+.detalle-actions-grid .btn-primary {
+    background: var(--pro-accent);
+    border-color: var(--pro-accent);
+    color: white;
+    box-shadow: none;
+}
+
+.detalle-actions-grid .btn-primary:hover {
+    background: #0052a3;
+    border-color: #0052a3;
+    transform: none;
+    box-shadow: var(--pro-shadow);
 }
 
 .detalle-actions-grid .btn:disabled {
+    opacity: 0.5;
     cursor: not-allowed;
-    opacity: 0.6;
 }
 
-.detalle-sidebar-note {
+.detalle-actions-grid .btn i {
     font-size: 0.75rem;
-    color: var(--public-text-light);
-    margin: 0;
-    padding: 0.75rem;
-    background: linear-gradient(135deg, rgba(58, 193, 161, 0.05) 0%, rgba(58, 193, 161, 0.02) 100%);
-    border-radius: var(--public-radius-sm);
-    border-left: 3px solid var(--public-accent);
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    line-height: 1.4;
-}
-
-.detalle-sidebar-note i {
-    flex-shrink: 0;
-    margin-top: 0.125rem;
-    color: var(--public-accent);
-    font-size: 0.875rem;
 }
 
 /* ============================================
-   AJUSTES DE ESPACIADO
+   BREADCRUMB PROFESIONAL
    ============================================ */
+.breadcrumb {
+    font-size: 0.75rem;
+    padding: 0;
+    margin-bottom: 1.25rem;
+    background: transparent;
+}
+
+.breadcrumb-item a {
+    color: var(--pro-accent);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: #0052a3;
+}
+
+.breadcrumb-item a i {
+    font-size: 0.75rem;
+}
+
+.breadcrumb-item.active {
+    color: var(--pro-text-secondary);
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: var(--pro-text-muted);
+}
+
+/* ============================================
+   AJUSTES DE CONTAINER
+   ============================================ */
+.container.py-3 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+
 .row.g-3 {
-    --bs-gutter-x: 1rem;
-    --bs-gutter-y: 1rem;
+    --bs-gutter-x: 1.25rem;
+    --bs-gutter-y: 1.25rem;
 }
 
 /* ============================================
    RESPONSIVE
    ============================================ */
 @media (max-width: 992px) {
-    .detalle-hero {
+    .resumen-header {
         flex-direction: column;
-        padding: 1.25rem 1.5rem;
+        align-items: flex-start !important;
+        gap: 1rem;
     }
-    
-    .detalle-hero-title {
-        font-size: 1.375rem;
-    }
-    
-    .detalle-hero-actions {
+
+    .resumen-top-tags {
         width: 100%;
-    }
-    
-    .detalle-hero-actions .btn {
-        width: 100%;
-    }
-    
-    .detalle-campo-item {
-        grid-template-columns: 200px 1fr;
+        flex-direction: column;
         gap: 0.75rem;
     }
-    
+
+    .detalle-top-tag {
+        width: 100%;
+    }
+
     .sticky-sidebar {
         position: static;
-        margin-top: 1rem;
+        margin-top: 1.25rem;
     }
 }
 
 @media (max-width: 768px) {
-    .detalle-hero {
-        padding: 1rem 1.25rem;
+    .resumen-header h1 {
+        font-size: 1rem;
     }
-    
-    .detalle-hero-title {
-        font-size: 1.25rem;
-    }
-    
-    .detalle-hero-subtitle {
-        font-size: 0.9375rem;
-    }
-    
-    .detalle-section-header {
-        padding: 0.625rem 1rem;
-    }
-    
-    .detalle-section-body {
+
+    .resumen-section {
         padding: 0.875rem 1rem;
     }
-    
-    .detalle-campo-item {
+
+    .resumen-section-title {
+        font-size: 0.6875rem;
+    }
+
+    .resumen-item {
         grid-template-columns: 1fr;
         gap: 0.375rem;
         padding: 0.5rem 0;
     }
-    
-    .campo-etiqueta {
+
+    .resumen-label {
+        font-size: 0.6875rem;
+        font-weight: 600;
+    }
+
+    .resumen-value {
         font-size: 0.75rem;
     }
-    
-    .campo-valor {
-        font-size: 0.8125rem;
+
+    .detalle-top-tag {
+        min-width: 0;
+        padding: 0.5rem 0.75rem;
     }
-    
-    .detalle-incipit {
-        padding: 0.875rem;
-    }
-    
-    .detalle-incipit-text {
-        font-size: 0.8125rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .detalle-incipit-code {
-        font-size: 0.75rem;
-        padding: 0.5rem;
-    }
-    
+
     .detalle-sidebar-card {
         padding: 1rem;
+    }
+
+    .detalle-incipit {
+        padding: 0.75rem;
+    }
+
+    .detalle-incipit-code {
+        font-size: 0.6875rem;
+        padding: 0.5rem 0.625rem;
     }
 }
 
 @media (max-width: 576px) {
-    .detalle-badge-group {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.375rem;
+    .container.py-3 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
     }
-    
-    .detalle-badge {
-        width: 100%;
-        justify-content: center;
+
+    .resumen-header {
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+    }
+
+    .breadcrumb {
+        font-size: 0.6875rem;
+        margin-bottom: 1rem;
     }
 }
