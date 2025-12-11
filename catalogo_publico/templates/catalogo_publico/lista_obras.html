@@ -147,7 +147,6 @@
                         </section>
                     </div>
 
-                    <!-- ÍNCIPIT MUSICAL (ya estaba arriba) -->
                     <section class="obra-info-card obra-incipit-card">
                         <p class="obra-card-label">Íncipit musical</p>
                         <div class="obra-card-body">
@@ -163,61 +162,7 @@
                             {% endwith %}
                         </div>
                     </section>
-
-                    <!-- UBICACIÓN (852) -->
-                   {% if obra.ubicaciones_852.exists %}
-                    <section class="obra-info-card mini">
-                        <p class="obra-card-label">Ubicación física (852)</p>
-                        <div class="obra-card-body">
-                            {% for ub in obra.ubicaciones_852.all %}
-                                <p class="obra-line">
-                                    <i class="bi bi-geo-alt text-muted"></i>
-                                    {% if ub.codigo_o_nombre %}
-                                        {{ ub.codigo_o_nombre }}
-                                    {% elif ub.autoridad %}
-                                        {{ ub.autoridad }}
-                                    {% else %}
-                                        Ubicación no especificada
-                                    {% endif %}
-                                </p>
-                            {% endfor %}
-                        </div>
-                    </section>
-                    {% else %}
-                    <section class="obra-info-card mini">
-                        <p class="obra-card-label">Ubicación física (852)</p>
-                        <div class="obra-card-body">
-                            <p class="meta-empty">Sin ubicación registrada</p>
-                        </div>
-                    </section>
-                    {% endif %}
-
-
-                                    {% if obra.disponibles_856.exists %}
-                    <section class="obra-info-card mini">
-                        <p class="obra-card-label">Acceso digital (856)</p>
-                        <div class="obra-card-body">
-                            {% for disp in obra.disponibles_856.all %}
-                                {% for url in disp.urls_856.all %}
-                                    <a href="{{ url.url }}" target="_blank" class="obra-inline-icon">
-                                        <i class="bi bi-box-arrow-up-right"></i>
-                                    </a>
-                                {% endfor %}
-                            {% endfor %}
-                        </div>
-                    </section>
-                    {% else %}
-                    <section class="obra-info-card mini">
-                        <p class="obra-card-label">Acceso digital (856)</p>
-                        <div class="obra-card-body">
-                            <p class="meta-empty">Sin enlaces digitales</p>
-                        </div>
-                    </section>
-                    {% endif %}
-
-
                 </div>
-
             </div>
         </article>
         {% endfor %}

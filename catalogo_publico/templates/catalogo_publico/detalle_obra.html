@@ -23,7 +23,8 @@
                 </a>
             </li>
             <li class="breadcrumb-item">
-                <a href="{% url 'catalogo_publico:detalle' pk=obra.pk %}">
+                <a href="{% url 'catalogo_publico:detalle' obra.pk %}">
+                    
                     {{ obra.signatura_publica_display }}
                 </a>
             </li>
@@ -36,14 +37,14 @@
         <div class="detalle-header-left">
             <h1 class="detalle-main-title">Vista detallada</h1>
             <div class="detalle-actions">
-                <a href="{% url 'catalogo_publico:detalle' pk=obra.pk %}" class="btn btn-outline-secondary btn-sm">
+                <a href="{% url 'catalogo_publico:detalle_obra' pk=obra.pk %}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left"></i> Volver al resumen
                 </a>
                 <button class="btn btn-outline-primary btn-sm" disabled>
-                    <i class="bi bi-code-square"></i> Ver formato MARC21
+                    <i class="bi bi-code-square"></i> Ver MARC21
                 </button>
                 <button class="btn btn-outline-primary btn-sm" disabled>
-                    <i class="bi bi-download"></i> Descargar documento
+                    <i class="bi bi-download"></i> Descargar
                 </button>
             </div>
         </div>
@@ -58,41 +59,25 @@
                 <span>
                     {% if ubicacion.institucion_persona %}{{ ubicacion.institucion_persona }}{% endif %}
                     {% if ubicacion.signatura_original %}.{{ ubicacion.signatura_original }}{% endif %}
-                    {% for estanteria in ubicacion.estanterias.all %}.{{ estanteria.estanteria }}{% endfor %}
                 </span>
             </div>
             {% empty %}
             <div class="detalle-meta-tag">
                 <small>Ubicación</small>
-                <span class="text-muted">Sin ubicación registrada</span>
-            </div>
-            {% endfor %}
-            {% for disponible in obra.disponibles_856.all %}
-            <div class="detalle-meta-tag detalle-meta-link">
-                <small>Disponible</small>
-                {% for texto in disponible.textos_enlace_856.all %}
-                    {% for url in disponible.urls_856.all %}
-                    <a href="{{ url.url }}" target="_blank" rel="noopener">{{ texto.texto_enlace }}</a>
-                    {% endfor %}
-                {% empty %}
-                    {% for url in disponible.urls_856.all %}
-                    <a href="{{ url.url }}" target="_blank" rel="noopener">{{ url.url|truncatechars:40 }}</a>
-                    {% endfor %}
-                {% endfor %}
+                <span class="text-muted">Sin ubicación</span>
             </div>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Contenido principal -->
+    <!-- Contenido en 2 columnas -->
     <div class="detalle-content">
-        <!-- Sección: Nombres y títulos -->
+        <!-- Columna 1: Nombres y títulos -->
         <section class="detalle-section">
             <h2 class="detalle-section-title">
                 <i class="bi bi-person-badge"></i> Nombres y títulos
             </h2>
             <div class="detalle-section-body">
-                <!-- Compositor 100 -->
                 <div class="detalle-field">
                     <span class="detalle-field-label">Compositor</span>
                     <span class="detalle-field-value">
@@ -101,15 +86,13 @@
                     </span>
                 </div>
 
-                <!-- Título uniforme 130 -->
                 {% if obra.titulo_uniforme_130_display %}
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Título uniforme (punto de acceso principal)</span>
+                    <span class="detalle-field-label">Título uniforme</span>
                     <span class="detalle-field-value">{{ obra.titulo_uniforme_130_display }}</span>
                 </div>
                 {% endif %}
 
-                <!-- Título uniforme 240 -->
                 {% if obra.titulo_uniforme_240_display %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Título uniforme</span>
@@ -117,13 +100,11 @@
                 </div>
                 {% endif %}
 
-                <!-- Título en fuente 245 -->
                 <div class="detalle-field">
                     <span class="detalle-field-label">Título en fuente</span>
                     <span class="detalle-field-value">{{ obra.titulo_245_display }}</span>
                 </div>
 
-                <!-- Títulos alternativos 246 -->
                 {% for titulo_alt in obra.titulos_alternativos.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Título alternativo</span>
@@ -135,55 +116,112 @@
                 </div>
                 {% endfor %}
 
-                <!-- Autores/colaboradores -->
                 {% if obra.nombres_relacionados_700.exists or obra.entidades_relacionadas_710.exists %}
-                <div class="detalle-subheader">Autores/colaboradores</div>
-                {% endif %}
-
+                <div class="detalle-subheader">Colaboradores</div>
+                
                 {% for nombre in obra.nombres_relacionados_700.all %}
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Nombre relacionado</span>
+                    <span class="detalle-field-label">Nombre</span>
                     <span class="detalle-field-value">
                         {{ nombre.persona }}
                         {% if nombre.coordenadas_biograficas %} ({{ nombre.coordenadas_biograficas }}){% endif %}
                         {% for funcion in nombre.funciones.all %}, {{ funcion.get_funcion_display }}{% endfor %}
-                        {% for termino in nombre.terminos_asociados.all %}, {{ termino.termino }}{% endfor %}
-                        {% if nombre.autoria %}<span class="detalle-field-note">({{ nombre.get_autoria_display }})</span>{% endif %}
                     </span>
                 </div>
                 {% endfor %}
 
                 {% for entidad in obra.entidades_relacionadas_710.all %}
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Entidad relacionada</span>
+                    <span class="detalle-field-label">Entidad</span>
                     <span class="detalle-field-value">
                         {{ entidad.entidad }}
                         {% if entidad.funcion %}, {{ entidad.get_funcion_display }}{% endif %}
                     </span>
                 </div>
                 {% endfor %}
+                {% endif %}
             </div>
         </section>
 
-        <!-- Sección: Producción/edición -->
+        <!-- Columna 2: Datos musicales -->
+        <section class="detalle-section">
+            <h2 class="detalle-section-title">
+                <i class="bi bi-music-note-beamed"></i> Datos musicales
+            </h2>
+            <div class="detalle-section-body">
+                {% if obra.formato %}
+                <div class="detalle-field">
+                    <span class="detalle-field-label">Formato</span>
+                    <span class="detalle-field-value">{{ obra.get_formato_display }}</span>
+                </div>
+                {% endif %}
+
+                <div class="detalle-field">
+                    <span class="detalle-field-label">Medio de interpretación</span>
+                    <span class="detalle-field-value">
+                        {% with medios=obra.medios_interpretacion_resumen %}
+                            {{ medios.0 }}
+                            {% if medios.1 %}<span class="detalle-solista">Solista: {{ medios.1 }}</span>{% endif %}
+                        {% endwith %}
+                    </span>
+                </div>
+
+                {% if obra.numero_obra or obra.opus %}
+                <div class="detalle-field">
+                    <span class="detalle-field-label">Designación numérica</span>
+                    <span class="detalle-field-value">
+                        {% if obra.numero_obra %}{{ obra.numero_obra }}{% endif %}
+                        {% if obra.numero_obra and obra.opus %} / {% endif %}
+                        {% if obra.opus %}{{ obra.opus }}{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+
+                <div class="detalle-field">
+                    <span class="detalle-field-label">Tonalidad</span>
+                    <span class="detalle-field-value">
+                        {% if obra.tonalidad_publica_display %}
+                            {{ obra.tonalidad_publica_display }}
+                        {% else %}
+                            <span class="text-muted">Sin tonalidad</span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="detalle-field detalle-field-incipit">
+                    <span class="detalle-field-label">Íncipit musical</span>
+                    <div class="detalle-field-value">
+                        {% with detalle=obra.primer_incipit_detalle %}
+                            {% if detalle.0 %}
+                                <div class="detalle-incipit-content">
+                                    <p class="detalle-incipit-line">{{ detalle.0 }}</p>
+                                    {% if detalle.1 %}<p class="detalle-incipit-code">{{ detalle.1 }}</p>{% endif %}
+                                </div>
+                            {% else %}
+                                <span class="text-muted">Sin íncipit</span>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Columna 1: Producción/edición -->
         <section class="detalle-section">
             <h2 class="detalle-section-title">
                 <i class="bi bi-file-earmark-text"></i> Producción / edición
             </h2>
             <div class="detalle-section-body">
-                <!-- Manuscrito/Impreso 340 -->
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Manuscrito/Impreso</span>
+                    <span class="detalle-field-label">Tipo</span>
                     <span class="detalle-field-value">{{ obra.tecnica_340_publica_display }}</span>
                 </div>
 
-                <!-- Producción de la obra 264 -->
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Producción de la obra</span>
+                    <span class="detalle-field-label">Producción</span>
                     <span class="detalle-field-value">{{ obra.publicacion_publica_display }}</span>
                 </div>
 
-                <!-- Edición 250 -->
                 {% for edicion in obra.ediciones.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Edición</span>
@@ -192,20 +230,17 @@
                 {% empty %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Edición</span>
-                    <span class="detalle-field-value text-muted">Sin edición registrada</span>
+                    <span class="detalle-field-value text-muted">Sin edición</span>
                 </div>
                 {% endfor %}
 
-                <!-- Descripción física 300 -->
                 <div class="detalle-field">
                     <span class="detalle-field-label">Descripción física</span>
                     <span class="detalle-field-value">{{ obra.descripcion_fisica_publica_display }}</span>
                 </div>
 
-                <!-- Identificadores -->
                 {% if obra.isbn or obra.ismn or obra.numero_editor %}
                 <div class="detalle-subheader">Identificadores</div>
-                {% endif %}
 
                 {% if obra.isbn %}
                 <div class="detalle-field">
@@ -227,96 +262,26 @@
                     <span class="detalle-field-value">{{ obra.numero_editor }}</span>
                 </div>
                 {% endif %}
+                {% endif %}
             </div>
         </section>
 
-        <!-- Sección: Datos musicales -->
-        <section class="detalle-section">
-            <h2 class="detalle-section-title">
-                <i class="bi bi-music-note-beamed"></i> Datos musicales
-            </h2>
-            <div class="detalle-section-body">
-                <!-- Formato de presentación musical 348 -->
-                {% if obra.formato %}
-                <div class="detalle-field">
-                    <span class="detalle-field-label">Formato de presentación musical</span>
-                    <span class="detalle-field-value">{{ obra.get_formato_display }}</span>
-                </div>
-                {% endif %}
-
-                <!-- Medio de interpretación 382 -->
-                <div class="detalle-field">
-                    <span class="detalle-field-label">Medio de interpretación</span>
-                    <span class="detalle-field-value">
-                        {% with medios=obra.medios_interpretacion_resumen %}
-                            {{ medios.0 }}
-                            {% if medios.1 %}<br><span class="detalle-solista">Solista: {{ medios.1 }}</span>{% endif %}
-                        {% endwith %}
-                    </span>
-                </div>
-
-                <!-- Designación numérica 383 -->
-                {% if obra.numero_obra or obra.opus %}
-                <div class="detalle-field">
-                    <span class="detalle-field-label">Designación numérica de obra musical</span>
-                    <span class="detalle-field-value">
-                        {% if obra.numero_obra %}{{ obra.numero_obra }}{% endif %}
-                        {% if obra.numero_obra and obra.opus %} / {% endif %}
-                        {% if obra.opus %}{{ obra.opus }}{% endif %}
-                    </span>
-                </div>
-                {% endif %}
-
-                <!-- Tonalidad 384 -->
-                <div class="detalle-field">
-                    <span class="detalle-field-label">Tonalidad</span>
-                    <span class="detalle-field-value">
-                        {% if obra.tonalidad_publica_display %}
-                            {{ obra.tonalidad_publica_display }}
-                        {% else %}
-                            <span class="text-muted">Sin tonalidad registrada</span>
-                        {% endif %}
-                    </span>
-                </div>
-
-                <!-- Íncipit musical 031 -->
-                <div class="detalle-field detalle-field-incipit">
-                    <span class="detalle-field-label">Íncipit musical</span>
-                    <div class="detalle-field-value">
-                        {% with detalle=obra.primer_incipit_detalle %}
-                            {% if detalle.0 %}
-                                <div class="detalle-incipit-content">
-                                    <p class="detalle-incipit-line">{{ detalle.0 }}</p>
-                                    {% if detalle.1 %}<p class="detalle-incipit-code">{{ detalle.1 }}</p>{% endif %}
-                                </div>
-                            {% else %}
-                                <span class="text-muted">Sin íncipit registrado</span>
-                            {% endif %}
-                        {% endwith %}
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección: Materias/serie -->
+        <!-- Columna 2: Materias/serie -->
         <section class="detalle-section">
             <h2 class="detalle-section-title">
                 <i class="bi bi-tags"></i> Materias / serie
             </h2>
             <div class="detalle-section-body">
-                <!-- Materia 650 -->
                 <div class="detalle-field">
                     <span class="detalle-field-label">Materia</span>
                     <span class="detalle-field-value">{{ obra.materia_publica_display }}</span>
                 </div>
 
-                <!-- Materia Género/Forma 655 -->
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Materia (Género/Forma)</span>
+                    <span class="detalle-field-label">Género/Forma</span>
                     <span class="detalle-field-value">{{ obra.temas_publico_display }}</span>
                 </div>
 
-                <!-- Serie 490 -->
                 {% for mencion in obra.menciones_serie.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Serie</span>
@@ -328,19 +293,18 @@
                 {% empty %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Serie</span>
-                    <span class="detalle-field-value text-muted">Sin serie registrada</span>
+                    <span class="detalle-field-value text-muted">Sin serie</span>
                 </div>
                 {% endfor %}
             </div>
         </section>
 
-        <!-- Sección: Relaciones -->
-        <section class="detalle-section">
+        <!-- Full width: Relaciones -->
+        <section class="detalle-section detalle-section-full">
             <h2 class="detalle-section-title">
                 <i class="bi bi-diagram-3"></i> Relaciones
             </h2>
             <div class="detalle-section-body">
-                <!-- Colección 773 -->
                 {% for enlace in obra.enlaces_documento_fuente_773.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Colección</span>
@@ -349,21 +313,19 @@
                 {% empty %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Colección</span>
-                    <span class="detalle-field-value text-muted">Sin colección asociada</span>
+                    <span class="detalle-field-value text-muted">Sin colección</span>
                 </div>
                 {% endfor %}
 
-                <!-- Obra en esta colección 774 -->
                 {% for enlace in obra.enlaces_unidades_774.all %}
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Obra en esta colección</span>
+                    <span class="detalle-field-label">Obra en colección</span>
                     <span class="detalle-field-value">
                         {% if enlace.encabezamiento_principal %}{{ enlace.encabezamiento_principal }}. {% endif %}{{ enlace.titulo }}
                     </span>
                 </div>
                 {% endfor %}
 
-                <!-- Otras relaciones 787 -->
                 {% for relacion in obra.otras_relaciones_787.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Otras relaciones</span>
@@ -375,13 +337,12 @@
             </div>
         </section>
 
-        <!-- Sección: Notas -->
-        <section class="detalle-section">
+        <!-- Full width: Notas -->
+        <section class="detalle-section detalle-section-full">
             <h2 class="detalle-section-title">
                 <i class="bi bi-journal-text"></i> Notas
             </h2>
             <div class="detalle-section-body">
-                <!-- Nota general 500 -->
                 {% for nota in obra.notas_generales_500.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Nota general</span>
@@ -390,11 +351,10 @@
                 {% empty %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Nota general</span>
-                    <span class="detalle-field-value text-muted">Sin notas generales</span>
+                    <span class="detalle-field-value text-muted">Sin notas</span>
                 </div>
                 {% endfor %}
 
-                <!-- Contenido 505 -->
                 {% for contenido in obra.contenidos_505.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Contenido</span>
@@ -402,7 +362,6 @@
                 </div>
                 {% endfor %}
 
-                <!-- Sumario 520 -->
                 {% for sumario in obra.sumarios_520.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Sumario</span>
@@ -410,10 +369,9 @@
                 </div>
                 {% endfor %}
 
-                <!-- Datos biográficos 545 -->
                 {% if obra.datos_biograficos_545 %}
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Datos biográficos del compositor</span>
+                    <span class="detalle-field-label">Datos biográficos</span>
                     <span class="detalle-field-value">
                         {{ obra.datos_biograficos_545.texto_biografico }}
                         {% if obra.datos_biograficos_545.uri %}
@@ -425,5 +383,56 @@
             </div>
         </section>
     </div>
+
+    <!-- Visor de PDF -->
+    {% for disponible in obra.disponibles_856.all %}
+        {% for url in disponible.urls_856.all %}
+            {% if url.url %}
+            <section class="pdf-viewer-section">
+                <div class="pdf-viewer-header">
+                    <h3 class="pdf-viewer-title">
+                        <i class="bi bi-file-pdf"></i> 
+                        {% for texto in disponible.textos_enlace_856.all %}
+                            {{ texto.texto_enlace }}
+                        {% empty %}
+                            Documento disponible
+                        {% endfor %}
+                    </h3>
+                    <div class="pdf-viewer-actions">
+                        <a href="{{ url.url }}" target="_blank" class="btn btn-sm">
+                            <i class="bi bi-box-arrow-up-right"></i> Abrir en nueva pestaña
+                        </a>
+                        <a href="{{ url.url }}" download class="btn btn-sm">
+                            <i class="bi bi-download"></i> Descargar
+                        </a>
+                    </div>
+                </div>
+                <div class="pdf-viewer-container">
+                    <iframe 
+                        src="{{ url.url }}" 
+                        class="pdf-viewer-frame"
+                        title="Visor de documento PDF"
+                        loading="lazy">
+                    </iframe>
+                </div>
+            </section>
+            {% endif %}
+        {% endfor %}
+    {% empty %}
+    <!-- Estado vacío si no hay PDF -->
+    <section class="pdf-viewer-section">
+        <div class="pdf-viewer-header">
+            <h3 class="pdf-viewer-title">
+                <i class="bi bi-file-pdf"></i> Documento
+            </h3>
+        </div>
+        <div class="pdf-viewer-container">
+            <div class="pdf-viewer-empty">
+                <i class="bi bi-file-earmark-x"></i>
+                <p>No hay documento disponible para esta obra</p>
+            </div>
+        </div>
+    </section>
+    {% endfor %}
 </div>
 {% endblock %}
