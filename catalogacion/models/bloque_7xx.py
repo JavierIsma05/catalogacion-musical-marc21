@@ -175,7 +175,11 @@ class EntidadRelacionada710(models.Model):
         'ObraGeneral',
         on_delete=models.CASCADE,
         related_name='entidades_relacionadas_710',
+        blank=True,
+        null=True,
+        help_text="710 $a – Entidad relacionada (NR)"
     )
+    
 
     entidad = models.ForeignKey(
         'AutoridadEntidad',

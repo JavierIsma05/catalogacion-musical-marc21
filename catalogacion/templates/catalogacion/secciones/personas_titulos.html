@@ -1,12 +1,7 @@
 {# Bloque 1XX - Punto de acceso principal #}
 <section id="bloque-1xx" class="bloque-section">
     <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">
-                <i class="bi bi-person"></i>
-                Bloque 1XX - Punto de Acceso Principal
-            </h5>
-        </div>
+        
         <div class="card-body">
 
             {# Campo 100 - Compositor #}
@@ -39,8 +34,7 @@
                     </div>
 
                     <div class="col-full">
-                        <label class="form-label" for="id_compositor_coordenadas">{{ form.compositor_coordenadas.label
-                            }}</label>
+                        <label class="form-label" for="id_compositor_coordenadas">{{ form.compositor_coordenadas.label }}</label>
                         {{ form.compositor_coordenadas }}
                         <div class="form-text">Fechas de vida (Ej: 1900-1980)</div>
                         {% if form.compositor_coordenadas.errors %}
@@ -49,8 +43,7 @@
                     </div>
 
                     <div class="col-full">
-                        <label class="form-label" for="{{ form.termino_asociado.id_for_label }}">{{
-                            form.termino_asociado.label }}</label>
+                        <label class="form-label" for="{{ form.termino_asociado.id_for_label }}">{{ form.termino_asociado.label }}</label>
                         {{ form.termino_asociado }}
                         {% if form.termino_asociado.errors %}
                         <div class="invalid-feedback">{{ form.termino_asociado.errors }}</div>
@@ -231,12 +224,6 @@
 {# Bloque 2XX - Títulos, edición y publicación #}
 <section id="bloque-2xx" class="bloque-section">
     <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">
-                <i class="bi bi-bookmark"></i>
-                Bloque 2XX - Títulos y Publicación
-            </h5>
-        </div>
         <div class="card-body">
 
             <!-- Campo 245 - Título Principal -->
@@ -295,12 +282,6 @@
 {# Bloque 7XX - Puntos de acceso adicionales y enlaces #}
 <section id="bloque-7xx" class="bloque-section">
     <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">
-                <i class="bi bi-link"></i>
-                Bloque 7XX - Enlaces
-            </h5>
-        </div>
         <div class="card-body">
             {# Campo 700 - Nombres Relacionados (Repetible) #}
             {% if 'nombres_relacionados_700' in formsets_visibles %}

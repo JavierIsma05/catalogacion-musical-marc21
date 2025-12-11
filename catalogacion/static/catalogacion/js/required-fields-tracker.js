@@ -16,148 +16,69 @@
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
-            formsetPrefix: "medios_382", // ← FORMSET, no input
+            id: "id_medios_382-0-solista", // ← FORMSET, no input
             label: "382",
             tab: 2,
-            special: true,
-        },
+            hidden: true,
+            },
         ],
         obra_en_coleccion_manuscrita: [
+            { id: "id_centro_catalogador", label: "040", tab: 6 },
+            { id: "id_compositor", label: "100", tab: 0 },
+            { id: "id_titulo_principal", label: "245", tab: 0 },
+            { id: "id_ms_imp", label: "340", tab: 1 },
             {
-                id: "id_fuente_catalogacion_040",
-                label: "040 - Fuente de Catalogación",
-                tab: 6,
-            },
-            {
-                id: "id_compositor",
-                label: "100 - Compositor",
-                tab: 0,
-            },
-            {
-                id: "id_titulo_principal",
-                label: "245 - Título Principal",
-                tab: 0,
-            },
-            {
-                id: "id_designacion_especifica_340",
-                label: "340 - Designación Específica",
-                tab: 1,
-            },
-            {
-                id: "id_medio_interpretacion_382",
-                label: "382 - Medio de Interpretación",
+                id: "id_medios_382-0-solista", // ← FORMSET, no input
+                label: "382",
                 tab: 2,
                 special: true,
             },
         ],
         obra_manuscrita_individual: [
+            { id: "id_centro_catalogador", label: "040", tab: 6 },
+            { id: "id_compositor", label: "100 - Compositor", tab: 0 },
+            { id: "id_titulo_principal", label: "245", tab: 0 },
+            { id: "id_ms_imp", label: "340", tab: 1 },
             {
-                id: "id_fuente_catalogacion_040",
-                label: "040 - Fuente de Catalogación",
-                tab: 6,
-            },
-            {
-                id: "id_compositor",
-                label: "100 - Compositor",
-                tab: 0,
-            },
-            {
-                id: "id_titulo_principal",
-                label: "245 - Título Principal",
-                tab: 0,
-            },
-            {
-                id: "id_designacion_especifica_340",
-                label: "340 - Designación Específica",
-                tab: 1,
-            },
-            {
-                id: "id_medio_interpretacion_382",
-                label: "382 - Medio de Interpretación",
+                formsetPrefix: "medios_382",
+                label: "382",
                 tab: 2,
                 special: true,
             },
         ],
+
         coleccion_impresa: [
+            { id: "id_centro_catalogador", label: "040", tab: 6 },
+            { id: "id_titulo_uniforme_texto", label: "130", tab: 0, hidden: true },
+            { id: "id_titulo_principal", label: "245", tab: 0 },
+            { id: "id_ms_imp", label: "340", tab: 1 },
             {
-                id: "id_fuente_catalogacion_040",
-                label: "040 - Fuente de Catalogación",
-                tab: 6,
-            },
-            {
-                id: "id_titulo_uniforme",
-                label: "130 - Título Uniforme",
-                tab: 0,
-            },
-            {
-                id: "id_titulo_principal",
-                label: "245 - Título Principal",
-                tab: 0,
-            },
-            {
-                id: "id_designacion_especifica_340",
-                label: "340 - Designación Específica",
-                tab: 1,
-            },
-            {
-                id: "id_medio_interpretacion_382",
-                label: "382 - Medio de Interpretación",
-                tab: 2,
-                special: true,
-            },
+            id: "id_medios_382-0-solista", // ← FORMSET, no input
+            label: "382",
+            tab: 2,
+            special: true,
+        },
         ],
         obra_en_coleccion_impresa: [
+            { id: "id_centro_catalogador", label: "040", tab: 6 },
+            { id: "id_compositor", label: "100 - Compositor", tab: 0 },
+            { id: "id_titulo_principal", label: "245", tab: 0 },
+            { id: "id_ms_imp", label: "340", tab: 1 },
             {
-                id: "id_fuente_catalogacion_040",
-                label: "040 - Fuente de Catalogación",
-                tab: 6,
-            },
-            {
-                id: "id_compositor",
-                label: "100 - Compositor",
-                tab: 0,
-            },
-            {
-                id: "id_titulo_principal",
-                label: "245 - Título Principal",
-                tab: 0,
-            },
-            {
-                id: "id_designacion_especifica_340",
-                label: "340 - Designación Específica",
-                tab: 1,
-            },
-            {
-                id: "id_medio_interpretacion_382",
-                label: "382 - Medio de Interpretación",
+                id: "id_medios_382-0-solista", // ← FORMSET, no input
+                label: "382",
                 tab: 2,
                 special: true,
             },
         ],
         obra_impresa_individual: [
+            { id: "id_centro_catalogador", label: "040", tab: 6 },
+            { id: "id_compositor", label: "100 - Compositor", tab: 0 },
+            { id: "id_titulo_principal", label: "245", tab: 0 },
+            { id: "id_ms_imp", label: "340", tab: 1 },
             {
-                id: "id_fuente_catalogacion_040",
-                label: "040 - Fuente de Catalogación",
-                tab: 6,
-            },
-            {
-                id: "id_compositor",
-                label: "100 - Compositor",
-                tab: 0,
-            },
-            {
-                id: "id_titulo_principal",
-                label: "245 - Título Principal",
-                tab: 0,
-            },
-            {
-                id: "id_designacion_especifica_340",
-                label: "340 - Designación Específica",
-                tab: 1,
-            },
-            {
-                id: "id_medio_interpretacion_382",
-                label: "382 - Medio de Interpretación",
+                id: "id_medios_382-0-solista", // ← FORMSET, no input
+                label: "382",
                 tab: 2,
                 special: true,
             },

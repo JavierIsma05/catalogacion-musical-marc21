@@ -111,57 +111,45 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
         return kwargs
     
     def get_context_data(self, **kwargs):
-        """Agregar formsets y contexto de tipo de obra"""
         logger.info(f"🔧 get_context_data() llamado (method={self.request.method})")
-        
+
         context = super().get_context_data(**kwargs)
-        
-        # Información del tipo de obra
+
+        # Datos del tipo de obra
         context['tipo_obra'] = self.tipo_obra
         context['tipo_obra_titulo'] = self.config_obra['titulo']
         context['tipo_obra_descripcion'] = self.config_obra['descripcion']
-        
-        # Configuración de campos visibles según tipo de obra
+
+        # Configuración de campos
         campos_config = get_campos_visibles(self.tipo_obra)
         context['campos_visibles'] = campos_config['campos_simples']
+
+        # 🚨 IMPORTANTE → primero declaramos formsets_visibles
         context['formsets_visibles'] = campos_config['formsets_visibles']
-        
-        # Obtener formsets según método HTTP
+
+        # 🚀 Obtener formsets
         with_post = self.request.method == 'POST'
-        logger.debug(f"   Obteniendo formsets con with_post={with_post}")
-        context.update(self._get_formsets(instance=None, with_post=with_post))
-        logger.debug(f"   Formsets obtenidos: {len([k for k in context.keys() if '_formset' in k])} formsets")
-        
-        # Formsets anidados para 382 (si estamos en POST, las instancias vienen del formset)
+        formsets = self._get_formsets(instance=None, with_post=with_post)
+
+        # Agregar TODOS los formsets al contexto
+        for key, fs in formsets.items():
+            context[key] = fs
+
+        logger.debug(f"   Formsets cargados en contexto: {list(formsets.keys())}")
+
+        # 382 → formsets anidados
         medios_formset = context.get('medios_interpretacion')
         if medios_formset:
             if with_post:
-                # En POST, obtener instancias del formset sin guardar
-                try:
-                    # Las instancias sin PK no tienen formsets anidados
-                    parent_instances = [form.instance for form in medios_formset if form.instance.pk]
-                except:
-                    parent_instances = []
+                parent_instances = [f.instance for f in medios_formset if f.instance.pk]
             else:
                 parent_instances = []
-            
-            context.update(self._get_nested_formsets(parent_instances=parent_instances, with_post=with_post))
-        
-        # ============================================================================
-        # SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
-        # ============================================================================
-        # Pasar borrador_id SOLO si viene de recuperar_borrador_view
-        # y luego limpiar inmediatamente la sesión
-        # if 'borrador_id' in self.request.session:
-        #     context['borrador_id_recuperar'] = self.request.session.get('borrador_id')
-        #     # Limpiar la sesión inmediatamente para que no persista
-        #     del self.request.session['borrador_id']
-        #     if 'tipo_obra' in self.request.session:
-        #         del self.request.session['tipo_obra']
-        #     self.request.session.modified = True
-        
+
+            nested = self._get_nested_formsets(parent_instances=parent_instances, with_post=with_post)
+            context.update(nested)
+
         return context
-    
+
     @transaction.atomic
     def form_valid(self, form):
         logger.info("=" * 60)
@@ -286,40 +274,53 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
         return 'obra_impresa_individual'
     
     def get_context_data(self, **kwargs):
-        """Agregar formsets con datos de la instancia"""
+        logger.info(f"🔧 get_context_data() EDITAR (method={self.request.method})")
+
         context = super().get_context_data(**kwargs)
-        
+
         # Información del tipo de obra
         context['tipo_obra'] = self.tipo_obra
         context['tipo_obra_titulo'] = self.config_obra.get('titulo', 'Obra')
         context['tipo_obra_descripcion'] = self.config_obra.get('descripcion', '')
-        
-        # Configuración de campos visibles según tipo de obra
+
+        # Configuración de campos visibles
         campos_config = get_campos_visibles(self.tipo_obra)
         context['campos_visibles'] = campos_config['campos_simples']
+
+        # 🚨 IMPORTANTE: declarar formsets_visibles ANTES de generarlos
         context['formsets_visibles'] = campos_config['formsets_visibles']
-        
-        # Obtener formsets según método HTTP
+
         with_post = self.request.method == 'POST'
-        context.update(self._get_formsets(instance=self.object, with_post=with_post))
-        
-        # Formsets anidados para 382
+
+        # 🚀 Crear todos los formsets
+        formsets = self._get_formsets(instance=self.object, with_post=with_post)
+
+        # Añadir cada formset explícitamente al contexto
+        for key, fs in formsets.items():
+            context[key] = fs
+
+        logger.debug(f"   Formsets cargados en contexto (editar): {list(formsets.keys())}")
+
+        # Formsets anidados del 382 (382$a)
         medios_formset = context.get('medios_interpretacion')
         if medios_formset:
             if with_post:
-                # En POST, obtener instancias del formset sin guardar
-                try:
-                    parent_instances = [form.instance for form in medios_formset if form.instance.pk]
-                except:
-                    parent_instances = []
+                # Instancias con PK
+                parent_instances = [
+                    form.instance for form in medios_formset if form.instance.pk
+                ]
             else:
-                # En GET, obtener todas las instancias existentes
+                # Todas las instancias ya guardadas
                 parent_instances = list(self.object.medios_interpretacion_382.all())
-            
-            context.update(self._get_nested_formsets(parent_instances=parent_instances, with_post=with_post))
-        
+
+            nested = self._get_nested_formsets(
+                parent_instances=parent_instances,
+                with_post=with_post
+            )
+            context.update(nested)
+
         return context
-    
+
     @transaction.atomic
     def form_valid(self, form):
         """Actualizar obra y todos los formsets en una transacción atómica"""
