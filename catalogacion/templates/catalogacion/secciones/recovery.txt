@@ -1,0 +1,513 @@
+{% extends 'catalogacion/base_catalogacion.html' %}
+{% load static %}
+{% load catalogacion_tags %}
+
+{% block title %}Crear {{ tipo_obra_titulo }} - MARC21{% endblock %}
+{% block page_title %}Crear {{ tipo_obra_titulo }}{% endblock %}
+
+{% block catalogacion_css %}
+<link rel="stylesheet" href="{% static 'catalogacion/css/crear-obra.css' %}">
+{% endblock %}
+
+{% block catalogacion_content %}
+<div class="form-with-progress-sidebar" data-tipo-obra="{{ tipo_obra }}">
+    <!-- SIDEBAR DE PROGRESO -->
+    <aside class="progress-sidebar">
+        <div class="progress-sidebar-sticky">
+            <div class="progress-panel">
+                <div class="progress-panel-header">
+                    <h6>Progreso del Formulario</h6>
+                    <p class="text-muted">Campos obligatorios completados</p>
+                </div>
+
+                <!-- Indicador circular -->
+                <!-- <div class="progress-circle-container">
+                    <div class="progress-circle">
+                        <svg width="80" height="80">
+                            <circle class="bg-circle" cx="40" cy="40" r="36"></circle>
+                            <circle class="progress-circle-bar" cx="40" cy="40" r="36"
+                                    id="progress-circle"
+                                    stroke-dasharray="226.19"
+                                    stroke-dashoffset="226.19"></circle>
+                        </svg>
+                        <div class="progress-text" id="progress-percent">0%</div>
+                    </div>
+                </div> -->
+
+                <!-- Estadísticas -->
+                <div class="progress-stats">
+                    <div class="progress-stat-row">
+                        <span class="progress-stat-label">Completados</span>
+                        <span class="progress-stat-value complete" id="campos-completados">0</span>
+                    </div>
+                    <div class="progress-stat-row">
+                        <span class="progress-stat-label">Pendientes</span>
+                        <span class="progress-stat-value incomplete" id="campos-pendientes">0</span>
+                    </div>
+                    <div class="progress-stat-row">
+                        <span class="progress-stat-label">Total</span>
+                        <span class="progress-stat-value" id="campos-totales">0</span>
+                    </div>
+                </div>
+
+                <!-- Lista de campos obligatorios -->
+                <ul class="required-fields-list" id="required-fields-list">
+                    <!-- Se llena dinámicamente con JavaScript -->
+                </ul>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL DEL FORMULARIO -->
+    <div class="form-content-area">
+        <form method="post" id="obra-form" novalidate>
+            {% csrf_token %}
+
+            <!-- Campos ocultos -->
+            <input type="hidden" name="tipo_registro" value="{{ form.tipo_registro.value|default:'' }}" id="id_tipo_registro">
+            <input type="hidden" name="nivel_bibliografico" value="{{ form.nivel_bibliografico.value|default:'' }}" id="id_nivel_bibliografico">
+
+            <!-- Header del formulario -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-plus"></i>
+                        Crear {{ tipo_obra_titulo }}
+                    </h5>
+                    <small class="text-muted">{{ tipo_obra_descripcion }}</small>
+                </div>
+            </div>
+
+            <!-- Barra de progreso superior -->
+            <div class="progress-indicator">
+                <div class="progress-bar-custom">
+                    <div class="progress-bar-fill" id="progress-bar" style="width: 11%"></div>
+                </div>
+                <small class="text-muted mt-2 d-block">Paso <span id="current-step">1</span> de 9</small>
+            </div>
+
+            <!-- Navegación de pestañas -->
+            <div class="tabs-navigation">
+                <button type="button" class="tab-button active" data-tab="tab-0xx" data-tab-index="0">
+                    <i class="bi bi-hash"></i> 0XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-1xx" data-tab-index="1">
+                    <i class="bi bi-person"></i> 1XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-2xx" data-tab-index="2">
+                    <i class="bi bi-bookmark"></i> 2XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-3xx" data-tab-index="3">
+                    <i class="bi bi-file-text"></i> 3XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-4xx" data-tab-index="4">
+                    <i class="bi bi-collection"></i> 4XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-5xx" data-tab-index="5">
+                    <i class="bi bi-journal"></i> 5XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-6xx" data-tab-index="6">
+                    <i class="bi bi-tag"></i> 6XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-7xx" data-tab-index="7">
+                    <i class="bi bi-people"></i> 7XX
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-8xx" data-tab-index="8">
+                    <i class="bi bi-geo"></i> 8XX
+                </button>
+            </div>
+
+            <!-- Contenido de pestañas -->
+            <div class="tabs-content">
+                <!-- Pestaña 0XX -->
+                <div id="tab-0xx" class="tab-content active">
+                    {% include 'catalogacion/bloques/bloque_0xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <div></div>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 1XX -->
+                <div id="tab-1xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_1xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 2XX -->
+                <div id="tab-2xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_2xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 3XX -->
+                <div id="tab-3xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_3xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 4XX -->
+                <div id="tab-4xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_4xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 5XX -->
+                <div id="tab-5xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_5xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 6XX -->
+                <div id="tab-6xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_6xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 7XX -->
+                <div id="tab-7xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_7xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 8XX (última) -->
+                <div id="tab-8xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_8xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle-fill"></i> Registrar Obra
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock catalogacion_content %}
+
+{% block catalogacion_js %}
+<script>
+// Pasar tipo de obra al JavaScript
+window.TIPO_OBRA_ACTUAL = '{{ tipo_obra }}';
+
+// Sistema de pestañas
+const tabs = ['tab-0xx', 'tab-1xx', 'tab-2xx', 'tab-3xx', 'tab-4xx', 'tab-5xx', 'tab-6xx', 'tab-7xx', 'tab-8xx'];
+let currentTabIndex = 0;
+
+// ============================================================================
+// SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
+// ============================================================================
+// Borrador a recuperar (si viene desde lista de borradores)
+// const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
+const BORRADOR_A_RECUPERAR = null; // Borradores deshabilitados
+</script>
+
+<script src="{% static 'catalogacion/js/autocomplete-core.js' %}"></script>
+<script src="{% static 'catalogacion/js/compositor-autocomplete.js' %}"></script>
+<script src="{% static 'catalogacion/js/titulos-formas-autocomplete.js' %}"></script>
+<script src="{% static 'catalogacion/js/required-fields-tracker.js' %}"></script>
+<!-- BORRADOR SYSTEM DESHABILITADO
+<script src="{% static 'catalogacion/js/borrador-system.js' %}"></script>
+-->
+<script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>
+<script src="{% static 'catalogacion/js/incipit-031-adapter.js' %}"></script>
+<script src="{% static 'catalogacion/js/autoridades-titulos-autocomplete.js' %}"></script>
+<script src="{% static 'catalogacion/js/enlaces-formsets.js' %}"></script>
+<script src="{% static 'catalogacion/js/field_help.js' %}"></script>
+<script src="{% static 'catalogacion/js/formset-manager.js' %}"></script>
+<script src="{% static 'catalogacion/js/form-validator.js' %}"></script>
+<!-- <script src="{% static 'catalogacion/js/subcampo-validators.js' %}"></script> -->
+
+
+
+<script>
+// Función para cambiar de pestaña
+function switchTab(index) {
+    if (index < 0 || index >= tabs.length) return;
+
+    // Ocultar todas las pestañas
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    // Desactivar todos los botones
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Activar pestaña actual
+    const tabId = tabs[index];
+    document.getElementById(tabId).classList.add('active');
+    document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+
+    // Actualizar índice
+    currentTabIndex = index;
+
+    // Actualizar barra de progreso
+    const progress = ((index + 1) / tabs.length) * 100;
+    document.getElementById('progress-bar').style.width = progress + '%';
+    document.getElementById('current-step').textContent = index + 1;
+
+    // Scroll al inicio
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Navegación siguiente
+function nextTab() {
+    switchTab(currentTabIndex + 1);
+}
+
+// Navegación anterior
+function prevTab() {
+    switchTab(currentTabIndex - 1);
+}
+
+// Eventos de botones de pestañas
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ DOM cargado, inicializando formulario...');
+
+    // Activar Select2 en campos de autoridades
+    if (typeof $.fn.select2 !== 'undefined') {
+        $('.select2').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: function() {
+                return $(this).data('placeholder');
+            },
+            allowClear: true
+        });
+    }
+
+    // Click en botones de pestañas
+    document.querySelectorAll('.tab-button').forEach((button, index) => {
+        button.addEventListener('click', () => {
+            switchTab(index);
+        });
+    });
+
+    // Validación de formulario
+    const form = document.getElementById('obra-form');
+
+    if (!form) {
+        console.error('❌ ERROR: No se encontró el formulario #obra-form');
+        return;
+    }
+
+    console.log('✅ Formulario encontrado, agregando listener de submit...');
+
+    form.addEventListener('submit', function(e) {
+        // SIEMPRE prevenir el comportamiento por defecto
+        e.preventDefault();
+        e.stopPropagation();
+
+        console.log('\n\n');
+        console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥');
+        console.log('🚀 EVENTO SUBMIT CAPTURADO');
+        console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥');
+
+        // LOG: SIEMPRE mostrar datos antes de validar
+        console.log('\n=== DATOS DEL FORMULARIO ===');
+        const formData = new FormData(form);
+        const entries = Array.from(formData.entries());
+        console.log('📊 Total de campos:', entries.length);
+        console.log('\n📋 Lista completa de datos:');
+        entries.forEach(([key, value]) => {
+            if (value && value !== '') {
+                console.log(`  ✅ ${key}: "${value}"`);
+            }
+        });
+
+        // Verificar validación HTML5
+        const isValid = form.checkValidity();
+        console.log('\n🔍 Validación HTML5:', isValid ? '✅ VÁLIDO' : '❌ INVÁLIDO');
+
+        if (!isValid) {
+            console.log('\n❌❌❌ FORMULARIO BLOQUEADO - Validación HTML5 falló ❌❌❌');
+
+            // Encontrar TODOS los campos inválidos
+            const invalidFields = form.querySelectorAll(':invalid');
+            console.log(`\n⚠️ Se encontraron ${invalidFields.length} campos inválidos:`);
+            invalidFields.forEach((field, index) => {
+                console.log(`\n  ${index + 1}. Campo INVÁLIDO:`);
+                console.log(`     📝 Name: ${field.name || 'sin nombre'}`);
+                console.log(`     🆔 ID: ${field.id || 'sin id'}`);
+                console.log(`     📌 Tipo: ${field.type}`);
+                console.log(`     💾 Valor: "${field.value}"`);
+                console.log(`     ⚡ Required: ${field.required}`);
+                console.log(`     💬 Mensaje: ${field.validationMessage}`);
+            });
+
+            // Navegar al primer campo inválido
+            const firstInvalid = invalidFields[0];
+            if (firstInvalid) {
+                tabs.forEach((tabId, index) => {
+                    const tabContent = document.getElementById(tabId);
+                    if (tabContent.contains(firstInvalid)) {
+                        console.log(`\n📍 Navegando a pestaña ${index}: ${tabId}`);
+                        switchTab(index);
+                        setTimeout(() => {
+                            firstInvalid.focus();
+                            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 300);
+                    }
+                });
+            }
+
+            alert('⚠️ Por favor complete todos los campos obligatorios antes de enviar.');
+            console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥\n\n');
+            return;
+        }
+
+        // Si llegamos aquí, el formulario es válido según HTML5
+        console.log('\n✅✅✅ FORMULARIO VÁLIDO - Enviando al servidor vía AJAX ✅✅✅');
+
+        // Enviar por AJAX para no recargar la página
+        console.log('\n🌐 Enviando petición AJAX...');
+        console.log('   URL:', form.action);
+        console.log('   Método: POST');
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => {
+            console.log('\n📡 RESPUESTA RECIBIDA DEL SERVIDOR');
+            console.log('   Status:', response.status);
+            console.log('   Status Text:', response.statusText);
+            console.log('   OK:', response.ok);
+            console.log('   URL final:', response.url);
+            console.log('   Redirected:', response.redirected);
+
+            // Si hubo redirección, la obra se creó exitosamente
+            if (response.redirected) {
+                console.log('\n🎉🎉🎉 ¡OBRA CREADA EXITOSAMENTE! 🎉🎉🎉');
+                console.log('   Redirigiendo a:', response.url);
+
+                // Mostrar alerta de éxito y redirigir
+                alert('✅ ¡Obra creada exitosamente!\n\nSerás redirigido a la página de detalle.');
+                window.location.href = response.url;
+                return; // No procesar más
+            }
+
+            return response.text();
+        })
+        .then(html => {
+            // Si ya hubo redirección, no procesar
+            if (!html) return;
+
+            console.log('\n📄 HTML RECIBIDO (primeros 500 caracteres):');
+            console.log(html.substring(0, 500));
+
+            // Buscar mensajes de error en el HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const alerts = doc.querySelectorAll('.alert, .error, .invalid-feedback');
+
+            if (alerts.length > 0) {
+                console.log('\n⚠️ MENSAJES/ERRORES ENCONTRADOS EN LA RESPUESTA:');
+                alerts.forEach((alert, i) => {
+                    console.log(`  ${i + 1}. ${alert.textContent.trim()}`);
+                });
+            }
+
+            // Si hay un redirect (obra creada exitosamente), ir allá
+            const successMessage = doc.querySelector('.alert-success');
+            if (successMessage) {
+                console.log('\n🎉 ¡ÉXITO! Obra creada correctamente');
+                console.log('   Mensaje:', successMessage.textContent.trim());
+                // Aquí podrías hacer window.location.href = ... si hay un redirect
+            } else {
+                console.log('\n❌ La respuesta no contiene mensaje de éxito');
+                console.log('   Probablemente hay errores de validación en el backend');
+                alert('❌ Error al guardar. Revisa la consola para más detalles.');
+            }
+        })
+        .catch(error => {
+            console.error('\n🔴 ERROR EN LA PETICIÓN AJAX:');
+            console.error(error);
+            alert('❌ Error de conexión: ' + error.message);
+        })
+        .finally(() => {
+            console.log('\n🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥\n\n');
+        });
+
+        form.classList.add('was-validated');
+    }, { capture: true }); // Captura temprana del evento
+
+    console.log('✅ Listener de submit agregado correctamente');
+
+    // Atajos de teclado
+    document.addEventListener('keydown', function(e) {
+        // Alt + Flecha Derecha = Siguiente
+        if (e.altKey && e.key === 'ArrowRight') {
+            e.preventDefault();
+            nextTab();
+        }
+        // Alt + Flecha Izquierda = Anterior
+        if (e.altKey && e.key === 'ArrowLeft') {
+            e.preventDefault();
+            prevTab();
+        }
+    });
+});
+</script>
+
+{% endblock catalogacion_js %}

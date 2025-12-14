@@ -1,0 +1,177 @@
+{% comment %}
+Template especializado para el campo 100 $e - Funciones del Compositor
+Permite repetir el subcampo $e siguiendo el patrón [+] [select] [x]
+El botón de agregar está en la primera fila, no en el header
+{% endcomment %}
+{% load catalogacion_tags %}
+
+{# Obtener las opciones de funciones #}
+{% get_funciones_persona as funciones_opciones %}
+
+<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
+    {{ formset.management_form }}
+    
+    <div class="formset-forms">
+        {# Contenedor de subcampos repetibles #}
+        <div class="subcampo-repetible-container" data-funciones-container="0">
+            {% for form in formset %}
+            <div class="subcampo-row funcion-form-row {% if form.instance.pk %}existing-form{% endif %}">
+                {% if form.instance.pk %}
+                    <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
+                {% endif %}
+                
+                {% if formset.can_delete %}
+                    <div class="d-none">
+                        {{ form.DELETE }}
+                    </div>
+                {% endif %}
+                
+                {% if forloop.first %}
+                <button type="button" class="subcampo-add-btn add-funcion-btn" title="Agregar Función">
+                    <i class="bi bi-plus"></i>
+                </button>
+                {% else %}
+                <div class="subcampo-placeholder"></div>
+                {% endif %}
+                
+                {{ form.funcion }}
+                
+                <button type="button" class="subcampo-delete-btn delete-funcion-btn" title="Eliminar" {% if forloop.first %}style="visibility: hidden;"{% endif %}>
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            {% empty %}
+            {# Si no hay formularios, mostrar uno vacío #}
+            <div class="subcampo-row funcion-form-row">
+                <button type="button" class="subcampo-add-btn add-funcion-btn" title="Agregar Función">
+                    <i class="bi bi-plus"></i>
+                </button>
+                <select class="form-select funcion-select" name="{{ formset.prefix }}-0-funcion">
+                    <option value="">Seleccione una función...</option>
+                    {% for codigo, nombre in funciones_opciones %}
+                    <option value="{{ codigo }}">{{ nombre }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="subcampo-delete-btn delete-funcion-btn" title="Eliminar" style="visibility: hidden;">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {# Template vacío oculto para clonar #}
+        <div class="formset-row empty-form" style="display:none;">
+            {{ formset.empty_form.funcion }}
+        </div>
+    </div>
+</div>
+
+{# Template global para nuevas funciones #}
+<div class="subcampo-row funcion-form-row funcion-template-100e d-none">
+    <div class="subcampo-placeholder"></div>
+    <select class="form-select funcion-select" name="">
+        <option value="">Seleccione una función...</option>
+        {% for codigo, nombre in funciones_opciones %}
+        <option value="{{ codigo }}">{{ nombre }}</option>
+        {% endfor %}
+    </select>
+    <button type="button" class="subcampo-delete-btn delete-funcion-btn" title="Eliminar">
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>
+
+<script>
+/**
+ * Script para subcampos repetibles del campo 100 $e (Funciones del Compositor)
+ * Usa selects nativos del navegador (sin Select2)
+ */
+(function() {
+    function init100eSubcampos() {
+        const prefix = '{{ formset.prefix }}';
+        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+        if (!container || container.dataset.subcampos100eInitialized) return;
+        container.dataset.subcampos100eInitialized = 'true';
+        
+        const funcionTemplate = document.querySelector('.funcion-template-100e');
+        if (!funcionTemplate) return;
+        
+        let funcionCounter = container.querySelectorAll('.funcion-form-row:not(.d-none):not(.funcion-template-100e)').length;
+        
+        // Función para actualizar visibilidad de botones de eliminar
+        function updateDeleteButtonsVisibility(subcampoContainer) {
+            const rows = subcampoContainer.querySelectorAll('.subcampo-row:not(.d-none):not(.funcion-template-100e)');
+            rows.forEach((row) => {
+                const deleteBtn = row.querySelector('.subcampo-delete-btn');
+                if (deleteBtn) {
+                    if (row.querySelector('.subcampo-add-btn')) {
+                        deleteBtn.style.visibility = 'hidden';
+                    } else {
+                        deleteBtn.style.visibility = 'visible';
+                    }
+                }
+            });
+        }
+        
+        // Actualizar el management form
+        function updateManagementForm() {
+            const totalInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+            if (totalInput) {
+                const count = container.querySelectorAll('.funcion-form-row:not(.d-none):not(.funcion-template-100e)').length;
+                totalInput.value = count;
+            }
+        }
+        
+        container.addEventListener('click', function(e) {
+            // Agregar Función
+            const addFuncionBtn = e.target.closest('.add-funcion-btn');
+            if (addFuncionBtn) {
+                const funcionesContainer = container.querySelector('[data-funciones-container]');
+                if (funcionesContainer && funcionTemplate) {
+                    const nuevo = funcionTemplate.cloneNode(true);
+                    nuevo.classList.remove('funcion-template-100e', 'd-none');
+                    const select = nuevo.querySelector('.funcion-select');
+                    if (select) {
+                        select.name = `${prefix}-${funcionCounter}-funcion`;
+                        funcionCounter++;
+                    }
+                    funcionesContainer.appendChild(nuevo);
+                    updateDeleteButtonsVisibility(funcionesContainer);
+                    updateManagementForm();
+                }
+                return;
+            }
+            
+            // Eliminar Función (solo si NO tiene el botón +)
+            const deleteFuncionBtn = e.target.closest('.delete-funcion-btn');
+            if (deleteFuncionBtn) {
+                const row = deleteFuncionBtn.closest('.funcion-form-row');
+                if (row && !row.classList.contains('funcion-template-100e') && !row.querySelector('.subcampo-add-btn')) {
+                    const subcampoContainer = row.closest('.subcampo-repetible-container');
+                    
+                    // Si es un form existente, marcar para eliminación
+                    const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
+                    if (deleteCheckbox) {
+                        deleteCheckbox.checked = true;
+                        row.style.display = 'none';
+                    } else {
+                        row.remove();
+                    }
+                    
+                    updateDeleteButtonsVisibility(subcampoContainer);
+                    updateManagementForm();
+                }
+                return;
+            }
+        });
+        
+        // Inicializar visibilidad de todos los contenedores
+        container.querySelectorAll('.subcampo-repetible-container').forEach(updateDeleteButtonsVisibility);
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init100eSubcampos);
+    } else {
+        setTimeout(init100eSubcampos, 50);
+    }
+})();
+</script>

@@ -7,95 +7,105 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
     {# Renderizar management_form sin mensajes de error #}
     <div style="display: none;">
         {% for field in formset.management_form %}
-            {{ field }}
+        {{ field }}
         {% endfor %}
     </div>
-    
-    <button type="button" class="add-form-row mb-3" title="Agregar Otra Relación">
-        <i class="bi bi-plus-circle"></i>
-        Agregar Otra Relación
-    </button>
-    
+
+
     <div class="formset-forms">
         {% for form in formset %}
         <div class="formset-row {% if form.instance.pk %}existing-form{% endif %}">
             {% if form.instance.pk %}
-                <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
+            <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
             {% endif %}
-            
+
             {% if formset.can_delete %}
-                <div class="d-none">
-                    {{ form.DELETE }}
-                </div>
+            <div class="d-none">
+                {{ form.DELETE }}
+            </div>
             {% endif %}
-            
+
             <button type="button" class="delete-row-btn" title="Eliminar">
                 <i class="bi bi-x-lg"></i>
             </button>
-            
+
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="campo-grid">
-                        {# Campo 787 $a - Encabezamiento principal #}
+                        {# Campo 787 $a - Persona con autocomplete #}
                         <div class="col-full">
-                            <label class="form-label" for="{{ form.compositor_787.id_for_label }}">
-                                {{ form.compositor_787.label }}
-                                {% if form.compositor_787.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ form.compositor_787 }}
-                            {% if form.compositor_787.errors %}
-                                <div class="invalid-feedback d-block">{{ form.compositor_787.errors }}</div>
-                            {% endif %}
-                            {% if form.compositor_787.help_text %}
-                                <small class="form-text text-muted">{{ form.compositor_787.help_text }}</small>
-                            {% endif %}
-                        </div>
-                        
+    {{ form.encabezamiento_principal }} <!-- hidden FK -->
+
+    <label class="form-label" for="{{ form.encabezamiento_principal_texto.id_for_label }}">
+        787 $a – Encabezamiento principal (Persona)
+    </label>
+
+    <div class="autocomplete-wrapper">
+        <input type="text"
+               name="{{ form.encabezamiento_principal_texto.name }}"
+               value="{{ form.encabezamiento_principal_texto.value|default_if_none:'' }}"
+               class="form-control persona787-autocomplete"
+               placeholder="Escriba para buscar…"
+               autocomplete="off">
+
+        <div class="autocomplete-suggestions persona787-suggestions"></div>
+    </div>
+
+    <div class="form-text">
+        Escriba para buscar personas ya existentes o crear una nueva.
+    </div>
+</div>
+
+
+
+
+
                         {# Campo 787 $t - Título #}
                         <div class="col-full">
                             <label class="form-label" for="{{ form.titulo.id_for_label }}">
                                 {{ form.titulo.label }}
-                                {% if form.titulo.field.required %}<span class="text-danger">*</span>{% endif %}
                             </label>
-                            {{ form.titulo }}
+                            <div class="autocomplete-wrapper">
+                                {{ form.titulo }}
+                                <div class="autocomplete-suggestions"></div>
+                            </div>
                             {% if form.titulo.errors %}
-                                <div class="invalid-feedback d-block">{{ form.titulo.errors }}</div>
+                            <div class="invalid-feedback d-block">{{ form.titulo.errors }}</div>
                             {% endif %}
                             {% if form.titulo.help_text %}
-                                <small class="form-text text-muted">{{ form.titulo.help_text }}</small>
+                            <small class="form-text text-muted">{{ form.titulo.help_text }}</small>
                             {% endif %}
                         </div>
-                        
+
                         {# Botón para agregar números de obra ($w) #}
                         <div class="col-full">
-                            <button type="button" class="btn btn-sm btn-outline-primary add-numero-btn w-100" data-enlace-index="{{ forloop.counter0 }}">
+                            <button type="button" class="btn btn-sm btn-outline-primary add-numero-btn w-100"
+                                data-enlace-index="{{ forloop.counter0 }}">
                                 <i class="bi bi-plus-circle"></i>
                                 Agregar Número de Obra ($w)
                             </button>
                         </div>
-                        
+
                         {# Subcampo $w - Números de obra (Repetible) #}
                         <div class="col-full numeros-container" data-numeros-container="{{ forloop.counter0 }}">
                             {% if form.instance.pk %}
-                                {# Cargar números existentes #}
-                                {% for numero in form.instance.numeros_obra.all %}
-                                <div class="numero-form-row">
-                                    <div class="d-flex flex-column w-100 mb-2">
-                                        <label class="form-label small">787 $w - Número de obra relacionada</label>
-                                        <div class="d-flex gap-2 align-items-center">
-                                            <input type="text" 
-                                                   class="form-control numero-input" 
-                                                   name="numero_enlace_787_{{ forloop.parentloop.counter0 }}_{{ numero.pk }}"
-                                                   value="{{ numero.numero }}"
-                                                   placeholder="Ej: 001234567" 
-                                                   style="flex: 1;">
-                                            <button type="button" class="btn btn-sm btn-outline-danger delete-numero-btn" title="Eliminar número">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
+                            {# Cargar números existentes #}
+                            {% for numero in form.instance.numeros_obra.all %}
+                            <div class="numero-form-row">
+                                <div class="d-flex flex-column w-100 mb-2">
+                                    <label class="form-label small">787 $w - Número de obra relacionada</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <input type="text" class="form-control numero-input"
+                                            name="numero_enlace_787_{{ forloop.parentloop.counter0 }}_{{ numero.pk }}"
+                                            value="{{ numero.numero }}" placeholder="Ej: 001234567" style="flex: 1;">
+                                        <button type="button" class="btn btn-sm btn-outline-danger delete-numero-btn"
+                                            title="Eliminar número">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
                                     </div>
                                 </div>
-                                {% endfor %}
+                            </div>
+                            {% endfor %}
                             {% endif %}
                         </div>
                     </div>
@@ -103,39 +113,46 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
             </div>
         </div>
         {% endfor %}
-        
+
         {# Template vacío para clonar enlaces #}
         <div class="formset-row empty-form">
             <button type="button" class="delete-row-btn" title="Eliminar">
                 <i class="bi bi-x-lg"></i>
             </button>
-            
+
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="campo-grid">
+                        {# Campo 787 $a - Encabezamiento principal (TEMPLATE VACÍO) #}
                         <div class="col-full">
-                            <label class="form-label">
-                                {{ formset.empty_form.compositor_787.label }}
-                                {% if formset.empty_form.compositor_787.field.required %}<span class="text-danger">*</span>{% endif %}
+                            <label class="form-label"
+                                for="{{ formset.empty_form.encabezamiento_principal_texto.id_for_label }}">
+                                787 $a – Encabezamiento principal (Persona)
                             </label>
-                            {{ formset.empty_form.compositor_787 }}
+                            {{ formset.empty_form.encabezamiento_principal_texto }}
+                            {{ formset.empty_form.encabezamiento_principal }}
                         </div>
-                        
+
+                        {# Campo 787 $t - Título (igual que antes) #}
                         <div class="col-full">
                             <label class="form-label">
                                 {{ formset.empty_form.titulo.label }}
-                                {% if formset.empty_form.titulo.field.required %}<span class="text-danger">*</span>{% endif %}
                             </label>
-                            {{ formset.empty_form.titulo }}
+                            <div class="autocomplete-wrapper">
+                                {{ formset.empty_form.titulo }}
+                                <div class="autocomplete-suggestions"></div>
+                            </div>
                         </div>
-                        
+
+                        {# Botón para agregar números de obra ($w) #}
                         <div class="col-full">
-                            <button type="button" class="btn btn-sm btn-outline-primary add-numero-btn w-100" data-enlace-index="__prefix__">
+                            <button type="button" class="btn btn-sm btn-outline-primary add-numero-btn w-100"
+                                data-enlace-index="__prefix__">
                                 <i class="bi bi-plus-circle"></i>
                                 Agregar Número de Obra ($w)
                             </button>
                         </div>
-                        
+
                         <div class="col-full numeros-container" data-numeros-container="__prefix__">
                             {# Los números se agregarán aquí dinámicamente #}
                         </div>
@@ -153,112 +170,168 @@ Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
         <div class="d-flex gap-2 align-items-center">
             <input type="text" class="form-control numero-input" placeholder="Ej: 001234567" style="flex: 1;">
             <button type="button" class="btn btn-sm btn-outline-danger delete-numero-btn" title="Eliminar número">
-                <i class="bi bi-trash"></i>
+                <i class="bi bi-x-lg"></i>
             </button>
         </div>
     </div>
 </div>
 
 <script>
-// Script para manejar el campo 787 con números de obra repetibles
-(function() {
-    const prefix = '{{ formset.prefix }}';
-    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-    if (!container) return;
-    
-    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-    const addButton = container.querySelector('.add-form-row');
-    const formsContainer = container.querySelector('.formset-forms');
-    const numeroTemplate = document.querySelector('.numero-template-787');
-    
-    if (!totalFormsInput || !addButton || !formsContainer || !numeroTemplate) return;
-    
-    // Agregar nuevo enlace 787
-    addButton.addEventListener('click', function() {
-        const totalForms = parseInt(totalFormsInput.value);
+    // Script para manejar el campo 787 con números de obra repetibles
+    (function () {
+        const prefix = '{{ formset.prefix }}';
+        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+        if (!container) return;
+
+        const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+        const addButton = document.querySelector(`.campo-add-btn[data-formset-target="${prefix}"]`);
+        const formsContainer = container.querySelector('.formset-forms');
         const emptyFormTemplate = formsContainer.querySelector('.empty-form');
-        
-        if (!emptyFormTemplate) return;
-        
-        const emptyForm = emptyFormTemplate.cloneNode(true);
-        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
-        emptyForm.classList.remove('empty-form');
-        emptyForm.style.display = '';
-        
-        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
-        totalFormsInput.value = totalForms + 1;
-        
-        // Inicializar Select2 si existe
-        if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
-            emptyForm.querySelectorAll('.form-select:not(.numero-input)').forEach(select => {
-                $(select).select2({
-                    theme: 'bootstrap-5',
-                    width: '100%'
-                });
+        const numeroTemplate = document.querySelector('.numero-template-787');
+
+        if (!totalFormsInput || !addButton || !formsContainer || !emptyFormTemplate || !numeroTemplate) return;
+
+
+        // Función general para iniciar Select2 en cualquier form
+        function initPersonaAutocomplete(context) {
+            $(context).find('.autocomplete-787').select2({
+                ajax: {
+                    url: '/autoridades/personas/autocomplete/',
+                    dataType: 'json',
+                    delay: 250,
+                    processResults: function (data) {
+                        return { results: data.results };
+                    }
+                },
+                theme: "bootstrap-5",
+                placeholder: "Buscar persona…",
+                width: "100%"
             });
         }
-    });
-    
-    // Eliminar enlace 787
-    container.addEventListener('click', function(e) {
-        const deleteBtn = e.target.closest('.delete-row-btn');
-        if (!deleteBtn) return;
-        
-        const row = deleteBtn.closest('.formset-row');
-        if (!row || row.classList.contains('empty-form')) return;
-        
-        const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
-        
-        if (row.classList.contains('existing-form')) {
-            if (deleteCheckbox && deleteCheckbox.checked) {
-                deleteCheckbox.checked = false;
-                row.style.opacity = '1';
-                deleteBtn.classList.remove('btn-warning');
-                deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
-                deleteBtn.title = 'Eliminar';
-            } else if (deleteCheckbox) {
-                deleteCheckbox.checked = true;
-                row.style.opacity = '0.5';
-                deleteBtn.classList.add('btn-warning');
-                deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
-                deleteBtn.title = 'Cancelar eliminación';
+
+        // Inicializar los ya existentes al cargar
+        initPersonaAutocomplete(container);
+
+
+        // ➕ Agregar nuevo enlace 787
+        addButton.addEventListener('click', function () {
+            const totalForms = parseInt(totalFormsInput.value);
+
+            const newForm = emptyFormTemplate.cloneNode(true);
+            newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, totalForms);
+
+            newForm.classList.remove('empty-form');
+            newForm.style.display = '';
+
+            formsContainer.insertBefore(newForm, emptyFormTemplate);
+            totalFormsInput.value = totalForms + 1;
+
+            // Inicializar autocomplete para el nuevo form
+            initPersonaAutocomplete(newForm);
+        });
+
+
+        // ❌ Marcar eliminar o remover
+        container.addEventListener('click', function (e) {
+            const deleteBtn = e.target.closest('.delete-row-btn');
+            if (!deleteBtn) return;
+
+            const row = deleteBtn.closest('.formset-row');
+            if (!row || row.classList.contains('empty-form')) return;
+
+            const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
+
+            if (deleteCheckbox) {
+                deleteCheckbox.checked = !deleteCheckbox.checked;
+                row.style.display = deleteCheckbox.checked ? "none" : "";
+            } else {
+                row.remove();
+                totalFormsInput.value = parseInt(totalFormsInput.value, 10) - 1;
             }
-        } else {
-            row.remove();
-            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
-        }
-    });
-    
-    // Manejar números de obra (subcampo $w repetible)
-    container.addEventListener('click', function(e) {
-        // Agregar número
-        const addNumeroBtn = e.target.closest('.add-numero-btn');
-        if (addNumeroBtn) {
-            const enlaceIndex = addNumeroBtn.getAttribute('data-enlace-index');
-            const numerosContainer = container.querySelector(`[data-numeros-container="${enlaceIndex}"]`);
-            
-            if (!numerosContainer) return;
-            
-            const newNumero = numeroTemplate.cloneNode(true);
-            newNumero.classList.remove('numero-template-787', 'd-none');
-            
-            // Actualizar el name del input
-            const input = newNumero.querySelector('.numero-input');
-            if (input) {
+        });
+
+
+        // ➕ / ❌ Manejar números de obra ($w)
+        container.addEventListener('click', function (e) {
+            const addNumeroBtn = e.target.closest('.add-numero-btn');
+            if (addNumeroBtn) {
+                const enlaceIndex = addNumeroBtn.dataset.enlaceIndex;
+                const numerosContainer = container.querySelector(`[data-numeros-container="${enlaceIndex}"]`);
+                if (!numerosContainer) return;
+
+                const newNumero = numeroTemplate.cloneNode(true);
+                newNumero.classList.remove('numero-template-787', 'd-none');
+
+                const input = newNumero.querySelector('.numero-input');
                 input.name = `numero_enlace_787_${enlaceIndex}_${Date.now()}`;
+
+                numerosContainer.appendChild(newNumero);
             }
-            
-            numerosContainer.appendChild(newNumero);
-        }
-        
-        // Eliminar número
-        const deleteNumeroBtn = e.target.closest('.delete-numero-btn');
-        if (deleteNumeroBtn) {
-            const numeroRow = deleteNumeroBtn.closest('.numero-form-row');
-            if (!numeroRow.classList.contains('numero-template-787')) {
-                numeroRow.remove();
+
+            const deleteNumeroBtn = e.target.closest('.delete-numero-btn');
+            if (deleteNumeroBtn) {
+                const row = deleteNumeroBtn.closest('.numero-form-row');
+                if (!row.classList.contains('numero-template-787')) row.remove();
             }
+        });
+
+    })();
+</script>
+<script>
+    document.addEventListener("input", function (e) {
+
+        const input = e.target.closest(".persona787-autocomplete");
+        if (!input) return;
+
+        const row = input.closest(".formset-row");
+        const hiddenId = row.querySelector('input[name$="encabezamiento_principal"]');
+        const box = row.querySelector(".persona787-suggestions");
+
+        const q = input.value.trim();
+        hiddenId.value = "";
+
+        if (q.length < 2) {
+            box.innerHTML = "";
+            box.classList.remove("show");
+            return;
         }
+
+        fetch(`/catalogacion/api/autocompletar/persona/?q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(data => {
+                box.innerHTML = "";
+
+                data.results.forEach(p => {
+                    const item = document.createElement("div");
+                    item.className = "autocomplete-item";
+                    item.innerHTML = `<strong>${p.apellidos_nombres}</strong> ${p.coordenadas_biograficas || ""}`;
+                    item.addEventListener("click", () => {
+                        input.value = p.apellidos_nombres;
+                        hiddenId.value = p.id;
+                        box.innerHTML = "";
+                        box.classList.remove("show");
+                    });
+                    box.appendChild(item);
+                });
+
+                const nuevo = document.createElement("div");
+                nuevo.className = "autocomplete-item new-item";
+                nuevo.innerHTML = `<i class="bi bi-plus-circle"></i> Crear nuevo: "${q}"`;
+                nuevo.addEventListener("click", () => {
+                    input.value = q;
+                    hiddenId.value = "";
+                    box.innerHTML = "";
+                    box.classList.remove("show");
+                });
+                box.appendChild(nuevo);
+
+                box.classList.add("show");
+            });
     });
-})();
+
+    document.addEventListener("click", function (e) {
+        document.querySelectorAll(".persona787-suggestions.show").forEach(box => {
+            if (!box.contains(e.target)) box.classList.remove("show");
+        });
+    });
 </script>

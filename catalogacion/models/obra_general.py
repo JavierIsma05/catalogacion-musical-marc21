@@ -134,9 +134,10 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
             ('4', 'Número de videograbación'),
             ('5', 'Otro número de editor'),
         ],
+        default='2',
         blank=True,
         null=True,
-        help_text="028 Primer indicador — Tipo de número de editor"
+        help_text="028 Primer indicador — Tipo de número de editor (predeterminado: Número de plancha)"
     )
     
     control_nota_028 = models.CharField(
@@ -147,9 +148,10 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
             ('2', 'Nota, no hay punto de acceso adicional'),
             ('3', 'No hay nota, hay punto de acceso adicional'),
         ],
+        default='0',
         blank=True,
         null=True,
-        help_text="028 Segundo indicador — Control de nota/punto de acceso adicional"
+        help_text="028 Segundo indicador — Control de nota (predeterminado: No hay nota ni punto de acceso adicional)"
     )
     
     numero_editor = models.CharField(
@@ -227,9 +229,10 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     medio_interpretacion_130 = models.CharField(
         max_length=200,
         choices=MEDIOS_INTERPRETACION,
+        default='piano',
         blank=True,
         null=True,
-        help_text="130 $m — Medio de interpretación"
+        help_text="130 $m — Medio de interpretación (predeterminado: piano)"
     )
     
     numero_parte_130 = models.CharField(
@@ -241,10 +244,11 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     
     arreglo_130 = models.CharField(
         max_length=10,
-        choices=[("arreglo", "arreglo")],
+        choices=[("arreglo", "Arreglo")],
+        default='arreglo',
         blank=True,
         null=True,
-        help_text="130 $o — Arreglo"
+        help_text="130 $o — Arreglo (predeterminado: Arreglo)"
     )
     
     nombre_parte_130 = models.CharField(
@@ -284,9 +288,10 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     medio_interpretacion_240 = models.CharField(
         max_length=200,
         choices=MEDIOS_INTERPRETACION,
+        default='piano',
         blank=True,
         null=True,
-        help_text="240 $m — Medio de interpretación"
+        help_text="240 $m — Medio de interpretación (predeterminado: piano)"
     )
     
     numero_parte_240 = models.CharField(
@@ -305,10 +310,11 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     
     arreglo_240 = models.CharField(
         max_length=10,
-        choices=[("arreglo", "arreglo")],
+        choices=[("arreglo", "Arreglo")],
+        default='arreglo',
         blank=True,
         null=True,
-        help_text="240 $o — Arreglo"
+        help_text="240 $o — Arreglo (predeterminado: Arreglo)"
     )
     
     tonalidad_240 = models.CharField(
@@ -527,6 +533,249 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
             f"$d{ms_imp} "
             f"$0{self.num_control}"
         )
+
+    # ===========================================
+    # PROPIEDADES DE PRESENTACIÓN PÚBLICA
+    # ===========================================
+
+    @staticmethod
+    def _construir_materia_descripcion(registros):
+        """Arma una descripción concatenada de materias con subdivisiones."""
+        descripciones = []
+        for registro in registros:
+            descriptor = str(getattr(registro, 'materia', registro))
+            subdivisiones = [sub.subdivision for sub in registro.subdivisiones.all()]
+            if subdivisiones:
+                descriptor = f"{descriptor} -- {' -- '.join(subdivisiones)}"
+            descriptor = descriptor.strip()
+            if descriptor:
+                descripciones.append(descriptor)
+        return "; ".join(descripciones)
+
+    def _titulo_uniforme_componentes(self, base, forma, medio, numero_parte, nombre_parte, tonalidad, arreglo):
+        if not base:
+            return ''
+        partes = [str(base)]
+        if forma:
+            partes.append(str(forma))
+        if medio:
+            partes.append(medio)
+        if numero_parte:
+            partes.append(numero_parte)
+        if nombre_parte:
+            partes.append(nombre_parte)
+        if tonalidad:
+            partes.append(tonalidad)
+        if arreglo:
+            partes.append(arreglo)
+        return ", ".join(partes)
+
+    @property
+    def titulo_destacado_display(self):
+        """Título prioritario para vistas públicas (240 > 130 > 245)."""
+        if self.titulo_240:
+            return str(self.titulo_240)
+        if self.titulo_uniforme:
+            return str(self.titulo_uniforme)
+        return self.titulo_245_display
+
+    @property
+    def titulo_uniforme_130_display(self):
+        medio = self.get_medio_interpretacion_130_display() if self.medio_interpretacion_130 else ''
+        tonalidad = self.get_tonalidad_130_display() if self.tonalidad_130 else ''
+        return self._titulo_uniforme_componentes(
+            self.titulo_uniforme,
+            self.forma_130,
+            medio,
+            self.numero_parte_130,
+            self.nombre_parte_130,
+            tonalidad,
+            self.arreglo_130,
+        )
+
+    @property
+    def titulo_uniforme_240_display(self):
+        medio = self.get_medio_interpretacion_240_display() if self.medio_interpretacion_240 else ''
+        tonalidad = self.get_tonalidad_240_display() if self.tonalidad_240 else ''
+        return self._titulo_uniforme_componentes(
+            self.titulo_240,
+            self.forma_240,
+            medio,
+            self.numero_parte_240,
+            self.nombre_parte_240,
+            tonalidad,
+            self.arreglo_240,
+        )
+
+    @property
+    def titulo_245_display(self):
+        titulo = self.titulo_principal or ''
+        if self.subtitulo:
+            titulo = f"{titulo} : {self.subtitulo}" if titulo else self.subtitulo
+        if self.mencion_responsabilidad:
+            separador = " / " if titulo else ''
+            titulo = f"{titulo}{separador}{self.mencion_responsabilidad}" if titulo else self.mencion_responsabilidad
+        return titulo.strip() or "Sin título registrado"
+
+    @property
+    def autor_publico_principal(self):
+        if self.compositor:
+            texto = self.compositor.apellidos_nombres
+            if self.compositor.coordenadas_biograficas:
+                texto = f"{texto} ({self.compositor.coordenadas_biograficas})"
+            return texto
+        return "[s.n.]"
+
+    @property
+    def autor_publico_nota(self):
+        return self.get_autoria_display() if self.autoria else ''
+
+    @property
+    def publicacion_publica_display(self):
+        produccion = next(iter(self.producciones_publicaciones.all()), None)
+        if not produccion:
+            return "Sin datos de publicación"
+        partes = []
+        lugares = [l.lugar for l in produccion.lugares.all()]
+        entidades = [e.nombre for e in produccion.entidades.all()]
+        fechas = [f.fecha for f in produccion.fechas.all()]
+        texto = ''
+        if lugares:
+            texto += ", ".join(filter(None, lugares))
+        if entidades:
+            texto += (" : " if texto else '') + ", ".join(filter(None, entidades))
+        if fechas:
+            texto += (", " if texto else '') + ", ".join(filter(None, fechas))
+        texto = texto.strip()
+        return texto + "." if texto else "Sin datos de publicación"
+
+    @property
+    def instrumento_publico_display(self):
+        descripciones = []
+        for medio in self.medios_interpretacion_382.all():
+            instrumentos = [m.get_medio_display() for m in medio.medios.all()]
+            descripcion = ", ".join(filter(None, instrumentos))
+            if medio.solista:
+                descripcion = f"{descripcion} (Solista: {medio.solista})" if descripcion else f"Solista: {medio.solista}"
+            if descripcion:
+                descripciones.append(descripcion)
+        return "; ".join(descripciones) if descripciones else "Sin instrumentos registrados"
+
+    @property
+    def materia_publica_display(self):
+        descripcion = self._construir_materia_descripcion(self.materias_650.all())
+        return descripcion or "Sin materias registradas"
+
+    @property
+    def temas_publico_display(self):
+        descripcion = self._construir_materia_descripcion(self.materias_655.all())
+        if descripcion:
+            return descripcion
+        return self.materia_publica_display
+
+    @property
+    def coleccion_publica_display(self):
+        colecciones = [str(enlace.titulo) for enlace in self.enlaces_documento_fuente_773.all()]
+        return "; ".join(colecciones)
+
+    @property
+    def tiene_incipit(self):
+        return self.incipits_musicales.exists()
+
+    @property
+    def primer_incipit_resumen(self):
+        incipit = next(iter(self.incipits_musicales.all()), None)
+        if not incipit:
+            return ""
+        partes = [incipit.identificador_completo]
+        if incipit.voz_instrumento:
+            partes.append(incipit.voz_instrumento)
+        return " · ".join(partes)
+
+    @property
+    def signatura_publica_display(self):
+        from .utils import obtener_pais_principal
+
+        if not self.centro_catalogador or not self.num_control:
+            return "Sin signatura"
+
+        pais = obtener_pais_principal(self)
+        ms_imp = 'Ms' if self.tipo_registro == 'd' else 'Imp'
+        return (
+            f"{self.centro_catalogador}. "
+            f"BLMP. "
+            f"{pais}. "
+            f"{ms_imp}.{self.num_control}"
+        )
+
+    @property
+    def tipo_soporte_publico_display(self):
+        return 'Manuscrito' if self.tipo_registro == 'd' else 'Impreso'
+
+    @property
+    def tecnica_340_publica_display(self):
+        if self.ms_imp:
+            return dict(TECNICAS).get(self.ms_imp, self.ms_imp)
+        return self.tipo_soporte_publico_display
+
+    @property
+    def primer_incipit_detalle(self):
+        """Formato detallado para el 031 según especificación."""
+        incipit = next(iter(self.incipits_musicales.all()), None)
+        if not incipit:
+            return "", ""
+
+        def formato(valor):
+            return valor if valor else '—'
+
+        firma = incipit.tiempo or incipit.clave or incipit.armadura
+        linea_superior = (
+            f"{formato(incipit.numero_obra)}."
+            f"{formato(incipit.numero_movimiento)}."
+            f"{formato(incipit.numero_pasaje)}; "
+            f"{formato(incipit.titulo_encabezamiento)}; "
+            f"{formato(incipit.voz_instrumento)}; "
+            f"{formato(firma)}"
+        )
+
+        linea_inferior = formato(incipit.notacion_musical)
+        return linea_superior, linea_inferior
+
+    @property
+    def descripcion_fisica_publica_display(self):
+        texto = self.extension or ''
+        if self.otras_caracteristicas:
+            texto = f"{texto} : {self.otras_caracteristicas}" if texto else self.otras_caracteristicas
+        if self.dimension:
+            texto = f"{texto} ; {self.dimension}" if texto else self.dimension
+        if self.material_acompanante:
+            texto = f"{texto} + {self.material_acompanante}" if texto else self.material_acompanante
+        return texto or "Sin descripción física"
+
+    @property
+    def tonalidad_publica_display(self):
+        return self.get_tonalidad_384_display() if self.tonalidad_384 else ''
+
+    @property
+    def medios_interpretacion_resumen(self):
+        medios = []
+        solistas = []
+        for registro in self.medios_interpretacion_382.all():
+            nombres = ", ".join(filter(None, [m.get_medio_display() for m in registro.medios.all()]))
+            if nombres:
+                medios.append(nombres)
+            if registro.solista:
+                solistas.append(registro.solista)
+        medios_texto = "; ".join(medios) if medios else "Sin medios registrados"
+        solistas_texto = "; ".join(solistas)
+        return medios_texto, solistas_texto
+
+    @property
+    def nota_general_resumen(self):
+        nota = next(iter(self.notas_generales_500.all()), None)
+        if nota and nota.nota_general:
+            return nota.nota_general.strip()
+        return ""
 
     # ===========================================
     # MÉTODOS DE PREPARACIÓN

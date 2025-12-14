@@ -15,6 +15,14 @@ from catalogacion.models import (
     AutoridadEntidad,
     AutoridadTituloUniforme,
     AutoridadMateria,
+    AutoridadFormaMusical,
+)
+from catalogacion.forms import (
+    AutoridadPersonaForm,
+    AutoridadEntidadForm,
+    AutoridadFormaMusicalForm,
+    AutoridadMateriaForm,
+    AutoridadTituloUniformeForm,
 )
 
 
@@ -25,7 +33,7 @@ from catalogacion.models import (
 class ListaPersonasView(ListView):
     """Listar todas las autoridades de personas"""
     model = AutoridadPersona
-    template_name = 'autoridades/lista_personas.html'
+    template_name = 'usuarios/catalogador/autoridades/lista_personas.html'
     context_object_name = 'personas'
     paginate_by = 20
     
@@ -37,8 +45,7 @@ class ListaPersonasView(ListView):
         if q:
             queryset = queryset.filter(
                 Q(apellidos_nombres__icontains=q) |
-                Q(codigo_autoridad__icontains=q) |
-                Q(fechas__icontains=q)
+                Q(coordenadas_biograficas__icontains=q)
             )
         
         return queryset
@@ -47,15 +54,8 @@ class ListaPersonasView(ListView):
 class CrearPersonaView(CreateView):
     """Crear nueva autoridad de persona"""
     model = AutoridadPersona
-    template_name = 'autoridades/crear_persona.html'
-    fields = [
-        'apellidos_nombres',
-        'codigo_autoridad',
-        'fechas',
-        'termino_asociado',
-        'notas',
-        'activo',
-    ]
+    template_name = 'usuarios/catalogador/autoridades/crear_persona.html'
+    form_class = AutoridadPersonaForm
     success_url = reverse_lazy('autoridades:lista_personas')
     
     def form_valid(self, form):
@@ -69,15 +69,8 @@ class CrearPersonaView(CreateView):
 class EditarPersonaView(UpdateView):
     """Editar autoridad de persona existente"""
     model = AutoridadPersona
-    template_name = 'autoridades/crear_persona.html'
-    fields = [
-        'apellidos_nombres',
-        'codigo_autoridad',
-        'fechas',
-        'termino_asociado',
-        'notas',
-        'activo',
-    ]
+    template_name = 'usuarios/catalogador/autoridades/crear_persona.html'
+    form_class = AutoridadPersonaForm
     success_url = reverse_lazy('autoridades:lista_personas')
     
     def form_valid(self, form):
@@ -91,7 +84,7 @@ class EditarPersonaView(UpdateView):
 class VerPersonaView(DetailView):
     """Ver detalles de una autoridad de persona"""
     model = AutoridadPersona
-    template_name = 'autoridades/ver_persona.html'
+    template_name = 'usuarios/catalogador/autoridades/ver_persona.html'
     context_object_name = 'persona'
     
     def get_context_data(self, **kwargs):
@@ -138,7 +131,7 @@ class EliminarPersonaView(DeleteView):
 class ListaEntidadesView(ListView):
     """Listar todas las autoridades de entidades"""
     model = AutoridadEntidad
-    template_name = 'autoridades/lista_entidades.html'
+    template_name = 'usuarios/catalogador/autoridades/lista_entidades.html'
     context_object_name = 'entidades'
     paginate_by = 20
     
@@ -150,8 +143,8 @@ class ListaEntidadesView(ListView):
         if q:
             queryset = queryset.filter(
                 Q(nombre__icontains=q) |
-                Q(codigo_autoridad__icontains=q) |
-                Q(lugar__icontains=q)
+                Q(pais__icontains=q) |
+                Q(descripcion__icontains=q)
             )
         
         return queryset
@@ -160,15 +153,8 @@ class ListaEntidadesView(ListView):
 class CrearEntidadView(CreateView):
     """Crear nueva autoridad de entidad"""
     model = AutoridadEntidad
-    template_name = 'autoridades/crear_entidad.html'
-    fields = [
-        'nombre',
-        'codigo_autoridad',
-        'lugar',
-        'fechas',
-        'notas',
-        'activo',
-    ]
+    template_name = 'usuarios/catalogador/autoridades/crear_entidad.html'
+    form_class = AutoridadEntidadForm
     success_url = reverse_lazy('autoridades:lista_entidades')
     
     def form_valid(self, form):
@@ -182,15 +168,8 @@ class CrearEntidadView(CreateView):
 class EditarEntidadView(UpdateView):
     """Editar autoridad de entidad existente"""
     model = AutoridadEntidad
-    template_name = 'autoridades/crear_entidad.html'
-    fields = [
-        'nombre',
-        'codigo_autoridad',
-        'lugar',
-        'fechas',
-        'notas',
-        'activo',
-    ]
+    template_name = 'usuarios/catalogador/autoridades/crear_entidad.html'
+    form_class = AutoridadEntidadForm
     success_url = reverse_lazy('autoridades:lista_entidades')
     
     def form_valid(self, form):
@@ -204,7 +183,7 @@ class EditarEntidadView(UpdateView):
 class VerEntidadView(DetailView):
     """Ver detalles de una autoridad de entidad"""
     model = AutoridadEntidad
-    template_name = 'autoridades/ver_entidad.html'
+    template_name = 'usuarios/catalogador/autoridades/ver_entidad.html'
     context_object_name = 'entidad'
     
     def get_context_data(self, **kwargs):
@@ -241,6 +220,165 @@ class EliminarEntidadView(DeleteView):
         
         self.object.delete()
         messages.success(request, f'Autoridad de entidad "{nombre}" eliminada exitosamente.')
+        return redirect(self.success_url)
+
+
+# =====================================================
+# VIEWS DE FORMAS MUSICALES
+# =====================================================
+
+
+class ListaFormasMusicalesView(ListView):
+    model = AutoridadFormaMusical
+    template_name = 'usuarios/catalogador/autoridades/lista_formas_musicales.html'
+    context_object_name = 'formas'
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = AutoridadFormaMusical.objects.all().order_by('forma')
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(forma__icontains=q)
+        return queryset
+
+
+class CrearFormaMusicalView(CreateView):
+    model = AutoridadFormaMusical
+    template_name = 'usuarios/catalogador/autoridades/crear_forma_musical.html'
+    form_class = AutoridadFormaMusicalForm
+    success_url = reverse_lazy('autoridades:lista_formas_musicales')
+
+    def form_valid(self, form):
+        messages.success(self.request, f'Forma musical "{form.instance.forma}" creada exitosamente.')
+        return super().form_valid(form)
+
+
+class EditarFormaMusicalView(UpdateView):
+    model = AutoridadFormaMusical
+    template_name = 'usuarios/catalogador/autoridades/crear_forma_musical.html'
+    form_class = AutoridadFormaMusicalForm
+    success_url = reverse_lazy('autoridades:lista_formas_musicales')
+
+    def form_valid(self, form):
+        messages.success(self.request, f'Forma musical "{form.instance.forma}" actualizada exitosamente.')
+        return super().form_valid(form)
+
+
+class EliminarFormaMusicalView(DeleteView):
+    model = AutoridadFormaMusical
+    success_url = reverse_lazy('autoridades:lista_formas_musicales')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        nombre = self.object.forma
+        self.object.delete()
+        messages.success(request, f'Forma musical "{nombre}" eliminada exitosamente.')
+        return redirect(self.success_url)
+
+
+# =====================================================
+# VIEWS DE MATERIAS
+# =====================================================
+
+
+class ListaMateriasView(ListView):
+    model = AutoridadMateria
+    template_name = 'usuarios/catalogador/autoridades/lista_materias.html'
+    context_object_name = 'materias'
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = AutoridadMateria.objects.all().order_by('termino')
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(termino__icontains=q)
+        return queryset
+
+
+class CrearMateriaView(CreateView):
+    model = AutoridadMateria
+    template_name = 'usuarios/catalogador/autoridades/crear_materia.html'
+    form_class = AutoridadMateriaForm
+    success_url = reverse_lazy('autoridades:lista_materias')
+
+    def form_valid(self, form):
+        messages.success(self.request, f'Término de materia "{form.instance.termino}" creado exitosamente.')
+        return super().form_valid(form)
+
+
+class EditarMateriaView(UpdateView):
+    model = AutoridadMateria
+    template_name = 'usuarios/catalogador/autoridades/crear_materia.html'
+    form_class = AutoridadMateriaForm
+    success_url = reverse_lazy('autoridades:lista_materias')
+
+    def form_valid(self, form):
+        messages.success(self.request, f'Término de materia "{form.instance.termino}" actualizado exitosamente.')
+        return super().form_valid(form)
+
+
+class EliminarMateriaView(DeleteView):
+    model = AutoridadMateria
+    success_url = reverse_lazy('autoridades:lista_materias')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        nombre = self.object.termino
+        self.object.delete()
+        messages.success(request, f'Término de materia "{nombre}" eliminado exitosamente.')
+        return redirect(self.success_url)
+
+
+# =====================================================
+# VIEWS DE TÍTULOS UNIFORMES
+# =====================================================
+
+
+class ListaTitulosUniformesView(ListView):
+    model = AutoridadTituloUniforme
+    template_name = 'usuarios/catalogador/autoridades/lista_titulos_uniformes.html'
+    context_object_name = 'titulos'
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = AutoridadTituloUniforme.objects.all().order_by('titulo')
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(titulo__icontains=q)
+        return queryset
+
+
+class CrearTituloUniformeView(CreateView):
+    model = AutoridadTituloUniforme
+    template_name = 'usuarios/catalogador/autoridades/crear_titulo_uniforme.html'
+    form_class = AutoridadTituloUniformeForm
+    success_url = reverse_lazy('autoridades:lista_titulos_uniformes')
+
+    def form_valid(self, form):
+        messages.success(self.request, f'Título uniforme "{form.instance.titulo}" creado exitosamente.')
+        return super().form_valid(form)
+
+
+class EditarTituloUniformeView(UpdateView):
+    model = AutoridadTituloUniforme
+    template_name = 'usuarios/catalogador/autoridades/crear_titulo_uniforme.html'
+    form_class = AutoridadTituloUniformeForm
+    success_url = reverse_lazy('autoridades:lista_titulos_uniformes')
+
+    def form_valid(self, form):
+        messages.success(self.request, f'Título uniforme "{form.instance.titulo}" actualizado exitosamente.')
+        return super().form_valid(form)
+
+
+class EliminarTituloUniformeView(DeleteView):
+    model = AutoridadTituloUniforme
+    success_url = reverse_lazy('autoridades:lista_titulos_uniformes')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        nombre = self.object.titulo
+        self.object.delete()
+        messages.success(request, f'Título uniforme "{nombre}" eliminado exitosamente.')
         return redirect(self.success_url)
 
 
@@ -303,33 +441,26 @@ class AutocompletarEntidadView(View):
     """
     def get(self, request):
         query = request.GET.get('q', '').strip()
-        
+
         if len(query) < 2:
             return JsonResponse({'results': []})
-        
+
         entidades = AutoridadEntidad.objects.filter(
-            nombre_entidad__icontains=query
+            nombre__icontains=query
         ).values(
             'id',
-            'nombre_entidad',
-            'lugar'
+            'nombre',
+            'pais'
         )[:10]
-        
-        results = []
-        for entidad in entidades:
-            nombre_completo = entidad['nombre_entidad']
-            if entidad['lugar']:
-                nombre_completo += f" ({entidad['lugar']})"
-            
-            results.append({
-                'id': entidad['id'],
-                'text': nombre_completo,
-                'nombre_entidad': entidad['nombre_entidad'],
-                'lugar': entidad['lugar'] or ''
-            })
-        
-        return JsonResponse({'results': results})
 
+        results = [{
+            'id': entidad['id'],
+            'text': entidad['nombre'] + (f" ({entidad['pais']})" if entidad['pais'] else ""),
+            'nombre': entidad['nombre'],
+            'pais': entidad['pais'] or ''
+        } for entidad in entidades]
+
+        return JsonResponse({'results': results})
 
 class AutocompletarTituloUniformeView(View):
     """
@@ -391,3 +522,4 @@ class AutocompletarMateriaView(View):
             })
 
         return JsonResponse({"results": resultados})
+

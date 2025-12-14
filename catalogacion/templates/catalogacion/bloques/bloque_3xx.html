@@ -15,6 +15,9 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">300</span>
                     <h6>Descripción Física</h6>
+                    <span class="campo-help-btn" data-field-code="300" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
                 
                 <div class="campo-grid">
@@ -47,6 +50,9 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">340</span>
                     <h6>Características Técnicas</h6>
+                    <span class="campo-help-btn" data-field-code="340" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
                 
                 <div class="campo-grid">
@@ -64,6 +70,9 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">348</span>
                     <h6>Formato</h6>
+                    <span class="campo-help-btn" data-field-code="348" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
                 
                 <div class="campo-grid">
@@ -81,10 +90,13 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">382</span>
                     <h6>Medio de Interpretación</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
+                    <button type="button" class="campo-add-btn" data-formset-target="medios_382" title="Agregar Medio de Interpretación">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                    <span class="campo-help-btn" data-field-code="382" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
-                
-                <p class="form-text">Instrumentos y voces para los que está escrita la obra.</p>
                 
                 {% include 'catalogacion/includes/formset_382_template.html' with formset=medios_interpretacion %}
             </div>
@@ -97,6 +109,9 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">383</span>
                     <h6>Designación Numérica</h6>
+                    <span class="campo-help-btn" data-field-code="383" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
                 
                 <div class="campo-grid">
@@ -119,6 +134,9 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">384</span>
                     <h6>Tonalidad</h6>
+                    <span class="campo-help-btn" data-field-code="384" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
                 
                 <div class="campo-grid">

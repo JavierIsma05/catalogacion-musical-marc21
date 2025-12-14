@@ -1,0 +1,51 @@
+{% extends 'usuarios/admin/base_admin.html' %}
+
+{% block title %}Dashboard - Admin{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Estadísticas -->
+<div class="admin-stats">
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <div class="stat-card-icon">
+                <i class="bi bi-people"></i>
+            </div>
+        </div>
+        <div class="stat-card-value">{{ total_catalogadores }}</div>
+        <div class="stat-card-label">Total Catalogadores</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <div class="stat-card-icon">
+                <i class="bi bi-person-check"></i>
+            </div>
+        </div>
+        <div class="stat-card-value">{{ catalogadores_activos }}</div>
+        <div class="stat-card-label">Activos</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-label stat-card-actions-title">Acciones</div>
+        <div class="quick-actions">
+            <a href="{% url 'usuarios:crear_catalogador' %}" class="quick-action-btn primary">
+                <i class="bi bi-plus"></i> Nuevo
+            </a>
+            <a href="{% url 'usuarios:lista_catalogadores' %}" class="quick-action-btn">
+                <i class="bi bi-list"></i> Ver todos
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="admin-info-card">
+    <div class="admin-info-card-title">
+        <i class="bi bi-info-circle"></i>
+        Panel de Administración
+    </div>
+    <p class="admin-info-card-text">
+        Gestiona los catalogadores del sistema. Utiliza el menú lateral para navegar.
+    </p>
+</div>
+{% endblock %}

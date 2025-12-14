@@ -1,0 +1,255 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel del Catalogador{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.3.1/select2-bootstrap-5-theme.min.css">
+    <!-- CSS Base Global -->
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    <!-- CSS Catalogación -->
+    <link href="{% static 'catalogacion/css/styles.css' %}" rel="stylesheet">
+    <!-- CSS Catalogador específico -->
+    <link href="{% static 'usuarios/css/catalogador.css' %}" rel="stylesheet">
+    
+    <link href="{% static 'usuarios/css/base-catalogador.css' %}" rel="stylesheet">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Overlay para móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Tooltip para sidebar colapsado -->
+    <div class="sidebar-tooltip" id="sidebarTooltip"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'usuarios:catalogador_dashboard' %}" class="sidebar-brand">
+                <i class="bi bi-music-note-beamed"></i>
+                <span>Catalogador</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebarToggle" title="Contraer menú">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-nav">
+            <a class="nav-link {% if request.resolver_match.url_name == 'catalogador_dashboard' %}active{% endif %}" 
+               href="{% url 'usuarios:catalogador_dashboard' %}"
+               data-tooltip="Inicio">
+                <i class="bi bi-house-door"></i>
+                <span>Inicio</span>
+            </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'seleccionar_tipo' %}active{% endif %}" 
+               href="{% url 'catalogacion:seleccionar_tipo' %}"
+               data-tooltip="Nueva Obra">
+                <i class="bi bi-plus-circle"></i>
+                <span>Nueva Obra</span>
+            </a>
+            <!-- <a class="nav-link {% if request.resolver_match.url_name == 'lista_obras' %}active{% endif %}" 
+               href="{% url 'catalogacion:lista_obras' %}"
+               data-tooltip="Mis Obras">
+                <i class="bi bi-collection"></i>
+                <span>Mis Obras</span>
+            </a> -->
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_personas' %}active{% endif %}" 
+               href="{% url 'autoridades:lista_personas' %}"
+               data-tooltip="Personas">
+                <i class="bi bi-person-badge"></i>
+                <span>Personas</span>
+            </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_entidades' %}active{% endif %}" 
+               href="{% url 'autoridades:lista_entidades' %}"
+               data-tooltip="Entidades">
+                <i class="bi bi-building"></i>
+                <span>Entidades</span>
+            </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_formas_musicales' %}active{% endif %}" 
+               href="{% url 'autoridades:lista_formas_musicales' %}"
+               data-tooltip="Formas Musicales">
+                <i class="bi bi-music-note-list"></i>
+                <span>Formas Musicales</span>
+            </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_materias' %}active{% endif %}" 
+               href="{% url 'autoridades:lista_materias' %}"
+               data-tooltip="Materias">
+                <i class="bi bi-tags"></i>
+                <span>Materias</span>
+            </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_titulos_uniformes' %}active{% endif %}" 
+               href="{% url 'autoridades:lista_titulos_uniformes' %}"
+               data-tooltip="Títulos Uniformes">
+                <i class="bi bi-journal-music"></i>
+                <span>Títulos Uniformes</span>
+            </a>
+        </div>
+        
+        <div class="sidebar-footer">
+            <a href="{% url 'catalogo_publico:home' %}" class="nav-link" data-tooltip="Ver Sitio Público">
+                <i class="bi bi-globe"></i>
+                <span>Ver Sitio Público</span>
+            </a>
+            <form method="post" action="{% url 'usuarios:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="nav-link border-0 bg-transparent w-100 text-start" data-tooltip="Cerrar Sesión">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Botón para expandir sidebar cuando está colapsado -->
+    <button class="expand-btn" id="expandBtn" title="Expandir menú">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir menú">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h1>{% block page_title %}Inicio{% endblock %}</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="user-info">
+                    <i class="bi bi-person-circle"></i>
+                    <span>{{ user.nombre_completo|default:user.email }}</span>
+                </div>
+                <span class="role-badge">Catalogador</span>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.full.min.js"></script>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const mobileToggle = document.getElementById('mobileToggle');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const expandBtn = document.getElementById('expandBtn');
+            const tooltip = document.getElementById('sidebarTooltip');
+            
+            // Aplicar estado guardado SIN transición para evitar flash visual
+            const savedState = localStorage.getItem('sidebarCollapsed');
+            if (savedState === 'true' && window.innerWidth > 992) {
+                sidebar.classList.add('no-transition', 'collapsed');
+                // Remover no-transition después de un frame para habilitar animaciones futuras
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        sidebar.classList.remove('no-transition');
+                    });
+                });
+            }
+            
+            // Toggle sidebar en desktop (contraer)
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            });
+
+            // Expandir sidebar desde el botón flotante
+            expandBtn.addEventListener('click', function() {
+                sidebar.classList.remove('collapsed');
+                localStorage.setItem('sidebarCollapsed', 'false');
+            });
+
+            // Tooltips para sidebar colapsado
+            const navLinksWithTooltip = sidebar.querySelectorAll('.nav-link[data-tooltip]');
+            
+            navLinksWithTooltip.forEach(link => {
+                link.addEventListener('mouseenter', function(e) {
+                    if (sidebar.classList.contains('collapsed') && window.innerWidth > 992) {
+                        const rect = this.getBoundingClientRect();
+                        const tooltipText = this.getAttribute('data-tooltip');
+                        
+                        tooltip.textContent = tooltipText;
+                        tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+                        tooltip.classList.add('visible');
+                    }
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    tooltip.classList.remove('visible');
+                });
+            });
+            
+            // Toggle sidebar en móvil
+            mobileToggle.addEventListener('click', function() {
+                sidebar.classList.add('mobile-open');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // Cerrar sidebar al hacer clic en overlay
+            sidebarOverlay.addEventListener('click', function() {
+                sidebar.classList.remove('mobile-open');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+            
+            // Cerrar sidebar en móvil al seleccionar un enlace
+            const navLinks = sidebar.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 992) {
+                        sidebar.classList.remove('mobile-open');
+                        sidebarOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+            
+            // Resetear al cambiar tamaño de ventana
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 992) {
+                    sidebar.classList.remove('mobile-open');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

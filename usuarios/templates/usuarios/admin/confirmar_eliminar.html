@@ -1,0 +1,41 @@
+{% extends 'usuarios/admin/base_admin.html' %}
+
+{% block title %}Eliminar - Admin{% endblock %}
+{% block page_title %}Eliminar Catalogador{% endblock %}
+
+{% block content %}
+<div class="admin-delete-confirm">
+    <div class="admin-delete-card">
+        <div class="admin-delete-header">
+            <div class="admin-delete-icon">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+        </div>
+        
+        <div class="admin-delete-body">
+            <h3 class="admin-delete-title">¿Eliminar catalogador?</h3>
+            <p class="admin-delete-text">Se eliminará permanentemente:</p>
+            <div class="admin-delete-name">
+                {{ object.nombre_completo|default:object.email }}
+            </div>
+            
+            <div class="admin-delete-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                Esta acción no se puede deshacer
+            </div>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="admin-delete-footer">
+                <a href="{% url 'usuarios:lista_catalogadores' %}" class="admin-btn admin-btn-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="admin-btn admin-btn-danger">
+                    Eliminar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -14,28 +14,49 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">700</span>
                     <h6>Nombres Relacionados</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
+                    <!-- Botón agregar relación 700 -->
+                    <button type="button" class="campo-add-btn"
+                        data-formset-target="{{ nombres_relacionados_700.prefix }}" title="Agregar Nombre Relacionado">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="700" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
-                
-                <p class="form-text">Personas relacionadas con la obra: intérpretes, arreglistas, editores, etc. Incluye subcampos no repetibles ($a, $d, $i, $j, $t) y repetibles ($c, $e).</p>
-                
+
+                <p class="form-text">Personas relacionadas con la obra: intérpretes, arreglistas, editores, etc. Incluye
+                    subcampos no repetibles ($a, $d, $i, $j, $t) y repetibles ($c, $e).</p>
+
                 {% include 'catalogacion/includes/formset_700_template.html' with formset=nombres_relacionados_700 %}
             </div>
             {% endif %}
-            
+
             {# Campo 710 - Entidades Corporativas (Repetible) #}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">710</span>
                     <h6>Entidades Corporativas</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
+
+                    <!-- Botón agregar 710 -->
+                    <button type="button" class="campo-add-btn btn btn-sm btn-outline-primary"
+                        data-formset-target="{{ entidades_relacionadas_710.prefix }}" title="Agregar Entidad">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="710" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
-                
+
                 <p class="form-text">Orquestas, coros, editoriales, etc.</p>
-                
-                {% include 'catalogacion/includes/formset_template.html' with formset=entidades_relacionadas_710 titulo="Entidad" %}
+
+                {% include 'catalogacion/includes/formset_710_template.html' with formset=entidades_relacionadas_710 titulo="Entidad" %}
             </div>
-            
+
+
             {# Campo 773 - Documento Fuente (Repetible) #}
             {% if 'enlaces_documento_fuente_773' in formsets_visibles %}
             <div class="campo-marc">
@@ -43,43 +64,62 @@
                     <span class="badge-marc">773</span>
                     <h6>Documento Fuente</h6>
                     <span class="badge-repetible">REPETIBLE</span>
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="773" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
-                
+
                 <p class="form-text">Enlace a la colección o compilación que contiene esta obra.</p>
-                
+
                 {% include 'catalogacion/includes/formset_773_template.html' with formset=enlaces_documento_fuente_773 %}
             </div>
             {% endif %}
-            
+
             {# Campo 774 - Unidades Constituyentes (Repetible) #}
             {% if 'enlaces_unidad_constituyente_774' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">774</span>
                     <h6>Unidades Constituyentes</h6>
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="774" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
-                
+
                 <p class="form-text">Obras contenidas en esta compilación.</p>
-                
+
                 {% include 'catalogacion/includes/formset_774_template.html' with formset=enlaces_unidad_constituyente_774 %}
 
             </div>
             {% endif %}
-            
+
             {# Campo 787 - Otras Relaciones (Repetible) #}
             {% if 'otras_relaciones_787' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">787</span>
                     <h6>Otras Relaciones</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
+
+                    <!-- Botón agregar relación 787 -->
+                    <button type="button" class="campo-add-btn" data-formset-target="{{ otras_relaciones_787.prefix }}"
+                        title="Agregar Otra Relación">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="787" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
-                
+
                 <p class="form-text">Otras obras relacionadas.</p>
-                
+
                 {% include 'catalogacion/includes/formset_787_template.html' with formset=otras_relaciones_787 %}
             </div>
             {% endif %}
+
         </div>
     </div>
 </section>

@@ -4,26 +4,23 @@ from django.db import models
 # 📦 BLOQUE 8XX – UBICACIÓN Y DISPONIBILIDAD
 # ============================================================
 
-class Ubicacion852(models.Model):
-    """
-    852 ## Ubicación (R)
-      $a Institución o persona (NR)
-      $c Estantería (R)
-      $h Signatura original (NR)
-    """
-    obra = models.ForeignKey(
-        'ObraGeneral',
-        on_delete=models.CASCADE,
-        related_name='ubicaciones_852'
-    )
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
-    institucion_persona = models.ForeignKey(
-        'AutoridadEntidad',
-        on_delete=models.PROTECT,
+class Ubicacion852(models.Model):
+
+    obra = models.ForeignKey('ObraGeneral', on_delete=models.CASCADE, related_name='ubicaciones_852')
+
+    # Relación con Persona o Entidad (si aplica)
+    autoridad_type = models.ForeignKey(ContentType, on_delete=models.PROTECT, null=True, blank=True)
+    autoridad_id = models.PositiveIntegerField(null=True, blank=True)
+    autoridad = GenericForeignKey("autoridad_type", "autoridad_id")
+
+    # Si el usuario escribe código libre
+    codigo_o_nombre = models.CharField(
+        max_length=255,
         blank=True,
-        null=True,
-        related_name='ubicaciones_852',
-        help_text="852 $a — Institución o persona"
+        help_text="Código o nombre de institución o persona (si no está en Autoridades)"
     )
 
     signatura_original = models.CharField(
@@ -37,13 +34,6 @@ class Ubicacion852(models.Model):
         verbose_name = "852 – Ubicación"
         verbose_name_plural = "📍 852 – Ubicaciones"
         ordering = ['obra', 'id']
-
-    def __str__(self):
-        if self.institucion_persona:
-            return f"Ubicación: {self.institucion_persona}"
-        if self.signatura_original:
-            return f"Ubicación: {self.signatura_original}"
-        return f"Ubicación ({self.estanterias.count()} estanterías)"
 
 
 class Estanteria852(models.Model):

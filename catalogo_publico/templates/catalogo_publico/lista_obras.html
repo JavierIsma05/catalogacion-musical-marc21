@@ -1,0 +1,286 @@
+
+{% extends 'catalogo_publico/base_publico.html' %}
+{% load static %}
+
+{% block title %}Explorar Catálogo - Catálogo Musical MARC21{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'catalogo_publico/css/lista-obras.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header Compacto -->
+    <div class="page-header mb-3">
+        <div>
+            <h1>
+                <i class="bi bi-collection"></i>
+                Catálogo de Obras
+            </h1>
+            {% if page_obj %}
+            <div class="catalog-meta">
+                <span>
+                    <i class="bi bi-bar-chart"></i>
+                    {{ page_obj.paginator.count }} obras registradas
+                </span>
+                {% if busqueda %}
+                <span class="filter-pill">
+                    <i class="bi bi-search"></i>
+                    "{{ busqueda }}"
+                </span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Barra de búsqueda y filtros -->
+    <div class="catalog-search-card mb-4">
+        <form method="get" class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <label class="form-label text-muted mb-1">Buscar obra</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" 
+                           class="form-control" 
+                           name="q" 
+                           placeholder="Buscar por título, compositor..." 
+                           value="{{ busqueda }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted mb-1">Tipo de registro</label>
+                <select name="tipo" class="form-select form-select-sm" title="Filtrar por tipo de obra">
+                    <option value="">Todos los tipos</option>
+                    {% for valor, nombre in tipos_obra %}
+                    <option value="{{ valor }}" {% if valor == tipo_seleccionado %}selected{% endif %}>
+                        {{ nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-muted mb-1 d-block">&nbsp;</label>
+                <button type="submit" class="btn btn-primary filter-btn w-100">
+                    <i class="bi bi-funnel"></i>
+                    Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resultados -->
+    {% if obras %}
+    <div class="catalogo-listado">
+        {% for obra in obras %}
+        <article class="obra-catalog-card">
+            <div class="obra-cover">
+                <div class="cover-frame">
+                    <div class="cover-placeholder">
+                        <i class="bi bi-image"></i>
+                        <span>Portada pendiente</span>
+                    </div>
+                </div>
+                <a href="{% url 'catalogo_publico:detalle' obra.pk %}" class="btn btn-outline-secondary btn-sm w-100 mt-2">Ver</a>
+            </div>
+            <div class="obra-details">
+                <div class="obra-header">
+                    <div class="obra-header-text">
+                        <h2 class="obra-main-title">{{ obra.titulo_destacado_display }}</h2>
+                    </div>
+                    <div class="obra-top-tags">
+                        <div class="obra-tag">
+                            <span class="tag-label">Signatura</span>
+                            <span class="tag-value">{{ obra.signatura_publica_display }}</span>
+                        </div>
+                        <div class="obra-tag">
+                            <span class="tag-label">Colección</span>
+                            {% if obra.coleccion_publica_display %}
+                                <span class="tag-value">{{ obra.coleccion_publica_display }}</span>
+                            {% else %}
+                                <span class="tag-value meta-empty">Sin colección asociada</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="obra-info-stack">
+                    <div class="obra-info-row">
+                        <section class="obra-info-card mini">
+                            <p class="obra-card-label">Compositor</p>
+                            <div class="obra-card-body">
+                                <p class="obra-line">{{ obra.autor_publico_principal }}</p>
+                                {% if obra.autor_publico_nota %}
+                                <p class="obra-subline">{{ obra.autor_publico_nota }}</p>
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        <section class="obra-info-card mini">
+                            <p class="obra-card-label">Título</p>
+                            <div class="obra-card-body">
+                                {% if obra.titulo_uniforme_130_display %}
+                                    <p class="obra-line">
+                                        <span class="obra-inline-label">Uniforme · acceso principal</span>
+                                        {{ obra.titulo_uniforme_130_display }}
+                                    </p>
+                                {% else %}
+                                    {% if obra.titulo_uniforme_240_display %}
+                                        <p class="obra-line">
+                                            <span class="obra-inline-label">Uniforme complementario</span>
+                                            {{ obra.titulo_uniforme_240_display }}
+                                        </p>
+                                    {% elif obra.titulo_245_display %}
+                                        <p class="obra-line">{{ obra.titulo_245_display }}</p>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </section>
+
+                        <section class="obra-info-card mini">
+                            <p class="obra-card-label">Manuscrito/Impreso</p>
+                            <div class="obra-card-body">
+                                <p class="obra-line">{{ obra.tipo_soporte_publico_display }}</p>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- ÍNCIPIT MUSICAL (ya estaba arriba) -->
+                    <section class="obra-info-card obra-incipit-card">
+                        <p class="obra-card-label">Íncipit musical</p>
+                        <div class="obra-card-body">
+                            {% with detalle=obra.primer_incipit_detalle %}
+                                {% if detalle.0 %}
+                                    <p class="obra-inline-line">{{ detalle.0 }}</p>
+                                    {% if detalle.1 %}
+                                        <p class="obra-inline-line code">{{ detalle.1 }}</p>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="meta-empty">Sin íncipit registrado</p>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </section>
+
+                    <!-- UBICACIÓN (852) -->
+                   {% if obra.ubicaciones_852.exists %}
+                    <section class="obra-info-card mini">
+                        <p class="obra-card-label">Ubicación física (852)</p>
+                        <div class="obra-card-body">
+                            {% for ub in obra.ubicaciones_852.all %}
+                                <p class="obra-line">
+                                    <i class="bi bi-geo-alt text-muted"></i>
+                                    {% if ub.codigo_o_nombre %}
+                                        {{ ub.codigo_o_nombre }}
+                                    {% elif ub.autoridad %}
+                                        {{ ub.autoridad }}
+                                    {% else %}
+                                        Ubicación no especificada
+                                    {% endif %}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    </section>
+                    {% else %}
+                    <section class="obra-info-card mini">
+                        <p class="obra-card-label">Ubicación física (852)</p>
+                        <div class="obra-card-body">
+                            <p class="meta-empty">Sin ubicación registrada</p>
+                        </div>
+                    </section>
+                    {% endif %}
+
+
+                                    {% if obra.disponibles_856.exists %}
+                    <section class="obra-info-card mini">
+                        <p class="obra-card-label">Acceso digital (856)</p>
+                        <div class="obra-card-body">
+                            {% for disp in obra.disponibles_856.all %}
+                                {% for url in disp.urls_856.all %}
+                                    <a href="{{ url.url }}" target="_blank" class="obra-inline-icon">
+                                        <i class="bi bi-box-arrow-up-right"></i>
+                                    </a>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    </section>
+                    {% else %}
+                    <section class="obra-info-card mini">
+                        <p class="obra-card-label">Acceso digital (856)</p>
+                        <div class="obra-card-body">
+                            <p class="meta-empty">Sin enlaces digitales</p>
+                        </div>
+                    </section>
+                    {% endif %}
+
+
+                </div>
+
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Navegación de páginas">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                {% if page_obj.has_previous %}
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if tipo_seleccionado %}&tipo={{ tipo_seleccionado }}{% endif %}">
+                    <i class="bi bi-chevron-left"></i>
+                    Anterior
+                </a>
+                {% else %}
+                <span class="page-link">
+                    <i class="bi bi-chevron-left"></i>
+                    Anterior
+                </span>
+                {% endif %}
+            </li>
+
+            <li class="page-item disabled">
+                <span class="page-link">
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+            </li>
+
+            <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                {% if page_obj.has_next %}
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if tipo_seleccionado %}&tipo={{ tipo_seleccionado }}{% endif %}">
+                    Siguiente
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+                {% else %}
+                <span class="page-link">
+                    Siguiente
+                    <i class="bi bi-chevron-right"></i>
+                </span>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- Estado vacío -->
+    <div class="catalog-empty text-center">
+        <div class="empty-icon">
+            <i class="bi bi-info-circle"></i>
+        </div>
+        <h4 class="mt-3">No se encontraron obras</h4>
+        {% if busqueda or tipo_seleccionado %}
+        <p>No hay resultados para tu búsqueda. Intenta con otros términos.</p>
+        <a href="{% url 'catalogo_publico:lista_obras' %}" class="btn btn-outline-primary btn-sm mt-2">
+            <i class="bi bi-x-circle"></i>
+            Limpiar filtros
+        </a>
+        {% else %}
+        <p>Aún no hay obras catalogadas en el sistema.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

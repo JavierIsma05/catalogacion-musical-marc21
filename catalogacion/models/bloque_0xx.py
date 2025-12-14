@@ -215,6 +215,12 @@ class CodigoLengua(models.Model):
         """Verifica si el documento es o incluye traducción"""
         return self.indicacion_traduccion == '1'
 
+    @property
+    def codigo_lengua_texto(self):
+        """Retorna el primer código de idioma para compatibilidad con tests"""
+        primer_idioma = self.idiomas.first()
+        return primer_idioma.codigo_idioma if primer_idioma else ''
+
 
 class IdiomaObra(models.Model):
     """

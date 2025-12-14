@@ -1,6 +1,7 @@
 {% comment %}
 Template personalizado para campo 031 - Íncipit musical + canvas
 Se usa con el formset "incipits_musicales"
+El botón de agregar campo completo está en el header del campo (campo-add-btn)
 {% endcomment %}
 
 
@@ -15,16 +16,13 @@ Se usa con el formset "incipits_musicales"
 }
 
 
+
+
 </style>
 
 
 <div class="formset-container formset-incipit" data-formset-prefix="{{ formset.prefix }}">
     {{ formset.management_form }}
-
-    <button type="button" class="add-form-row mb-3" title="Agregar Íncipit">
-        <i class="bi bi-plus-circle"></i>
-        Agregar Íncipit
-    </button>
 
     <div class="formset-forms">
         {% for form in formset %}
@@ -33,15 +31,6 @@ Se usa con el formset "incipits_musicales"
                 <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
             {% endif %}
 
-            {% if formset.can_delete %}
-                <div class="d-none">
-                    {{ form.DELETE }}
-                </div>
-            {% endif %}
-
-            <button type="button" class="delete-row-btn" title="Eliminar">
-                <i class="bi bi-x-lg"></i>
-            </button>
 
             {# Fila 1: números a, b, c #}
             <div class="campo-grid">
@@ -327,7 +316,7 @@ Se usa con el formset "incipits_musicales"
                 <div class="flex-grow-1">
                     <div class="position-relative d-inline-block w-100">
                     <canvas id="incipit_canvas_0"
-                            width="750"
+                            width="600"
                             height="270"
                             style="display:block; "></canvas>
                     </div>
@@ -475,55 +464,10 @@ Se usa con el formset "incipits_musicales"
 </div>
 
 <script>
-// Script para manejar agregar/eliminar formularios (similar al genérico)
-(function() {
-    const prefix = '{{ formset.prefix }}';
-    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-    if (!container) return;
-
-    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-    const addButton = container.querySelector('.add-form-row');
-    const formsContainer = container.querySelector('.formset-forms');
-
-    if (!totalFormsInput || !addButton || !formsContainer) return;
-
-    // Agregar nuevo íncipit
-    addButton.addEventListener('click', function() {
-        const totalForms = parseInt(totalFormsInput.value);
-        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
-
-        if (!emptyFormTemplate) {
-            console.error('No se encontró template vacío para el formset 031');
-            return;
-        }
-
-        const emptyForm = emptyFormTemplate.cloneNode(true);
-
-        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
-        emptyForm.classList.remove('empty-form');
-        emptyForm.style.display = '';
-
-        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
-
-        totalFormsInput.value = totalForms + 1;
-    });
-
-    // Eliminar íncipit
-    formsContainer.addEventListener('click', function(e) {
-        const deleteBtn = e.target.closest('.delete-row-btn');
-        if (!deleteBtn) return;
-
-        const row = deleteBtn.closest('.formset-row');
-        if (!row || row.classList.contains('empty-form')) return;
-
-        const deleteInput = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
-        if (deleteInput) {
-            deleteInput.checked = true;
-            row.style.display = 'none';
-        } else {
-            row.remove();
-            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
-        }
-    });
-})();
+/**
+ * Script para el campo 031 - Incipit Musical
+ * Este campo NO tiene subcampos repetibles, solo es un formset estándar.
+ * La gestión del formset está en formset-manager.js
+ */
+console.log('[031] Este formset es manejado por formset-manager.js');
 </script>

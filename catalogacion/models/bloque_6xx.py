@@ -21,6 +21,8 @@ class Materia650(models.Model):
     materia = models.ForeignKey(
         'AutoridadMateria',
         on_delete=models.PROTECT,
+        blank=True,
+        null=True,
         help_text="650 $a — Materia (NR)"
     )
 
@@ -78,6 +80,8 @@ class MateriaGenero655(models.Model):
     materia = models.ForeignKey(
         'AutoridadFormaMusical',
         on_delete=models.PROTECT,
+        blank=True,
+        null=True,
         help_text="655 $a — Género/Forma (NR)"
     )
 

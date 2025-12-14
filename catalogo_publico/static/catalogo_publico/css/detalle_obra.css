@@ -1,0 +1,245 @@
+/* ==========================================================================
+   ESTILOS PARA PÁGINA DE VISTA DETALLADA DE OBRA
+   Sistema de Catalogación Musical MARC21
+   ========================================================================== */
+
+/* ============================================
+   HEADER
+   ============================================ */
+.detalle-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--public-border-light);
+}
+
+@media (min-width: 992px) {
+    .detalle-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+}
+
+.detalle-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.detalle-main-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--public-primary);
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.detalle-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.detalle-actions .btn {
+    font-weight: 600;
+    font-size: 0.8125rem;
+}
+
+.detalle-header-right {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+.detalle-meta-tag {
+    background: #f4f6fa;
+    color: #2f3545;
+    border: 1px solid #dfe3ea;
+    border-radius: 10px;
+    padding: 0.5rem 0.9rem;
+    min-width: 150px;
+}
+
+.detalle-meta-tag small {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 0.15rem;
+}
+
+.detalle-meta-tag span,
+.detalle-meta-tag a {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #2f3545;
+}
+
+.detalle-meta-link a {
+    color: var(--public-accent);
+    text-decoration: none;
+}
+
+.detalle-meta-link a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================
+   CONTENIDO PRINCIPAL
+   ============================================ */
+.detalle-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* ============================================
+   SECCIONES
+   ============================================ */
+.detalle-section {
+    background: #ffffff;
+    border: 1px solid var(--public-border-light);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(23, 27, 33, 0.04);
+}
+
+.detalle-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--public-text);
+    margin: 0;
+    padding: 0.85rem 1.25rem;
+    background: linear-gradient(135deg, var(--public-surface) 0%, #fafbfc 100%);
+    border-bottom: 1px solid var(--public-border-light);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detalle-section-title i {
+    color: var(--public-accent);
+    font-size: 1rem;
+}
+
+.detalle-section-body {
+    padding: 0.9rem 1.25rem;
+}
+
+/* ============================================
+   CAMPOS
+   ============================================ */
+.detalle-field {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--public-border-light);
+}
+
+.detalle-field:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.detalle-field-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #4b556f;
+}
+
+.detalle-field-value {
+    font-size: 0.88rem;
+    color: var(--public-text);
+    line-height: 1.6;
+}
+
+.detalle-field-note {
+    font-style: italic;
+    color: #6b7280;
+    margin-left: 0.35rem;
+}
+
+.detalle-subheader {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--public-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.75rem 0 0.35rem;
+    border-bottom: none;
+}
+
+.detalle-solista {
+    font-size: 0.82rem;
+    color: #6b7280;
+}
+
+/* ============================================
+   ÍNCIPIT
+   ============================================ */
+.detalle-field-incipit .detalle-field-value {
+    grid-column: span 1;
+}
+
+.detalle-incipit-content {
+    background: linear-gradient(135deg, rgba(58, 193, 161, 0.04) 0%, #fff 100%);
+    border: 2px dashed rgba(58, 193, 161, 0.3);
+    border-radius: 8px;
+    padding: 0.85rem;
+}
+
+.detalle-incipit-line {
+    font-size: 0.875rem;
+    color: var(--public-text);
+    margin: 0 0 0.5rem;
+    font-weight: 500;
+}
+
+.detalle-incipit-code {
+    font-family: 'Courier New', 'Monaco', 'Consolas', monospace;
+    font-size: 0.8rem;
+    color: var(--public-primary);
+    background: var(--public-surface);
+    padding: 0.5rem;
+    border-radius: 6px;
+    margin: 0;
+    overflow-x: auto;
+    border: 1px solid var(--public-border-light);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .detalle-main-title {
+        font-size: 1.35rem;
+    }
+
+    .detalle-field {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+    }
+
+    .detalle-field-label {
+        font-size: 0.75rem;
+    }
+
+    .detalle-field-value {
+        font-size: 0.85rem;
+    }
+
+    .detalle-section-body {
+        padding: 0.75rem 1rem;
+    }
+
+    .detalle-meta-tag {
+        min-width: 130px;
+        padding: 0.4rem 0.7rem;
+    }
+}

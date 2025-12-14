@@ -10,10 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent 
 
 
 # Quick-start development settings - unsuitable for production
@@ -23,10 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-u#)zn$bx21fz@5v(8c%ejx!p4d*s4d0m4*!y%+kn&u^u3&p&s$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG=True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', 'testserver', 'localhost', '127.0.0.1','.ngrok-free.app']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.ngrok-free.app'
+]
 
 # Application definition
 
@@ -37,7 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'catalogacion',  # Aqui llamamos a la aplicacion catalogacion
+    'catalogacion',  
+    'usuarios',
+    'catalogo_publico',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +55,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AUTH_USER_MODEL = 'usuarios.CustomUser'
 
 ROOT_URLCONF = 'marc21_project.urls'
 import os
@@ -103,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-es'
 
 TIME_ZONE = 'America/Bogota'
 
@@ -117,7 +125,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "catalogacion" / "static",
+    BASE_DIR / "static",  # Carpeta global de estáticos
+    BASE_DIR / "catalogacion" / "static",  # Estáticos específicos de catalogación
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -157,3 +166,12 @@ LOGGING = {
         },
     },
 }
+
+# A dónde redirigir tras un login exitoso (se maneja en la vista CustomLoginView)
+LOGIN_REDIRECT_URL = '/'  
+
+# A dónde redirigir tras hacer logout
+LOGOUT_REDIRECT_URL = '/' 
+
+# URL del login (para que el decorador @login_required sepa a dónde mandarte)
+LOGIN_URL = '/usuarios/login/'

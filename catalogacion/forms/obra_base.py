@@ -8,7 +8,6 @@ from catalogacion.models import (
     AutoridadPersona,
     AutoridadTituloUniforme,
     AutoridadFormaMusical,
-    AutoridadEntidad,
 )
 from .widgets import Select2Widget, TextAreaAutosize
 
@@ -232,7 +231,7 @@ class ObraGeneralForm(forms.ModelForm):
         labels = {
             'tipo_registro': 'Tipo de registro',
             'nivel_bibliografico': 'Nivel bibliográfico',
-            'centro_catalogador': '040 $a - Centro catalogador *',
+            'centro_catalogador': '040 $a - Centro catalogador',
             'isbn': '020 $a - ISBN',
             'ismn': '024 $a - ISMN',
             'tipo_numero_028': '028 - Tipo de número',
@@ -255,14 +254,14 @@ class ObraGeneralForm(forms.ModelForm):
             'nombre_parte_240': '240 $p - Nombre de parte',
             'arreglo_240': '240 $o - Arreglo',
             'tonalidad_240': '240 $r - Tonalidad',
-            'titulo_principal': '245 $a - Título principal *',
+            'titulo_principal': '245 $a - Título principal',
             'subtitulo': '245 $b - Subtítulo',
             'mencion_responsabilidad': '245 $c - Nombres en fuente',
             'extension': '300 $a - Extensión',
             'otras_caracteristicas': '300 $b - Otras características físicas',
             'dimension': '300 $c - Dimensiones',
             'material_acompanante': '300 $e - Material acompañante',
-            'ms_imp': '340 $d - Técnica (Manuscrito/Impreso) *',
+            'ms_imp': '340 $d - Técnica (Manuscrito/Impreso)',
             'formato': '348 $a - Formato',
             'numero_obra': '383 $a - Número serial de obra',
             'opus': '383 $b - Número de opus',
@@ -287,6 +286,26 @@ class ObraGeneralForm(forms.ModelForm):
         self.fields['titulo_principal'].required = True
         self.fields['centro_catalogador'].required = True
         self.fields['ms_imp'].required = True
+        
+        # Establecer valores iniciales solo cuando es una instancia nueva (creación)
+        if not self.instance.pk:
+            # 028 - Número de editor
+            if not self.initial.get('tipo_numero_028'):
+                self.initial['tipo_numero_028'] = '2'  # Número de plancha
+            if not self.initial.get('control_nota_028'):
+                self.initial['control_nota_028'] = '0'  # No hay nota ni punto de acceso
+            
+            # 130 - Título uniforme (medio y arreglo)
+            if not self.initial.get('medio_interpretacion_130'):
+                self.initial['medio_interpretacion_130'] = 'piano'
+            if not self.initial.get('arreglo_130'):
+                self.initial['arreglo_130'] = 'arreglo'
+            
+            # 240 - Título uniforme (medio y arreglo)
+            if not self.initial.get('medio_interpretacion_240'):
+                self.initial['medio_interpretacion_240'] = 'piano'
+            if not self.initial.get('arreglo_240'):
+                self.initial['arreglo_240'] = 'arreglo'
     
     def clean(self):
         """Validación personalizada y creación automática de autoridades"""
@@ -298,7 +317,6 @@ class ObraGeneralForm(forms.ModelForm):
         titulo_uniforme = cleaned_data.get('titulo_uniforme')
         titulo_uniforme_texto = cleaned_data.get('titulo_uniforme_texto', '').strip()
         
-        # Verificar si hay AL MENOS uno de los dos puntos de acceso
         tiene_compositor = bool(compositor or compositor_texto)
         tiene_titulo_uniforme = bool(titulo_uniforme or titulo_uniforme_texto)
         
@@ -307,14 +325,15 @@ class ObraGeneralForm(forms.ModelForm):
                 'Debe especificar al menos un punto de acceso principal: '
                 'Campo 100 (Compositor) o Campo 130 (Título Uniforme)'
             )
-        
-        # NOTA: Se permite tener AMBOS campos (100 Y 130) simultáneamente
-        # Esto es válido para colecciones y otras estructuras MARC21 complejas
-        
-        # Manejar compositor autocomplete editable
+
+        # ==============================
+        # MANEJO DE AUTORIDADES
+        # ==============================
+
+        # Compositor editable
         compositor_texto = cleaned_data.get('compositor_texto', '').strip()
         compositor_coordenadas = cleaned_data.get('compositor_coordenadas', '').strip()
-        
+
         if compositor_texto:
             try:
                 persona = AutoridadPersona.objects.get(apellidos_nombres__iexact=compositor_texto)
@@ -333,8 +352,8 @@ class ObraGeneralForm(forms.ModelForm):
                     apellidos_nombres__iexact=compositor_texto
                 ).first()
                 cleaned_data['compositor'] = persona
-        
-        # Manejar título uniforme 130 autocomplete editable
+
+        # Título uniforme 130 editable
         titulo_uniforme_texto = cleaned_data.get('titulo_uniforme_texto', '').strip()
         if titulo_uniforme_texto:
             titulo, _ = AutoridadTituloUniforme.objects.get_or_create(
@@ -342,8 +361,8 @@ class ObraGeneralForm(forms.ModelForm):
                 defaults={'titulo': titulo_uniforme_texto}
             )
             cleaned_data['titulo_uniforme'] = titulo
-        
-        # Manejar forma musical 130 autocomplete editable
+
+        # Forma 130 editable
         forma_130_texto = cleaned_data.get('forma_130_texto', '').strip()
         if forma_130_texto:
             forma, _ = AutoridadFormaMusical.objects.get_or_create(
@@ -351,8 +370,8 @@ class ObraGeneralForm(forms.ModelForm):
                 defaults={'forma': forma_130_texto}
             )
             cleaned_data['forma_130'] = forma
-        
-        # Manejar título uniforme 240 autocomplete editable
+
+        # Título uniforme 240 editable
         titulo_240_texto = cleaned_data.get('titulo_240_texto', '').strip()
         if titulo_240_texto:
             titulo, _ = AutoridadTituloUniforme.objects.get_or_create(
@@ -360,8 +379,8 @@ class ObraGeneralForm(forms.ModelForm):
                 defaults={'titulo': titulo_240_texto}
             )
             cleaned_data['titulo_240'] = titulo
-        
-        # Manejar forma musical 240 autocomplete editable
+
+        # Forma 240 editable
         forma_240_texto = cleaned_data.get('forma_240_texto', '').strip()
         if forma_240_texto:
             forma, _ = AutoridadFormaMusical.objects.get_or_create(
@@ -369,23 +388,80 @@ class ObraGeneralForm(forms.ModelForm):
                 defaults={'forma': forma_240_texto}
             )
             cleaned_data['forma_240'] = forma
-        
-        # ✅ VALIDACIÓN ELIMINADA: Se permite tener 100 Y 130 simultáneamente
-        # Los campos 100 (Compositor) y 130 (Título Uniforme) pueden coexistir
-        # Esto es válido especialmente para colecciones manuscritas y otros casos complejos
-        
-        # Validar campos condicionales según tipo de obra
+
+        # ==============================
+        # VALIDACIÓN DE MANUSCRITOS
+        # ==============================
         tipo_registro = cleaned_data.get('tipo_registro')
-        
-        # Manuscritos no pueden tener ISBN/ISMN
+
         if tipo_registro == 'd':
             if cleaned_data.get('isbn'):
-                raise forms.ValidationError({
-                    'isbn': "Los manuscritos no pueden tener ISBN (campo 020)."
-                })
+                raise forms.ValidationError({'isbn': "Los manuscritos no pueden tener ISBN (campo 020)."})
             if cleaned_data.get('ismn'):
-                raise forms.ValidationError({
-                    'ismn': "Los manuscritos no pueden tener ISMN (campo 024)."
-                })
-        
+                raise forms.ValidationError({'ismn': "Los manuscritos no pueden tener ISMN (campo 024)."})
+
+        # ============================================================
+        # 🔥 SINCRONIZACIÓN AUTOMÁTICA ENTRE CAMPOS 100 / 130 / 240
+        # ============================================================
+
+        compositor = cleaned_data.get('compositor')
+
+        # Bloque 130
+        titulo_130 = cleaned_data.get('titulo_uniforme')
+        forma_130 = cleaned_data.get('forma_130')
+        medio_130 = cleaned_data.get('medio_interpretacion_130')
+        numero_parte_130 = cleaned_data.get('numero_parte_130')
+        nombre_parte_130 = cleaned_data.get('nombre_parte_130')
+        arreglo_130 = cleaned_data.get('arreglo_130')
+        tonalidad_130 = cleaned_data.get('tonalidad_130')
+
+        # Bloque 240
+        titulo_240 = cleaned_data.get('titulo_240')
+        forma_240 = cleaned_data.get('forma_240')
+        medio_240 = cleaned_data.get('medio_interpretacion_240')
+        numero_parte_240 = cleaned_data.get('numero_parte_240')
+        nombre_parte_240 = cleaned_data.get('nombre_parte_240')
+        arreglo_240 = cleaned_data.get('arreglo_240')
+        tonalidad_240 = cleaned_data.get('tonalidad_240')
+
+        # CASO 1 → HAY COMPOSITOR → usar SIEMPRE 240
+        if compositor:
+            if titulo_130 and not titulo_240:
+                cleaned_data['titulo_240'] = titulo_130
+                cleaned_data['forma_240'] = forma_130
+                cleaned_data['medio_interpretacion_240'] = medio_130
+                cleaned_data['numero_parte_240'] = numero_parte_130
+                cleaned_data['nombre_parte_240'] = nombre_parte_130
+                cleaned_data['arreglo_240'] = arreglo_130
+                cleaned_data['tonalidad_240'] = tonalidad_130
+
+            # limpiar 130
+            cleaned_data['titulo_uniforme'] = None
+            cleaned_data['forma_130'] = None
+            cleaned_data['medio_interpretacion_130'] = None
+            cleaned_data['numero_parte_130'] = None
+            cleaned_data['nombre_parte_130'] = None
+            cleaned_data['arreglo_130'] = None
+            cleaned_data['tonalidad_130'] = None
+
+        # CASO 2 → NO HAY COMPOSITOR → usar SIEMPRE 130
+        else:
+            if titulo_240 and not titulo_130:
+                cleaned_data['titulo_uniforme'] = titulo_240
+                cleaned_data['forma_130'] = forma_240
+                cleaned_data['medio_interpretacion_130'] = medio_240
+                cleaned_data['numero_parte_130'] = numero_parte_240
+                cleaned_data['nombre_parte_130'] = nombre_parte_240
+                cleaned_data['arreglo_130'] = arreglo_240
+                cleaned_data['tonalidad_130'] = tonalidad_240
+
+            # limpiar 240
+            cleaned_data['titulo_240'] = None
+            cleaned_data['forma_240'] = None
+            cleaned_data['medio_interpretacion_240'] = None
+            cleaned_data['numero_parte_240'] = None
+            cleaned_data['nombre_parte_240'] = None
+            cleaned_data['arreglo_240'] = None
+            cleaned_data['tonalidad_240'] = None
+
         return cleaned_data

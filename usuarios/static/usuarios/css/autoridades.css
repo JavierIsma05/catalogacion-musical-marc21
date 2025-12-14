@@ -1,0 +1,181 @@
+/* Estilos para las páginas de autoridades en el panel de catalogador
+   Alineados con la estética del panel de administración */
+
+:root {
+    --autoridad-primary: #293042;
+    --autoridad-muted: #6c757d;
+    --autoridad-border: #e9ecef;
+    --autoridad-bg: #f8f9fa;
+    --autoridad-shadow: 0 0 0.875rem 0 rgba(33, 37, 41, 0.05);
+}
+
+.autoridad-card {
+    margin-bottom: 1.5rem;
+    box-shadow: var(--autoridad-shadow);
+}
+
+.autoridad-card .admin-card-header {
+    align-items: center;
+    gap: 1rem;
+}
+
+.autoridad-meta {
+    color: var(--autoridad-muted);
+    font-size: 0.85rem;
+}
+
+.autoridad-search {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.autoridad-search input[type="text"] {
+    border: 1px solid var(--autoridad-border);
+}
+
+.autoridad-table .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #e7f5ef;
+    color: #218f6f;
+}
+
+.autoridad-table .status-pill .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #1cbb8c;
+}
+
+.autoridad-table .muted {
+    color: var(--autoridad-muted);
+    font-size: 0.82rem;
+}
+
+.autoridad-actions {
+    display: inline-flex;
+    gap: 0.4rem;
+}
+
+.autoridad-actions .action-btn {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--autoridad-border);
+    border-radius: 6px;
+    background: white;
+    color: var(--autoridad-primary);
+    transition: all 0.15s ease;
+    text-decoration: none;
+}
+
+.autoridad-actions .action-btn:hover {
+    background: var(--autoridad-bg);
+    border-color: #d0d5dc;
+}
+
+.autoridad-actions .action-btn.delete {
+    color: #c53030;
+}
+
+.autoridad-actions .action-btn.view {
+    color: #0d6efd;
+}
+
+.autoridad-form .form-label {
+    font-weight: 600;
+    color: #303947;
+}
+
+.autoridad-form .form-text {
+    color: var(--autoridad-muted);
+}
+
+.autoridad-form .errorlist {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0.25rem;
+    color: #c53030;
+    font-size: 0.875rem;
+}
+
+.autoridad-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--autoridad-muted);
+}
+
+.autoridad-empty .icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--autoridad-bg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    color: var(--autoridad-primary);
+    font-size: 1.25rem;
+}
+
+.autoridad-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.autoridad-meta-tile {
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--autoridad-border);
+    border-radius: 8px;
+    background: white;
+}
+
+.autoridad-meta-tile .label {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--autoridad-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.15rem;
+}
+
+.autoridad-meta-tile .value {
+    font-weight: 600;
+    color: var(--autoridad-primary);
+}
+
+.autoridad-detail {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+}
+
+.autoridad-detail .detail-item {
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--autoridad-border);
+    border-radius: 10px;
+    background: white;
+}
+
+.autoridad-detail .detail-item h6 {
+    font-size: 0.85rem;
+    color: var(--autoridad-muted);
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.autoridad-detail .detail-item p {
+    margin: 0;
+    color: #303947;
+    font-weight: 600;
+}

@@ -15,6 +15,7 @@ from catalogacion.forms.formsets import (
     TituloAlternativoFormSet, EdicionFormSet, ProduccionPublicacionFormSet,
     # Bloque 3XX
     MedioInterpretacion382FormSet,
+    MedioInterpretacion382_aFormSet,
     # Bloque 4XX
     MencionSerie490FormSet,
     # Bloque 5XX
@@ -62,7 +63,43 @@ class ObraFormsetMixin:
             kwargs['data'] = self.request.POST
         if instance:
             kwargs['instance'] = instance
+        # =======================================================
+        # 🔥 PASAR COMPOSITOR A TODOS LOS FORMSETS 7XX
+        # =======================================================
+        
         return kwargs
+    
+    def _get_nested_formsets(self, parent_instances=None, with_post=False):
+        """
+        Obtener formsets anidados (formsets dentro de otros formsets).
+        Actualmente solo el 382 tiene formsets anidados (el 382_a dentro del 382).
+        
+        Args:
+            parent_instances: Lista de instancias padre (ej: instancias de MedioInterpretacion382)
+            with_post: Si True, incluye datos POST
+        
+        Returns:
+            dict: {'medios_formsets': [formset_382_a_0, formset_382_a_1, ...]}
+        """
+        nested = {}
+        
+        if parent_instances:
+            medios_formsets = []
+            for idx, parent_instance in enumerate(parent_instances):
+                kwargs = {}
+                if with_post:
+                    kwargs['data'] = self.request.POST
+                kwargs['instance'] = parent_instance
+                
+                formset = MedioInterpretacion382_aFormSet(
+                    prefix=f'medios_interpretacion382_set-{idx}',
+                    **kwargs
+                )
+                medios_formsets.append(formset)
+            
+            nested['medios_formsets'] = medios_formsets
+        
+        return nested
     
     def _get_formsets(self, instance=None, with_post=False):
         """
@@ -149,52 +186,84 @@ class ObraFormsetMixin:
     def _validar_formsets(self, context):
         """
         Validar todos los formsets en el contexto.
-        
-        Args:
-            context: Contexto con formsets
-        
+
         Returns:
             tuple: (formsets_validos: bool, formsets: dict)
         """
         logger.info("🔍 Iniciando validación de formsets...")
+
         formsets_validos = True
         formsets = {}
-        
-        # Formsets opcionales que NO deben validarse si no tienen datos POST
+
+        formsets_inhabilitados = {
+            'codigos_pais',
+            'codigos_lengua',
+            
+        }
+
+        formsets_visibles = context.get('formsets_visibles')
+        if not formsets_visibles:
+            formsets_visibles = [
+                name for name in self._get_formset_names()
+                if name not in formsets_inhabilitados
+            ]
+
         formsets_opcionales = {
             'incipits_musicales': 'incipits-TOTAL_FORMS',
             'menciones_serie_490': 'menciones_490-TOTAL_FORMS',
+            'contenidos': 'contenidos_505-TOTAL_FORMS',
             'enlaces_documento_fuente_773': 'enlaces_773-TOTAL_FORMS',
-            'enlaces_unidad_constituyente_774': 'enlaces_774-TOTAL_FORMS',   # ← AGREGA ESTO
+            'enlaces_unidad_constituyente_774': 'enlaces_774-TOTAL_FORMS',
             'otras_relaciones_787': 'relaciones_787-TOTAL_FORMS',
+            'titulos_alternativos': 'titulos_alt-TOTAL_FORMS',
+            'ediciones': 'ediciones-TOTAL_FORMS',
         }
-        
+
         for key in self._get_formset_names():
+
+            if key in formsets_inhabilitados:
+                logger.debug(f"  ⏭️  {key}: SALTADO (inhabilitado en UI V2)")
+                continue
+
             formset = context.get(key)
-            
-            # Si es formset opcional y NO tiene ManagementForm en POST, saltarlo
+
+    # 🚨 IGNORAR FORMSETS NO VISIBLES (aunque tengan datos en POST)
+            if key not in formsets_visibles:
+                logger.debug(f"  ⏭️  {key}: SALTADO COMPLETAMENTE (no visible en este tipo de obra)")
+                continue
+
             if key in formsets_opcionales:
                 mgmt_field = formsets_opcionales[key]
                 if mgmt_field not in self.request.POST:
-                    logger.debug(f"  ⏭️  {key}: SALTADO (no está en el template)")
+                    logger.debug(f"  ⏭️  {key}: SALTADO (no está en el POST/template)")
                     continue
-            
-            if formset:
-                formsets[key] = formset
-                is_valid = formset.is_valid()
-                
-                if is_valid:
-                    logger.debug(f"  ✅ {key}: VÁLIDO")
-                else:
-                    logger.error(f"  ❌ {key}: INVÁLIDO")
-                    logger.error(f"     Errores: {formset.errors}")
-                    if hasattr(formset, 'non_form_errors') and formset.non_form_errors():
-                        logger.error(f"     Errores no-form: {formset.non_form_errors()}")
-                    formsets_validos = False
-        
+
+            if not formset:
+                continue
+
+            if all(not form.has_changed() for form in formset.forms):
+                logger.debug(f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)")
+                continue
+
+            formsets[key] = formset
+
+            if formset.is_valid():
+                logger.debug(f"  ✅ {key}: VÁLIDO")
+            else:
+                logger.error(f"  ❌ FORMSET INVÁLIDO: {key}")
+                formsets_validos = False
+
+                for i, form in enumerate(formset.forms):
+                    if form.errors:
+                        logger.error(f"     ➤ Formulario #{i}: {form.errors}")
+
+                if hasattr(formset, 'deleted_objects'):
+                    logger.debug(f"     Deleted objects: {len(formset.deleted_objects)}")
+
+        # 🔥 RETURN ÚNICO Y SEGURO
         logger.info(f"✅ Resultado final: {'TODOS VÁLIDOS' if formsets_validos else 'HAY ERRORES'}")
         return formsets_validos, formsets
-    
+
     def _guardar_formsets(self, formsets, instance):
         """
         Guardar todos los formsets y procesar subcampos dinámicos.
@@ -208,19 +277,83 @@ class ObraFormsetMixin:
             'produccion_publicacion': ['_save_lugares_264', '_save_entidades_264', '_save_fechas_264'],
             'medios_interpretacion': ['_save_medios_382'],
             'menciones_serie_490': ['_save_titulos_490', '_save_volumenes_490'],
-            'enlaces_documento_fuente_773': ['_save_numeros_obra_773'],
-            'enlaces_unidad_constituyente_774': ['_save_numeros_obra_774'],
-            'otras_relaciones_787': ['_save_numeros_obra_787'],
             'ubicaciones_852': ['_save_estanterias_852'],
             'disponibles_856': ['_save_urls_856', '_save_textos_enlace_856'],
-            'datos_biograficos': ['_save_textos_biograficos_545', '_save_uris_545'],
             'materias_650': ['_save_subdivisiones_650'],
             'materias_genero_655': ['_save_subdivisiones_655'],
         }
         
         for key, formset in formsets.items():
-            formset.instance = instance
-            formset.save()
+
+            # ⭐⭐⭐ CREAR PADRES 856 ANTES DE SUBCAMPOS ⭐⭐⭐
+            # 🔥 1) GUARDAR PADRES 856 ANTES QUE NADA
+            if key == 'disponibles_856':
+                objs_856 = formset.save(commit=False)
+                for obj in objs_856:
+                    obj.obra = instance
+                    obj.save()
+                formset.save_m2m()
+                logger.info(f"🟢 856 padre(s) creados: {len(objs_856)}")
+                # 👇 IMPORTANTE: continuar sin ejecutar el ciclo inferior
+                continue
+
+            # ---------------------------
+            # Guardado NORMAL para otros formsets
+            # ---------------------------
+            for form in formset:
+                if getattr(form, 'cleaned_data', None) and not form.cleaned_data.get("DELETE", False):
+                    obj = form.save(commit=False)
+
+                    # 🔥 Asignar FK a la obra
+                    if hasattr(obj, 'obra_general'):
+                        obj.obra_general = instance
+                    elif hasattr(obj, 'obra'):
+                        obj.obra = instance
+
+                    obj.save()
+                    logger.info(f"📝 Guardado formset {key}: {obj.pk}")
+
+                    # ------------------------------
+                    # 🔥 Subcampos 852$c
+                    # ------------------------------
+                    if hasattr(obj, "estanterias"):
+                        for sub in obj.estanterias.all():
+                            if sub.ubicacion_id is None:
+                                sub.ubicacion = obj
+                                sub.save()
+
+                    # ------------------------------
+                    # 🔥 Subcampos 856$u y 856$y
+                    # ------------------------------
+                    if hasattr(obj, "urls_856"):
+                        for sub in obj.urls_856.all():
+                            if sub.disponible_id is None:
+                                sub.disponible = obj
+                                sub.save()
+
+                    if hasattr(obj, "textos_enlace_856"):
+                        for sub in obj.textos_enlace_856.all():
+                            if sub.disponible_id is None:
+                                sub.disponible = obj
+                                sub.save()
+
+
+            if key == 'incipits_musicales':
+                incipits_guardados = list(instance.incipits_musicales.all())
+                logger.info(
+                    "🎼 Campo 031: %s íncipit(s) guardado(s) para la obra %s",
+                    len(incipits_guardados),
+                    instance.pk,
+                )
+                for incipit in incipits_guardados:
+                    logger.debug(
+                        "   · Íncipit ID=%s | %s | Clave=%s | Armadura=%s | Tiempo=%s",
+                        incipit.id,
+                        incipit.identificador_completo,
+                        incipit.clave or '-',
+                        incipit.armadura or '-',
+                        incipit.tiempo or '-',
+                    )
             
             # Procesar subcampos dinámicos si el formset los tiene
             if key in formset_subcampo_mapping:

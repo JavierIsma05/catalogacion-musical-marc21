@@ -1,6 +1,7 @@
 {% comment %}
 Template para campo 490 - Mención de Serie
 El campo 490 es repetible y contiene subcampos repetibles ($a título de serie y $v volumen)
+El botón de agregar campo completo está en el header del campo (campo-add-btn)
 {% endcomment %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
@@ -10,11 +11,6 @@ El campo 490 es repetible y contiene subcampos repetibles ($a título de serie y
             {{ field }}
         {% endfor %}
     </div>
-    
-    <button type="button" class="add-form-row mb-3" title="Agregar Mención de Serie">
-        <i class="bi bi-plus-circle"></i>
-        Agregar Mención de Serie
-    </button>
     
     <div class="formset-forms">
         {% for form in formset %}
@@ -34,70 +30,102 @@ El campo 490 es repetible y contiene subcampos repetibles ($a título de serie y
             </button>
             
             <div class="campo-grid">
-                {# Botón para agregar títulos ($a) #}
+                {# Subcampo $a - Títulos de serie (Repetible) con botón + a la izquierda #}
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-titulo-btn w-100" data-mencion-index="{{ forloop.counter0 }}">
-                        <i class="bi bi-plus-circle"></i>
-                        Agregar Título de Serie ($a)
-                    </button>
-                </div>
-                
-                {# Subcampo $a - Títulos de serie (Repetible) #}
-                <div class="col-full titulos-container" data-titulos-container="{{ forloop.counter0 }}">
-                    {% if form.instance.pk %}
-                        {# Cargar títulos existentes #}
-                        {% for titulo in form.instance.titulos_serie_490.all %}
-                        <div class="titulo-form-row">
-                            <div class="d-flex flex-column w-100 mb-2">
-                                <label class="form-label small">490 $a - Título de serie</label>
-                                <div class="d-flex gap-2 align-items-center">
-                                    <input type="text" 
-                                           class="form-control titulo-input" 
-                                           name="titulo_mencion_490_{{ forloop.parentloop.counter0 }}_{{ titulo.pk }}"
-                                           value="{{ titulo.titulo_serie }}"
-                                           placeholder="Título de la serie" 
-                                           style="flex: 1;">
-                                    <button type="button" class="btn btn-sm btn-outline-danger delete-titulo-btn" title="Eliminar título">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
+                    <label class="form-label small">490 $a - Título de serie</label>
+                    <div class="subcampo-repetible-container titulos-container" data-titulos-container="{{ forloop.counter0 }}">
+                        {% if form.instance.pk %}
+                            {# Cargar títulos existentes #}
+                            {% for titulo in form.instance.titulos_serie_490.all %}
+                            <div class="subcampo-row titulo-form-row">
+                                {% if forloop.first %}
+                                <button type="button" class="subcampo-add-btn add-titulo-btn" data-mencion-index="{{ forloop.parentloop.counter0 }}" title="Agregar Título">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                {% else %}
+                                <div class="subcampo-placeholder"></div>
+                                {% endif %}
+                                <input type="text" 
+                                       class="form-control titulo-input" 
+                                       name="titulo_mencion_490_{{ forloop.parentloop.counter0 }}_{{ titulo.pk }}"
+                                       value="{{ titulo.titulo_serie }}"
+                                       placeholder="Título de la serie">
+                                <button type="button" class="subcampo-delete-btn delete-titulo-btn" title="Eliminar" {% if forloop.first and forloop.last %}style="visibility: hidden;"{% endif %}>
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
                             </div>
+                            {% empty %}
+                            <div class="subcampo-row titulo-form-row">
+                                <button type="button" class="subcampo-add-btn add-titulo-btn" data-mencion-index="{{ forloop.counter0 }}" title="Agregar Título">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                <input type="text" class="form-control titulo-input" name="titulo_mencion_490_{{ forloop.counter0 }}_0" placeholder="Título de la serie">
+                                <button type="button" class="subcampo-delete-btn delete-titulo-btn" title="Eliminar" style="visibility: hidden;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="subcampo-row titulo-form-row">
+                            <button type="button" class="subcampo-add-btn add-titulo-btn" data-mencion-index="{{ forloop.counter0 }}" title="Agregar Título">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <input type="text" class="form-control titulo-input" name="titulo_mencion_490_{{ forloop.counter0 }}_0" placeholder="Título de la serie">
+                            <button type="button" class="subcampo-delete-btn delete-titulo-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
                         </div>
-                        {% endfor %}
-                    {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
                 
-                {# Botón para agregar volúmenes ($v) #}
+                {# Subcampo $v - Volúmenes (Repetible) con botón + a la izquierda #}
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-volumen-btn w-100" data-mencion-index="{{ forloop.counter0 }}">
-                        <i class="bi bi-plus-circle"></i>
-                        Agregar Volumen ($v)
-                    </button>
-                </div>
-                
-                {# Subcampo $v - Volúmenes (Repetible) #}
-                <div class="col-full volumenes-container" data-volumenes-container="{{ forloop.counter0 }}">
-                    {% if form.instance.pk %}
-                        {# Cargar volúmenes existentes #}
-                        {% for volumen in form.instance.volumenes_serie_490.all %}
-                        <div class="volumen-form-row">
-                            <div class="d-flex flex-column w-100 mb-2">
-                                <label class="form-label small">490 $v - Volumen</label>
-                                <div class="d-flex gap-2 align-items-center">
-                                    <input type="text" 
-                                           class="form-control volumen-input" 
-                                           name="volumen_mencion_490_{{ forloop.parentloop.counter0 }}_{{ volumen.pk }}"
-                                           value="{{ volumen.volumen }}"
-                                           placeholder="Número de volumen" 
-                                           style="flex: 1;">
-                                    <button type="button" class="btn btn-sm btn-outline-danger delete-volumen-btn" title="Eliminar volumen">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
+                    <label class="form-label small">490 $v - Volumen</label>
+                    <div class="subcampo-repetible-container volumenes-container" data-volumenes-container="{{ forloop.counter0 }}">
+                        {% if form.instance.pk %}
+                            {# Cargar volúmenes existentes #}
+                            {% for volumen in form.instance.volumenes_serie_490.all %}
+                            <div class="subcampo-row volumen-form-row">
+                                {% if forloop.first %}
+                                <button type="button" class="subcampo-add-btn add-volumen-btn" data-mencion-index="{{ forloop.parentloop.counter0 }}" title="Agregar Volumen">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                {% else %}
+                                <div class="subcampo-placeholder"></div>
+                                {% endif %}
+                                <input type="text" 
+                                       class="form-control volumen-input" 
+                                       name="volumen_mencion_490_{{ forloop.parentloop.counter0 }}_{{ volumen.pk }}"
+                                       value="{{ volumen.volumen }}"
+                                       placeholder="Número de volumen">
+                                <button type="button" class="subcampo-delete-btn delete-volumen-btn" title="Eliminar" {% if forloop.first and forloop.last %}style="visibility: hidden;"{% endif %}>
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
                             </div>
+                            {% empty %}
+                            <div class="subcampo-row volumen-form-row">
+                                <button type="button" class="subcampo-add-btn add-volumen-btn" data-mencion-index="{{ forloop.counter0 }}" title="Agregar Volumen">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                <input type="text" class="form-control volumen-input" name="volumen_mencion_490_{{ forloop.counter0 }}_0" placeholder="Número de volumen">
+                                <button type="button" class="subcampo-delete-btn delete-volumen-btn" title="Eliminar" style="visibility: hidden;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="subcampo-row volumen-form-row">
+                            <button type="button" class="subcampo-add-btn add-volumen-btn" data-mencion-index="{{ forloop.counter0 }}" title="Agregar Volumen">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <input type="text" class="form-control volumen-input" name="volumen_mencion_490_{{ forloop.counter0 }}_0" placeholder="Número de volumen">
+                            <button type="button" class="subcampo-delete-btn delete-volumen-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
                         </div>
-                        {% endfor %}
-                    {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -111,25 +139,33 @@ El campo 490 es repetible y contiene subcampos repetibles ($a título de serie y
             
             <div class="campo-grid">
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-titulo-btn w-100" data-mencion-index="__prefix__">
-                        <i class="bi bi-plus-circle"></i>
-                        Agregar Título de Serie ($a)
-                    </button>
-                </div>
-                
-                <div class="col-full titulos-container" data-titulos-container="__prefix__">
-                    {# Los títulos se agregarán aquí dinámicamente #}
+                    <label class="form-label small">490 $a - Título de serie</label>
+                    <div class="subcampo-repetible-container titulos-container" data-titulos-container="__prefix__">
+                        <div class="subcampo-row titulo-form-row">
+                            <button type="button" class="subcampo-add-btn add-titulo-btn" data-mencion-index="__prefix__" title="Agregar Título">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <input type="text" class="form-control titulo-input" name="titulo_mencion_490___prefix___0" placeholder="Título de la serie">
+                            <button type="button" class="subcampo-delete-btn delete-titulo-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="col-full">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-volumen-btn w-100" data-mencion-index="__prefix__">
-                        <i class="bi bi-plus-circle"></i>
-                        Agregar Volumen ($v)
-                    </button>
-                </div>
-                
-                <div class="col-full volumenes-container" data-volumenes-container="__prefix__">
-                    {# Los volúmenes se agregarán aquí dinámicamente #}
+                    <label class="form-label small">490 $v - Volumen</label>
+                    <div class="subcampo-repetible-container volumenes-container" data-volumenes-container="__prefix__">
+                        <div class="subcampo-row volumen-form-row">
+                            <button type="button" class="subcampo-add-btn add-volumen-btn" data-mencion-index="__prefix__" title="Agregar Volumen">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <input type="text" class="form-control volumen-input" name="volumen_mencion_490___prefix___0" placeholder="Número de volumen">
+                            <button type="button" class="subcampo-delete-btn delete-volumen-btn" title="Eliminar" style="visibility: hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -137,153 +173,134 @@ El campo 490 es repetible y contiene subcampos repetibles ($a título de serie y
 </div>
 
 {# Templates globales para títulos y volúmenes (fuera del formset loop) #}
-<div class="titulo-form-row titulo-template-490 d-none">
-    <div class="d-flex flex-column w-100 mb-2">
-        <label class="form-label small">490 $a - Título de serie</label>
-        <div class="d-flex gap-2 align-items-center">
-            <input type="text" class="form-control titulo-input" placeholder="Título de la serie" style="flex: 1;">
-            <button type="button" class="btn btn-sm btn-outline-danger delete-titulo-btn" title="Eliminar título">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
-    </div>
+<div class="subcampo-row titulo-form-row titulo-template-490 d-none">
+    <div class="subcampo-placeholder"></div>
+    <input type="text" class="form-control titulo-input" placeholder="Título de la serie">
+    <button type="button" class="subcampo-delete-btn delete-titulo-btn" title="Eliminar">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 
-<div class="volumen-form-row volumen-template-490 d-none">
-    <div class="d-flex flex-column w-100 mb-2">
-        <label class="form-label small">490 $v - Volumen</label>
-        <div class="d-flex gap-2 align-items-center">
-            <input type="text" class="form-control volumen-input" placeholder="Número de volumen" style="flex: 1;">
-            <button type="button" class="btn btn-sm btn-outline-danger delete-volumen-btn" title="Eliminar volumen">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
-    </div>
+<div class="subcampo-row volumen-form-row volumen-template-490 d-none">
+    <div class="subcampo-placeholder"></div>
+    <input type="text" class="form-control volumen-input" placeholder="Número de volumen">
+    <button type="button" class="subcampo-delete-btn delete-volumen-btn" title="Eliminar">
+        <i class="bi bi-x-lg"></i>
+    </button>
 </div>
 
 <script>
-// Script para manejar el campo 490 con títulos y volúmenes repetibles
+/**
+ * Script para subcampos repetibles del campo 490 (Títulos y Volúmenes de serie)
+ * La gestión del formset principal está en formset-manager.js
+ */
 (function() {
-    const prefix = '{{ formset.prefix }}';
-    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-    if (!container) return;
-    
-    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-    const addButton = container.querySelector('.add-form-row');
-    const formsContainer = container.querySelector('.formset-forms');
-    const tituloTemplate = document.querySelector('.titulo-template-490');
-    const volumenTemplate = document.querySelector('.volumen-template-490');
-    
-    if (!totalFormsInput || !addButton || !formsContainer || !tituloTemplate || !volumenTemplate) return;
-    
-    // Agregar nueva mención de serie 490
-    addButton.addEventListener('click', function() {
-        const totalForms = parseInt(totalFormsInput.value);
-        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
+    function init490Subcampos() {
+        const prefix = '{{ formset.prefix }}';
+        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+        if (!container || container.dataset.subcampos490Initialized) return;
+        container.dataset.subcampos490Initialized = 'true';
         
-        if (!emptyFormTemplate) return;
+        const tituloTemplate = document.querySelector('.titulo-template-490');
+        const volumenTemplate = document.querySelector('.volumen-template-490');
         
-        const emptyForm = emptyFormTemplate.cloneNode(true);
-        emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, totalForms);
-        emptyForm.classList.remove('empty-form');
-        emptyForm.style.display = '';
+        if (!tituloTemplate || !volumenTemplate) return;
         
-        formsContainer.insertBefore(emptyForm, emptyFormTemplate);
-        totalFormsInput.value = totalForms + 1;
-    });
-    
-    // Eliminar mención de serie 490
-    container.addEventListener('click', function(e) {
-        const deleteBtn = e.target.closest('.delete-row-btn');
-        if (!deleteBtn) return;
-        
-        const row = deleteBtn.closest('.formset-row');
-        if (!row || row.classList.contains('empty-form')) return;
-        
-        const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
-        
-        if (row.classList.contains('existing-form')) {
-            if (deleteCheckbox && deleteCheckbox.checked) {
-                deleteCheckbox.checked = false;
-                row.style.opacity = '1';
-                deleteBtn.classList.remove('btn-warning');
-                deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
-                deleteBtn.title = 'Eliminar';
-            } else if (deleteCheckbox) {
-                deleteCheckbox.checked = true;
-                row.style.opacity = '0.5';
-                deleteBtn.classList.add('btn-warning');
-                deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
-                deleteBtn.title = 'Cancelar eliminación';
-            }
-        } else {
-            row.remove();
-            totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
-        }
-    });
-    
-    // Manejar títulos de serie (subcampo $a repetible)
-    container.addEventListener('click', function(e) {
-        // Agregar título
-        const addTituloBtn = e.target.closest('.add-titulo-btn');
-        if (addTituloBtn) {
-            const mencionIndex = addTituloBtn.getAttribute('data-mencion-index');
-            const titulosContainer = container.querySelector(`[data-titulos-container="${mencionIndex}"]`);
-            
-            if (!titulosContainer) return;
-            
-            const newTitulo = tituloTemplate.cloneNode(true);
-            newTitulo.classList.remove('titulo-template-490', 'd-none');
-            
-            // Actualizar el name del input
-            const input = newTitulo.querySelector('.titulo-input');
-            if (input) {
-                input.name = `titulo_mencion_490_${mencionIndex}_${Date.now()}`;
-            }
-            
-            titulosContainer.appendChild(newTitulo);
+        // Función para actualizar visibilidad de botones de eliminar
+        // La primera fila (con .subcampo-add-btn) NUNCA se puede eliminar
+        function updateDeleteButtonsVisibility(subcampoContainer) {
+            const rows = subcampoContainer.querySelectorAll('.subcampo-row:not(.d-none)');
+            rows.forEach((row) => {
+                const deleteBtn = row.querySelector('.subcampo-delete-btn');
+                if (deleteBtn) {
+                    // Si es la primera fila (tiene el botón +), ocultar siempre
+                    if (row.querySelector('.subcampo-add-btn')) {
+                        deleteBtn.style.visibility = 'hidden';
+                    } else {
+                        // Las demás filas siempre pueden eliminarse
+                        deleteBtn.style.visibility = 'visible';
+                    }
+                }
+            });
         }
         
-        // Eliminar título
-        const deleteTituloBtn = e.target.closest('.delete-titulo-btn');
-        if (deleteTituloBtn) {
-            const tituloRow = deleteTituloBtn.closest('.titulo-form-row');
-            if (!tituloRow.classList.contains('titulo-template-490')) {
-                tituloRow.remove();
-            }
-        }
-    });
-    
-    // Manejar volúmenes (subcampo $v repetible)
-    container.addEventListener('click', function(e) {
-        // Agregar volumen
-        const addVolumenBtn = e.target.closest('.add-volumen-btn');
-        if (addVolumenBtn) {
-            const mencionIndex = addVolumenBtn.getAttribute('data-mencion-index');
-            const volumenesContainer = container.querySelector(`[data-volumenes-container="${mencionIndex}"]`);
-            
-            if (!volumenesContainer) return;
-            
-            const newVolumen = volumenTemplate.cloneNode(true);
-            newVolumen.classList.remove('volumen-template-490', 'd-none');
-            
-            // Actualizar el name del input
-            const input = newVolumen.querySelector('.volumen-input');
-            if (input) {
-                input.name = `volumen_mencion_490_${mencionIndex}_${Date.now()}`;
+        container.addEventListener('click', function(e) {
+            // Agregar Título
+            const addTituloBtn = e.target.closest('.add-titulo-btn');
+            if (addTituloBtn) {
+                const mencionIndex = addTituloBtn.getAttribute('data-mencion-index');
+                const titulosContainer = container.querySelector(`[data-titulos-container="${mencionIndex}"]`);
+                
+                if (titulosContainer && tituloTemplate) {
+                    const newTitulo = tituloTemplate.cloneNode(true);
+                    newTitulo.classList.remove('titulo-template-490', 'd-none');
+                    
+                    const input = newTitulo.querySelector('.titulo-input');
+                    if (input) {
+                        input.name = `titulo_mencion_490_${mencionIndex}_${Date.now()}`;
+                    }
+                    
+                    titulosContainer.appendChild(newTitulo);
+                    updateDeleteButtonsVisibility(titulosContainer);
+                }
+                return;
             }
             
-            volumenesContainer.appendChild(newVolumen);
-        }
+            // Eliminar Título (solo si NO tiene el botón +)
+            const deleteTituloBtn = e.target.closest('.delete-titulo-btn');
+            if (deleteTituloBtn) {
+                const tituloRow = deleteTituloBtn.closest('.titulo-form-row');
+                if (tituloRow && !tituloRow.classList.contains('titulo-template-490') && !tituloRow.querySelector('.subcampo-add-btn')) {
+                    const subcampoContainer = tituloRow.closest('.subcampo-repetible-container');
+                    tituloRow.remove();
+                    updateDeleteButtonsVisibility(subcampoContainer);
+                }
+                return;
+            }
+            
+            // Agregar Volumen
+            const addVolumenBtn = e.target.closest('.add-volumen-btn');
+            if (addVolumenBtn) {
+                const mencionIndex = addVolumenBtn.getAttribute('data-mencion-index');
+                const volumenesContainer = container.querySelector(`[data-volumenes-container="${mencionIndex}"]`);
+                
+                if (volumenesContainer && volumenTemplate) {
+                    const newVolumen = volumenTemplate.cloneNode(true);
+                    newVolumen.classList.remove('volumen-template-490', 'd-none');
+                    
+                    const input = newVolumen.querySelector('.volumen-input');
+                    if (input) {
+                        input.name = `volumen_mencion_490_${mencionIndex}_${Date.now()}`;
+                    }
+                    
+                    volumenesContainer.appendChild(newVolumen);
+                    updateDeleteButtonsVisibility(volumenesContainer);
+                }
+                return;
+            }
+            
+            // Eliminar Volumen (solo si NO tiene el botón +)
+            const deleteVolumenBtn = e.target.closest('.delete-volumen-btn');
+            if (deleteVolumenBtn) {
+                const volumenRow = deleteVolumenBtn.closest('.volumen-form-row');
+                if (volumenRow && !volumenRow.classList.contains('volumen-template-490') && !volumenRow.querySelector('.subcampo-add-btn')) {
+                    const subcampoContainer = volumenRow.closest('.subcampo-repetible-container');
+                    volumenRow.remove();
+                    updateDeleteButtonsVisibility(subcampoContainer);
+                }
+                return;
+            }
+        });
         
-        // Eliminar volumen
-        const deleteVolumenBtn = e.target.closest('.delete-volumen-btn');
-        if (deleteVolumenBtn) {
-            const volumenRow = deleteVolumenBtn.closest('.volumen-form-row');
-            if (!volumenRow.classList.contains('volumen-template-490')) {
-                volumenRow.remove();
-            }
-        }
-    });
+        // Inicializar visibilidad de todos los contenedores de subcampos
+        container.querySelectorAll('.subcampo-repetible-container').forEach(updateDeleteButtonsVisibility);
+    }
+    
+    // Ejecutar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init490Subcampos);
+    } else {
+        setTimeout(init490Subcampos, 0);
+    }
 })();
 </script>

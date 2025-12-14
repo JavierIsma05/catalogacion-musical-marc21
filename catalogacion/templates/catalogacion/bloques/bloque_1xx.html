@@ -15,6 +15,9 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">100</span>
                     <h6>Compositor</h6>
+                    <span class="campo-help-btn" data-field-code="100" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
                 
                 <div class="campo-grid">
@@ -23,9 +26,11 @@
                     
                     <div class="col-full">
                         <label class="form-label" for="id_compositor_texto">{{ form.compositor_texto.label }}</label>
-                        {{ form.compositor_texto }}
+                        <div class="autocomplete-wrapper">
+                            {{ form.compositor_texto }}
+                            <div id="compositor-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
                         <div class="form-text">Escriba para buscar compositores existentes o ingrese un nombre nuevo</div>
-                        <div id="compositor-suggestions" class="autocomplete-suggestions"></div>
                         {% if form.compositor_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.compositor_texto.errors }}</div>
                         {% endif %}
@@ -60,12 +65,11 @@
                 {# Subcampo repetible: 100 $e - Funciones #}
                 {% if 'funciones_compositor' in formsets_visibles %}
                 <div class="mt-3">
-                    <div class="campo-titulo">
-                        <span class="badge-marc">100$e</span>
-                        <h6>Funciones</h6>
-                        <span class="badge-repetible">REPETIBLE</span>
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="badge-marc me-2">100$e</span>
+                        <label class="form-label small mb-0">Función</label>
                     </div>
-                    {% include 'catalogacion/includes/formset_template.html' with formset=funciones_compositor titulo="Función" %}
+                    {% include 'catalogacion/includes/formset_100e_template.html' with formset=funciones_compositor %}
                 </div>
                 {% endif %}
             </div>
@@ -77,6 +81,9 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">130</span>
                     <h6>Título Uniforme Principal</h6>
+                    <span class="campo-help-btn" data-field-code="130" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
                 
                 <div class="campo-grid">
@@ -85,9 +92,11 @@
                     
                     <div class="col-full">
                         <label class="form-label" for="id_titulo_uniforme_texto">{{ form.titulo_uniforme_texto.label }}</label>
-                        {{ form.titulo_uniforme_texto }}
+                        <div class="autocomplete-wrapper">
+                            {{ form.titulo_uniforme_texto }}
+                            <div id="titulo-uniforme-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
                         <div class="form-text">Escriba para buscar títulos existentes o ingrese uno nuevo</div>
-                        <div id="titulo-uniforme-suggestions" class="autocomplete-suggestions"></div>
                         {% if form.titulo_uniforme_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.titulo_uniforme_texto.errors }}</div>
                         {% endif %}
@@ -98,9 +107,11 @@
                     
                     <div class="col-half">
                         <label class="form-label" for="id_forma_130_texto">{{ form.forma_130_texto.label }}</label>
-                        {{ form.forma_130_texto }}
+                        <div class="autocomplete-wrapper">
+                            {{ form.forma_130_texto }}
+                            <div id="forma-130-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
                         <div class="form-text">Escriba para buscar formas musicales o ingrese una nueva</div>
-                        <div id="forma-130-suggestions" class="autocomplete-suggestions"></div>
                         {% if form.forma_130_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.forma_130_texto.errors }}</div>
                         {% endif %}
@@ -140,6 +151,9 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">240</span>
                     <h6>Título Uniforme (subordinado al 100)</h6>
+                    <span class="campo-help-btn" data-field-code="240" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
                 
                 <div class="campo-grid">
@@ -148,9 +162,11 @@
                     
                     <div class="col-full">
                         <label class="form-label" for="id_titulo_240_texto">{{ form.titulo_240_texto.label }}</label>
-                        {{ form.titulo_240_texto }}
+                        <div class="autocomplete-wrapper">
+                            {{ form.titulo_240_texto }}
+                            <div id="titulo-240-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
                         <div class="form-text">Escriba para buscar títulos existentes o ingrese uno nuevo</div>
-                        <div id="titulo-240-suggestions" class="autocomplete-suggestions"></div>
                         {% if form.titulo_240_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.titulo_240_texto.errors }}</div>
                         {% endif %}
@@ -161,9 +177,11 @@
                     
                     <div class="col-half">
                         <label class="form-label" for="id_forma_240_texto">{{ form.forma_240_texto.label }}</label>
-                        {{ form.forma_240_texto }}
+                        <div class="autocomplete-wrapper">
+                            {{ form.forma_240_texto }}
+                            <div id="forma-240-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
                         <div class="form-text">Escriba para buscar formas musicales o ingrese una nueva</div>
-                        <div id="forma-240-suggestions" class="autocomplete-suggestions"></div>
                         {% if form.forma_240_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.forma_240_texto.errors }}</div>
                         {% endif %}

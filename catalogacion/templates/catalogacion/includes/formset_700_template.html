@@ -1,9 +1,9 @@
 {% comment %}
-Template especializado para el campo 700 - Nombres Relacionados.
-Permite:
-- Autocomplete editable para 700 $a (AutoridadPersona)
-- Campo 700 $d separado
-- Subcampos repetibles $c (término asociado) y $e (función)
+Template definitivo para el campo 700 – Nombres Relacionados
+- Autocomplete 700 $a (persona)
+- 700 $d, $t, $i, $j normales
+- 700 $c y 700 $e repetibles con botones +
+- Sin filtros personalizados (NO add_class)
 {% endcomment %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
@@ -12,16 +12,11 @@ Permite:
             {{ hidden }}
         {% endfor %}
     </div>
-
-    <button type="button" class="add-form-row mb-3" title="Agregar nombre relacionado">
-        <i class="bi bi-plus-circle"></i>
-        Agregar Nombre Relacionado (700)
-    </button>
     
 
     <div class="formset-forms">
         {% for form in formset %}
-        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
+        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3 position-relative">
             {% for hidden in form.hidden_fields %}
                 {{ hidden }}
             {% endfor %}
@@ -31,7 +26,11 @@ Permite:
                 </div>
             {% endif %}
 
-            <button type="button" class="delete-row-btn" title="Eliminar registro 700">
+            <!-- Botón eliminar fila -->
+            <button type="button"
+                    class="delete-row-btn btn btn-sm btn-outline-danger position-absolute"
+                    style="right: 8px; top: 8px;"
+                    title="Eliminar registro 700">
                 <i class="bi bi-x-lg"></i>
             </button>
 
@@ -43,25 +42,25 @@ Permite:
 
             <div class="campo-grid">
 
-                {# 700 $a – persona (autocomplete + hidden FK) #}
+                {# 700 $a – Persona (autocomplete) #}
                 <div class="col-full">
-                    {{ form.persona }} {# HIDDEN con class persona700-id #}
+                    {{ form.persona }} {# hidden FK #}
                     <label class="form-label" for="{{ form.persona_texto.id_for_label }}">
                         {{ form.persona_texto.label }}
                     </label>
-                    {{ form.persona_texto }}
-                    
+                    <div class="autocomplete-wrapper">
+                        {{ form.persona_texto }}
+                        <div class="autocomplete-suggestions persona700-suggestions"></div>
+                    </div>
                     <div class="form-text">
-                        
                         Escriba para buscar personas existentes o ingrese un nombre nuevo.
                     </div>
-                    <div class="autocomplete-suggestions persona700-suggestions"></div>
                     {% if form.persona_texto.errors %}
                         <div class="invalid-feedback d-block">{{ form.persona_texto.errors }}</div>
                     {% endif %}
                 </div>
 
-                {# 700 $d – coordenadas biográficas (campo separado, pero también tenemos coordenadas_biograficas en el modelo) #}
+                {# 700 $d – Coordenadas biográficas #}
                 <div class="col-half">
                     <label class="form-label" for="{{ form.persona_coordenadas.id_for_label }}">
                         {{ form.persona_coordenadas.label }}
@@ -72,29 +71,36 @@ Permite:
                     {% endif %}
                 </div>
 
-                
-
-                {# 700 $t – Título de obra (NR) #}
+                {# 700 $t – Título de la obra #}
                 <div class="col-half">
-                    <label class="form-label" for="{{ form.titulo_obra.id_for_label }}">{{ form.titulo_obra.label }}</label>
-                    {{ form.titulo_obra }}
+                    <label class="form-label" for="{{ form.titulo_obra.id_for_label }}">
+                        {{ form.titulo_obra.label }}
+                    </label>
+                    <div class="autocomplete-wrapper">
+                        {{ form.titulo_obra }}
+                        <div class="autocomplete-suggestions titulo700-suggestions"></div>
+                    </div>
                     {% if form.titulo_obra.errors %}
                         <div class="invalid-feedback d-block">{{ form.titulo_obra.errors }}</div>
                     {% endif %}
                 </div>
 
-                {# 700 $i – Relación (NR) #}
+                {# 700 $i – Relación #}
                 <div class="col-half">
-                    <label class="form-label" for="{{ form.relacion.id_for_label }}">{{ form.relacion.label }}</label>
+                    <label class="form-label" for="{{ form.relacion.id_for_label }}">
+                        {{ form.relacion.label }}
+                    </label>
                     {{ form.relacion }}
                     {% if form.relacion.errors %}
                         <div class="invalid-feedback d-block">{{ form.relacion.errors }}</div>
                     {% endif %}
                 </div>
 
-                {# 700 $j – Autoría (NR) #}
+                {# 700 $j – Autoría #}
                 <div class="col-full">
-                    <label class="form-label" for="{{ form.autoria.id_for_label }}">{{ form.autoria.label }}</label>
+                    <label class="form-label" for="{{ form.autoria.id_for_label }}">
+                        {{ form.autoria.label }}
+                    </label>
                     {{ form.autoria }}
                     {% if form.autoria.errors %}
                         <div class="invalid-feedback d-block">{{ form.autoria.errors }}</div>
@@ -111,7 +117,7 @@ Permite:
                     </button>
                 </div>
 
-                {# Subcampo $c – Términos asociados (Repetible) #}
+                {# Contenedor inicial de $c – si hay existentes #}
                 <div class="col-full terminos-container"
                      data-terminos-container="{{ forloop.counter0 }}">
                     {% if form.instance.pk %}
@@ -148,7 +154,7 @@ Permite:
                     </button>
                 </div>
 
-                {# Subcampo $e – Funciones (Repetible) #}
+                {# Contenedor inicial de $e – si hay existentes #}
                 <div class="col-full funciones-container"
                      data-funciones-container="{{ forloop.counter0 }}">
                     {% if form.instance.pk %}
@@ -162,7 +168,7 @@ Permite:
                                             style="flex: 1;">
                                         {% for value, label in funcion.FUNCIONES_PERSONA %}
                                             <option value="{{ value }}"
-                                                {% if funcion.funcion == value %}selected{% endif %}>
+                                                    {% if funcion.funcion == value %}selected{% endif %}>
                                                 {{ label }}
                                             </option>
                                         {% endfor %}
@@ -183,7 +189,7 @@ Permite:
         </div>
         {% endfor %}
 
-        {# TEMPLATE vacío #}
+        {# TEMPLATE vacío para nuevas filas #}
         <div class="formset-row empty-form mb-3" style="display:none;">
             <div style="display:none;">
                 {% for hidden in formset.empty_form.hidden_fields %}
@@ -191,7 +197,10 @@ Permite:
                 {% endfor %}
             </div>
 
-            <button type="button" class="delete-row-btn" title="Eliminar registro 700">
+            <button type="button"
+                    class="delete-row-btn btn btn-sm btn-outline-danger position-absolute"
+                    style="right: 8px; top: 8px;"
+                    title="Eliminar registro 700">
                 <i class="bi bi-x-lg"></i>
             </button>
 
@@ -203,11 +212,13 @@ Permite:
                            for="{{ formset.empty_form.persona_texto.id_for_label }}">
                         {{ formset.empty_form.persona_texto.label }}
                     </label>
-                    {{ formset.empty_form.persona_texto }}
+                    <div class="autocomplete-wrapper">
+                        {{ formset.empty_form.persona_texto }}
+                        <div class="autocomplete-suggestions persona700-suggestions"></div>
+                    </div>
                     <div class="form-text">
                         Escriba para buscar personas existentes o ingrese un nombre nuevo.
                     </div>
-                    <div class="autocomplete-suggestions persona700-suggestions"></div>
                 </div>
 
                 <div class="col-half">
@@ -220,18 +231,13 @@ Permite:
 
                 <div class="col-half">
                     <label class="form-label"
-                           for="{{ formset.empty_form.coordenadas_biograficas.id_for_label }}">
-                        {{ formset.empty_form.coordenadas_biograficas.label }}
-                    </label>
-                    {{ formset.empty_form.coordenadas_biograficas }}
-                </div>
-
-                <div class="col-half">
-                    <label class="form-label"
                            for="{{ formset.empty_form.titulo_obra.id_for_label }}">
                         {{ formset.empty_form.titulo_obra.label }}
                     </label>
-                    {{ formset.empty_form.titulo_obra }}
+                    <div class="autocomplete-wrapper">
+                        {{ formset.empty_form.titulo_obra }}
+                        <div class="autocomplete-suggestions titulo700-suggestions"></div>
+                    </div>
                 </div>
 
                 <div class="col-half">
@@ -300,14 +306,9 @@ Permite:
         <label class="form-label small">700 $e - Función</label>
         <div class="d-flex gap-2 align-items-center">
             <select class="form-select funcion-select" style="flex: 1;">
-                <option value="arreglista">Arreglista</option>
-                <option value="coeditor">Coeditor</option>
-                <option value="compilador">Compilador</option>
-                <option value="compositor">Compositor</option>
-                <option value="copista">Copista</option>
-                <option value="dedicatario">Dedicatario</option>
-                <option value="editor">Editor</option>
-                <option value="prologuista">Prologuista</option>
+                {% for value, label in formset.empty_form.fields.autoria.choices %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
             </select>
             <button type="button"
                     class="btn btn-sm btn-outline-danger delete-funcion-btn"
@@ -318,9 +319,35 @@ Permite:
     </div>
 </div>
 
+<style>
+.campo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.col-full { grid-column: span 2; }
+.autocomplete-suggestions {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    background: #fff;
+    z-index: 1030;
+}
+.autocomplete-item {
+    padding: 4px 8px;
+    cursor: pointer;
+}
+.autocomplete-item:hover,
+.autocomplete-item.selected {
+    background-color: #e9ecef;
+}
+</style>
+
 <script>
-(function() {
-    const container = document.querySelector('[data-formset-prefix="{{ formset.prefix }}"]');
+(function () {
+    const prefix = "{{ formset.prefix }}";
+    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
     if (!container) return;
 
     const terminoTemplate = document.querySelector('.termino-template-700');
@@ -332,14 +359,16 @@ Permite:
         return div.innerHTML;
     }
 
-    // -------- AUTOCOMPLETE PERSONA 700 (similar a compositor, pero por fila) ----------
-    function initPersonaAutocompleteForRow(row) {
+    /* ============================
+       AUTOCOMPLETE PERSONA 700 $a
+       ============================ */
+    function initPersonaAutocomplete(row) {
         if (row.dataset.persona700Init === "1") return;
         row.dataset.persona700Init = "1";
 
-        const input = row.querySelector('.persona700-input');
-        const hiddenId = row.querySelector('.persona700-id');
-        const coordInput = row.querySelector('.persona700-coord-input');
+        const input = row.querySelector('input[name$="persona_texto"]');
+        const hiddenId = row.querySelector('input[name$="persona"]');
+        const coordInput = row.querySelector('input[name$="persona_coordenadas"]');
         const suggestionsBox = row.querySelector('.persona700-suggestions');
 
         if (!input || !hiddenId || !suggestionsBox) return;
@@ -383,19 +412,15 @@ Permite:
 
             if (data.isNew) {
                 item.classList.add("autocomplete-item-new");
-                item.innerHTML = `
-                    <i class="bi bi-plus-circle me-2"></i>
-                    <strong>Crear nuevo:</strong> "${escapeHtml(data.apellidos_nombres)}"
-                `;
+                item.innerHTML =
+                    `<i class="bi bi-plus-circle me-2"></i>` +
+                    `<strong>Crear nuevo:</strong> "${escapeHtml(data.apellidos_nombres)}"`;
             } else {
-                item.innerHTML = `
-                    <div><strong>${escapeHtml(data.apellidos_nombres)}</strong></div>
-                    ${
-                        data.coordenadas_biograficas
-                            ? `<small class="text-muted">${escapeHtml(data.coordenadas_biograficas)}</small>`
-                            : ""
-                    }
-                `;
+                item.innerHTML =
+                    `<div><strong>${escapeHtml(data.apellidos_nombres)}</strong></div>` +
+                    (data.coordenadas_biograficas
+                        ? `<small class="text-muted">${escapeHtml(data.coordenadas_biograficas)}</small>`
+                        : "");
             }
 
             item.addEventListener("click", function () {
@@ -448,7 +473,7 @@ Permite:
                 .catch(err => console.error("Error al buscar personas 700:", err));
         }
 
-        input.addEventListener("input", function() {
+        input.addEventListener("input", function () {
             const q = input.value.trim();
             if (q.length < 2) {
                 hideSuggestions();
@@ -458,7 +483,7 @@ Permite:
             debounceTimer = setTimeout(() => searchPersonas(q), 300);
         });
 
-        input.addEventListener("keydown", function(e) {
+        input.addEventListener("keydown", function (e) {
             if (!suggestionsBox.classList.contains("show")) return;
 
             const items = suggestionsBox.querySelectorAll(".autocomplete-item");
@@ -483,42 +508,33 @@ Permite:
             }
         });
 
-        document.addEventListener("click", function(ev) {
+        document.addEventListener("click", function (ev) {
             if (!row.contains(ev.target)) {
                 hideSuggestions();
             }
         });
     }
 
-    // Reindexar formularios después de agregar/eliminar
+    /* ============================
+       REINDEXAR FORMSET 700
+       ============================ */
     function reindexForms() {
         const rows = container.querySelectorAll('.formset-row:not(.empty-form)');
-        const totalInput = container.querySelector('[name="{{ formset.prefix }}-TOTAL_FORMS"]');
+        const totalInput = container.querySelector(`[name="${prefix}-TOTAL_FORMS"]`);
         if (totalInput) totalInput.value = rows.length;
 
         rows.forEach((row, index) => {
-            row.querySelectorAll('input, select, textarea').forEach(field => {
-                ['name', 'id'].forEach(attr => {
-                    const val = field.getAttribute(attr);
+            row.querySelectorAll('input, select, textarea, label').forEach(el => {
+                ['name', 'id', 'for'].forEach(attr => {
+                    const val = el.getAttribute(attr);
                     if (!val) return;
 
                     if (val.includes('__prefix__')) {
-                        field.setAttribute(attr, val.replace(/__prefix__/, index));
+                        el.setAttribute(attr, val.replace(/__prefix__/, index));
                     } else if (/-\d+-/.test(val)) {
-                        field.setAttribute(attr, val.replace(/-\d+-/, `-${index}-`));
+                        el.setAttribute(attr, val.replace(/-\d+-/, `-${index}-`));
                     }
                 });
-            });
-
-            row.querySelectorAll('label').forEach(label => {
-                const forAttr = label.getAttribute('for');
-                if (!forAttr) return;
-
-                if (forAttr.includes('__prefix__')) {
-                    label.setAttribute('for', forAttr.replace(/__prefix__/, index));
-                } else if (/-\d+-/.test(forAttr)) {
-                    label.setAttribute('for', forAttr.replace(/-\d+-/, `-${index}-`));
-                }
             });
 
             row.querySelectorAll('[data-nombre-index]').forEach(btn => {
@@ -530,38 +546,58 @@ Permite:
             if (terminosContainer) terminosContainer.setAttribute('data-terminos-container', index);
             if (funcionesContainer) funcionesContainer.setAttribute('data-funciones-container', index);
 
-            function actualizarSubcampo(selector, prefix) {
-                row.querySelectorAll(selector).forEach(input => {
-                    if (!input.name) return;
-                    const match = input.name.match(new RegExp(`${prefix}(\\d+)_(\\d+)`));
-                    if (match) {
-                        input.name = `${prefix}${index}_${match[2]}`;
-                    }
-                });
-            }
+            // actualizar nombres de subcampos personalizados
+            row.querySelectorAll('input[name^="termino_asociado_700_"]').forEach(input => {
+                const partes = input.name.split('_');
+                if (partes.length === 4) { // termino_asociado_700_INDEX_PK
+                    input.name = `termino_asociado_700_${index}_${partes[3]}`;
+                }
+            });
+            row.querySelectorAll('select[name^="funcion_700_"]').forEach(sel => {
+                const partes = sel.name.split('_');
+                if (partes.length === 3) { // funcion_700_INDEX_PK
+                    sel.name = `funcion_700_${index}_${partes[2]}`;
+                }
+            });
 
-            actualizarSubcampo('input[name^="termino_asociado_700_"]', 'termino_asociado_700_');
-            actualizarSubcampo('select[name^="funcion_700_"]', 'funcion_700_');
-
-            // asegurarnos de que siga funcionando el autocomplete en cada fila
-            initPersonaAutocompleteForRow(row);
+            initPersonaAutocomplete(row);
         });
     }
 
-    container.addEventListener('click', (e) => {
-        const addBtn = e.target.closest('.add-form-row');
-        if (addBtn) {
+    /* ============================
+       BOTÓN EXTERNO (HEADER) 700
+       ============================ */
+    const headerAddBtn = document.querySelector(`.campo-add-btn[data-formset-target="${prefix}"]`);
+    if (headerAddBtn) {
+        headerAddBtn.addEventListener('click', function () {
             const emptyForm = container.querySelector('.empty-form');
-            if (emptyForm) {
-                const nuevo = emptyForm.cloneNode(true);
-                nuevo.classList.remove('empty-form');
-                nuevo.style.display = '';
-                container.querySelector('.formset-forms').appendChild(nuevo);
-                reindexForms();
-            }
-            return;
-        }
+            const formsContainer = container.querySelector('.formset-forms');
+            const totalInput = container.querySelector(`[name="${prefix}-TOTAL_FORMS"]`);
 
+            if (!emptyForm || !formsContainer || !totalInput) return;
+
+            const total = parseInt(totalInput.value, 10) || 0;
+
+            const nuevo = emptyForm.cloneNode(true);
+            nuevo.innerHTML = nuevo.innerHTML.replace(/__prefix__/g, total);
+            nuevo.classList.remove('empty-form');
+            nuevo.style.display = '';
+
+            formsContainer.appendChild(nuevo);
+
+            // Autocomplete en $a para la nueva fila
+            initPersonaAutocomplete(nuevo);
+
+            totalInput.value = total + 1;
+           // reindexForms();
+        });
+    }
+
+    /* ============================
+       EVENTOS CLICK DENTRO DEL 700
+       ============================ */
+    container.addEventListener('click', (e) => {
+        // ❌ Eliminar fila 700
         const deleteBtn = e.target.closest('.delete-row-btn');
         if (deleteBtn) {
             const row = deleteBtn.closest('.formset-row');
@@ -570,8 +606,6 @@ Permite:
                 if (deleteCheckbox && row.classList.contains('existing-form')) {
                     deleteCheckbox.checked = !deleteCheckbox.checked;
                     row.style.opacity = deleteCheckbox.checked ? "0.5" : "1";
-                    deleteBtn.classList.add('btn-warning');
-                    deleteBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
                 } else {
                     row.remove();
                     reindexForms();
@@ -580,6 +614,7 @@ Permite:
             return;
         }
 
+        // ➕ Agregar término $c
         const addTerminoBtn = e.target.closest('.add-termino-btn');
         if (addTerminoBtn) {
             const index = addTerminoBtn.getAttribute('data-nombre-index');
@@ -596,6 +631,7 @@ Permite:
             return;
         }
 
+        // ➕ Agregar función $e
         const addFuncionBtn = e.target.closest('.add-funcion-btn');
         if (addFuncionBtn) {
             const index = addFuncionBtn.getAttribute('data-nombre-index');
@@ -612,6 +648,7 @@ Permite:
             return;
         }
 
+        // ❌ Borrar término $c
         if (e.target.closest('.delete-termino-btn')) {
             const row = e.target.closest('.termino-form-row');
             if (row && !row.classList.contains('termino-template-700')) {
@@ -620,6 +657,7 @@ Permite:
             return;
         }
 
+        // ❌ Borrar función $e
         if (e.target.closest('.delete-funcion-btn')) {
             const row = e.target.closest('.funcion-form-row');
             if (row && !row.classList.contains('funcion-template-700')) {
@@ -629,9 +667,9 @@ Permite:
         }
     });
 
-    // Inicializar al cargar
+    // Inicializar todo al cargar
     container.querySelectorAll('.formset-row:not(.empty-form)').forEach(row => {
-        initPersonaAutocompleteForRow(row);
+        initPersonaAutocomplete(row);
     });
     reindexForms();
 })();

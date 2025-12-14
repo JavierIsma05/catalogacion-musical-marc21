@@ -1,0 +1,92 @@
+{
+    "campos": {
+        "020": {
+            "titulo": "ISBN",
+            "ayuda": ""
+        },
+        "024": {
+            "titulo": "ISMN",
+            "ayuda": ""
+        },
+        "028": {
+            "titulo": "Número de Editor",
+            "ayuda": ""
+        },
+        "031": {
+            "titulo": "Íncipit Musical",
+            "ayuda": "Incipit musical en notación moderna o en notación de tablatura."
+        },
+        "040": {
+            "titulo": "Fuente de Catalogación",
+            "ayuda": ""
+        },
+        "041": {
+            "titulo": "Código de Idioma",
+            "ayuda": ""
+        },
+        "044": {
+            "titulo": "Código de País",
+            "ayuda": ""
+        },
+        "100": {
+            "titulo": "Compositor",
+            "ayuda": ""
+        },
+        "100e": {
+            "titulo": "Funciones del Compositor",
+            "ayuda": ""
+        },
+        "130": {
+            "titulo": "Título Uniforme Principal",
+            "ayuda": ""
+        },
+        "240": {
+            "titulo": "Título Uniforme Subordinado",
+            "ayuda": ""
+        },
+        "245": {
+            "titulo": "Título Principal",
+            "ayuda": ""
+        },
+        "246": {
+            "titulo": "Títulos Alternativos",
+            "ayuda": ""
+        },
+        "250": {
+            "titulo": "Edición",
+            "ayuda": ""
+        },
+        "264": {
+            "titulo": "Producción/Publicación",
+            "ayuda": ""
+        },
+        "300": {
+            "titulo": "Descripción Física",
+            "ayuda": ""
+        },
+        "340": {
+            "titulo": "Características Técnicas",
+            "ayuda": ""
+        },
+        "348": {
+            "titulo": "Formato",
+            "ayuda": ""
+        },
+        "382": {
+            "titulo": "Medio de Interpretación",
+            "ayuda": ""
+        },
+        "383": {
+            "titulo": "Designación Numérica",
+            "ayuda": ""
+        },
+        "384": {
+            "titulo": "Tonalidad",
+            "ayuda": ""
+        },
+        "490": {
+            "titulo": "Mención de Serie",
+            "ayuda": ""
+        }
+    }
+}

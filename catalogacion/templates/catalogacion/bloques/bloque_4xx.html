@@ -14,10 +14,13 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">490</span>
                     <h6>Mención de Serie</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
+                    <button type="button" class="campo-add-btn" data-formset-target="menciones_490" title="Agregar Mención de Serie">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                    <span class="campo-help-btn" data-field-code="490" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
                 </div>
-                
-                <p class="form-text">Información de la serie a la que pertenece la obra. Subcampos $a (título) y $v (volumen) repetibles.</p>
                 
                 {% include 'catalogacion/includes/formset_490_template.html' with formset=menciones_serie_490 %}
             </div>

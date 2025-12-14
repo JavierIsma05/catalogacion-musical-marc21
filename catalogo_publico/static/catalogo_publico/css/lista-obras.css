@@ -1,0 +1,351 @@
+/* ==========================================================================
+   ESTILOS MEJORADOS PARA LISTA DE OBRAS
+   Versión con mejor contraste y profundidad visual
+   ========================================================================== */
+
+/* ============================================
+   CARDS DE OBRAS - REDISEÑO ELEGANTE
+   ============================================ */
+.obra-catalog-card {
+    display: flex;
+    gap: 1rem;
+    padding: 0;
+    border: none;
+    border-radius: 12px;
+    background: #fdfdff;
+    box-shadow:
+        0 10px 30px rgba(23, 27, 33, 0.06),
+        0 1px 0 rgba(47, 53, 69, 0.04);
+    align-items: stretch;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.obra-catalog-card:hover {
+    box-shadow: 
+        0 8px 24px rgba(47, 53, 69, 0.14),
+        0 0 0 1px rgba(47, 53, 69, 0.1);
+    transform: translateY(-3px);
+}
+
+/* ============================================
+   SECCIÓN DE PORTADA - MÁS DEFINIDA
+   ============================================ */
+.obra-cover {
+    width: 132px;
+    flex-shrink: 0;
+    background: linear-gradient(180deg, #eef2f7 0%, #e2e6ee 100%);
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    border-right: 1px solid #dfe3ea;
+}
+
+.cover-frame {
+    border: 1.5px dashed rgba(47, 53, 69, 0.18);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+}
+
+.cover-placeholder {
+    text-align: center;
+    color: #4b556f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cover-placeholder i {
+    font-size: 1.8rem;
+    opacity: 0.45;
+}
+
+.obra-cover .btn {
+    background: #2f3545;
+    border: 1px solid #2f3545;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    box-shadow: 0 4px 12px rgba(47, 53, 69, 0.18);
+}
+
+.obra-cover .btn:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   DETALLES DE LA OBRA - MEJORADO
+   ============================================ */
+.obra-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 1.05rem 1.25rem 1.05rem 0;
+}
+
+/* Header de la obra */
+.obra-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.1rem;
+    align-items: flex-start;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.obra-main-title {
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: #2d303b;
+    margin: 0;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+}
+
+/* Tags superiores - REDISEÑO */
+.obra-top-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    justify-content: flex-end;
+}
+
+.obra-tag {
+    background: #f4f6fa;
+    border: 1px solid #dfe3ea;
+    border-radius: 8px;
+    padding: 0.45rem 0.8rem;
+    min-width: 150px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.tag-label {
+    display: block;
+    font-size: 0.6rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 0.2rem;
+    font-weight: 700;
+}
+
+.tag-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #2f3545;
+    letter-spacing: 0.01em;
+}
+
+/* Secciones de información */
+.obra-info-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.obra-info-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 0.75rem;
+}
+
+/* Cards de información - MEJORADAS */
+.obra-info-card {
+    border: 1px solid #e6e9ef;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fb 100%);
+    padding: 0.75rem 0.9rem;
+    height: 100%;
+    box-shadow: 0 1px 2px rgba(47, 53, 69, 0.03);
+    transition: all 0.2s ease;
+}
+
+.obra-info-card:hover {
+    border-color: #c8d7df;
+    box-shadow: 0 4px 12px rgba(47, 53, 69, 0.08);
+}
+
+.obra-info-card.mini {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Card de íncipit - ESPECIAL */
+.obra-incipit-card {
+    background: linear-gradient(135deg, #f5f6f8 0%, #fafbfc 100%);
+    border: 2px dashed #c5cdd8;
+    padding: 1rem 1.25rem;
+}
+
+.obra-incipit-card:hover {
+    border-color: #3ac1a1;
+    background: linear-gradient(135deg, #f8faf9 0%, #ffffff 100%);
+}
+
+/* Labels de las cards */
+.obra-card-label {
+    font-size: 0.675rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #5d6573;
+    margin-bottom: 0.35rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.obra-card-label::before {
+    content: '';
+    width: 3px;
+    height: 12px;
+    background: #3ac1a1;
+    border-radius: 2px;
+}
+
+/* Contenido de las cards */
+.obra-line,
+.obra-subline {
+    margin: 0 0 0.3rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    color: #2d303b;
+    font-size: 0.86rem;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+.obra-subline {
+    font-size: 0.8rem;
+    color: #5d6573;
+    font-weight: 400;
+}
+
+.obra-inline-label {
+    font-weight: 600;
+    color: #4b556f;
+    margin-right: 0.25rem;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Líneas de código (íncipit) */
+.obra-inline-line {
+    margin: 0 0 0.35rem;
+    font-family: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+    font-size: 0.8125rem;
+    color: #2d303b;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+    padding: 0.25rem 0;
+}
+
+.obra-inline-line.code {
+    color: #3d4557;
+    background: rgba(58, 193, 161, 0.04);
+    padding: 0.35rem 0.5rem;
+    border-radius: 4px;
+    border-left: 3px solid #3ac1a1;
+}
+
+/* Estados vacíos */
+.meta-empty {
+    font-style: italic;
+    color: #8b93a4;
+    font-size: 0.8125rem;
+}
+.obra-link {
+    color: var(--accent);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.obra-link:hover {
+    color: var(--gray-800);
+    text-decoration: underline;
+}
+
+
+/* ============================================
+   ACCIONES - REFINADAS
+   ============================================ */
+/* Acciones eliminadas: se mantiene solo el botón Ver en portada */
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .obra-catalog-card {
+        flex-direction: column;
+    }
+
+    .obra-cover {
+        width: 100%;
+        padding: 1.25rem;
+    }
+
+    .cover-frame {
+        height: 200px;
+    }
+
+    .obra-details {
+        padding: 1.25rem;
+    }
+
+    .obra-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .obra-top-tags {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .obra-tag {
+        min-width: unset;
+        flex: 1;
+    }
+
+    .obra-info-row {
+        grid-template-columns: 1fr;
+    }
+
+    .obra-actions {
+        justify-content: flex-start;
+    }
+
+    .obra-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .obra-tag {
+        width: 100%;
+    }
+
+    .obra-top-tags {
+        flex-direction: column;
+    }
+}

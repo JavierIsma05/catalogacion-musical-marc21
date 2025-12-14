@@ -1,0 +1,60 @@
+{% extends 'usuarios/catalogador/base_catalogador.html' %}
+{% load static %}
+
+{% block title %}Detalle Entidad{% endblock %}
+{% block page_title %}Autoridades · Entidades{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usuarios/css/admin.css' %}">
+<link rel="stylesheet" href="{% static 'usuarios/css/autoridades.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-card autoridad-card">
+    <div class="admin-card-header">
+        <h2 class="admin-card-title">
+            <i class="bi bi-building"></i>
+            {{ entidad.nombre }}
+        </h2>
+        <div class="d-flex gap-2">
+            <a href="{% url 'autoridades:editar_entidad' pk=entidad.pk %}" class="admin-btn admin-btn-secondary admin-btn-sm">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            <a href="{% url 'autoridades:lista_entidades' %}" class="admin-btn admin-btn-light admin-btn-sm">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+    <div class="admin-card-body">
+        <div class="autoridad-meta-grid mb-3">
+            <div class="autoridad-meta-tile">
+                <span class="label">País</span>
+                <span class="value">{{ entidad.pais|default:"—" }}</span>
+            </div>
+            <div class="autoridad-meta-tile">
+                <span class="label">Actualización</span>
+                <span class="value">{{ entidad.fecha_modificacion|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="autoridad-meta-tile">
+                <span class="label">Creación</span>
+                <span class="value">{{ entidad.fecha_creacion|date:"d/m/Y H:i" }}</span>
+            </div>
+        </div>
+
+        <div class="autoridad-detail mb-3">
+            <div class="detail-item">
+                <h6>Descripción</h6>
+                <p>{{ entidad.descripcion|default:"Sin descripción" }}</p>
+            </div>
+            <div class="detail-item">
+                <h6>Obras relacionadas</h6>
+                <p>{{ obras_relacionadas }}</p>
+            </div>
+            <div class="detail-item">
+                <h6>Obras ubicadas</h6>
+                <p>{{ obras_ubicacion }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

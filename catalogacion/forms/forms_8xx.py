@@ -6,6 +6,8 @@ from catalogacion.models import (
     Ubicacion852,
     Estanteria852,
     Disponible856,
+    URL856,
+    TextoEnlace856,
     AutoridadEntidad,
 )
 from .widgets import Select2Widget
@@ -16,16 +18,14 @@ from .widgets import Select2Widget
 # ============================================================
 
 class Ubicacion852Form(forms.ModelForm):
-    """
-    Formulario para campo 852 - Ubicación
-    Incluye $a (institución) y $h (signatura)
-    """
     class Meta:
         model = Ubicacion852
-        fields = ['institucion_persona', 'signatura_original']
+        fields = ['codigo_o_nombre', 'signatura_original']
         widgets = {
-            'institucion_persona': Select2Widget(attrs={
-                'data-url': '/catalogacion/autocompletar/entidad/',
+            'codigo_o_nombre': forms.TextInput(attrs={
+                'class': 'form-control autoridad852-autocomplete',
+                'placeholder': 'Buscar institución/persona o escribir código…',
+                'autocomplete': 'off',
             }),
             'signatura_original': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -33,15 +33,16 @@ class Ubicacion852Form(forms.ModelForm):
             }),
         }
         labels = {
-            'institucion_persona': '852 $a – Institución o persona',
-            'signatura_original': '852 $h – Signatura original',
+            'codigo_o_nombre': '852 $a — Institución / persona / código',
+            'signatura_original': '852 $h — Signatura original',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['institucion_persona'].queryset = AutoridadEntidad.objects.all().order_by('nombre')
-        self.fields['institucion_persona'].required = False
+        self.fields['codigo_o_nombre'].required = False
         self.fields['signatura_original'].required = False
+
+
 
 
 # ============================================================
@@ -59,11 +60,50 @@ class Estanteria852Form(forms.ModelForm):
             'estanteria': '852 $c – Estantería',
         }
 
+
+
 class Disponible856Form(forms.ModelForm):
-    """
-    Formulario fantasma usado por el formset.
-    No tiene campos porque $u y $y se manejan por JavaScript.
-    """
+    dummy = forms.CharField(required=False, widget=forms.HiddenInput(), initial="1")
+
     class Meta:
         model = Disponible856
-        fields = []
+        fields = ["dummy"]
+
+
+
+class URL856Form(forms.ModelForm):
+    """
+    856 $u – URL
+    (si algún día quieres manejar las URLs con formsets Django
+    en vez de 100% JavaScript)
+    """
+    class Meta:
+        model = URL856
+        fields = ["url"]
+        widgets = {
+            "url": forms.URLInput(attrs={
+                "class": "form-control",
+                "placeholder": "https://ejemplo.com/recurso",
+            })
+        }
+        labels = {
+            "url": "856 $u — URL",
+        }
+
+
+class TextoEnlace856Form(forms.ModelForm):
+    """
+    856 $y – Texto del enlace
+    """
+    class Meta:
+        model = TextoEnlace856
+        fields = ["texto_enlace"]
+        widgets = {
+            "texto_enlace": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Texto descriptivo del enlace",
+            })
+        }
+        labels = {
+            "texto_enlace": "856 $y — Texto del enlace",
+        }

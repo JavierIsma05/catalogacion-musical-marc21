@@ -1,0 +1,114 @@
+{% extends 'catalogo_publico/base_publico.html' %}
+
+{% block title %}Inicio - Catálogo Musical MARC21{% endblock %}
+
+{% block content %}
+<!-- Hero Section Mejorado -->
+<section class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 mb-3">
+            <i class="bi bi-music-note-beamed"></i>
+            Catálogo Musical MARC21
+        </h1>
+        <p class="lead">
+            Explora nuestra colección de obras musicales catalogadas con estándares profesionales
+        </p>
+        <div class="hero-highlight">
+            <span><i class="bi bi-shield-check"></i> Curaduría experta</span>
+            <span><i class="bi bi-cloud-arrow-down"></i> Datos siempre disponibles</span>
+        </div>
+        <a href="{% url 'catalogo_publico:lista_obras' %}" class="btn btn-light btn-lg">
+            <i class="bi bi-collection"></i>
+            Explorar Catálogo
+        </a>
+    </div>
+</section>
+
+<!-- Estadísticas -->
+<section class="home-stats py-5">
+    <div class="container">
+        <div class="stats-grid">
+            <article class="home-stat-card accent">
+                <div class="home-stat-icon">
+                    <i class="bi bi-file-music"></i>
+                </div>
+                <div class="home-stat-content">
+                    <p class="stat-label">Obras Catalogadas</p>
+                    <p class="stat-value">{{ total_obras }}</p>
+                    <span class="stat-helper">Actualizado diariamente</span>
+                </div>
+            </article>
+            <article class="home-stat-card">
+                <div class="home-stat-icon neutral">
+                    <i class="bi bi-search"></i>
+                </div>
+                <div class="home-stat-content">
+                    <p class="stat-title">Búsqueda Avanzada</p>
+                    <span class="stat-helper">Encuentra obras por título, compositor y más</span>
+                </div>
+            </article>
+            <article class="home-stat-card">
+                <div class="home-stat-icon neutral">
+                    <i class="bi bi-journal-text"></i>
+                </div>
+                <div class="home-stat-content">
+                    <p class="stat-title">Formato MARC21</p>
+                    <span class="stat-helper">Catalogación profesional estandarizada</span>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- Últimas Obras -->
+{% if ultimas_obras %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">
+            <i class="bi bi-clock-history"></i>
+            Últimas Obras Catalogadas
+        </h2>
+        <div class="row g-4">
+            {% for obra in ultimas_obras %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-obra h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-file-earmark-music"></i>
+                            <span>{{ obra.titulo_principal|truncatechars:50 }}</span>
+                        </h5>
+                        {% if obra.compositor %}
+                        <p class="card-text">
+                            <i class="bi bi-person"></i>
+                            {{ obra.compositor }}
+                        </p>
+                        {% endif %}
+                        <span class="badge bg-secondary">
+                            {% if obra.tipo_registro == 'd' %}
+                                <i class="bi bi-pen"></i> Manuscrito
+                            {% else %}
+                                <i class="bi bi-file-text"></i> Impreso
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{% url 'catalogo_publico:detalle' obra.pk %}" 
+                           class="btn btn-outline-primary btn-sm w-100">
+                            <i class="bi bi-eye"></i>
+                            Ver Detalle
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="{% url 'catalogo_publico:lista_obras' %}" class="btn btn-primary btn-lg">
+                Ver Todas las Obras
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

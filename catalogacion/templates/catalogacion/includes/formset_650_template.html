@@ -12,10 +12,7 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
         {% endfor %}
     </div>
 
-    <!-- Botón agregar materia -->
-    <button type="button" class="add-form-row mb-3">
-        <i class="bi bi-plus-circle"></i> Agregar Materia (Tema)
-    </button>
+    
 
     <div class="formset-forms">
 
@@ -40,20 +37,31 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
 
             <div class="campo-grid">
 
-                <!-- 💚 CAMPO 650 $a – AUTOCOMPLETE TIPO COMPOSITOR -->
+                <!-- 💚 CAMPO 650 $a – AUTOCOMPLETE -->
                 <div class="col-full">
                     <label class="form-label">650 $a – Encabezamiento de materia</label>
 
-                    <!-- campo visible -->
-                    <input type="text" class="form-control materia-input" name="{{ form.prefix }}-materia_texto"
-                        placeholder="Escriba materia…" autocomplete="off"
-                        value="{% if form.instance.pk %}{{ form.materia.termino }}{% endif %}">
+                    <div class="autocomplete-wrapper position-relative">
+                        <!-- campo visible -->
+                        <input
+                            type="text"
+                            class="form-control materia-input"
+                            name="{{ form.prefix }}-materia_texto"
+                            placeholder="Escriba materia…"
+                            autocomplete="off"
+                            value="{% if form.instance.pk and form.materia.value %}{{ form.instance.materia.termino }}{% endif %}"
+                        >
 
-                    <!-- campo oculto para guardar ID -->
-                    <input type="hidden" name="{{ form.prefix }}-materia" class="materia-id"
-                        value="{% if form.instance.pk %}{{ form.materia.id }}{% endif %}">
+                        <!-- campo oculto para guardar ID -->
+                        <input
+                            type="hidden"
+                            name="{{ form.prefix }}-materia"
+                            class="materia-id"
+                            value="{% if form.instance.pk and form.materia.value %}{{ form.instance.materia.id }}{% endif %}"
+                        >
 
-                    <div class="materia-suggestions autocomplete-suggestions"></div>
+                        <div class="materia-suggestions autocomplete-suggestions list-group"></div>
+                    </div>
 
                     {% if form.materia.errors %}
                     <div class="invalid-feedback d-block">
@@ -64,14 +72,20 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
 
                 <!-- Botón subdivisión -->
                 <div class="col-full mt-2">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-subdivision-btn w-100"
-                        data-materia-index="{{ forloop.counter0 }}">
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-primary add-subdivision-btn w-100"
+                        data-materia-index="{{ forloop.counter0 }}"
+                    >
                         <i class="bi bi-plus-circle"></i> Agregar Subdivisión ($x)
                     </button>
                 </div>
 
                 <!-- Subdivisiones existentes -->
-                <div class="col-full subdivisiones-container" data-subdivisiones-container="{{ forloop.counter0 }}">
+                <div
+                    class="col-full subdivisiones-container"
+                    data-subdivisiones-container="{{ forloop.counter0 }}"
+                >
 
                     {% if form.instance.pk %}
                     {% for subdivision in form.instance.subdivisiones.all %}
@@ -80,9 +94,13 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
                             <label class="form-label small">650 $x – Subdivisión de materia</label>
                             <div class="d-flex gap-2 align-items-center">
 
-                                <input type="text" class="form-control subdivision-input"
+                                <input
+                                    type="text"
+                                    class="form-control subdivision-input"
                                     name="subdivision_materia_650_{{ forloop.parentloop.counter0 }}_{{ subdivision.pk }}"
-                                    value="{{ subdivision.subdivision }}" placeholder="Subdivisión de materia">
+                                    value="{{ subdivision.subdivision }}"
+                                    placeholder="Subdivisión de materia"
+                                >
 
                                 <button type="button" class="btn btn-sm btn-outline-danger delete-subdivision-btn">
                                     <i class="bi bi-trash"></i>
@@ -113,23 +131,39 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
                 <div class="col-full">
                     <label class="form-label">650 $a – Encabezamiento de materia</label>
 
-                    <input type="text" class="form-control materia-input"
-                        name="{{ formset.prefix }}-__prefix__-materia_texto" placeholder="Escriba materia…"
-                        autocomplete="off">
+                    <div class="autocomplete-wrapper position-relative">
+                        <input
+                            type="text"
+                            class="form-control materia-input"
+                            name="{{ formset.prefix }}-__prefix__-materia_texto"
+                            placeholder="Escriba materia…"
+                            autocomplete="off"
+                        >
 
-                    <input type="hidden" class="materia-id" name="{{ formset.prefix }}-__prefix__-materia">
+                        <input
+                            type="hidden"
+                            class="materia-id"
+                            name="{{ formset.prefix }}-__prefix__-materia"
+                        >
 
-                    <div class="materia-suggestions autocomplete-suggestions"></div>
+                        <div class="materia-suggestions autocomplete-suggestions list-group"></div>
+                    </div>
                 </div>
 
                 <div class="col-full mt-2">
-                    <button type="button" class="btn btn-sm btn-outline-primary add-subdivision-btn w-100"
-                        data-materia-index="__prefix__">
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-primary add-subdivision-btn w-100"
+                        data-materia-index="__prefix__"
+                    >
                         <i class="bi bi-plus-circle"></i> Agregar Subdivisión ($x)
                     </button>
                 </div>
 
-                <div class="col-full subdivisiones-container" data-subdivisiones-container="__prefix__">
+                <div
+                    class="col-full subdivisiones-container"
+                    data-subdivisiones-container="__prefix__"
+                >
                 </div>
             </div>
         </div>
@@ -155,14 +189,99 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
     (function () {
 
         function initMateriaAutocomplete(input) {
-            const suggestionsBox = input.parentElement.querySelector('.materia-suggestions');
-            const hiddenIdInput = input.parentElement.querySelector('.materia-id');
+            // evita doble inicialización al clonar filas
+            if (input.dataset.materiaInit === "1") {
+                return;
+            }
+            input.dataset.materiaInit = "1";
+
+            const wrapper = input.closest(".autocomplete-wrapper");
+            const suggestionsBox = wrapper.querySelector('.materia-suggestions');
+            const hiddenIdInput = wrapper.querySelector('.materia-id');
 
             let debounceTimer = null;
             let selectedIndex = -1;
 
+            function hide() {
+                suggestionsBox.classList.remove("show");
+                suggestionsBox.innerHTML = "";
+                selectedIndex = -1;
+            }
+
+            function marcar(items) {
+                items.forEach((el, i) => {
+                    el.classList.toggle("selected", i === selectedIndex);
+                });
+            }
+
+            function seleccionar(item) {
+                // CAMBIO: item.text en vez de item.termino
+                input.value = item.text;
+
+                if (item.nuevo) {
+                    // nuevo término => sin ID, backend lo crea con materia_texto
+                    hiddenIdInput.value = "";
+                    hiddenIdInput.dataset.nuevo = "1";
+                } else {
+                    hiddenIdInput.value = item.id || "";
+                    hiddenIdInput.dataset.nuevo = "0";
+                }
+
+                // notificar cambio al formset
+                hiddenIdInput.dispatchEvent(new Event("change"));
+                hide();
+            }
+
+            function mostrar(resultados, query) {
+                suggestionsBox.innerHTML = "";
+                selectedIndex = -1;
+
+                if (!resultados || resultados.length === 0) {
+                    suggestionsBox.innerHTML = `
+                        <div class="autocomplete-item autocomplete-item-new list-group-item">
+                            <i class="bi bi-plus-circle me-2"></i> Crear: "${query}"
+                        </div>`;
+                    const nuevoEl = suggestionsBox.querySelector(".autocomplete-item-new");
+                    nuevoEl.addEventListener("click", function () {
+                        seleccionar({ id: "", text: query, nuevo: true });
+                    });
+                } else {
+                    resultados.forEach(r => {
+                        const item = document.createElement("div");
+                        item.className = "autocomplete-item list-group-item";
+                        item.innerHTML = `<strong>${r.text}</strong>`;
+                        item.addEventListener("click", () => seleccionar({ id: r.id, text: r.text, nuevo: false }));
+                        suggestionsBox.appendChild(item);
+                    });
+
+                    const nuevo = document.createElement("div");
+                    nuevo.className = "autocomplete-item autocomplete-item-new list-group-item";
+                    nuevo.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${query}"`;
+                    nuevo.addEventListener("click", () => seleccionar({ id: "", text: query, nuevo: true }));
+                    suggestionsBox.appendChild(nuevo);
+                }
+
+                suggestionsBox.classList.add("show");
+            }
+
+            function buscar(query) {
+                fetch(`/catalogacion/api/autocompletar/materia/?q=${encodeURIComponent(query)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        // se espera formato {results: [{id, text}, ...]}
+                        mostrar(data.results || [], query);
+                    })
+                    .catch(() => {
+                        hide();
+                    });
+            }
+
             input.addEventListener("input", function () {
                 const q = input.value.trim();
+
+                // al escribir, limpiamos cualquier ID previo
+                hiddenIdInput.value = "";
+                hiddenIdInput.removeAttribute("data-nuevo");
 
                 if (q.length < 2) {
                     hide();
@@ -191,70 +310,23 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
                     e.preventDefault();
                     if (items[selectedIndex]) items[selectedIndex].click();
                 }
+                if (e.key === "Escape") {
+                    hide();
+                }
             });
 
-            function buscar(query) {
-                fetch(`/catalogacion/api/autocompletar/materia/?q=${encodeURIComponent(query)}`)
-                    .then(r => r.json())
-                    .then(data => mostrar(data.results, query));
-            }
-
-            function mostrar(resultados, query) {
-                suggestionsBox.innerHTML = "";
-                selectedIndex = -1;
-
-                if (resultados.length === 0) {
-                    suggestionsBox.innerHTML = `
-                <div class="autocomplete-item autocomplete-item-new">
-                    <i class="bi bi-plus-circle me-2"></i> Crear: "${query}"
-                </div>`;
-                } else {
-                    resultados.forEach(r => {
-                        const item = document.createElement("div");
-                        item.className = "autocomplete-item";
-
-                        // CAMBIO: r.text en lugar de r.termino
-                        item.innerHTML = `<strong>${r.text}</strong>`;
-
-                        item.addEventListener("click", () => seleccionar(r));
-                        suggestionsBox.appendChild(item);
-                    });
-
-                    const nuevo = document.createElement("div");
-                    nuevo.className = "autocomplete-item autocomplete-item-new";
-                    nuevo.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${query}"`;
-
-                    // CAMBIO: usar text en vez de termino
-                    nuevo.addEventListener("click", () => seleccionar({ id: "", text: query, nuevo: true }));
-
-                    suggestionsBox.appendChild(nuevo);
+            // cerrar si se hace click fuera
+            document.addEventListener("click", function (e) {
+                if (!wrapper.contains(e.target)) {
+                    hide();
                 }
-
-                suggestionsBox.classList.add("show");
-            }
-
-            function seleccionar(item) {
-                // CAMBIO: item.text en vez de item.termino
-                input.value = item.text;
-                hiddenIdInput.value = item.id || "";
-                hide();
-            }
-
-            function hide() {
-                suggestionsBox.classList.remove("show");
-                suggestionsBox.innerHTML = "";
-                selectedIndex = -1;
-            }
-
-            function marcar(items) {
-                items.forEach((el, i) => {
-                    el.classList.toggle("selected", i === selectedIndex);
-                });
-            }
+            });
         }
 
+        // inicializar los existentes
         document.querySelectorAll('.materia-input').forEach(initMateriaAutocomplete);
 
+        // cuando se agrega una nueva fila de formset, volver a inicializar
         document.addEventListener("click", function (e) {
             if (e.target.closest('.add-form-row')) {
                 setTimeout(() => {
@@ -263,70 +335,68 @@ El campo 650 es repetible y contiene subcampo repetible ($x subdivisión de mate
             }
         });
 
-
     })();
 </script>
 
 <!-- SCRIPT SUBDIVISIONES -->
 <script>
-    (function () {
-        const prefix = '{{ formset.prefix }}';
-        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-        if (!container) return;
+(function () {
+    const prefix = '{{ formset.prefix }}';
+    const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+    if (!container) return;
 
-        const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-        const addButton = container.querySelector('.add-form-row');
-        const formsContainer = container.querySelector('.formset-forms');
-        const subdivisionTemplate = document.querySelector('.subdivision-template-650');
+    const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
+    const formsContainer = container.querySelector('.formset-forms');
+    const emptyForm = formsContainer.querySelector('.empty-form');
+    const subdivisionTemplate = document.querySelector('.subdivision-template-650');
 
-        addButton.addEventListener('click', function () {
+    // 🔹 Agregar fila 650 (Materia)
+    container.addEventListener("click", function(e) {
+
+        // ➕ Agregar materia
+        if (e.target.closest('.add-form-row')) {
             const total = parseInt(totalFormsInput.value);
-            const empty = formsContainer.querySelector('.empty-form');
-
-            const newForm = empty.cloneNode(true);
+            const newForm = emptyForm.cloneNode(true);
             newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, total);
             newForm.classList.remove('empty-form');
             newForm.style.display = '';
 
-            formsContainer.insertBefore(newForm, empty);
+            // Reinicializar autocomplete en la nueva fila
+            setTimeout(() => {
+                newForm.querySelectorAll('.materia-input').forEach(i => initMateriaAutocomplete(i));
+            }, 50);
+
+            formsContainer.insertBefore(newForm, emptyForm);
             totalFormsInput.value = total + 1;
-        });
+        }
 
-        container.addEventListener('click', function (e) {
-            const del = e.target.closest('.delete-row-btn');
-            if (del) {
-                const row = del.closest('.formset-row');
-                if (!row.classList.contains('empty-form')) {
-                    const deleteInput = row.querySelector('input[name*="DELETE"]');
-                    if (row.classList.contains('existing-form')) {
-                        deleteInput.checked = !deleteInput.checked;
-                        row.style.opacity = deleteInput.checked ? "0.4" : "1";
-                    } else {
-                        row.remove();
-                        totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
-                    }
-                }
-            }
-
+        // ➕ Agregar subdivisión ($x)
+        if (e.target.closest('.add-subdivision-btn')) {
             const btn = e.target.closest('.add-subdivision-btn');
-            if (btn) {
-                const index = btn.dataset.materiaIndex;
-                const cont = container.querySelector(`[data-subdivisiones-container="${index}"]`);
+            const index = btn.dataset.materiaIndex;
+            const cont = container.querySelector(`[data-subdivisiones-container="${index}"]`);
 
-                const sub = subdivisionTemplate.cloneNode(true);
-                sub.classList.remove('subdivision-template-650', 'd-none');
-                const input = sub.querySelector('.subdivision-input');
-                input.name = `subdivision_materia_650_${index}_${Date.now()}`;
+            const sub = subdivisionTemplate.cloneNode(true);
+            sub.classList.remove('subdivision-template-650', 'd-none');
+            sub.querySelector('.subdivision-input')
+               .name = `subdivision_materia_650_${index}_${Date.now()}`;
 
-                cont.appendChild(sub);
+            cont.appendChild(sub);
+        }
+
+        // ❌ Eliminar subdivisión
+        if (e.target.closest('.delete-subdivision-btn')) {
+            e.target.closest('.subdivision-form-row').remove();
+        }
+
+        // ❌ Eliminar fila completa
+        if (e.target.closest('.delete-row-btn')) {
+            const row = e.target.closest('.formset-row');
+            if (!row.classList.contains('empty-form')) {
+                row.remove();
+                totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
             }
-
-            const delSub = e.target.closest('.delete-subdivision-btn');
-            if (delSub) {
-                delSub.closest('.subdivision-form-row').remove();
-            }
-
-        });
-
-    })();
+        }
+    });
+})();
 </script>

@@ -1,9 +1,10 @@
-{% extends 'base.html' %}
+{% extends 'catalogacion/base_catalogacion.html' %}
 {% load static %}
 
 {% block title %}Borradores Guardados - MARC21{% endblock %}
+{% block page_title %}Borradores Guardados{% endblock %}
 
-{% block extra_css %}
+{% block catalogacion_css %}
 <style>
     .borrador-card {
         transition: all 0.3s ease;
@@ -34,16 +35,13 @@
 </style>
 {% endblock %}
 
-{% block breadcrumb %}
+{% block catalogacion_content %}
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'catalogacion:index' %}">Inicio</a></li>
         <li class="breadcrumb-item active">Borradores</li>
     </ol>
 </nav>
-{% endblock %}
-
-{% block content %}
 <div class="container-fluid">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -187,7 +185,7 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block catalogacion_js %}
 <script>
 function confirmarDescarte(borradorId, titulo, url) {
     if (confirm(`¿Estás seguro de que deseas descartar el borrador "${titulo}"?\n\nEsta acción no se puede deshacer.`)) {
