@@ -16,8 +16,106 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 }
 
 
+/* ============================================
+   Botones del incipit (toolbar + cabecera)
+   ============================================ */
+.btn-incipit {
+  background: var(--gray-50);
+  color: black;
+  border: 1px solid var(--gray-800);
+  padding: .5rem .9rem;
+  font-weight: 400;
+  transition: filter .15s ease, transform .02s ease;
+}
 
 
+.btn-incipit:hover {
+  filter: brightness(0.92);
+
+  background-color: var(--gray-800);
+  color: rgb(255, 255, 255);
+}
+
+
+/* Accesibilidad: SOLO cuando se navega con teclado mostramos un ring sutil */
+.btn-incipit:focus-visible {
+  outline: 2px solid var(--gray-400);
+  outline-offset: 2px;
+}
+
+/* Estado activo corto (click) */
+.btn-incipit:active {
+  transform: translateY(1px);
+}
+
+/* Mantener la fuente para glifos musicales */
+.btn-music span {
+  font-family: 'Maestro','Bravura','Music', serif;
+}
+
+/* ----normalizar tamaño de los botones del toolbar ---- */
+
+.btn-music {
+  font-size: 15px;
+  padding: 0px 11px;
+  text-align: center;
+  justify-content: center;
+}
+
+.btn-music-gliphos {
+  font-size: 23px;   /* glifos musicales*/
+  max-height: 40px;
+  margin-top: 5px;
+}
+
+/* fuerza Maestro en los botones del toolbar */
+.btn-music span {
+  font-family: 'Maestro','Bravura','Music', serif;
+}
+
+/* 031: forzar grid real de 2 columnas */
+.formset-incipit .campo-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0;
+  align-items: start;
+}
+
+/* Campos que deben ocupar toda la fila */
+.formset-incipit .campo-grid .col-full{
+  grid-column: 1 / -1;
+}
+
+/* wrappers */
+.formset-incipit .campo-grid > .col-half,
+.formset-incipit .campo-grid > .col-third{
+  grid-column: span 1;
+  min-width: 0;
+}
+.formset-row {
+    position: relative;
+    background: var(--gray-50);
+    border: 1px solid var(--border-color);
+    border-left: 2px solid var(--gray-400);
+    border-radius: 3px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    transition: var(--transition);
+}
+
+.formset-row:hover {
+    background: white;
+    border-color: var(--gray-300);
+    border-left-color: var(--accent);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* el editor ocupa 100% del padre */
+#incipit-toolbar-top-031 { width: 100%; }
+
+/* el canvas no se pasa de 600, pero se centra */
+#incipit_canvas_0 { width: 100%; max-width: 700px; height: auto; display:block; }
 </style>
 
 
@@ -34,7 +132,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 
             {# Fila 1: números a, b, c #}
             <div class="campo-grid">
-                <div class="col-third">
+                <div class="col-half">
                     <label class="form-label" for="{{ form.numero_obra.id_for_label }}">
                         {{ form.numero_obra.label }}
                     </label>
@@ -44,7 +142,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                     {% endif %}
                 </div>
 
-                <div class="col-third">
+                <div class="col-half">
                     <label class="form-label" for="{{ form.numero_movimiento.id_for_label }}">
                         {{ form.numero_movimiento.label }}
                     </label>
@@ -54,7 +152,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                     {% endif %}
                 </div>
 
-                <div class="col-third">
+                <div class="col-half">
                     <label class="form-label" for="{{ form.numero_pasaje.id_for_label }}">
                         {{ form.numero_pasaje.label }}
                     </label>
@@ -134,196 +232,162 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
             </div>
 
             {# EDITOR DE ÍNCIPIT: TOOLBAR + CANVAS #}
-            <div>
-            <label class="subcampo-label d-block m-2">Editor de íncipit</label>
+<div>
+  <label class="subcampo-label d-block m-2">Editor de íncipit</label>
 
-            <div class="border rounded p-3 bg-light">
-                <div class="d-flex align-items-center" style="box-sizing: content-box;">
+  <div class="border rounded p-3 bg-light">
 
-                {# TOOLBAR IZQUIERDA COMPACTA #}
-                <div id="incipit-toolbar-031"
-                    class="d-flex flex-column gap-2 flex-shrink-0 btn-music"
-                    style="max-width:310px;">
+    {# WRAPPER: columna (toolbar arriba, canvas, toolbar abajo) #}
+    <div class="d-flex flex-column w-100">
 
-                    {# CLAVE #}
-                    <div>
-                    <div class="text-muted small">Clave</div>
-                    <div class="btn-group btn-group-sm" role="group"  aria-label="Claves">
-                        <button type="button" class="btn btn-incipit btn-music"
-                                title="Clave de Sol" onclick="ClefPressed('1')">
-                        <span class="btn-music-gliphos">𝄞</span>
-                        </button>
-                        <button type="button" class="btn btn-incipit btn-music" style="margin: 0px 6px; padding-top: 7px;"
-                                title="Clave de Do" onclick="ClefPressed('2')">
-                        <span class="btn-music-gliphos">𝄡</span>
-                        </button>
-                        <button type="button" class="btn btn-incipit btn-music" style="padding-top: 7px"
-                                title="Clave de Fa" onclick="ClefPressed('3')">
-                        <span class="btn-music-gliphos">𝄢</span>
-                        </button>
-                    </div>
-                    </div>
+{# TOOLBAR TOP #}
+<div id="incipit-toolbar-top-031"
+     class="d-flex flex-wrap gap-3 w-100 btn-music align-items-start">
 
-                    {# ALTERACIONES #}
-                    <div>
-                    <div class="text-muted small mb-1">Alteraciones</div>
-                    <div class="btn-group btn-group-sm flex-wrap" role="group" aria-label="Alteraciones">
-                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
-                                style="border-radius: 10% 0 0 10%;" title="Doble sostenido"
-                                onclick="alterationPressed('l')">𝄪</button>
-                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
-                                style="margin: 0px 5px;" title="Sostenido"
-                                onclick="alterationPressed('p')">♯</button>
-                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
-                                style="" title="Becuadro"
-                                onclick="alterationPressed('o')">♮</button>
-                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
-                                style="margin: 0px 5px;" title="Bemol"
-                                onclick="alterationPressed('m')">♭</button>
-                        <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
-                                style="border-radius: 0 10% 10% 0%;" title="Doble bemol"
-                                onclick="alterationPressed('n')">𝄫</button>
-                    </div>
-                    </div>
+  {# CLAVE #}
+  <div class="incipit-group">
+    <div class="incipit-group-title">Clave</div>
+    <div class="btn-group btn-group-sm" role="group" aria-label="Claves">
+      <button type="button" class="btn btn-incipit btn-music"
+              title="Clave de Sol" onclick="ClefPressed('1')" >
+        <span class="btn-music-gliphos">𝄞</span>
+      </button>
+      <button type="button" class="btn btn-incipit btn-music"
+              title="Clave de Do" onclick="ClefPressed('2')">
+        <span class="btn-music-gliphos">𝄡</span>
+      </button>
+      <button type="button" class="btn btn-incipit btn-music"
+              title="Clave de Fa" onclick="ClefPressed('3')">
+        <span class="btn-music-gliphos">𝄢</span>
+      </button>
+    </div>
+  </div>
 
-                    {# COMPÁS #}
-                    <div>
-                    <div class="text-muted" >Compás</div>
+  {# COMPÁS #}
+  <div class="incipit-group">
+    <div class="incipit-group-title">Compás</div>
 
+    <div class="btn-group btn-group-sm mb-1" role="group">
+      <button type="button" class="btn btn-incipit btn-music" onclick="TimePressed('t')">4/4</button>
+      <button type="button" class="btn btn-incipit btn-music" onclick="TimePressed('w')">3/4</button>
+      <button type="button" class="btn btn-incipit btn-music" onclick="TimePressed('v')">2/4</button>
+    </div>
 
-                    <div class="btn-group-sm"  role="group" aria-label="Compases">
-                        <button type="button" class="btn btn-incipit btn-music"
-                                onclick="TimePressed('t')">4/4</button>
-                        <button type="button" class="btn btn-incipit btn-music"
-                                onclick="TimePressed('w')">3/4</button>
-                        <button type="button" class="btn btn-incipit btn-music"
-                                onclick="TimePressed('v')">2/4</button>
-                    </div>
+    <div class="btn-group btn-group-sm mb-1" role="group">
+      <button type="button" class="btn btn-incipit btn-music" onclick="TimePressed('u')">2/2</button>
+      <button type="button" class="btn btn-incipit btn-music" onclick="TimePressed('|')">3/2</button>
+      <button type="button" class="btn btn-incipit btn-music" onclick="TimePressed('x')">3/8</button>
+      <button type="button" class="btn btn-incipit btn-music" onclick="TimePressed('y')">6/8</button>
+      <button type="button" class="btn btn-incipit btn-music" onclick="TimePressed('z')">9/8</button>
+      <button type="button" class="btn btn-incipit btn-music"
+              style="font-size:14px;max-width:43px;"
+              onclick="TimePressed('{')">12/8</button>
+    </div>
 
+  </div>
 
+  {# ALTERACIONES #}
+  <div class="incipit-group">
+    <div class="incipit-group-title">Alteraciones</div>
+    <div class="btn-group btn-group-sm" role="group">
+      <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
+              title="Doble sostenido" onclick="alterationPressed('l')">𝄪</button>
+      <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
+              title="Sostenido" onclick="alterationPressed('p')">♯</button>
+      <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
+              title="Becuadro" onclick="alterationPressed('o')">♮</button>
+      <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
+              title="Bemol" onclick="alterationPressed('m')">♭</button>
+      <button type="button" class="btn btn-incipit btn-music btn-music-gliphos"
+              title="Doble bemol" onclick="alterationPressed('n')">𝄫</button>
+    </div>
+  </div>
 
+  {# FIGURAS (AL FINAL) #}
+  <div class="incipit-group">
+    <div class="incipit-group-title">Figuras</div>
+    <div class="btn-group btn-group-sm flex-wrap" role="group">
+      <button type="button" class="btn btn-incipit btn-music"
+              title="Redonda" onclick="NotePressed('d')" style="font-size: 26px;">𝅝</button>
+      <button type="button" class="btn btn-incipit btn-music"
+              title="Blanca" onclick="NotePressed('e')" style="font-size: 26px;">𝅗𝅥</button>
+      <button type="button" class="btn btn-incipit btn-music"
+              title="Negra" onclick="NotePressed('f')" style="font-size: 26px;">𝅘𝅥</button>
+      <button type="button" class="btn btn-incipit btn-music"
+              title="Corchea" onclick="NotePressed('g')" style="font-size: 26px;">𝅘𝅥𝅮</button>
+      <button type="button" class="btn btn-incipit btn-music"
+              title="Semicorchea" onclick="NotePressed('h')" style="font-size: 26px;" >𝅘𝅥𝅯</button>
+      <button type="button" class="btn btn-incipit btn-music"
+              title="Fusa" onclick="NotePressed('i')" style="font-size: 26px;">𝅘𝅥𝅰</button>
+      <button type="button" class="btn btn-incipit btn-music"
+              title="Puntillo" onclick="dotPressed()" style="font-size: 26px;">·</button>
+    </div>
+  </div>
 
+    {# ALTURA #}
+        <div>
+          <div class="incipit-group-title" style="margin-left:11px;">Altura</div>
+          <div class="btn-group btn-group-sm flex-wrap" role="group">
+            <button type="button" class="btn btn-incipit btn-music" style="margin:1px;" title="Subir altura"
+                    onclick="CanvasIncipit.toneUpDown(CanvasIncipit, -1)">▲</button>
+            <button type="button" class="btn btn-incipit btn-music" style="margin:1px;" title="Bajar altura"
+                    onclick="CanvasIncipit.toneUpDown(CanvasIncipit, 1)">▼</button>
+          </div>
+        </div>
 
-                    <div class="btn-group-sm"  style="padding: 5px 0px;" role="group" aria-label="Compases">
-                        <button type="button" class="btn btn-incipit btn-music"
-                                onclick="TimePressed('u')">2/2</button>
-                        <button type="button" class="btn btn-incipit btn-music"
-                                onclick="TimePressed('|')">3/2</button>
-                        <button type="button" class="btn btn-incipit btn-music"
-                                    onclick="TimePressed('x')">3/8</button>
+        {# BARRA #}
+        <div>
+          <div class="incipit-group-title">Barras</div>
+          <div class="btn-group-sm flex-wrap text-align-center" role="group" aria-label="Barras">
+            <button type="button" class="btn btn-incipit btn-music" style="border-radius: 10% 0 0 10%;"
+                    title="Barra simple" onclick="BarPressed(';')">|</button>
+            <button type="button" class="btn btn-incipit btn-music"
+                    title="Doble barra" onclick="BarPressed('<')">||</button>
+            <button type="button" class="btn btn-incipit btn-music"
+                    title="Inicio repetición" onclick="BarPressed('>')">|:</button>
+            <button type="button" class="btn btn-incipit btn-music"
+                    title="Fin repetición" onclick="BarPressed('?')">:||</button>
+            <button type="button" class="btn btn-incipit btn-music" style="border-radius: 0 10% 10% 0%;"
+                    title="Repetición doble" onclick="BarPressed('@')">:||:</button>
+          </div>
+        </div>
 
-                    </div>
-
-                    <div class="btn-group-sm" role="group" aria-label="Compases">
-
-                        <button type="button" class="btn btn-incipit btn-music"
-                                    onclick="TimePressed('y')">6/8</button>
-                        <button type="button" class="btn btn-incipit btn-music"
-                                    onclick="TimePressed('z')">9/8</button>
-                        <button type="button" class="btn btn-incipit btn-music" style="font-size: 14px;max-width: 43px; padding: 0px 7px;"
-                                    onclick="TimePressed('{')">12/8</button>
-
-                    </div>
-
-
-
-
-                    {# FIGURAS #}
-                    <div>
-                    <div class="text-muted small mb-1">Figuras</div>
-                    <div class="btn-group btn-group-sm flex-wrap" role="group" aria-label="Figuras">
-                        <button type="button" class="btn btn-incipit btn-music" style="margin:1px;"
-                                title="Redonda" onclick="NotePressed('d')">
-                        <span style="font-size:24px;">𝅝</span>
-                        </button>
-                        <button type="button" class="btn btn-incipit btn-music" style="margin:1px 3px;"
-                                title="Blanca" onclick="NotePressed('e')">
-                        <span style="font-size:24px;">𝅗𝅥</span>
-                        </button>
-                        <button type="button" class="btn btn-incipit btn-music" style="margin:1px"
-                                title="Negra" onclick="NotePressed('f')">
-                        <span style="font-size:24px;">𝅘𝅥</span>
-                        </button>
-                        <button type="button" class="btn btn-incipit btn-music" style="margin:1px 3px;"
-                                title="Corchea" onclick="NotePressed('g')">
-                        <span style="font-size:24px;">𝅘𝅥𝅮</span>
-                        </button>
-                        <button type="button" class="btn btn-incipit btn-music" style="margin:1px;"
-                                title="Semicorchea" onclick="NotePressed('h')">
-                        <span style="font-size:24px;">𝅘𝅥𝅯</span>
-                        </button>
-                        <button type="button" class="btn btn-incipit btn-music" style="margin:1px 3px;"
-                                title="Fusa" onclick="NotePressed('i')">
-                        <span style="font-size:24px;">𝅘𝅥𝅰</span>
-                        </button>
-                        <button type="button" class="btn btn-incipit btn-music" style="margin:1px;"
-                                title="Puntillo" onclick="dotPressed()">
-                        ·
-                        </button>
-                    </div>
-                    </div>
-
-                    {# ALTURA #}
-                    <div>
-                    <div class="text-muted" style="margin-left:11px;">Altura</div>
-                    <div class="btn-group btn-group-sm flex-wrap" role="group">
-                        <button type="button" class="btn btn-incipit btn-music"
-                                style="margin:1px;" title="Subir altura"
-                                onclick="CanvasIncipit.toneUpDown(CanvasIncipit, -1)">▲</button>
-                        <button type="button" class="btn btn-incipit btn-music"
-                                style="margin:1px;" title="Bajar altura"
-                                onclick="CanvasIncipit.toneUpDown(CanvasIncipit, 1)">▼</button>
-                    </div>
-
-
-                    {# BARRA #}
-                    <div class="text-muted ">Barras</div>
-                    <div class="btn-group-sm flex-wrap text-align-center" role="group" aria-label="Barras">
-                        <button type="button" class="btn btn-incipit btn-music"
-                                style="border-radius: 10% 0 0 10%;"
-                                title="Barra simple" onclick="BarPressed(';')">|</button>
-                        <button type="button" class="btn btn-incipit btn-music"
-                                title="Doble barra" onclick="BarPressed('<')">||</button>
-                        <button type="button" class="btn btn-incipit btn-music"
-                                title="Inicio repetición" onclick="BarPressed('>')">|:</button>
-                        <button type="button" class="btn btn-incipit btn-music"
-                                title="Fin repetición" onclick="BarPressed('?')">:||</button>
-                        <button type="button" class="btn btn-incipit btn-music"
-                                title="Repetición doble"
-                                style="border-radius: 0 10% 10% 0%;"
-                                onclick="BarPressed('@')">:||:</button>
-                    </div>
-                    </div>
-
-
-
-                    <div class="btn-group btn-group-sm flex-wrap mt-1" role="group">
-                        <button type="button" class="btn btn-outline-danger"
-                                style="margin:1px; font-size: small;"
-                                title="Borrar nota" onclick="deleteNote(false)">
-                        🗑 Borrar última nota
-                        </button>
-                        <button type="button" class="btn btn-outline-danger"
-                                style="margin:1px; font-size: small;"
-                                title="Borrar todo" onclick="deleteNote(true)">
-                        🗑 Borrar todo
-                        </button>
-                    </div>
-                    </div>
-                </div>
-
-                {# CANVAS TIPO PENTAGRAMA REAL #}
-                <div class="flex-grow-1">
-                    <div class="position-relative d-inline-block w-100">
-                    <canvas id="incipit_canvas_0"
-                            width="600"
-                            height="270"
-                            style="display:block; "></canvas>
-                    </div>
-                </div>
-
-                </div>
+   {# TOOLBAR BOTTOM (solo acciones) #}
+    <div id="incipit-toolbar-bottom-031" class="d-flex flex-wrap gap-2">
+            <div class="btn-group btn-group-sm flex-wrap mt-1" role="group">
+            <button type="button" class="btn btn-outline-danger"
+                    style="margin:1px; font-size: small;"
+                    title="Borrar nota" onclick="deleteNote(false)">
+                🗑 Borrar última nota
+            </button>
+            <button type="button" class="btn btn-outline-danger"
+                    style="margin:1px; font-size: small;"
+                    title="Borrar todo" onclick="deleteNote(true)">
+                🗑 Borrar todo
+            </button>
             </div>
+        </div>
+
+
+    </div>
+
+
+
+      {# CANVAS WRAPPER #}
+      <div class="w-100 d-flex justify-content-center my-2">
+        <div class="position-relative d-inline-block" style="max-width:700px;">
+          <canvas id="incipit_canvas_0" width="700" height="250" style="display:block;"></canvas>
+        </div>
+
+      </div>
+
+
+
+
+    </div>
+  </div>
+</div>
+
             <small class="text-muted d-block mt-2">
                 El contenido del canvas se sincronizará con el campo de notación musical (PAE).
             </small>
