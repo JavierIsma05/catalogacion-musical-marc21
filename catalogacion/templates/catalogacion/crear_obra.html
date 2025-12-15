@@ -85,11 +85,11 @@
             <!-- Barra de progreso superior -->
             <div class="progress-indicator">
                 <div class="progress-bar-custom">
-                    {# Paso 1 de 6 ≈ 16.6% #}
-                    <div class="progress-bar-fill" id="progress-bar" style="width: 16.6%"></div>
+                    {# Paso 1 de 8 ≈ 12.5% #}
+                    <div class="progress-bar-fill" id="progress-bar" style="width: 12.5%"></div>
                 </div>
                 <small class="text-muted mt-2 d-block">
-                    Paso <span id="current-step">1</span> de 7
+                    Paso <span id="current-step">1</span> de 8
                 </small>
             </div>
 
@@ -113,9 +113,13 @@
                 <button type="button" class="tab-button" data-tab="tab-relaciones" data-tab-index="5">
                     <i class="bi bi-diagram-3"></i> Relaciones
                 </button>
-                <button type="button" class="tab-button" data-tab="tab-admin" data-tab-index="6">
+                <button type="button" class="tab-button" data-tab="tab-existencias" data-tab-index="6">
+                    <i class="bi bi-sticky-fill"></i> Existencias
+                </button>
+                <button type="button" class="tab-button" data-tab="tab-admin" data-tab-index="7">
                     <i class="bi bi-exclamation-circle"></i> Administración
                 </button>
+                
             </div>
 
             
@@ -196,6 +200,17 @@
                         </button>
                     </div>
                 </div>
+                <div id="tab-existencias" class="tab-content">
+                    {% include 'catalogacion/secciones/existencias.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
                 <div id="tab-admin" class="tab-content">
                     {% include 'catalogacion/secciones/administracion.html' %}
                     <div class="tab-navigation-buttons">
@@ -211,6 +226,32 @@
         </form>
     </div>
 </div>
+
+<!-- ================= MODAL BUSCAR OBRA ($w 773/774/787) ================= -->
+<div class="modal fade" id="modalBuscarObra" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-search"></i> Buscar obra registrada
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="text"
+               id="buscarObraInput"
+               class="form-control mb-3"
+               placeholder="Buscar por número de control (001)">
+
+        <ul class="list-group" id="buscarObraResultados"></ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 {% endblock catalogacion_content %}
 
 {% block catalogacion_js %}
@@ -226,6 +267,8 @@ window.TIPO_OBRA_ACTUAL = '{{ tipo_obra }}';
 // 3: Materias / serie
 // 4: Notas
 // 5: Relaciones
+// 6: Existencias
+// 7: Administrativa
 const tabs = [
     'tab-personas',
     'tab-produccion',
@@ -233,6 +276,7 @@ const tabs = [
     'tab-materias',
     'tab-notas',
     'tab-relaciones',
+    'tab-existencias',
     'tab-admin'
 ];
 let currentTabIndex = 0;
@@ -504,6 +548,92 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+</script>
+<script>
+(function () {
+
+    let targetTextInput = null;
+    let targetHiddenInput = null;
+
+    // Abrir modal al hacer click en 🔍
+    document.addEventListener("click", function (e) {
+        const btn = e.target.closest(".btn-buscar-obra");
+        if (!btn) return;
+
+        const group = btn.closest(".input-group");
+        if (!group) return;
+
+        targetTextInput = group.querySelector(".numero-w-input");
+        targetHiddenInput = group.querySelector(".obra-relacionada-id-input");
+
+        const modal = new bootstrap.Modal(
+            document.getElementById("modalBuscarObra")
+        );
+        modal.show();
+    });
+
+    // Buscar obras
+    const inputBuscar = document.getElementById("buscarObraInput");
+    const resultados = document.getElementById("buscarObraResultados");
+
+    if (!inputBuscar || !resultados) return;
+
+    inputBuscar.addEventListener("input", function () {
+        const q = this.value.trim();
+
+        if (q.length < 2) {
+            resultados.innerHTML = "";
+            return;
+        }
+
+        fetch(`/catalogacion/api/buscar-obras/?q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(data => {
+                resultados.innerHTML = "";
+
+                if (!data.results.length) {
+                    resultados.innerHTML = `
+                        <li class="list-group-item text-muted">
+                            Sin resultados
+                        </li>`;
+                    return;
+                }
+
+                data.results.forEach(o => {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item list-group-item-action";
+                    li.innerHTML = `
+                        <div>
+                            <strong>${o.num_control}</strong>
+                            ${o.titulo ? `— ${o.titulo}` : ""}
+                        </div>
+                        ${o.compositor ? `
+                            <small class="text-muted">
+                                ${o.compositor}
+                            </small>
+                        ` : ""}
+                    `;
+
+
+                    li.addEventListener("click", () => {
+                        if (targetTextInput) {
+                            targetTextInput.value = o.num_control;
+                        }
+                        if (targetHiddenInput) {
+                            targetHiddenInput.value = o.id;
+                        }
+
+                        bootstrap.Modal
+                            .getInstance(document.getElementById("modalBuscarObra"))
+                            .hide();
+                    });
+
+                    resultados.appendChild(li);
+                });
+            });
+    });
+
+})();
 </script>
 
 {% endblock catalogacion_js %}

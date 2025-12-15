@@ -60,7 +60,7 @@ class ValidadorColeccion(ValidadorBase):
     def validar_reglas_especificas(self):
         """Validaciones específicas para colecciones"""
         # Una colección debe tener obras componentes (774)
-        if self.obra.pk:
+        if self.obra.pk is None:
             unidades = self.obra.enlaces_unidades_774.count()
             if unidades == 0:
                 self.errores['__all__'] = (
@@ -158,3 +158,5 @@ def obtener_validador(obra):
     # Si es impresa o manuscrita, podríamos agregar validaciones adicionales
     # Por ahora, usamos solo el validador base
     return ValidadorClase(obra)
+
+

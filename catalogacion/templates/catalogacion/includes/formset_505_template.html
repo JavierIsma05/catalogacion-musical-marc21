@@ -1,0 +1,63 @@
+{# FORMSET 505 – Contenido (R): 505 $a #}
+
+<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
+
+  <div class="d-none">
+    {% for hidden in formset.management_form %}
+      {{ hidden }}
+    {% endfor %}
+  </div>
+
+  <div class="formset-forms">
+    {% for form in formset %}
+      <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
+
+        {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+        {% endfor %}
+
+        {% if formset.can_delete %}
+          <div class="d-none">{{ form.DELETE }}</div>
+        {% endif %}
+
+        <button type="button" class="delete-row-btn" title="Eliminar contenido">
+          <i class="bi bi-x-lg"></i>
+        </button>
+
+        <div class="card mt-2">
+          <div class="card-body">
+            <label class="form-label small fw-semibold">505 $a – Nota de contenido</label>
+            {{ form.contenido }}
+            {% if form.contenido.errors %}
+              <div class="invalid-feedback d-block">{{ form.contenido.errors }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    {% endfor %}
+
+    {# EMPTY FORM #}
+    <div class="formset-row empty-form d-none">
+      {% for hidden in formset.empty_form.hidden_fields %}
+        {{ hidden }}
+      {% endfor %}
+
+      {% if formset.can_delete %}
+        <div class="d-none">{{ formset.empty_form.DELETE }}</div>
+      {% endif %}
+
+      <button type="button" class="delete-row-btn" title="Eliminar contenido">
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <div class="card mt-2">
+        <div class="card-body">
+          <label class="form-label small fw-semibold">505 $a – Nota de contenido</label>
+          {{ formset.empty_form.contenido }}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

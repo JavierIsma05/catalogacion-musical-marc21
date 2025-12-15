@@ -30,7 +30,7 @@ TIPO_OBRA_CONFIG = {
         'descripcion': 'Conjunto de obras publicadas',
         'tipo_registro': 'c',
         'nivel_bibliografico': 'c',
-        'punto_acceso': '130',  # Título uniforme principal
+        'punto_acceso': '100',  # Compositor
     },
     'obra_en_coleccion_impresa': {
         'titulo': 'Obra en Colección Impresa',
@@ -160,7 +160,7 @@ CAMPOS_POR_TIPO_OBRA = {
         # Igual que coleccion_manuscrita pero con tipo_registro='c'
         'campos_simples': [
             '001', '005', '008', '020', '024', '028', '040', '041', '044', '092',  # 0XX
-            '100', '130',  # 1XX
+            '100',  # 1XX
             '240', '245', '246', '250', '264',  # 2XX
             '300', '340', '348', '382',  # 3XX
             '490',  # 4XX

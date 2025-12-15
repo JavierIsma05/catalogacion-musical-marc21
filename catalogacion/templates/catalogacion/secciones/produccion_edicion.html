@@ -170,6 +170,22 @@
                 </div>
             </div>
             {% endif %}
+            {% if 'codigos_pais' in formsets_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">044</span>
+                    <h6>Código de País</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="paises" title="Agregar País">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                    <span class="campo-help-btn" data-field-code="044" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                {% include 'catalogacion/includes/formset_template.html' with formset=codigos_pais titulo="País" %}
+            </div>
+            {% endif %}
             
             
         </div>
