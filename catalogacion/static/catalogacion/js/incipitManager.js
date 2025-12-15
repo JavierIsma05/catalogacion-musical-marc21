@@ -609,9 +609,12 @@ function CanvasClass() {
   };
 
   this.setDrawPosition = function (context, index, showNote) {
+
     if (!showNote && index > context.drawXPosition.length - 1)
       context.drawXPosition.push(0);
-    if (!showNote && context.drawIncipitElements[index].isClef) return;
+      const elem = context.drawIncipitElements[index];
+    if (!elem) return; // ✅ evita undefined.isClef en modo list
+    if (!showNote && elem.isClef) return;
 
     var lastElement = context.drawIncipitElements[index - 1];
     var sumAlt = 0;
@@ -1535,7 +1538,7 @@ function CanvasClass() {
         the StepY cause problems not drawing the Note head on the position, that is why the substract
         step*6 + pixelsToAdd occurs, to set it on the mouse position */
     var pixelsToAdd = 2;
-    if (context.operation == "list") pixelsToAdd = 0.5;
+    // if (context.operation == "list") pixelsToAdd = 0.5;
     this.verticalOffset = 5;
     var positionY =
       (elementY + drawingProblemYPatchAmountFix + context.minStepY) *
@@ -1607,6 +1610,15 @@ function CanvasClass() {
 
   //Main function that draw incipit
   this.drawPentagram = function (context) {
+    // ✅ evita que scale/translate acumulen y maten el dibujo
+    context.gDrawingContext.setTransform(1, 0, 0, 1, 0, 0);
+    context.gDrawingContext.clearRect(
+      0,
+      0,
+      context.gCanvasElement.width,
+      context.gCanvasElement.height
+    );
+
     var drawingProblemYPatchAmountFix = 0; //solves Drawing problem (Chrome and Firefox)
     //Incipit.gDrawingContext.clearRect(0, 0, Incipit.gCanvasElement.width, Incipit.gCanvasElement.height);
     //Dibujo rayas pentagrama
@@ -1841,9 +1853,9 @@ function CanvasClass() {
       );
     }
 
-    if (context.operation == "list") {
-      context.gDrawingContext.scale(0.5, 0.5);
-    }
+    // if (context.operation == "list") {
+    //   context.gDrawingContext.scale(0.5, 0.5);
+    // }
 
     context.gDrawingContext.stroke();
   };
@@ -2029,7 +2041,7 @@ function CanvasClass() {
     var paecOctave = "";
     var paecNote = "";
     // Corrección fina: bajamos un grado porque el dibujo quedó 1 paso corrido
-    notePosition += 1;
+    notePosition += 0;
     // 19 notes the incipit can represent, 31 notes can mean
     //'''DC''BAGFEDC'BAGFEDC,BAG                 Treble
     //         ''EDC'BAGFEDC,BAGFEDC,,BA         Alto
@@ -2291,6 +2303,32 @@ function CanvasClass() {
     var currentClef = "treble";
     var hasDot = false;
     var paecRythm = "";
+
+    // --- Normaliza header para que el parser legacy lo lea bien ---
+    // Soporta que venga "%... $... @..." o en cualquier orden.
+    paec = (paec || "").trim();
+    if (paec) {
+      // toma 1 ocurrencia de cada cosa (header)
+      const clefMatch = paec.match(/%[^ $@]+/); // ej: %G-2
+      const keyMatch = paec.match(/\$[^ %@]+/); // ej: $xFCGD
+      const timeMatch = paec.match(/@[^ $%]+/); // ej: @4/4
+
+      // quita esas piezas del string original
+      let rest = paec
+        .replace(clefMatch ? clefMatch[0] : "", "")
+        .replace(keyMatch ? keyMatch[0] : "", "")
+        .replace(timeMatch ? timeMatch[0] : "", "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      // reconstruye en el orden que el parser espera: $ @ %
+      let header = "";
+      if (keyMatch) header += keyMatch[0];
+      if (timeMatch) header += timeMatch[0];
+      if (clefMatch) header += clefMatch[0];
+
+      paec = (header ? header + (rest ? " " : "") : "") + rest;
+    }
 
     for (var index = 0; index < paec.length; index++) {
       var elem = null;

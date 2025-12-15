@@ -6,11 +6,37 @@
 
 {% block catalogacion_css %}
 <link rel="stylesheet" href="{% static 'catalogacion/css/detalle-obra.css' %}">
+
+<style>
+@font-face {
+  font-family: 'Maestro';
+  src: url("{% static 'catalogacion/fonts/Maestro.ttf' %}") format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.incipit-canvas-wrap{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: .5rem;
+}
+
+.incipit-view-canvas{
+  width: 100%;
+  max-width: 700px;
+  height: 250px;      /* tamaño visual */
+  display: block;
+  background: #ffffffdc;
+}
+
+
+</style>
 {% endblock %}
 
 {% block catalogacion_content %}
 <div class="detalle-container">
-    
+
     <!-- ============= ENCABEZADO ============= -->
     <div class="detalle-header">
         <div class="header-content">
@@ -23,11 +49,10 @@
                 <span class="separator">›</span>
                 <span class="current">{{ obra.titulo_principal|truncatewords:5 }}</span>
             </div>
-            
+
             <div class="header-main">
                 <div class="header-info">
 
-                    <!-- SOLO SIGNATURA ARRIBA -->
                     {% if obra.signatura_completa %}
                     <div class="signatura-badge">
                         <i class="bi bi-bookmark-fill"></i>
@@ -84,7 +109,7 @@
                         <strong>{{ obra.centro_catalogador }}</strong>
                     </div>
                     {% endif %}
-                    
+
                     {% if obra.ms_imp %}
                     <div class="data-row">
                         <span class="campo-tag">340</span>
@@ -115,7 +140,6 @@
 
                 <div class="titulos-bloque">
 
-                    {# 100 – Compositor principal #}
                     {% if obra.compositor %}
                     <div class="data-row-alt">
                         <span class="campo-tag">100</span>
@@ -140,7 +164,6 @@
                     </div>
                     {% endif %}
 
-                    {# 130 – Título uniforme principal (sin compositor) #}
                     {% if obra.titulo_uniforme %}
                     <div class="data-row-alt">
                         <span class="campo-tag">130</span>
@@ -160,7 +183,6 @@
                     </div>
                     {% endif %}
 
-                    {# 240 – Título uniforme secundario (con compositor) #}
                     {% if obra.titulo_240 %}
                     <div class="data-row-alt">
                         <span class="campo-tag">240</span>
@@ -180,7 +202,6 @@
                     </div>
                     {% endif %}
 
-                    {# 245 – Título principal #}
                     {% if obra.titulo_principal %}
                     <div class="data-row-alt">
                         <span class="campo-tag">245</span>
@@ -197,7 +218,6 @@
                     </div>
                     {% endif %}
 
-                    {# 246 – Títulos alternativos #}
                     {% if obra.titulos_alternativos.all %}
                         {% for alt in obra.titulos_alternativos.all %}
                         <div class="data-row-alt">
@@ -219,7 +239,7 @@
                 </div>
             </section>
 
-            <!-- 🟧 SECCIÓN 3: Colaboradores (700 / 710) -->
+            <!-- 🟧 SECCIÓN 3 -->
             <section id="seccion-colaboradores" class="detalle-section">
                 <div class="section-header">
                     <h3 class="section-title"><i class="bi bi-people"></i> Colaboradores</h3>
@@ -269,7 +289,7 @@
                 {% endif %}
             </section>
 
-            <!-- 🟨 SECCIÓN 4: Producción y Edición (250 / 264) -->
+            <!-- 🟨 SECCIÓN 4 -->
             <section id="seccion-produccion" class="detalle-section">
                 <div class="section-header">
                     <h3 class="section-title"><i class="bi bi-building"></i> Producción / Edición</h3>
@@ -277,7 +297,6 @@
 
                 <div class="data-grid-compact">
 
-                    {# 264 – Producción / Publicación #}
                     {% if obra.producciones_publicaciones.all %}
                         {% for prod in obra.producciones_publicaciones.all %}
                         <div class="data-row">
@@ -290,13 +309,13 @@
                                     {% endfor %}
                                 {% endif %}
                                 {% if prod.entidades.all %}
-                                    — 
+                                    —
                                     {% for ent in prod.entidades.all %}
                                         {{ ent.nombre }}{% if not forloop.last %} ; {% endif %}
                                     {% endfor %}
                                 {% endif %}
                                 {% if prod.fechas.all %}
-                                    — 
+                                    —
                                     {% for f in prod.fechas.all %}
                                         {{ f.fecha }}{% if not forloop.last %} ; {% endif %}
                                     {% endfor %}
@@ -306,7 +325,6 @@
                         {% endfor %}
                     {% endif %}
 
-                    {# 250 – Edición #}
                     {% if obra.ediciones.all %}
                         {% for edicion in obra.ediciones.all %}
                         <div class="data-row">
@@ -318,7 +336,7 @@
                 </div>
             </section>
 
-            <!-- 🟦 SECCIÓN 5: Datos Musicales (348 / 382 / 383 / 384 / 031) -->
+            <!-- 🟦 SECCIÓN 5 -->
             <section id="seccion-musical" class="detalle-section">
                 <div class="section-header">
                     <h3 class="section-title"><i class="bi bi-music-note-list"></i> Datos Musicales</h3>
@@ -326,7 +344,6 @@
 
                 <div class="data-grid-compact">
 
-                    {# 348 – Formato #}
                     {% if obra.formato %}
                     <div class="data-row">
                         <span class="campo-tag">348</span>
@@ -334,7 +351,6 @@
                     </div>
                     {% endif %}
 
-                    {# 382 – Medios de interpretación #}
                     {% if obra.medios_interpretacion_382.all %}
                     <div class="data-row full">
                         <span class="campo-tag">382</span>
@@ -355,7 +371,6 @@
                     </div>
                     {% endif %}
 
-                    {# 383 – Número de obra / Opus #}
                     {% if obra.numero_obra or obra.opus %}
                     <div class="data-row">
                         <span class="campo-tag">383</span>
@@ -366,7 +381,6 @@
                     </div>
                     {% endif %}
 
-                    {# 384 – Tonalidad #}
                     {% if obra.tonalidad_384 %}
                     <div class="data-row">
                         <span class="campo-tag">384</span>
@@ -375,60 +389,125 @@
                     {% endif %}
                 </div>
 
-                {# 031 – Íncipits musicales #}
                 {% if obra.incipits_musicales.all %}
                 <div class="incipit-section">
                     <h4 class="subsection-title">Íncipit Musical (031)</h4>
+
                     {% for incipit in obra.incipits_musicales.all %}
                     <div class="incipit-card">
                         <div class="incipit-header">
                             <strong>Obra {{ incipit.numero_obra }}, mov. {{ incipit.numero_movimiento }}, pas. {{ incipit.numero_pasaje }}</strong>
                         </div>
+
                         {% if incipit.titulo_encabezamiento %}
                         <div class="incipit-subtitle">
                             {{ incipit.titulo_encabezamiento }}
                         </div>
                         {% endif %}
+
                         <div class="incipit-meta">
                             {% if incipit.voz_instrumento %}{{ incipit.voz_instrumento }}{% endif %}
                             {% if incipit.clave %} · Clave: {{ incipit.clave }}{% endif %}
                             {% if incipit.armadura %} · Armadura: {{ incipit.armadura }}{% endif %}
                             {% if incipit.tiempo %} · Tiempo: {{ incipit.tiempo }}{% endif %}
                         </div>
-                        {% if incipit.notacion_musical %}
-                        <code class="incipit-code">{{ incipit.notacion_musical|truncatechars:120 }}</code>
-                        {% endif %}
-                        {% if incipit.urls.all %}
-                        <div class="incipit-urls">
-                            {% for u in incipit.urls.all %}
-                            <a href="{{ u.url }}" target="_blank" class="acceso-link">
-                                Ver íncipit en línea <i class="bi bi-box-arrow-up-right"></i>
-                            </a>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </section>
 
-            <!-- 🟩 SECCIÓN 6: Materias y Géneros (650 / 655 / 490) -->
+
+    {% if incipit.paec_full %}
+        {# ========== MÉTODO CORRECTO: json_script con ID fijo ========== #}
+        <script id="paec_json_{{ incipit.pk }}" type="application/json">{{ incipit.paec_full|safe }}</script>
+
+        <div class="incipit-canvas-wrap">
+            <canvas
+                id="incipit_view_canvas_{{ incipit.pk }}"
+                class="incipit-view-canvas"
+                width="800"
+                height="320"
+                data-paec-json-id="paec_json_{{ incipit.pk }}">
+            </canvas>
+        </div>
+
+        {# ========== PANEL DE DEBUG (quitar en producción) ========== #}
+        <div class="debug-panel" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
+            <div style="font-size: 12px; font-family: monospace;">
+                <div style="margin-bottom: 0.5rem;">
+                    <strong style="color: #0066cc;">🔍 DEBUG INCIPIT {{ incipit.pk }}</strong>
+                </div>
+                <table style="width: 100%; font-size: 11px;">
+                    <tr style="background: #fff;">
+                        <td style="padding: 4px; width: 120px;"><strong>Clave (DB):</strong></td>
+                        <td style="padding: 4px; color: #666;">"{{ incipit.clave|default:"vacío" }}"</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px;"><strong>Armadura (DB):</strong></td>
+                        <td style="padding: 4px; color: #666;">"{{ incipit.armadura|default:"vacío" }}"</td>
+                    </tr>
+                    <tr style="background: #fff;">
+                        <td style="padding: 4px;"><strong>Tiempo (DB):</strong></td>
+                        <td style="padding: 4px; color: #666;">"{{ incipit.tiempo|default:"vacío" }}"</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px;"><strong>Body (DB):</strong></td>
+                        <td style="padding: 4px; color: #666;">"{{ incipit.notacion_musical|truncatechars:60 }}"</td>
+                    </tr>
+                    <tr style="background: #e7f3ff;">
+                        <td style="padding: 4px; vertical-align: top;"><strong>PAEC FULL:</strong></td>
+                        <td style="padding: 4px;">
+                            <code style="color: #d63384; word-break: break-all;">{{ incipit.paec_full }}</code>
+                        </td>
+                    </tr>
+                    <tr style="background: #fff;">
+                        <td style="padding: 4px;"><strong>JSON ID:</strong></td>
+                        <td style="padding: 4px; color: #28a745;">paec_json_{{ incipit.pk }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        {% elif incipit.notacion_musical %}
+        {# ========== FALLBACK: si paec_full está vacío pero hay body ========== #}
+        <div class="alert alert-warning" style="padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
+            <strong>⚠️ Advertencia:</strong> Este íncipit tiene <code>notacion_musical</code> pero no <code>paec_full</code>.
+            <br>Ejecuta la migración o actualiza el registro para regenerar el PAEC completo.
+            <br><small>Body: <code>{{ incipit.notacion_musical|truncatechars:80 }}</code></small>
+        </div>
+
+        {% else %}
+        {# ========== Sin notación musical ========== #}
+        <div class="text-muted" style="font-style: italic; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+            No hay notación musical disponible para este íncipit.
+        </div>
+        {% endif %}
+
+        {% if incipit.urls.all %}
+        <div class="incipit-urls" style="margin-top: 1rem;">
+            {% for u in incipit.urls.all %}
+            <a href="{{ u.url }}" target="_blank" class="acceso-link">
+                Ver íncipit en línea <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+</section>
+
+            <!-- 🟩 SECCIÓN 6 -->
             <section id="seccion-materias" class="detalle-section">
                 <div class="section-header">
                     <h3 class="section-title"><i class="bi bi-tags"></i> Materias / Géneros</h3>
                 </div>
 
                 <div class="materias-container">
-
-                    {# 650 – Materias #}
                     {% for mat in obra.materias_650.all %}
                     <div class="materia-tag">
                         <span class="campo-tag">650</span>
                         <span>
                             {% if mat.materia %}{{ mat.materia }}{% else %}—{% endif %}
                             {% if mat.subdivisiones.all %}
-                                — 
+                                —
                                 {% for sub in mat.subdivisiones.all %}
                                     {{ sub.subdivision }}{% if not forloop.last %} ; {% endif %}
                                 {% endfor %}
@@ -437,14 +516,13 @@
                     </div>
                     {% endfor %}
 
-                    {# 655 – Género / forma #}
                     {% for mat in obra.materias_655.all %}
                     <div class="materia-tag">
                         <span class="campo-tag">655</span>
                         <span>
                             {% if mat.materia %}{{ mat.materia }}{% else %}—{% endif %}
                             {% if mat.subdivisiones.all %}
-                                — 
+                                —
                                 {% for sub in mat.subdivisiones.all %}
                                     {{ sub.subdivision }}{% if not forloop.last %} ; {% endif %}
                                 {% endfor %}
@@ -454,7 +532,6 @@
                     {% endfor %}
                 </div>
 
-                {# 490 – Series #}
                 {% if obra.menciones_serie.all %}
                 <h4 class="subsection-title mt-3">Series</h4>
                 {% for mencion in obra.menciones_serie.all %}
@@ -467,7 +544,7 @@
                             {% endfor %}
                         {% endif %}
                         {% if mencion.volumenes.all %}
-                            — 
+                            —
                             {% for v in mencion.volumenes.all %}
                                 {{ v.volumen }}{% if not forloop.last %} ; {% endif %}
                             {% endfor %}
@@ -478,7 +555,7 @@
                 {% endif %}
             </section>
 
-            <!-- 🟥 SECCIÓN 7: Notas (500 / 505 / 520 / 545) -->
+            <!-- 🟥 SECCIÓN 7 -->
             <section id="seccion-notas" class="detalle-section">
                 <div class="section-header">
                     <h3 class="section-title"><i class="bi bi-journal-text"></i> Notas</h3>
@@ -517,13 +594,12 @@
                 </div>
             </section>
 
-            <!-- 🟪 SECCIÓN 8: Ubicación y Acceso (852 / 856) -->
+            <!-- 🟪 SECCIÓN 8 -->
             <section id="seccion-ubicacion" class="detalle-section">
                 <div class="section-header">
                     <h3 class="section-title"><i class="bi bi-geo-alt"></i> Ubicación y acceso</h3>
                 </div>
 
-                {# 852 – Ubicación física #}
                 {% if obra.ubicaciones_852.all %}
                 <div class="ubicaciones-list">
                     {% for ubicacion in obra.ubicaciones_852.all %}
@@ -550,7 +626,6 @@
                 <p class="text-muted">No hay ubicación registrada.</p>
                 {% endif %}
 
-                {# 856 – Recursos en línea #}
                 {% if obra.disponibles_856.exists %}
                 <h4 class="subsection-title mt-4">Disponible en línea</h4>
 
@@ -570,16 +645,12 @@
                     {% endfor %}
                 {% endfor %}
                 {% endif %}
-
-
             </section>
-
 
         </main>
     </div>
 </div>
 
-<!-- 🔗 Script para navegación lateral y scroll suave -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const navLinks = document.querySelectorAll('.nav-link');
@@ -620,5 +691,223 @@ document.addEventListener('DOMContentLoaded', function() {
     sections.forEach(section => observer.observe(section));
 });
 </script>
+
+<!-- Motor del canvas -->
+<script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function () {
+  console.log('🎵 [INCIPIT] Iniciando carga de incipits musicales...');
+
+  // ===== PASO 1: ESPERAR FUENTE MAESTRO =====
+  try {
+    if (document.fonts && document.fonts.load) {
+      console.log('⏳ [INCIPIT] Cargando fuente Maestro...');
+      await document.fonts.load('16px "Maestro"');
+      await document.fonts.ready;
+      console.log('✅ [INCIPIT] Fuente Maestro cargada');
+    }
+  } catch (e) {
+    console.warn('⚠️ [INCIPIT] Error al cargar fuente:', e);
+  }
+
+  // ===== PASO 2: VERIFICAR QUE CANVASINCIPIT EXISTE =====
+  if (typeof CanvasIncipit === 'undefined') {
+    console.error('❌ [INCIPIT] CanvasIncipit no está definido. Verifica que incipitManager.js esté cargado.');
+    return;
+  }
+
+  console.log('✅ [INCIPIT] CanvasIncipit disponible');
+
+  // ===== PASO 3: BUSCAR TODOS LOS CANVAS =====
+  const canvases = document.querySelectorAll('canvas.incipit-view-canvas[data-paec-json-id]');
+  console.log(`📊 [INCIPIT] Canvas encontrados: ${canvases.length}`);
+
+  if (canvases.length === 0) {
+    console.warn('⚠️ [INCIPIT] No se encontraron canvas para renderizar');
+    return;
+  }
+
+  // ===== PASO 4: RENDERIZAR CADA CANVAS =====
+  let successCount = 0;
+  let errorCount = 0;
+
+  canvases.forEach((cv, index) => {
+    const canvasId = cv.id;
+    const jsonId = cv.dataset.paecJsonId;
+
+    console.log(`\n--- [INCIPIT ${index + 1}/${canvases.length}] ---`);
+    console.log('📌 Canvas ID:', canvasId);
+    console.log('📌 JSON ID:', jsonId);
+
+    try {
+      // Buscar el elemento script con el JSON
+      const scriptElement = document.getElementById(jsonId);
+
+      if (!scriptElement) {
+        console.error(`❌ [${canvasId}] No se encontró script con id="${jsonId}"`);
+        console.log('💡 Verifica que el template tenga: <script id="' + jsonId + '" type="application/json">');
+        errorCount++;
+        return;
+      }
+
+      // Leer el contenido del script
+      const rawContent = scriptElement.textContent || scriptElement.innerText || "";
+      console.log('📄 Contenido raw:', rawContent.substring(0, 100) + (rawContent.length > 100 ? '...' : ''));
+
+      if (!rawContent || rawContent.trim() === '') {
+        console.error(`❌ [${canvasId}] El script "${jsonId}" está vacío`);
+        errorCount++;
+        return;
+      }
+
+      // Parsear el JSON (o usar como string directo)
+      let paecFull;
+      try {
+        paecFull = JSON.parse(rawContent);
+      } catch (e) {
+        // Si no es JSON válido, usar como string directo
+        paecFull = rawContent.trim();
+      }
+
+      if (!paecFull) {
+        console.error(`❌ [${canvasId}] PAEC vacío después del parsing`);
+        errorCount++;
+        return;
+      }
+
+      console.log('📝 PAEC completo:', paecFull);
+
+      // Validar formato PAEC básico
+      if (!paecFull.includes('%')) {
+        console.warn(`⚠️ [${canvasId}] PAEC no contiene clave (%). Esto puede causar errores.`);
+      }
+
+      // Inicializar el canvas
+      console.log('🎨 Inicializando canvas...');
+      CanvasIncipit.initializeCanvas(canvasId, 'list', paecFull);
+
+      console.log(`✅ [${canvasId}] Canvas renderizado correctamente`);
+      successCount++;
+
+    } catch (error) {
+      console.error(`❌ [${canvasId}] Error al renderizar:`, error);
+      console.error('Stack:', error.stack);
+      errorCount++;
+
+      // Mostrar error en el canvas
+      try {
+        const ctx = cv.getContext('2d');
+        ctx.fillStyle = '#dc3545';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Error al renderizar íncipit', cv.width / 2, cv.height / 2 - 10);
+        ctx.font = '12px Arial';
+        ctx.fillStyle = '#666';
+        ctx.fillText(error.message, cv.width / 2, cv.height / 2 + 10);
+      } catch (e) {
+        console.error('No se pudo mostrar error en canvas:', e);
+      }
+    }
+  });
+
+  // ===== RESUMEN FINAL =====
+  console.log('\n=================================');
+  console.log('🏁 [INCIPIT] Proceso completado');
+  console.log(`✅ Exitosos: ${successCount}`);
+  console.log(`❌ Errores: ${errorCount}`);
+  console.log('=================================\n');
+});
+
+
+// ============================================
+// FUNCIÓN DE DEPURACIÓN
+// Ejecutar en consola: debugIncipits()
+// ============================================
+window.debugIncipits = function() {
+  console.log('\n========== DEBUG INCIPITS ==========');
+
+  // Verificar CanvasIncipit
+  console.log('1. CanvasIncipit definido:', typeof CanvasIncipit !== 'undefined');
+
+  // Verificar fuente Maestro
+  if (document.fonts && document.fonts.check) {
+    const maestroLoaded = document.fonts.check('16px Maestro');
+    console.log('2. Fuente Maestro cargada:', maestroLoaded);
+  }
+
+  // Listar canvas
+  const canvases = document.querySelectorAll('canvas.incipit-view-canvas');
+  console.log('3. Canvas encontrados:', canvases.length);
+
+  canvases.forEach((cv, i) => {
+    const jsonId = cv.dataset.paecJsonId;
+    const scriptEl = jsonId ? document.getElementById(jsonId) : null;
+    const paecContent = scriptEl ? scriptEl.textContent.substring(0, 80) : 'NO SCRIPT';
+
+    console.log(`\n   Canvas ${i + 1}:`);
+    console.log(`   - ID: ${cv.id}`);
+    console.log(`   - JSON ID: ${jsonId || 'NO DATA-PAEC-JSON-ID'}`);
+    console.log(`   - Script existe: ${!!scriptEl}`);
+    console.log(`   - PAEC: ${paecContent}...`);
+  });
+
+  console.log('\n====================================\n');
+};
+
+
+// ============================================
+// FUNCIÓN PARA REFRESCAR UN CANVAS
+// Uso: refreshCanvas('incipit_view_canvas_123')
+// ============================================
+window.refreshCanvas = function(canvasId) {
+  console.log(`\n🔄 Refrescando canvas: ${canvasId}`);
+
+  const cv = document.getElementById(canvasId);
+  if (!cv) {
+    console.error(`❌ No se encontró canvas con id="${canvasId}"`);
+    return;
+  }
+
+  const jsonId = cv.dataset.paecJsonId;
+  if (!jsonId) {
+    console.error('❌ Canvas no tiene data-paec-json-id');
+    return;
+  }
+
+  const scriptEl = document.getElementById(jsonId);
+  if (!scriptEl) {
+    console.error(`❌ No se encontró script con id="${jsonId}"`);
+    return;
+  }
+
+  let paecFull;
+  try {
+    paecFull = JSON.parse(scriptEl.textContent);
+  } catch (e) {
+    paecFull = scriptEl.textContent.trim();
+  }
+
+  if (!paecFull) {
+    console.error('❌ PAEC vacío');
+    return;
+  }
+
+  console.log('📝 PAEC:', paecFull);
+
+  try {
+    CanvasIncipit.initializeCanvas(canvasId, 'list', paecFull);
+    console.log('✅ Canvas refrescado correctamente');
+  } catch (error) {
+    console.error('❌ Error al refrescar:', error);
+  }
+};
+</script>
+
+
+<style>
+  .incipit-view-canvas { pointer-events: none; }
+</style>
+
 
 {% endblock catalogacion_content %}
