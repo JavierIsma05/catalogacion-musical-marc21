@@ -63,13 +63,9 @@ class Estanteria852Form(forms.ModelForm):
 
 
 class Disponible856Form(forms.ModelForm):
-    dummy = forms.CharField(required=False, widget=forms.HiddenInput(), initial="1")
-
     class Meta:
         model = Disponible856
-        fields = ["dummy"]
-
-
+        fields = []  # NO dummy
 
 class URL856Form(forms.ModelForm):
     """

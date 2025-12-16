@@ -163,22 +163,16 @@ class NombreRelacionado700Form(forms.ModelForm):
         # 4️⃣ VALIDACIÓN NUEVA: 100 vs 700
         #    Evita duplicados o doble compositor
         # ============================================================
-        compositor_100 = self.compositor_100
+        compositor_100 = getattr(self, "compositor_100", None)
 
         if compositor_100 and persona:
-            # Caso 1: son iguales → no se debe repetir en 700
-            if compositor_100.apellidos_nombres.lower() == persona.apellidos_nombres.lower():
+            # ❌ PROHIBIDO: duplicar exactamente el del 100
+            if compositor_100.apellidos_nombres.strip().lower() == persona.apellidos_nombres.strip().lower():
                 raise forms.ValidationError(
-                    "El compositor del campo 700 es el mismo que el del campo 100. "
-                    "No debe repetirse."
+                    "La persona del campo 700 no puede ser la misma que el compositor del campo 100."
                 )
 
-            # Caso 2: son diferentes → tampoco permitido
-            raise forms.ValidationError(
-                "No puedes tener dos compositores diferentes: uno en el 100 y otro en el 700. "
-                "Debe existir solo un compositor principal."
-            )
-
+        # ✅ Si son distintos → permitido
         return cleaned_data
 
 

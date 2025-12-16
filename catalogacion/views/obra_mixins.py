@@ -35,6 +35,7 @@ from catalogacion.forms.formsets import (
     Ubicacion852FormSet,
     Disponible856FormSet,
 )
+from catalogacion.models.bloque_8xx import Disponible856
 from catalogacion.views.obra_formset_handlers import SUBCAMPO_HANDLERS
 
 # Configurar logger
@@ -241,9 +242,21 @@ class ObraFormsetMixin:
             if not formset:
                 continue
 
-            if all(not form.has_changed() for form in formset.forms):
-                logger.debug(f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)")
-                continue
+            # ⚠️ 856 se maneja por subcampos JS → no usar has_changed
+            if key == 'disponibles_856':
+                # Comprobamos si hay algún cambio en los campos $u o $y en el POST
+                hay_urls = any(k.startswith("url_disponible_856_") for k in self.request.POST.keys())
+                hay_textos = any(k.startswith("texto_disponible_856_") for k in self.request.POST.keys())
+
+                if not hay_urls and not hay_textos:
+                    logger.debug("⏭️  disponibles_856: sin URLs ni textos, se omite")
+                    continue
+            else:
+                if all(not form.has_changed() for form in formset.forms):
+                    logger.debug(f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)")
+                    continue
+
+
 
             formsets[key] = formset
 
@@ -285,17 +298,36 @@ class ObraFormsetMixin:
         
         for key, formset in formsets.items():
 
-            # ⭐⭐⭐ CREAR PADRES 856 ANTES DE SUBCAMPOS ⭐⭐⭐
             # 🔥 1) GUARDAR PADRES 856 ANTES QUE NADA
             if key == 'disponibles_856':
-                objs_856 = formset.save(commit=False)
-                for obj in objs_856:
-                    obj.obra = instance
-                    obj.save()
-                formset.save_m2m()
-                logger.info(f"🟢 856 padre(s) creados: {len(objs_856)}")
-                # 👇 IMPORTANTE: continuar sin ejecutar el ciclo inferior
+                disponibles_creados = []
+
+                total_forms = int(self.request.POST.get('disponibles_856-TOTAL_FORMS', 0))
+
+                for i in range(total_forms):
+                    if self.request.POST.get(f'disponibles_856-{i}-DELETE'):
+                        continue
+
+                    disponible = Disponible856.objects.create(
+                        obra=instance
+                    )
+                    disponibles_creados.append(disponible)
+
+                logger.info(f"🟢 856 padres creados: {len(disponibles_creados)}")
+
+                # 🔥 LLAMADAS CORRECTAS A LOS HANDLERS
+                SUBCAMPO_HANDLERS['_save_urls_856'](
+                    self.request.POST,
+                    disponibles_creados
+                )
+
+                SUBCAMPO_HANDLERS['_save_textos_enlace_856'](
+                    self.request.POST,
+                    disponibles_creados
+                )
+
                 continue
+
 
             # ---------------------------
             # Guardado NORMAL para otros formsets
