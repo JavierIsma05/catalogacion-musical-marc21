@@ -304,6 +304,22 @@ function IncipitClass() {
 
       //Silencios
       {
+        name: "restSemirev",
+        value: "$",
+        font: 38,
+        isRest: true,
+        yPosition: 7.7,
+        paec: "1-"
+      },
+      {
+        name: "restMinim",
+        value: "%",
+        font: 38,
+        isRest: true,
+        yPosition: 8.3,
+        paec: "2-"
+      },
+      {
         name: "restLon",
         value: '"',
         font: 38,
@@ -318,22 +334,6 @@ function IncipitClass() {
         isRest: true,
         yPosition: 8,
         paec: "9-"
-      },
-      {
-        name: "restSemirev",
-        value: "$",
-        font: 38,
-        isRest: true,
-        yPosition: 8,
-        paec: "1-"
-      },
-      {
-        name: "restMinim",
-        value: "%",
-        font: 38,
-        isRest: true,
-        yPosition: 8,
-        paec: "2-"
       },
       {
         name: "restCrotchet",
@@ -351,6 +351,7 @@ function IncipitClass() {
         yPosition: 8,
         paec: "8-"
       },
+
       {
         name: "restSemiqua",
         value: "(",
