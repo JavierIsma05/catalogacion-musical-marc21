@@ -65,7 +65,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 .btn-music-gliphos {
   font-size: 23px;   /* glifos musicales*/
   max-height: 40px;
-  margin-top: 5px;
+  padding-top: 3px;
 }
 
 /* fuerza Maestro en los botones del toolbar */
@@ -113,6 +113,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 
 /* el editor ocupa 100% del padre */
 #incipit-toolbar-top-031 { width: 100%; }
+#incipit-toolbar-bottom-031 { justify-content: center; }
 
 /* el canvas no se pasa de 600, pero se centra */
 #incipit_canvas_0 { width: 100%; max-width: 700px; height: auto; display:block; }
@@ -322,35 +323,71 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
       <button type="button" class="btn btn-incipit btn-music"
               title="Puntillo" onclick="dotPressed()" style="font-size: 26px;">·</button>
     </div>
-  </div>
 
-    {# ALTURA #}
-        <div>
-          <div class="incipit-group-title" style="margin-left:11px;">Altura</div>
-          <div class="btn-group btn-group-sm flex-wrap" role="group">
-            <button type="button" class="btn btn-incipit btn-music" style="margin:1px;" title="Subir altura"
-                    onclick="CanvasIncipit.toneUpDown(CanvasIncipit, -1)">▲</button>
-            <button type="button" class="btn btn-incipit btn-music" style="margin:1px;" title="Bajar altura"
-                    onclick="CanvasIncipit.toneUpDown(CanvasIncipit, 1)">▼</button>
-          </div>
-        </div>
+</div>
+<div class="incipit-group">
+<div class="incipit-group-title">Silencios</div>
 
-        {# BARRA #}
-        <div>
-          <div class="incipit-group-title">Barras</div>
-          <div class="btn-group-sm flex-wrap text-align-center" role="group" aria-label="Barras">
-            <button type="button" class="btn btn-incipit btn-music" style="border-radius: 10% 0 0 10%;"
-                    title="Barra simple" onclick="BarPressed(';')">|</button>
-            <button type="button" class="btn btn-incipit btn-music"
-                    title="Doble barra" onclick="BarPressed('<')">||</button>
-            <button type="button" class="btn btn-incipit btn-music"
-                    title="Inicio repetición" onclick="BarPressed('>')">|:</button>
-            <button type="button" class="btn btn-incipit btn-music"
-                    title="Fin repetición" onclick="BarPressed('?')">:||</button>
-            <button type="button" class="btn btn-incipit btn-music" style="border-radius: 0 10% 10% 0%;"
-                    title="Repetición doble" onclick="BarPressed('@')">:||:</button>
-          </div>
-        </div>
+<div class="btn-group btn-group-sm flex-wrap" role="group" aria-label="Silencios">
+<button type="button" class="btn btn-incipit btn-music-gliphos" onclick="NotePressed('$')"  title="Silencio de redonda">
+  <span style="font-family: Maestro; font-size:24px;">$</span>
+</button>
+
+<button type="button" class="btn btn-incipit btn-music-gliphos" onclick="NotePressed('%')"    title="Silencio de blanca">
+  <span style="font-family: Maestro; font-size:24px;">%</span>
+</button>
+
+<button type="button" class="btn btn-incipit btn-music-gliphos" onclick="NotePressed('&amp;')"  title="Silencio de negra">
+  <span style="font-family: Maestro; font-size:24px;">&amp;</span>
+</button>
+
+<button type="button" class="btn btn-incipit btn-music-gliphos"  onclick="NotePressed('&#39;')"   title="Silencio de corchea">
+  <span style="font-family: Maestro; font-size:24px;">'</span>
+</button>
+
+<button type="button" class="btn btn-incipit btn-music-gliphos" onclick="NotePressed('(')"  title="Silencio de semicorchea">
+  <span style="font-family: Maestro; font-size:24px;">(</span>
+</button>
+
+<button type="button" class="btn btn-incipit btn-music-gliphos"  onclick="NotePressed(')')" title="Silencio de fusa">
+  <span style="font-family: Maestro; font-size:24px;">)</span>
+</button>
+
+<button type="button" class="btn btn-incipit btn-music-gliphos" onclick="NotePressed('*')" title="Silencio de semifusa">
+  <span style="font-family: Maestro; font-size:24px;">*</span>
+</button>
+</div>
+</div>
+
+{# ALTURA #}
+    <div class="incipit-group">
+      <div class="incipit-group-title" style="margin-left:11px;">Altura</div>
+      <div class="btn-group btn-group-sm flex-wrap" role="group">
+        <button type="button" class="btn btn-incipit btn-music" style="margin:1px;" title="Subir altura"
+                onclick="CanvasIncipit.toneUpDown(CanvasIncipit, -1)">▲</button>
+        <button type="button" class="btn btn-incipit btn-music" style="margin:1px;" title="Bajar altura"
+                onclick="CanvasIncipit.toneUpDown(CanvasIncipit, 1)">▼</button>
+      </div>
+    </div>
+
+    {# BARRA #}
+    <div class="incipit-group">
+      <div class="incipit-group-title">Barras</div>
+      <div class="btn-group-sm flex-wrap text-align-center" role="group" aria-label="Barras">
+        <button type="button" class="btn btn-incipit btn-music" style="border-radius: 10% 0 0 10%;"
+                title="Barra simple" onclick="BarPressed(';')">|</button>
+        <button type="button" class="btn btn-incipit btn-music"
+                title="Doble barra" onclick="BarPressed('<')">||</button>
+        <button type="button" class="btn btn-incipit btn-music"
+                title="Inicio repetición" onclick="BarPressed('>')">|:</button>
+        <button type="button" class="btn btn-incipit btn-music"
+                title="Fin repetición" onclick="BarPressed('?')">:||</button>
+        <button type="button" class="btn btn-incipit btn-music" style="border-radius: 0 10% 10% 0%;"
+                title="Repetición doble" onclick="BarPressed('@')">:||:</button>
+      </div>
+    </div>
+</div>
+
 
    {# TOOLBAR BOTTOM (solo acciones) #}
     <div id="incipit-toolbar-bottom-031" class="d-flex flex-wrap gap-2">

@@ -6,6 +6,49 @@
 
 {% block extra_css %}
 <link href="{% static 'catalogo_publico/css/lista-obras.css' %}" rel="stylesheet">
+
+<style>
+@font-face {
+  font-family: 'Maestro';
+  src: url("{% static 'catalogacion/fonts/Maestro.ttf' %}") format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.incipit-canvas-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+  background: #fff;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.incipit-view-canvas {
+  width: 100%;
+  max-width: 600px;
+  height: 200px;
+  display: block;
+  background: #fff;
+  pointer-events: none;
+  cursor: default;
+}
+
+.obra-incipit-card {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.obra-incipit-card .obra-card-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -43,10 +86,10 @@
                     <span class="input-group-text">
                         <i class="bi bi-search"></i>
                     </span>
-                    <input type="text" 
-                           class="form-control" 
-                           name="q" 
-                           placeholder="Buscar por título, compositor..." 
+                    <input type="text"
+                           class="form-control"
+                           name="q"
+                           placeholder="Buscar por título, compositor..."
                            value="{{ busqueda }}">
                 </div>
             </div>
@@ -148,15 +191,32 @@
                     </div>
 
                     <!-- ÍNCIPIT MUSICAL (ya estaba arriba) -->
+                    <!-- ÍNCIPIT MUSICAL -->
                     <section class="obra-info-card obra-incipit-card">
                         <p class="obra-card-label">Íncipit musical</p>
                         <div class="obra-card-body">
-                            {% with detalle=obra.primer_incipit_detalle %}
-                                {% if detalle.0 %}
-                                    <p class="obra-inline-line">{{ detalle.0 }}</p>
-                                    {% if detalle.1 %}
-                                        <p class="obra-inline-line code">{{ detalle.1 }}</p>
+                            {% with primer_incipit=obra.incipits_musicales.first %}
+                                {% if primer_incipit and primer_incipit.paec_full %}
+                                    {# Mostrar canvas del primer íncipit #}
+                                    <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
+
+                                    <div class="incipit-canvas-wrap" style="margin-top: 0.5rem;">
+                                        <canvas
+                                            id="incipit_view_canvas_{{ primer_incipit.pk }}"
+                                            class="incipit-view-canvas"
+                                            width="800"
+                                            height="320"
+                                            data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
+                                        </canvas>
+                                    </div>
+
+                                    {# Información textual del íncipit #}
+                                    {% if primer_incipit.titulo_encabezamiento %}
+                                    <p class="obra-inline-line" style="margin-top: 0.5rem; font-size: 0.9em; color: #666;">
+                                        {{ primer_incipit.titulo_encabezamiento }}
+                                    </p>
                                     {% endif %}
+
                                 {% else %}
                                     <p class="meta-empty">Sin íncipit registrado</p>
                                 {% endif %}
@@ -283,4 +343,14 @@
     </div>
     {% endif %}
 </div>
+
+{% block extra_js %}
+{{ block.super }}
+<!-- Motor del canvas (legacy) -->
+<script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>
+
+<!-- Inicializador global (nuevo) -->
+<script src="{% static 'catalogacion/js/incipitInit.js' %}"></script>
+{% endblock %}
+
 {% endblock %}

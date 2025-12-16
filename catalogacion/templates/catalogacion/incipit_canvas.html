@@ -1,0 +1,71 @@
+{# ============================================ #}
+{# COMPONENTE REUTILIZABLE: Canvas de Íncipit #}
+{# Uso: {% include 'catalogacion/components/incipit_canvas.html' with incipit=incipit show_debug=False %} #}
+{# ============================================ #}
+
+{% if incipit.paec_full %}
+  {# ========== JSON SCRIPT CON PAEC ========== #}
+  <script id="paec_json_{{ incipit.pk }}" type="application/json">{{ incipit.paec_full|safe }}</script>
+
+  {# ========== CANVAS ========== #}
+  <div class="incipit-canvas-wrap">
+    <canvas
+      id="incipit_view_canvas_{{ incipit.pk }}"
+      class="incipit-view-canvas"
+      width="800"
+      height="320"
+      data-paec-json-id="paec_json_{{ incipit.pk }}">
+    </canvas>
+  </div>
+
+  {# ========== PANEL DE DEBUG (opcional) ========== #}
+  {% if show_debug %}
+  <div class="debug-panel" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6; font-family: monospace; font-size: 11px;">
+    <div style="margin-bottom: 0.5rem;">
+      <strong style="color: #0066cc;">🔍 DEBUG INCIPIT {{ incipit.pk }}</strong>
+    </div>
+    <table style="width: 100%;">
+      <tr style="background: #fff;">
+        <td style="padding: 4px; width: 120px;"><strong>Clave:</strong></td>
+        <td style="padding: 4px; color: #666;">"{{ incipit.clave|default:"vacío" }}"</td>
+      </tr>
+      <tr>
+        <td style="padding: 4px;"><strong>Armadura:</strong></td>
+        <td style="padding: 4px; color: #666;">"{{ incipit.armadura|default:"vacío" }}"</td>
+      </tr>
+      <tr style="background: #fff;">
+        <td style="padding: 4px;"><strong>Tiempo:</strong></td>
+        <td style="padding: 4px; color: #666;">"{{ incipit.tiempo|default:"vacío" }}"</td>
+      </tr>
+      <tr>
+        <td style="padding: 4px;"><strong>Body:</strong></td>
+        <td style="padding: 4px; color: #666;">"{{ incipit.notacion_musical|truncatechars:60 }}"</td>
+      </tr>
+      <tr style="background: #e7f3ff;">
+        <td style="padding: 4px; vertical-align: top;"><strong>PAEC FULL:</strong></td>
+        <td style="padding: 4px;">
+          <code style="color: #d63384; word-break: break-all;">{{ incipit.paec_full }}</code>
+        </td>
+      </tr>
+      <tr style="background: #fff;">
+        <td style="padding: 4px;"><strong>JSON ID:</strong></td>
+        <td style="padding: 4px; color: #28a745;">paec_json_{{ incipit.pk }}</td>
+      </tr>
+    </table>
+  </div>
+  {% endif %}
+
+{% elif incipit.notacion_musical %}
+  {# ========== FALLBACK: si paec_full está vacío pero hay body ========== #}
+  <div class="alert alert-warning" style="padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; margin-top: 1rem;">
+    <strong>⚠️ Advertencia:</strong> Este íncipit tiene notación musical pero no PAEC completo.
+    <br><small>Body: <code>{{ incipit.notacion_musical|truncatechars:80 }}</code></small>
+    <br><small>Actualiza el registro para regenerar el PAEC completo.</small>
+  </div>
+
+{% else %}
+  {# ========== Sin notación musical ========== #}
+  <div class="text-muted" style="font-style: italic; padding: 1rem; background: #f8f9fa; border-radius: 4px; margin-top: 1rem;">
+    No hay notación musical disponible para este íncipit.
+  </div>
+{% endif %}

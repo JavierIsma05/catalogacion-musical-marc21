@@ -239,7 +239,7 @@
                 </div>
             </section>
 
-            <!-- 🟧 SECCIÓN 3 -->
+            <!-- 🟧 SECCIÓN 3: Colaboradores (700 / 710) -->
             <section id="seccion-colaboradores" class="detalle-section">
                 <div class="section-header">
                     <h3 class="section-title"><i class="bi bi-people"></i> Colaboradores</h3>
@@ -289,7 +289,7 @@
                 {% endif %}
             </section>
 
-            <!-- 🟨 SECCIÓN 4 -->
+            <!-- 🟨 SECCIÓN 4: Producción y Edición (250 / 264) -->
             <section id="seccion-produccion" class="detalle-section">
                 <div class="section-header">
                     <h3 class="section-title"><i class="bi bi-building"></i> Producción / Edición</h3>
@@ -336,7 +336,7 @@
                 </div>
             </section>
 
-            <!-- 🟦 SECCIÓN 5 -->
+            <!-- 🟦 SECCIÓN 5: Datos Musicales (348 / 382 / 383 / 384 / 031) -->
             <section id="seccion-musical" class="detalle-section">
                 <div class="section-header">
                     <h3 class="section-title"><i class="bi bi-music-note-list"></i> Datos Musicales</h3>
@@ -413,88 +413,88 @@
                         </div>
 
 
-    {% if incipit.paec_full %}
-        {# ========== MÉTODO CORRECTO: json_script con ID fijo ========== #}
-        <script id="paec_json_{{ incipit.pk }}" type="application/json">{{ incipit.paec_full|safe }}</script>
+                        {% if incipit.paec_full %}
+                            {# ========== MÉTODO CORRECTO: json_script con ID fijo ========== #}
+                            <script id="paec_json_{{ incipit.pk }}" type="application/json">{{ incipit.paec_full|safe }}</script>
 
-        <div class="incipit-canvas-wrap">
-            <canvas
-                id="incipit_view_canvas_{{ incipit.pk }}"
-                class="incipit-view-canvas"
-                width="800"
-                height="320"
-                data-paec-json-id="paec_json_{{ incipit.pk }}">
-            </canvas>
-        </div>
+                            <div class="incipit-canvas-wrap">
+                                <canvas
+                                    id="incipit_view_canvas_{{ incipit.pk }}"
+                                    class="incipit-view-canvas"
+                                    width="800"
+                                    height="320"
+                                    data-paec-json-id="paec_json_{{ incipit.pk }}">
+                                </canvas>
+                            </div>
 
-        {# ========== PANEL DE DEBUG (quitar en producción) ========== #}
-        <div class="debug-panel" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
-            <div style="font-size: 12px; font-family: monospace;">
-                <div style="margin-bottom: 0.5rem;">
-                    <strong style="color: #0066cc;">🔍 DEBUG INCIPIT {{ incipit.pk }}</strong>
-                </div>
-                <table style="width: 100%; font-size: 11px;">
-                    <tr style="background: #fff;">
-                        <td style="padding: 4px; width: 120px;"><strong>Clave (DB):</strong></td>
-                        <td style="padding: 4px; color: #666;">"{{ incipit.clave|default:"vacío" }}"</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 4px;"><strong>Armadura (DB):</strong></td>
-                        <td style="padding: 4px; color: #666;">"{{ incipit.armadura|default:"vacío" }}"</td>
-                    </tr>
-                    <tr style="background: #fff;">
-                        <td style="padding: 4px;"><strong>Tiempo (DB):</strong></td>
-                        <td style="padding: 4px; color: #666;">"{{ incipit.tiempo|default:"vacío" }}"</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 4px;"><strong>Body (DB):</strong></td>
-                        <td style="padding: 4px; color: #666;">"{{ incipit.notacion_musical|truncatechars:60 }}"</td>
-                    </tr>
-                    <tr style="background: #e7f3ff;">
-                        <td style="padding: 4px; vertical-align: top;"><strong>PAEC FULL:</strong></td>
-                        <td style="padding: 4px;">
-                            <code style="color: #d63384; word-break: break-all;">{{ incipit.paec_full }}</code>
-                        </td>
-                    </tr>
-                    <tr style="background: #fff;">
-                        <td style="padding: 4px;"><strong>JSON ID:</strong></td>
-                        <td style="padding: 4px; color: #28a745;">paec_json_{{ incipit.pk }}</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
+                            {# ========== PANEL DE DEBUG (quitar en producción) ========== #}
+                            <div class="debug-panel" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <div style="font-size: 12px; font-family: monospace;">
+                                    <div style="margin-bottom: 0.5rem;">
+                                        <strong style="color: #0066cc;">🔍 DEBUG INCIPIT {{ incipit.pk }}</strong>
+                                    </div>
+                                    <table style="width: 100%; font-size: 11px;">
+                                        <tr style="background: #fff;">
+                                            <td style="padding: 4px; width: 120px;"><strong>Clave (DB):</strong></td>
+                                            <td style="padding: 4px; color: #666;">"{{ incipit.clave|default:"vacío" }}"</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 4px;"><strong>Armadura (DB):</strong></td>
+                                            <td style="padding: 4px; color: #666;">"{{ incipit.armadura|default:"vacío" }}"</td>
+                                        </tr>
+                                        <tr style="background: #fff;">
+                                            <td style="padding: 4px;"><strong>Tiempo (DB):</strong></td>
+                                            <td style="padding: 4px; color: #666;">"{{ incipit.tiempo|default:"vacío" }}"</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 4px;"><strong>Body (DB):</strong></td>
+                                            <td style="padding: 4px; color: #666;">"{{ incipit.notacion_musical|truncatechars:60 }}"</td>
+                                        </tr>
+                                        <tr style="background: #e7f3ff;">
+                                            <td style="padding: 4px; vertical-align: top;"><strong>PAEC FULL:</strong></td>
+                                            <td style="padding: 4px;">
+                                                <code style="color: #d63384; word-break: break-all;">{{ incipit.paec_full }}</code>
+                                            </td>
+                                        </tr>
+                                        <tr style="background: #fff;">
+                                            <td style="padding: 4px;"><strong>JSON ID:</strong></td>
+                                            <td style="padding: 4px; color: #28a745;">paec_json_{{ incipit.pk }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
 
-        {% elif incipit.notacion_musical %}
-        {# ========== FALLBACK: si paec_full está vacío pero hay body ========== #}
-        <div class="alert alert-warning" style="padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
-            <strong>⚠️ Advertencia:</strong> Este íncipit tiene <code>notacion_musical</code> pero no <code>paec_full</code>.
-            <br>Ejecuta la migración o actualiza el registro para regenerar el PAEC completo.
-            <br><small>Body: <code>{{ incipit.notacion_musical|truncatechars:80 }}</code></small>
-        </div>
+                            {% elif incipit.notacion_musical %}
+                            {# ========== FALLBACK: si paec_full está vacío pero hay body ========== #}
+                            <div class="alert alert-warning" style="padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
+                                <strong>⚠️ Advertencia:</strong> Este íncipit tiene <code>notacion_musical</code> pero no <code>paec_full</code>.
+                                <br>Ejecuta la migración o actualiza el registro para regenerar el PAEC completo.
+                                <br><small>Body: <code>{{ incipit.notacion_musical|truncatechars:80 }}</code></small>
+                            </div>
 
-        {% else %}
-        {# ========== Sin notación musical ========== #}
-        <div class="text-muted" style="font-style: italic; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
-            No hay notación musical disponible para este íncipit.
-        </div>
-        {% endif %}
+                            {% else %}
+                            {# ========== Sin notación musical ========== #}
+                            <div class="text-muted" style="font-style: italic; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                                No hay notación musical disponible para este íncipit.
+                            </div>
+                            {% endif %}
 
-        {% if incipit.urls.all %}
-        <div class="incipit-urls" style="margin-top: 1rem;">
-            {% for u in incipit.urls.all %}
-            <a href="{{ u.url }}" target="_blank" class="acceso-link">
-                Ver íncipit en línea <i class="bi bi-box-arrow-up-right"></i>
-            </a>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
-</section>
+                            {% if incipit.urls.all %}
+                            <div class="incipit-urls" style="margin-top: 1rem;">
+                                {% for u in incipit.urls.all %}
+                                <a href="{{ u.url }}" target="_blank" class="acceso-link">
+                                    Ver íncipit en línea <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    </section>
 
-            <!-- 🟩 SECCIÓN 6 -->
+            <!-- 🟩 SECCIÓN 6: Materias y Géneros (650 / 655 / 490) -->
             <section id="seccion-materias" class="detalle-section">
                 <div class="section-header">
                     <h3 class="section-title"><i class="bi bi-tags"></i> Materias / Géneros</h3>
@@ -555,7 +555,7 @@
                 {% endif %}
             </section>
 
-            <!-- 🟥 SECCIÓN 7 -->
+            <!-- 🟥 SECCIÓN 7: Notas (500 / 505 / 520 / 545) -->
             <section id="seccion-notas" class="detalle-section">
                 <div class="section-header">
                     <h3 class="section-title"><i class="bi bi-journal-text"></i> Notas</h3>
@@ -594,7 +594,7 @@
                 </div>
             </section>
 
-            <!-- 🟪 SECCIÓN 8 -->
+            <!-- 🟪 SECCIÓN 8: Ubicación y Acceso (852 / 856) -->
             <section id="seccion-ubicacion" class="detalle-section">
                 <div class="section-header">
                     <h3 class="section-title"><i class="bi bi-geo-alt"></i> Ubicación y acceso</h3>
@@ -651,6 +651,7 @@
     </div>
 </div>
 
+<!-- 🔗 Script para navegación lateral y scroll suave -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const navLinks = document.querySelectorAll('.nav-link');
@@ -694,8 +695,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- Motor del canvas -->
 <script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>
+<script src="{% static 'catalogacion/js/incipitInit.js' %}"></script>
 
-<script>
+<!-- <script>
     document.addEventListener('DOMContentLoaded', async function () {
   console.log('🎵 [INCIPIT] Iniciando carga de incipits musicales...');
 
@@ -902,7 +904,7 @@ window.refreshCanvas = function(canvasId) {
     console.error('❌ Error al refrescar:', error);
   }
 };
-</script>
+</script> -->
 
 
 <style>
