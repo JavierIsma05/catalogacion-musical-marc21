@@ -82,16 +82,24 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">774</span>
                     <h6>Unidades Constituyentes</h6>
-                    <!-- Botón de ayuda -->
-                    <span class="campo-help-btn" data-field-code="774" tabindex="0" title="Ayuda">
+
+                    <!-- botón ayuda -->
+                    <span class="campo-help-btn" data-field-code="774" tabindex="0">
                         <i class="bi bi-question-circle"></i>
                     </span>
+
+                    <!-- ✅ BOTÓN GLOBAL (ÚNICO) -->
+                    <button type="button"
+                            class="campo-add-btn"
+                            data-formset-target="{{ enlaces_unidad_constituyente_774.prefix }}"
+                            title="Agregar unidad constituyente">
+                        <i class="bi bi-plus"></i>
+                    </button>
                 </div>
 
                 <p class="form-text">Obras contenidas en esta compilación.</p>
 
                 {% include 'catalogacion/includes/formset_774_template.html' with formset=enlaces_unidad_constituyente_774 %}
-
             </div>
             {% endif %}
 

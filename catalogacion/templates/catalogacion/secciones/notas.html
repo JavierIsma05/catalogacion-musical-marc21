@@ -1,1 +1,138 @@
-{% include 'catalogacion/bloques/bloque_5xx.html' %}
+{# Bloque 5XX - Notas #}
+<section id="bloque-5xx" class="bloque-section">
+    <div class="card">
+        
+
+        <div class="card-body">
+
+            {# Campo 500 - Nota general (Repetible) #}
+            {% if '500' in campos_visibles and 'notas_generales' in formsets_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">500</span>
+                    <h6>Nota General</h6>
+                    <!-- 🔥 BOTÓN ADD (MISMO ESTILO 7XX / 856) -->
+                    <button type="button"
+                            class="campo-add-btn"
+                            data-formset-target="{{ notas_generales.prefix }}"  title="Agregar nota">
+                        <i class="bi bi-plus"></i> 
+                    </button>
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="500" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                <p class="form-text">Información general que no encaja en otros campos.</p>
+
+                {% include 'catalogacion/includes/formset_500_template.html' with formset=notas_generales %}
+            </div>
+            {% endif %}
+
+
+            {# Campo 505 - Nota de Contenido (Repetible) #}
+            {% if '505' in campos_visibles and 'contenidos' in formsets_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">505</span>
+                    <h6>Contenido</h6>
+                    <button type="button"
+                            class="campo-add-btn"
+                            data-formset-target="{{ contenidos.prefix }}" title="Agregar contenido">
+                        <i class="bi bi-plus"></i> 
+                    </button>
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="505" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                <p class="form-text">Listado de contenidos de la obra.</p>
+
+                {% include 'catalogacion/includes/formset_505_template.html' with formset=contenidos %}
+
+            </div>
+            {% endif %}
+
+
+            {# Campo 520 - Sumario/Resumen (Repetible) #}
+            {% if '520' in campos_visibles and 'sumarios' in formsets_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">520</span>
+                    <h6>Sumario</h6>
+                    <button type="button"
+                            class="campo-add-btn"
+                            data-formset-target="{{ sumarios.prefix }}" title="Agregar sumario">
+                        <i class="bi bi-plus"></i> 
+                    </button>
+                    
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="520" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                <p class="form-text">Resumen o sumario del contenido.</p>
+
+                {% include 'catalogacion/includes/formset_520_template.html' with formset=sumarios %}
+
+            </div>
+            {% endif %}
+
+
+            {# Campo 545 - Datos biográficos del compositor (R) #}
+            {% if '545' in campos_visibles and 'datos_biograficos' in formsets_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">545</span>
+                    <h6>Datos biográficos del compositor</h6>
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="545" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                <p class="form-text">
+                    Cada registro 545 contiene un solo $a (datos biográficos) y un solo $u (URL).
+                    Puedes agregar múltiples 545.
+                </p>
+
+                <div class="formset-container" data-formset-prefix="{{ datos_biograficos.prefix }}">
+
+                    {{ datos_biograficos.management_form }}
+
+                    <div class="formset-forms">
+                        {% for form in datos_biograficos %}
+                        <div class="formset-row mb-3 border rounded p-3">
+
+                            {% if formset.can_delete %}
+                            <div class="text-end">
+                                {{ form.DELETE }} <label>Eliminar</label>
+                            </div>
+                            {% endif %}
+
+                            <div class="mb-3">
+                                {{ form.texto_biografico.label_tag }}
+                                {{ form.texto_biografico }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.uri.label_tag }}
+                                {{ form.uri }}
+                            </div>
+
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
+            {% endif %}
+
+
+        </div>
+    </div>
+</section>

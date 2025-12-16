@@ -1,49 +1,67 @@
 {# Bloque 7XX - Puntos de acceso adicionales y enlaces #}
 <section id="bloque-7xx" class="bloque-section">
     <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">
-                <i class="bi bi-link"></i>
-                Bloque 7XX - Enlaces
-            </h5>
-        </div>
         <div class="card-body">
 
             {# Campo 773 - Documento Fuente (Repetible) #}
             {% if 'enlaces_documento_fuente_773' in formsets_visibles %}
             <div class="campo-marc">
+
                 <div class="campo-titulo">
                     <span class="badge-marc">773</span>
-                    <h6>Documento Fuente</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
-                    <!-- Botón de ayuda -->
-                    <span class="campo-help-btn" data-field-code="773" tabindex="0" title="Ayuda">
+                    <h6>Colección</h6>
+             
+
+                    <!-- BOTÓN GLOBAL (+) -->
+                    <button type="button"
+                            class="campo-add-btn"
+                            data-formset-target="{{ enlaces_documento_fuente_773.prefix }}"
+                            title="Agregar documento fuente">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+
+                    <span class="campo-help-btn"
+                        data-field-code="773"
+                        tabindex="0"
+                        title="Ayuda">
                         <i class="bi bi-question-circle"></i>
                     </span>
                 </div>
 
-                <p class="form-text">Enlace a la colección o compilación que contiene esta obra.</p>
+                <p class="form-text">
+                    Enlace a la colección o compilación que contiene esta obra.
+                </p>
 
                 {% include 'catalogacion/includes/formset_773_template.html' with formset=enlaces_documento_fuente_773 %}
+
             </div>
             {% endif %}
 
-            {# Campo 774 - Unidades Constituyentes (Repetible) #}
+
+           {# Campo 774 - Unidades Constituyentes (Repetible) #}
             {% if 'enlaces_unidad_constituyente_774' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">774</span>
-                    <h6>Unidades Constituyentes</h6>
-                    <!-- Botón de ayuda -->
-                    <span class="campo-help-btn" data-field-code="774" tabindex="0" title="Ayuda">
+                    <h6>Obra en esta colección</h6>
+                    <!-- BOTÓN GLOBAL -->
+                    <button type="button"
+                            class="campo-add-btn"
+                            data-formset-target="{{ enlaces_unidad_constituyente_774.prefix }}"
+                            title="Agregar unidad constituyente (774)">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                    <!-- botón ayuda -->
+                    <span class="campo-help-btn" data-field-code="774" tabindex="0">
                         <i class="bi bi-question-circle"></i>
                     </span>
+
+                    
                 </div>
 
                 <p class="form-text">Obras contenidas en esta compilación.</p>
 
                 {% include 'catalogacion/includes/formset_774_template.html' with formset=enlaces_unidad_constituyente_774 %}
-
             </div>
             {% endif %}
 

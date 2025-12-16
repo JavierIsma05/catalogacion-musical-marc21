@@ -9,7 +9,12 @@ from django.urls import reverse_lazy, reverse
 from django.shortcuts import redirect
 from django.db import transaction
 from django.db.models import Q
-
+from jsonschema import ValidationError
+from catalogacion.models import (
+    NumeroControl773,
+    NumeroControl774,
+    NumeroControl787,
+)
 from catalogacion.models import ObraGeneral
 from catalogacion.forms import ObraGeneralForm
 from catalogacion.views.obra_config import (
@@ -46,6 +51,22 @@ class SeleccionarTipoObraView(CatalogadorRequiredMixin, TemplateView):
         return self.get(request, *args, **kwargs)
 
 
+def validar_autores_principales_y_secundarios(form_principal, formset_700):
+    autor_100 = form_principal.cleaned_data.get("compositor")
+
+    if not autor_100:
+        return []  # No hay autor principal, no validar nada
+
+    errores = []
+
+    for f in formset_700:
+        if f.cleaned_data and not f.cleaned_data.get("DELETE", False):
+            autor_700 = f.cleaned_data.get("nombre_relacionado")
+
+            if autor_700 and autor_700 == autor_100:
+                errores.append("El autor del campo 700 no puede ser igual al autor del 100.")
+
+    return errores
 class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
     """
     Vista para crear una nueva obra MARC21.
@@ -155,61 +176,123 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
         logger.info("=" * 60)
         logger.info("🚀 INICIANDO form_valid()")
         logger.info("=" * 60)
-        
+
         context = self.get_context_data()
-        logger.debug(f"Contexto obtenido, claves: {list(context.keys())[:10]}...")
-        
+
         # Validar formsets
-        logger.info("📋 Validando formsets...")
         formsets_validos, formsets = self._validar_formsets(context)
-        
+
+        # ---------------------------------------------------------
+        # 🔥 Validación especial 100 vs 700
+        # ---------------------------------------------------------
+        formset_700 = (
+            formsets.get("punto_acceso_700")
+            or formsets.get("campo_700")
+            or formsets.get("relacionados_700")
+        )
+
+        if formset_700:
+            errores_autores = validar_autores_principales_y_secundarios(form, formset_700)
+            if errores_autores:
+                for e in errores_autores:
+                    messages.error(self.request, e)
+                return self.form_invalid(form)
+
         if not formsets_validos:
-            logger.error("❌ Validación de formsets FALLÓ")
-            # Mensaje más informativo
-            error_msg = (
-                'Hay errores en los formsets. Revisa la consola del navegador (F12) '
-                'para ver los detalles específicos de qué campo(s) tienen problemas.'
+            messages.error(
+                self.request,
+                "Hay errores en los formsets. Revisa la consola del navegador."
             )
-            messages.error(self.request, error_msg)
             return self.form_invalid(form)
-        
-        logger.info("✅ TODOS LOS FORMSETS VÁLIDOS - Procediendo a guardar")
 
-        # Guardar la obra principal
+        # =====================================================
+        # GUARDAR OBRA PRINCIPAL
+        # =====================================================
         self.object = form.save(commit=False)
-        self.object.save()  # Ahora ya tenemos PK
+        self.object.save()  # PK disponible
 
-        # 1️⃣ Guardar el formset principal del 382
-        medios_formset = formsets.get('medios_interpretacion')
+        # =====================================================
+        # 773 $w – Documento fuente
+        # =====================================================
+        for enlace in self.object.enlaces_documento_fuente_773.all():
+            obra_ids = self.request.POST.getlist(f"w_773_{enlace.pk}")
+
+            for obra_id in obra_ids:
+                if not obra_id:
+                    continue
+
+                if int(obra_id) == self.object.pk:
+                    raise ValidationError(
+                        "La obra no puede referenciarse a sí misma en el campo 773 $w."
+                    )
+
+                NumeroControl773.objects.create(
+                    enlace_773=enlace,
+                    obra_relacionada_id=obra_id
+                )
+
+        # =====================================================
+        # 774 $w – Unidad constituyente
+        # =====================================================
+        for enlace in self.object.enlaces_unidades_774.all():
+            obra_ids = self.request.POST.getlist(f"w_774_{enlace.pk}")
+
+            for obra_id in obra_ids:
+                if not obra_id:
+                    continue
+
+                if int(obra_id) == self.object.pk:
+                    raise ValidationError(
+                        "La obra no puede referenciarse a sí misma en el campo 774 $w."
+                    )
+
+                NumeroControl774.objects.create(
+                    enlace_774=enlace,
+                    obra_relacionada_id=obra_id
+                )
+
+        # =====================================================
+        # 787 $w – Otras relaciones
+        # =====================================================
+        for enlace in self.object.otras_relaciones_787.all():
+            obra_ids = self.request.POST.getlist(f"w_787_{enlace.pk}")
+
+            for obra_id in obra_ids:
+                if not obra_id:
+                    continue
+
+                if int(obra_id) == self.object.pk:
+                    raise ValidationError(
+                        "La obra no puede referenciarse a sí misma en el campo 787 $w."
+                    )
+
+                NumeroControl787.objects.create(
+                    enlace_787=enlace,
+                    obra_relacionada_id=obra_id
+                )
+
+        # =====================================================
+        # 382 – Medios de interpretación
+        # =====================================================
+        medios_formset = formsets.get("medios_interpretacion")
         if medios_formset:
             medios = medios_formset.save(commit=False)
             for medio in medios:
-                medio.obra = self.object  # Asignar FK
-                medio.save()  # Ahora tiene PK
+                medio.obra = self.object
+                medio.save()
 
-            # Borrar los marcados para eliminar
             for medio in medios_formset.deleted_objects:
                 medio.delete()
 
-        # 2️⃣ Guardar los formsets anidados del 382_a
-        medios_formsets = context.get('medios_formsets', [])
-        if medios_formsets:
-            for idx, medios_anidado in enumerate(medios_formsets):
-                # Validar cada formset anidado
-                if medios_anidado.is_valid():
-                    medios_anidado.save()
-                    logger.info(f"✅ Formset anidado 382_a[{idx}] guardado correctamente")
-                else:
-                    logger.warning(f"⚠️ Formset anidado 382_a[{idx}] tiene errores: {medios_anidado.errors}")
-
-        # 3️⃣ Guardar los demás formsets normalmente
+        # =====================================================
+        # Guardar el resto de formsets
+        # =====================================================
         for nombre, formset in formsets.items():
-            if nombre != 'medios_interpretacion':
+            if nombre != "medios_interpretacion":
                 formset.instance = self.object
                 formset.save()
-                logger.info(f"✅ Formset {nombre} guardado")
 
-        messages.success(self.request, 'Obra registrada exitosamente.')
+        messages.success(self.request, "Obra registrada exitosamente.")
         return redirect(self.get_success_url())
 
     def get_success_url(self):

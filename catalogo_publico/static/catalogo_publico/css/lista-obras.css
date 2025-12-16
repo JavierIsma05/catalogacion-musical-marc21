@@ -1,51 +1,188 @@
 /* ==========================================================================
-   ESTILOS MEJORADOS PARA LISTA DE OBRAS
-   Versión con mejor contraste y profundidad visual
+   ESTILOS PROFESIONALES PARA LISTA DE OBRAS
+   Diseño Minimalista, Elegante y Compacto
    ========================================================================== */
 
+:root {
+    --pro-primary: #1a1d29;
+    --pro-secondary: #2d3142;
+    --pro-accent: #0066cc;
+    --pro-text: #1a1d29;
+    --pro-text-secondary: #4a5568;
+    --pro-text-muted: #718096;
+    --pro-border: #e2e8f0;
+    --pro-border-light: #f1f5f9;
+    --pro-surface: #f8fafc;
+    --pro-white: #ffffff;
+    --pro-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --pro-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
 /* ============================================
-   CARDS DE OBRAS - REDISEÑO ELEGANTE
+   HEADER PÁGINA
    ============================================ */
-.obra-catalog-card {
+.page-header {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--pro-border);
+}
+
+.page-header h1 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--pro-text);
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-header h1 i {
+    font-size: 1rem;
+    color: var(--pro-accent);
+}
+
+.catalog-meta {
     display: flex;
     gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 0.75rem;
+    color: var(--pro-text-secondary);
+}
+
+.catalog-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.catalog-meta i {
+    font-size: 0.75rem;
+    color: var(--pro-accent);
+}
+
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    background: var(--pro-surface);
+    color: var(--pro-accent);
+    border: 1px solid var(--pro-border);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+}
+
+/* ============================================
+   BARRA DE BÚSQUEDA Y FILTROS
+   ============================================ */
+.catalog-search-card {
+    border: 1px solid var(--pro-border);
+    background: var(--pro-white);
+    padding: 1.25rem;
+    box-shadow: var(--pro-shadow);
+}
+
+.catalog-search-card .form-label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--pro-text-muted);
+    margin-bottom: 0.375rem;
+}
+
+.input-group-text {
+    background: var(--pro-surface);
+    border: 1px solid var(--pro-border);
+    border-right: none;
+    color: var(--pro-text-muted);
+    font-size: 0.75rem;
+}
+
+.form-control,
+.form-select {
+    font-size: 0.8125rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--pro-border);
+    transition: border-color 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--pro-accent);
+    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--pro-text-muted);
+}
+
+.btn-primary.filter-btn {
+    background: var(--pro-accent);
+    border: 1px solid var(--pro-accent);
+    color: white;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.btn-primary.filter-btn:hover {
+    background: #0052a3;
+    border-color: #0052a3;
+}
+
+.btn-primary.filter-btn i {
+    font-size: 0.75rem;
+}
+
+/* ============================================
+   CARDS DE OBRAS
+   ============================================ */
+.catalogo-listado {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.obra-catalog-card {
+    display: flex;
+    gap: 0;
     padding: 0;
-    border: none;
-    border-radius: 12px;
-    background: #fdfdff;
-    box-shadow:
-        0 10px 30px rgba(23, 27, 33, 0.06),
-        0 1px 0 rgba(47, 53, 69, 0.04);
+    border: 1px solid var(--pro-border);
+    background: var(--pro-white);
+    box-shadow: var(--pro-shadow);
     align-items: stretch;
     overflow: hidden;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
 }
 
 .obra-catalog-card:hover {
-    box-shadow: 
-        0 8px 24px rgba(47, 53, 69, 0.14),
-        0 0 0 1px rgba(47, 53, 69, 0.1);
-    transform: translateY(-3px);
+    box-shadow: var(--pro-shadow-md);
+    border-color: var(--pro-text-muted);
 }
 
 /* ============================================
-   SECCIÓN DE PORTADA - MÁS DEFINIDA
+   SECCIÓN DE PORTADA
    ============================================ */
 .obra-cover {
-    width: 132px;
+    width: 140px;
     flex-shrink: 0;
-    background: linear-gradient(180deg, #eef2f7 0%, #e2e6ee 100%);
-    padding: 0.9rem;
+    background: var(--pro-surface);
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
-    border-right: 1px solid #dfe3ea;
+    gap: 0.75rem;
+    border-right: 1px solid var(--pro-border);
 }
 
 .cover-frame {
-    border: 1.5px dashed rgba(47, 53, 69, 0.18);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.8);
+    border: 1px dashed var(--pro-border);
+    background: var(--pro-white);
     height: 160px;
     display: flex;
     align-items: center;
@@ -55,265 +192,389 @@
 
 .cover-placeholder {
     text-align: center;
-    color: #4b556f;
+    color: var(--pro-text-muted);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.4rem;
-    font-size: 0.72rem;
-    font-weight: 600;
+    gap: 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .cover-placeholder i {
-    font-size: 1.8rem;
-    opacity: 0.45;
+    font-size: 1.5rem;
+    opacity: 0.4;
 }
 
 .obra-cover .btn {
-    background: #2f3545;
-    border: 1px solid #2f3545;
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 0.8rem;
-    box-shadow: 0 4px 12px rgba(47, 53, 69, 0.18);
+    background: var(--pro-white);
+    border: 1px solid var(--pro-border);
+    color: var(--pro-text);
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.2s ease;
 }
 
 .obra-cover .btn:hover {
-    background: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: var(--pro-accent);
+    border-color: var(--pro-accent);
+    color: white;
 }
 
 /* ============================================
-   DETALLES DE LA OBRA - MEJORADO
+   DETALLES DE LA OBRA
    ============================================ */
 .obra-details {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
-    padding: 1.05rem 1.25rem 1.05rem 0;
+    gap: 0;
+    padding: 0;
 }
 
 /* Header de la obra */
 .obra-header {
     display: flex;
     justify-content: space-between;
-    gap: 1.1rem;
+    gap: 1rem;
     align-items: flex-start;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #edf0f5;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--pro-border-light);
 }
 
 .obra-main-title {
-    font-size: 1.02rem;
-    font-weight: 700;
-    color: #2d303b;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--pro-text);
     margin: 0;
-    line-height: 1.35;
+    line-height: 1.4;
     letter-spacing: -0.01em;
 }
 
-/* Tags superiores - REDISEÑO */
+/* Tags superiores */
 .obra-top-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.55rem;
+    gap: 0.75rem;
     justify-content: flex-end;
 }
 
 .obra-tag {
-    background: #f4f6fa;
-    border: 1px solid #dfe3ea;
-    border-radius: 8px;
-    padding: 0.45rem 0.8rem;
-    min-width: 150px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    background: var(--pro-white);
+    border: 1px solid var(--pro-border);
+    padding: 0.5rem 0.75rem;
+    min-width: 130px;
 }
 
 .tag-label {
     display: block;
-    font-size: 0.6rem;
-    letter-spacing: 0.09em;
+    font-size: 0.625rem;
     text-transform: uppercase;
-    color: #6b7280;
-    margin-bottom: 0.2rem;
-    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--pro-text-muted);
+    margin-bottom: 0.25rem;
+    font-weight: 500;
 }
 
 .tag-value {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #2f3545;
-    letter-spacing: 0.01em;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--pro-text);
 }
 
-/* Secciones de información */
+.tag-value.meta-empty {
+    color: var(--pro-text-muted);
+    font-style: italic;
+    font-weight: 400;
+}
+
+/* Stack de información */
 .obra-info-stack {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0;
 }
 
 .obra-info-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-bottom: 1px solid var(--pro-border-light);
 }
 
-/* Cards de información - MEJORADAS */
+.obra-info-row:last-child {
+    border-bottom: none;
+}
+
+/* Cards de información */
 .obra-info-card {
-    border: 1px solid #e6e9ef;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fb 100%);
-    padding: 0.75rem 0.9rem;
+    border-right: 1px solid var(--pro-border-light);
+    background: var(--pro-white);
+    padding: 0.875rem 1rem;
     height: 100%;
-    box-shadow: 0 1px 2px rgba(47, 53, 69, 0.03);
-    transition: all 0.2s ease;
 }
 
-.obra-info-card:hover {
-    border-color: #c8d7df;
-    box-shadow: 0 4px 12px rgba(47, 53, 69, 0.08);
+.obra-info-card:last-child {
+    border-right: none;
 }
 
 .obra-info-card.mini {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 0.5rem;
 }
 
-/* Card de íncipit - ESPECIAL */
+/* Card de íncipit */
 .obra-incipit-card {
-    background: linear-gradient(135deg, #f5f6f8 0%, #fafbfc 100%);
-    border: 2px dashed #c5cdd8;
+    background: var(--pro-surface);
+    border: none;
+    border-top: 1px solid var(--pro-border-light);
     padding: 1rem 1.25rem;
-}
-
-.obra-incipit-card:hover {
-    border-color: #3ac1a1;
-    background: linear-gradient(135deg, #f8faf9 0%, #ffffff 100%);
+    grid-column: 1 / -1;
 }
 
 /* Labels de las cards */
 .obra-card-label {
-    font-size: 0.675rem;
-    letter-spacing: 0.08em;
+    font-size: 0.6875rem;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: #5d6573;
-    margin-bottom: 0.35rem;
-    font-weight: 700;
+    color: var(--pro-text-muted);
+    margin: 0 0 0.5rem 0;
+    font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.375rem;
 }
 
 .obra-card-label::before {
     content: '';
-    width: 3px;
-    height: 12px;
-    background: #3ac1a1;
-    border-radius: 2px;
+    width: 2px;
+    height: 10px;
+    background: var(--pro-accent);
 }
 
 /* Contenido de las cards */
 .obra-line,
 .obra-subline {
-    margin: 0 0 0.3rem;
+    margin: 0 0 0.25rem;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.3rem;
-    color: #2d303b;
-    font-size: 0.86rem;
-    font-weight: 500;
-    line-height: 1.45;
+    gap: 0.25rem;
+    color: var(--pro-text);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.obra-line:last-child,
+.obra-subline:last-child {
+    margin-bottom: 0;
 }
 
 .obra-subline {
-    font-size: 0.8rem;
-    color: #5d6573;
-    font-weight: 400;
+    font-size: 0.75rem;
+    color: var(--pro-text-secondary);
 }
 
 .obra-inline-label {
-    font-weight: 600;
-    color: #4b556f;
-    margin-right: 0.25rem;
-    font-size: 0.74rem;
+    font-weight: 500;
+    color: var(--pro-text-secondary);
+    font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 /* Líneas de código (íncipit) */
 .obra-inline-line {
-    margin: 0 0 0.35rem;
-    font-family: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
-    font-size: 0.8125rem;
-    color: #2d303b;
+    margin: 0 0 0.375rem;
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    font-size: 0.75rem;
+    color: var(--pro-text);
     letter-spacing: 0.02em;
     line-height: 1.6;
-    padding: 0.25rem 0;
+}
+
+.obra-inline-line:last-child {
+    margin-bottom: 0;
 }
 
 .obra-inline-line.code {
-    color: #3d4557;
-    background: rgba(58, 193, 161, 0.04);
-    padding: 0.35rem 0.5rem;
-    border-radius: 4px;
-    border-left: 3px solid #3ac1a1;
+    color: var(--pro-text-secondary);
+    background: var(--pro-white);
+    padding: 0.5rem 0.625rem;
+    border: 1px solid var(--pro-border-light);
+    border-left: 2px solid var(--pro-accent);
 }
 
 /* Estados vacíos */
 .meta-empty {
     font-style: italic;
-    color: #8b93a4;
-    font-size: 0.8125rem;
+    color: var(--pro-text-muted);
+    font-size: 0.75rem;
 }
-.obra-link {
-    color: var(--accent);
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: 0.2s;
-}
-
-.obra-link:hover {
-    color: var(--gray-800);
-    text-decoration: underline;
-}
-
 
 /* ============================================
-   ACCIONES - REFINADAS
+   PAGINACIÓN
    ============================================ */
-/* Acciones eliminadas: se mantiene solo el botón Ver en portada */
+.pagination {
+    margin-top: 2rem;
+    gap: 0.5rem;
+}
+
+.page-link {
+    color: var(--pro-text);
+    border: 1px solid var(--pro-border);
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+    transition: all 0.2s ease;
+    background: var(--pro-white);
+}
+
+.page-link:hover {
+    background: var(--pro-surface);
+    border-color: var(--pro-text-secondary);
+    color: var(--pro-text);
+}
+
+.page-link i {
+    font-size: 0.75rem;
+}
+
+.page-item.disabled .page-link {
+    background: var(--pro-surface);
+    border-color: var(--pro-border);
+    color: var(--pro-text-muted);
+}
+
+/* ============================================
+   ESTADO VACÍO
+   ============================================ */
+.catalog-empty {
+    background: var(--pro-surface);
+    border: 1px solid var(--pro-border);
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.empty-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem;
+    background: var(--pro-white);
+    border: 1px solid var(--pro-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--pro-text-muted);
+    font-size: 1.5rem;
+}
+
+.catalog-empty h4 {
+    color: var(--pro-text);
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.catalog-empty p {
+    color: var(--pro-text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.btn-outline-primary {
+    color: var(--pro-accent);
+    border: 1px solid var(--pro-accent);
+    font-size: 0.8125rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-primary:hover {
+    background: var(--pro-accent);
+    border-color: var(--pro-accent);
+    color: white;
+}
+
+.btn-outline-primary i {
+    font-size: 0.75rem;
+}
+
+/* ============================================
+   SPACING UTILITIES
+   ============================================ */
+.container.py-4 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+
+.mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.mt-2 {
+    margin-top: 0.5rem !important;
+}
+
+.mt-3 {
+    margin-top: 1rem !important;
+}
 
 /* ============================================
    RESPONSIVE
    ============================================ */
+@media (max-width: 992px) {
+    .obra-info-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .obra-incipit-card {
+        grid-column: 1 / -1;
+    }
+}
+
 @media (max-width: 768px) {
+    .page-header h1 {
+        font-size: 1rem;
+    }
+
+    .catalog-search-card {
+        padding: 1rem;
+    }
+
     .obra-catalog-card {
         flex-direction: column;
     }
 
     .obra-cover {
         width: 100%;
-        padding: 1.25rem;
+        flex-direction: row;
+        align-items: center;
+        padding: 1rem;
+        border-right: none;
+        border-bottom: 1px solid var(--pro-border);
     }
 
     .cover-frame {
-        height: 200px;
+        width: 100px;
+        height: 100px;
     }
 
-    .obra-details {
-        padding: 1.25rem;
+    .obra-cover .btn {
+        width: auto;
+        padding: 0.5rem 1rem;
     }
 
     .obra-header {
         flex-direction: column;
-        gap: 1rem;
+        padding: 1rem;
     }
 
     .obra-top-tags {
@@ -322,7 +583,7 @@
     }
 
     .obra-tag {
-        min-width: unset;
+        min-width: 0;
         flex: 1;
     }
 
@@ -330,22 +591,64 @@
         grid-template-columns: 1fr;
     }
 
-    .obra-actions {
-        justify-content: flex-start;
+    .obra-info-card {
+        border-right: none;
+        border-bottom: 1px solid var(--pro-border-light);
     }
 
-    .obra-actions .btn {
-        width: 100%;
-        justify-content: center;
+    .obra-info-card:last-child {
+        border-bottom: none;
+    }
+
+    .obra-incipit-card {
+        padding: 1rem;
+    }
+
+    .catalog-empty {
+        padding: 2rem 1.5rem;
     }
 }
 
 @media (max-width: 576px) {
-    .obra-tag {
+    .container.py-4 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+
+    .catalog-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .obra-cover {
+        flex-direction: column;
+    }
+
+    .cover-frame {
+        width: 100%;
+        height: 140px;
+    }
+
+    .obra-cover .btn {
         width: 100%;
     }
 
     .obra-top-tags {
         flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .obra-tag {
+        width: 100%;
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .page-item {
+        flex: 0 0 auto;
     }
 }

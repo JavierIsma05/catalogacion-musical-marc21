@@ -3,8 +3,7 @@
 
 {# 
    Template base para las páginas de catalogación que necesitan el sidebar.
-   Hereda del layout de catalogador con sidebar.
-   Usado por: seleccionar_tipo_obra, lista_obras, detalle_obra, etc.
+   Usado por: crear_obra, editar_obra, detalle_obra, etc.
 #}
 
 {% block extra_css %}
@@ -19,5 +18,95 @@
 
 {% block extra_js %}
 {{ block.super }}
-{% block catalogacion_js %}{% endblock %}
+
+{% block catalogacion_js %}
+
+
+<div class="modal fade" id="modalBuscarObra" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Seleccionar obra relacionada</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="text"
+               class="form-control mb-3"
+               id="buscarObraInput"
+               placeholder="Buscar por número de control (001)…">
+
+        <ul class="list-group" id="buscarObraResultados"></ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+
+    let targetInputText = null;
+    let targetInputHidden = null;
+
+    // 🔍 Abrir modal desde cualquier botón lupa ($w)
+    document.addEventListener("click", function (e) {
+        const btn = e.target.closest(".btn-buscar-obra");
+        if (!btn) return;
+
+        const group = btn.closest(".input-group");
+        targetInputText = group.querySelector(".numero-w-input");
+        targetInputHidden = group.querySelector(".obra-relacionada-id-input");
+
+        new bootstrap.Modal(
+            document.getElementById("modalBuscarObra")
+        ).show();
+    });
+
+    const inputBuscar = document.getElementById("buscarObraInput");
+    const resultados = document.getElementById("buscarObraResultados");
+
+    let timer = null;
+
+    // 🔎 Buscar obras por número de control
+    inputBuscar.addEventListener("input", function () {
+        const q = this.value.trim();
+
+        if (q.length < 2) {
+            resultados.innerHTML = "";
+            return;
+        }
+
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            fetch(`/catalogacion/api/buscar-obras/?q=${encodeURIComponent(q)}`)
+                .then(r => r.json())
+                .then(data => {
+                    resultados.innerHTML = "";
+
+                    data.results.forEach(o => {
+                        const li = document.createElement("li");
+                        li.className = "list-group-item list-group-item-action";
+                        li.textContent = o.num_control;
+
+                        li.addEventListener("click", () => {
+                            targetInputText.value = o.num_control;
+                            targetInputHidden.value = o.id;
+
+                            bootstrap.Modal.getInstance(
+                                document.getElementById("modalBuscarObra")
+                            ).hide();
+                        });
+
+                        resultados.appendChild(li);
+                    });
+                });
+        }, 300);
+    });
+
+})();
+</script>
+
+{% endblock %}
 {% endblock %}

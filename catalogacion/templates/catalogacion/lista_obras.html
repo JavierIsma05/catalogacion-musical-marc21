@@ -1,0 +1,48 @@
+{% extends 'catalogacion/base_catalogacion.html' %}
+{% load static %}
+
+{% block title %}Listado de obras{% endblock %}
+{% block page_title %}Obras en progreso{% endblock %}
+
+{% block catalogacion_content %}
+
+<div class="container">
+
+    {% if obras %}
+        <div class="list-group mt-4">
+            {% for obra in obras %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+
+                    <div>
+                        <strong>{{ obra.titulo_principal }}</strong>
+                        <br>
+
+                        {% if obra.compositor %}
+                            <small>Compositor: {{ obra.compositor }}</small>
+                        {% endif %}
+
+                        {% if obra.nivel_bibliografico %}
+                            <small class="d-block">Nivel: {{ obra.nivel_bibliografico }}</small>
+                        {% endif %}
+
+                        {% if obra.estado == 'borrador' %}
+                            <span class="badge bg-warning text-dark">Borrador</span>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <a href="{% url 'catalogacion:detalle_obra' obra.pk %}" class="btn btn-outline-secondary btn-sm">Ver</a>
+                        <a href="{% url 'catalogacion:editar_obra' obra.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <p class="mt-4">No hay obras registradas aún.</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

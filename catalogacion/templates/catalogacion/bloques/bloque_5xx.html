@@ -1,12 +1,7 @@
 {# Bloque 5XX - Notas #}
 <section id="bloque-5xx" class="bloque-section">
     <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">
-                <i class="bi bi-journal"></i>
-                Bloque 5XX - Notas
-            </h5>
-        </div>
+        
 
         <div class="card-body">
 
@@ -26,7 +21,7 @@
 
                 <p class="form-text">Información general que no encaja en otros campos.</p>
 
-                {% include 'catalogacion/includes/formset_template.html' with formset=notas_generales titulo="Nota General" %}
+                {% include 'catalogacion/includes/formset_500_template.html' with formset=notas_generales %}
             </div>
             {% endif %}
 
@@ -47,7 +42,7 @@
 
                 <p class="form-text">Listado de contenidos de la obra.</p>
 
-                {% include 'catalogacion/includes/formset_template.html' with formset=contenidos titulo="Contenido" %}
+                {% include 'catalogacion/includes/formset_notas_5xx.html' with formset=contenidos campo='contenido' titulo='Contenido' %}
             </div>
             {% endif %}
 
@@ -68,7 +63,7 @@
 
                 <p class="form-text">Resumen o sumario del contenido.</p>
 
-                {% include 'catalogacion/includes/formset_template.html' with formset=sumarios titulo="Sumario" %}
+                {% include 'catalogacion/includes/formset_notas_5xx.html' with formset=sumarios campo='sumario' titulo='Sumario' %}
             </div>
             {% endif %}
 

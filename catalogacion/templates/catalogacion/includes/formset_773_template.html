@@ -1,34 +1,23 @@
 {% comment %}
-FORMSET 773 – Enlace a Documento Fuente
-Plantilla UNIFICADA, optimizada y estable
-Incluye:
-✔ Autocomplete usable
-✔ Diseño estable
+FORMSET 773 – Documento Fuente (R)
+✔ Sin botón interno
+✔ Controlado por botón global 7XX
+✔ Autocomplete estable
 ✔ Clonado correcto
-✔ Subcampo $w funcionando
 {% endcomment %}
 
-<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
-    {{ formset.management_form }}
-{% comment %}
-FORMSET 773 – Documentos fuente
-{% endcomment %}
+<div class="formset-container"
+     data-formset-prefix="{{ formset.prefix }}">
 
-<div class="formset-container enlace-formset" data-enlace-formset="true"
-     data-formset-prefix="{{ formset.prefix }}" data-numero-prefix="773"
-     data-persona-endpoint="/catalogacion/api/autocompletar/persona/">
-
+    <!-- Management form -->
     <div class="d-none">
         {% for hidden in formset.management_form %}
             {{ hidden }}
         {% endfor %}
     </div>
 
-    <button type="button" class="add-form-row btn btn-outline-primary mb-3">
-        <i class="bi bi-plus-circle"></i> Agregar documento fuente (773)
-    </button>
-
     <div class="formset-forms">
+
         {% for form in formset %}
         <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
 
@@ -40,141 +29,286 @@ FORMSET 773 – Documentos fuente
                 <div class="d-none">{{ form.DELETE }}</div>
             {% endif %}
 
-            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger float-end"
-                    aria-label="Eliminar enlace 773">
+            <!-- ❌ eliminar fila -->
+            <button type="button"
+                    class="delete-row-btn"
+                    title="Eliminar documento fuente">
                 <i class="bi bi-x-lg"></i>
             </button>
 
-            {% if form.non_field_errors %}
-            <div class="alert alert-danger mb-3">{{ form.non_field_errors }}</div>
-            {% endif %}
-
-            <div class="card mt-4">
-                <div class="card-header bg-light">
-                    <div class="d-flex flex-column">
-                        <strong>773 · Documento fuente (R)</strong>
-                        <small class="text-muted">Enlace a la colección o compilación que contiene esta obra.</small>
-                    </div>
-                </div>
+            <div class="card mt-3">
+                
                 <div class="card-body">
-                    <div class="visually-hidden">
+
+                    <!-- indicadores ocultos -->
+                    <div class="d-none">
                         {{ form.primer_indicador }}
                         {{ form.segundo_indicador }}
                     </div>
 
+                    <!-- ================= 773 $a ================= -->
                     <div class="mb-3">
-                        <label class="form-label" for="{{ form.encabezamiento_principal_texto.id_for_label }}">
-                            {{ form.encabezamiento_principal_texto.label }}
+                        <label class="form-label small">
+                            773 $a – Encabezamiento principal
                         </label>
-                        <div class="autocomplete-wrapper">
+
+                        <div class="autocomplete-wrapper"
+                             data-autocomplete="persona">
                             {{ form.encabezamiento_principal_texto }}
                             <div class="autocomplete-suggestions"></div>
                         </div>
-                        <div class="form-text">Usa el buscador para traer el encabezamiento principal desde Autoridades.</div>
-                        {% if form.encabezamiento_principal_texto.errors %}
-                            <div class="invalid-feedback d-block">{{ form.encabezamiento_principal_texto.errors }}</div>
-                        {% endif %}
+
+                        <small class="form-text text-muted">
+                            Seleccione una autoridad o escriba para crearla.
+                        </small>
                     </div>
 
-                    <div class="mt-3">
-                        <label class="form-label" for="{{ form.titulo_texto.id_for_label }}">{{ form.titulo_texto.label }}</label>
-                        <div class="autocomplete-wrapper">
+                    <!-- ================= 773 $t ================= -->
+                    <div class="mb-3">
+                        <label class="form-label small">
+                            773 $t – Título
+                        </label>
+
+                        <div class="autocomplete-wrapper"
+                             data-autocomplete="titulo">
                             {{ form.titulo_texto }}
                             <div class="autocomplete-suggestions"></div>
                         </div>
-                        <div class="form-text">El campo usa el mismo autocompletado de Títulos Uniformes que el resto del sistema.</div>
-                        {% if form.titulo_texto.errors %}
-                            <div class="invalid-feedback d-block">{{ form.titulo_texto.errors }}</div>
-                        {% endif %}
+
+                        <small class="form-text text-muted">
+                            Usa autoridades de títulos uniformes.
+                        </small>
                     </div>
 
+                    <!-- ================= 773 $w ================= -->
                     <div class="mt-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="fw-semibold">773 $w – Números de control</span>
-                            <button type="button" class="btn btn-sm btn-outline-secondary add-numero-btn">
-                                <i class="bi bi-plus-circle"></i> Agregar número
+                        <label class="form-label small fw-semibold">
+                            773 $w – Número de control
+                        </label>
+
+                        <div class="input-group">
+                            <!-- Visible (solo muestra el 001) -->
+                            <input type="text"
+                                class="form-control numero-w-input"
+                                placeholder="Seleccione una obra"
+                                readonly>
+
+                            <!-- Botón lupa -->
+                            <button type="button"
+                                    class="btn btn-outline-secondary btn-buscar-obra"
+                                    data-enlace-id="{{ enlace.pk }}"
+                                    data-campo="773"
+                                    title="Buscar obra">
+                                <i class="bi bi-search"></i>
                             </button>
-                        </div>
-                        <div class="numeros-container" data-numeros-container>
-                            {% if form.instance.pk %}
-                                {% for numero in form.instance.numeros_control.all %}
-                                <div class="numero-form-row d-flex gap-2 mb-2">
-                                    <input type="text" class="form-control numero-w-input"
-                                           name="numero_773_{{ forloop.parentloop.counter0 }}_{{ numero.pk }}"
-                                           value="{{ numero.obra_relacionada.num_control }}"
-                                           placeholder="Ej: 000123456">
-                                    <button type="button" class="btn btn-outline-danger delete-numero-btn"
-                                            aria-label="Eliminar número">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                                {% empty %}
-                                <p class="text-muted small mb-0 numero-placeholder">Sin números de control registrados.</p>
-                                {% endfor %}
-                            {% else %}
-                                <p class="text-muted small mb-0 numero-placeholder">Sin números de control registrados.</p>
-                            {% endif %}
+
+                            <!-- 🔥 ESTE ES EL IMPORTANTE -->
+                            <input type="hidden"
+                                class="obra-relacionada-id-input"
+                                name="w_773_{{ enlace.pk }}">
                         </div>
                     </div>
+
+
                 </div>
             </div>
         </div>
         {% endfor %}
 
-        <div class="formset-row empty-form mb-3 d-none">
-            <div class="d-none">
-                {% for hidden in formset.empty_form.hidden_fields %}
-                    {{ hidden }}
-                {% endfor %}
-            </div>
+        <!-- ================= EMPTY FORM ================= -->
+        <div class="formset-row empty-form d-none">
 
-            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger float-end"
-                    aria-label="Eliminar enlace 773">
+            {% for hidden in formset.empty_form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+
+            <button type="button" class="delete-row-btn">
                 <i class="bi bi-x-lg"></i>
             </button>
 
-            <div class="card mt-4">
+            <div class="card mt-3">
                 <div class="card-body">
-                    <div class="visually-hidden">
+
+                    <div class="d-none">
                         {{ formset.empty_form.primer_indicador }}
                         {{ formset.empty_form.segundo_indicador }}
                     </div>
 
                     <div class="mb-3">
-                        <div class="autocomplete-wrapper">
+                        <label class="form-label small">
+                            773 $a – Encabezamiento principal
+                        </label>
+                        <div class="autocomplete-wrapper"
+                             data-autocomplete="persona">
                             {{ formset.empty_form.encabezamiento_principal_texto }}
                             <div class="autocomplete-suggestions"></div>
                         </div>
                     </div>
 
-                    <div class="mt-3">
-                        <div class="autocomplete-wrapper">
+                    <div class="mb-3">
+                        <label class="form-label small">
+                            773 $t – Título
+                        </label>
+                        <div class="autocomplete-wrapper"
+                             data-autocomplete="titulo">
                             {{ formset.empty_form.titulo_texto }}
                             <div class="autocomplete-suggestions"></div>
                         </div>
                     </div>
 
-                    <div class="mt-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="fw-semibold">773 $w – Números de control</span>
-                            <button type="button" class="btn btn-sm btn-outline-secondary add-numero-btn">
-                                <i class="bi bi-plus-circle"></i> Agregar número
-                            </button>
-                        </div>
-                        <div class="numeros-container" data-numeros-container></div>
+                    <div class="mt-3">
+                        <label class="form-label small">
+                            773 $w – Número de control
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               placeholder="Ej: 000123456">
                     </div>
+
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="numero-form-row numero-template d-none mt-3" data-numero-template>
-        <div class="d-flex gap-2 align-items-center">
-            <input type="text" class="form-control numero-w-input" placeholder="Ej: 000123456">
-            <button type="button" class="btn btn-outline-danger delete-numero-btn"
-                    aria-label="Eliminar número">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
     </div>
 </div>
+<script>
+(function () {
+
+    /* =====================================================
+       AUTOCOMPLETE GENÉRICO (persona / título)
+       ===================================================== */
+    function initAutocomplete(wrapper) {
+
+        // 🔥 CLAVE: permitir reinicializar
+        wrapper.removeAttribute("data-autocomplete-init");
+
+        if (!wrapper || wrapper.dataset.autocompleteInit === "1") return;
+        wrapper.dataset.autocompleteInit = "1";
+
+        const type  = wrapper.dataset.autocomplete;
+        const input = wrapper.querySelector("input");
+        const box   = wrapper.querySelector(".autocomplete-suggestions");
+
+        if (!type || !input || !box) return;
+
+        let endpoint = null;
+
+        if (type === "persona") {
+            endpoint = "/catalogacion/api/autocompletar/persona/";
+        }
+        if (type === "titulo") {
+            endpoint = "/catalogacion/api/autocompletar/titulo-uniforme/";
+        }
+        if (!endpoint) return;
+
+        let timer = null;
+
+        function hide() {
+            box.classList.remove("show");
+            box.innerHTML = "";
+        }
+
+        input.addEventListener("input", () => {
+            const q = input.value.trim();
+            if (q.length < 2) {
+                hide();
+                return;
+            }
+
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                fetch(`${endpoint}?q=${encodeURIComponent(q)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        box.innerHTML = "";
+                        const results = data.results || [];
+
+                        if (!results.length) {
+                            box.innerHTML = `
+                                <div class="autocomplete-item autocomplete-item-new">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Crear: "${q}"
+                                </div>`;
+                        } else {
+                            results.forEach(item => {
+                                const div = document.createElement("div");
+                                div.className = "autocomplete-item";
+                                div.textContent = item.text;
+                                div.onclick = () => {
+                                    input.value = item.text;
+                                    hide();
+                                };
+                                box.appendChild(div);
+                            });
+
+                            const crear = document.createElement("div");
+                            crear.className = "autocomplete-item autocomplete-item-new";
+                            crear.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${q}"`;
+                            crear.onclick = () => {
+                                input.value = q;
+                                hide();
+                            };
+                            box.appendChild(crear);
+                        }
+
+                        box.classList.add("show");
+                    });
+            }, 300);
+        });
+
+        document.addEventListener("click", e => {
+            if (!wrapper.contains(e.target)) hide();
+        });
+    }
+
+    /* =====================================================
+       BOTÓN GLOBAL + (formsets)
+       ===================================================== */
+    document.addEventListener("click", function (e) {
+
+        const btn = e.target.closest(".campo-add-btn");
+        if (!btn) return;
+
+        const prefix = btn.dataset.formsetTarget;
+        if (!prefix) return;
+
+        const container = document.querySelector(
+            `.formset-container[data-formset-prefix="${prefix}"]`
+        );
+        if (!container) return;
+
+        const forms = container.querySelector(".formset-forms");
+        const empty = container.querySelector(".empty-form");
+        const totalInput = container.querySelector(
+            `input[name="${prefix}-TOTAL_FORMS"]`
+        );
+
+        if (!forms || !empty || !totalInput) return;
+
+        const index = parseInt(totalInput.value, 10);
+
+        const clone = empty.cloneNode(true);
+        clone.classList.remove("empty-form", "d-none");
+        clone.innerHTML = clone.innerHTML.replace(/__prefix__/g, index);
+
+        forms.appendChild(clone);
+        totalInput.value = index + 1;
+
+        // 🔥 REINICIALIZAR AUTOCOMPLETE EN CLON
+        clone
+            .querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
+            .forEach(w => {
+                w.removeAttribute("data-autocomplete-init");
+                initAutocomplete(w);
+            });
+    });
+
+    /* =====================================================
+       INIT INICIAL
+       ===================================================== */
+    document
+        .querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
+        .forEach(initAutocomplete);
+
+})();
+</script>

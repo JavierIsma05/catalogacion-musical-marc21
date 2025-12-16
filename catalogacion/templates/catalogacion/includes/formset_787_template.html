@@ -1,337 +1,305 @@
 {% comment %}
-Template para campo 787 - Otras Relaciones
-Similar al campo 773 y 774, los números de obra ($w) se manejan con JavaScript
+FORMSET 787 – Otras Relaciones (R)
+Patrón unificado con 773 / 774
 {% endcomment %}
 
-<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
-    {# Renderizar management_form sin mensajes de error #}
-    <div style="display: none;">
-        {% for field in formset.management_form %}
-        {{ field }}
+<div class="formset-container"
+     data-formset-prefix="{{ formset.prefix }}">
+
+    <!-- Management -->
+    <div class="d-none">
+        {% for hidden in formset.management_form %}
+            {{ hidden }}
         {% endfor %}
     </div>
-
 
     <div class="formset-forms">
+
         {% for form in formset %}
-        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %}">
-            {% if form.instance.pk %}
-            <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
-            {% endif %}
+        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
+
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
 
             {% if formset.can_delete %}
-            <div class="d-none">
-                {{ form.DELETE }}
-            </div>
+                <div class="d-none">{{ form.DELETE }}</div>
             {% endif %}
 
-            <button type="button" class="delete-row-btn" title="Eliminar">
+            <!-- ❌ eliminar -->
+            <button type="button"
+                    class="delete-row-btn"
+                    title="Eliminar relación">
                 <i class="bi bi-x-lg"></i>
             </button>
 
-            <div class="card mb-3">
+            <div class="card mt-3">
+                
+
                 <div class="card-body">
-                    <div class="campo-grid">
-                        {# Campo 787 $a - Persona con autocomplete #}
-                        <div class="col-full">
-    {{ form.encabezamiento_principal }} <!-- hidden FK -->
 
-    <label class="form-label" for="{{ form.encabezamiento_principal_texto.id_for_label }}">
-        787 $a – Encabezamiento principal (Persona)
-    </label>
+                    <!-- indicadores -->
+                    <div class="d-none">
+                        {{ form.primer_indicador }}
+                        {{ form.segundo_indicador }}
+                    </div>
 
-    <div class="autocomplete-wrapper">
-        <input type="text"
-               name="{{ form.encabezamiento_principal_texto.name }}"
-               value="{{ form.encabezamiento_principal_texto.value|default_if_none:'' }}"
-               class="form-control persona787-autocomplete"
-               placeholder="Escriba para buscar…"
-               autocomplete="off">
+                    <!-- ================= 787 $a ================= -->
+                    <div class="mb-3">
+                        <label class="form-label small">
+                            787 $a – Encabezamiento principal
+                        </label>
 
-        <div class="autocomplete-suggestions persona787-suggestions"></div>
-    </div>
-
-    <div class="form-text">
-        Escriba para buscar personas ya existentes o crear una nueva.
-    </div>
-</div>
-
-
-
-
-
-                        {# Campo 787 $t - Título #}
-                        <div class="col-full">
-                            <label class="form-label" for="{{ form.titulo.id_for_label }}">
-                                {{ form.titulo.label }}
-                            </label>
-                            <div class="autocomplete-wrapper">
-                                {{ form.titulo }}
-                                <div class="autocomplete-suggestions"></div>
-                            </div>
-                            {% if form.titulo.errors %}
-                            <div class="invalid-feedback d-block">{{ form.titulo.errors }}</div>
-                            {% endif %}
-                            {% if form.titulo.help_text %}
-                            <small class="form-text text-muted">{{ form.titulo.help_text }}</small>
-                            {% endif %}
+                        <div class="autocomplete-wrapper"
+                             data-autocomplete="persona">
+                            {{ form.encabezamiento_principal_texto }}
+                            <div class="autocomplete-suggestions"></div>
                         </div>
 
-                        {# Botón para agregar números de obra ($w) #}
-                        <div class="col-full">
-                            <button type="button" class="btn btn-sm btn-outline-primary add-numero-btn w-100"
-                                data-enlace-index="{{ forloop.counter0 }}">
-                                <i class="bi bi-plus-circle"></i>
-                                Agregar Número de Obra ($w)
-                            </button>
-                        </div>
+                        {{ form.encabezamiento_principal }} {# hidden FK #}
 
-                        {# Subcampo $w - Números de obra (Repetible) #}
-                        <div class="col-full numeros-container" data-numeros-container="{{ forloop.counter0 }}">
-                            {% if form.instance.pk %}
-                            {# Cargar números existentes #}
-                            {% for numero in form.instance.numeros_obra.all %}
-                            <div class="numero-form-row">
-                                <div class="d-flex flex-column w-100 mb-2">
-                                    <label class="form-label small">787 $w - Número de obra relacionada</label>
-                                    <div class="d-flex gap-2 align-items-center">
-                                        <input type="text" class="form-control numero-input"
-                                            name="numero_enlace_787_{{ forloop.parentloop.counter0 }}_{{ numero.pk }}"
-                                            value="{{ numero.numero }}" placeholder="Ej: 001234567" style="flex: 1;">
-                                        <button type="button" class="btn btn-sm btn-outline-danger delete-numero-btn"
-                                            title="Eliminar número">
-                                            <i class="bi bi-x-lg"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                            {% endif %}
+                        <small class="form-text text-muted">
+                            Busque una persona o escriba para crearla.
+                        </small>
+                    </div>
+
+                    <!-- ================= 787 $t ================= -->
+                    <div class="mb-3">
+                        <label class="form-label small">
+                            787 $t – Título
+                        </label>
+
+                        <div class="autocomplete-wrapper"
+                             data-autocomplete="titulo">
+                            {{ form.titulo }}
+                            <div class="autocomplete-suggestions"></div>
                         </div>
                     </div>
+
+                    <!-- ================= 787 $w ================= -->
+                    <div class="mt-4">
+                        <label class="form-label small fw-semibold">
+                            787 $w – Número de control
+                        </label>
+
+                        <div class="input-group">
+                            <!-- Visible: muestra el 001 -->
+                            <input type="text"
+                                class="form-control numero-w-input"
+                                placeholder="Seleccione una obra"
+                                readonly>
+
+                            <!-- Botón lupa -->
+                            <button type="button"
+                                    class="btn btn-outline-secondary btn-buscar-obra"
+                                    data-enlace-id="{{ enlace.pk }}"
+                                    data-campo="787"
+                                    title="Buscar obra">
+                                <i class="bi bi-search"></i>
+                            </button>
+
+                            <!-- 🔥 FK real hacia ObraGeneral -->
+                            <input type="hidden"
+                                class="obra-relacionada-id-input"
+                                name="w_787_{{ enlace.pk }}">
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
         </div>
         {% endfor %}
 
-        {# Template vacío para clonar enlaces #}
-        <div class="formset-row empty-form">
-            <button type="button" class="delete-row-btn" title="Eliminar">
+        <!-- ============ EMPTY FORM ============ -->
+        <div class="formset-row empty-form d-none">
+
+            {% for hidden in formset.empty_form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+
+            <button type="button" class="delete-row-btn">
                 <i class="bi bi-x-lg"></i>
             </button>
 
-            <div class="card mb-3">
+            <div class="card mt-3">
                 <div class="card-body">
-                    <div class="campo-grid">
-                        {# Campo 787 $a - Encabezamiento principal (TEMPLATE VACÍO) #}
-                        <div class="col-full">
-                            <label class="form-label"
-                                for="{{ formset.empty_form.encabezamiento_principal_texto.id_for_label }}">
-                                787 $a – Encabezamiento principal (Persona)
-                            </label>
+
+                    <div class="d-none">
+                        {{ formset.empty_form.primer_indicador }}
+                        {{ formset.empty_form.segundo_indicador }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small">787 $a – Encabezamiento principal</label>
+                        <div class="autocomplete-wrapper"
+                             data-autocomplete="persona">
                             {{ formset.empty_form.encabezamiento_principal_texto }}
-                            {{ formset.empty_form.encabezamiento_principal }}
+                            <div class="autocomplete-suggestions"></div>
                         </div>
+                        {{ formset.empty_form.encabezamiento_principal }}
+                    </div>
 
-                        {# Campo 787 $t - Título (igual que antes) #}
-                        <div class="col-full">
-                            <label class="form-label">
-                                {{ formset.empty_form.titulo.label }}
-                            </label>
-                            <div class="autocomplete-wrapper">
-                                {{ formset.empty_form.titulo }}
-                                <div class="autocomplete-suggestions"></div>
-                            </div>
-                        </div>
-
-                        {# Botón para agregar números de obra ($w) #}
-                        <div class="col-full">
-                            <button type="button" class="btn btn-sm btn-outline-primary add-numero-btn w-100"
-                                data-enlace-index="__prefix__">
-                                <i class="bi bi-plus-circle"></i>
-                                Agregar Número de Obra ($w)
-                            </button>
-                        </div>
-
-                        <div class="col-full numeros-container" data-numeros-container="__prefix__">
-                            {# Los números se agregarán aquí dinámicamente #}
+                    <div class="mb-3">
+                        <label class="form-label small">787 $t – Título</label>
+                        <div class="autocomplete-wrapper"
+                             data-autocomplete="titulo">
+                            {{ formset.empty_form.titulo }}
+                            <div class="autocomplete-suggestions"></div>
                         </div>
                     </div>
+
+                    <div class="mt-3">
+                        <label class="form-label small">787 $w – Número de obra</label>
+                        <input type="text"
+                               class="form-control"
+                               placeholder="Ej: 001234567">
+                    </div>
+
                 </div>
             </div>
         </div>
+
     </div>
 </div>
-
-{# Template global para números de obra (fuera del formset loop) #}
-<div class="numero-form-row numero-template-787 d-none">
-    <div class="d-flex flex-column w-100 mb-2">
-        <label class="form-label small">787 $w - Número de obra relacionada</label>
-        <div class="d-flex gap-2 align-items-center">
-            <input type="text" class="form-control numero-input" placeholder="Ej: 001234567" style="flex: 1;">
-            <button type="button" class="btn btn-sm btn-outline-danger delete-numero-btn" title="Eliminar número">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
-    </div>
-</div>
-
 <script>
-    // Script para manejar el campo 787 con números de obra repetibles
-    (function () {
-        const prefix = '{{ formset.prefix }}';
-        const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+(function () {
+
+    /* =====================================================
+       AUTOCOMPLETE GENÉRICO (persona / título)
+       ===================================================== */
+    function initAutocomplete(wrapper) {
+
+        // 🔥 CLAVE: permitir reinicializar
+        wrapper.removeAttribute("data-autocomplete-init");
+
+        if (!wrapper || wrapper.dataset.autocompleteInit === "1") return;
+        wrapper.dataset.autocompleteInit = "1";
+
+        const type  = wrapper.dataset.autocomplete;
+        const input = wrapper.querySelector("input");
+        const box   = wrapper.querySelector(".autocomplete-suggestions");
+
+        if (!type || !input || !box) return;
+
+        let endpoint = null;
+
+        if (type === "persona") {
+            endpoint = "/catalogacion/api/autocompletar/persona/";
+        }
+        if (type === "titulo") {
+            endpoint = "/catalogacion/api/autocompletar/titulo-uniforme/";
+        }
+        if (!endpoint) return;
+
+        let timer = null;
+
+        function hide() {
+            box.classList.remove("show");
+            box.innerHTML = "";
+        }
+
+        input.addEventListener("input", () => {
+            const q = input.value.trim();
+            if (q.length < 2) {
+                hide();
+                return;
+            }
+
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                fetch(`${endpoint}?q=${encodeURIComponent(q)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        box.innerHTML = "";
+                        const results = data.results || [];
+
+                        if (!results.length) {
+                            box.innerHTML = `
+                                <div class="autocomplete-item autocomplete-item-new">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Crear: "${q}"
+                                </div>`;
+                        } else {
+                            results.forEach(item => {
+                                const div = document.createElement("div");
+                                div.className = "autocomplete-item";
+                                div.textContent = item.text;
+                                div.onclick = () => {
+                                    input.value = item.text;
+                                    hide();
+                                };
+                                box.appendChild(div);
+                            });
+
+                            const crear = document.createElement("div");
+                            crear.className = "autocomplete-item autocomplete-item-new";
+                            crear.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${q}"`;
+                            crear.onclick = () => {
+                                input.value = q;
+                                hide();
+                            };
+                            box.appendChild(crear);
+                        }
+
+                        box.classList.add("show");
+                    });
+            }, 300);
+        });
+
+        document.addEventListener("click", e => {
+            if (!wrapper.contains(e.target)) hide();
+        });
+    }
+
+    /* =====================================================
+       BOTÓN GLOBAL + (formsets)
+       ===================================================== */
+    document.addEventListener("click", function (e) {
+
+        const btn = e.target.closest(".campo-add-btn");
+        if (!btn) return;
+
+        const prefix = btn.dataset.formsetTarget;
+        if (!prefix) return;
+
+        const container = document.querySelector(
+            `.formset-container[data-formset-prefix="${prefix}"]`
+        );
         if (!container) return;
 
-        const totalFormsInput = container.querySelector(`#id_${prefix}-TOTAL_FORMS`);
-        const addButton = document.querySelector(`.campo-add-btn[data-formset-target="${prefix}"]`);
-        const formsContainer = container.querySelector('.formset-forms');
-        const emptyFormTemplate = formsContainer.querySelector('.empty-form');
-        const numeroTemplate = document.querySelector('.numero-template-787');
+        const forms = container.querySelector(".formset-forms");
+        const empty = container.querySelector(".empty-form");
+        const totalInput = container.querySelector(
+            `input[name="${prefix}-TOTAL_FORMS"]`
+        );
 
-        if (!totalFormsInput || !addButton || !formsContainer || !emptyFormTemplate || !numeroTemplate) return;
+        if (!forms || !empty || !totalInput) return;
 
+        const index = parseInt(totalInput.value, 10);
 
-        // Función general para iniciar Select2 en cualquier form
-        function initPersonaAutocomplete(context) {
-            $(context).find('.autocomplete-787').select2({
-                ajax: {
-                    url: '/autoridades/personas/autocomplete/',
-                    dataType: 'json',
-                    delay: 250,
-                    processResults: function (data) {
-                        return { results: data.results };
-                    }
-                },
-                theme: "bootstrap-5",
-                placeholder: "Buscar persona…",
-                width: "100%"
-            });
-        }
+        const clone = empty.cloneNode(true);
+        clone.classList.remove("empty-form", "d-none");
+        clone.innerHTML = clone.innerHTML.replace(/__prefix__/g, index);
 
-        // Inicializar los ya existentes al cargar
-        initPersonaAutocomplete(container);
+        forms.appendChild(clone);
+        totalInput.value = index + 1;
 
-
-        // ➕ Agregar nuevo enlace 787
-        addButton.addEventListener('click', function () {
-            const totalForms = parseInt(totalFormsInput.value);
-
-            const newForm = emptyFormTemplate.cloneNode(true);
-            newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, totalForms);
-
-            newForm.classList.remove('empty-form');
-            newForm.style.display = '';
-
-            formsContainer.insertBefore(newForm, emptyFormTemplate);
-            totalFormsInput.value = totalForms + 1;
-
-            // Inicializar autocomplete para el nuevo form
-            initPersonaAutocomplete(newForm);
-        });
-
-
-        // ❌ Marcar eliminar o remover
-        container.addEventListener('click', function (e) {
-            const deleteBtn = e.target.closest('.delete-row-btn');
-            if (!deleteBtn) return;
-
-            const row = deleteBtn.closest('.formset-row');
-            if (!row || row.classList.contains('empty-form')) return;
-
-            const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
-
-            if (deleteCheckbox) {
-                deleteCheckbox.checked = !deleteCheckbox.checked;
-                row.style.display = deleteCheckbox.checked ? "none" : "";
-            } else {
-                row.remove();
-                totalFormsInput.value = parseInt(totalFormsInput.value, 10) - 1;
-            }
-        });
-
-
-        // ➕ / ❌ Manejar números de obra ($w)
-        container.addEventListener('click', function (e) {
-            const addNumeroBtn = e.target.closest('.add-numero-btn');
-            if (addNumeroBtn) {
-                const enlaceIndex = addNumeroBtn.dataset.enlaceIndex;
-                const numerosContainer = container.querySelector(`[data-numeros-container="${enlaceIndex}"]`);
-                if (!numerosContainer) return;
-
-                const newNumero = numeroTemplate.cloneNode(true);
-                newNumero.classList.remove('numero-template-787', 'd-none');
-
-                const input = newNumero.querySelector('.numero-input');
-                input.name = `numero_enlace_787_${enlaceIndex}_${Date.now()}`;
-
-                numerosContainer.appendChild(newNumero);
-            }
-
-            const deleteNumeroBtn = e.target.closest('.delete-numero-btn');
-            if (deleteNumeroBtn) {
-                const row = deleteNumeroBtn.closest('.numero-form-row');
-                if (!row.classList.contains('numero-template-787')) row.remove();
-            }
-        });
-
-    })();
-</script>
-<script>
-    document.addEventListener("input", function (e) {
-
-        const input = e.target.closest(".persona787-autocomplete");
-        if (!input) return;
-
-        const row = input.closest(".formset-row");
-        const hiddenId = row.querySelector('input[name$="encabezamiento_principal"]');
-        const box = row.querySelector(".persona787-suggestions");
-
-        const q = input.value.trim();
-        hiddenId.value = "";
-
-        if (q.length < 2) {
-            box.innerHTML = "";
-            box.classList.remove("show");
-            return;
-        }
-
-        fetch(`/catalogacion/api/autocompletar/persona/?q=${encodeURIComponent(q)}`)
-            .then(r => r.json())
-            .then(data => {
-                box.innerHTML = "";
-
-                data.results.forEach(p => {
-                    const item = document.createElement("div");
-                    item.className = "autocomplete-item";
-                    item.innerHTML = `<strong>${p.apellidos_nombres}</strong> ${p.coordenadas_biograficas || ""}`;
-                    item.addEventListener("click", () => {
-                        input.value = p.apellidos_nombres;
-                        hiddenId.value = p.id;
-                        box.innerHTML = "";
-                        box.classList.remove("show");
-                    });
-                    box.appendChild(item);
-                });
-
-                const nuevo = document.createElement("div");
-                nuevo.className = "autocomplete-item new-item";
-                nuevo.innerHTML = `<i class="bi bi-plus-circle"></i> Crear nuevo: "${q}"`;
-                nuevo.addEventListener("click", () => {
-                    input.value = q;
-                    hiddenId.value = "";
-                    box.innerHTML = "";
-                    box.classList.remove("show");
-                });
-                box.appendChild(nuevo);
-
-                box.classList.add("show");
+        // 🔥 REINICIALIZAR AUTOCOMPLETE EN CLON
+        clone
+            .querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
+            .forEach(w => {
+                w.removeAttribute("data-autocomplete-init");
+                initAutocomplete(w);
             });
     });
 
-    document.addEventListener("click", function (e) {
-        document.querySelectorAll(".persona787-suggestions.show").forEach(box => {
-            if (!box.contains(e.target)) box.classList.remove("show");
-        });
-    });
+    /* =====================================================
+       INIT INICIAL
+       ===================================================== */
+    document
+        .querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
+        .forEach(initAutocomplete);
+
+})();
 </script>

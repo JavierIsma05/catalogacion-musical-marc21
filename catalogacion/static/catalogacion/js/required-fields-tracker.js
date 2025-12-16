@@ -49,7 +49,7 @@
 
         coleccion_impresa: [
             { id: "id_centro_catalogador", label: "040", tab: 6 },
-            { id: "id_titulo_uniforme_texto", label: "130", tab: 0, hidden: true },
+            { id: "id_compositor", label: "100", tab: 0 },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
