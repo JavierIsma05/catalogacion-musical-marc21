@@ -10,6 +10,7 @@ from django.shortcuts import redirect
 from django.db import transaction
 from django.db.models import Q
 from jsonschema import ValidationError
+from catalogacion.forms.formsets import Funcion700FormSet
 from catalogacion.models import (
     NumeroControl773,
     NumeroControl774,
@@ -132,6 +133,18 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
 
         for key, fs in formsets.items():
             context[key] = fs
+        # =====================================================
+        # 🔥 INLINE FORMSET 700 $e – Función
+        # =====================================================
+        formset_700 = formsets.get("nombres_relacionados_700") or formsets.get("700")
+
+        if formset_700:
+            for form in formset_700:
+                form.funcion700_formset = Funcion700FormSet(
+                    instance=form.instance,
+                    prefix=f'funcion700-{form.prefix}',
+                )
+
 
         # 382 → nested
         medios_formset = context.get('medios_interpretacion')
@@ -298,6 +311,19 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
         # Añadir cada formset explícitamente al contexto
         for key, fs in formsets.items():
             context[key] = fs
+        
+        # =====================================================
+        # 🔥 INLINE FORMSET 700 $e – Función
+        # =====================================================
+        formset_700 = formsets.get("nombres_relacionados_700") or formsets.get("700")
+
+        if formset_700:
+            for form in formset_700:
+                form.funcion700_formset = Funcion700FormSet(
+                    instance=form.instance,
+                    prefix=f'funcion700-{form.prefix}',
+                )
+
 
         logger.debug(f"   Formsets cargados en contexto (editar): {list(formsets.keys())}")
 
