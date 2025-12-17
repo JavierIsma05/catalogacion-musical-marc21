@@ -69,11 +69,25 @@ class IncipitMusical(models.Model):
         max_length=20, blank=True, help_text="031 $o – Tiempo"
     )
 
-    # Subcampo $p - Notación musical (PAE)
+    # Subcampo $p - Notación musical (Cuerpo PAE)
     notacion_musical = models.TextField(
         blank=True,
         null=True,
         help_text="031 $p – Íncipit musical codificado en PAE (Plaine & Easie)",
+    )
+    # PAEC completo (CABECERA + Cuerpo PAE)
+    paec_full = models.TextField(
+        blank=True,
+        null=True,
+        help_text="PAEC completo para render en modo vista. Ej: %G-2 $xFCGD @2/2 '2G4B/B''2E8EDC/'B''C'BABA/",
+    )
+
+    # Transposición (la usa en búsquedas)
+    transposicion = models.CharField(
+        max_length=32,
+        blank=True,
+        null=True,
+        help_text="Transposición asociada al íncipit (si aplica).",
     )
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -123,6 +137,43 @@ class IncipitMusical(models.Model):
             marc += f" $p{notacion_preview}"
 
         return marc
+
+    @property
+    def build_paec_full(self) -> str:
+        """
+        Construye PAEC completo para el legacy.
+        Mantiene apóstrofes del body (son parte del PAEC).
+        Formato recomendado (compatible con tu adapter):
+          %<clave> $<armadura> @<tiempo> <body>
+        """
+        body = (self.notacion_musical or "").strip()
+        if not body:
+            return ""
+
+        parts = []
+
+        # clave: "G-2", "C-3", "F-4"
+        if self.clave:
+            parts.append(f"%{self.clave}")
+
+        # armadura: "xFCGD" / "bBEADG" / etc
+        if self.armadura:
+            parts.append(f"${self.armadura}")
+
+        # tiempo: "2/2", "4/4", "6/8", etc
+        if self.tiempo:
+            parts.append(f"@{self.tiempo}")
+
+        header = " ".join(parts).strip()
+        # IMPORTANTE: un espacio entre cabecera y body
+        return f"{header} {body}".strip()
+
+    def save(self, *args, **kwargs):
+        # Autogenera paec_full si hay body
+        # `build_paec_full` es una `@property` que retorna un `str`,
+        # por eso debe usarse sin paréntesis.
+        self.paec_full = self.build_paec_full or None
+        super().save(*args, **kwargs)
 
 
 class IncipitURL(models.Model):
