@@ -60,7 +60,6 @@
                     {% endif %}
 
                 </div>
-                {% endif %}
 
                 <a href="{% url 'catalogacion:editar_obra' pk=obra.pk %}" class="btn-action">
                     <i class="bi bi-pencil"></i> Editar
@@ -137,24 +136,23 @@
                     {% endfor %}
                 {% endif %}
 
-                    {% if obra.compositor %}
-                    <div class="data-row-alt">
-                        <span class="campo-tag">100</span>
-                        <div class="data-cell">
-                            <div class="linea-principal">
-                                <strong>{{ obra.compositor }}</strong>
-                                {% if obra.compositor.coordenadas_biograficas %}
-                                    ({{ obra.compositor.coordenadas_biograficas }})
-                                {% endif %}
-                            </div>
-                            {% if obra.termino_asociado %}
-                                <div class="linea-secundaria">
-                                    <em>{{ obra.termino_asociado }}</em>
-                                </div>
+                {% if obra.compositor %}
+                <div class="data-row-alt">
+                    <span class="campo-tag">100</span>
+                    <div class="data-cell">
+                        <div class="linea-principal">
+                            <strong>{{ obra.compositor }}</strong>
+                            {% if obra.compositor.coordenadas_biograficas %}
+                                ({{ obra.compositor.coordenadas_biograficas }})
                             {% endif %}
                         </div>
+                        {% if obra.termino_asociado %}
+                            <div class="linea-secundaria">
+                                <em>{{ obra.termino_asociado }}</em>
+                            </div>
                         {% endif %}
-                    {% endfor %}
+                    </div>
+                </div>
                 {% endif %}
 
                     {% if obra.titulo_uniforme %}
@@ -304,8 +302,6 @@
                         </div>
                         {% endfor %}
                     {% endif %}
-                </div>
-                {% endif %}
 
                 {% if obra.tonalidad_384 %}
                 <div class="data-row"><span class="campo-tag">384</span>{{ obra.tonalidad_384 }}</div>
@@ -348,7 +344,6 @@
                         </div>
                     </div>
                     {% endif %}
-                {% endfor %}
 
                     {% if obra.numero_obra or obra.opus %}
                     <div class="data-row">
@@ -359,7 +354,6 @@
                         </span>
                     </div>
                     {% endif %}
-                {% endfor %}
 
                     {% if obra.tonalidad_384 %}
                     <div class="data-row">
@@ -367,7 +361,6 @@
                         <span>{{ obra.tonalidad_384 }}</span>
                     </div>
                     {% endif %}
-                {% endfor %}
 
                 {% if obra.incipits_musicales.all %}
                 <div class="incipit-section">
@@ -478,6 +471,7 @@
             <section id="relaciones" class="detalle-section">
                 <h3>Relaciones</h3>
 
+                {% if obra.materias_650.exists or obra.materias_655.exists %}
                 <div class="materias-container">
                     {% for mat in obra.materias_650.all %}
                     <div class="materia-tag">
@@ -509,9 +503,9 @@
                     </div>
                     {% endfor %}
                 </div>
-                {% empty %}
-                <p class="text-muted">No hay relaciones 774 registradas.</p>
-                {% endfor %}
+                {% else %}
+                <p class="text-muted">No hay relaciones registradas.</p>
+                {% endif %}
 
                 {% if obra.menciones_serie.all %}
                 <h4 class="subsection-title mt-3">Series</h4>
@@ -537,6 +531,7 @@
                 {% empty %}
                 <p class="text-muted">No hay relaciones 787 registradas.</p>
                 {% endfor %}
+                {% endif %}
             </section>
 
 
@@ -556,10 +551,6 @@
                     {% endfor %}
 
                     {# 856 #}
-
-                    {% for d in obra.disponibles_856.all %}
-                        <div>
-                            <strong>856</strong><br>
 
                 {% if obra.ubicaciones_852.all %}
                 <div class="ubicaciones-list">
@@ -582,6 +573,8 @@
                         </span>
                     </div>
                     {% endfor %}
+                </div>
+                {% endif %}
 
                 {% if obra.disponibles_856.exists %}
                 <h4 class="subsection-title mt-4">Disponible en línea</h4>
