@@ -2,6 +2,7 @@
 URLs para gestión de autoridades
 """
 from django.urls import path
+from catalogacion.views import api_views
 from catalogacion.views.autoridades import (
     # Personas
     ListaPersonasView,
@@ -100,4 +101,5 @@ urlpatterns = [
         AutocompletarMateriaView.as_view(),
         name='autocompletar_materia'
     ),
+    path('api/buscar-obras/', api_views.buscar_obras, name='buscar_obras'),
 ]

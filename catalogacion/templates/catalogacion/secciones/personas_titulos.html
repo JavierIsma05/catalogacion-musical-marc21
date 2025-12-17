@@ -1,0 +1,331 @@
+{# Bloque 1XX - Punto de acceso principal #}
+<section id="bloque-1xx" class="bloque-section">
+    <div class="card">
+        
+        <div class="card-body">
+
+            {# Campo 100 - Compositor #}
+            {% if '100' in campos_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">100</span>
+                    <h6>Compositor</h6>
+                    <span class="campo-help-btn" data-field-code="100" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                <div class="campo-grid">
+                    {# Campo oculto para el ID del compositor #}
+                    <input type="hidden" name="compositor" id="id_compositor"
+                        value="{{ form.compositor.value|default:'' }}">
+
+                    <div class="col-full">
+                        <label class="form-label" for="id_compositor_texto">{{ form.compositor_texto.label }}</label>
+                        <div class="autocomplete-wrapper">
+                            {{ form.compositor_texto }}
+                            <div id="compositor-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
+                        <div class="form-text">Escriba para buscar compositores existentes o ingrese un nombre nuevo
+                        </div>
+                        {% if form.compositor_texto.errors %}
+                        <div class="invalid-feedback d-block">{{ form.compositor_texto.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-full">
+                        <label class="form-label" for="id_compositor_coordenadas">{{ form.compositor_coordenadas.label }}</label>
+                        {{ form.compositor_coordenadas }}
+                        <div class="form-text">Fechas de vida (Ej: 1900-1980)</div>
+                        {% if form.compositor_coordenadas.errors %}
+                        <div class="invalid-feedback d-block">{{ form.compositor_coordenadas.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.termino_asociado.id_for_label }}">{{ form.termino_asociado.label }}</label>
+                        {{ form.termino_asociado }}
+                        {% if form.termino_asociado.errors %}
+                        <div class="invalid-feedback">{{ form.termino_asociado.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.autoria.id_for_label }}">{{ form.autoria.label }}</label>
+                        {{ form.autoria }}
+                        {% if form.autoria.errors %}
+                        <div class="invalid-feedback">{{ form.autoria.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# Subcampo repetible: 100 $e - Funciones #}
+                {% if 'funciones_compositor' in formsets_visibles %}
+                <div class="mt-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="badge-marc me-2">100$e</span>
+                        <label class="form-label small mb-0">Función</label>
+                    </div>
+                    {% include 'catalogacion/includes/formset_100e_template.html' with formset=funciones_compositor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            {# Campo 130 - Título uniforme (punto de acceso principal) #}
+            {% if '130' in campos_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">130</span>
+                    <h6>Título Uniforme Principal</h6>
+                    <span class="campo-help-btn" data-field-code="130" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="campo-grid">
+                    {# Campo oculto para el ID del título uniforme - SOLO si 130 es visible #}
+                    <input type="hidden" name="titulo_uniforme" id="id_titulo_uniforme" value="{{ form.titulo_uniforme.value|default:'' }}">
+                    
+                    <div class="col-full">
+                        <label class="form-label" for="id_titulo_uniforme_texto">{{ form.titulo_uniforme_texto.label }}</label>
+                        <div class="autocomplete-wrapper">
+                            {{ form.titulo_uniforme_texto }}
+                            <div id="titulo-uniforme-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
+                        <div class="form-text">Escriba para buscar títulos existentes o ingrese uno nuevo</div>
+                        {% if form.titulo_uniforme_texto.errors %}
+                            <div class="invalid-feedback d-block">{{ form.titulo_uniforme_texto.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    {# Campo oculto para el ID de la forma musical 130 - SOLO si 130 es visible #}
+                    <input type="hidden" name="forma_130" id="id_forma_130" value="{{ form.forma_130.value|default:'' }}">
+                    
+                    <div class="col-half">
+                        <label class="form-label" for="id_forma_130_texto">{{ form.forma_130_texto.label }}</label>
+                        <div class="autocomplete-wrapper">
+                            {{ form.forma_130_texto }}
+                            <div id="forma-130-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
+                        <div class="form-text">Escriba para buscar formas musicales o ingrese una nueva</div>
+                        {% if form.forma_130_texto.errors %}
+                            <div class="invalid-feedback d-block">{{ form.forma_130_texto.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.medio_interpretacion_130.id_for_label }}">{{ form.medio_interpretacion_130.label }}</label>
+                        {{ form.medio_interpretacion_130 }}
+                    </div>
+                    
+                    <div class="col-third">
+                        <label class="form-label" for="{{ form.tonalidad_130.id_for_label }}">{{ form.tonalidad_130.label }}</label>
+                        {{ form.tonalidad_130 }}
+                    </div>
+                    
+                    <div class="col-third">
+                        <label class="form-label" for="{{ form.numero_parte_130.id_for_label }}">{{ form.numero_parte_130.label }}</label>
+                        {{ form.numero_parte_130 }}
+                    </div>
+                    
+                    <div class="col-third">
+                        <label class="form-label" for="{{ form.nombre_parte_130.id_for_label }}">{{ form.nombre_parte_130.label }}</label>
+                        {{ form.nombre_parte_130 }}
+                    </div>
+                    
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.arreglo_130.id_for_label }}">{{ form.arreglo_130.label }}</label>
+                        {{ form.arreglo_130 }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {# Campo 240 - Título uniforme subordinado #}
+            {% if '240' in campos_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">240</span>
+                    <h6>Título Uniforme (subordinado al 100)</h6>
+                    <span class="campo-help-btn" data-field-code="240" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                <div class="campo-grid">
+                    {# Campo oculto para el ID del título 240 #}
+                    <input type="hidden" name="titulo_240" id="id_titulo_240"
+                        value="{{ form.titulo_240.value|default:'' }}">
+
+                    <div class="col-full">
+                        <label class="form-label" for="id_titulo_240_texto">{{ form.titulo_240_texto.label }}</label>
+                        <div class="autocomplete-wrapper">
+                            {{ form.titulo_240_texto }}
+                            <div id="titulo-240-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
+                        <div class="form-text">Escriba para buscar títulos existentes o ingrese uno nuevo</div>
+                        {% if form.titulo_240_texto.errors %}
+                        <div class="invalid-feedback d-block">{{ form.titulo_240_texto.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    {# Campo oculto para el ID de la forma musical 240 #}
+                    <input type="hidden" name="forma_240" id="id_forma_240"
+                        value="{{ form.forma_240.value|default:'' }}">
+
+                    <div class="col-half">
+                        <label class="form-label" for="id_forma_240_texto">{{ form.forma_240_texto.label }}</label>
+                        <div class="autocomplete-wrapper">
+                            {{ form.forma_240_texto }}
+                            <div id="forma-240-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
+                        <div class="form-text">Escriba para buscar formas musicales o ingrese una nueva</div>
+                        {% if form.forma_240_texto.errors %}
+                        <div class="invalid-feedback d-block">{{ form.forma_240_texto.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.medio_interpretacion_240.id_for_label }}">{{ form.medio_interpretacion_240.label }}</label>
+                        {{ form.medio_interpretacion_240 }}
+                    </div>
+
+                    <div class="col-third">
+                        <label class="form-label" for="{{ form.tonalidad_240.id_for_label }}">{{ form.tonalidad_240.label }}</label>
+                        {{ form.tonalidad_240 }}
+                    </div>
+
+                    <div class="col-third">
+                        <label class="form-label" for="{{ form.numero_parte_240.id_for_label }}">{{ form.numero_parte_240.label }}</label>
+                        {{ form.numero_parte_240 }}
+                    </div>
+
+                    <div class="col-third">
+                        <label class="form-label" for="{{ form.nombre_parte_240.id_for_label }}">{{ form.nombre_parte_240.label }}</label>
+                        {{ form.nombre_parte_240 }}
+                    </div>
+
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.arreglo_240.id_for_label }}">{{ form.arreglo_240.label }}</label>
+                        {{ form.arreglo_240 }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</section>
+{# Bloque 2XX - Títulos, edición y publicación #}
+<section id="bloque-2xx" class="bloque-section">
+    <div class="card">
+        <div class="card-body">
+
+            <!-- Campo 245 - Título Principal -->
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">245</span>
+                    <h6>Título Principal</h6>
+                    <span class="campo-help-btn" data-field-code="245" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                <div class="campo-grid">
+                    <div class="col-full">
+                        <label class="form-label " for="id_titulo_principal">{{ form.titulo_principal.label }}</label>
+                        {{ form.titulo_principal }}
+                        {% if form.titulo_principal.errors %}
+                        <div class="invalid-feedback">{{ form.titulo_principal.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-half">
+                        <label class="form-label" for="id_subtitulo">{{ form.subtitulo.label }}</label>
+                        {{ form.subtitulo }}
+                    </div>
+
+                    <div class="col-half">
+                        <label class="form-label" for="id_mencion_responsabilidad">{{ form.mencion_responsabilidad.label }}</label>
+                        {{ form.mencion_responsabilidad }}
+                    </div>
+                </div>
+            </div>
+
+
+            {# Campo 246 - Títulos alternativos (Repetible) #}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">246</span>
+                    <h6>Títulos Alternativos</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="titulos_alt"
+                        title="Agregar Título Alternativo">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                    <span class="campo-help-btn" data-field-code="246" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                {% include 'catalogacion/includes/formset_template.html' with formset=titulos_alternativos titulo="Título Alternativo" %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{# Bloque 7XX - Puntos de acceso adicionales y enlaces #}
+<section id="bloque-7xx" class="bloque-section">
+    <div class="card">
+        <div class="card-body">
+            {# Campo 700 - Nombres Relacionados (Repetible) #}
+            {% if 'nombres_relacionados_700' in formsets_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">700</span>
+                    <h6>Nombres Relacionados</h6>
+                    <!-- Botón agregar relación 700 -->
+                    <button type="button" class="campo-add-btn"
+                        data-formset-target="{{ nombres_relacionados_700.prefix }}" title="Agregar Nombre Relacionado">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="700" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                <p class="form-text">Personas relacionadas con la obra: intérpretes, arreglistas, editores, etc. Incluye
+                    subcampos no repetibles ($a, $d, $i, $j, $t) y repetibles ($c, $e).</p>
+
+                {% include 'catalogacion/includes/formset_700_template.html' with formset=nombres_relacionados_700 %}
+            </div>
+            {% endif %}
+
+            {# Campo 710 - Entidades Corporativas (Repetible) #}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">710</span>
+                    <h6>Entidades Corporativas</h6>
+
+                    <!-- Botón agregar 710 -->
+                    <button type="button" class="campo-add-btn btn btn-sm btn-outline-primary"
+                        data-formset-target="{{ entidades_relacionadas_710.prefix }}" title="Agregar Entidad">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
+                    <!-- Botón de ayuda -->
+                    <span class="campo-help-btn" data-field-code="710" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                <p class="form-text">Orquestas, coros, editoriales, etc.</p>
+
+                {% include 'catalogacion/includes/formset_710_template.html' with formset=entidades_relacionadas_710 titulo="Entidad" %}
+            </div>
+            
+
+        </div>
+    </div>
+</section>

@@ -41,8 +41,15 @@ class FormsetSubcampoHandler:
         valores = self._agrupar_subcampos_por_indice(prefijo_input, indice_posicion)
 
         for index, form in enumerate(formset):
+            # 1. Asegurar que el form padre exista
             if not form.instance.pk:
-                continue
+                parent = form.save(commit=False)
+                obra = formset.instance  # La obra que contiene este 856
+                parent.obra = obra
+                parent.save()
+
+            # 2. Ahora SÍ tiene pk
+            instance = form.instance
 
             if index not in valores:
                 continue
@@ -105,30 +112,54 @@ def save_estanterias_852(request_post, formset):
     )
 
 
-def save_urls_856(request_post, formset):
+def _save_urls_856(request_post, disponibles):
     from catalogacion.models import URL856
 
-    handler = FormsetSubcampoHandler(request_post)
-    handler.procesar_subcampo_simple(
-        formset,
-        "url_disponible_856_",
-        URL856,
-        "disponible",
-        "url",
-    )
+    # 🔥 Recorremos POST en orden, no por índice
+    for key, value in request_post.items():
+        if not key.startswith("url_disponible_856_"):
+            continue
+
+        if not value.strip():
+            continue
+
+        try:
+            _, _, _, orden = key.split("_", 3)
+        except ValueError:
+            continue
+
+        # 🔐 USAR EL ORDEN REAL, NO EL ÍNDICE DEL NAME
+        try:
+            disponible = disponibles.pop(0)
+        except IndexError:
+            break  # no hay más padres
+
+        URL856.objects.create(
+            disponible=disponible,
+            url=value.strip()
+        )
 
 
-def save_textos_enlace_856(request_post, formset):
+def _save_textos_enlace_856(request_post, disponibles):
     from catalogacion.models import TextoEnlace856
 
-    handler = FormsetSubcampoHandler(request_post)
-    handler.procesar_subcampo_simple(
-        formset,
-        "texto_disponible_856_",
-        TextoEnlace856,
-        "disponible",
-        "texto_enlace",
-    )
+    for key, value in request_post.items():
+        if not key.startswith("texto_disponible_856_"):
+            continue
+
+        if not value.strip():
+            continue
+
+        try:
+            disponible = disponibles[0]
+        except IndexError:
+            break
+
+        TextoEnlace856.objects.create(
+            disponible=disponible,
+            texto_enlace=value.strip()
+        )
+
 
 
 def save_lugares_264(request_post, formset):
@@ -217,8 +248,8 @@ SUBCAMPO_HANDLERS = {
     "_save_subdivisiones_650": save_subdivisiones_650,
     "_save_subdivisiones_655": save_subdivisiones_655,
     "_save_estanterias_852": save_estanterias_852,
-    "_save_urls_856": save_urls_856,
-    "_save_textos_enlace_856": save_textos_enlace_856,
+    "_save_urls_856": _save_urls_856,
+    "_save_textos_enlace_856": _save_textos_enlace_856,
     "_save_lugares_264": save_lugares_264,
     "_save_entidades_264": save_entidades_264,
     "_save_fechas_264": save_fechas_264,

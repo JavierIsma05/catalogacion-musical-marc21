@@ -63,15 +63,9 @@ class Estanteria852Form(forms.ModelForm):
 
 
 class Disponible856Form(forms.ModelForm):
-    """
-    Un 856 'padre'. No tiene campos propios editables,
-    sólo sirve para crear/eliminar bloques 856.
-    """
     class Meta:
         model = Disponible856
-        # 'obra' la seteas en la vista, así que no se muestra en el form
-        fields = []
-
+        fields = []  # NO dummy
 
 class URL856Form(forms.ModelForm):
     """

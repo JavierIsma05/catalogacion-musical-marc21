@@ -1,0 +1,193 @@
+{# Bloque 3XX - Descripción física y características técnicas #}
+<section id="bloque-3xx" class="bloque-section">
+    <div class="card">
+        <div class="card-body">
+            
+            {# Campo 300 - Descripción física #}
+            {% if '300' in campos_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">300</span>
+                    <h6>Descripción Física</h6>
+                    <span class="campo-help-btn" data-field-code="300" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="campo-grid">
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.extension.id_for_label }}">{{ form.extension.label }}</label>
+                        {{ form.extension }}
+                    </div>
+                    
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.otras_caracteristicas.id_for_label }}">{{ form.otras_caracteristicas.label }}</label>
+                        {{ form.otras_caracteristicas }}
+                    </div>
+                    
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.dimension.id_for_label }}">{{ form.dimension.label }}</label>
+                        {{ form.dimension }}
+                    </div>
+                    
+                    <div class="col-half">
+                        <label class="form-label" for="{{ form.material_acompanante.id_for_label }}">{{ form.material_acompanante.label }}</label>
+                        {{ form.material_acompanante }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {# Campo 264 - Producción/Publicación (Repetible) #}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">264</span>
+                    <h6>Producción/Publicación</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="produccion" title="Agregar Producción/Publicación">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                    <span class="campo-help-btn" data-field-code="264" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+                
+                {% include 'catalogacion/includes/formset_264_template.html' with formset=produccion_publicacion %}
+            </div>
+            {# Campo 250 - Edición (Repetible) #}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">250</span>
+                    <h6>Edición</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="ediciones" title="Agregar Edición">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                    <span class="campo-help-btn" data-field-code="250" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+                
+                {% include 'catalogacion/includes/formset_template.html' with formset=ediciones titulo="Edición" %}
+            </div>
+            {# Campo 340 - Características técnicas #}
+            {% if '340' in campos_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">340</span>
+                    <h6>Características Técnicas</h6>
+                    <span class="campo-help-btn" data-field-code="340" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="campo-grid">
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.ms_imp.id_for_label }}">{{ form.ms_imp.label }}</label>
+                        {{ form.ms_imp }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+             {# Campo 020 - ISBN #}
+            {% if '020' in campos_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">020</span>
+                    <h6>ISBN</h6>
+                    <span class="campo-help-btn" data-field-code="020" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                <div class="campo-grid">
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.isbn.id_for_label }}">{{ form.isbn.label }}</label>
+                        {{ form.isbn }}
+                        {% if form.isbn.errors %}
+                        <div class="invalid-feedback">{{ form.isbn.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {# Campo 024 - ISMN #}
+            {% if '024' in campos_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">024</span>
+                    <h6>ISMN</h6>
+                    <span class="campo-help-btn" data-field-code="024" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                <div class="campo-grid">
+                    <div class="col-full">
+                        <label class="form-label" for="{{ form.ismn.id_for_label }}">{{ form.ismn.label }}</label>
+                        {{ form.ismn }}
+                        {% if form.ismn.errors %}
+                        <div class="invalid-feedback">{{ form.ismn.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Campo 028 - Número de Editor -->
+            {% if '028' in campos_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">028</span>
+                    <h6>Número de Editor</h6>
+                    <span class="campo-help-btn" data-field-code="028" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                <div class="campo-grid">
+                    <div class="col-third">
+                        <label class="form-label" for="id_tipo_numero_028">{{ form.tipo_numero_028.label }}</label>
+                        {{ form.tipo_numero_028 }}
+                        {% if form.tipo_numero_028.errors %}
+                        <div class="invalid-feedback">{{ form.tipo_numero_028.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-third">
+                        <label class="form-label" for="id_control_nota_028">{{ form.control_nota_028.label }}</label>
+                        {{ form.control_nota_028 }}
+                        {% if form.control_nota_028.errors %}
+                        <div class="invalid-feedback">{{ form.control_nota_028.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-third">
+                        <label class="form-label" for="id_numero_editor">{{ form.numero_editor.label }}</label>
+                        {{ form.numero_editor }}
+                        {% if form.numero_editor.errors %}
+                        <div class="invalid-feedback">{{ form.numero_editor.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% if 'codigos_pais' in formsets_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">044</span>
+                    <h6>Código de País</h6>
+                    <button type="button" class="campo-add-btn" data-formset-target="paises" title="Agregar País">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                    <span class="campo-help-btn" data-field-code="044" tabindex="0" title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                {% include 'catalogacion/includes/formset_template.html' with formset=codigos_pais titulo="País" %}
+            </div>
+            {% endif %}
+            
+            
+        </div>
+    </div>
+</section>

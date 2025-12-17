@@ -11,8 +11,12 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">500</span>
                     <h6>Nota General</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
-
+                    <!-- 🔥 BOTÓN ADD (MISMO ESTILO 7XX / 856) -->
+                    <button type="button"
+                            class="campo-add-btn"
+                            data-formset-target="{{ notas_generales.prefix }}"  title="Agregar nota">
+                        <i class="bi bi-plus"></i> 
+                    </button>
                     <!-- Botón de ayuda -->
                     <span class="campo-help-btn" data-field-code="500" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
@@ -32,7 +36,11 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">505</span>
                     <h6>Contenido</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
+                    <button type="button"
+                            class="campo-add-btn"
+                            data-formset-target="{{ contenidos.prefix }}" title="Agregar contenido">
+                        <i class="bi bi-plus"></i> 
+                    </button>
 
                     <!-- Botón de ayuda -->
                     <span class="campo-help-btn" data-field-code="505" tabindex="0" title="Ayuda">
@@ -42,7 +50,8 @@
 
                 <p class="form-text">Listado de contenidos de la obra.</p>
 
-                {% include 'catalogacion/includes/formset_notas_5xx.html' with formset=contenidos campo='contenido' titulo='Contenido' %}
+                {% include 'catalogacion/includes/formset_505_template.html' with formset=contenidos %}
+
             </div>
             {% endif %}
 
@@ -53,8 +62,12 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">520</span>
                     <h6>Sumario</h6>
-                    <span class="badge-repetible">REPETIBLE</span>
-
+                    <button type="button"
+                            class="campo-add-btn"
+                            data-formset-target="{{ sumarios.prefix }}" title="Agregar sumario">
+                        <i class="bi bi-plus"></i> 
+                    </button>
+                    
                     <!-- Botón de ayuda -->
                     <span class="campo-help-btn" data-field-code="520" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
@@ -63,7 +76,8 @@
 
                 <p class="form-text">Resumen o sumario del contenido.</p>
 
-                {% include 'catalogacion/includes/formset_notas_5xx.html' with formset=sumarios campo='sumario' titulo='Sumario' %}
+                {% include 'catalogacion/includes/formset_520_template.html' with formset=sumarios %}
+
             </div>
             {% endif %}
 
@@ -74,7 +88,6 @@
                 <div class="campo-titulo">
                     <span class="badge-marc">545</span>
                     <h6>Datos biográficos del compositor</h6>
-                    <span class="badge-repetible">NO REPETIBLE</span>
 
                     <!-- Botón de ayuda -->
                     <span class="campo-help-btn" data-field-code="545" tabindex="0" title="Ayuda">

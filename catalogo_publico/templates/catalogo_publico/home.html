@@ -3,19 +3,19 @@
 {% block title %}Inicio - Catálogo Musical MARC21{% endblock %}
 
 {% block content %}
-<!-- Hero Section Mejorado -->
+<!-- Hero Section Profesional -->
 <section class="hero-section text-center">
     <div class="container">
-        <h1 class="display-4 mb-3">
+        <h1>
             <i class="bi bi-music-note-beamed"></i>
             Catálogo Musical MARC21
         </h1>
         <p class="lead">
-            Explora nuestra colección de obras musicales catalogadas con estándares profesionales
+            Sistema profesional de catalogación de obras musicales con estándares internacionales
         </p>
         <div class="hero-highlight">
-            <span><i class="bi bi-shield-check"></i> Curaduría experta</span>
-            <span><i class="bi bi-cloud-arrow-down"></i> Datos siempre disponibles</span>
+            <span><i class="bi bi-shield-check"></i> Catalogación profesional</span>
+            <span><i class="bi bi-search"></i> Búsqueda avanzada</span>
         </div>
         <a href="{% url 'catalogo_publico:lista_obras' %}" class="btn btn-light btn-lg">
             <i class="bi bi-collection"></i>
@@ -25,7 +25,7 @@
 </section>
 
 <!-- Estadísticas -->
-<section class="home-stats py-5">
+<section class="home-stats">
     <div class="container">
         <div class="stats-grid">
             <article class="home-stat-card accent">
@@ -35,25 +35,27 @@
                 <div class="home-stat-content">
                     <p class="stat-label">Obras Catalogadas</p>
                     <p class="stat-value">{{ total_obras }}</p>
-                    <span class="stat-helper">Actualizado diariamente</span>
+                    <span class="stat-helper">Base de datos actualizada</span>
                 </div>
             </article>
+            
             <article class="home-stat-card">
                 <div class="home-stat-icon neutral">
                     <i class="bi bi-search"></i>
                 </div>
                 <div class="home-stat-content">
                     <p class="stat-title">Búsqueda Avanzada</p>
-                    <span class="stat-helper">Encuentra obras por título, compositor y más</span>
+                    <span class="stat-helper">Encuentra obras por título, compositor y más criterios</span>
                 </div>
             </article>
+            
             <article class="home-stat-card">
                 <div class="home-stat-icon neutral">
                     <i class="bi bi-journal-text"></i>
                 </div>
                 <div class="home-stat-content">
                     <p class="stat-title">Formato MARC21</p>
-                    <span class="stat-helper">Catalogación profesional estandarizada</span>
+                    <span class="stat-helper">Estándar internacional de catalogación musical</span>
                 </div>
             </article>
         </div>
@@ -64,7 +66,7 @@
 {% if ultimas_obras %}
 <section class="py-5">
     <div class="container">
-        <h2 class="text-center mb-5">
+        <h2>
             <i class="bi bi-clock-history"></i>
             Últimas Obras Catalogadas
         </h2>
@@ -83,7 +85,7 @@
                             {{ obra.compositor }}
                         </p>
                         {% endif %}
-                        <span class="badge bg-secondary">
+                        <span class="badge">
                             {% if obra.tipo_registro == 'd' %}
                                 <i class="bi bi-pen"></i> Manuscrito
                             {% else %}
@@ -91,9 +93,9 @@
                             {% endif %}
                         </span>
                     </div>
-                    <div class="card-footer bg-transparent">
-                        <a href="{% url 'catalogo_publico:detalle' obra.pk %}" 
-                           class="btn btn-outline-primary btn-sm w-100">
+                    <div class="card-footer">
+                        <a href="{% url 'catalogo_publico:detalle_obra' obra.pk %}" 
+                           class="btn btn-sm w-100">
                             <i class="bi bi-eye"></i>
                             Ver Detalle
                         </a>

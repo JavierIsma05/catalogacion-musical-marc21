@@ -2,8 +2,6 @@
 {% load static %}
 {% load catalogacion_tags %}
 
-{# 🆕 UI V2 - Secciones temáticas (Personas, Producción, Musical, etc.) #}
-
 {% block title %}Crear {{ tipo_obra_titulo }} - MARC21{% endblock %}
 {% block page_title %}Crear {{ tipo_obra_titulo }}{% endblock %}
 
@@ -22,9 +20,8 @@
                     <p class="text-muted">Campos obligatorios completados</p>
                 </div>
 
-                <!-- Indicador circular (opcional, sigue comentado) -->
-                
-                <div class="progress-circle-container">
+                <!-- Indicador circular -->
+                <!-- <div class="progress-circle-container">
                     <div class="progress-circle">
                         <svg width="80" height="80">
                             <circle class="bg-circle" cx="40" cy="40" r="36"></circle>
@@ -35,8 +32,7 @@
                         </svg>
                         <div class="progress-text" id="progress-percent">0%</div>
                     </div>
-                </div>
-                
+                </div> -->
 
                 <!-- Estadísticas -->
                 <div class="progress-stats">
@@ -85,49 +81,47 @@
             <!-- Barra de progreso superior -->
             <div class="progress-indicator">
                 <div class="progress-bar-custom">
-                    {# Paso 1 de 8 ≈ 12.5% #}
-                    <div class="progress-bar-fill" id="progress-bar" style="width: 12.5%"></div>
+                    <div class="progress-bar-fill" id="progress-bar" style="width: 11%"></div>
                 </div>
-                <small class="text-muted mt-2 d-block">
-                    Paso <span id="current-step">1</span> de 8
-                </small>
+                <small class="text-muted mt-2 d-block">Paso <span id="current-step">1</span> de 9</small>
             </div>
 
-            <!-- ==================== NAVEGACIÓN DE PESTAÑAS (NUEVA UI) ==================== -->
+            <!-- Navegación de pestañas -->
             <div class="tabs-navigation">
-                <button type="button" class="tab-button active" data-tab="tab-personas" data-tab-index="0">
-                    <i class="bi bi-person-vcard"></i> Nombres y títulos
+                <button type="button" class="tab-button active" data-tab="tab-0xx" data-tab-index="0">
+                    <i class="bi bi-hash"></i> 0XX
                 </button>
-                <button type="button" class="tab-button" data-tab="tab-produccion" data-tab-index="1">
-                    <i class="bi bi-building-gear"></i> Producción / edición
+                <button type="button" class="tab-button" data-tab="tab-1xx" data-tab-index="1">
+                    <i class="bi bi-person"></i> 1XX
                 </button>
-                <button type="button" class="tab-button" data-tab="tab-datos-musicales" data-tab-index="2">
-                    <i class="bi bi-music-note-beamed"></i> Datos musicales
+                <button type="button" class="tab-button" data-tab="tab-2xx" data-tab-index="2">
+                    <i class="bi bi-bookmark"></i> 2XX
                 </button>
-                <button type="button" class="tab-button" data-tab="tab-materias" data-tab-index="3">
-                    <i class="bi bi-tags"></i> Materias / serie
+                <button type="button" class="tab-button" data-tab="tab-3xx" data-tab-index="3">
+                    <i class="bi bi-file-text"></i> 3XX
                 </button>
-                <button type="button" class="tab-button" data-tab="tab-notas" data-tab-index="4">
-                    <i class="bi bi-journal-text"></i> Notas
+                <button type="button" class="tab-button" data-tab="tab-4xx" data-tab-index="4">
+                    <i class="bi bi-collection"></i> 4XX
                 </button>
-                <button type="button" class="tab-button" data-tab="tab-relaciones" data-tab-index="5">
-                    <i class="bi bi-diagram-3"></i> Relaciones
+                <button type="button" class="tab-button" data-tab="tab-5xx" data-tab-index="5">
+                    <i class="bi bi-journal"></i> 5XX
                 </button>
-                <button type="button" class="tab-button" data-tab="tab-existencias" data-tab-index="6">
-                    <i class="bi bi-sticky-fill"></i> Existencias
+                <button type="button" class="tab-button" data-tab="tab-6xx" data-tab-index="6">
+                    <i class="bi bi-tag"></i> 6XX
                 </button>
-                <button type="button" class="tab-button" data-tab="tab-admin" data-tab-index="7">
-                    <i class="bi bi-exclamation-circle"></i> Administración
+                <button type="button" class="tab-button" data-tab="tab-7xx" data-tab-index="7">
+                    <i class="bi bi-people"></i> 7XX
                 </button>
-                
+                <button type="button" class="tab-button" data-tab="tab-8xx" data-tab-index="8">
+                    <i class="bi bi-geo"></i> 8XX
+                </button>
             </div>
 
-            
+            <!-- Contenido de pestañas -->
             <div class="tabs-content">
-
-                <!-- 1️⃣ NOMBRES Y TÍTULOS -->
-                <div id="tab-personas" class="tab-content active">
-                    {% include 'catalogacion/secciones/personas_titulos.html' %}
+                <!-- Pestaña 0XX -->
+                <div id="tab-0xx" class="tab-content active">
+                    {% include 'catalogacion/bloques/bloque_0xx.html' %}
                     <div class="tab-navigation-buttons">
                         <div></div>
                         <button type="button" class="btn btn-primary" onclick="nextTab()">
@@ -136,9 +130,9 @@
                     </div>
                 </div>
 
-                <!-- 2️⃣ PRODUCCIÓN / EDICIÓN -->
-                <div id="tab-produccion" class="tab-content">
-                    {% include 'catalogacion/secciones/produccion_edicion.html' %}
+                <!-- Pestaña 1XX -->
+                <div id="tab-1xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_1xx.html' %}
                     <div class="tab-navigation-buttons">
                         <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
                             <i class="bi bi-arrow-left"></i> Anterior
@@ -149,9 +143,9 @@
                     </div>
                 </div>
 
-                <!-- 3️⃣ DATOS MUSICALES -->
-                <div id="tab-datos-musicales" class="tab-content">
-                    {% include 'catalogacion/secciones/datos_musicales.html' %}
+                <!-- Pestaña 2XX -->
+                <div id="tab-2xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_2xx.html' %}
                     <div class="tab-navigation-buttons">
                         <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
                             <i class="bi bi-arrow-left"></i> Anterior
@@ -162,9 +156,9 @@
                     </div>
                 </div>
 
-                <!-- 4️⃣ MATERIAS / SERIE -->
-                <div id="tab-materias" class="tab-content">
-                    {% include 'catalogacion/secciones/materias_serie.html' %}
+                <!-- Pestaña 3XX -->
+                <div id="tab-3xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_3xx.html' %}
                     <div class="tab-navigation-buttons">
                         <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
                             <i class="bi bi-arrow-left"></i> Anterior
@@ -175,9 +169,9 @@
                     </div>
                 </div>
 
-                <!-- 5️⃣ NOTAS -->
-                <div id="tab-notas" class="tab-content">
-                    {% include 'catalogacion/secciones/notas.html' %}
+                <!-- Pestaña 4XX -->
+                <div id="tab-4xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_4xx.html' %}
                     <div class="tab-navigation-buttons">
                         <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
                             <i class="bi bi-arrow-left"></i> Anterior
@@ -188,9 +182,9 @@
                     </div>
                 </div>
 
-                <!-- 6️⃣ RELACIONES (última pestaña) -->
-                <div id="tab-relaciones" class="tab-content">
-                    {% include 'catalogacion/secciones/relaciones.html' %}
+                <!-- Pestaña 5XX -->
+                <div id="tab-5xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_5xx.html' %}
                     <div class="tab-navigation-buttons">
                         <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
                             <i class="bi bi-arrow-left"></i> Anterior
@@ -200,8 +194,10 @@
                         </button>
                     </div>
                 </div>
-                <div id="tab-existencias" class="tab-content">
-                    {% include 'catalogacion/secciones/existencias.html' %}
+
+                <!-- Pestaña 6XX -->
+                <div id="tab-6xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_6xx.html' %}
                     <div class="tab-navigation-buttons">
                         <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
                             <i class="bi bi-arrow-left"></i> Anterior
@@ -211,8 +207,23 @@
                         </button>
                     </div>
                 </div>
-                <div id="tab-admin" class="tab-content">
-                    {% include 'catalogacion/secciones/administracion.html' %}
+
+                <!-- Pestaña 7XX -->
+                <div id="tab-7xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_7xx.html' %}
+                    <div class="tab-navigation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextTab()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 8XX (última) -->
+                <div id="tab-8xx" class="tab-content">
+                    {% include 'catalogacion/bloques/bloque_8xx.html' %}
                     <div class="tab-navigation-buttons">
                         <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
                             <i class="bi bi-arrow-left"></i> Anterior
@@ -222,34 +233,9 @@
                         </button>
                     </div>
                 </div>
-            </div> <!-- /tabs-content -->
+            </div>
         </form>
     </div>
-</div>
-
-<!-- ================= MODAL BUSCAR OBRA ($w 773/774/787) ================= -->
-<div class="modal fade" id="modalBuscarObra" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-search"></i> Buscar obra registrada
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body">
-        <input type="text"
-               id="buscarObraInput"
-               class="form-control mb-3"
-               placeholder="Buscar por número de control (001)">
-
-        <ul class="list-group" id="buscarObraResultados"></ul>
-      </div>
-
-    </div>
-  </div>
 </div>
 
 {% endblock catalogacion_content %}
@@ -259,31 +245,14 @@
 // Pasar tipo de obra al JavaScript
 window.TIPO_OBRA_ACTUAL = '{{ tipo_obra }}';
 
-// ==================== SISTEMA DE PESTAÑAS (NUEVA UI) ====================
-// Orden de secciones:
-// 0: Personas y títulos
-// 1: Producción / edición
-// 2: Datos musicales
-// 3: Materias / serie
-// 4: Notas
-// 5: Relaciones
-// 6: Existencias
-// 7: Administrativa
-const tabs = [
-    'tab-personas',
-    'tab-produccion',
-    'tab-datos-musicales',
-    'tab-materias',
-    'tab-notas',
-    'tab-relaciones',
-    'tab-existencias',
-    'tab-admin'
-];
+// Sistema de pestañas
+const tabs = ['tab-0xx', 'tab-1xx', 'tab-2xx', 'tab-3xx', 'tab-4xx', 'tab-5xx', 'tab-6xx', 'tab-7xx', 'tab-8xx'];
 let currentTabIndex = 0;
 
 // ============================================================================
 // SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
 // ============================================================================
+// Borrador a recuperar (si viene desde lista de borradores)
 // const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
 const BORRADOR_A_RECUPERAR = null; // Borradores deshabilitados
 </script>
@@ -304,8 +273,10 @@ const BORRADOR_A_RECUPERAR = null; // Borradores deshabilitados
 <script src="{% static 'catalogacion/js/form-validator.js' %}"></script>
 <!-- <script src="{% static 'catalogacion/js/subcampo-validators.js' %}"></script> -->
 
+
+
 <script>
-// ==================== FUNCIONES DE NAVEGACIÓN ENTRE PESTAÑAS ====================
+// Función para cambiar de pestaña
 function switchTab(index) {
     if (index < 0 || index >= tabs.length) return;
 
@@ -319,51 +290,36 @@ function switchTab(index) {
         btn.classList.remove('active');
     });
 
+    // Activar pestaña actual
     const tabId = tabs[index];
-    const tabElement = document.getElementById(tabId);
-    const btnElement = document.querySelector(`[data-tab="${tabId}"]`);
+    document.getElementById(tabId).classList.add('active');
+    document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
 
-    if (!tabElement || !btnElement) {
-        console.error('❌ No se encontró la pestaña o el botón para índice', index, tabId);
-        return;
-    }
-
-    // Activar pestaña y botón actual
-    tabElement.classList.add('active');
-    btnElement.classList.add('active');
-
+    // Actualizar índice
     currentTabIndex = index;
 
     // Actualizar barra de progreso
     const progress = ((index + 1) / tabs.length) * 100;
-    const progressBar = document.getElementById('progress-bar');
-    const currentStepSpan = document.getElementById('current-step');
-
-    if (progressBar) {
-        progressBar.style.width = progress + '%';
-    }
-    if (currentStepSpan) {
-        currentStepSpan.textContent = index + 1;
-    }
+    document.getElementById('progress-bar').style.width = progress + '%';
+    document.getElementById('current-step').textContent = index + 1;
 
     // Scroll al inicio
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// Navegación siguiente
 function nextTab() {
     switchTab(currentTabIndex + 1);
 }
 
+// Navegación anterior
 function prevTab() {
     switchTab(currentTabIndex - 1);
 }
 
-// ==================== INICIALIZACIÓN DOM ====================
+// Eventos de botones de pestañas
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ DOM cargado, inicializando formulario (UI V2)...');
-
-    // Asegurarse de que iniciamos en la primera pestaña
-    switchTab(0);
+    console.log('✅ DOM cargado, inicializando formulario...');
 
     // Activar Select2 en campos de autoridades
     if (typeof $.fn.select2 !== 'undefined') {
@@ -384,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ==================== VALIDACIÓN Y ENVÍO AJAX ====================
+    // Validación de formulario
     const form = document.getElementById('obra-form');
 
     if (!form) {
@@ -395,21 +351,21 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ Formulario encontrado, agregando listener de submit...');
 
     form.addEventListener('submit', function(e) {
-        // Prevenir el comportamiento por defecto SIEMPRE
+        // SIEMPRE prevenir el comportamiento por defecto
         e.preventDefault();
         e.stopPropagation();
 
         console.log('\n\n');
         console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥');
-        console.log('🚀 EVENTO SUBMIT CAPTURADO (UI V2)');
+        console.log('🚀 EVENTO SUBMIT CAPTURADO');
         console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥');
 
-        // LOG: mostrar datos antes de validar
+        // LOG: SIEMPRE mostrar datos antes de validar
         console.log('\n=== DATOS DEL FORMULARIO ===');
         const formData = new FormData(form);
         const entries = Array.from(formData.entries());
         console.log('📊 Total de campos:', entries.length);
-        console.log('\n📋 Lista completa de datos (solo no vacíos):');
+        console.log('\n📋 Lista completa de datos:');
         entries.forEach(([key, value]) => {
             if (value && value !== '') {
                 console.log(`  ✅ ${key}: "${value}"`);
@@ -426,7 +382,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Encontrar TODOS los campos inválidos
             const invalidFields = form.querySelectorAll(':invalid');
             console.log(`\n⚠️ Se encontraron ${invalidFields.length} campos inválidos:`);
-
             invalidFields.forEach((field, index) => {
                 console.log(`\n  ${index + 1}. Campo INVÁLIDO:`);
                 console.log(`     📝 Name: ${field.name || 'sin nombre'}`);
@@ -442,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (firstInvalid) {
                 tabs.forEach((tabId, index) => {
                     const tabContent = document.getElementById(tabId);
-                    if (tabContent && tabContent.contains(firstInvalid)) {
+                    if (tabContent.contains(firstInvalid)) {
                         console.log(`\n📍 Navegando a pestaña ${index}: ${tabId}`);
                         switchTab(index);
                         setTimeout(() => {
@@ -486,19 +441,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('\n🎉🎉🎉 ¡OBRA CREADA EXITOSAMENTE! 🎉🎉🎉');
                 console.log('   Redirigiendo a:', response.url);
 
+                // Mostrar alerta de éxito y redirigir
                 alert('✅ ¡Obra creada exitosamente!\n\nSerás redirigido a la página de detalle.');
                 window.location.href = response.url;
-                return;
+                return; // No procesar más
             }
 
             return response.text();
         })
         .then(html => {
+            // Si ya hubo redirección, no procesar
             if (!html) return;
 
             console.log('\n📄 HTML RECIBIDO (primeros 500 caracteres):');
             console.log(html.substring(0, 500));
 
+            // Buscar mensajes de error en el HTML
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const alerts = doc.querySelectorAll('.alert, .error, .invalid-feedback');
@@ -510,10 +468,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
 
+            // Si hay un redirect (obra creada exitosamente), ir allá
             const successMessage = doc.querySelector('.alert-success');
             if (successMessage) {
                 console.log('\n🎉 ¡ÉXITO! Obra creada correctamente');
                 console.log('   Mensaje:', successMessage.textContent.trim());
+                // Aquí podrías hacer window.location.href = ... si hay un redirect
             } else {
                 console.log('\n❌ La respuesta no contiene mensaje de éxito');
                 console.log('   Probablemente hay errores de validación en el backend');
@@ -526,11 +486,11 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('❌ Error de conexión: ' + error.message);
         })
         .finally(() => {
-            console.log('\n🔥🔥🔥 FIN DEL SUBMIT (UI V2) 🔥🔥🔥\n\n');
+            console.log('\n🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥\n\n');
         });
 
         form.classList.add('was-validated');
-    }, { capture: true });
+    }, { capture: true }); // Captura temprana del evento
 
     console.log('✅ Listener de submit agregado correctamente');
 
@@ -548,92 +508,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-</script>
-<script>
-(function () {
-
-    let targetTextInput = null;
-    let targetHiddenInput = null;
-
-    // Abrir modal al hacer click en 🔍
-    document.addEventListener("click", function (e) {
-        const btn = e.target.closest(".btn-buscar-obra");
-        if (!btn) return;
-
-        const group = btn.closest(".input-group");
-        if (!group) return;
-
-        targetTextInput = group.querySelector(".numero-w-input");
-        targetHiddenInput = group.querySelector(".obra-relacionada-id-input");
-
-        const modal = new bootstrap.Modal(
-            document.getElementById("modalBuscarObra")
-        );
-        modal.show();
-    });
-
-    // Buscar obras
-    const inputBuscar = document.getElementById("buscarObraInput");
-    const resultados = document.getElementById("buscarObraResultados");
-
-    if (!inputBuscar || !resultados) return;
-
-    inputBuscar.addEventListener("input", function () {
-        const q = this.value.trim();
-
-        if (q.length < 2) {
-            resultados.innerHTML = "";
-            return;
-        }
-
-        fetch(`/catalogacion/api/buscar-obras/?q=${encodeURIComponent(q)}`)
-            .then(r => r.json())
-            .then(data => {
-                resultados.innerHTML = "";
-
-                if (!data.results.length) {
-                    resultados.innerHTML = `
-                        <li class="list-group-item text-muted">
-                            Sin resultados
-                        </li>`;
-                    return;
-                }
-
-                data.results.forEach(o => {
-                    const li = document.createElement("li");
-                    li.className = "list-group-item list-group-item-action";
-                    li.innerHTML = `
-                        <div>
-                            <strong>${o.num_control}</strong>
-                            ${o.titulo ? `— ${o.titulo}` : ""}
-                        </div>
-                        ${o.compositor ? `
-                            <small class="text-muted">
-                                ${o.compositor}
-                            </small>
-                        ` : ""}
-                    `;
-
-
-                    li.addEventListener("click", () => {
-                        if (targetTextInput) {
-                            targetTextInput.value = o.num_control;
-                        }
-                        if (targetHiddenInput) {
-                            targetHiddenInput.value = o.id;
-                        }
-
-                        bootstrap.Modal
-                            .getInstance(document.getElementById("modalBuscarObra"))
-                            .hide();
-                    });
-
-                    resultados.appendChild(li);
-                });
-            });
-    });
-
-})();
 </script>
 
 {% endblock catalogacion_js %}

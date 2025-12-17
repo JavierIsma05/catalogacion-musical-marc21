@@ -9,10 +9,13 @@
 {% endblock %}
 
 {% block catalogacion_content %}
-<div class="detalle-container">
-    <!-- Header compacto con información principal -->
+
+<div class="detalle-container detalle-layout">
+
+    <!-- ================= ENCABEZADO ================= -->
     <div class="detalle-header">
         <div class="header-content">
+
             <div class="header-breadcrumb">
                 <a href="{% url 'usuarios:catalogador_dashboard' %}">Inicio</a>
                 <span class="separator">›</span>
@@ -20,676 +23,345 @@
                 <span class="separator">›</span>
                 <span class="current">{{ obra.titulo_principal|truncatewords:5 }}</span>
             </div>
-            
+
             <div class="header-main">
-                <div class="header-info">
-                    {% if obra.signatura_completa %}
-                    <div class="signatura-badge">
-                        <i class="bi bi-bookmark-fill"></i>
-                        <span>{{ obra.signatura_completa }}</span>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="obra-metadata">
-                        {% if obra.coleccion %}
-                        <div class="metadata-item">
-                            <span class="metadata-label">Colección (773):</span>
-                            <span class="metadata-value">{{ obra.coleccion.nombre_completo }}</span>
-                        </div>
-                        {% endif %}
-                        
-                        {% if obra.compositor %}
-                        <div class="metadata-item compositor">
-                            <span class="metadata-label">Compositor (100):</span>
-                            <span class="metadata-value">
-                                {{ obra.compositor.nombre_completo }}
-                                {% if obra.compositor.coordenadas_biograficas %}
-                                <span class="fechas">({{ obra.compositor.coordenadas_biograficas }})</span>
-                                {% endif %}
-                            </span>
-                        </div>
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Título Uniforme 130 - Solo para colecciones manuscritas sin título en fuente -->
-                    {% if obra.titulo_uniforme %}
-                    <h1 class="obra-titulo titulo-130">
-                        {{ obra.titulo_uniforme.nombre_completo }}{% if obra.medio_interpretacion_130 %}, {{ obra.medio_interpretacion_130 }}{% endif %}{% if obra.tonalidad_130 %}, {{ obra.tonalidad_130 }}{% endif %}
-                    </h1>
-                    <div class="titulo-referencia">(130)</div>
-                    {% endif %}
-                    
-                    <!-- Título Uniforme 240 -->
-                    {% if obra.titulo_240 %}
-                    <h1 class="obra-titulo titulo-240">
-                        {{ obra.titulo_240.nombre_completo }}{% if obra.medio_interpretacion_240 %}, {{ obra.medio_interpretacion_240 }}{% endif %}{% if obra.tonalidad_240 %}, {{ obra.tonalidad_240 }}{% endif %}
-                    </h1>
-                    <div class="titulo-referencia">(240)</div>
-                    {% endif %}
-                    
-                    <!-- Título en fuente 245 -->
-                    {% if not obra.titulo_uniforme or obra.titulo_240 %}
-                    <h2 class="obra-titulo-fuente">
-                        {{ obra.titulo_principal }}{% if obra.subtitulo %} : {{ obra.subtitulo }}{% endif %}
-                    </h2>
-                    <div class="titulo-referencia">(245)</div>
-                    {% endif %}
-                    
-                    {% if obra.mencion_responsabilidad %}
-                    <div class="mencion-responsabilidad">
-                        / {{ obra.mencion_responsabilidad }}
-                    </div>
-                    {% endif %}
-                    
-                    {% if obra.ms_imp %}
-                    <div class="tipo-material-badge">
-                        <span class="badge-label">Tipo de material (340):</span>
-                        <span class="badge-value">{{ obra.get_ms_imp_display }}</span>
-                    </div>
-                    {% endif %}
+                {% if obra.signatura_completa %}
+                <div class="signatura-badge">
+                    <i class="bi bi-bookmark-fill"></i>
+                    {{ obra.signatura_completa }}
                 </div>
-                
-                <div class="header-actions">
-                    <a href="{% url 'catalogacion:editar_obra' pk=obra.pk %}" class="btn-action">
-                        <i class="bi bi-pencil"></i>
-                        <span>Editar</span>
-                    </a>
-                </div>
+                {% endif %}
+
+                <a href="{% url 'catalogacion:editar_obra' pk=obra.pk %}" class="btn-action">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
             </div>
+
         </div>
     </div>
 
-    <!-- Contenido principal con navegación lateral -->
+    <!-- ================= BODY ================= -->
     <div class="detalle-body">
-        <!-- Sidebar de navegación -->
+
+        <!-- ========== SIDEBAR ========== -->
         <aside class="detalle-sidebar">
             <nav class="sidebar-nav">
-                <div class="nav-header">
-                    <h6>Contenido</h6>
-                </div>
+                <div class="nav-header"><h6>Contenido</h6></div>
                 <ul class="nav-list">
-                    <li><a href="#seccion-titulos" class="nav-link active">
-                        <i class="bi bi-music-note-beamed"></i>
-                        Títulos
-                    </a></li>
-                    <li><a href="#seccion-colaboradores" class="nav-link">
-                        <i class="bi bi-people"></i>
-                        Colaboradores
-                    </a></li>
-                    <li><a href="#seccion-produccion" class="nav-link">
-                        <i class="bi bi-building"></i>
-                        Producción
-                    </a></li>
-                    <li><a href="#seccion-fisica" class="nav-link">
-                        <i class="bi bi-book"></i>
-                        Descripción física
-                    </a></li>
-                    <li><a href="#seccion-identificadores" class="nav-link">
-                        <i class="bi bi-upc-scan"></i>
-                        Identificadores
-                    </a></li>
-                    <li><a href="#seccion-materias" class="nav-link">
-                        <i class="bi bi-tags"></i>
-                        Materias y géneros
-                    </a></li>
-                    <li><a href="#seccion-musical" class="nav-link">
-                        <i class="bi bi-music-note-list"></i>
-                        Datos musicales
-                    </a></li>
-                    <li><a href="#seccion-notas" class="nav-link">
-                        <i class="bi bi-journal-text"></i>
-                        Notas
-                    </a></li>
-                    <li><a href="#seccion-relaciones" class="nav-link">
-                        <i class="bi bi-diagram-3"></i>
-                        Relaciones
-                    </a></li>
-                    <li><a href="#seccion-ubicacion" class="nav-link">
-                        <i class="bi bi-geo-alt"></i>
-                        Ubicación
-                    </a></li>
+                    <li><a href="#nombres" class="nav-link">Nombres y Títulos</a></li>
+                    <li><a href="#produccion" class="nav-link">Producción / Edición</a></li>
+                    <li><a href="#musical" class="nav-link">Datos Musicales</a></li>
+                    <li><a href="#materias" class="nav-link">Materias y Serie</a></li>
+                    <li><a href="#notas" class="nav-link">Notas</a></li>
+                    <li><a href="#relaciones" class="nav-link">Relaciones</a></li>
+                    <li><a href="#existencias" class="nav-link">Existencias</a></li>
+                    <li><a href="#admin" class="nav-link">Administración</a></li>
                 </ul>
             </nav>
         </aside>
 
-        <!-- Contenido principal -->
+        <!-- ========== CONTENIDO ========== -->
         <main class="detalle-main">
-            
-            <!-- Títulos Alternativos -->
-            {% if obra.titulos_alternativos.all %}
-            <section id="seccion-titulos" class="detalle-section">
-                <div class="section-header">
-                    <h3 class="section-title">
-                        <i class="bi bi-music-note-beamed"></i>
-                        Títulos alternativos
-                    </h3>
+
+            <!-- ================= NOMBRES Y TÍTULOS ================= -->
+            <section id="nombres" class="detalle-section">
+                <h3>Nombres y Títulos</h3>
+
+                {% if obra.compositor %}
+                <div class="data-row"><span class="campo-tag">100</span>{{ obra.compositor }}</div>
+                {% endif %}
+
+                {% if obra.titulo_uniforme %}
+                <div class="data-row"><span class="campo-tag">130</span>{{ obra.titulo_uniforme }}</div>
+                {% endif %}
+
+                {% if obra.titulo_240 %}
+                <div class="data-row"><span class="campo-tag">240</span>{{ obra.titulo_240 }}</div>
+                {% endif %}
+
+                {% if obra.titulo_principal %}
+                <div class="data-row">
+                    <span class="campo-tag">245</span>
+                    {{ obra.titulo_principal }}{% if obra.subtitulo %} : {{ obra.subtitulo }}{% endif %}
                 </div>
-                
-                <div class="data-list">
-                    {% for titulo in obra.titulos_alternativos.all %}
-                    <div class="data-item-alt">
-                        <span class="campo-tag">246</span>
-                        <div class="data-content">
-                            {% if titulo.indicador_titulo %}
-                            <span class="indicador-tipo">{{ titulo.get_indicador_titulo_display }}:</span>
-                            {% endif %}
-                            <span class="valor-principal">{{ titulo.titulo_alternativo }}</span>
-                            {% if titulo.parte %}
-                            <span class="valor-secundario">: {{ titulo.parte }}</span>
+                {% endif %}
+
+                {% if obra.titulos_alternativos.exists %}
+                    {% for alt in obra.titulos_alternativos.all %}
+                        {% if alt.titulo %}
+                        <div class="data-row"><span class="campo-tag">246</span>{{ alt.titulo }}</div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if obra.nombres_relacionados_700.exists %}
+                    {% for n in obra.nombres_relacionados_700.all %}
+                        {% if n.persona %}
+                        <div class="data-row">
+                            <span class="campo-tag">700</span>
+                            {{ n.persona }}
+                            {% if n.funciones.exists %}
+                                — {{ n.funciones.first.get_funcion_display }}
                             {% endif %}
                         </div>
-                    </div>
+                        {% endif %}
                     {% endfor %}
-                </div>
-            </section>
-            {% endif %}
+                {% endif %}
 
-            <!-- Autores/Colaboradores -->
-            {% if obra.nombres_relacionados_700.all or obra.entidades_relacionadas_710.all %}
-            <section id="seccion-colaboradores" class="detalle-section">
-                <div class="section-header">
-                    <h3 class="section-title">
-                        <i class="bi bi-people"></i>
-                        Autores y colaboradores
-                    </h3>
-                </div>
-                
-                <div class="colaboradores-list">
-                    {% for nombre in obra.nombres_relacionados_700.all %}
-                    <div class="colaborador-item">
-                        <span class="campo-tag">700</span>
-                        <div class="colaborador-info">
-                            <div class="colaborador-nombre">{{ nombre.persona.nombre_completo }}</div>
-                            {% if nombre.coordenadas_biograficas %}
-                            <div class="colaborador-fechas">({{ nombre.coordenadas_biograficas }})</div>
-                            {% endif %}
-                            <div class="colaborador-detalles">
-                                {% if nombre.funciones.all %}
-                                <span class="detalle-item">
-                                    {% for funcion in nombre.funciones.all %}{{ funcion.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                                </span>
-                                {% endif %}
-                                {% if nombre.autoria %}
-                                <span class="detalle-item autoria">{{ nombre.get_autoria_display }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+                {% if obra.entidades_relacionadas_710.exists %}
+                    {% for e in obra.entidades_relacionadas_710.all %}
+                        {% if e.entidad %}
+                        <div class="data-row"><span class="campo-tag">710</span>{{ e.entidad }}</div>
+                        {% endif %}
                     {% endfor %}
-                    
-                    {% for entidad in obra.entidades_relacionadas_710.all %}
-                    <div class="colaborador-item entidad">
-                        <span class="campo-tag">710</span>
-                        <div class="colaborador-info">
-                            <div class="colaborador-nombre">
-                                <i class="bi bi-building"></i>
-                                {{ entidad.entidad.nombre_completo }}
-                            </div>
-                            {% if entidad.funciones.all %}
-                            <div class="colaborador-detalles">
-                                <span class="detalle-item">
-                                    {% for funcion in entidad.funciones.all %}{{ funcion.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                                </span>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </section>
-            {% endif %}
-
-            <!-- Producción y Edición -->
-            <section id="seccion-produccion" class="detalle-section">
-                <div class="section-header">
-                    <h3 class="section-title">
-                        <i class="bi bi-building"></i>
-                        Producción y edición
-                    </h3>
-                </div>
-                
-                <div class="data-grid-compact">
-                    {% if obra.producciones_publicacion.exists %}
-                    {% for prod in obra.producciones_publicacion.all %}
-                    <div class="data-row">
-                        <span class="campo-tag">264</span>
-                        <span class="data-label">Publicación:</span>
-                        <span class="data-value">
-                            {% if prod.lugar_produccion %}{{ prod.lugar_produccion }}{% endif %}{% if prod.editor %} : {{ prod.editor }}{% endif %}{% if prod.fecha_produccion %}, {{ prod.fecha_produccion }}{% endif %}
-                        </span>
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-                    
-                    {% if obra.ediciones.exists %}
-                    {% for edicion in obra.ediciones.all %}
-                    <div class="data-row">
-                        <span class="campo-tag">250</span>
-                        <span class="data-label">Edición:</span>
-                        <span class="data-value">{{ edicion.mencion_edicion }}</span>
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-                </div>
+                {% endif %}
             </section>
 
-            <!-- Descripción física -->
-            <section id="seccion-fisica" class="detalle-section">
-                <div class="section-header">
-                    <h3 class="section-title">
-                        <i class="bi bi-book"></i>
-                        Descripción física
-                    </h3>
-                </div>
-                
-                <div class="data-row-fisica">
+            <!-- ================= PRODUCCIÓN / EDICIÓN ================= -->
+            <section id="produccion" class="detalle-section">
+                <h3>Producción / Edición</h3>
+
+                {% if obra.ms_imp %}
+                <div class="data-row"><span class="campo-tag">340</span>{{ obra.get_ms_imp_display }}</div>
+                {% endif %}
+
+                {% if obra.producciones_publicaciones.exists %}
+                    {% for prod in obra.producciones_publicaciones.all %}
+                    <div class="data-row"><span class="campo-tag">264</span>{{ prod.get_funcion_display }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if obra.ediciones.exists %}
+                    {% for ed in obra.ediciones.all %}
+                    <div class="data-row"><span class="campo-tag">250</span>{{ ed.edicion }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if obra.extension or obra.dimension %}
+                <div class="data-row">
                     <span class="campo-tag">300</span>
-                    <div class="descripcion-fisica">
-                        {% if obra.extension %}
-                        <span class="fisica-parte">{{ obra.extension }}</span>
-                        {% endif %}
-                        {% if obra.otras_caracteristicas %}
-                        <span class="fisica-separador">:</span>
-                        <span class="fisica-parte">{{ obra.otras_caracteristicas }}</span>
-                        {% endif %}
-                        {% if obra.dimension %}
-                        <span class="fisica-separador">;</span>
-                        <span class="fisica-parte">{{ obra.dimension }}</span>
-                        {% endif %}
-                        {% if obra.material_acompanante %}
-                        <span class="fisica-separador">+</span>
-                        <span class="fisica-parte">{{ obra.material_acompanante }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-            </section>
-
-            <!-- Identificadores -->
-            {% if obra.isbn or obra.ismn or obra.numero_editor %}
-            <section id="seccion-identificadores" class="detalle-section">
-                <div class="section-header">
-                    <h3 class="section-title">
-                        <i class="bi bi-upc-scan"></i>
-                        Identificadores
-                    </h3>
-                </div>
-                
-                <div class="data-grid-compact">
-                    {% if obra.isbn %}
-                    <div class="data-row">
-                        <span class="campo-tag">020</span>
-                        <span class="data-label">ISBN:</span>
-                        <span class="data-value codigo">{{ obra.isbn }}</span>
-                    </div>
-                    {% endif %}
-                    
-                    {% if obra.ismn %}
-                    <div class="data-row">
-                        <span class="campo-tag">024</span>
-                        <span class="data-label">ISMN:</span>
-                        <span class="data-value codigo">{{ obra.ismn }}</span>
-                    </div>
-                    {% endif %}
-                    
-                    {% if obra.numero_editor %}
-                    <div class="data-row">
-                        <span class="campo-tag">028</span>
-                        <span class="data-label">Número de editor:</span>
-                        <span class="data-value codigo">{{ obra.numero_editor }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-            </section>
-            {% endif %}
-
-            <!-- Materias y géneros -->
-            <section id="seccion-materias" class="detalle-section">
-                <div class="section-header">
-                    <h3 class="section-title">
-                        <i class="bi bi-tags"></i>
-                        Materias y géneros
-                    </h3>
-                </div>
-                
-                {% if obra.materias_650.all or obra.materias_655.all %}
-                <div class="materias-container">
-                    {% for materia in obra.materias_650.all %}
-                    <div class="materia-tag tag-650">
-                        <span class="campo-tag">650</span>
-                        <span class="materia-texto">
-                            {{ materia.materia }}{% if materia.subdivisiones.all %} -- {{ materia.subdivisiones.all.0.subdivision }}{% endif %}
-                        </span>
-                    </div>
-                    {% endfor %}
-                    
-                    {% for materia in obra.materias_655.all %}
-                    <div class="materia-tag tag-655">
-                        <span class="campo-tag">655</span>
-                        <span class="materia-texto">
-                            {{ materia.materia }}{% if materia.subdivisiones.all %} -- {{ materia.subdivisiones.all.0.subdivision }}{% endif %}
-                        </span>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="empty-state">
-                    <i class="bi bi-tag"></i>
-                    <p>No hay materias o géneros registrados</p>
-                </div>
-                {% endif %}
-                
-                {% if obra.series_490.all %}
-                <div class="series-section">
-                    <h4 class="subsection-title">Series</h4>
-                    {% for serie in obra.series_490.all %}
-                    <div class="data-row">
-                        <span class="campo-tag">490</span>
-                        <span class="data-value">
-                            {{ serie.titulo_serie }}{% if serie.numero_serie %} ; {{ serie.numero_serie }}{% endif %}
-                        </span>
-                    </div>
-                    {% endfor %}
+                    {{ obra.extension }}{% if obra.dimension %} ; {{ obra.dimension }}{% endif %}
                 </div>
                 {% endif %}
             </section>
 
-            <!-- Datos musicales -->
-            <section id="seccion-musical" class="detalle-section">
-                <div class="section-header">
-                    <h3 class="section-title">
-                        <i class="bi bi-music-note-list"></i>
-                        Datos musicales
-                    </h3>
+            <!-- ================= DATOS MUSICALES ================= -->
+            <section id="musical" class="detalle-section">
+                <h3>Datos Musicales</h3>
+
+                {% if obra.formato %}
+                <div class="data-row"><span class="campo-tag">348</span>{{ obra.get_formato_display }}</div>
+                {% endif %}
+
+                {% if obra.medios_interpretacion_382.exists %}
+                    {% for m in obra.medios_interpretacion_382.all %}
+                    <div class="data-row"><span class="campo-tag">382</span>{{ m }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if obra.numero_obra or obra.opus %}
+                <div class="data-row">
+                    <span class="campo-tag">383</span>
+                    {{ obra.numero_obra }}{% if obra.opus %} Op. {{ obra.opus }}{% endif %}
                 </div>
-                
-                <div class="data-grid-compact">
-                    {% if obra.formato %}
-                    <div class="data-row">
-                        <span class="campo-tag">348</span>
-                        <span class="data-label">Formato de presentación:</span>
-                        <span class="data-value">{{ obra.get_formato_display }}</span>
-                    </div>
+                {% endif %}
+
+                {% if obra.tonalidad_384 %}
+                <div class="data-row"><span class="campo-tag">384</span>{{ obra.tonalidad_384 }}</div>
+                {% endif %}
+            </section>
+
+            <!-- ================= MATERIAS Y SERIE ================= -->
+            <section id="materias" class="detalle-section">
+                <h3>Materias y Serie</h3>
+
+                {% if obra.materias_650.exists %}
+                    {% for m in obra.materias_650.all %}
+                    <div class="data-row"><span class="campo-tag">650</span>{{ m.materia }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if obra.materias_655.exists %}
+                    {% for g in obra.materias_655.all %}
+                    <div class="data-row"><span class="campo-tag">655</span>{{ g.materia }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                {# 440 – Series (cuando esté modelado) #}
+            </section>
+
+            <!-- ================= NOTAS ================= -->
+            <section id="notas" class="detalle-section">
+                <h3>Notas</h3>
+
+                {% for n in obra.notas_generales_500.all %}
+                    {% if n.nota_general %}
+                    <div class="data-row"><span class="campo-tag">500</span>{{ n.nota_general }}</div>
                     {% endif %}
-                    
-                    {% if obra.medios_interpretacion.exists %}
-                    <div class="data-row full">
-                        <span class="campo-tag">382</span>
-                        <span class="data-label">Medio de interpretación:</span>
-                        <div class="data-value-list">
-                            {% for medio in obra.medios_interpretacion.all %}
-                            <span class="medio-item">
-                                {{ medio.medio }}{% if medio.solista %} (solista: {{ medio.solista }}){% endif %}{% if not forloop.last %},{% endif %}
-                            </span>
+                {% endfor %}
+
+                {% for c in obra.contenidos_505.all %}
+                    {% if c.contenido %}
+                    <div class="data-row"><span class="campo-tag">505</span>{{ c.contenido }}</div>
+                    {% endif %}
+                {% endfor %}
+
+                {% for s in obra.sumarios_520.all %}
+                    {% if s.sumario %}
+                    <div class="data-row"><span class="campo-tag">510</span>{{ s.sumario }}</div>
+                    {% endif %}
+                {% endfor %}
+
+                {% if obra.datos_biograficos_545 %}
+                <div class="data-row"><span class="campo-tag">545</span>{{ obra.datos_biograficos_545.texto_biografico }}</div>
+                {% endif %}
+            </section>
+
+            <!-- ================= RELACIONES ================= -->
+            <section id="relaciones" class="detalle-section">
+                <h3>Relaciones</h3>
+
+                {# ================= 773 ================= #}
+                {% for r in obra.enlaces_documento_fuente_773.all %}
+                <div class="data-row">
+                    <span class="campo-tag">773</span>
+                    <span>
+                        {% if r.encabezamiento_principal %}
+                            {{ r.encabezamiento_principal }}.
+                        {% endif %}
+                        {% if r.titulo %}
+                            <em>{{ r.titulo }}</em>
+                        {% endif %}
+
+                        {% for w in r.numeros_control.all %}
+                            ({{ w.obra_relacionada.num_control }})
+                        {% endfor %}
+                    </span>
+                </div>
+                {% empty %}
+                <p class="text-muted">No hay relaciones 773 registradas.</p>
+                {% endfor %}
+
+                {# ================= 774 ================= #}
+                {% for r in obra.enlaces_unidades_774.all %}
+                <div class="data-row">
+                    <span class="campo-tag">774</span>
+                    <span>
+                        {% if r.encabezamiento_principal %}
+                            {{ r.encabezamiento_principal }}.
+                        {% endif %}
+                        {% if r.titulo %}
+                            <em>{{ r.titulo }}</em>
+                        {% endif %}
+
+                        {% for w in r.numeros_control.all %}
+                            ({{ w.obra_relacionada.num_control }})
+                        {% endfor %}
+                    </span>
+                </div>
+                {% empty %}
+                <p class="text-muted">No hay relaciones 774 registradas.</p>
+                {% endfor %}
+
+                {# ================= 787 ================= #}
+                {% for r in obra.otras_relaciones_787.all %}
+                <div class="data-row">
+                    <span class="campo-tag">787</span>
+                    <span>
+                        {% if r.encabezamiento_principal %}
+                            {{ r.encabezamiento_principal }}.
+                        {% endif %}
+                        {% if r.titulo %}
+                            <em>{{ r.titulo }}</em>
+                        {% endif %}
+
+                        {% for w in r.numeros_control.all %}
+                            ({{ w.obra_relacionada.num_control }})
+                        {% endfor %}
+                    </span>
+                </div>
+                {% empty %}
+                <p class="text-muted">No hay relaciones 787 registradas.</p>
+                {% endfor %}
+            </section>
+
+
+            <!-- ================= EXISTENCIAS ================= -->
+            <section id="existencias" class="detalle-section">
+                <h3>Existencias</h3>
+
+
+                    {# 852 #}
+                    {% for u in obra.ubicaciones_852.all %}
+                        {% if u.signatura_original %}
+                        <div class="data-row">
+                            <span class="campo-tag">852</span>
+                            {{ u.signatura_original }}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    {# 856 #}
+
+                    {% for d in obra.disponibles_856.all %}
+                        <div>
+                            <strong>856</strong><br>
+
+                            {% for u in d.urls_856.all %}
+                                $u <a href="{{ u.url }}">{{ u.url }}</a><br>
+                            {% endfor %}
+
+                            {% for y in d.textos_enlace_856.all %}
+                                $y {{ y.texto_enlace }}<br>
                             {% endfor %}
                         </div>
-                    </div>
-                    {% endif %}
-                    
-                    {% if obra.numero_obra or obra.opus %}
-                    <div class="data-row">
-                        <span class="campo-tag">383</span>
-                        <span class="data-label">Designación numérica:</span>
-                        <span class="data-value">
-                            {% if obra.numero_obra %}{{ obra.numero_obra }}{% endif %}{% if obra.opus %} / Op. {{ obra.opus }}{% endif %}
-                        </span>
-                    </div>
-                    {% endif %}
-                    
-                    {% if obra.tonalidad_384 %}
-                    <div class="data-row">
-                        <span class="campo-tag">384</span>
-                        <span class="data-label">Tonalidad:</span>
-                        <span class="data-value">{{ obra.tonalidad_384 }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                {% if obra.incipits_musicales.all %}
-                <div class="incipit-section">
-                    <h4 class="subsection-title">Íncipit musical</h4>
-                    {% for incipit in obra.incipits_musicales.all %}
-                    <div class="incipit-card">
-                        <div class="incipit-header">
-                            <span class="campo-tag">031</span>
-                            <div class="incipit-id">
-                                {% if incipit.numero_orden or incipit.numero_movimiento or incipit.numero_parte %}
-                                {{ incipit.numero_orden|default:"" }}{% if incipit.numero_movimiento %}.{{ incipit.numero_movimiento }}{% endif %}{% if incipit.numero_parte %}.{{ incipit.numero_parte }}{% endif %}
-                                {% endif %}
-                                {% if incipit.titulo_movimiento %}
-                                ; {{ incipit.titulo_movimiento }}
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="incipit-datos">
-                            {% if incipit.tonalidad %}
-                            <span class="incipit-dato">{{ incipit.tonalidad }}</span>
-                            {% endif %}
-                            {% if incipit.compas %}
-                            <span class="incipit-separador">;</span>
-                            <span class="incipit-dato">{{ incipit.compas }}</span>
-                            {% endif %}
-                        </div>
-                        {% if incipit.codigo_notacion %}
-                        <div class="incipit-codigo">
-                            <code>{{ incipit.codigo_notacion }}</code>
-                        </div>
-                        {% endif %}
-                    </div>
+                    {% empty %}
+                        <p>No existen recursos electrónicos disponibles.</p>
                     {% endfor %}
-                </div>
+
+
+
+            <!-- ================= ADMINISTRACIÓN ================= -->
+            <section id="admin" class="detalle-section">
+                <h3>Administración</h3>
+
+                {% if obra.centro_catalogador %}
+                <div class="data-row"><span class="campo-tag">040</span>{{ obra.centro_catalogador }}</div>
                 {% endif %}
             </section>
 
-            <!-- Notas -->
-            <section id="seccion-notas" class="detalle-section">
-                <div class="section-header">
-                    <h3 class="section-title">
-                        <i class="bi bi-journal-text"></i>
-                        Notas
-                    </h3>
-                </div>
-                
-                {% if obra.notas_generales_500.all or obra.contenidos_505.all or obra.sumarios_520.all or obra.datos_biograficos_545 %}
-                <div class="notas-list">
-                    {% for nota in obra.notas_generales_500.all %}
-                    <div class="nota-item">
-                        <span class="campo-tag">500</span>
-                        <p class="nota-texto">{{ nota.nota_general }}</p>
-                    </div>
-                    {% endfor %}
-                    
-                    {% for contenido in obra.contenidos_505.all %}
-                    <div class="nota-item">
-                        <span class="campo-tag">505</span>
-                        <p class="nota-texto">{{ contenido.contenido }}</p>
-                    </div>
-                    {% endfor %}
-                    
-                    {% for sumario in obra.sumarios_520.all %}
-                    <div class="nota-item">
-                        <span class="campo-tag">520</span>
-                        <p class="nota-texto">{{ sumario.sumario }}</p>
-                    </div>
-                    {% endfor %}
-                    
-                    {% with datos=obra.datos_biograficos_545 %}
-                    {% if datos and datos.texto_biografico %}
-                    <div class="nota-item">
-                        <span class="campo-tag">545</span>
-                        <div class="nota-content">
-                            <p class="nota-texto">{{ datos.texto_biografico }}</p>
-                            {% if datos.uri %}
-                            <a href="{{ datos.uri }}" class="nota-link" target="_blank">
-                                <i class="bi bi-link-45deg"></i>
-                                Ver más información
-                            </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endif %}
-                    {% endwith %}
-                </div>
-                {% else %}
-                <div class="empty-state">
-                    <i class="bi bi-journal"></i>
-                    <p>No hay notas registradas</p>
-                </div>
-                {% endif %}
-            </section>
-
-            <!-- Relaciones -->
-            {% if obra.enlaces_documento_fuente_773.all or obra.enlaces_unidades_774.all or obra.otras_relaciones_787.all %}
-            <section id="seccion-relaciones" class="detalle-section">
-                <div class="section-header">
-                    <h3 class="section-title">
-                        <i class="bi bi-diagram-3"></i>
-                        Obras relacionadas
-                    </h3>
-                </div>
-                
-                <div class="relaciones-list">
-                    {% for relacion in obra.enlaces_documento_fuente_773.all %}
-                    <div class="relacion-item">
-                        <span class="campo-tag">773</span>
-                        <div class="relacion-content">
-                            <span class="relacion-tipo">Documento fuente:</span>
-                            <span class="relacion-titulo">{{ relacion.titulo }}</span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    
-                    {% for relacion in obra.enlaces_unidades_774.all %}
-                    <div class="relacion-item">
-                        <span class="campo-tag">774</span>
-                        <div class="relacion-content">
-                            <span class="relacion-tipo">Unidad constituyente:</span>
-                            <span class="relacion-titulo">{{ relacion.titulo }}</span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    
-                    {% for relacion in obra.otras_relaciones_787.all %}
-                    <div class="relacion-item">
-                        <span class="campo-tag">787</span>
-                        <div class="relacion-content">
-                            <span class="relacion-tipo">Otra relación:</span>
-                            <span class="relacion-titulo">{{ relacion.titulo }}</span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </section>
-            {% endif %}
-
-            <!-- Ubicación y acceso -->
-            <section id="seccion-ubicacion" class="detalle-section">
-                <div class="section-header">
-                    <h3 class="section-title">
-                        <i class="bi bi-geo-alt"></i>
-                        Ubicación y acceso
-                    </h3>
-                </div>
-                
-                {% if obra.ubicaciones_852.all %}
-                <div class="ubicaciones-list">
-                    {% for ubicacion in obra.ubicaciones_852.all %}
-                    <div class="ubicacion-item">
-                        <span class="campo-tag">852</span>
-                        <div class="ubicacion-datos">
-                            {% if ubicacion.codigo_o_nombre  %}
-                            {# <span class="ubicacion-parte">{{ ubicacion.codigo_o_nombre .nombre_completo }}</span> #}
-                            {% endif %}
-                            {% if ubicacion.signatura_original %}
-                            <span class="ubicacion-separador">.</span>
-                            <span class="ubicacion-parte">{{ ubicacion.signatura_original }}</span>
-                            {% endif %}
-                            {% if ubicacion.estanterias.all %}
-                            <span class="ubicacion-separador">.</span>
-                            <span class="ubicacion-parte">
-                                {% for estanteria in ubicacion.estanterias.all %}{{ estanteria.estanteria }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                            </span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                
-                {% if obra.disponibles_856.all %}
-                <div class="acceso-section">
-                    <h4 class="subsection-title">Disponible en línea</h4>
-                    {% for disponible in obra.disponibles_856.all %}
-                    {% for url in disponible.urls_856.all %}
-                    <div class="acceso-item">
-                        <span class="campo-tag">856</span>
-                        <a href="{{ url.url }}" class="acceso-link" target="_blank">
-                            <span class="acceso-texto">
-                                {% if disponible.textos_enlace_856.all %}
-                                {{ disponible.textos_enlace_856.first.texto_enlace }}
-                                {% else %}
-                                {{ url.url }}
-                                {% endif %}
-                            </span>
-                            <i class="bi bi-box-arrow-up-right"></i>
-                        </a>
-                    </div>
-                    {% endfor %}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </section>
         </main>
     </div>
 </div>
 
+<!-- ================= JS ================= -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const navLinks = document.querySelectorAll('.nav-link');
+document.addEventListener('DOMContentLoaded', () => {
+    const links = document.querySelectorAll('.nav-link');
     const sections = document.querySelectorAll('.detalle-section');
-    
-    // Smooth scroll
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+    if (!links.length || !sections.length) return;
+
+    links.forEach(link => {
+        link.addEventListener('click', e => {
             e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-            
-            if (targetSection) {
-                const offset = 80;
-                const targetPosition = targetSection.offsetTop - offset;
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-                
-                navLinks.forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-            }
+            const target = document.querySelector(link.getAttribute('href'));
+            if (!target) return;
+            window.scrollTo({ top: target.offsetTop - 90, behavior: 'smooth' });
         });
     });
-    
-    // Intersection Observer
-    const observerOptions = {
-        root: null,
-        rootMargin: '-80px 0px -50% 0px',
-        threshold: 0
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
+
+    const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                const id = entry.target.getAttribute('id');
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${id}`) {
-                        link.classList.add('active');
-                    }
-                });
+                links.forEach(l =>
+                    l.classList.toggle('active', l.getAttribute('href') === `#${entry.target.id}`)
+                );
             }
         });
-    }, observerOptions);
-    
-    sections.forEach(section => observer.observe(section));
+    }, { rootMargin: '-40% 0px -40% 0px' });
+
+    sections.forEach(s => observer.observe(s));
 });
 </script>
-{% endblock catalogacion_content %}
+
+{% endblock %}
