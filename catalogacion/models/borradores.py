@@ -17,6 +17,18 @@ class BorradorObra(models.Model):
         max_length=50,
         help_text="Tipo de obra MARC21: manuscrito, impreso, coleccion, etc."
     )
+
+    obra_objetivo = models.ForeignKey(
+        'ObraGeneral',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='borradores_edicion',
+        help_text=(
+            "Si se está editando una obra existente, referencia la obra objetivo. "
+            "Si es un borrador de creación, queda vacío."
+        ),
+    )
     
     datos_formulario = models.JSONField(
         help_text="Datos del formulario serializados en JSON"
@@ -84,6 +96,7 @@ class BorradorObra(models.Model):
             models.Index(fields=['tipo_obra']),
             models.Index(fields=['tipo_registro']),
             models.Index(fields=['estado']),
+            models.Index(fields=['obra_objetivo']),
         ]
     
     def __str__(self):
@@ -97,16 +110,30 @@ class BorradorObra(models.Model):
             datos = self.datos_formulario
             if isinstance(datos, str):
                 datos = json.loads(datos)
+
+            # Soportar el formato actual del borrador-system.js
+            # datos = { _campos_simples: {...}, _formsets: {...}, _subcampos_dinamicos: {...} }
+            if isinstance(datos, dict) and '_campos_simples' in datos and isinstance(datos.get('_campos_simples'), dict):
+                campos = datos.get('_campos_simples', {})
+            else:
+                campos = datos if isinstance(datos, dict) else {}
             
             # Extraer título del campo 245$a (titulo_principal)
-            self.titulo_temporal = datos.get('titulo_principal', '')[:500] or "Sin título"
+            titulo = campos.get('titulo_principal', '')
+            if isinstance(titulo, list):
+                titulo = titulo[0] if titulo else ''
+            self.titulo_temporal = (titulo or "Sin título")[:500]
             
             # Extraer tipo de registro y nivel bibliográfico
-            self.tipo_registro = datos.get('tipo_registro', '')
-            self.nivel_bibliografico = datos.get('nivel_bibliografico', '')
+            self.tipo_registro = campos.get('tipo_registro', '') or ''
+            self.nivel_bibliografico = campos.get('nivel_bibliografico', '') or ''
             
             # Extraer número de control si existe
-            self.num_control_temporal = datos.get('num_control', '')
+            self.num_control_temporal = (
+                campos.get('num_control')
+                or campos.get('numero_control')
+                or ''
+            )
             
         except Exception as e:
             self.titulo_temporal = "Sin título"

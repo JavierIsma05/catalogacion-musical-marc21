@@ -17,12 +17,27 @@
 
     const form = document.getElementById("obra-form");
 
+    // Si no hay formulario, no inicializar nada (evita errores en otras páginas)
+    if (!form) {
+        return;
+    }
+
     const API_URLS = {
-        guardar: "/api/borradores/guardar/",
-        autoguardar: "/api/borradores/autoguardar/",
-        obtener: (id) => `/api/borradores/${id}/`,
-        eliminar: (id) => `/api/borradores/${id}/eliminar/`,
+        guardar: "/catalogacion/api/borradores/guardar/",
+        autoguardar: "/catalogacion/api/borradores/autoguardar/",
+        obtener: (id) => `/catalogacion/api/borradores/${id}/`,
+        obtenerUltimoPorObra: (obraId) =>
+            `/catalogacion/api/borradores/obra/${obraId}/ultimo/`,
+        eliminar: (id) => `/catalogacion/api/borradores/${id}/eliminar/`,
     };
+
+    function getObraObjetivoId() {
+        // Detectar modo edición por URL: /catalogacion/obras/<pk>/editar/
+        const match = window.location.pathname.match(
+            /\/obras\/(\d+)\/editar\/?$/
+        );
+        return match ? parseInt(match[1], 10) : null;
+    }
 
     /**
      * Obtiene el CSRF token
@@ -196,9 +211,10 @@
         try {
             const datos = serializeFormData();
             const tipoObra = getTipoObra();
+            const obraObjetivoId = getObraObjetivoId();
 
-            // No guardar si el tipo de obra no está determinado aún
-            if (!tipoObra || tipoObra === "desconocido") {
+            // En edición permitimos guardar aunque el tipo de obra aún no esté listo.
+            if (!obraObjetivoId && (!tipoObra || tipoObra === "desconocido")) {
                 if (!esAutoguardado) {
                     console.warn(
                         "No se puede guardar: tipo de obra no determinado"
@@ -215,6 +231,10 @@
                 datos_formulario: datos,
                 pestana_actual: pestanaActual,
             };
+
+            if (obraObjetivoId) {
+                payload.obra_objetivo_id = obraObjetivoId;
+            }
 
             if (borradorId) {
                 payload.borrador_id = borradorId;
@@ -273,11 +293,16 @@
             if (result.success) {
                 const borrador = result.borrador;
 
-                // VALIDACIÓN: Verificar que el tipo de obra coincida
+                const obraObjetivoId = getObraObjetivoId();
+
+                // VALIDACIÓN: Verificar que el tipo de obra coincida (solo en creación)
                 const tipoObraActual = getTipoObra();
 
-                // Si aún no se ha determinado el tipo de obra, esperar
-                if (!tipoObraActual || tipoObraActual === "desconocido") {
+                // Si aún no se ha determinado el tipo de obra, esperar (solo creación)
+                if (
+                    !obraObjetivoId &&
+                    (!tipoObraActual || tipoObraActual === "desconocido")
+                ) {
                     console.warn(
                         "Tipo de obra aún no determinado, reintentando..."
                     );
@@ -286,7 +311,7 @@
                     return;
                 }
 
-                if (borrador.tipo_obra !== tipoObraActual) {
+                if (!obraObjetivoId && borrador.tipo_obra !== tipoObraActual) {
                     console.error(
                         `ERROR: Tipo de obra no coincide. Borrador: ${borrador.tipo_obra}, Actual: ${tipoObraActual}`
                     );
@@ -327,7 +352,7 @@
                 // Limpiar la variable de sesión para evitar recargas automáticas
                 if (typeof BORRADOR_A_RECUPERAR !== "undefined") {
                     // Hacer una petición para limpiar la sesión
-                    fetch("/api/borradores/limpiar-sesion/", {
+                    fetch("/catalogacion/api/borradores/limpiar-sesion/", {
                         method: "POST",
                         headers: {
                             "X-CSRFToken": getCsrfToken(),
@@ -852,8 +877,6 @@
      * Inicialización
      */
     function init() {
-        if (!form) return;
-
         // Esperar a que los campos tipo_registro y nivel_bibliografico estén disponibles
         const esperarFormularioListo = () => {
             const tipoRegistro = document.getElementById("id_tipo_registro");
@@ -861,8 +884,11 @@
                 "id_nivel_bibliografico"
             );
 
-            if (!tipoRegistro || !nivelBibliografico) {
-                // Reintentar después de 100ms
+            const obraObjetivoId = getObraObjetivoId();
+
+            // En creación, esperamos a tipo_registro/nivel_bibliografico para poder identificar tipo_obra.
+            // En edición, podemos continuar aunque aún no estén listos.
+            if (!obraObjetivoId && (!tipoRegistro || !nivelBibliografico)) {
                 setTimeout(esperarFormularioListo, 100);
                 return;
             }
@@ -875,6 +901,32 @@
             ) {
                 // Esperar un poco más para asegurar que todo está cargado
                 setTimeout(() => cargarBorrador(BORRADOR_A_RECUPERAR), 300);
+            }
+
+            // En edición: si existe un borrador activo ligado a esta obra, cargarlo automáticamente
+            if (obraObjetivoId) {
+                fetch(API_URLS.obtenerUltimoPorObra(obraObjetivoId))
+                    .then((r) => r.json())
+                    .then((res) => {
+                        if (
+                            res &&
+                            res.success &&
+                            res.tiene_borrador &&
+                            res.borrador &&
+                            res.borrador.id
+                        ) {
+                            setTimeout(
+                                () => cargarBorrador(res.borrador.id),
+                                300
+                            );
+                        }
+                    })
+                    .catch((err) =>
+                        console.error(
+                            "Error consultando borrador de edición:",
+                            err
+                        )
+                    );
             }
 
             iniciarAutoguardado();

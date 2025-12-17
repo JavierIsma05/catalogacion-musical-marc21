@@ -31,18 +31,22 @@ def guardar_borrador_ajax(request):
         datos_formulario = data.get('datos_formulario')
         pestana_actual = data.get('pestana_actual', 0)
         borrador_id = data.get('borrador_id')
+        obra_objetivo_id = data.get('obra_objetivo_id')
         
-        if not tipo_obra or not datos_formulario:
+        if not datos_formulario or (not tipo_obra and not obra_objetivo_id):
             return JsonResponse({
                 'success': False,
-                'error': 'Faltan datos requeridos (tipo_obra y datos_formulario)'
+                'error': 'Faltan datos requeridos (datos_formulario y tipo_obra u obra_objetivo_id)'
             }, status=400)
         
         # Actualizar o crear borrador
         if borrador_id:
             try:
                 borrador = BorradorObra.objects.get(id=borrador_id)
-                borrador.tipo_obra = tipo_obra
+                if tipo_obra:
+                    borrador.tipo_obra = tipo_obra
+                if obra_objetivo_id:
+                    borrador.obra_objetivo_id = obra_objetivo_id
                 borrador.datos_formulario = datos_formulario
                 borrador.pestana_actual = pestana_actual
                 borrador.save()
@@ -55,7 +59,8 @@ def guardar_borrador_ajax(request):
         else:
             # Crear nuevo borrador
             borrador = BorradorObra.objects.create(
-                tipo_obra=tipo_obra,
+                tipo_obra=tipo_obra or 'edicion',
+                obra_objetivo_id=obra_objetivo_id,
                 datos_formulario=datos_formulario,
                 pestana_actual=pestana_actual
             )
@@ -180,6 +185,39 @@ def verificar_borrador_ajax(request):
         }, status=500)
 
 
+@require_http_methods(["GET"])
+def obtener_ultimo_borrador_obra_ajax(request, obra_id):
+    """Obtiene el último borrador activo asociado a una obra existente (edición)."""
+    try:
+        borrador = (
+            BorradorObra.objects.filter(
+                obra_objetivo_id=obra_id,
+                estado='activo',
+            )
+            .order_by('-fecha_modificacion')
+            .first()
+        )
+
+        if not borrador:
+            return JsonResponse({'success': True, 'tiene_borrador': False})
+
+        return JsonResponse({
+            'success': True,
+            'tiene_borrador': True,
+            'borrador': {
+                'id': borrador.id,
+                'tipo_obra': borrador.tipo_obra,
+                'datos_formulario': borrador.datos_formulario,
+                'pestana_actual': borrador.pestana_actual,
+                'titulo_temporal': borrador.titulo_temporal,
+                'fecha_modificacion': borrador.fecha_modificacion.isoformat(),
+                'fecha_creacion': borrador.fecha_creacion.isoformat(),
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
 @require_http_methods(["DELETE", "POST"])
 def eliminar_borrador_ajax(request, borrador_id):
     """
@@ -283,6 +321,7 @@ def autoguardar_borrador_ajax(request):
         tipo_obra = data.get('tipo_obra')
         datos_formulario = data.get('datos_formulario')
         pestana_actual = data.get('pestana_actual', 0)
+        obra_objetivo_id = data.get('obra_objetivo_id')
         
         if not datos_formulario:
             return JsonResponse({
@@ -298,6 +337,8 @@ def autoguardar_borrador_ajax(request):
                 borrador.pestana_actual = pestana_actual
                 if tipo_obra:
                     borrador.tipo_obra = tipo_obra
+                if obra_objetivo_id:
+                    borrador.obra_objetivo_id = obra_objetivo_id
                 borrador.save()
                 
                 return JsonResponse({
@@ -311,14 +352,15 @@ def autoguardar_borrador_ajax(request):
                 pass
         
         # Si no hay borrador_id o no existe, crear nuevo
-        if not tipo_obra:
+        if not tipo_obra and not obra_objetivo_id:
             return JsonResponse({
                 'success': False,
-                'error': 'Se requiere tipo_obra para crear nuevo borrador'
+                'error': 'Se requiere tipo_obra u obra_objetivo_id para crear nuevo borrador'
             }, status=400)
         
         borrador = BorradorObra.objects.create(
-            tipo_obra=tipo_obra,
+            tipo_obra=tipo_obra or 'edicion',
+            obra_objetivo_id=obra_objetivo_id,
             datos_formulario=datos_formulario,
             pestana_actual=pestana_actual
         )

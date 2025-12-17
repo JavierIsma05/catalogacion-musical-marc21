@@ -123,6 +123,9 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
         context['tipo_obra_titulo'] = self.config_obra['titulo']
         context['tipo_obra_descripcion'] = self.config_obra['descripcion']
 
+        # Borradores: si se viene de "recuperar borrador", se guarda en sesión
+        context['borrador_id_recuperar'] = self.request.session.get('borrador_id')
+
         campos_config = get_campos_visibles(self.tipo_obra)
         context['campos_visibles'] = campos_config['campos_simples']
         context['formsets_visibles'] = campos_config['formsets_visibles']
