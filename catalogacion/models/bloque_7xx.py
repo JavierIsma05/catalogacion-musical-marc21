@@ -155,7 +155,6 @@ class Funcion700(models.Model):
         max_length=30,
         choices=FUNCIONES_PERSONA,
         help_text="700 $e – Función (R)"
-       
     )
 
     class Meta:
