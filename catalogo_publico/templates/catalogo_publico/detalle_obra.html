@@ -13,7 +13,6 @@
   font-weight: normal;
   font-style: normal;
 }
-
 .incipit-canvas-wrap{
   width: 100%;
   display: flex;
@@ -28,8 +27,6 @@
   display: block;
   background: #ffffffdc;
 }
-
-
 </style>
 {% endblock %}
 
@@ -50,7 +47,7 @@
             </li>
             <li class="breadcrumb-item">
                 <a href="{% url 'catalogo_publico:detalle' obra.pk %}">
-
+                    
                     {{ obra.signatura_publica_display }}
                 </a>
             </li>
@@ -144,7 +141,7 @@
 
                 {% if obra.nombres_relacionados_700.exists or obra.entidades_relacionadas_710.exists %}
                 <div class="detalle-subheader">Colaboradores</div>
-
+                
                 {% for nombre in obra.nombres_relacionados_700.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Nombre</span>
@@ -214,6 +211,9 @@
                     </span>
                 </div>
 
+                <div class="detalle-field detalle-field-incipit">
+
+
                 <section class="obra-info-card obra-incipit-card">
                         <p class="obra-card-label">Íncipit musical</p>
                         <div class="obra-card-body">
@@ -244,7 +244,12 @@
                                 {% endif %}
                             {% endwith %}
                         </div>
-                    </section>
+                </section>
+
+
+                </div>
+            </div>
+        </section>
 
         <!-- Columna 1: Producción/edición -->
         <section class="detalle-section">
@@ -431,7 +436,7 @@
             <section class="pdf-viewer-section">
                 <div class="pdf-viewer-header">
                     <h3 class="pdf-viewer-title">
-                        <i class="bi bi-file-pdf"></i>
+                        <i class="bi bi-file-pdf"></i> 
                         {% for texto in disponible.textos_enlace_856.all %}
                             {{ texto.texto_enlace }}
                         {% empty %}
@@ -448,8 +453,8 @@
                     </div>
                 </div>
                 <div class="pdf-viewer-container">
-                    <iframe
-                        src="{{ url.url }}"
+                    <iframe 
+                        src="{{ url.url }}" 
                         class="pdf-viewer-frame"
                         title="Visor de documento PDF"
                         loading="lazy">
@@ -476,7 +481,6 @@
     {% endfor %}
 </div>
 
-<!-- Motor del canvas -->
 <script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>
 <script src="{% static 'catalogacion/js/incipitInit.js' %}"></script>
 {% endblock %}
