@@ -3,7 +3,7 @@ var positionNoteSelected = null;
 var CanvasIncipit = new CanvasClass(); //Define the object Canvas
 
 // Detector de navegador mejorado (InstallTrigger es obsoleto)
-var isFirefox = navigator.userAgent.indexOf('Firefox') > -1; // Firefox
+var isFirefox = navigator.userAgent.indexOf("Firefox") > -1; // Firefox
 var isChrome = false;
 // Chrome 1 - 71
 // please note,
@@ -116,7 +116,7 @@ function IncipitClass() {
       { xPosition: 50, yPosition: 20 }, //antes 22
       { xPosition: 60, yPosition: -3 }, //antes -2
       { xPosition: 70, yPosition: 29 }, //antes 30
-      { xPosition: 80, yPosition: 6 },  //antes 6
+      { xPosition: 80, yPosition: 6 }, //antes 6
       { xPosition: 90, yPosition: 38 }, //antes 38
       { xPosition: 100, yPosition: 13 }, //antes 14
       { xPosition: 110, yPosition: 45 } //antes 45
@@ -176,6 +176,7 @@ function IncipitClass() {
         xPosition: 35
       }
     ];
+
 
     context.Time = [
       {
@@ -322,17 +323,17 @@ function IncipitClass() {
       {
         name: "restLon",
         value: '"',
-        font: 38,
+        font: 46,
         isRest: true,
-        yPosition: 8,
+        yPosition: 7.5,
         paec: "0-"
       },
       {
         name: "restBrev",
         value: "#",
-        font: 38,
+        font: 46,
         isRest: true,
-        yPosition: 8,
+        yPosition: 7.5,
         paec: "9-"
       },
       {
@@ -343,37 +344,37 @@ function IncipitClass() {
         yPosition: 8,
         paec: "4-"
       },
-      {
+      {//6 Silencio corchea
         name: "restQuaver",
         value: "'",
-        font: 38,
+        font: 55,
         isRest: true,
-        yPosition: 8,
+        yPosition: 6.8,
         paec: "8-"
       },
 
-      {
+      {//7 Silencio semicorchea
         name: "restSemiqua",
         value: "(",
-        font: 38,
+        font: 55,
         isRest: true,
-        yPosition: 8,
+        yPosition: 4.8,
         paec: "6-"
       },
-      {
+      { //8 Silencio fusa
         name: "restDemsemqu",
         value: ")",
-        font: 38,
+        font: 55,
         isRest: true,
-        yPosition: 8,
+        yPosition: 6.8,
         paec: "3-"
       },
-      {
+      { //9 Silencio semifusa
         name: "restHemdemsemqu",
         value: "*",
-        font: 38,
+        font: 55,
         isRest: true,
-        yPosition: 8,
+        yPosition: 6.8,
         paec: "5-"
       }
     ];
@@ -610,12 +611,9 @@ function CanvasClass() {
   };
 
   this.setDrawPosition = function (context, index, showNote) {
-
     if (!showNote && index > context.drawXPosition.length - 1)
       context.drawXPosition.push(0);
-      const elem = context.drawIncipitElements[index];
-    if (!elem) return; // ✅ evita undefined.isClef en modo list
-    if (!showNote && elem.isClef) return;
+    if (!showNote && context.drawIncipitElements[index].isClef) return;
 
     var lastElement = context.drawIncipitElements[index - 1];
     var sumAlt = 0;
@@ -765,7 +763,7 @@ function CanvasClass() {
     } else {
       cursor.x = null;
     }
-    context.drawPentagram(context);
+
     context.showNote(context, cursor);
   };
   /*ENDREGION*/
@@ -1594,8 +1592,8 @@ function CanvasClass() {
 
     // 3ª línea auxiliar (más alejada)
     if (
-      (upOrDown === -1 && yPosition <= -1) || // arriba
-      (upOrDown === 1 && yPosition >= 19) // abajo
+      (upOrDown === -1 && yPosition <= 0) || // arriba
+      (upOrDown === 1 && yPosition >= 18) // abajo
     ) {
       pixelsToAdd = context.stepY * 2 * 5 * upOrDown + context.stepY / 2;
       context.gDrawingContext.moveTo(
@@ -1611,15 +1609,6 @@ function CanvasClass() {
 
   //Main function that draw incipit
   this.drawPentagram = function (context) {
-    // ✅ evita que scale/translate acumulen y maten el dibujo
-    context.gDrawingContext.setTransform(1, 0, 0, 1, 0, 0);
-    context.gDrawingContext.clearRect(
-      0,
-      0,
-      context.gCanvasElement.width,
-      context.gCanvasElement.height
-    );
-
     var drawingProblemYPatchAmountFix = 0; //solves Drawing problem (Chrome and Firefox)
     //Incipit.gDrawingContext.clearRect(0, 0, Incipit.gCanvasElement.width, Incipit.gCanvasElement.height);
     //Dibujo rayas pentagrama
@@ -1854,9 +1843,9 @@ function CanvasClass() {
       );
     }
 
-    // if (context.operation == "list") {
-    //   context.gDrawingContext.scale(0.5, 0.5);
-    // }
+    if (context.operation == "list") {
+      context.gDrawingContext.scale(0.5, 0.5);
+    }
 
     context.gDrawingContext.stroke();
   };
