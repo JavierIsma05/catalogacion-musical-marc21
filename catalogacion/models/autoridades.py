@@ -19,6 +19,7 @@ class AutoridadPersona(models.Model):
     coordenadas_biograficas = models.CharField(
         max_length=50,
         blank=True,
+        null=True,
         help_text="Coordenadas biográficas: año nacimiento - año muerte"
     )
     fecha_creacion = models.DateTimeField(auto_now_add=True)

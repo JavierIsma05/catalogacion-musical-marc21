@@ -23,20 +23,18 @@
                 </div>
 
                 <!-- Indicador circular (opcional, sigue comentado) -->
-                
+
                 <div class="progress-circle-container">
                     <div class="progress-circle">
                         <svg width="80" height="80">
                             <circle class="bg-circle" cx="40" cy="40" r="36"></circle>
-                            <circle class="progress-circle-bar" cx="40" cy="40" r="36"
-                                    id="progress-circle"
-                                    stroke-dasharray="226.19"
-                                    stroke-dashoffset="226.19"></circle>
+                            <circle class="progress-circle-bar" cx="40" cy="40" r="36" id="progress-circle"
+                                stroke-dasharray="226.19" stroke-dashoffset="226.19"></circle>
                         </svg>
                         <div class="progress-text" id="progress-percent">0%</div>
                     </div>
                 </div>
-                
+
 
                 <!-- Estadísticas -->
                 <div class="progress-stats">
@@ -68,8 +66,10 @@
             {% csrf_token %}
 
             <!-- Campos ocultos -->
-            <input type="hidden" name="tipo_registro" value="{{ form.tipo_registro.value|default:'' }}" id="id_tipo_registro">
-            <input type="hidden" name="nivel_bibliografico" value="{{ form.nivel_bibliografico.value|default:'' }}" id="id_nivel_bibliografico">
+            <input type="hidden" name="tipo_registro" value="{{ form.tipo_registro.value|default:'' }}"
+                id="id_tipo_registro">
+            <input type="hidden" name="nivel_bibliografico" value="{{ form.nivel_bibliografico.value|default:'' }}"
+                id="id_nivel_bibliografico">
 
             <!-- Header del formulario -->
             <div class="card mb-3">
@@ -119,10 +119,10 @@
                 <button type="button" class="tab-button" data-tab="tab-admin" data-tab-index="7">
                     <i class="bi bi-exclamation-circle"></i> Administración
                 </button>
-                
+
             </div>
 
-            
+
             <div class="tabs-content">
 
                 <!-- 1️⃣ NOMBRES Y TÍTULOS -->
@@ -229,63 +229,61 @@
 
 <!-- ================= MODAL BUSCAR OBRA ($w 773/774/787) ================= -->
 <div class="modal fade" id="modalBuscarObra" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
 
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-search"></i> Buscar obra registrada
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-search"></i> Buscar obra registrada
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
 
-      <div class="modal-body">
-        <input type="text"
-               id="buscarObraInput"
-               class="form-control mb-3"
-               placeholder="Buscar por número de control (001)">
+            <div class="modal-body">
+                <input type="text" id="buscarObraInput" class="form-control mb-3"
+                    placeholder="Buscar por número de control (001)">
 
-        <ul class="list-group" id="buscarObraResultados"></ul>
-      </div>
+                <ul class="list-group" id="buscarObraResultados"></ul>
+            </div>
 
+        </div>
     </div>
-  </div>
 </div>
 
 {% endblock catalogacion_content %}
 
 {% block catalogacion_js %}
 <script>
-// Pasar tipo de obra al JavaScript
-window.TIPO_OBRA_ACTUAL = '{{ tipo_obra }}';
+    // Pasar tipo de obra al JavaScript
+    window.TIPO_OBRA_ACTUAL = '{{ tipo_obra }}';
 
-// ==================== SISTEMA DE PESTAÑAS (NUEVA UI) ====================
-// Orden de secciones:
-// 0: Personas y títulos
-// 1: Producción / edición
-// 2: Datos musicales
-// 3: Materias / serie
-// 4: Notas
-// 5: Relaciones
-// 6: Existencias
-// 7: Administrativa
-const tabs = [
-    'tab-personas',
-    'tab-produccion',
-    'tab-datos-musicales',
-    'tab-materias',
-    'tab-notas',
-    'tab-relaciones',
-    'tab-existencias',
-    'tab-admin'
-];
-let currentTabIndex = 0;
+    // ==================== SISTEMA DE PESTAÑAS (NUEVA UI) ====================
+    // Orden de secciones:
+    // 0: Personas y títulos
+    // 1: Producción / edición
+    // 2: Datos musicales
+    // 3: Materias / serie
+    // 4: Notas
+    // 5: Relaciones
+    // 6: Existencias
+    // 7: Administrativa
+    const tabs = [
+        'tab-personas',
+        'tab-produccion',
+        'tab-datos-musicales',
+        'tab-materias',
+        'tab-notas',
+        'tab-relaciones',
+        'tab-existencias',
+        'tab-admin'
+    ];
+    let currentTabIndex = 0;
 
-// ============================================================================
-// SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
-// ============================================================================
-// const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
-const BORRADOR_A_RECUPERAR = null; // Borradores deshabilitados
+    // ============================================================================
+    // SISTEMA DE BORRADORES DESHABILITADO TEMPORALMENTE
+    // ============================================================================
+    // const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
+    const BORRADOR_A_RECUPERAR = null; // Borradores deshabilitados
 </script>
 
 <script src="{% static 'catalogacion/js/autocomplete-core.js' %}"></script>
@@ -305,304 +303,304 @@ const BORRADOR_A_RECUPERAR = null; // Borradores deshabilitados
 <!-- <script src="{% static 'catalogacion/js/subcampo-validators.js' %}"></script> -->
 
 <script>
-// ==================== FUNCIONES DE NAVEGACIÓN ENTRE PESTAÑAS ====================
-function switchTab(index) {
-    if (index < 0 || index >= tabs.length) return;
+    // ==================== FUNCIONES DE NAVEGACIÓN ENTRE PESTAÑAS ====================
+    function switchTab(index) {
+        if (index < 0 || index >= tabs.length) return;
 
-    // Ocultar todas las pestañas
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-    });
-
-    // Desactivar todos los botones
-    document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    const tabId = tabs[index];
-    const tabElement = document.getElementById(tabId);
-    const btnElement = document.querySelector(`[data-tab="${tabId}"]`);
-
-    if (!tabElement || !btnElement) {
-        console.error('❌ No se encontró la pestaña o el botón para índice', index, tabId);
-        return;
-    }
-
-    // Activar pestaña y botón actual
-    tabElement.classList.add('active');
-    btnElement.classList.add('active');
-
-    currentTabIndex = index;
-
-    // Actualizar barra de progreso
-    const progress = ((index + 1) / tabs.length) * 100;
-    const progressBar = document.getElementById('progress-bar');
-    const currentStepSpan = document.getElementById('current-step');
-
-    if (progressBar) {
-        progressBar.style.width = progress + '%';
-    }
-    if (currentStepSpan) {
-        currentStepSpan.textContent = index + 1;
-    }
-
-    // Scroll al inicio
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function nextTab() {
-    switchTab(currentTabIndex + 1);
-}
-
-function prevTab() {
-    switchTab(currentTabIndex - 1);
-}
-
-// ==================== INICIALIZACIÓN DOM ====================
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ DOM cargado, inicializando formulario (UI V2)...');
-
-    // Asegurarse de que iniciamos en la primera pestaña
-    switchTab(0);
-
-    // Activar Select2 en campos de autoridades
-    if (typeof $.fn.select2 !== 'undefined') {
-        $('.select2').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            placeholder: function() {
-                return $(this).data('placeholder');
-            },
-            allowClear: true
-        });
-    }
-
-    // Click en botones de pestañas
-    document.querySelectorAll('.tab-button').forEach((button, index) => {
-        button.addEventListener('click', () => {
-            switchTab(index);
-        });
-    });
-
-    // ==================== VALIDACIÓN Y ENVÍO AJAX ====================
-    const form = document.getElementById('obra-form');
-
-    if (!form) {
-        console.error('❌ ERROR: No se encontró el formulario #obra-form');
-        return;
-    }
-
-    console.log('✅ Formulario encontrado, agregando listener de submit...');
-
-    form.addEventListener('submit', function(e) {
-        // Prevenir el comportamiento por defecto SIEMPRE
-        e.preventDefault();
-        e.stopPropagation();
-
-        console.log('\n\n');
-        console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥');
-        console.log('🚀 EVENTO SUBMIT CAPTURADO (UI V2)');
-        console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥');
-
-        // LOG: mostrar datos antes de validar
-        console.log('\n=== DATOS DEL FORMULARIO ===');
-        const formData = new FormData(form);
-        const entries = Array.from(formData.entries());
-        console.log('📊 Total de campos:', entries.length);
-        console.log('\n📋 Lista completa de datos (solo no vacíos):');
-        entries.forEach(([key, value]) => {
-            if (value && value !== '') {
-                console.log(`  ✅ ${key}: "${value}"`);
-            }
+        // Ocultar todas las pestañas
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
         });
 
-        // Verificar validación HTML5
-        const isValid = form.checkValidity();
-        console.log('\n🔍 Validación HTML5:', isValid ? '✅ VÁLIDO' : '❌ INVÁLIDO');
+        // Desactivar todos los botones
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
 
-        if (!isValid) {
-            console.log('\n❌❌❌ FORMULARIO BLOQUEADO - Validación HTML5 falló ❌❌❌');
+        const tabId = tabs[index];
+        const tabElement = document.getElementById(tabId);
+        const btnElement = document.querySelector(`[data-tab="${tabId}"]`);
 
-            // Encontrar TODOS los campos inválidos
-            const invalidFields = form.querySelectorAll(':invalid');
-            console.log(`\n⚠️ Se encontraron ${invalidFields.length} campos inválidos:`);
-
-            invalidFields.forEach((field, index) => {
-                console.log(`\n  ${index + 1}. Campo INVÁLIDO:`);
-                console.log(`     📝 Name: ${field.name || 'sin nombre'}`);
-                console.log(`     🆔 ID: ${field.id || 'sin id'}`);
-                console.log(`     📌 Tipo: ${field.type}`);
-                console.log(`     💾 Valor: "${field.value}"`);
-                console.log(`     ⚡ Required: ${field.required}`);
-                console.log(`     💬 Mensaje: ${field.validationMessage}`);
-            });
-
-            // Navegar al primer campo inválido
-            const firstInvalid = invalidFields[0];
-            if (firstInvalid) {
-                tabs.forEach((tabId, index) => {
-                    const tabContent = document.getElementById(tabId);
-                    if (tabContent && tabContent.contains(firstInvalid)) {
-                        console.log(`\n📍 Navegando a pestaña ${index}: ${tabId}`);
-                        switchTab(index);
-                        setTimeout(() => {
-                            firstInvalid.focus();
-                            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }, 300);
-                    }
-                });
-            }
-
-            alert('⚠️ Por favor complete todos los campos obligatorios antes de enviar.');
-            console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥\n\n');
+        if (!tabElement || !btnElement) {
+            console.error('❌ No se encontró la pestaña o el botón para índice', index, tabId);
             return;
         }
 
-        // Si llegamos aquí, el formulario es válido según HTML5
-        console.log('\n✅✅✅ FORMULARIO VÁLIDO - Enviando al servidor vía AJAX ✅✅✅');
+        // Activar pestaña y botón actual
+        tabElement.classList.add('active');
+        btnElement.classList.add('active');
 
-        // Enviar por AJAX para no recargar la página
-        console.log('\n🌐 Enviando petición AJAX...');
-        console.log('   URL:', form.action);
-        console.log('   Método: POST');
+        currentTabIndex = index;
 
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-            }
-        })
-        .then(response => {
-            console.log('\n📡 RESPUESTA RECIBIDA DEL SERVIDOR');
-            console.log('   Status:', response.status);
-            console.log('   Status Text:', response.statusText);
-            console.log('   OK:', response.ok);
-            console.log('   URL final:', response.url);
-            console.log('   Redirected:', response.redirected);
+        // Actualizar barra de progreso
+        const progress = ((index + 1) / tabs.length) * 100;
+        const progressBar = document.getElementById('progress-bar');
+        const currentStepSpan = document.getElementById('current-step');
 
-            // Si hubo redirección, la obra se creó exitosamente
-            if (response.redirected) {
-                console.log('\n🎉🎉🎉 ¡OBRA CREADA EXITOSAMENTE! 🎉🎉🎉');
-                console.log('   Redirigiendo a:', response.url);
+        if (progressBar) {
+            progressBar.style.width = progress + '%';
+        }
+        if (currentStepSpan) {
+            currentStepSpan.textContent = index + 1;
+        }
 
-                alert('✅ ¡Obra creada exitosamente!\n\nSerás redirigido a la página de detalle.');
-                window.location.href = response.url;
+        // Scroll al inicio
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextTab() {
+        switchTab(currentTabIndex + 1);
+    }
+
+    function prevTab() {
+        switchTab(currentTabIndex - 1);
+    }
+
+    // ==================== INICIALIZACIÓN DOM ====================
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('✅ DOM cargado, inicializando formulario (UI V2)...');
+
+        // Asegurarse de que iniciamos en la primera pestaña
+        switchTab(0);
+
+        // Activar Select2 en campos de autoridades
+        if (typeof $.fn.select2 !== 'undefined') {
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: function () {
+                    return $(this).data('placeholder');
+                },
+                allowClear: true
+            });
+        }
+
+        // Click en botones de pestañas
+        document.querySelectorAll('.tab-button').forEach((button, index) => {
+            button.addEventListener('click', () => {
+                switchTab(index);
+            });
+        });
+
+        // ==================== VALIDACIÓN Y ENVÍO AJAX ====================
+        const form = document.getElementById('obra-form');
+
+        if (!form) {
+            console.error('❌ ERROR: No se encontró el formulario #obra-form');
+            return;
+        }
+
+        console.log('✅ Formulario encontrado, agregando listener de submit...');
+
+        form.addEventListener('submit', function (e) {
+            // Prevenir el comportamiento por defecto SIEMPRE
+            e.preventDefault();
+            e.stopPropagation();
+
+            console.log('\n\n');
+            console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥');
+            console.log('🚀 EVENTO SUBMIT CAPTURADO (UI V2)');
+            console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥');
+
+            // LOG: mostrar datos antes de validar
+            console.log('\n=== DATOS DEL FORMULARIO ===');
+            const formData = new FormData(form);
+            const entries = Array.from(formData.entries());
+            console.log('📊 Total de campos:', entries.length);
+            console.log('\n📋 Lista completa de datos (solo no vacíos):');
+            entries.forEach(([key, value]) => {
+                if (value && value !== '') {
+                    console.log(`  ✅ ${key}: "${value}"`);
+                }
+            });
+
+            // Verificar validación HTML5
+            const isValid = form.checkValidity();
+            console.log('\n🔍 Validación HTML5:', isValid ? '✅ VÁLIDO' : '❌ INVÁLIDO');
+
+            if (!isValid) {
+                console.log('\n❌❌❌ FORMULARIO BLOQUEADO - Validación HTML5 falló ❌❌❌');
+
+                // Encontrar TODOS los campos inválidos
+                const invalidFields = form.querySelectorAll(':invalid');
+                console.log(`\n⚠️ Se encontraron ${invalidFields.length} campos inválidos:`);
+
+                invalidFields.forEach((field, index) => {
+                    console.log(`\n  ${index + 1}. Campo INVÁLIDO:`);
+                    console.log(`     📝 Name: ${field.name || 'sin nombre'}`);
+                    console.log(`     🆔 ID: ${field.id || 'sin id'}`);
+                    console.log(`     📌 Tipo: ${field.type}`);
+                    console.log(`     💾 Valor: "${field.value}"`);
+                    console.log(`     ⚡ Required: ${field.required}`);
+                    console.log(`     💬 Mensaje: ${field.validationMessage}`);
+                });
+
+                // Navegar al primer campo inválido
+                const firstInvalid = invalidFields[0];
+                if (firstInvalid) {
+                    tabs.forEach((tabId, index) => {
+                        const tabContent = document.getElementById(tabId);
+                        if (tabContent && tabContent.contains(firstInvalid)) {
+                            console.log(`\n📍 Navegando a pestaña ${index}: ${tabId}`);
+                            switchTab(index);
+                            setTimeout(() => {
+                                firstInvalid.focus();
+                                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 300);
+                        }
+                    });
+                }
+
+                alert('⚠️ Por favor complete todos los campos obligatorios antes de enviar.');
+                console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥\n\n');
                 return;
             }
 
-            return response.text();
-        })
-        .then(html => {
-            if (!html) return;
+            // Si llegamos aquí, el formulario es válido según HTML5
+            console.log('\n✅✅✅ FORMULARIO VÁLIDO - Enviando al servidor vía AJAX ✅✅✅');
 
-            console.log('\n📄 HTML RECIBIDO (primeros 500 caracteres):');
-            console.log(html.substring(0, 500));
+            // Enviar por AJAX para no recargar la página
+            console.log('\n🌐 Enviando petición AJAX...');
+            console.log('   URL:', form.action);
+            console.log('   Método: POST');
 
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const alerts = doc.querySelectorAll('.alert, .error, .invalid-feedback');
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+                .then(response => {
+                    console.log('\n📡 RESPUESTA RECIBIDA DEL SERVIDOR');
+                    console.log('   Status:', response.status);
+                    console.log('   Status Text:', response.statusText);
+                    console.log('   OK:', response.ok);
+                    console.log('   URL final:', response.url);
+                    console.log('   Redirected:', response.redirected);
 
-            if (alerts.length > 0) {
-                console.log('\n⚠️ MENSAJES/ERRORES ENCONTRADOS EN LA RESPUESTA:');
-                alerts.forEach((alert, i) => {
-                    console.log(`  ${i + 1}. ${alert.textContent.trim()}`);
+                    // Si hubo redirección, la obra se creó exitosamente
+                    if (response.redirected) {
+                        console.log('\n🎉🎉🎉 ¡OBRA CREADA EXITOSAMENTE! 🎉🎉🎉');
+                        console.log('   Redirigiendo a:', response.url);
+
+                        alert('✅ ¡Obra creada exitosamente!\n\nSerás redirigido a la página de detalle.');
+                        window.location.href = response.url;
+                        return;
+                    }
+
+                    return response.text();
+                })
+                .then(html => {
+                    if (!html) return;
+
+                    console.log('\n📄 HTML RECIBIDO (primeros 500 caracteres):');
+                    console.log(html.substring(0, 500));
+
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const alerts = doc.querySelectorAll('.alert, .error, .invalid-feedback');
+
+                    if (alerts.length > 0) {
+                        console.log('\n⚠️ MENSAJES/ERRORES ENCONTRADOS EN LA RESPUESTA:');
+                        alerts.forEach((alert, i) => {
+                            console.log(`  ${i + 1}. ${alert.textContent.trim()}`);
+                        });
+                    }
+
+                    const successMessage = doc.querySelector('.alert-success');
+                    if (successMessage) {
+                        console.log('\n🎉 ¡ÉXITO! Obra creada correctamente');
+                        console.log('   Mensaje:', successMessage.textContent.trim());
+                    } else {
+                        console.log('\n❌ La respuesta no contiene mensaje de éxito');
+                        console.log('   Probablemente hay errores de validación en el backend');
+                        alert('❌ Error al guardar. Revisa la consola para más detalles.');
+                    }
+                })
+                .catch(error => {
+                    console.error('\n🔴 ERROR EN LA PETICIÓN AJAX:');
+                    console.error(error);
+                    alert('❌ Error de conexión: ' + error.message);
+                })
+                .finally(() => {
+                    console.log('\n🔥🔥🔥 FIN DEL SUBMIT (UI V2) 🔥🔥🔥\n\n');
                 });
-            }
 
-            const successMessage = doc.querySelector('.alert-success');
-            if (successMessage) {
-                console.log('\n🎉 ¡ÉXITO! Obra creada correctamente');
-                console.log('   Mensaje:', successMessage.textContent.trim());
-            } else {
-                console.log('\n❌ La respuesta no contiene mensaje de éxito');
-                console.log('   Probablemente hay errores de validación en el backend');
-                alert('❌ Error al guardar. Revisa la consola para más detalles.');
+            form.classList.add('was-validated');
+        }, { capture: true });
+
+        console.log('✅ Listener de submit agregado correctamente');
+
+        // Atajos de teclado
+        document.addEventListener('keydown', function (e) {
+            // Alt + Flecha Derecha = Siguiente
+            if (e.altKey && e.key === 'ArrowRight') {
+                e.preventDefault();
+                nextTab();
             }
-        })
-        .catch(error => {
-            console.error('\n🔴 ERROR EN LA PETICIÓN AJAX:');
-            console.error(error);
-            alert('❌ Error de conexión: ' + error.message);
-        })
-        .finally(() => {
-            console.log('\n🔥🔥🔥 FIN DEL SUBMIT (UI V2) 🔥🔥🔥\n\n');
+            // Alt + Flecha Izquierda = Anterior
+            if (e.altKey && e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevTab();
+            }
         });
-
-        form.classList.add('was-validated');
-    }, { capture: true });
-
-    console.log('✅ Listener de submit agregado correctamente');
-
-    // Atajos de teclado
-    document.addEventListener('keydown', function(e) {
-        // Alt + Flecha Derecha = Siguiente
-        if (e.altKey && e.key === 'ArrowRight') {
-            e.preventDefault();
-            nextTab();
-        }
-        // Alt + Flecha Izquierda = Anterior
-        if (e.altKey && e.key === 'ArrowLeft') {
-            e.preventDefault();
-            prevTab();
-        }
     });
-});
 </script>
 <script>
-(function () {
+    (function () {
 
-    let targetTextInput = null;
-    let targetHiddenInput = null;
+        let targetTextInput = null;
+        let targetHiddenInput = null;
 
-    // Abrir modal al hacer click en 🔍
-    document.addEventListener("click", function (e) {
-        const btn = e.target.closest(".btn-buscar-obra");
-        if (!btn) return;
+        // Abrir modal al hacer click en 🔍
+        document.addEventListener("click", function (e) {
+            const btn = e.target.closest(".btn-buscar-obra");
+            if (!btn) return;
 
-        const group = btn.closest(".input-group");
-        if (!group) return;
+            const group = btn.closest(".input-group");
+            if (!group) return;
 
-        targetTextInput = group.querySelector(".numero-w-input");
-        targetHiddenInput = group.querySelector(".obra-relacionada-id-input");
+            targetTextInput = group.querySelector(".numero-w-input");
+            targetHiddenInput = group.querySelector(".obra-relacionada-id-input");
 
-        const modal = new bootstrap.Modal(
-            document.getElementById("modalBuscarObra")
-        );
-        modal.show();
-    });
+            const modal = new bootstrap.Modal(
+                document.getElementById("modalBuscarObra")
+            );
+            modal.show();
+        });
 
-    // Buscar obras
-    const inputBuscar = document.getElementById("buscarObraInput");
-    const resultados = document.getElementById("buscarObraResultados");
+        // Buscar obras
+        const inputBuscar = document.getElementById("buscarObraInput");
+        const resultados = document.getElementById("buscarObraResultados");
 
-    if (!inputBuscar || !resultados) return;
+        if (!inputBuscar || !resultados) return;
 
-    inputBuscar.addEventListener("input", function () {
-        const q = this.value.trim();
+        inputBuscar.addEventListener("input", function () {
+            const q = this.value.trim();
 
-        if (q.length < 2) {
-            resultados.innerHTML = "";
-            return;
-        }
-
-        fetch(`/catalogacion/api/buscar-obras/?q=${encodeURIComponent(q)}`)
-            .then(r => r.json())
-            .then(data => {
+            if (q.length < 2) {
                 resultados.innerHTML = "";
+                return;
+            }
 
-                if (!data.results.length) {
-                    resultados.innerHTML = `
+            fetch(`/catalogacion/api/buscar-obras/?q=${encodeURIComponent(q)}`)
+                .then(r => r.json())
+                .then(data => {
+                    resultados.innerHTML = "";
+
+                    if (!data.results.length) {
+                        resultados.innerHTML = `
                         <li class="list-group-item text-muted">
                             Sin resultados
                         </li>`;
-                    return;
-                }
+                        return;
+                    }
 
-                data.results.forEach(o => {
-                    const li = document.createElement("li");
-                    li.className = "list-group-item list-group-item-action";
-                    li.innerHTML = `
+                    data.results.forEach(o => {
+                        const li = document.createElement("li");
+                        li.className = "list-group-item list-group-item-action";
+                        li.innerHTML = `
                         <div>
                             <strong>${o.num_control}</strong>
                             ${o.titulo ? `— ${o.titulo}` : ""}
@@ -615,25 +613,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
 
 
-                    li.addEventListener("click", () => {
-                        if (targetTextInput) {
-                            targetTextInput.value = o.num_control;
-                        }
-                        if (targetHiddenInput) {
-                            targetHiddenInput.value = o.id;
-                        }
+                        li.addEventListener("click", () => {
+                            if (targetTextInput) {
+                                targetTextInput.value = o.num_control;
+                            }
+                            if (targetHiddenInput) {
+                                targetHiddenInput.value = o.id;
+                            }
 
-                        bootstrap.Modal
-                            .getInstance(document.getElementById("modalBuscarObra"))
-                            .hide();
+                            bootstrap.Modal
+                                .getInstance(document.getElementById("modalBuscarObra"))
+                                .hide();
+                        });
+
+                        resultados.appendChild(li);
                     });
-
-                    resultados.appendChild(li);
                 });
-            });
-    });
+        });
 
-})();
+    })();
 </script>
 
 {% endblock catalogacion_js %}

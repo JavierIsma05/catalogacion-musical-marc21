@@ -57,6 +57,9 @@ def validar_autores_principales_y_secundarios(form_principal, formset_700):
 
     if not autor_100:
         return []  # No hay autor principal, no validar nada
+    
+    if not formset_700:
+        return []
 
     errores = []
 
@@ -173,6 +176,16 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
 
         if not formsets_validos:
             messages.error(self.request, "Hay errores en los formsets.")
+            return self.form_invalid(form)
+        
+        errores_autores = validar_autores_principales_y_secundarios(
+            form,
+            formsets.get("nombres_relacionados_700"),
+        )
+
+        if errores_autores:
+            for error in errores_autores:
+                form.add_error(None, error)
             return self.form_invalid(form)
 
         # =====================================================
@@ -361,7 +374,18 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
                 'Por favor corrija los errores en los formularios.'
             )
             return self.form_invalid(form)
-        
+
+        errores_autores = validar_autores_principales_y_secundarios(
+            form,
+            formsets.get("nombres_relacionados_700"),
+        )
+
+        if errores_autores:
+            for error in errores_autores:
+                form.add_error(None, error)
+            return self.form_invalid(form)
+
+
         # Actualizar la obra principal
         self.object = form.save(commit=False)
         

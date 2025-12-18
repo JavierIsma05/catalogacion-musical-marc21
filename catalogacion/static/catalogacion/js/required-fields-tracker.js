@@ -24,7 +24,7 @@
         ],
         obra_en_coleccion_manuscrita: [
             { id: "id_centro_catalogador", label: "040", tab: 6 },
-            { id: "id_compositor", label: "100", tab: 0 },
+            { id: "id_compositor_texto", label: "100", tab: 0,hidden: true  },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
@@ -36,7 +36,7 @@
         ],
         obra_manuscrita_individual: [
             { id: "id_centro_catalogador", label: "040", tab: 6 },
-            { id: "id_compositor", label: "100", tab: 0 },
+            { id: "id_compositor_texto", label: "100", tab: 0,hidden: true  },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
@@ -49,7 +49,7 @@
 
         coleccion_impresa: [
             { id: "id_centro_catalogador", label: "040", tab: 6 },
-            { id: "id_compositor", label: "100", tab: 0 },
+            { id: "id_compositor_texto", label: "100", tab: 0 },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
@@ -61,7 +61,7 @@
         ],
         obra_en_coleccion_impresa: [
             { id: "id_centro_catalogador", label: "040", tab: 6 },
-            { id: "id_compositor", label: "100 - Compositor", tab: 0 },
+            { id: "id_compositor_texto", label: "100", tab: 0 },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
@@ -73,7 +73,7 @@
         ],
         obra_impresa_individual: [
             { id: "id_centro_catalogador", label: "040", tab: 6 },
-            { id: "id_compositor", label: "100 - Compositor", tab: 0 },
+            { id: "id_compositor_texto", label: "100 - Compositor", tab: 0 },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
