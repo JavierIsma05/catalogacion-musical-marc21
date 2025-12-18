@@ -58,7 +58,7 @@ Lógica intacta
                     <label class="form-label small">852 $c – Estantería</label>
 
                     <div class="subcampo-repetible-container estanterias-container"
-                         data-estanterias-container="{{ forloop.counter0 }}">
+                        data-estanterias-container="{{ forloop.counter0 }}" data-borrador-container="estanteria_ubicacion_852" data-borrador-parent="{{ forloop.counter0 }}">
 
                         {% if form.instance.pk %}
                             {% for estanteria in form.instance.estanterias.all %}
@@ -68,6 +68,8 @@ Lógica intacta
                                 <button type="button"
                                         class="subcampo-add-btn add-estanteria-btn"
                                         data-ubicacion-index="{{ forloop.parentloop.counter0 }}"
+                                        data-borrador-add="estanteria_ubicacion_852"
+                                        data-borrador-parent="{{ forloop.parentloop.counter0 }}"
                                         title="Agregar estantería">
                                     <i class="bi bi-plus"></i>
                                 </button>
@@ -94,6 +96,8 @@ Lógica intacta
                                 <button type="button"
                                         class="subcampo-add-btn add-estanteria-btn"
                                         data-ubicacion-index="{{ forloop.counter0 }}"
+                                        data-borrador-add="estanteria_ubicacion_852"
+                                        data-borrador-parent="{{ forloop.counter0 }}"
                                         title="Agregar estantería">
                                     <i class="bi bi-plus"></i>
                                 </button>
@@ -140,12 +144,14 @@ Lógica intacta
                     <label class="form-label small">852 $c – Estantería</label>
 
                     <div class="subcampo-repetible-container estanterias-container"
-                         data-estanterias-container="__prefix__">
+                        data-estanterias-container="__prefix__" data-borrador-container="estanteria_ubicacion_852" data-borrador-parent="__prefix__">
 
                         <div class="subcampo-row estanteria-form-row">
                             <button type="button"
                                     class="subcampo-add-btn add-estanteria-btn"
                                     data-ubicacion-index="__prefix__"
+                                    data-borrador-add="estanteria_ubicacion_852"
+                                    data-borrador-parent="__prefix__"
                                     title="Agregar estantería">
                                 <i class="bi bi-plus"></i>
                             </button>

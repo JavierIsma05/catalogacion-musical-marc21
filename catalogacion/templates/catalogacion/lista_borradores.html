@@ -1,5 +1,6 @@
 {% extends 'catalogacion/base_catalogacion.html' %}
 {% load static %}
+{% load catalogacion_tags %}
 
 {% block title %}Borradores Guardados - MARC21{% endblock %}
 {% block page_title %}Borradores Guardados{% endblock %}
@@ -13,7 +14,7 @@
 
     .borrador-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 1rem;
     }
 
@@ -32,6 +33,23 @@
         color: var(--admin-primary);
         margin: 0 0 0.25rem 0;
         line-height: 1.25;
+    }
+
+    .borrador-subtitle {
+        font-size: 0.8125rem;
+        color: var(--admin-text-light);
+        margin: 0 0 0.75rem 0;
+    }
+
+    .borrador-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin: 0.25rem 0 0.75rem 0;
+    }
+
+    .borrador-badges .badge {
+        font-weight: 600;
     }
 
     .borrador-meta {
@@ -98,19 +116,103 @@
                         {{ borrador.titulo_temporal|default:"Sin título"|truncatewords:10 }}
                     </h3>
 
+                    <p class="borrador-subtitle">
+                        {% if borrador.obra_objetivo_id %}
+                            <i class="bi bi-pencil-square"></i> Edición de obra
+                        {% else %}
+                            <i class="bi bi-file-earmark-plus"></i> Creación
+                        {% endif %}
+                    </p>
+
+                    <div class="borrador-badges">
+                        <span class="badge text-bg-light">
+                            <i class="bi bi-tag"></i>
+                            {{ borrador.get_descripcion_tipo|default:borrador.tipo_obra }}
+                        </span>
+
+                        {% if borrador.tipo_registro %}
+                        <span class="badge text-bg-light">
+                            {% if borrador.tipo_registro == 'd' %}
+                                <i class="bi bi-journal-text"></i> Manuscrito
+                            {% elif borrador.tipo_registro == 'c' %}
+                                <i class="bi bi-printer"></i> Impreso
+                            {% else %}
+                                <i class="bi bi-info-circle"></i> Tipo {{ borrador.tipo_registro }}
+                            {% endif %}
+                        </span>
+                        {% endif %}
+
+                        {% if borrador.nivel_bibliografico %}
+                        <span class="badge text-bg-light">
+                            {% if borrador.nivel_bibliografico == 'c' %}
+                                <i class="bi bi-collection"></i> Colección
+                            {% elif borrador.nivel_bibliografico == 'm' %}
+                                <i class="bi bi-book"></i> Monografía
+                            {% elif borrador.nivel_bibliografico == 'a' %}
+                                <i class="bi bi-layers"></i> Parte
+                            {% else %}
+                                <i class="bi bi-info-circle"></i> Nivel {{ borrador.nivel_bibliografico }}
+                            {% endif %}
+                        </span>
+                        {% endif %}
+
+                        {% with tab=tab_labels|get_item:borrador.pestana_actual %}
+                        {% if tab %}
+                        <span class="badge text-bg-light">
+                            <i class="bi bi-ui-checks"></i> {{ tab }}
+                        </span>
+                        {% endif %}
+                        {% endwith %}
+
+                        <span class="badge text-bg-light">
+                            <i class="bi bi-hourglass-split"></i>
+                            {% if borrador.dias_desde_modificacion == 0 %}
+                                Hoy
+                            {% elif borrador.dias_desde_modificacion == 1 %}
+                                Ayer
+                            {% else %}
+                                Hace {{ borrador.dias_desde_modificacion }} días
+                            {% endif %}
+                        </span>
+                    </div>
+
                     <div class="borrador-meta">
                         {% if borrador.num_control_temporal %}
                         <div class="muted"><i class="bi bi-hash"></i> {{ borrador.num_control_temporal }}</div>
                         {% endif %}
                         <div class="muted"><i class="bi bi-clock"></i> Última modificación: {{ borrador.fecha_modificacion|date:"d/m/Y H:i" }}</div>
+                        <div class="muted"><i class="bi bi-calendar-plus"></i> Creado: {{ borrador.fecha_creacion|date:"d/m/Y H:i" }}</div>
+
+                        {% if borrador.obra_objetivo_id %}
+                        <div class="muted">
+                            <i class="bi bi-link-45deg"></i>
+                            Obra objetivo:
+                            <a href="{% url 'catalogacion:detalle_obra' borrador.obra_objetivo_id %}">#{{ borrador.obra_objetivo_id }}</a>
+                        </div>
+                        {% endif %}
+
+                        {% if borrador.obra_creada_id %}
+                        <div class="muted">
+                            <i class="bi bi-check-circle"></i>
+                            Obra creada:
+                            <a href="{% url 'catalogacion:detalle_obra' borrador.obra_creada_id %}">#{{ borrador.obra_creada_id }}</a>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
                 <div class="borrador-footer">
-                    <a href="{% url 'catalogacion:recuperar_borrador' borrador.id %}"
-                       class="admin-btn admin-btn-primary admin-btn-sm">
-                        <i class="bi bi-arrow-clockwise"></i> Continuar
-                    </a>
+                    {% if borrador.obra_objetivo_id %}
+                        <a href="{% url 'catalogacion:editar_obra' borrador.obra_objetivo_id %}?borrador={{ borrador.id }}"
+                           class="admin-btn admin-btn-primary admin-btn-sm">
+                            <i class="bi bi-pencil-square"></i> Continuar edición
+                        </a>
+                    {% else %}
+                        <a href="{% url 'catalogacion:recuperar_borrador' borrador.id %}"
+                           class="admin-btn admin-btn-primary admin-btn-sm">
+                            <i class="bi bi-arrow-clockwise"></i> Continuar
+                        </a>
+                    {% endif %}
 
                     <button type="button"
                             class="admin-btn admin-btn-outline-danger admin-btn-sm"

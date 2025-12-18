@@ -411,6 +411,18 @@ class ListaBorradoresView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['total_borradores'] = self.get_queryset().count()
+        # Labels de pestañas para mostrar dónde quedó el usuario.
+        # Deben mantenerse en sync con el orden definido en crear_obra.html (tabs).
+        context['tab_labels'] = [
+            'Nombres y títulos',
+            'Producción / edición',
+            'Datos musicales',
+            'Materias / serie',
+            'Notas',
+            'Relaciones',
+            'Existencias',
+            'Administración',
+        ]
         return context
 
 

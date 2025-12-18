@@ -39,7 +39,7 @@ Estilo similar al 264: botón + a la izquierda, eliminar a la derecha.
                 <div class="col-full">
                     <label class="form-label small">856 $u – URL</label>
                     <div class="subcampo-repetible-container urls-container"
-                         data-urls-container="{{ forloop.counter0 }}">
+                        data-urls-container="{{ forloop.counter0 }}" data-borrador-container="url_disponible_856" data-borrador-parent="{{ forloop.counter0 }}">
 
                         {% if form.instance.pk %}
                             {% for url in form.instance.urls_856.all %}
@@ -48,6 +48,8 @@ Estilo similar al 264: botón + a la izquierda, eliminar a la derecha.
                                 <button type="button"
                                         class="subcampo-add-btn add-url-btn"
                                         data-recurso-index="{{ forloop.parentloop.counter0 }}"
+                                        data-borrador-add="url_disponible_856"
+                                        data-borrador-parent="{{ forloop.parentloop.counter0 }}"
                                         title="Agregar URL">
                                     <i class="bi bi-plus"></i>
                                 </button>
@@ -73,6 +75,8 @@ Estilo similar al 264: botón + a la izquierda, eliminar a la derecha.
                                 <button type="button"
                                         class="subcampo-add-btn add-url-btn"
                                         data-recurso-index="{{ forloop.parentloop.counter0 }}"
+                                        data-borrador-add="url_disponible_856"
+                                        data-borrador-parent="{{ forloop.parentloop.counter0 }}"
                                         title="Agregar URL">
                                     <i class="bi bi-plus"></i>
                                 </button>
@@ -93,6 +97,8 @@ Estilo similar al 264: botón + a la izquierda, eliminar a la derecha.
                                 <button type="button"
                                         class="subcampo-add-btn add-url-btn"
                                         data-recurso-index="{{ forloop.counter0 }}"
+                                        data-borrador-add="url_disponible_856"
+                                        data-borrador-parent="{{ forloop.counter0 }}"
                                         title="Agregar URL">
                                     <i class="bi bi-plus"></i>
                                 </button>
@@ -115,7 +121,7 @@ Estilo similar al 264: botón + a la izquierda, eliminar a la derecha.
                 <div class="col-full">
                     <label class="form-label small">856 $y – Texto del enlace</label>
                     <div class="subcampo-repetible-container textos-container"
-                         data-textos-container="{{ forloop.counter0 }}">
+                        data-textos-container="{{ forloop.counter0 }}" data-borrador-container="texto_disponible_856" data-borrador-parent="{{ forloop.counter0 }}">
 
                         {% if form.instance.pk %}
                             {% for texto in form.instance.textos_enlace_856.all %}
@@ -124,6 +130,8 @@ Estilo similar al 264: botón + a la izquierda, eliminar a la derecha.
                                 <button type="button"
                                         class="subcampo-add-btn add-texto-btn"
                                         data-recurso-index="{{ forloop.parentloop.counter0 }}"
+                                        data-borrador-add="texto_disponible_856"
+                                        data-borrador-parent="{{ forloop.parentloop.counter0 }}"
                                         title="Agregar texto de enlace">
                                     <i class="bi bi-plus"></i>
                                 </button>
@@ -149,6 +157,8 @@ Estilo similar al 264: botón + a la izquierda, eliminar a la derecha.
                                 <button type="button"
                                         class="subcampo-add-btn add-texto-btn"
                                         data-recurso-index="{{ forloop.parentloop.counter0 }}"
+                                        data-borrador-add="texto_disponible_856"
+                                        data-borrador-parent="{{ forloop.parentloop.counter0 }}"
                                         title="Agregar texto de enlace">
                                     <i class="bi bi-plus"></i>
                                 </button>
@@ -169,6 +179,8 @@ Estilo similar al 264: botón + a la izquierda, eliminar a la derecha.
                                 <button type="button"
                                         class="subcampo-add-btn add-texto-btn"
                                         data-recurso-index="{{ forloop.counter0 }}"
+                                        data-borrador-add="texto_disponible_856"
+                                        data-borrador-parent="{{ forloop.counter0 }}"
                                         title="Agregar texto de enlace">
                                     <i class="bi bi-plus"></i>
                                 </button>
@@ -201,11 +213,13 @@ Estilo similar al 264: botón + a la izquierda, eliminar a la derecha.
                 <div class="col-full">
                     <label class="form-label small">856 $u – URL</label>
                     <div class="subcampo-repetible-container urls-container"
-                         data-urls-container="__prefix__">
+                        data-urls-container="__prefix__" data-borrador-container="url_disponible_856" data-borrador-parent="__prefix__">
                         <div class="subcampo-row url-form-row">
                             <button type="button"
                                     class="subcampo-add-btn add-url-btn"
                                     data-recurso-index="__prefix__"
+                                    data-borrador-add="url_disponible_856"
+                                    data-borrador-parent="__prefix__"
                                     title="Agregar URL">
                                 <i class="bi bi-plus"></i>
                             </button>
@@ -226,11 +240,13 @@ Estilo similar al 264: botón + a la izquierda, eliminar a la derecha.
                 <div class="col-full">
                     <label class="form-label small">856 $y – Texto del enlace</label>
                     <div class="subcampo-repetible-container textos-container"
-                         data-textos-container="__prefix__">
+                        data-textos-container="__prefix__" data-borrador-container="texto_disponible_856" data-borrador-parent="__prefix__">
                         <div class="subcampo-row texto-form-row">
                             <button type="button"
                                     class="subcampo-add-btn add-texto-btn"
                                     data-recurso-index="__prefix__"
+                                    data-borrador-add="texto_disponible_856"
+                                    data-borrador-parent="__prefix__"
                                     title="Agregar texto de enlace">
                                 <i class="bi bi-plus"></i>
                             </button>

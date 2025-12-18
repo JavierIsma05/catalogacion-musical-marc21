@@ -45,13 +45,13 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 {# Subcampo $a - Lugares (Repetible) con botón + a la izquierda #}
                 <div class="col-full">
                     <label class="form-label small">264 $a - Lugar</label>
-                    <div class="subcampo-repetible-container lugares-container" data-lugares-container="{{ forloop.counter0 }}">
+                    <div class="subcampo-repetible-container lugares-container" data-lugares-container="{{ forloop.counter0 }}" data-borrador-container="lugar_produccion_264" data-borrador-parent="{{ forloop.counter0 }}">
                         {% if form.instance.pk %}
                             {# Cargar lugares existentes #}
                             {% for lugar in form.instance.lugares.all %}
                             <div class="subcampo-row lugar-form-row">
                                 {% if forloop.first %}
-                                <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="{{ forloop.parentloop.counter0 }}" title="Agregar Lugar">
+                                <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="{{ forloop.parentloop.counter0 }}" data-borrador-add="lugar_produccion_264" data-borrador-parent="{{ forloop.parentloop.counter0 }}" title="Agregar Lugar">
                                     <i class="bi bi-plus"></i>
                                 </button>
                                 {% else %}
@@ -64,7 +64,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             </div>
                             {% empty %}
                             <div class="subcampo-row lugar-form-row">
-                                <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Lugar">
+                                <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="{{ forloop.counter0 }}" data-borrador-add="lugar_produccion_264" data-borrador-parent="{{ forloop.counter0 }}" title="Agregar Lugar">
                                     <i class="bi bi-plus"></i>
                                 </button>
                                 <input type="text" class="form-control lugar-input" name="lugar_produccion_264_{{ forloop.counter0 }}_0" placeholder="Ciudad, País">
@@ -75,7 +75,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             {% endfor %}
                         {% else %}
                         <div class="subcampo-row lugar-form-row">
-                            <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Lugar">
+                            <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="{{ forloop.counter0 }}" data-borrador-add="lugar_produccion_264" data-borrador-parent="{{ forloop.counter0 }}" title="Agregar Lugar">
                                 <i class="bi bi-plus"></i>
                             </button>
                             <input type="text" class="form-control lugar-input" name="lugar_produccion_264_{{ forloop.counter0 }}_0" placeholder="Ciudad, País">
@@ -90,13 +90,13 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 {# Subcampo $b - Entidades (Repetible) con botón + a la izquierda #}
                 <div class="col-full">
                     <label class="form-label small">264 $b - Nombre de entidad</label>
-                    <div class="subcampo-repetible-container entidades-container" data-entidades-container="{{ forloop.counter0 }}">
+                    <div class="subcampo-repetible-container entidades-container" data-entidades-container="{{ forloop.counter0 }}" data-borrador-container="entidad_produccion_264" data-borrador-parent="{{ forloop.counter0 }}">
                         {% if form.instance.pk %}
                             {# Cargar entidades existentes #}
                             {% for entidad in form.instance.entidades.all %}
                             <div class="subcampo-row entidad-form-row">
                                 {% if forloop.first %}
-                                <button type="button" class="subcampo-add-btn add-entidad-btn" data-produccion-index="{{ forloop.parentloop.counter0 }}" title="Agregar Entidad">
+                                <button type="button" class="subcampo-add-btn add-entidad-btn" data-produccion-index="{{ forloop.parentloop.counter0 }}" data-borrador-add="entidad_produccion_264" data-borrador-parent="{{ forloop.parentloop.counter0 }}" title="Agregar Entidad">
                                     <i class="bi bi-plus"></i>
                                 </button>
                                 {% else %}
@@ -109,7 +109,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             </div>
                             {% empty %}
                             <div class="subcampo-row entidad-form-row">
-                                <button type="button" class="subcampo-add-btn add-entidad-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Entidad">
+                                <button type="button" class="subcampo-add-btn add-entidad-btn" data-produccion-index="{{ forloop.counter0 }}" data-borrador-add="entidad_produccion_264" data-borrador-parent="{{ forloop.counter0 }}" title="Agregar Entidad">
                                     <i class="bi bi-plus"></i>
                                 </button>
                                 <input type="text" class="form-control entidad-input" name="entidad_produccion_264_{{ forloop.counter0 }}_0" placeholder="Nombre del editor o productor">
@@ -120,7 +120,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             {% endfor %}
                         {% else %}
                         <div class="subcampo-row entidad-form-row">
-                            <button type="button" class="subcampo-add-btn add-entidad-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Entidad">
+                            <button type="button" class="subcampo-add-btn add-entidad-btn" data-produccion-index="{{ forloop.counter0 }}" data-borrador-add="entidad_produccion_264" data-borrador-parent="{{ forloop.counter0 }}" title="Agregar Entidad">
                                 <i class="bi bi-plus"></i>
                             </button>
                             <input type="text" class="form-control entidad-input" name="entidad_produccion_264_{{ forloop.counter0 }}_0" placeholder="Nombre del editor o productor">
@@ -135,13 +135,13 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 {# Subcampo $c - Fechas (Repetible) con botón + a la izquierda #}
                 <div class="col-full">
                     <label class="form-label small">264 $c - Fecha</label>
-                    <div class="subcampo-repetible-container fechas-container" data-fechas-container="{{ forloop.counter0 }}">
+                    <div class="subcampo-repetible-container fechas-container" data-fechas-container="{{ forloop.counter0 }}" data-borrador-container="fecha_produccion_264" data-borrador-parent="{{ forloop.counter0 }}">
                         {% if form.instance.pk %}
                             {# Cargar fechas existentes #}
                             {% for fecha in form.instance.fechas.all %}
                             <div class="subcampo-row fecha-form-row">
                                 {% if forloop.first %}
-                                <button type="button" class="subcampo-add-btn add-fecha-btn" data-produccion-index="{{ forloop.parentloop.counter0 }}" title="Agregar Fecha">
+                                <button type="button" class="subcampo-add-btn add-fecha-btn" data-produccion-index="{{ forloop.parentloop.counter0 }}" data-borrador-add="fecha_produccion_264" data-borrador-parent="{{ forloop.parentloop.counter0 }}" title="Agregar Fecha">
                                     <i class="bi bi-plus"></i>
                                 </button>
                                 {% else %}
@@ -154,7 +154,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             </div>
                             {% empty %}
                             <div class="subcampo-row fecha-form-row">
-                                <button type="button" class="subcampo-add-btn add-fecha-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Fecha">
+                                <button type="button" class="subcampo-add-btn add-fecha-btn" data-produccion-index="{{ forloop.counter0 }}" data-borrador-add="fecha_produccion_264" data-borrador-parent="{{ forloop.counter0 }}" title="Agregar Fecha">
                                     <i class="bi bi-plus"></i>
                                 </button>
                                 <input type="text" class="form-control fecha-input" name="fecha_produccion_264_{{ forloop.counter0 }}_0" placeholder="2024, [2024], ©2024">
@@ -165,7 +165,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             {% endfor %}
                         {% else %}
                         <div class="subcampo-row fecha-form-row">
-                            <button type="button" class="subcampo-add-btn add-fecha-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Fecha">
+                            <button type="button" class="subcampo-add-btn add-fecha-btn" data-produccion-index="{{ forloop.counter0 }}" data-borrador-add="fecha_produccion_264" data-borrador-parent="{{ forloop.counter0 }}" title="Agregar Fecha">
                                 <i class="bi bi-plus"></i>
                             </button>
                             <input type="text" class="form-control fecha-input" name="fecha_produccion_264_{{ forloop.counter0 }}_0" placeholder="2024, [2024], ©2024">
@@ -197,9 +197,9 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 
                 <div class="col-full">
                     <label class="form-label small">264 $a - Lugar</label>
-                    <div class="subcampo-repetible-container lugares-container" data-lugares-container="__prefix__">
+                    <div class="subcampo-repetible-container lugares-container" data-lugares-container="__prefix__" data-borrador-container="lugar_produccion_264" data-borrador-parent="__prefix__">
                         <div class="subcampo-row lugar-form-row">
-                            <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="__prefix__" title="Agregar Lugar">
+                            <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="__prefix__" data-borrador-add="lugar_produccion_264" data-borrador-parent="__prefix__" title="Agregar Lugar">
                                 <i class="bi bi-plus"></i>
                             </button>
                             <input type="text" class="form-control lugar-input" name="lugar_produccion_264___prefix___0" placeholder="Ciudad, País">
@@ -212,9 +212,9 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 
                 <div class="col-full">
                     <label class="form-label small">264 $b - Nombre de entidad</label>
-                    <div class="subcampo-repetible-container entidades-container" data-entidades-container="__prefix__">
+                    <div class="subcampo-repetible-container entidades-container" data-entidades-container="__prefix__" data-borrador-container="entidad_produccion_264" data-borrador-parent="__prefix__">
                         <div class="subcampo-row entidad-form-row">
-                            <button type="button" class="subcampo-add-btn add-entidad-btn" data-produccion-index="__prefix__" title="Agregar Entidad">
+                            <button type="button" class="subcampo-add-btn add-entidad-btn" data-produccion-index="__prefix__" data-borrador-add="entidad_produccion_264" data-borrador-parent="__prefix__" title="Agregar Entidad">
                                 <i class="bi bi-plus"></i>
                             </button>
                             <input type="text" class="form-control entidad-input" name="entidad_produccion_264___prefix___0" placeholder="Nombre del editor o productor">
@@ -227,9 +227,9 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 
                 <div class="col-full">
                     <label class="form-label small">264 $c - Fecha</label>
-                    <div class="subcampo-repetible-container fechas-container" data-fechas-container="__prefix__">
+                    <div class="subcampo-repetible-container fechas-container" data-fechas-container="__prefix__" data-borrador-container="fecha_produccion_264" data-borrador-parent="__prefix__">
                         <div class="subcampo-row fecha-form-row">
-                            <button type="button" class="subcampo-add-btn add-fecha-btn" data-produccion-index="__prefix__" title="Agregar Fecha">
+                            <button type="button" class="subcampo-add-btn add-fecha-btn" data-produccion-index="__prefix__" data-borrador-add="fecha_produccion_264" data-borrador-parent="__prefix__" title="Agregar Fecha">
                                 <i class="bi bi-plus"></i>
                             </button>
                             <input type="text" class="form-control fecha-input" name="fecha_produccion_264___prefix___0" placeholder="2024, [2024], ©2024">

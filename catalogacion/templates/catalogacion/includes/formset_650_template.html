@@ -76,7 +76,7 @@ Autocomplete con el mismo look (list-group / list-group-item) como en tu versió
                     <label class="form-label small">650 $x – Subdivisión de materia</label>
 
                     <div class="subcampo-repetible-container subdivisiones-container"
-                         data-subdivisiones-container="{{ forloop.counter0 }}">
+                        data-subdivisiones-container="{{ forloop.counter0 }}" data-borrador-container="subdivision_materia_650" data-borrador-parent="{{ forloop.counter0 }}">
 
                         {% if form.instance.pk %}
                             {% for subdivision in form.instance.subdivisiones.all %}
@@ -86,6 +86,8 @@ Autocomplete con el mismo look (list-group / list-group-item) como en tu versió
                                 <button type="button"
                                         class="subcampo-add-btn add-subdivision-btn"
                                         data-materia-index="{{ forloop.parentloop.counter0 }}"
+                                        data-borrador-add="subdivision_materia_650"
+                                        data-borrador-parent="{{ forloop.parentloop.counter0 }}"
                                         title="Agregar subdivisión">
                                     <i class="bi bi-plus"></i>
                                 </button>
@@ -115,6 +117,8 @@ Autocomplete con el mismo look (list-group / list-group-item) como en tu versió
                                 <button type="button"
                                         class="subcampo-add-btn add-subdivision-btn"
                                         data-materia-index="{{ forloop.counter0 }}"
+                                        data-borrador-add="subdivision_materia_650"
+                                        data-borrador-parent="{{ forloop.counter0 }}"
                                         title="Agregar subdivisión">
                                     <i class="bi bi-plus"></i>
                                 </button>
@@ -175,12 +179,14 @@ Autocomplete con el mismo look (list-group / list-group-item) como en tu versió
                     <label class="form-label small">650 $x – Subdivisión de materia</label>
 
                     <div class="subcampo-repetible-container subdivisiones-container"
-                         data-subdivisiones-container="__prefix__">
+                        data-subdivisiones-container="__prefix__" data-borrador-container="subdivision_materia_650" data-borrador-parent="__prefix__">
 
                         <div class="subcampo-row subdivision-form-row">
                             <button type="button"
                                     class="subcampo-add-btn add-subdivision-btn"
                                     data-materia-index="__prefix__"
+                                    data-borrador-add="subdivision_materia_650"
+                                    data-borrador-parent="__prefix__"
                                     title="Agregar subdivisión">
                                 <i class="bi bi-plus"></i>
                             </button>

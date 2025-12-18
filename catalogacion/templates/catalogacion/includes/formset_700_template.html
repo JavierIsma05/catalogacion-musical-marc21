@@ -58,14 +58,14 @@ Orden vertical limpio
                 <div class="col-full">
                     <label class="form-label small">700 $c – Término asociado</label>
                     <div class="subcampo-repetible-container terminos-container"
-                        data-terminos-container="{{ forloop.counter0 }}">
+                        data-terminos-container="{{ forloop.counter0 }}" data-borrador-container="termino_asociado_700" data-borrador-parent="{{ forloop.counter0 }}">
 
                         {% if form.instance.pk %}
                         {% for termino in form.instance.terminos_asociados.all %}
                         <div class="subcampo-row termino-form-row">
                             {% if forloop.first %}
                             <button type="button" class="subcampo-add-btn add-termino-btn"
-                                data-nombre-index="{{ forloop.parentloop.counter0 }}">
+                                data-nombre-index="{{ forloop.parentloop.counter0 }}" data-borrador-add="termino_asociado_700" data-borrador-parent="{{ forloop.parentloop.counter0 }}">
                                 <i class="bi bi-plus"></i>
                             </button>
                             {% else %}
@@ -84,7 +84,7 @@ Orden vertical limpio
                         {% else %}
                         <div class="subcampo-row termino-form-row">
                             <button type="button" class="subcampo-add-btn add-termino-btn"
-                                data-nombre-index="{{ forloop.counter0 }}">
+                                data-nombre-index="{{ forloop.counter0 }}" data-borrador-add="termino_asociado_700" data-borrador-parent="{{ forloop.counter0 }}">
                                 <i class="bi bi-plus"></i>
                             </button>
                             <input type="text" class="form-control termino-input"
@@ -104,7 +104,7 @@ Orden vertical limpio
                 <div class="col-full">
                     <label class="form-label small">700 $e – Función</label>
 
-                    <div class="subcampo-repetible-container funciones-container">
+                    <div class="subcampo-repetible-container funciones-container" data-borrador-container="funcion_700" data-borrador-parent="{{ forloop.counter0 }}">
 
                         {{ form.funcion700_formset.management_form }}
 
@@ -114,7 +114,7 @@ Orden vertical limpio
                             {% if forloop.first %}
                             <button type="button"
                                     class="subcampo-add-btn add-funcion-btn"
-                                    data-nombre-index="{{ forloop.parentloop.counter0 }}">
+                                    data-nombre-index="{{ forloop.parentloop.counter0 }}" data-borrador-add="funcion_700" data-borrador-parent="{{ forloop.parentloop.counter0 }}">
                                 <i class="bi bi-plus"></i>
                             </button>
                             {% else %}
@@ -207,10 +207,10 @@ Orden vertical limpio
                 <!-- $c -->
                 <div class="col-full">
                     <label class="form-label small">700 $c – Término asociado</label>
-                    <div class="subcampo-repetible-container terminos-container" data-terminos-container="__prefix__">
+                    <div class="subcampo-repetible-container terminos-container" data-terminos-container="__prefix__" data-borrador-container="termino_asociado_700" data-borrador-parent="__prefix__">
                         <div class="subcampo-row termino-form-row">
                             <button type="button" class="subcampo-add-btn add-termino-btn"
-                                data-nombre-index="__prefix__">
+                                data-nombre-index="__prefix__" data-borrador-add="termino_asociado_700" data-borrador-parent="__prefix__">
                                 <i class="bi bi-plus"></i>
                             </button>
                             <input type="text" class="form-control termino-input"
@@ -226,10 +226,10 @@ Orden vertical limpio
                 <!-- $e -->
                 <div class="col-full">
                     <label class="form-label small">700 $e – Función</label>
-                    <div class="subcampo-repetible-container funciones-container" data-funciones-container="__prefix__">
+                    <div class="subcampo-repetible-container funciones-container" data-funciones-container="__prefix__" data-borrador-container="funcion_700" data-borrador-parent="__prefix__">
                         <div class="subcampo-row funcion-form-row">
                             <button type="button" class="subcampo-add-btn add-funcion-btn"
-                                data-nombre-index="__prefix__">
+                                data-nombre-index="__prefix__" data-borrador-add="funcion_700" data-borrador-parent="__prefix__">
                                 <i class="bi bi-plus"></i>
                             </button>
                             <select class="form-select funcion-select" name="funcion_700___prefix___0">

@@ -446,205 +446,88 @@
     async function restaurarSubcamposDinamicos(datos) {
         const subcampos = datos._subcampos_dinamicos || {};
 
+        // Opción B (data-driven):
+        // - Los templates marcan contenedores y botones con:
+        //   - data-borrador-container="<groupKey>"  + data-borrador-parent="<index>"
+        //   - data-borrador-add="<groupKey>"        + data-borrador-parent="<index>"
+        // - groupKey se arma como:
+        //   - sin campo:  "<tipo>_<subtipo>"  (ej: idioma_lengua)
+        //   - con campo:  "<tipo>_<subtipo>_<campo>" (ej: titulo_mencion_490)
+        function buildGroupKey(item) {
+            if (!item) return null;
+            const tipo = item.tipo;
+            const subtipo = item.subtipo;
+            const campo = item.campo;
+            if (!tipo || !subtipo) return null;
+            return campo ? `${tipo}_${subtipo}_${campo}` : `${tipo}_${subtipo}`;
+        }
+
+        function findContainer(groupKey, parentIndex) {
+            if (!groupKey) return null;
+            return document.querySelector(
+                `[data-borrador-container="${groupKey}"][data-borrador-parent="${parentIndex}"]`
+            );
+        }
+
+        function findAddButton(groupKey, parentIndex) {
+            if (!groupKey) return null;
+            return document.querySelector(
+                `[data-borrador-add="${groupKey}"][data-borrador-parent="${parentIndex}"]`
+            );
+        }
+
+        function findLastRow(container) {
+            if (!container) return null;
+            const rows = container.querySelectorAll(
+                ".subcampo-row:not(.d-none)"
+            );
+            return rows.length ? rows[rows.length - 1] : null;
+        }
+
+        function setRowValue(row, value) {
+            if (!row) return;
+            const input = row.querySelector("input, select, textarea");
+            if (!input) return;
+
+            if (input.tagName === "SELECT") {
+                input.value = value;
+                if (window.$ && $(input).data("select2")) {
+                    $(input).val(value).trigger("change");
+                } else {
+                    input.dispatchEvent(new Event("change", { bubbles: true }));
+                }
+            } else {
+                input.value = value;
+                input.dispatchEvent(new Event("input", { bubbles: true }));
+                input.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+        }
+
         for (let key in subcampos) {
             const items = subcampos[key];
             if (!items || items.length === 0) continue;
 
             const firstItem = items[0];
-            const { tipo, subtipo, parentIndex, campo } = firstItem;
+            const groupKey = buildGroupKey(firstItem);
+            const parentIndex = firstItem.parentIndex;
 
-            // Buscar el contenedor correcto según el tipo
-            let container, addButton, template;
-
-            if (tipo === "idioma" && subtipo === "lengua") {
-                // Campo 041 - Idiomas
-                container = document.querySelector(
-                    `[data-idiomas-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-idioma-btn[data-lengua-index="${parentIndex}"]`
-                );
-                template = document.querySelector(".idioma-template");
-            } else if (tipo === "titulo" && subtipo === "mencion") {
-                // Campo 490 - Títulos de serie
-                container = document.querySelector(
-                    `[data-titulos-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-titulo-btn[data-mencion-index="${parentIndex}"]`
-                );
-                template = document.querySelector(".titulo-template-490");
-            } else if (tipo === "volumen" && subtipo === "mencion") {
-                // Campo 490 - Volúmenes
-                container = document.querySelector(
-                    `[data-volumenes-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-volumen-btn[data-mencion-index="${parentIndex}"]`
-                );
-                template = document.querySelector(".volumen-template-490");
-            } else if (tipo === "texto" && subtipo === "biografico") {
-                // Campo 545 - Textos biográficos
-                container = document.querySelector(
-                    `[data-textos-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-texto-btn[data-dato-index="${parentIndex}"]`
-                );
-                template = document.querySelector(".texto-template-545");
-            } else if (tipo === "uri") {
-                // Campo 545 - URIs
-                container = document.querySelector(
-                    `[data-uris-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-uri-btn[data-dato-index="${parentIndex}"]`
-                );
-                template = document.querySelector(".uri-template-545");
-            } else if (tipo === "url" && subtipo === "disponible") {
-                // Campo 856 - URLs
-                container = document.querySelector(
-                    `[data-urls-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-url-btn[data-disponible-index="${parentIndex}"]`
-                );
-                template = document.querySelector(".url-template-856");
-            } else if (tipo === "texto" && subtipo === "disponible") {
-                // Campo 856 - Textos de enlace
-                container = document.querySelector(
-                    `[data-textos-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-texto-btn[data-disponible-index="${parentIndex}"]`
-                );
-                template = document.querySelector(".texto-template-856");
-            } else if (tipo === "numero" && subtipo === "enlace") {
-                // Campos 773/774/787 - Números de obra (diferenciar por campo)
-                // IMPORTANTE: Todos los campos están en la misma pestaña y comparten
-                // los mismos valores de data-numeros-container, así que debemos buscar
-                // dentro del .campo-marc específico que contiene el badge correcto
-
-                // Buscar el contenedor .campo-marc que tenga el badge con el número de campo
-                const campoMarc = Array.from(
-                    document.querySelectorAll(".campo-marc")
-                ).find((div) => {
-                    const badge = div.querySelector(".badge-marc");
-                    return badge && badge.textContent.trim() === campo;
-                });
-
-                if (campoMarc) {
-                    container = campoMarc.querySelector(
-                        `[data-numeros-container="${parentIndex}"]`
-                    );
-                    addButton = campoMarc.querySelector(
-                        `.add-numero-btn[data-enlace-index="${parentIndex}"]`
-                    );
-                } else {
-                    console.warn(
-                        `⚠️ No se encontró .campo-marc con badge ${campo}`
-                    );
-                    container = null;
-                    addButton = null;
-                }
-
-                // Seleccionar template correcto según el número de campo MARC
-                if (campo === "773") {
-                    template = document.querySelector(".numero-template");
-                } else if (campo === "774") {
-                    template = document.querySelector(".numero-template-774");
-                } else if (campo === "787") {
-                    template = document.querySelector(".numero-template-787");
-                }
-            } else if (tipo === "estanteria" && subtipo === "ubicacion") {
-                // Campo 852 - Estanterías
-                container = document.querySelector(
-                    `[data-estanterias-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-estanteria-btn[data-ubicacion-index="${parentIndex}"]`
-                );
-                template = document.querySelector(".estanteria-template-852");
-            } else if (tipo === "lugar" && subtipo === "produccion") {
-                // Campo 264 - Lugares de producción ($a)
-                container = document.querySelector(
-                    `[data-lugares-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-lugar-btn[data-produccion-index="${parentIndex}"]`
-                );
-            } else if (tipo === "entidad" && subtipo === "produccion") {
-                // Campo 264 - Entidades productoras ($b)
-                container = document.querySelector(
-                    `[data-entidades-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-entidad-btn[data-produccion-index="${parentIndex}"]`
-                );
-            } else if (tipo === "fecha" && subtipo === "produccion") {
-                // Campo 264 - Fechas de producción ($c)
-                container = document.querySelector(
-                    `[data-fechas-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-fecha-btn[data-produccion-index="${parentIndex}"]`
-                );
-            } else if (tipo === "medio" && subtipo === "interpretacion") {
-                // Campo 382 - Medios de interpretación ($a)
-                container = document.querySelector(
-                    `[data-medios-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-medio-btn[data-medio-index="${parentIndex}"]`
-                );
-            } else if (tipo === "termino" && subtipo === "asociado") {
-                // Campo 700 - Términos asociados ($c)
-                container = document.querySelector(
-                    `[data-terminos-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-termino-btn[data-nombre-index="${parentIndex}"]`
-                );
-            } else if (tipo === "funcion" && subtipo === "700") {
-                // Campo 700 - Funciones ($e)
-                container = document.querySelector(
-                    `[data-funciones-container="${parentIndex}"]`
-                );
-                addButton = document.querySelector(
-                    `.add-funcion-btn[data-nombre-index="${parentIndex}"]`
-                );
-            }
+            const container = findContainer(groupKey, parentIndex);
+            const addButton = findAddButton(groupKey, parentIndex);
 
             if (!container || !addButton) {
-                console.warn(`⚠️ No se encontró contenedor para ${key}`);
+                // Si no existe el contrato data-borrador-* en el HTML, no forzamos nada.
+                console.warn(
+                    `⚠️ No se encontró data-borrador-* para ${key} (groupKey=${groupKey}, parentIndex=${parentIndex})`
+                );
                 continue;
             }
 
             // Crear y llenar los subcampos
             for (let item of items) {
                 addButton.click();
-                await new Promise((resolve) => setTimeout(resolve, 50));
-
-                // Buscar el último input/select/textarea creado
-                const lastRow = container.querySelector(
-                    ":scope > div:last-child, :scope > .idioma-form-row:last-child, :scope > .titulo-form-row:last-child, :scope > .volumen-form-row:last-child, :scope > .texto-form-row:last-child, :scope > .uri-form-row:last-child, :scope > .url-form-row:last-child, :scope > .numero-form-row:last-child, :scope > .estanteria-form-row:last-child, :scope > .lugar-form-row:last-child, :scope > .entidad-form-row:last-child, :scope > .fecha-form-row:last-child, :scope > .medio-form-row:last-child, :scope > .termino-form-row:last-child, :scope > .funcion-form-row:last-child"
-                );
-
-                if (lastRow) {
-                    const input = lastRow.querySelector(
-                        "input, select, textarea"
-                    );
-                    if (input) {
-                        if (input.tagName === "SELECT") {
-                            input.value = item.value;
-                            if ($(input).data("select2")) {
-                                $(input).val(item.value).trigger("change");
-                            }
-                        } else {
-                            input.value = item.value;
-                        }
-                    }
-                }
+                await new Promise((resolve) => setTimeout(resolve, 60));
+                const lastRow = findLastRow(container);
+                setRowValue(lastRow, item.value);
             }
         }
     }
@@ -905,28 +788,43 @@
 
             // En edición: si existe un borrador activo ligado a esta obra, cargarlo automáticamente
             if (obraObjetivoId) {
-                fetch(API_URLS.obtenerUltimoPorObra(obraObjetivoId))
-                    .then((r) => r.json())
-                    .then((res) => {
-                        if (
-                            res &&
-                            res.success &&
-                            res.tiene_borrador &&
-                            res.borrador &&
-                            res.borrador.id
-                        ) {
-                            setTimeout(
-                                () => cargarBorrador(res.borrador.id),
-                                300
-                            );
-                        }
-                    })
-                    .catch((err) =>
-                        console.error(
-                            "Error consultando borrador de edición:",
-                            err
-                        )
+                const params = new URLSearchParams(window.location.search);
+                const borradorQuery = params.get("borrador");
+
+                // Si se especifica un borrador concreto (por ejemplo desde la lista de borradores), cargar ese.
+                if (
+                    borradorQuery &&
+                    !Number.isNaN(parseInt(borradorQuery, 10))
+                ) {
+                    setTimeout(
+                        () => cargarBorrador(parseInt(borradorQuery, 10)),
+                        300
                     );
+                } else {
+                    // Caso normal: cargar el último borrador activo asociado a la obra
+                    fetch(API_URLS.obtenerUltimoPorObra(obraObjetivoId))
+                        .then((r) => r.json())
+                        .then((res) => {
+                            if (
+                                res &&
+                                res.success &&
+                                res.tiene_borrador &&
+                                res.borrador &&
+                                res.borrador.id
+                            ) {
+                                setTimeout(
+                                    () => cargarBorrador(res.borrador.id),
+                                    300
+                                );
+                            }
+                        })
+                        .catch((err) =>
+                            console.error(
+                                "Error consultando borrador de edición:",
+                                err
+                            )
+                        );
+                }
             }
 
             iniciarAutoguardado();
