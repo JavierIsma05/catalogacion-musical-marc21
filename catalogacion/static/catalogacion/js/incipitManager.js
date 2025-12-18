@@ -3,7 +3,7 @@ var positionNoteSelected = null;
 var CanvasIncipit = new CanvasClass(); //Define the object Canvas
 
 // Detector de navegador mejorado (InstallTrigger es obsoleto)
-var isFirefox = navigator.userAgent.indexOf('Firefox') > -1; // Firefox
+var isFirefox = navigator.userAgent.indexOf("Firefox") > -1; // Firefox
 var isChrome = false;
 // Chrome 1 - 71
 // please note,
@@ -98,28 +98,28 @@ function IncipitClass() {
 
     context.AlterationClefPositionNote = [
       { name: "treble", xPosition: 0, yPosition: 0 },
-      { name: "alto", xPosition: 0, yPosition: 24 },
-      { name: "bass", xPosition: 0, yPosition: 48 }
+      { name: "alto", xPosition: 0, yPosition: 32 },
+      { name: "bass", xPosition: 0, yPosition: 58 }
     ];
 
     context.AlterationClefPositionSostenido = [
-      { xPosition: 50, yPosition: -12 }, // antes -6
-      { xPosition: 60, yPosition: 14 }, // antes 20
-      { xPosition: 70, yPosition: -20 }, // antes -14
-      { xPosition: 80, yPosition: 4 }, // antes 10
-      { xPosition: 90, yPosition: 30 }, // antes 36
-      { xPosition: 100, yPosition: -4 }, // antes 2
-      { xPosition: 110, yPosition: 20 } // antes 28
+      { xPosition: 50, yPosition: -6 }, // antes -6
+      { xPosition: 60, yPosition: 20 }, // antes 20
+      { xPosition: 70, yPosition: -14 }, // antes -14
+      { xPosition: 80, yPosition: 10 }, // antes 10
+      { xPosition: 90, yPosition: 36 }, // antes 36
+      { xPosition: 100, yPosition: 2 }, // antes 2
+      { xPosition: 110, yPosition: 24 } // antes 28
     ];
 
     context.AlterationClefPositionBemol = [
-      { xPosition: 50, yPosition: 14 }, //antes 22
-      { xPosition: 60, yPosition: -10 }, //antes -2
-      { xPosition: 70, yPosition: 22 }, //antes 30
-      { xPosition: 80, yPosition: -2 },  //antes 6
-      { xPosition: 90, yPosition: 30 }, //antes 38
-      { xPosition: 100, yPosition: 6 }, //antes 14
-      { xPosition: 110, yPosition: 37 } //antes 45
+      { xPosition: 50, yPosition: 20 }, //antes 22
+      { xPosition: 60, yPosition: -3 }, //antes -2
+      { xPosition: 70, yPosition: 29 }, //antes 30
+      { xPosition: 80, yPosition: 6 }, //antes 6
+      { xPosition: 90, yPosition: 38 }, //antes 38
+      { xPosition: 100, yPosition: 13 }, //antes 14
+      { xPosition: 110, yPosition: 45 } //antes 45
     ];
 
     context.DotNote = [
@@ -140,7 +140,7 @@ function IncipitClass() {
         value: ";",
         font: 30,
         paec: "/",
-        yPosition: 11.5,
+        yPosition: 12.5,
         xPosition: 35
       },
       {
@@ -148,7 +148,7 @@ function IncipitClass() {
         value: "<",
         font: 30,
         paec: "//",
-        yPosition: 11.5,
+        yPosition: 12.5,
         xPosition: 35
       },
       {
@@ -156,7 +156,7 @@ function IncipitClass() {
         value: ">",
         font: 30,
         paec: "//:",
-        yPosition: 11.5,
+        yPosition: 12.5,
         xPosition: 35
       },
       {
@@ -164,7 +164,7 @@ function IncipitClass() {
         value: "?",
         font: 30,
         paec: "://",
-        yPosition: 11.5,
+        yPosition: 12.5,
         xPosition: 35
       },
       {
@@ -172,10 +172,11 @@ function IncipitClass() {
         value: "@",
         font: 30,
         paec: "://:",
-        yPosition: 11.5,
+        yPosition: 12.5,
         xPosition: 35
       }
     ];
+
 
     context.Time = [
       {
@@ -183,7 +184,7 @@ function IncipitClass() {
         value: "t",
         font: 70,
         paec: "4/4",
-        yPosition: 5,
+        yPosition: 6,
         xPosition: 50
       },
       {
@@ -191,7 +192,7 @@ function IncipitClass() {
         value: "u",
         font: 70,
         paec: "2/2",
-        yPosition: 5,
+        yPosition: 5.7,
         xPosition: 50
       },
       {
@@ -199,7 +200,7 @@ function IncipitClass() {
         value: "v",
         font: 70,
         paec: "2/4",
-        yPosition: 5,
+        yPosition: 6,
         xPosition: 50
       },
       {
@@ -207,7 +208,7 @@ function IncipitClass() {
         value: "w",
         font: 70,
         paec: "3/4",
-        yPosition: 5,
+        yPosition: 6,
         xPosition: 50
       },
       {
@@ -215,7 +216,7 @@ function IncipitClass() {
         value: "x",
         font: 70,
         paec: "3/8",
-        yPosition: 5,
+        yPosition: 6,
         xPosition: 50
       },
       {
@@ -223,7 +224,7 @@ function IncipitClass() {
         value: "y",
         font: 70,
         paec: "6/8",
-        yPosition: 5,
+        yPosition: 6,
         xPosition: 50
       },
       {
@@ -231,7 +232,7 @@ function IncipitClass() {
         value: "z",
         font: 70,
         paec: "9/8",
-        yPosition: 5,
+        yPosition: 6,
         xPosition: 50
       },
       {
@@ -239,7 +240,7 @@ function IncipitClass() {
         value: "{",
         font: 70,
         paec: "12/8",
-        yPosition: 5,
+        yPosition: 6,
         xPosition: 50
       },
       {
@@ -247,7 +248,7 @@ function IncipitClass() {
         value: "|",
         font: 70,
         paec: "3/2",
-        yPosition: 5,
+        yPosition: 6,
         xPosition: 50
       }
     ];
@@ -267,7 +268,7 @@ function IncipitClass() {
         value: "2",
         font: 60,
         isRest: false,
-        yPosition: 3,
+        yPosition: 4,
         paec: "%C-3"
       }, //46 for clef
       {
@@ -275,7 +276,7 @@ function IncipitClass() {
         value: "3",
         font: 60,
         isRest: false,
-        yPosition: 1,
+        yPosition: 2,
         paec: "%F-4"
       }, //46 for clef
 
@@ -304,27 +305,11 @@ function IncipitClass() {
 
       //Silencios
       {
-        name: "restLon",
-        value: '"',
-        font: 38,
-        isRest: true,
-        yPosition: 8,
-        paec: "0-"
-      },
-      {
-        name: "restBrev",
-        value: "#",
-        font: 38,
-        isRest: true,
-        yPosition: 8,
-        paec: "9-"
-      },
-      {
         name: "restSemirev",
         value: "$",
         font: 38,
         isRest: true,
-        yPosition: 8,
+        yPosition: 7.7,
         paec: "1-"
       },
       {
@@ -332,8 +317,24 @@ function IncipitClass() {
         value: "%",
         font: 38,
         isRest: true,
-        yPosition: 8,
+        yPosition: 8.3,
         paec: "2-"
+      },
+      {
+        name: "restLon",
+        value: '"',
+        font: 46,
+        isRest: true,
+        yPosition: 7.5,
+        paec: "0-"
+      },
+      {
+        name: "restBrev",
+        value: "#",
+        font: 46,
+        isRest: true,
+        yPosition: 7.5,
+        paec: "9-"
       },
       {
         name: "restCrotchet",
@@ -343,36 +344,37 @@ function IncipitClass() {
         yPosition: 8,
         paec: "4-"
       },
-      {
+      {//6 Silencio corchea
         name: "restQuaver",
         value: "'",
-        font: 38,
+        font: 55,
         isRest: true,
-        yPosition: 8,
+        yPosition: 6.8,
         paec: "8-"
       },
-      {
+
+      {//7 Silencio semicorchea
         name: "restSemiqua",
         value: "(",
-        font: 38,
+        font: 55,
         isRest: true,
-        yPosition: 8,
+        yPosition: 4.8,
         paec: "6-"
       },
-      {
+      { //8 Silencio fusa
         name: "restDemsemqu",
         value: ")",
-        font: 38,
+        font: 55,
         isRest: true,
-        yPosition: 8,
+        yPosition: 6.8,
         paec: "3-"
       },
-      {
+      { //9 Silencio semifusa
         name: "restHemdemsemqu",
         value: "*",
-        font: 38,
+        font: 55,
         isRest: true,
-        yPosition: 8,
+        yPosition: 6.8,
         paec: "5-"
       }
     ];
@@ -1535,14 +1537,14 @@ function CanvasClass() {
         the StepY cause problems not drawing the Note head on the position, that is why the substract
         step*6 + pixelsToAdd occurs, to set it on the mouse position */
     var pixelsToAdd = 2;
-    if (context.operation == "list") pixelsToAdd = 0.5;
-    this.verticalOffset = 5;
+    if (context.operation == "list") pixelsToAdd = 3;
+    context.verticalOffset = -1.5;
     var positionY =
       (elementY + drawingProblemYPatchAmountFix + context.minStepY) *
         context.stepY -
       context.stepY * contextMultiplier +
       pixelsToAdd +
-      this.verticalOffset;
+      context.verticalOffset;
 
     return { x: positionX, y: positionY };
   };
@@ -1558,8 +1560,8 @@ function CanvasClass() {
 
     // 1ª línea auxiliar (más cercana al pentagrama)
     if (
-      (upOrDown === -1 && yPosition <= 2) || // arriba
-      (upOrDown === 1 && yPosition >= 14) // abajo
+      (upOrDown === -1 && yPosition <= 3) || // arriba
+      (upOrDown === 1 && yPosition >= 15) // abajo
     ) {
       pixelsToAdd = context.stepY * 2 * 3 * upOrDown + context.stepY / 2;
       context.gDrawingContext.moveTo(
@@ -1575,7 +1577,7 @@ function CanvasClass() {
     // 2ª línea auxiliar
     if (
       (upOrDown === -1 && yPosition <= 1) || // arriba
-      (upOrDown === 1 && yPosition >= 15) // abajo
+      (upOrDown === 1 && yPosition >= 17) // abajo
     ) {
       pixelsToAdd = context.stepY * 2 * 4 * upOrDown + context.stepY / 2;
       context.gDrawingContext.moveTo(
@@ -1591,7 +1593,7 @@ function CanvasClass() {
     // 3ª línea auxiliar (más alejada)
     if (
       (upOrDown === -1 && yPosition <= 0) || // arriba
-      (upOrDown === 1 && yPosition >= 17) // abajo
+      (upOrDown === 1 && yPosition >= 18) // abajo
     ) {
       pixelsToAdd = context.stepY * 2 * 5 * upOrDown + context.stepY / 2;
       context.gDrawingContext.moveTo(
@@ -2029,7 +2031,7 @@ function CanvasClass() {
     var paecOctave = "";
     var paecNote = "";
     // Corrección fina: bajamos un grado porque el dibujo quedó 1 paso corrido
-    notePosition += 1;
+    notePosition += 0;
     // 19 notes the incipit can represent, 31 notes can mean
     //'''DC''BAGFEDC'BAGFEDC,BAG                 Treble
     //         ''EDC'BAGFEDC,BAGFEDC,,BA         Alto
@@ -2291,6 +2293,32 @@ function CanvasClass() {
     var currentClef = "treble";
     var hasDot = false;
     var paecRythm = "";
+
+    // --- Normaliza header para que el parser legacy lo lea bien ---
+    // Soporta que venga "%... $... @..." o en cualquier orden.
+    paec = (paec || "").trim();
+    if (paec) {
+      // toma 1 ocurrencia de cada cosa (header)
+      const clefMatch = paec.match(/%[^ $@]+/); // ej: %G-2
+      const keyMatch = paec.match(/\$[^ %@]+/); // ej: $xFCGD
+      const timeMatch = paec.match(/@[^ $%]+/); // ej: @4/4
+
+      // quita esas piezas del string original
+      let rest = paec
+        .replace(clefMatch ? clefMatch[0] : "", "")
+        .replace(keyMatch ? keyMatch[0] : "", "")
+        .replace(timeMatch ? timeMatch[0] : "", "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      // reconstruye en el orden que el parser espera: $ @ %
+      let header = "";
+      if (keyMatch) header += keyMatch[0];
+      if (timeMatch) header += timeMatch[0];
+      if (clefMatch) header += clefMatch[0];
+
+      paec = (header ? header + (rest ? " " : "") : "") + rest;
+    }
 
     for (var index = 0; index < paec.length; index++) {
       var elem = null;

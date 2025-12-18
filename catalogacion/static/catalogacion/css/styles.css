@@ -835,62 +835,6 @@ textarea.form-control {
 }
 
 /* ============================================
-   Botones del incipit (toolbar + cabecera)
-   ============================================ */
-.btn-incipit {
-  background: var(--gray-50);
-  color: black;
-  border: 1px solid var(--gray-800);
-  padding: .5rem .9rem;
-  font-weight: 600;
-  transition: filter .15s ease, transform .02s ease;
-}
-
-
-.btn-incipit:hover {
-  filter: brightness(0.92);
-
-  background-color: var(--gray-800);
-  color: rgb(255, 255, 255);
-}
-
-
-/* Accesibilidad: SOLO cuando se navega con teclado mostramos un ring sutil */
-.btn-incipit:focus-visible {
-  outline: 2px solid var(--gray-400);
-  outline-offset: 2px;
-}
-
-/* Estado activo corto (click) */
-.btn-incipit:active {
-  transform: translateY(1px);
-}
-
-/* Mantener la fuente para glifos musicales */
-.btn-music span {
-  font-family: 'Maestro','Bravura','Music', serif;
-}
-
-/* ----normalizar tamaño de los botones del toolbar ---- */
-
-.btn-music {
-  font-size: 14px;
-  min-width: 20px;
-  padding: 0px 10px;
-  text-align: left
-}
-
-.btn-music-gliphos {
-  font-size: 23px;   /* glifos musicales*/
-  max-height: 40px;
-}
-
-/* fuerza Maestro en los botones del toolbar */
-.btn-music span {
-  font-family: 'Maestro','Bravura','Music', serif;
-}
-
-/* ============================================
    AUTOCOMPLETE DROPDOWNS - AUTORIDADES
    ============================================ */
 .autocomplete-wrapper {

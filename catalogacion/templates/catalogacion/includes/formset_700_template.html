@@ -100,17 +100,43 @@ Orden vertical limpio
 
                 
 
-                <!-- 700 $e – Función (NO repetible visualmente) -->
+                <!-- 700 $e – Función (REPETIBLE, INLINE FORMSET) -->
                 <div class="col-full">
                     <label class="form-label small">700 $e – Función</label>
-                    <select class="form-select funcion-select" name="funcion_700_{{ forloop.counter0 }}_0">
-                        {% for value, label in form.autoria.field.choices %}
-                            <option value="{{ value }}" {% if form.instance.pk and form.instance.funciones.first.funcion == value %}selected{% endif %}>
-                                {{ label }}
-                            </option>
+
+                    <div class="subcampo-repetible-container funciones-container">
+
+                        {{ form.funcion700_formset.management_form }}
+
+                        {% for fform in form.funcion700_formset %}
+                        <div class="subcampo-row funcion-form-row">
+
+                            {% if forloop.first %}
+                            <button type="button"
+                                    class="subcampo-add-btn add-funcion-btn"
+                                    data-nombre-index="{{ forloop.parentloop.counter0 }}">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            {% else %}
+                            <div class="subcampo-placeholder"></div>
+                            {% endif %}
+
+                            {{ fform.funcion }}
+
+                            {% if form.funcion700_formset.can_delete %}
+                                {{ fform.DELETE }}
+                                <button type="button"
+                                        class="subcampo-delete-btn delete-funcion-btn"
+                                        {% if forloop.first and forloop.last %}style="visibility:hidden"{% endif %}>
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            {% endif %}
+                        </div>
                         {% endfor %}
-                    </select>
+
+                    </div>
                 </div>
+
 
                 <!-- 700 $i – Relación -->
                 <div class="col-full">
@@ -227,167 +253,131 @@ Orden vertical limpio
 
 
 <script>
-    (function () {
+(function () {
 
-        const prefix = "{{ formset.prefix }}";
-        const root = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-        if (!root) return;
+    const prefix = "{{ formset.prefix }}";
+    const root = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+    if (!root) return;
 
-        const terminoTemplate = document.querySelector('.termino-template-700');
-        const funcionTemplate = document.querySelector('.funcion-template-700');
+    /* ======================================================
+       AUTOCOMPLETE PERSONA 700 $a (SIN CAMBIOS)
+       ====================================================== */
+    function initPersonaAutocomplete(row) {
+        if (row.dataset.persona700Init === "1") return;
+        row.dataset.persona700Init = "1";
 
-        /* ======================================================
-           AUTOCOMPLETE PERSONA 700 $a
-           ====================================================== */
-        function initPersonaAutocomplete(row) {
-            if (row.dataset.persona700Init === "1") return;
-            row.dataset.persona700Init = "1";
+        const input = row.querySelector('input[name$="persona_texto"]');
+        const hidden = row.querySelector('input[name$="persona"]');
+        const coord = row.querySelector('input[name$="persona_coordenadas"]');
+        const box = row.querySelector('.persona700-suggestions');
 
-            const input = row.querySelector('input[name$="persona_texto"]');
-            const hidden = row.querySelector('input[name$="persona"]');
-            const coord = row.querySelector('input[name$="persona_coordenadas"]');
-            const box = row.querySelector('.persona700-suggestions');
+        if (!input || !hidden || !box) return;
 
-            if (!input || !hidden || !box) return;
+        let timer = null;
 
-            let timer = null;
-            let selectedIndex = -1;
-
-            function hide() {
-                box.classList.remove("show");
-                box.innerHTML = "";
-                selectedIndex = -1;
-            }
-
-            function selectPersona(p) {
-                input.value = p.text;
-                hidden.value = p.id || "";
-                if (coord) coord.value = p.coordenadas || "";
-                hide();
-            }
-
-            function render(list, query) {
-                box.innerHTML = "";
-                selectedIndex = -1;
-
-                if (!list.length) {
-                    const nuevo = document.createElement("div");
-                    nuevo.className = "autocomplete-item autocomplete-item-new";
-                    nuevo.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${query}"`;
-                    nuevo.onclick = () => selectPersona({ text: query, id: "", coordenadas: "" });
-                    box.appendChild(nuevo);
-                } else {
-                    list.forEach(p => {
-                        const d = document.createElement("div");
-                        d.className = "autocomplete-item";
-                        d.innerHTML = `<strong>${p.apellidos_nombres}</strong>`;
-                        d.onclick = () => selectPersona({
-                            text: p.apellidos_nombres,
-                            id: p.id,
-                            coordenadas: p.coordenadas_biograficas || ""
-                        });
-                        box.appendChild(d);
-                    });
-
-                    const nuevo = document.createElement("div");
-                    nuevo.className = "autocomplete-item autocomplete-item-new";
-                    nuevo.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${query}"`;
-                    nuevo.onclick = () => selectPersona({ text: query, id: "", coordenadas: "" });
-                    box.appendChild(nuevo);
-                }
-
-                box.classList.add("show");
-            }
-
-            function search(q) {
-                fetch(`/catalogacion/api/autocompletar/persona/?q=${encodeURIComponent(q)}`)
-                    .then(r => r.json())
-                    .then(data => render(data.results || [], q))
-                    .catch(() => hide());
-            }
-
-            input.addEventListener("input", () => {
-                const q = input.value.trim();
-                hidden.value = "";
-                if (q.length < 2) return hide();
-                clearTimeout(timer);
-                timer = setTimeout(() => search(q), 300);
-            });
-
-            document.addEventListener("click", e => {
-                if (!row.contains(e.target)) hide();
-            });
+        function hide() {
+            box.classList.remove("show");
+            box.innerHTML = "";
         }
 
-        /* ======================================================
-           REINDEXAR FORMSET 700
-           ====================================================== */
-        function reindex700() {
-            const rows = root.querySelectorAll(".formset-row:not(.empty-form)");
-            const totalInput = root.querySelector(`[name="${prefix}-TOTAL_FORMS"]`);
+        function selectPersona(p) {
+            input.value = p.text;
+            hidden.value = p.id || "";
+            if (coord) coord.value = p.coordenadas || "";
+            hide();
+        }
 
-            rows.forEach((row, index) => {
-                row.querySelectorAll("[name], [id], label[for]").forEach(el => {
-                    ["name", "id", "for"].forEach(attr => {
-                        const val = el.getAttribute(attr);
-                        if (!val) return;
+        function render(list, query) {
+            box.innerHTML = "";
 
-                        el.setAttribute(
-                            attr,
-                            val.replace(/-\d+-/, `-${index}-`)
-                                .replace(/__prefix__/, index)
-                        );
-                    });
+            list.forEach(p => {
+                const d = document.createElement("div");
+                d.className = "autocomplete-item";
+                d.innerHTML = `<strong>${p.apellidos_nombres}</strong>`;
+                d.onclick = () => selectPersona({
+                    text: p.apellidos_nombres,
+                    id: p.id,
+                    coordenadas: p.coordenadas_biograficas || ""
                 });
-
-                row.querySelectorAll("[data-nombre-index]").forEach(btn =>
-                    btn.dataset.nombreIndex = index
-                );
-
-                row.querySelector("[data-terminos-container]")
-                    ?.setAttribute("data-terminos-container", index);
-                row.querySelector("[data-funciones-container]")
-                    ?.setAttribute("data-funciones-container", index);
-
-                initPersonaAutocomplete(row);
+                box.appendChild(d);
             });
 
-            if (totalInput) totalInput.value = rows.length;
+            const nuevo = document.createElement("div");
+            nuevo.className = "autocomplete-item autocomplete-item-new";
+            nuevo.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${query}"`;
+            nuevo.onclick = () => selectPersona({ text: query, id: "" });
+            box.appendChild(nuevo);
+
+            box.classList.add("show");
         }
 
-        /* ======================================================
-           AGREGAR FILA 700 (FUNCIÓN ÚNICA)
-           ====================================================== */
-        function add700Row() {
-            const empty = root.querySelector(".empty-form");
-            const forms = root.querySelector(".formset-forms");
-            const totalInput = root.querySelector(`[name="${prefix}-TOTAL_FORMS"]`);
-
-            if (!empty || !forms || !totalInput) return;
-
-            const index = parseInt(totalInput.value, 10) || 0;
-
-            const clone = empty.cloneNode(true);
-            clone.innerHTML = clone.innerHTML.replace(/__prefix__/g, index);
-            clone.classList.remove("empty-form");
-            clone.style.display = "";
-
-            forms.appendChild(clone);
-            totalInput.value = index + 1;
-
-            initPersonaAutocomplete(clone);
-            reindex700();
+        function search(q) {
+            fetch(`/catalogacion/api/autocompletar/persona/?q=${encodeURIComponent(q)}`)
+                .then(r => r.json())
+                .then(data => render(data.results || [], q))
+                .catch(() => hide());
         }
 
-        /* ======================================================
-           SUBCAMPOS $c y $e
-           ====================================================== */
-        function createSubRow(type, index) {
+        input.addEventListener("input", () => {
+            const q = input.value.trim();
+            hidden.value = "";
+            if (q.length < 2) return hide();
+            clearTimeout(timer);
+            timer = setTimeout(() => search(q), 300);
+        });
+
+        document.addEventListener("click", e => {
+            if (!row.contains(e.target)) hide();
+        });
+    }
+
+    /* ======================================================
+       REINDEXAR FORMSET 700 (SIN CAMBIOS)
+       ====================================================== */
+    function reindex700() {
+        const rows = root.querySelectorAll(".formset-row:not(.empty-form)");
+        const totalInput = root.querySelector(`[name="${prefix}-TOTAL_FORMS"]`);
+
+        rows.forEach((row, index) => {
+            row.querySelectorAll("[name], [id], label[for]").forEach(el => {
+                ["name", "id", "for"].forEach(attr => {
+                    const val = el.getAttribute(attr);
+                    if (!val) return;
+                    el.setAttribute(
+                        attr,
+                        val.replace(/-\d+-/, `-${index}-`)
+                           .replace(/__prefix__/g, index)
+                    );
+                });
+            });
+
+            row.querySelectorAll("[data-nombre-index]").forEach(btn =>
+                btn.dataset.nombreIndex = index
+            );
+
+            initPersonaAutocomplete(row);
+        });
+
+        if (totalInput) totalInput.value = rows.length;
+    }
+
+    /* ======================================================
+       EVENTOS
+       ====================================================== */
+    root.addEventListener("click", e => {
+
+        /* ==========================================
+           ➕ 700 $c – término asociado (SIN CAMBIOS)
+           ========================================== */
+        const addTermino = e.target.closest(".add-termino-btn");
+        if (addTermino) {
+            const index = addTermino.dataset.nombreIndex;
+            const cont = root.querySelector(`[data-terminos-container="${index}"]`);
+            if (!cont) return;
+
             const row = document.createElement("div");
             row.className = "subcampo-row mt-2";
-
-            if (type === "termino") {
-                row.innerHTML = `
+            row.innerHTML = `
                 <div class="subcampo-placeholder"></div>
                 <input type="text" class="form-control termino-input"
                        name="termino_asociado_700_${index}_${Date.now()}"
@@ -395,93 +385,71 @@ Orden vertical limpio
                 <button type="button" class="subcampo-delete-btn delete-termino-btn">
                     <i class="bi bi-x-lg"></i>
                 </button>`;
-            }
-
-            if (type === "funcion") {
-                row.innerHTML = `
-                <div class="subcampo-placeholder"></div>
-                <select class="form-select funcion-select"
-                        name="funcion_700_${index}_${Date.now()}">
-                    ${funcionTemplate.querySelector("select").innerHTML}
-                </select>
-                <button type="button" class="subcampo-delete-btn delete-funcion-btn">
-                    <i class="bi bi-x-lg"></i>
-                </button>`;
-            }
-
-            return row;
+            cont.appendChild(row);
+            return;
         }
 
-        /* ======================================================
-           EVENTOS
-           ====================================================== */
-        root.addEventListener("click", e => {
+        /* ==========================================
+           ➕ 700 $e – FUNCIÓN (INLINE FORMSET CORRECTO)
+           ========================================== */
+        const addFuncion = e.target.closest(".add-funcion-btn");
+        if (addFuncion) {
+            const container = addFuncion.closest(".funciones-container");
+            if (!container) return;
 
-            // ➕ fila 700 (botón header)
-            if (e.target.closest(`.campo-add-btn[data-formset-target="${prefix}"]`)) {
-                add700Row();
-                return;
+            const rows = container.querySelectorAll(".funcion-form-row");
+            if (!rows.length) return;
+
+            const last = rows[rows.length - 1];
+            const clone = last.cloneNode(true);
+
+            // limpiar select
+            const select = clone.querySelector("select");
+            if (select) select.selectedIndex = 0;
+
+            // limpiar DELETE
+            const delInput = clone.querySelector('input[type="checkbox"]');
+            if (delInput) delInput.checked = false;
+
+            // mostrar botón eliminar
+            const delBtn = clone.querySelector(".delete-funcion-btn");
+            if (delBtn) delBtn.style.visibility = "visible";
+
+            container.appendChild(clone);
+
+            // 🔥 actualizar TOTAL_FORMS del inline formset
+            const management = container.querySelector('input[name$="-TOTAL_FORMS"]');
+            if (management) {
+                management.value = parseInt(management.value, 10) + 1;
             }
+            return;
+        }
 
-            // ❌ eliminar fila 700
-            const delRow = e.target.closest(".delete-row-btn");
-            if (delRow) {
-                const row = delRow.closest(".formset-row");
-                if (!row || row.classList.contains("empty-form")) return;
+        /* ==========================================
+           ❌ eliminar subcampo $c o $e
+           ========================================== */
+        const delBtn = e.target.closest(".delete-termino-btn, .delete-funcion-btn");
+        if (delBtn) {
+            const row = delBtn.closest(".subcampo-row, .funcion-form-row");
+            if (!row) return;
 
-                const delInput = row.querySelector('[name$="-DELETE"]');
-
-                // 🔒 fila existente → marcar DELETE y ocultar
-                if (delInput && row.classList.contains("existing-form")) {
-                    delInput.checked = !delInput.checked;
-                    row.style.display = delInput.checked ? "none" : "";
-                    return;
-                }
-
-                // 🆕 fila nueva → eliminar del DOM
+            const delInput = row.querySelector('input[type="checkbox"]');
+            if (delInput) {
+                delInput.checked = true;
+                row.style.display = "none";
+            } else {
                 row.remove();
-                reindex700();
-
-                // 🔒 asegurar que siempre quede una fila
-                if (!root.querySelector(".formset-row:not(.empty-form)")) {
-                    add700Row();
-                }
-                return;
             }
+        }
+    });
 
+    /* ======================================================
+       INIT
+       ====================================================== */
+    root.querySelectorAll(".formset-row:not(.empty-form)")
+        .forEach(row => initPersonaAutocomplete(row));
 
-            // ➕ término $c
-            const addTermino = e.target.closest(".add-termino-btn");
-            if (addTermino) {
-                const index = addTermino.dataset.nombreIndex;
-                const cont = root.querySelector(`[data-terminos-container="${index}"]`);
-                if (cont) cont.appendChild(createSubRow("termino", index));
-                return;
-            }
+    reindex700();
 
-            // ➕ función $e
-            const addFuncion = e.target.closest(".add-funcion-btn");
-            if (addFuncion) {
-                const index = addFuncion.dataset.nombreIndex;
-                const cont = root.querySelector(`[data-funciones-container="${index}"]`);
-                if (cont) cont.appendChild(createSubRow("funcion", index));
-                return;
-            }
-
-            // ❌ eliminar subcampo
-            if (e.target.closest(".delete-termino-btn") ||
-                e.target.closest(".delete-funcion-btn")) {
-                e.target.closest(".subcampo-row")?.remove();
-            }
-        });
-
-        /* ======================================================
-           INIT
-           ====================================================== */
-        root.querySelectorAll(".formset-row:not(.empty-form)")
-            .forEach(row => initPersonaAutocomplete(row));
-
-        reindex700();
-
-    })();
+})();
 </script>
