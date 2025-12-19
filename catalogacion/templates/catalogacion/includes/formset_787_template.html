@@ -26,7 +26,6 @@ Patrón unificado con 773 / 774
                 <div class="d-none">{{ form.DELETE }}</div>
             {% endif %}
 
-            <!-- ❌ eliminar -->
             <button type="button"
                     class="delete-row-btn"
                     title="Eliminar relación">
@@ -50,16 +49,12 @@ Patrón unificado con 773 / 774
                             787 $a – Encabezamiento principal
                         </label>
 
-                        <div class="autocomplete-wrapper"
-                             data-autocomplete="persona">
-                            {{ form.encabezamiento_principal_texto }}
-                            <div class="autocomplete-suggestions"></div>
-                        </div>
+                        {{ form.encabezamiento_principal_texto }}
 
                         {{ form.encabezamiento_principal }} {# hidden FK #}
 
                         <small class="form-text text-muted">
-                            Busque una persona o escriba para crearla.
+                            Texto libre (sin búsqueda).
                         </small>
                     </div>
 
@@ -69,11 +64,11 @@ Patrón unificado con 773 / 774
                             787 $t – Título
                         </label>
 
-                        <div class="autocomplete-wrapper"
-                             data-autocomplete="titulo">
-                            {{ form.titulo }}
-                            <div class="autocomplete-suggestions"></div>
-                        </div>
+                        {{ form.titulo }}
+
+                        <small class="form-text text-muted">
+                            Texto libre (sin búsqueda).
+                        </small>
                     </div>
 
                     <!-- ================= 787 $w ================= -->
@@ -132,21 +127,15 @@ Patrón unificado con 773 / 774
 
                     <div class="mb-3">
                         <label class="form-label small">787 $a – Encabezamiento principal</label>
-                        <div class="autocomplete-wrapper"
-                             data-autocomplete="persona">
-                            {{ formset.empty_form.encabezamiento_principal_texto }}
-                            <div class="autocomplete-suggestions"></div>
-                        </div>
+                        {{ formset.empty_form.encabezamiento_principal_texto }}
                         {{ formset.empty_form.encabezamiento_principal }}
+                        <small class="form-text text-muted">Texto libre (sin búsqueda).</small>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label small">787 $t – Título</label>
-                        <div class="autocomplete-wrapper"
-                             data-autocomplete="titulo">
-                            {{ formset.empty_form.titulo }}
-                            <div class="autocomplete-suggestions"></div>
-                        </div>
+                        {{ formset.empty_form.titulo }}
+                        <small class="form-text text-muted">Texto libre (sin búsqueda).</small>
                     </div>
 
                     <div class="mt-3">
@@ -188,7 +177,7 @@ Patrón unificado con 773 / 774
             endpoint = "/catalogacion/api/autocompletar/persona/";
         }
         if (type === "titulo") {
-            endpoint = "/catalogacion/api/autocompletar/titulo-uniforme/";
+            endpoint = "/catalogacion/api/autocompletar/titulo/";
         }
         if (!endpoint) return;
 
@@ -206,100 +195,4 @@ Patrón unificado con 773 / 774
                 return;
             }
 
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-                fetch(`${endpoint}?q=${encodeURIComponent(q)}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        box.innerHTML = "";
-                        const results = data.results || [];
-
-                        if (!results.length) {
-                            box.innerHTML = `
-                                <div class="autocomplete-item autocomplete-item-new">
-                                    <i class="bi bi-plus-circle me-2"></i>
-                                    Crear: "${q}"
-                                </div>`;
-                        } else {
-                            results.forEach(item => {
-                                const div = document.createElement("div");
-                                div.className = "autocomplete-item";
-                                div.textContent = item.text;
-                                div.onclick = () => {
-                                    input.value = item.text;
-                                    hide();
-                                };
-                                box.appendChild(div);
-                            });
-
-                            const crear = document.createElement("div");
-                            crear.className = "autocomplete-item autocomplete-item-new";
-                            crear.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${q}"`;
-                            crear.onclick = () => {
-                                input.value = q;
-                                hide();
-                            };
-                            box.appendChild(crear);
-                        }
-
-                        box.classList.add("show");
-                    });
-            }, 300);
-        });
-
-        document.addEventListener("click", e => {
-            if (!wrapper.contains(e.target)) hide();
-        });
-    }
-
-    /* =====================================================
-       BOTÓN GLOBAL + (formsets)
-       ===================================================== */
-    document.addEventListener("click", function (e) {
-
-        const btn = e.target.closest(".campo-add-btn");
-        if (!btn) return;
-
-        const prefix = btn.dataset.formsetTarget;
-        if (!prefix) return;
-
-        const container = document.querySelector(
-            `.formset-container[data-formset-prefix="${prefix}"]`
-        );
-        if (!container) return;
-
-        const forms = container.querySelector(".formset-forms");
-        const empty = container.querySelector(".empty-form");
-        const totalInput = container.querySelector(
-            `input[name="${prefix}-TOTAL_FORMS"]`
-        );
-
-        if (!forms || !empty || !totalInput) return;
-
-        const index = parseInt(totalInput.value, 10);
-
-        const clone = empty.cloneNode(true);
-        clone.classList.remove("empty-form", "d-none");
-        clone.innerHTML = clone.innerHTML.replace(/__prefix__/g, index);
-
-        forms.appendChild(clone);
-        totalInput.value = index + 1;
-
-        // 🔥 REINICIALIZAR AUTOCOMPLETE EN CLON
-        clone
-            .querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
-            .forEach(w => {
-                w.removeAttribute("data-autocomplete-init");
-                initAutocomplete(w);
-            });
-    });
-
-    /* =====================================================
-       INIT INICIAL
-       ===================================================== */
-    document
-        .querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
-        .forEach(initAutocomplete);
-
-})();
-</script>
+            box.classList.remove("show");

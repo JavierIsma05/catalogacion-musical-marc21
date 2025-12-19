@@ -14,6 +14,8 @@
     let autoSaveTimer = null;
     let changeTimer = null;
     let hasUnsavedChanges = false;
+    let allowNativeReload = false;
+    let allowUnloadOnce = false;
 
     const form = document.getElementById("obra-form");
 
@@ -335,6 +337,9 @@
                 // 3. NUEVO: Restaurar subcampos dinámicos
                 await restaurarSubcamposDinamicos(datos);
 
+                // 3.1 Rehidratar campos derivados en UI (ej: enlaces 773/774/787)
+                await rehidratarEnlacesObrasRelacionadas();
+
                 // 4. Navegar a pestaña guardada
                 if (
                     typeof switchTab === "function" &&
@@ -367,6 +372,68 @@
         } catch (error) {
             console.error("Error cargando borrador:", error);
             mostrarNotificacion("Error al cargar borrador", "error");
+        }
+    }
+
+    /**
+     * Rehidrata el texto visible de los enlaces ($w) a obras relacionadas.
+     * En el HTML, el valor real va en un hidden `.obra-relacionada-id-input` (id de ObraGeneral)
+     * y el input visible `.numero-w-input` solo muestra el 001 (num_control).
+     * Al restaurar desde borrador tenemos el id, así que consultamos el num_control.
+     */
+    async function rehidratarEnlacesObrasRelacionadas() {
+        const hiddenInputs = Array.from(
+            document.querySelectorAll(
+                'input.obra-relacionada-id-input[name^="w_"]'
+            )
+        );
+
+        if (!hiddenInputs.length) return;
+
+        const cache = new Map();
+
+        async function resolveNumControlById(id) {
+            if (!id) return null;
+            if (cache.has(id)) return cache.get(id);
+
+            try {
+                const resp = await fetch(
+                    `/catalogacion/api/buscar-obras/?id=${encodeURIComponent(
+                        id
+                    )}`
+                );
+                const data = await resp.json();
+                const result =
+                    (data && data.results && data.results[0]) || null;
+                const num = result ? result.num_control : null;
+                cache.set(id, num);
+                return num;
+            } catch (e) {
+                console.warn(
+                    "No se pudo resolver num_control para obra id",
+                    id
+                );
+                cache.set(id, null);
+                return null;
+            }
+        }
+
+        // Resolver en serie para evitar ráfagas; el cache reduce duplicados
+        for (const hidden of hiddenInputs) {
+            const obraId = (hidden.value || "").trim();
+            if (!obraId) continue;
+
+            const group = hidden.closest(".input-group");
+            if (!group) continue;
+            const visible = group.querySelector(".numero-w-input");
+            if (!visible) continue;
+
+            const num = await resolveNumControlById(obraId);
+            if (num) {
+                visible.value = num;
+                visible.dispatchEvent(new Event("input", { bubbles: true }));
+                visible.dispatchEvent(new Event("change", { bubbles: true }));
+            }
         }
     }
 
@@ -731,11 +798,154 @@
      * Prevenir pérdida de datos
      */
     window.addEventListener("beforeunload", (e) => {
-        if (hasUnsavedChanges) {
+        // Si el usuario eligió recargar explícitamente desde nuestra alerta,
+        // dejamos que el navegador continúe sin bloquear.
+        if (allowNativeReload || allowUnloadOnce) {
+            return;
+        }
+
+        // Nota: aquí NO se puede mostrar SweetAlert2.
+        // Los navegadores solo permiten un aviso nativo.
+        if (hasUnsavedChanges || borradorId) {
             e.preventDefault();
             e.returnValue = "";
         }
     });
+
+    /**
+     * Intercepta intentos comunes de recarga (teclado) y muestra una alerta.
+     * Nota: los navegadores NO permiten reemplazar el diálogo nativo de recarga
+     * al usar el botón del navegador; esto cubre F5/Ctrl+R/⌘R.
+     */
+    function instalarAlertaRecargaConBorrador() {
+        async function mostrarAlertaSalida({ accion, onContinuar }) {
+            const titulo = "Borrador guardado";
+            const html = `
+                <div class="text-start">
+                    <p class="mb-2">Tu avance ya está guardado como <strong>borrador</strong>.</p>
+                    <ul class="mb-0">
+                        <li>Para continuar luego, entra a <strong>Borradores</strong> y elige cuál seguir.</li>
+                        <li>Si ${accion}, el formulario se reiniciará.</li>
+                    </ul>
+                </div>
+            `;
+
+            if (typeof Swal === "undefined") {
+                const ok = window.confirm(
+                    "Tu avance ya está guardado como borrador.\n\nPara continuar luego, entra a Borradores y elige cuál seguir.\n\n¿Ir a Borradores ahora?"
+                );
+                if (ok) {
+                    window.location.href = "/catalogacion/borradores/";
+                }
+                return;
+            }
+
+            const res = await Swal.fire({
+                icon: "info",
+                title: titulo,
+                html,
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: "Ir a Borradores",
+                denyButtonText: "Continuar igual",
+                cancelButtonText: "Cancelar",
+                focusCancel: true,
+            });
+
+            if (res.isConfirmed) {
+                window.location.href = "/catalogacion/borradores/";
+            } else if (res.isDenied) {
+                onContinuar?.();
+            }
+        }
+
+        function isReloadShortcut(e) {
+            const key = (e.key || "").toLowerCase();
+            // F5 / Ctrl+R / Cmd+R
+            return (
+                e.key === "F5" ||
+                ((e.ctrlKey || e.metaKey) && key === "r")
+            );
+        }
+
+        window.addEventListener(
+            "keydown",
+            async (e) => {
+                if (!isReloadShortcut(e)) return;
+
+                // Solo aplicar cuando YA existe un borrador guardado.
+                if (!borradorId) return;
+
+                // Si hay cambios sin guardar, dejamos el warning nativo (más fiable).
+                if (hasUnsavedChanges) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                await mostrarAlertaSalida({
+                    accion: "recargas la página",
+                    onContinuar: () => {
+                        allowNativeReload = true;
+                        window.location.reload();
+                    },
+                });
+            },
+            true
+        );
+
+        // Navegación interna (sidebar/topbar/links): mostrar SweetAlert2 y permitir continuar.
+        document.addEventListener(
+            "click",
+            async (e) => {
+                const link = e.target.closest("a[href]");
+                if (!link) return;
+
+                // No interceptar: nueva pestaña/descargas/anclas internas
+                const target = (link.getAttribute("target") || "").toLowerCase();
+                if (target && target !== "_self") return;
+                if (link.hasAttribute("download")) return;
+
+                const hrefAttr = link.getAttribute("href");
+                if (!hrefAttr) return;
+                if (hrefAttr.startsWith("#")) return;
+                if (hrefAttr.startsWith("javascript:")) return;
+
+                // Solo aplicar cuando YA existe un borrador guardado.
+                if (!borradorId) return;
+
+                // Si hay cambios sin guardar, dejamos el warning nativo.
+                if (hasUnsavedChanges) return;
+
+                let destination;
+                try {
+                    destination = new URL(hrefAttr, window.location.href);
+                } catch {
+                    return;
+                }
+
+                // Si es la misma página (solo cambia hash), no avisar.
+                const currentNoHash = window.location.href.split("#")[0];
+                const destNoHash = destination.href.split("#")[0];
+                if (currentNoHash === destNoHash) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                await mostrarAlertaSalida({
+                    accion: "sales de esta página",
+                    onContinuar: () => {
+                        allowUnloadOnce = true;
+                        window.location.href = destination.href;
+                        // Reset en caso de que la navegación falle
+                        setTimeout(() => {
+                            allowUnloadOnce = false;
+                        }, 1500);
+                    },
+                });
+            },
+            true
+        );
+    }
 
     /**
      * Eliminar borrador al publicar
@@ -769,6 +979,16 @@
 
             const obraObjetivoId = getObraObjetivoId();
 
+            // En creación, además esperamos a poder determinar el tipo de obra.
+            // Esto evita consultar/verificar borradores con tipo_obra null/desconocido.
+            if (!obraObjetivoId) {
+                const tipoObraTmp = getTipoObra();
+                if (!tipoObraTmp || tipoObraTmp === "desconocido") {
+                    setTimeout(esperarFormularioListo, 100);
+                    return;
+                }
+            }
+
             // En creación, esperamos a tipo_registro/nivel_bibliografico para poder identificar tipo_obra.
             // En edición, podemos continuar aunque aún no estén listos.
             if (!obraObjetivoId && (!tipoRegistro || !nivelBibliografico)) {
@@ -785,6 +1005,12 @@
                 // Esperar un poco más para asegurar que todo está cargado
                 setTimeout(() => cargarBorrador(BORRADOR_A_RECUPERAR), 300);
             }
+
+            // En creación: si NO viene un borrador explícito por sesión, ofrecer restaurar el último borrador
+            // En creación: NO ofrecer restauración automática.
+            // El usuario elige manualmente el borrador desde la lista.
+
+            instalarAlertaRecargaConBorrador();
 
             // En edición: si existe un borrador activo ligado a esta obra, cargarlo automáticamente
             if (obraObjetivoId) {

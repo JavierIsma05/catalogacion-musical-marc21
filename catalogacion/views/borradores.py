@@ -154,11 +154,17 @@ def verificar_borrador_ajax(request):
                 'error': 'Tipo de obra no especificado'
             }, status=400)
         
-        # Buscar el borrador más reciente activo para este tipo de obra
-        borrador = BorradorObra.objects.filter(
-            tipo_obra=tipo_obra,
-            estado='activo'
-        ).first()
+        # Buscar el borrador más reciente activo para este tipo de obra.
+        # En modo creación, solo aplican borradores SIN obra_objetivo.
+        borrador = (
+            BorradorObra.objects.filter(
+                tipo_obra=tipo_obra,
+                estado='activo',
+                obra_objetivo__isnull=True,
+            )
+            .order_by('-fecha_modificacion')
+            .first()
+        )
         
         if borrador:
             return JsonResponse({
