@@ -12,6 +12,7 @@ from django.db.models import Q
 from jsonschema import ValidationError
 from catalogacion.forms.formsets import Funcion700FormSet
 from catalogacion.models import (
+    NombreRelacionado700,
     NumeroControl773,
     NumeroControl774,
     NumeroControl787,
@@ -147,6 +148,12 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
                     instance=form.instance,
                     prefix=f'funcion700-{form.prefix}',
                 )
+
+            # 🔥 Empty formset para nuevas filas (clonado en frontend)
+            context['funcion700_empty_formset'] = Funcion700FormSet(
+                instance=NombreRelacionado700(),
+                prefix='funcion700-__prefix__',
+            )
 
 
         # 382 → nested
@@ -326,6 +333,12 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
                     instance=form.instance,
                     prefix=f'funcion700-{form.prefix}',
                 )
+
+            # 🔥 Empty formset para nuevas filas (clonado en frontend)
+            context['funcion700_empty_formset'] = Funcion700FormSet(
+                instance=NombreRelacionado700(),
+                prefix='funcion700-__prefix__',
+            )
 
 
         logger.debug(f"   Formsets cargados en contexto (editar): {list(formsets.keys())}")

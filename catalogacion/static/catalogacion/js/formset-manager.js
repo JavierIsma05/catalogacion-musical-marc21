@@ -75,28 +75,52 @@
         newForm.classList.remove("empty-form");
         newForm.style.display = "";
 
+        // Limpiar cualquier artefacto de Select2 que haya sido inicializado
+        // sobre el template vacío (para evitar inputs "No results found"/IDs duplicados)
+        newForm
+            .querySelectorAll(".select2-container")
+            .forEach((el) => el.remove());
+        newForm.querySelectorAll("select").forEach((select) => {
+            select.classList.remove("select2-hidden-accessible");
+            select.removeAttribute("data-select2-id");
+            select.removeAttribute("tabindex");
+            const next = select.nextElementSibling;
+            if (next && next.classList && next.classList.contains("select2")) {
+                next.remove();
+            }
+        });
+
         // Insertar antes del template vacío
         formsContainer.insertBefore(newForm, emptyFormTemplate);
 
         // Incrementar contador
         totalFormsInput.value = totalForms + 1;
 
-        // Reinicializar Select2 si existe
+        // Reinicializar Select2 SOLO en campos marcados con .select2
         if (
             typeof $ !== "undefined" &&
             $.fn &&
             typeof $.fn.select2 === "function"
         ) {
-            newForm
-                .querySelectorAll(".form-select, select.select2")
-                .forEach((select) => {
-                    if (!$(select).hasClass("select2-hidden-accessible")) {
-                        $(select).select2({
-                            theme: "bootstrap-5",
-                            width: "100%",
-                        });
+            newForm.querySelectorAll("select.select2").forEach((select) => {
+                // Siempre reinicializar limpio
+                try {
+                    if ($(select).hasClass("select2-hidden-accessible")) {
+                        $(select).select2("destroy");
                     }
+                } catch (e) {
+                    // ignore
+                }
+
+                $(select).select2({
+                    theme: "bootstrap-5",
+                    width: "100%",
+                    placeholder: function () {
+                        return $(this).data("placeholder");
+                    },
+                    allowClear: true,
                 });
+            });
         }
 
         // Inicializar visibilidad de botones de eliminar en subcampos
