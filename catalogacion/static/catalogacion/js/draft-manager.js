@@ -581,7 +581,10 @@
 
                 // Crear filas adicionales si es necesario
                 while (currentCount < rows.length) {
-                    const added = await this._addFormsetRow(prefix, container);
+                    const added = await this._addFormsetRow(prefix, container, {
+                        isSubcampoFormset,
+                        subcampoContainer,
+                    });
                     if (!added) break;
                     currentCount++;
                     await Utils.wait(CONFIG.ROW_ANIMATION_DELAY);
@@ -618,29 +621,64 @@
         /**
          * Agrega una fila al formset
          */
-        async _addFormsetRow(prefix, container) {
-            // Método 1: Botón local específico del contenedor (ej: 100e tiene .add-funcion-100e-btn)
-            // Esto tiene prioridad porque es más específico
-            const localBtn = container.querySelector(
-                ".add-funcion-100e-btn, .add-form-row, .add-funcion-btn, .subcampo-add-btn"
-            );
-            if (localBtn) {
-                localBtn.click();
+        async _addFormsetRow(prefix, container, options = {}) {
+            const isSubcampoFormset = !!options.isSubcampoFormset;
+            const subcampoContainer = options.subcampoContainer || null;
+
+            const countRows = () => {
+                if (isSubcampoFormset) {
+                    const target = subcampoContainer || container;
+                    return Array.from(
+                        target.querySelectorAll(
+                            ".subcampo-row:not(.d-none):not([class*='template'])"
+                        )
+                    ).filter((r) => r.style.display !== "none").length;
+                }
+
+                return Array.from(
+                    container.querySelectorAll(".formset-row:not(.empty-form)")
+                ).filter((r) => r.style.display !== "none").length;
+            };
+
+            const clickAndVerify = async (btnOrFn) => {
+                const before = countRows();
+                if (typeof btnOrFn === "function") {
+                    btnOrFn();
+                } else if (btnOrFn?.click) {
+                    btnOrFn.click();
+                } else {
+                    return false;
+                }
+
+                await Utils.wait(80);
+                return countRows() > before;
+            };
+
+            // Método 1: Botón local específico del contenedor (ej: 100e)
+            // Importante: NO usar .subcampo-add-btn para formsets normales (ej: 700),
+            // porque esos botones agregan subfilas internas y no una fila del formset principal.
+            const localSelector = isSubcampoFormset
+                ? ".add-funcion-100e-btn, .add-form-row, .add-funcion-btn, .subcampo-add-btn"
+                : ".add-funcion-100e-btn, .add-form-row, .add-funcion-btn";
+
+            const localBtn = container.querySelector(localSelector);
+            if (localBtn && (await clickAndVerify(localBtn))) {
                 return true;
             }
 
             // Método 2: FormsetManager global
             if (window.FormsetManager?.addNewForm) {
-                const result = window.FormsetManager.addNewForm(prefix);
-                if (result !== false) return true;
+                const added = await clickAndVerify(() => {
+                    window.FormsetManager.addNewForm(prefix);
+                });
+                if (added) return true;
             }
 
             // Método 3: Botón en header
             const headerBtn = document.querySelector(
                 `.campo-add-btn[data-formset-target="${prefix}"]`
             );
-            if (headerBtn) {
-                headerBtn.click();
+            if (headerBtn && (await clickAndVerify(headerBtn))) {
                 return true;
             }
 
