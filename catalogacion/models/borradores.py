@@ -111,12 +111,21 @@ class BorradorObra(models.Model):
             if isinstance(datos, str):
                 datos = json.loads(datos)
 
-            # Soportar el formato actual del borrador-system.js
-            # datos = { _campos_simples: {...}, _formsets: {...}, _subcampos_dinamicos: {...} }
-            if isinstance(datos, dict) and '_campos_simples' in datos and isinstance(datos.get('_campos_simples'), dict):
-                campos = datos.get('_campos_simples', {})
+            # Soportar múltiples formatos:
+            # v1: { _campos_simples: {...}, _formsets: {...}, _subcampos_dinamicos: {...} }
+            # v2: { version: 2, campos: {...}, formsets: {...}, meta: {...} }
+            if isinstance(datos, dict):
+                if '_campos_simples' in datos:
+                    # Formato v1
+                    campos = datos.get('_campos_simples', {})
+                elif 'version' in datos and datos.get('version') == 2:
+                    # Formato v2
+                    campos = datos.get('campos', {})
+                else:
+                    # Formato legacy o directo
+                    campos = datos
             else:
-                campos = datos if isinstance(datos, dict) else {}
+                campos = {}
             
             # Extraer título del campo 245$a (titulo_principal)
             titulo = campos.get('titulo_principal', '')

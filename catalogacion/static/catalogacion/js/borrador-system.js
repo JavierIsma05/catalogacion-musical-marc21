@@ -1,28 +1,29 @@
 /**
  * Sistema de Borradores para Obras MARC21
- * VERSION CORREGIDA - Maneja subcampos dinámicos anidados
+ * VERSION REFACTORIZADA - Arquitectura limpia y mantenible
+ *
+ * ARQUITECTURA:
+ * - Serialización: Captura TODOS los inputs del formulario tal cual están
+ * - Restauración: Crea las filas necesarias y llena los valores en orden
+ *
+ * FORMATOS DE CAMPOS:
+ * 1. Campos simples: name="campo" -> valor directo
+ * 2. Formsets Django: name="prefix-N-campo" -> por fila
+ * 3. Subcampos repetibles: name="tipo_subtipo_parentIndex_timestamp" -> dinámicos
  */
 
 (function () {
     "use strict";
 
-    // Configuración
-    const AUTOSAVE_INTERVAL = 60000; // 60 segundos
-    const MIN_CHANGE_DELAY = 3000; // 3 segundos después del último cambio
-
-    let borradorId = null;
-    let autoSaveTimer = null;
-    let changeTimer = null;
-    let hasUnsavedChanges = false;
-    let allowNativeReload = false;
-    let allowUnloadOnce = false;
-
-    const form = document.getElementById("obra-form");
-
-    // Si no hay formulario, no inicializar nada (evita errores en otras páginas)
-    if (!form) {
-        return;
-    }
+    // ========================================
+    // CONFIGURACIÓN
+    // ========================================
+    const CONFIG = {
+        AUTOSAVE_INTERVAL: 60000, // 60 segundos
+        MIN_CHANGE_DELAY: 3000, // 3 segundos después del último cambio
+        ROW_ADD_DELAY: 100, // Delay entre agregar filas
+        SUBCAMPO_ADD_DELAY: 50, // Delay entre agregar subcampos
+    };
 
     const API_URLS = {
         guardar: "/catalogacion/api/borradores/guardar/",
@@ -31,191 +32,562 @@
         obtenerUltimoPorObra: (obraId) =>
             `/catalogacion/api/borradores/obra/${obraId}/ultimo/`,
         eliminar: (id) => `/catalogacion/api/borradores/${id}/eliminar/`,
+        limpiarSesion: "/catalogacion/api/borradores/limpiar-sesion/",
+        buscarObras: "/catalogacion/api/buscar-obras/",
     };
 
-    function getObraObjetivoId() {
-        // Detectar modo edición por URL: /catalogacion/obras/<pk>/editar/
-        const match = window.location.pathname.match(
-            /\/obras\/(\d+)\/editar\/?$/
-        );
-        return match ? parseInt(match[1], 10) : null;
-    }
+    // ========================================
+    // ESTADO
+    // ========================================
+    let state = {
+        borradorId: null,
+        autoSaveTimer: null,
+        changeTimer: null,
+        hasUnsavedChanges: false,
+        allowNativeReload: false,
+        allowUnloadOnce: false,
+    };
 
-    /**
-     * Obtiene el CSRF token
-     */
+    const form = document.getElementById("obra-form");
+
+    // Si no hay formulario, no inicializar
+    if (!form) return;
+
+    // ========================================
+    // UTILIDADES
+    // ========================================
+
     function getCsrfToken() {
         const token = document.querySelector('[name="csrfmiddlewaretoken"]');
         return token ? token.value : "";
     }
 
-    /**
-     * NUEVO: Serializa TODOS los datos incluyendo subcampos dinámicos
-     */
-    function serializeFormData() {
-        const formData = new FormData(form);
-        const data = {
-            _campos_simples: {},
-            _formsets: {},
-            _subcampos_dinamicos: {}, // NUEVO: Para idiomas, títulos, volúmenes, etc.
-        };
-
-        // 1. Procesar campos simples y formsets normales
-        for (let [key, value] of formData.entries()) {
-            if (shouldExcludeField(key)) continue;
-
-            // Subcampos dinámicos - Dos patrones:
-            // 1. tipo_subtipo_parentIndex_timestamp (4 partes):
-            //    - idioma_lengua_0_1234567890 (campo 041)
-            //    - lugar_produccion_264_0_1234567890 (campo 264 $a)
-            //    - entidad_produccion_264_0_1234567890 (campo 264 $b)
-            //    - fecha_produccion_264_0_1234567890 (campo 264 $c)
-            //    - medio_interpretacion_382_0_1234567890 (campo 382 $a)
-            //    - termino_asociado_700_0_1234567890 (campo 700 $c)
-            //    - funcion_700_0_1234567890 (campo 700 $e)
-            // 2. tipo_subtipo_campo_parentIndex_timestamp (5 partes):
-            //    - numero_enlace_773_0_1234567890 (campo 773)
-
-            // Primero intentar patrón de 5 partes
-            let subcampoMatch = key.match(/^(\w+)_(\w+)_(\d+)_(\d+)_(\d+)$/);
-            if (subcampoMatch) {
-                const [, tipo, subtipo, campo, parentIndex, timestamp] =
-                    subcampoMatch;
-                const subcampoKey = `${tipo}_${subtipo}_${campo}_${parentIndex}`;
-
-                if (!data._subcampos_dinamicos[subcampoKey]) {
-                    data._subcampos_dinamicos[subcampoKey] = [];
-                }
-
-                data._subcampos_dinamicos[subcampoKey].push({
-                    value: value,
-                    tipo: tipo,
-                    subtipo: subtipo,
-                    campo: campo, // Número de campo MARC (773, 774, 787, 852)
-                    parentIndex: parentIndex,
-                });
-
-                continue;
-            }
-
-            // Luego intentar patrón de 4 partes (incluye 264 y 382)
-            subcampoMatch = key.match(/^(\w+)_(\w+)_(\d+)_(\d+)$/);
-            if (subcampoMatch) {
-                const [, tipo, subtipo, parentIndex, timestamp] = subcampoMatch;
-                const subcampoKey = `${tipo}_${subtipo}_${parentIndex}`;
-
-                if (!data._subcampos_dinamicos[subcampoKey]) {
-                    data._subcampos_dinamicos[subcampoKey] = [];
-                }
-
-                data._subcampos_dinamicos[subcampoKey].push({
-                    value: value,
-                    tipo: tipo,
-                    subtipo: subtipo,
-                    parentIndex: parentIndex,
-                });
-
-                continue;
-            }
-
-            // Campos normales
-            if (data._campos_simples.hasOwnProperty(key)) {
-                if (!Array.isArray(data._campos_simples[key])) {
-                    data._campos_simples[key] = [data._campos_simples[key]];
-                }
-                data._campos_simples[key].push(value);
-            } else {
-                data._campos_simples[key] = value;
-            }
-        }
-
-        // 2. Agrupar por formsets
-        for (let key in data._campos_simples) {
-            const formsetMatch = key.match(/^([a-z_]+)-(\d+)-(.+)$/);
-            if (formsetMatch) {
-                const [, prefix, index, field] = formsetMatch;
-
-                if (!data._formsets[prefix]) {
-                    data._formsets[prefix] = {};
-                }
-                if (!data._formsets[prefix][index]) {
-                    data._formsets[prefix][index] = {};
-                }
-
-                data._formsets[prefix][index][field] =
-                    data._campos_simples[key];
-            }
-        }
-
-        // 3. Incluir checkboxes no marcados
-        form.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
-            if (
-                !checkbox.checked &&
-                !data._campos_simples.hasOwnProperty(checkbox.name)
-            ) {
-                data._campos_simples[checkbox.name] = "";
-            }
-        });
-
-        return data;
+    function delay(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    /**
-     * Determina si un campo debe excluirse
-     */
-    function shouldExcludeField(fieldName) {
-        if (!fieldName || fieldName === "") return true;
-
-        // NO excluir subcampos dinámicos (cambio principal)
-        // Solo excluir campos realmente inválidos
-        if (fieldName.includes("NaN") || fieldName === "undefined") {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Obtiene el tipo de obra actual
-     */
     function getTipoObra() {
         const tipoRegistro = document.getElementById("id_tipo_registro")?.value;
         const nivelBibliografico = document.getElementById(
             "id_nivel_bibliografico"
         )?.value;
 
-        // Si los campos no están disponibles aún, retornar null
-        if (!tipoRegistro || !nivelBibliografico) {
-            return null;
+        if (!tipoRegistro || !nivelBibliografico) return null;
+
+        const mapa = {
+            d_c: "coleccion_manuscrita",
+            d_a: "obra_en_coleccion_manuscrita",
+            d_m: "obra_manuscrita_individual",
+            c_c: "coleccion_impresa",
+            c_a: "obra_en_coleccion_impresa",
+            c_m: "obra_impresa_individual",
+        };
+
+        return mapa[`${tipoRegistro}_${nivelBibliografico}`] || "desconocido";
+    }
+
+    function getObraObjetivoId() {
+        const match = window.location.pathname.match(
+            /\/obras\/(\d+)\/editar\/?$/
+        );
+        return match ? parseInt(match[1], 10) : null;
+    }
+
+    // ========================================
+    // SERIALIZACIÓN (Guardar)
+    // ========================================
+
+    /**
+     * Serializa el formulario en un formato estructurado:
+     * {
+     *   campos: { "name": "value" | ["value1", "value2"] },
+     *   formsets: { "prefix": { count: N, rows: [ {campo: valor, ...}, ... ] } },
+     *   subcampos: { "groupKey_parentIndex": [ {value, name}, ... ] }
+     * }
+     */
+    function serializarFormulario() {
+        const formData = new FormData(form);
+        const result = {
+            campos: {},
+            formsets: {},
+            subcampos: {},
+        };
+
+        // Patterns para identificar tipos de campos
+        const formsetPattern = /^([a-z_]+)-(\d+)-(.+)$/;
+        const subcampoPattern4 = /^(\w+)_(\w+)_(\d+)_(\d+)$/; // tipo_subtipo_parent_ts
+        const subcampoPattern5 = /^(\w+)_(\w+)_(\d+)_(\d+)_(\d+)$/; // tipo_subtipo_campo_parent_ts
+
+        for (const [name, value] of formData.entries()) {
+            if (!name || name.includes("NaN")) continue;
+
+            const strValue = String(value).trim();
+
+            // 1) Intentar subcampo de 5 partes
+            let match = name.match(subcampoPattern5);
+            if (match) {
+                const [, tipo, subtipo, campo, parentIndex] = match;
+                const groupKey = `${tipo}_${subtipo}_${campo}_${parentIndex}`;
+                if (strValue) {
+                    // Solo guardar si tiene valor
+                    if (!result.subcampos[groupKey])
+                        result.subcampos[groupKey] = [];
+                    result.subcampos[groupKey].push({ value: strValue, name });
+                }
+                continue;
+            }
+
+            // 2) Intentar subcampo de 4 partes
+            match = name.match(subcampoPattern4);
+            if (match) {
+                const [, tipo, subtipo, parentIndex] = match;
+                const groupKey = `${tipo}_${subtipo}_${parentIndex}`;
+                if (strValue) {
+                    // Solo guardar si tiene valor
+                    if (!result.subcampos[groupKey])
+                        result.subcampos[groupKey] = [];
+                    result.subcampos[groupKey].push({ value: strValue, name });
+                }
+                continue;
+            }
+
+            // 3) Intentar formset Django
+            match = name.match(formsetPattern);
+            if (match) {
+                const [, prefix, indexStr, field] = match;
+                const index = parseInt(indexStr, 10);
+
+                if (!result.formsets[prefix]) {
+                    result.formsets[prefix] = { count: 0, rows: [] };
+                }
+
+                // Asegurar que existe la fila
+                while (result.formsets[prefix].rows.length <= index) {
+                    result.formsets[prefix].rows.push({});
+                }
+
+                result.formsets[prefix].rows[index][field] = value;
+                result.formsets[prefix].count = Math.max(
+                    result.formsets[prefix].count,
+                    index + 1
+                );
+                continue;
+            }
+
+            // 4) Campo simple
+            if (result.campos.hasOwnProperty(name)) {
+                // Convertir a array si hay múltiples valores
+                if (!Array.isArray(result.campos[name])) {
+                    result.campos[name] = [result.campos[name]];
+                }
+                result.campos[name].push(value);
+            } else {
+                result.campos[name] = value;
+            }
         }
 
-        // Mapeo correcto según TIPO_OBRA_CONFIG en obra_config.py
-        if (tipoRegistro === "d" && nivelBibliografico === "c") {
-            return "coleccion_manuscrita";
-        } else if (tipoRegistro === "d" && nivelBibliografico === "a") {
-            return "obra_en_coleccion_manuscrita";
-        } else if (tipoRegistro === "d" && nivelBibliografico === "m") {
-            return "obra_manuscrita_individual";
-        } else if (tipoRegistro === "c" && nivelBibliografico === "c") {
-            return "coleccion_impresa";
-        } else if (tipoRegistro === "c" && nivelBibliografico === "a") {
-            return "obra_en_coleccion_impresa";
-        } else if (tipoRegistro === "c" && nivelBibliografico === "m") {
-            return "obra_impresa_individual";
+        // Incluir checkboxes no marcados
+        form.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+            if (!cb.checked && !result.campos.hasOwnProperty(cb.name)) {
+                result.campos[cb.name] = "";
+            }
+        });
+
+        // Limpiar filas vacías de formsets (DELETE=on o sin datos reales)
+        for (const prefix of Object.keys(result.formsets)) {
+            const fs = result.formsets[prefix];
+            fs.rows = fs.rows.filter((row, idx) => {
+                // Si está marcado para eliminar, excluir
+                if (row.DELETE === "on") return false;
+
+                // Si solo tiene campos de management, excluir
+                const realFields = Object.keys(row).filter(
+                    (k) => !["id", "DELETE", "ORDER"].includes(k)
+                );
+                const hasRealData = realFields.some((k) => {
+                    const v = row[k];
+                    return v && String(v).trim() !== "";
+                });
+
+                return hasRealData;
+            });
+            fs.count = fs.rows.length;
         }
-        return "desconocido";
+
+        return result;
+    }
+
+    // ========================================
+    // RESTAURACIÓN (Cargar)
+    // ========================================
+
+    /**
+     * Restaura el formulario desde los datos guardados
+     */
+    async function restaurarFormulario(datos) {
+        if (!datos) return;
+
+        // Compatibilidad: convertir formato antiguo si es necesario
+        const normalized = normalizarDatos(datos);
+
+        // 1. Restaurar campos simples
+        restaurarCamposSimples(normalized.campos);
+
+        // 2. Restaurar formsets (crear filas y llenar)
+        await restaurarFormsets(normalized.formsets);
+
+        // 3. Restaurar subcampos repetibles
+        await restaurarSubcampos(normalized.subcampos);
+
+        // 4. Rehidratar campos derivados (ej: enlaces 773/774/787)
+        await rehidratarEnlacesObras();
     }
 
     /**
-     * Guarda o actualiza el borrador
+     * Convierte formato antiguo (_campos_simples, _formsets, _subcampos_dinamicos)
+     * al nuevo formato (campos, formsets, subcampos)
      */
+    function normalizarDatos(datos) {
+        // Si ya tiene el nuevo formato
+        if (datos.campos && datos.formsets && datos.subcampos) {
+            return datos;
+        }
+
+        // Convertir desde formato antiguo
+        const result = {
+            campos: {},
+            formsets: {},
+            subcampos: {},
+        };
+
+        // Campos simples
+        const camposAntiguos = datos._campos_simples || datos.campos || {};
+        for (const [name, value] of Object.entries(camposAntiguos)) {
+            result.campos[name] = value;
+        }
+
+        // Formsets: convertir de { prefix: { "0": {campo: valor}, "1": {...} } }
+        // a { prefix: { count: N, rows: [{campo: valor}, ...] } }
+        const formsetsAntiguos = datos._formsets || {};
+        for (const prefix of Object.keys(formsetsAntiguos)) {
+            const oldFormat = formsetsAntiguos[prefix];
+            const indices = Object.keys(oldFormat)
+                .filter((k) => k !== "_total" && !isNaN(parseInt(k, 10)))
+                .map((k) => parseInt(k, 10))
+                .sort((a, b) => a - b);
+
+            result.formsets[prefix] = {
+                count: indices.length,
+                rows: indices.map((i) => oldFormat[String(i)] || {}),
+            };
+        }
+
+        // Subcampos dinámicos: convertir de { key: [{value, tipo, subtipo, parentIndex}, ...] }
+        // a { groupKey: [{value, name}, ...] }
+        const subcamposAntiguos = datos._subcampos_dinamicos || {};
+        for (const key of Object.keys(subcamposAntiguos)) {
+            const items = subcamposAntiguos[key];
+            if (!items || !items.length) continue;
+
+            // Extraer groupKey del key o del primer item
+            const first = items[0];
+            let groupKey;
+            if (first.campo) {
+                groupKey = `${first.tipo}_${first.subtipo}_${first.campo}_${first.parentIndex}`;
+            } else {
+                groupKey = `${first.tipo}_${first.subtipo}_${first.parentIndex}`;
+            }
+
+            result.subcampos[groupKey] = items
+                .filter((it) => it.value && String(it.value).trim())
+                .map((it) => ({ value: it.value, name: null }));
+        }
+
+        return result;
+    }
+
+    /**
+     * Restaura campos simples (no formsets, no subcampos)
+     */
+    function restaurarCamposSimples(campos) {
+        for (const [name, value] of Object.entries(campos)) {
+            // Ignorar management forms de formsets
+            if (
+                name.includes("-TOTAL_FORMS") ||
+                name.includes("-INITIAL_FORMS")
+            ) {
+                continue;
+            }
+
+            // Ignorar campos que parecen de formset
+            if (/^[a-z_]+-\d+-/.test(name)) continue;
+
+            const inputs = form.querySelectorAll(`[name="${name}"]`);
+            if (!inputs.length) continue;
+
+            if (Array.isArray(value)) {
+                inputs.forEach((input, i) => {
+                    if (i < value.length) setInputValue(input, value[i]);
+                });
+            } else {
+                inputs.forEach((input) => setInputValue(input, value));
+            }
+        }
+    }
+
+    /**
+     * Restaura formsets: crea las filas necesarias y llena los valores
+     */
+    async function restaurarFormsets(formsets) {
+        for (const [prefix, data] of Object.entries(formsets)) {
+            const container = document.querySelector(
+                `[data-formset-prefix="${prefix}"]`
+            );
+            if (!container) continue;
+
+            const { rows } = data;
+            if (!rows || !rows.length) continue;
+
+            // Contar filas actuales (excluyendo empty-form)
+            const currentRows = container.querySelectorAll(
+                ".formset-row:not(.empty-form)"
+            );
+            let currentCount = currentRows.length;
+
+            // Crear filas adicionales si es necesario
+            while (currentCount < rows.length) {
+                const added = await agregarFilaFormset(prefix, container);
+                if (!added) break;
+                currentCount++;
+                await delay(CONFIG.ROW_ADD_DELAY);
+            }
+
+            // Llenar cada fila con sus datos
+            for (let i = 0; i < rows.length; i++) {
+                const rowData = rows[i];
+                for (const [field, value] of Object.entries(rowData)) {
+                    if (["id", "DELETE", "ORDER"].includes(field)) continue;
+
+                    const inputName = `${prefix}-${i}-${field}`;
+                    const input = form.querySelector(`[name="${inputName}"]`);
+                    if (input) {
+                        setInputValue(input, value);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Agrega una fila a un formset usando el mecanismo del proyecto
+     */
+    async function agregarFilaFormset(prefix, container) {
+        // Opción 1: FormsetManager (mecanismo oficial)
+        if (window.FormsetManager?.addNewForm) {
+            window.FormsetManager.addNewForm(prefix);
+            return true;
+        }
+
+        // Opción 2: Botón en el header
+        const headerBtn = document.querySelector(
+            `.campo-add-btn[data-formset-target="${prefix}"]`
+        );
+        if (headerBtn) {
+            headerBtn.click();
+            return true;
+        }
+
+        // Opción 3: Botón dentro del contenedor
+        const localBtn = container?.querySelector(".add-form-row");
+        if (localBtn) {
+            localBtn.click();
+            return true;
+        }
+
+        console.warn(`No se pudo agregar fila para formset "${prefix}"`);
+        return false;
+    }
+
+    /**
+     * Restaura subcampos repetibles usando el contrato data-borrador-*
+     */
+    async function restaurarSubcampos(subcampos) {
+        // Agrupar por groupKey base (sin el parentIndex al final)
+        // para poder aplicar el remapeo de índices
+        const grouped = new Map();
+
+        for (const [fullKey, items] of Object.entries(subcampos)) {
+            if (!items || !items.length) continue;
+
+            // Extraer groupKey base y parentIndex del fullKey
+            // fullKey puede ser: "tipo_subtipo_parentIndex" o "tipo_subtipo_campo_parentIndex"
+            const parts = fullKey.split("_");
+            const parentIndex = parseInt(parts.pop(), 10);
+            const groupKey = parts.join("_");
+
+            if (isNaN(parentIndex)) continue;
+
+            if (!grouped.has(groupKey)) {
+                grouped.set(groupKey, new Map());
+            }
+            grouped.get(groupKey).set(parentIndex, items);
+        }
+
+        // Para cada grupo, aplicar los valores
+        for (const [groupKey, parentMap] of grouped.entries()) {
+            // Obtener índices ordenados y crear remapeo
+            const oldIndices = Array.from(parentMap.keys()).sort(
+                (a, b) => a - b
+            );
+            const indexRemap = new Map();
+            oldIndices.forEach((oldIdx, newIdx) =>
+                indexRemap.set(oldIdx, newIdx)
+            );
+
+            // Restaurar cada parentIndex
+            for (const [oldParentIndex, items] of parentMap.entries()) {
+                const newParentIndex = indexRemap.get(oldParentIndex);
+
+                // Buscar contenedor y botón usando data-borrador-*
+                const container = document.querySelector(
+                    `[data-borrador-container="${groupKey}"][data-borrador-parent="${newParentIndex}"]`
+                );
+                const addButton = document.querySelector(
+                    `[data-borrador-add="${groupKey}"][data-borrador-parent="${newParentIndex}"]`
+                );
+
+                if (!container || !addButton) {
+                    console.warn(
+                        `No se encontró contenedor para ${groupKey} parent=${newParentIndex}`
+                    );
+                    continue;
+                }
+
+                // Obtener filas existentes
+                let rows = getSubcampoRows(container);
+
+                // Llenar filas existentes primero, crear nuevas si faltan
+                for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+
+                    if (i < rows.length) {
+                        // Usar fila existente
+                        setSubcampoRowValue(rows[i], item.value);
+                    } else {
+                        // Crear nueva fila
+                        addButton.click();
+                        await delay(CONFIG.SUBCAMPO_ADD_DELAY);
+                        rows = getSubcampoRows(container);
+                        const newRow = rows[rows.length - 1];
+                        if (newRow) {
+                            setSubcampoRowValue(newRow, item.value);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Obtiene las filas de subcampos visibles de un contenedor
+     */
+    function getSubcampoRows(container) {
+        return Array.from(
+            container.querySelectorAll(".subcampo-row:not(.d-none)")
+        );
+    }
+
+    /**
+     * Establece el valor de una fila de subcampo
+     */
+    function setSubcampoRowValue(row, value) {
+        const input = row.querySelector("input, select, textarea");
+        if (input) {
+            setInputValue(input, value);
+        }
+    }
+
+    /**
+     * Establece el valor de cualquier tipo de input
+     */
+    function setInputValue(input, value) {
+        if (input.type === "checkbox") {
+            input.checked =
+                value === "on" || value === true || value === "true";
+        } else if (input.type === "radio") {
+            input.checked = input.value === value;
+        } else if (input.tagName === "SELECT") {
+            input.value = value || "";
+            // Trigger Select2 si existe
+            if (window.$ && $(input).data("select2")) {
+                $(input).val(value).trigger("change");
+            }
+        } else {
+            input.value = value || "";
+        }
+
+        // Disparar eventos para validadores y otros listeners
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    /**
+     * Rehidrata los campos de enlaces a obras relacionadas (773/774/787)
+     * El hidden tiene el ID de la obra, el visible debe mostrar el num_control
+     */
+    async function rehidratarEnlacesObras() {
+        const hiddenInputs = form.querySelectorAll(
+            'input.obra-relacionada-id-input[name^="w_"]'
+        );
+        if (!hiddenInputs.length) return;
+
+        const cache = new Map();
+
+        async function resolverNumControl(id) {
+            if (!id) return null;
+            if (cache.has(id)) return cache.get(id);
+
+            try {
+                const resp = await fetch(
+                    `${API_URLS.buscarObras}?id=${encodeURIComponent(id)}`
+                );
+                const data = await resp.json();
+                const num = data?.results?.[0]?.num_control || null;
+                cache.set(id, num);
+                return num;
+            } catch {
+                cache.set(id, null);
+                return null;
+            }
+        }
+
+        for (const hidden of hiddenInputs) {
+            const obraId = hidden.value?.trim();
+            if (!obraId) continue;
+
+            const group = hidden.closest(".input-group");
+            const visible = group?.querySelector(".numero-w-input");
+            if (!visible) continue;
+
+            const num = await resolverNumControl(obraId);
+            if (num) {
+                visible.value = num;
+                visible.dispatchEvent(new Event("input", { bubbles: true }));
+            }
+        }
+    }
+
+    // ========================================
+    // API DE BORRADORES
+    // ========================================
+
     async function guardarBorrador(esAutoguardado = false) {
         try {
-            const datos = serializeFormData();
+            const datos = serializarFormulario();
             const tipoObra = getTipoObra();
             const obraObjetivoId = getObraObjetivoId();
 
-            // En edición permitimos guardar aunque el tipo de obra aún no esté listo.
+            // Validar que podemos guardar
             if (!obraObjetivoId && (!tipoObra || tipoObra === "desconocido")) {
                 if (!esAutoguardado) {
                     console.warn(
@@ -234,13 +606,8 @@
                 pestana_actual: pestanaActual,
             };
 
-            if (obraObjetivoId) {
-                payload.obra_objetivo_id = obraObjetivoId;
-            }
-
-            if (borradorId) {
-                payload.borrador_id = borradorId;
-            }
+            if (obraObjetivoId) payload.obra_objetivo_id = obraObjetivoId;
+            if (state.borradorId) payload.borrador_id = state.borradorId;
 
             const url = esAutoguardado
                 ? API_URLS.autoguardar
@@ -258,15 +625,13 @@
             const result = await response.json();
 
             if (result.success) {
-                borradorId = result.borrador_id;
-                hasUnsavedChanges = false;
-
+                state.borradorId = result.borrador_id;
+                state.hasUnsavedChanges = false;
                 mostrarNotificacion(
                     esAutoguardado ? "Autoguardado" : result.message,
                     "success",
                     esAutoguardado ? 2000 : 3000
                 );
-
                 actualizarIndicadorGuardado();
             } else {
                 console.error("Error guardando:", result.error);
@@ -282,9 +647,6 @@
         }
     }
 
-    /**
-     * NUEVO: Carga un borrador con subcampos dinámicos
-     */
     async function cargarBorrador(id) {
         try {
             mostrarNotificacion("Cargando borrador...", "info", 2000);
@@ -292,82 +654,55 @@
             const response = await fetch(API_URLS.obtener(id));
             const result = await response.json();
 
-            if (result.success) {
-                const borrador = result.borrador;
-
-                const obraObjetivoId = getObraObjetivoId();
-
-                // VALIDACIÓN: Verificar que el tipo de obra coincida (solo en creación)
-                const tipoObraActual = getTipoObra();
-
-                // Si aún no se ha determinado el tipo de obra, esperar (solo creación)
-                if (
-                    !obraObjetivoId &&
-                    (!tipoObraActual || tipoObraActual === "desconocido")
-                ) {
-                    console.warn(
-                        "Tipo de obra aún no determinado, reintentando..."
-                    );
-                    // Reintentar después de un momento
-                    setTimeout(() => cargarBorrador(id), 500);
-                    return;
-                }
-
-                if (!obraObjetivoId && borrador.tipo_obra !== tipoObraActual) {
-                    console.error(
-                        `ERROR: Tipo de obra no coincide. Borrador: ${borrador.tipo_obra}, Actual: ${tipoObraActual}`
-                    );
-                    mostrarNotificacion(
-                        "Error: Este borrador es de otro tipo de obra.",
-                        "error",
-                        5000
-                    );
-                    return;
-                }
-
-                borradorId = borrador.id;
-                const datos = borrador.datos_formulario;
-
-                // 1. Preparar formsets principales
-                await prepararFormsetsPrincipales(datos);
-
-                // 2. Cargar campos simples y formsets
-                await cargarCamposYFormsets(datos);
-
-                // 3. NUEVO: Restaurar subcampos dinámicos
-                await restaurarSubcamposDinamicos(datos);
-
-                // 3.1 Rehidratar campos derivados en UI (ej: enlaces 773/774/787)
-                await rehidratarEnlacesObrasRelacionadas();
-
-                // 4. Navegar a pestaña guardada
-                if (
-                    typeof switchTab === "function" &&
-                    borrador.pestana_actual
-                ) {
-                    setTimeout(() => switchTab(borrador.pestana_actual), 500);
-                }
-
-                mostrarNotificacion(
-                    "Borrador recuperado exitosamente",
-                    "success"
-                );
-                actualizarIndicadorGuardado();
-
-                // Limpiar la variable de sesión para evitar recargas automáticas
-                if (typeof BORRADOR_A_RECUPERAR !== "undefined") {
-                    // Hacer una petición para limpiar la sesión
-                    fetch("/catalogacion/api/borradores/limpiar-sesion/", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRFToken": getCsrfToken(),
-                        },
-                    }).catch((err) =>
-                        console.error("Error limpiando sesión:", err)
-                    );
-                }
-            } else {
+            if (!result.success) {
                 mostrarNotificacion("Error al cargar borrador", "error");
+                return;
+            }
+
+            const borrador = result.borrador;
+            const obraObjetivoId = getObraObjetivoId();
+            const tipoObraActual = getTipoObra();
+
+            // Validar tipo de obra en modo creación
+            if (
+                !obraObjetivoId &&
+                (!tipoObraActual || tipoObraActual === "desconocido")
+            ) {
+                console.warn(
+                    "Tipo de obra aún no determinado, reintentando..."
+                );
+                setTimeout(() => cargarBorrador(id), 500);
+                return;
+            }
+
+            if (!obraObjetivoId && borrador.tipo_obra !== tipoObraActual) {
+                mostrarNotificacion(
+                    "Error: Este borrador es de otro tipo de obra.",
+                    "error",
+                    5000
+                );
+                return;
+            }
+
+            state.borradorId = borrador.id;
+
+            // Restaurar formulario
+            await restaurarFormulario(borrador.datos_formulario);
+
+            // Navegar a la pestaña guardada
+            if (typeof switchTab === "function" && borrador.pestana_actual) {
+                setTimeout(() => switchTab(borrador.pestana_actual), 500);
+            }
+
+            mostrarNotificacion("Borrador recuperado exitosamente", "success");
+            actualizarIndicadorGuardado();
+
+            // Limpiar variable de sesión
+            if (typeof BORRADOR_A_RECUPERAR !== "undefined") {
+                fetch(API_URLS.limpiarSesion, {
+                    method: "POST",
+                    headers: { "X-CSRFToken": getCsrfToken() },
+                }).catch(() => {});
             }
         } catch (error) {
             console.error("Error cargando borrador:", error);
@@ -375,331 +710,6 @@
         }
     }
 
-    /**
-     * Rehidrata el texto visible de los enlaces ($w) a obras relacionadas.
-     * En el HTML, el valor real va en un hidden `.obra-relacionada-id-input` (id de ObraGeneral)
-     * y el input visible `.numero-w-input` solo muestra el 001 (num_control).
-     * Al restaurar desde borrador tenemos el id, así que consultamos el num_control.
-     */
-    async function rehidratarEnlacesObrasRelacionadas() {
-        const hiddenInputs = Array.from(
-            document.querySelectorAll(
-                'input.obra-relacionada-id-input[name^="w_"]'
-            )
-        );
-
-        if (!hiddenInputs.length) return;
-
-        const cache = new Map();
-
-        async function resolveNumControlById(id) {
-            if (!id) return null;
-            if (cache.has(id)) return cache.get(id);
-
-            try {
-                const resp = await fetch(
-                    `/catalogacion/api/buscar-obras/?id=${encodeURIComponent(
-                        id
-                    )}`
-                );
-                const data = await resp.json();
-                const result =
-                    (data && data.results && data.results[0]) || null;
-                const num = result ? result.num_control : null;
-                cache.set(id, num);
-                return num;
-            } catch (e) {
-                console.warn(
-                    "No se pudo resolver num_control para obra id",
-                    id
-                );
-                cache.set(id, null);
-                return null;
-            }
-        }
-
-        // Resolver en serie para evitar ráfagas; el cache reduce duplicados
-        for (const hidden of hiddenInputs) {
-            const obraId = (hidden.value || "").trim();
-            if (!obraId) continue;
-
-            const group = hidden.closest(".input-group");
-            if (!group) continue;
-            const visible = group.querySelector(".numero-w-input");
-            if (!visible) continue;
-
-            const num = await resolveNumControlById(obraId);
-            if (num) {
-                visible.value = num;
-                visible.dispatchEvent(new Event("input", { bubbles: true }));
-                visible.dispatchEvent(new Event("change", { bubbles: true }));
-            }
-        }
-    }
-
-    /**
-     * Prepara formsets principales (crea filas necesarias)
-     */
-    async function prepararFormsetsPrincipales(datos) {
-        const formsets = datos._formsets || {};
-
-        for (let prefix in formsets) {
-            const indices = Object.keys(formsets[prefix]).filter(
-                (k) => k !== "_total"
-            );
-            const totalNeeded =
-                Math.max(...indices.map((i) => parseInt(i))) + 1;
-
-            const container = document.querySelector(
-                `[data-formset-prefix="${prefix}"]`
-            );
-            if (!container) continue;
-
-            const currentRows = container.querySelectorAll(
-                ".formset-row:not(.empty-form)"
-            ).length;
-            const rowsToAdd = totalNeeded - currentRows;
-
-            if (rowsToAdd > 0) {
-                const addButton = container.querySelector(".add-form-row");
-
-                if (addButton) {
-                    for (let i = 0; i < rowsToAdd; i++) {
-                        addButton.click();
-                        await new Promise((resolve) =>
-                            setTimeout(resolve, 100)
-                        );
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Carga campos simples y formsets
-     */
-    async function cargarCamposYFormsets(datos) {
-        const camposSimples = datos._campos_simples || {};
-
-        for (let [key, value] of Object.entries(camposSimples)) {
-            if (
-                key.includes("-TOTAL_FORMS") ||
-                key.includes("-INITIAL_FORMS")
-            ) {
-                const input = form.querySelector(`[name="${key}"]`);
-                if (input) input.value = value;
-                continue;
-            }
-
-            if (Array.isArray(value)) {
-                const inputs = form.querySelectorAll(`[name="${key}"]`);
-                inputs.forEach((input, index) => {
-                    if (index < value.length) {
-                        establecerValorInput(input, value[index]);
-                    }
-                });
-            } else {
-                const input = form.querySelector(`[name="${key}"]`);
-                if (input) {
-                    establecerValorInput(input, value);
-                }
-            }
-        }
-    }
-
-    /**
-     * NUEVO: Restaura subcampos dinámicos (idiomas, títulos, volúmenes, etc.)
-     */
-    async function restaurarSubcamposDinamicos(datos) {
-        const subcampos = datos._subcampos_dinamicos || {};
-
-        // Opción B (data-driven):
-        // - Los templates marcan contenedores y botones con:
-        //   - data-borrador-container="<groupKey>"  + data-borrador-parent="<index>"
-        //   - data-borrador-add="<groupKey>"        + data-borrador-parent="<index>"
-        // - groupKey se arma como:
-        //   - sin campo:  "<tipo>_<subtipo>"  (ej: idioma_lengua)
-        //   - con campo:  "<tipo>_<subtipo>_<campo>" (ej: titulo_mencion_490)
-        function buildGroupKey(item) {
-            if (!item) return null;
-            const tipo = item.tipo;
-            const subtipo = item.subtipo;
-            const campo = item.campo;
-            if (!tipo || !subtipo) return null;
-            return campo ? `${tipo}_${subtipo}_${campo}` : `${tipo}_${subtipo}`;
-        }
-
-        function findContainer(groupKey, parentIndex) {
-            if (!groupKey) return null;
-            return document.querySelector(
-                `[data-borrador-container="${groupKey}"][data-borrador-parent="${parentIndex}"]`
-            );
-        }
-
-        function findAddButton(groupKey, parentIndex) {
-            if (!groupKey) return null;
-            return document.querySelector(
-                `[data-borrador-add="${groupKey}"][data-borrador-parent="${parentIndex}"]`
-            );
-        }
-
-        function findLastRow(container) {
-            if (!container) return null;
-            const rows = container.querySelectorAll(
-                ".subcampo-row:not(.d-none)"
-            );
-            return rows.length ? rows[rows.length - 1] : null;
-        }
-
-        function setRowValue(row, value) {
-            if (!row) return;
-            const input = row.querySelector("input, select, textarea");
-            if (!input) return;
-
-            if (input.tagName === "SELECT") {
-                input.value = value;
-                if (window.$ && $(input).data("select2")) {
-                    $(input).val(value).trigger("change");
-                } else {
-                    input.dispatchEvent(new Event("change", { bubbles: true }));
-                }
-            } else {
-                input.value = value;
-                input.dispatchEvent(new Event("input", { bubbles: true }));
-                input.dispatchEvent(new Event("change", { bubbles: true }));
-            }
-        }
-
-        for (let key in subcampos) {
-            const items = subcampos[key];
-            if (!items || items.length === 0) continue;
-
-            const firstItem = items[0];
-            const groupKey = buildGroupKey(firstItem);
-            const parentIndex = firstItem.parentIndex;
-
-            const container = findContainer(groupKey, parentIndex);
-            const addButton = findAddButton(groupKey, parentIndex);
-
-            if (!container || !addButton) {
-                // Si no existe el contrato data-borrador-* en el HTML, no forzamos nada.
-                console.warn(
-                    `⚠️ No se encontró data-borrador-* para ${key} (groupKey=${groupKey}, parentIndex=${parentIndex})`
-                );
-                continue;
-            }
-
-            // Crear y llenar los subcampos
-            for (let item of items) {
-                addButton.click();
-                await new Promise((resolve) => setTimeout(resolve, 60));
-                const lastRow = findLastRow(container);
-                setRowValue(lastRow, item.value);
-            }
-        }
-    }
-
-    /**
-     * Establece el valor de un input
-     */
-    function establecerValorInput(input, value) {
-        if (input.type === "checkbox") {
-            input.checked =
-                value === "on" || value === true || value === "true";
-        } else if (input.type === "radio") {
-            if (input.value === value) input.checked = true;
-        } else {
-            input.value = value || "";
-            if ($(input).data("select2")) {
-                $(input).val(value).trigger("change");
-            }
-        }
-        input.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-
-    /**
-     * Limpia completamente el formulario
-     */
-    function limpiarFormularioCompleto() {
-        const camposExcluidos = [
-            "csrfmiddlewaretoken",
-            "tipo_registro",
-            "nivel_bibliografico",
-        ];
-
-        // Limpiar inputs normales
-        form.querySelectorAll(
-            'input[type="text"], input[type="number"], textarea, select'
-        ).forEach((input) => {
-            if (!camposExcluidos.includes(input.name)) {
-                input.value = "";
-                if ($(input).data("select2")) {
-                    $(input).val(null).trigger("change");
-                }
-            }
-        });
-
-        // Limpiar checkboxes y radios
-        form.querySelectorAll(
-            'input[type="checkbox"], input[type="radio"]'
-        ).forEach((input) => {
-            input.checked = false;
-        });
-
-        // Resetear formsets a 1 fila vacía
-        form.querySelectorAll('input[name$="-TOTAL_FORMS"]').forEach(
-            (totalInput) => {
-                totalInput.value = "1";
-
-                const container = totalInput.closest(".formset-container");
-                if (container) {
-                    const rows = container.querySelectorAll(
-                        ".formset-row:not(.empty-form)"
-                    );
-                    rows.forEach((row, index) => {
-                        if (index > 0) {
-                            row.remove();
-                        } else {
-                            // Limpiar primera fila completamente
-                            row.querySelectorAll(
-                                "input, select, textarea"
-                            ).forEach((field) => {
-                                if (
-                                    field.type === "checkbox" ||
-                                    field.type === "radio"
-                                ) {
-                                    field.checked = false;
-                                } else {
-                                    field.value = "";
-                                }
-                            });
-
-                            // Limpiar subcampos dentro de la fila
-                            row.querySelectorAll(
-                                "[data-idiomas-container], [data-titulos-container], [data-volumenes-container], [data-textos-container], [data-uris-container], [data-urls-container], [data-numeros-container], [data-estanterias-container], [data-lugares-container], [data-entidades-container], [data-fechas-container], [data-medios-container], [data-terminos-container], [data-funciones-container]"
-                            ).forEach((subContainer) => {
-                                subContainer.innerHTML = "";
-                            });
-                        }
-                    });
-                }
-            }
-        );
-
-        if (typeof switchTab === "function") {
-            switchTab(0);
-        }
-
-        borradorId = null;
-        hasUnsavedChanges = false;
-        actualizarIndicadorGuardado();
-
-        mostrarNotificacion("Formulario limpiado completamente", "info");
-    }
-
-    /**
-     * Elimina un borrador
-     */
     async function eliminarBorrador(id) {
         try {
             const response = await fetch(API_URLS.eliminar(id), {
@@ -708,17 +718,18 @@
             });
 
             const result = await response.json();
-            if (result.success && id === borradorId) {
-                borradorId = null;
+            if (result.success && id === state.borradorId) {
+                state.borradorId = null;
             }
         } catch (error) {
             console.error("Error eliminando:", error);
         }
     }
 
-    /**
-     * Notificación toast
-     */
+    // ========================================
+    // UI
+    // ========================================
+
     function mostrarNotificacion(mensaje, tipo = "info", duracion = 3000) {
         const notif = document.createElement("div");
         notif.textContent = mensaje;
@@ -740,9 +751,6 @@
         setTimeout(() => notif.remove(), duracion);
     }
 
-    /**
-     * Indicador de guardado
-     */
     function actualizarIndicadorGuardado() {
         let indicador = document.getElementById("save-indicator");
 
@@ -759,82 +767,74 @@
             document.body.appendChild(indicador);
         }
 
-        if (hasUnsavedChanges) {
+        if (state.hasUnsavedChanges) {
             indicador.style.backgroundColor = "#F39C12";
             indicador.style.color = "white";
             indicador.innerHTML = "<span>●</span> Cambios sin guardar";
-        } else if (borradorId) {
+        } else if (state.borradorId) {
             indicador.style.backgroundColor = "#27AE60";
             indicador.style.color = "white";
             indicador.innerHTML = "<span>✓</span> Guardado";
         }
     }
 
-    /**
-     * Detecta cambios
-     */
+    // ========================================
+    // EVENTOS Y AUTOGUARDADO
+    // ========================================
+
     function onFormChange() {
-        hasUnsavedChanges = true;
+        state.hasUnsavedChanges = true;
         actualizarIndicadorGuardado();
 
-        if (changeTimer) clearTimeout(changeTimer);
-        changeTimer = setTimeout(() => guardarBorrador(true), MIN_CHANGE_DELAY);
+        if (state.changeTimer) clearTimeout(state.changeTimer);
+        state.changeTimer = setTimeout(
+            () => guardarBorrador(true),
+            CONFIG.MIN_CHANGE_DELAY
+        );
     }
 
-    /**
-     * Autoguardado periódico
-     */
     function iniciarAutoguardado() {
-        if (autoSaveTimer) clearInterval(autoSaveTimer);
+        if (state.autoSaveTimer) clearInterval(state.autoSaveTimer);
 
-        autoSaveTimer = setInterval(() => {
-            if (borradorId && hasUnsavedChanges) {
+        state.autoSaveTimer = setInterval(() => {
+            if (state.borradorId && state.hasUnsavedChanges) {
                 guardarBorrador(true);
             }
-        }, AUTOSAVE_INTERVAL);
+        }, CONFIG.AUTOSAVE_INTERVAL);
     }
 
-    /**
-     * Prevenir pérdida de datos
-     */
+    // Prevenir pérdida de datos
     window.addEventListener("beforeunload", (e) => {
-        // Si el usuario eligió recargar explícitamente desde nuestra alerta,
-        // dejamos que el navegador continúe sin bloquear.
-        if (allowNativeReload || allowUnloadOnce) {
-            return;
-        }
+        if (state.allowNativeReload || state.allowUnloadOnce) return;
 
-        // Nota: aquí NO se puede mostrar SweetAlert2.
-        // Los navegadores solo permiten un aviso nativo.
-        if (hasUnsavedChanges || borradorId) {
+        if (state.hasUnsavedChanges || state.borradorId) {
             e.preventDefault();
             e.returnValue = "";
         }
     });
 
-    /**
-     * Intercepta intentos comunes de recarga (teclado) y muestra una alerta.
-     * Nota: los navegadores NO permiten reemplazar el diálogo nativo de recarga
-     * al usar el botón del navegador; esto cubre F5/Ctrl+R/⌘R.
-     */
-    function instalarAlertaRecargaConBorrador() {
+    // ========================================
+    // ALERTAS DE SALIDA (SweetAlert2)
+    // ========================================
+
+    function instalarAlertasSalida() {
         async function mostrarAlertaSalida({ accion, onContinuar }) {
-            const titulo = "Borrador guardado";
             const html = `
                 <div class="text-start">
                     <p class="mb-2">Tu avance ya está guardado como <strong>borrador</strong>.</p>
                     <ul class="mb-0">
-                        <li>Para continuar luego, entra a <strong>Borradores</strong> y elige cuál seguir.</li>
+                        <li>Para continuar luego, entra a <strong>Borradores</strong>.</li>
                         <li>Si ${accion}, el formulario se reiniciará.</li>
                     </ul>
                 </div>
             `;
 
             if (typeof Swal === "undefined") {
-                const ok = window.confirm(
-                    "Tu avance ya está guardado como borrador.\n\nPara continuar luego, entra a Borradores y elige cuál seguir.\n\n¿Ir a Borradores ahora?"
-                );
-                if (ok) {
+                if (
+                    window.confirm(
+                        "Tu avance ya está guardado como borrador.\n\n¿Ir a Borradores ahora?"
+                    )
+                ) {
                     window.location.href = "/catalogacion/borradores/";
                 }
                 return;
@@ -842,7 +842,7 @@
 
             const res = await Swal.fire({
                 icon: "info",
-                title: titulo,
+                title: "Borrador guardado",
                 html,
                 showCancelButton: true,
                 showDenyButton: true,
@@ -859,25 +859,16 @@
             }
         }
 
-        function isReloadShortcut(e) {
-            const key = (e.key || "").toLowerCase();
-            // F5 / Ctrl+R / Cmd+R
-            return (
-                e.key === "F5" ||
-                ((e.ctrlKey || e.metaKey) && key === "r")
-            );
-        }
-
+        // Interceptar atajos de recarga (F5, Ctrl+R)
         window.addEventListener(
             "keydown",
             async (e) => {
-                if (!isReloadShortcut(e)) return;
+                const key = (e.key || "").toLowerCase();
+                const isReload =
+                    e.key === "F5" || ((e.ctrlKey || e.metaKey) && key === "r");
 
-                // Solo aplicar cuando YA existe un borrador guardado.
-                if (!borradorId) return;
-
-                // Si hay cambios sin guardar, dejamos el warning nativo (más fiable).
-                if (hasUnsavedChanges) return;
+                if (!isReload || !state.borradorId || state.hasUnsavedChanges)
+                    return;
 
                 e.preventDefault();
                 e.stopPropagation();
@@ -885,7 +876,7 @@
                 await mostrarAlertaSalida({
                     accion: "recargas la página",
                     onContinuar: () => {
-                        allowNativeReload = true;
+                        state.allowNativeReload = true;
                         window.location.reload();
                     },
                 });
@@ -893,39 +884,38 @@
             true
         );
 
-        // Navegación interna (sidebar/topbar/links): mostrar SweetAlert2 y permitir continuar.
+        // Interceptar navegación interna
         document.addEventListener(
             "click",
             async (e) => {
                 const link = e.target.closest("a[href]");
                 if (!link) return;
 
-                // No interceptar: nueva pestaña/descargas/anclas internas
-                const target = (link.getAttribute("target") || "").toLowerCase();
+                const target = (
+                    link.getAttribute("target") || ""
+                ).toLowerCase();
                 if (target && target !== "_self") return;
                 if (link.hasAttribute("download")) return;
 
-                const hrefAttr = link.getAttribute("href");
-                if (!hrefAttr) return;
-                if (hrefAttr.startsWith("#")) return;
-                if (hrefAttr.startsWith("javascript:")) return;
+                const href = link.getAttribute("href");
+                if (
+                    !href ||
+                    href.startsWith("#") ||
+                    href.startsWith("javascript:")
+                )
+                    return;
 
-                // Solo aplicar cuando YA existe un borrador guardado.
-                if (!borradorId) return;
+                if (!state.borradorId || state.hasUnsavedChanges) return;
 
-                // Si hay cambios sin guardar, dejamos el warning nativo.
-                if (hasUnsavedChanges) return;
-
-                let destination;
+                let dest;
                 try {
-                    destination = new URL(hrefAttr, window.location.href);
+                    dest = new URL(href, window.location.href);
                 } catch {
                     return;
                 }
 
-                // Si es la misma página (solo cambia hash), no avisar.
                 const currentNoHash = window.location.href.split("#")[0];
-                const destNoHash = destination.href.split("#")[0];
+                const destNoHash = dest.href.split("#")[0];
                 if (currentNoHash === destNoHash) return;
 
                 e.preventDefault();
@@ -934,11 +924,10 @@
                 await mostrarAlertaSalida({
                     accion: "sales de esta página",
                     onContinuar: () => {
-                        allowUnloadOnce = true;
-                        window.location.href = destination.href;
-                        // Reset en caso de que la navegación falle
+                        state.allowUnloadOnce = true;
+                        window.location.href = dest.href;
                         setTimeout(() => {
-                            allowUnloadOnce = false;
+                            state.allowUnloadOnce = false;
                         }, 1500);
                     },
                 });
@@ -947,96 +936,61 @@
         );
     }
 
-    /**
-     * Eliminar borrador al publicar
-     */
-    form.addEventListener("submit", (e) => {
-        console.log("🗑️ [BORRADOR-SYSTEM] Listener de submit activado");
-        console.log("   Submitter:", e.submitter);
-        console.log("   Submitter value:", e.submitter?.value);
-        console.log("   BorradorId actual:", borradorId);
+    // ========================================
+    // INICIALIZACIÓN
+    // ========================================
 
-        if (e.submitter?.value === "publish" && borradorId) {
-            console.log("   ✅ Eliminando borrador:", borradorId);
-            eliminarBorrador(borradorId);
-        } else {
-            console.log(
-                "   ℹ️ No se elimina borrador (no es publish o no hay borradorId)"
-            );
-        }
-    });
-
-    /**
-     * Inicialización
-     */
     function init() {
-        // Esperar a que los campos tipo_registro y nivel_bibliografico estén disponibles
         const esperarFormularioListo = () => {
             const tipoRegistro = document.getElementById("id_tipo_registro");
             const nivelBibliografico = document.getElementById(
                 "id_nivel_bibliografico"
             );
-
             const obraObjetivoId = getObraObjetivoId();
 
-            // En creación, además esperamos a poder determinar el tipo de obra.
-            // Esto evita consultar/verificar borradores con tipo_obra null/desconocido.
+            // En creación, esperar a poder determinar tipo de obra
             if (!obraObjetivoId) {
-                const tipoObraTmp = getTipoObra();
-                if (!tipoObraTmp || tipoObraTmp === "desconocido") {
+                const tipoObra = getTipoObra();
+                if (!tipoObra || tipoObra === "desconocido") {
                     setTimeout(esperarFormularioListo, 100);
                     return;
                 }
             }
 
-            // En creación, esperamos a tipo_registro/nivel_bibliografico para poder identificar tipo_obra.
-            // En edición, podemos continuar aunque aún no estén listos.
+            // En creación, esperar a los campos
             if (!obraObjetivoId && (!tipoRegistro || !nivelBibliografico)) {
                 setTimeout(esperarFormularioListo, 100);
                 return;
             }
 
-            // Formulario listo, proceder con la inicialización
-            // Si hay un borrador específico a recuperar (desde lista de borradores con botón "Continuar")
+            // Cargar borrador si viene desde lista de borradores
             if (
                 typeof BORRADOR_A_RECUPERAR !== "undefined" &&
                 BORRADOR_A_RECUPERAR !== null
             ) {
-                // Esperar un poco más para asegurar que todo está cargado
                 setTimeout(() => cargarBorrador(BORRADOR_A_RECUPERAR), 300);
             }
 
-            // En creación: si NO viene un borrador explícito por sesión, ofrecer restaurar el último borrador
-            // En creación: NO ofrecer restauración automática.
-            // El usuario elige manualmente el borrador desde la lista.
+            instalarAlertasSalida();
 
-            instalarAlertaRecargaConBorrador();
-
-            // En edición: si existe un borrador activo ligado a esta obra, cargarlo automáticamente
+            // En edición: cargar borrador activo de la obra
             if (obraObjetivoId) {
                 const params = new URLSearchParams(window.location.search);
                 const borradorQuery = params.get("borrador");
 
-                // Si se especifica un borrador concreto (por ejemplo desde la lista de borradores), cargar ese.
-                if (
-                    borradorQuery &&
-                    !Number.isNaN(parseInt(borradorQuery, 10))
-                ) {
+                if (borradorQuery && !isNaN(parseInt(borradorQuery, 10))) {
                     setTimeout(
                         () => cargarBorrador(parseInt(borradorQuery, 10)),
                         300
                     );
                 } else {
-                    // Caso normal: cargar el último borrador activo asociado a la obra
                     fetch(API_URLS.obtenerUltimoPorObra(obraObjetivoId))
                         .then((r) => r.json())
                         .then((res) => {
                             if (
-                                res &&
-                                res.success &&
+                                res?.success &&
                                 res.tiene_borrador &&
-                                res.borrador &&
-                                res.borrador.id
+                                res.borrador?.id
                             ) {
                                 setTimeout(
                                     () => cargarBorrador(res.borrador.id),
@@ -1044,12 +998,7 @@
                                 );
                             }
                         })
-                        .catch((err) =>
-                            console.error(
-                                "Error consultando borrador de edición:",
-                                err
-                            )
-                        );
+                        .catch(() => {});
                 }
             }
 
@@ -1062,12 +1011,21 @@
         esperarFormularioListo();
     }
 
+    // Eliminar borrador al publicar
+    form.addEventListener("submit", (e) => {
+        if (e.submitter?.value === "publish" && state.borradorId) {
+            eliminarBorrador(state.borradorId);
+        }
+    });
+
+    // Iniciar
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", init);
     } else {
         init();
     }
 
+    // API pública
     window.BorradorSystem = {
         guardar: () => guardarBorrador(false),
         cargar: cargarBorrador,
