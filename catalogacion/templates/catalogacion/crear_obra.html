@@ -364,13 +364,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Activar Select2 en campos de autoridades
     if (typeof $.fn.select2 !== 'undefined') {
-        $('.select2').select2({
+        $('.select2').not('.no-select2').not('[data-no-select2="1"]').select2({
             theme: 'bootstrap-5',
             width: '100%',
             placeholder: function() {
                 return $(this).data('placeholder');
             },
             allowClear: true
+        });
+
+        // Asegurar que los selects nativos (no-select2) nunca queden con Select2
+        $('select.no-select2, select[data-no-select2="1"]').each(function () {
+            try {
+                if ($(this).data('select2')) {
+                    $(this).select2('destroy');
+                }
+            } catch (e) {
+                // ignore
+            }
+            $(this)
+                .removeClass('select2-hidden-accessible')
+                .removeClass('select2')
+                .removeAttr('data-select2-id')
+                .removeAttr('tabindex')
+                .removeAttr('aria-hidden');
+
+            const next = this.nextElementSibling;
+            if (next && next.classList && next.classList.contains('select2')) {
+                next.remove();
+            }
         });
     }
 

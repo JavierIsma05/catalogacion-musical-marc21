@@ -280,6 +280,75 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
         const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
         if (!container || container.dataset.subcampos264Initialized) return;
         container.dataset.subcampos264Initialized = 'true';
+
+        // =====================================================================
+        // KILL SWITCH: Forzar que el select "funcion" del 264 sea SIEMPRE nativo
+        // =====================================================================
+        function forceNativeSelect(select) {
+            if (!select) return;
+            
+            // Destruir Select2 si existe
+            if (typeof $ !== 'undefined' && $.fn && $.fn.select2) {
+                try {
+                    if ($(select).data('select2')) {
+                        $(select).select2('destroy');
+                    }
+                } catch (e) {}
+            }
+            
+            // Limpiar clases y atributos de Select2
+            select.classList.remove('select2-hidden-accessible', 'select2');
+            select.removeAttribute('data-select2-id');
+            select.removeAttribute('tabindex');
+            select.removeAttribute('aria-hidden');
+            select.style.display = '';
+            
+            // Eliminar contenedores Select2 adyacentes
+            const parent = select.parentElement;
+            if (parent) {
+                parent.querySelectorAll('.select2-container, .select2').forEach(el => {
+                    if (el !== select) el.remove();
+                });
+            }
+        }
+
+        // Limpiar todos los selects de función actuales
+        function cleanAllFuncionSelects() {
+            container.querySelectorAll('select[name$="-funcion"]').forEach(forceNativeSelect);
+        }
+
+        // Ejecutar limpieza inicial
+        cleanAllFuncionSelects();
+
+        // MutationObserver: detectar cuando se agregan nuevas filas y limpiar Select2
+        const observer = new MutationObserver((mutations) => {
+            let needsClean = false;
+            for (const mutation of mutations) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    for (const node of mutation.addedNodes) {
+                        if (node.nodeType === 1) { // Element node
+                            // Si es una fila del formset o contiene un select de función
+                            if (node.classList?.contains('formset-row') ||
+                                node.querySelector?.('select[name$="-funcion"]') ||
+                                node.classList?.contains('select2-container') ||
+                                node.classList?.contains('select2')) {
+                                needsClean = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (needsClean) break;
+            }
+            if (needsClean) {
+                // Pequeño delay para que Select2 termine de inicializarse y luego destruirlo
+                setTimeout(cleanAllFuncionSelects, 10);
+                setTimeout(cleanAllFuncionSelects, 50);
+                setTimeout(cleanAllFuncionSelects, 150);
+            }
+        });
+
+        observer.observe(container, { childList: true, subtree: true });
         
         const lugarTemplate = document.querySelector('.lugar-template-264');
         const entidadTemplate = document.querySelector('.entidad-template-264');

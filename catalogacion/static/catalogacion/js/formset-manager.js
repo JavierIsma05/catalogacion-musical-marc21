@@ -84,6 +84,16 @@
             select.classList.remove("select2-hidden-accessible");
             select.removeAttribute("data-select2-id");
             select.removeAttribute("tabindex");
+
+            // Si el select está marcado como no-select2, remover también la clase select2
+            // (esto evita que cualquier inicialización posterior lo convierta a Select2).
+            if (
+                select.classList.contains("no-select2") ||
+                select.getAttribute("data-no-select2") === "1"
+            ) {
+                select.classList.remove("select2");
+            }
+
             const next = select.nextElementSibling;
             if (next && next.classList && next.classList.contains("select2")) {
                 next.remove();
@@ -97,12 +107,19 @@
         totalFormsInput.value = totalForms + 1;
 
         // Reinicializar Select2 SOLO en campos marcados con .select2
+        // y que NO estén marcados como no-select2.
         if (
             typeof $ !== "undefined" &&
             $.fn &&
             typeof $.fn.select2 === "function"
         ) {
             newForm.querySelectorAll("select.select2").forEach((select) => {
+                if (
+                    select.classList.contains("no-select2") ||
+                    select.getAttribute("data-no-select2") === "1"
+                ) {
+                    return;
+                }
                 // Siempre reinicializar limpio
                 try {
                     if ($(select).hasClass("select2-hidden-accessible")) {
@@ -121,6 +138,42 @@
                     allowClear: true,
                 });
             });
+
+            // Kill switch: algunos selects NO deben ser Select2 aunque se cuele por clones o scripts.
+            // Caso crítico: 264 (prefix "produccion") indicador/función debe ser dropdown nativo.
+            const forceNativeSelect = (select) => {
+                try {
+                    if ($(select).data("select2")) {
+                        $(select).select2("destroy");
+                    }
+                } catch (e) {
+                    // ignore
+                }
+
+                select.classList.remove("select2-hidden-accessible");
+                select.classList.remove("select2");
+                select.removeAttribute("data-select2-id");
+                select.removeAttribute("tabindex");
+                select.removeAttribute("aria-hidden");
+
+                // Remover cualquier contenedor select2 adyacente o dentro del mismo wrapper
+                const next = select.nextElementSibling;
+                if (next && next.classList && next.classList.contains("select2")) {
+                    next.remove();
+                }
+                const parent = select.parentElement;
+                if (parent) {
+                    parent
+                        .querySelectorAll(".select2-container")
+                        .forEach((el) => el.remove());
+                }
+            };
+
+            if (prefix === "produccion") {
+                newForm
+                    .querySelectorAll('select[name$="-funcion"]')
+                    .forEach(forceNativeSelect);
+            }
         }
 
         // Inicializar visibilidad de botones de eliminar en subcampos
