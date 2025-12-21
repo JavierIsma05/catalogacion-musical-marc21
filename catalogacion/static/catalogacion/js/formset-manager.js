@@ -158,7 +158,11 @@
 
                 // Remover cualquier contenedor select2 adyacente o dentro del mismo wrapper
                 const next = select.nextElementSibling;
-                if (next && next.classList && next.classList.contains("select2")) {
+                if (
+                    next &&
+                    next.classList &&
+                    next.classList.contains("select2")
+                ) {
                     next.remove();
                 }
                 const parent = select.parentElement;
@@ -180,6 +184,22 @@
         newForm
             .querySelectorAll(".subcampo-repetible-container")
             .forEach(updateSubcampoDeleteVisibility);
+
+        // Notificar a scripts específicos (por ejemplo, autocompletes de 773/774)
+        // que se añadió una nueva fila al formset.
+        try {
+            document.dispatchEvent(
+                new CustomEvent("formset:added", {
+                    detail: {
+                        prefix,
+                        container,
+                        newForm,
+                    },
+                })
+            );
+        } catch (e) {
+            // ignore
+        }
     }
 
     /**

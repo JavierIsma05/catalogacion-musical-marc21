@@ -262,42 +262,23 @@ FORMSET 773 – Documento Fuente (R)
     }
 
     /* =====================================================
-       BOTÓN GLOBAL + (formsets)
+       HOOK: reinicializar autocomplete al agregar fila
+       (evita duplicar filas por handlers globales)
        ===================================================== */
-    document.addEventListener("click", function (e) {
+    const THIS_FORMSET_PREFIX = "{{ formset.prefix|escapejs }}";
 
-        const btn = e.target.closest(".campo-add-btn");
-        if (!btn) return;
+    // Si existe el gestor central (FormsetManager), él es el único que agrega filas.
+    // Aquí solo reinicializamos autocompletes cuando se agrega una nueva fila.
+    document.addEventListener("formset:added", function (ev) {
+        const detail = ev && ev.detail ? ev.detail : null;
+        if (!detail || detail.prefix !== THIS_FORMSET_PREFIX) return;
 
-        const prefix = btn.dataset.formsetTarget;
-        if (!prefix) return;
+        const root = detail.newForm;
+        if (!root || !root.querySelectorAll) return;
 
-        const container = document.querySelector(
-            `.formset-container[data-formset-prefix="${prefix}"]`
-        );
-        if (!container) return;
-
-        const forms = container.querySelector(".formset-forms");
-        const empty = container.querySelector(".empty-form");
-        const totalInput = container.querySelector(
-            `input[name="${prefix}-TOTAL_FORMS"]`
-        );
-
-        if (!forms || !empty || !totalInput) return;
-
-        const index = parseInt(totalInput.value, 10);
-
-        const clone = empty.cloneNode(true);
-        clone.classList.remove("empty-form", "d-none");
-        clone.innerHTML = clone.innerHTML.replace(/__prefix__/g, index);
-
-        forms.appendChild(clone);
-        totalInput.value = index + 1;
-
-        // 🔥 REINICIALIZAR AUTOCOMPLETE EN CLON
-        clone
+        root
             .querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
-            .forEach(w => {
+            .forEach((w) => {
                 w.removeAttribute("data-autocomplete-init");
                 initAutocomplete(w);
             });
