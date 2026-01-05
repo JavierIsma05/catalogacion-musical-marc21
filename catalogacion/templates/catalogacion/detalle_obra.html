@@ -77,34 +77,37 @@
             <nav class="sidebar-nav">
                 <div class="nav-header"><h6>Contenido</h6></div>
                 <ul class="nav-list">
-                    <li><a href="#nombres" class="nav-link">Nombres y Títulos</a></li>
-                    <li><a href="#produccion" class="nav-link">Producción / Edición</a></li>
-                    <li><a href="#musical" class="nav-link">Datos Musicales</a></li>
-                    <li><a href="#materias" class="nav-link">Materias y Serie</a></li>
-                    <li><a href="#notas" class="nav-link">Notas</a></li>
+                    <li><a href="#admin" class="nav-link">Administración</a></li>
+                    <li><a href="#nombres_titulos" class="nav-link">Nombres y Títulos</a></li>
+                    <li><a href="#edicion_produccion" class="nav-link">Producción / Edición</a></li>
+                    <li><a href="#datomusical" class="nav-link">Datos Musicales</a></li>
+                    <li><a href="#materias_serie" class="nav-link">Materias y Serie</a></li>
+                    <li><a href="#nuevas_notas" class="nav-link">Notas</a></li>
                     <li><a href="#relaciones" class="nav-link">Relaciones</a></li>
                     <li><a href="#existencias" class="nav-link">Existencias</a></li>
-                    <li><a href="#admin" class="nav-link">Administración</a></li>
                 </ul>
             </nav>
         </aside>
 
         <!-- ========== CONTENIDO ========== -->
         <main class="detalle-main">
-
+            <!-- ================= ADMINISTRACIÓN ================= -->
+            <section id="admin" class="detalle-section">
+                <h3>Administración</h3>
+                {% if obra.centro_catalogador %}
+                <div class="data-row">
+                    <span class="campo-tag">040</span>
+                    <span>Centro catalogador:</span>
+                    <strong>{{ obra.centro_catalogador }}</strong>
+                </div>
+                {% endif %}
+            </section> 
             <!-- ================= NOMBRES Y TÍTULOS ================= -->
-            <section id="nombres" class="detalle-section">
+            <section id="nombres_titulos" class="detalle-section">
                 <h3>Nombres y Títulos</h3>
 
                 <div class="data-grid-compact">
-                    {% if obra.centro_catalogador %}
-                    <div class="data-row">
-                        <span class="campo-tag">040</span>
-                        <span>Centro catalogador:</span>
-                        <strong>{{ obra.centro_catalogador }}</strong>
-                    </div>
-                    {% endif %}
-
+                    
                     {% if obra.ms_imp %}
                     <div class="data-row">
                         <span class="campo-tag">340</span>
@@ -113,47 +116,47 @@
                     </div>
                     {% endif %}
 
-                {% if obra.titulo_uniforme %}
-                <div class="data-row"><span class="campo-tag">130</span>{{ obra.titulo_uniforme }}</div>
-                {% endif %}
+                    {% if obra.titulo_uniforme %}
+                    <div class="data-row"><span class="campo-tag">130</span>{{ obra.titulo_uniforme }}</div>
+                    {% endif %}
 
-                {% if obra.titulo_240 %}
-                <div class="data-row"><span class="campo-tag">240</span>{{ obra.titulo_240 }}</div>
-                {% endif %}
+                    {% if obra.titulo_240 %}
+                    <div class="data-row"><span class="campo-tag">240</span>{{ obra.titulo_240 }}</div>
+                    {% endif %}
 
-                {% if obra.titulo_principal %}
-                <div class="data-row">
-                    <span class="campo-tag">245</span>
-                    {{ obra.titulo_principal }}{% if obra.subtitulo %} : {{ obra.subtitulo }}{% endif %}
-                </div>
-                {% endif %}
+                    {% if obra.titulo_principal %}
+                    <div class="data-row">
+                        <span class="campo-tag">245</span>
+                        {{ obra.titulo_principal }}{% if obra.subtitulo %} : {{ obra.subtitulo }}{% endif %}
+                    </div>
+                    {% endif %}
 
-                {% if obra.titulos_alternativos.exists %}
-                    {% for alt in obra.titulos_alternativos.all %}
-                        {% if alt.titulo %}
-                        <div class="data-row"><span class="campo-tag">246</span>{{ alt.titulo }}</div>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
+                    {% if obra.titulos_alternativos.exists %}
+                        {% for alt in obra.titulos_alternativos.all %}
+                            {% if alt.titulo %}
+                            <div class="data-row"><span class="campo-tag">246</span>{{ alt.titulo }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
 
-                {% if obra.compositor %}
-                <div class="data-row-alt">
-                    <span class="campo-tag">100</span>
-                    <div class="data-cell">
-                        <div class="linea-principal">
-                            <strong>{{ obra.compositor }}</strong>
-                            {% if obra.compositor.coordenadas_biograficas %}
-                                ({{ obra.compositor.coordenadas_biograficas }})
+                    {% if obra.compositor %}
+                    <div class="data-row-alt">
+                        <span class="campo-tag">100</span>
+                        <div class="data-cell">
+                            <div class="linea-principal">
+                                <strong>{{ obra.compositor }}</strong>
+                                {% if obra.compositor.coordenadas_biograficas %}
+                                    ({{ obra.compositor.coordenadas_biograficas }})
+                                {% endif %}
+                            </div>
+                            {% if obra.termino_asociado %}
+                                <div class="linea-secundaria">
+                                    <em>{{ obra.termino_asociado }}</em>
+                                </div>
                             {% endif %}
                         </div>
-                        {% if obra.termino_asociado %}
-                            <div class="linea-secundaria">
-                                <em>{{ obra.termino_asociado }}</em>
-                            </div>
-                        {% endif %}
                     </div>
-                </div>
-                {% endif %}
+                    {% endif %}
 
                     {% if obra.titulo_uniforme %}
                     <div class="data-row-alt">
@@ -231,7 +234,7 @@
             </section>
 
             <!-- ================= PRODUCCIÓN / EDICIÓN ================= -->
-            <section id="produccion" class="detalle-section">
+            <section id="edicion_produccion" class="detalle-section">
                 <h3>Producción / Edición</h3>
 
                 {% if obra.ms_imp %}
@@ -259,66 +262,9 @@
             </section>
 
             <!-- ================= DATOS MUSICALES ================= -->
-            <section id="musical" class="detalle-section">
+            <section id="datomusical" class="detalle-section">
                 <h3>Datos Musicales</h3>
-
                 {% if obra.formato %}
-                <div class="data-row"><span class="campo-tag">348</span>{{ obra.get_formato_display }}</div>
-                {% endif %}
-
-                    {% if obra.producciones_publicaciones.all %}
-                        {% for prod in obra.producciones_publicaciones.all %}
-                        <div class="data-row">
-                            <span class="campo-tag">264</span>
-                            <span>
-                                [{{ prod.get_funcion_display }}]
-                                {% if prod.lugares.all %}
-                                    {% for lugar in prod.lugares.all %}
-                                        {{ lugar.lugar }}{% if not forloop.last %} ; {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                                {% if prod.entidades.all %}
-                                    —
-                                    {% for ent in prod.entidades.all %}
-                                        {{ ent.nombre }}{% if not forloop.last %} ; {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                                {% if prod.fechas.all %}
-                                    —
-                                    {% for f in prod.fechas.all %}
-                                        {{ f.fecha }}{% if not forloop.last %} ; {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                            </span>
-                        </div>
-                        {% endfor %}
-                    {% endif %}
-
-                    {% if obra.ediciones.all %}
-                        {% for edicion in obra.ediciones.all %}
-                        <div class="data-row">
-                            <span class="campo-tag">250</span>
-                            <span>{{ edicion.edicion }}</span>
-                        </div>
-                        {% endfor %}
-                    {% endif %}
-
-                {% if obra.tonalidad_384 %}
-                <div class="data-row"><span class="campo-tag">384</span>{{ obra.tonalidad_384 }}</div>
-                {% endif %}
-            </section>
-
-            <!-- ================= MATERIAS Y SERIE ================= -->
-            <section id="materias" class="detalle-section">
-                <h3>Materias y Serie</h3>
-
-                {% if obra.materias_650.exists %}
-                    {% for m in obra.materias_650.all %}
-                    <div class="data-row"><span class="campo-tag">650</span>{{ m.materia }}</div>
-                    {% endfor %}
-                {% endif %}
-
-                    {% if obra.formato %}
                     <div class="data-row">
                         <span class="campo-tag">348</span>
                         <span>Formato: {{ obra.get_formato_display }}</span>
@@ -465,11 +411,56 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-                    </section>
 
-            <!-- ================= RELACIONES ================= -->
-            <section id="relaciones" class="detalle-section">
-                <h3>Relaciones</h3>
+                {% if obra.formato %}
+                <div class="data-row"><span class="campo-tag">348</span>{{ obra.get_formato_display }}</div>
+                {% endif %}
+
+                    {% if obra.producciones_publicaciones.all %}
+                        {% for prod in obra.producciones_publicaciones.all %}
+                        <div class="data-row">
+                            <span class="campo-tag">264</span>
+                            <span>
+                                [{{ prod.get_funcion_display }}]
+                                {% if prod.lugares.all %}
+                                    {% for lugar in prod.lugares.all %}
+                                        {{ lugar.lugar }}{% if not forloop.last %} ; {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                {% if prod.entidades.all %}
+                                    —
+                                    {% for ent in prod.entidades.all %}
+                                        {{ ent.nombre }}{% if not forloop.last %} ; {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                {% if prod.fechas.all %}
+                                    —
+                                    {% for f in prod.fechas.all %}
+                                        {{ f.fecha }}{% if not forloop.last %} ; {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if obra.ediciones.all %}
+                        {% for edicion in obra.ediciones.all %}
+                        <div class="data-row">
+                            <span class="campo-tag">250</span>
+                            <span>{{ edicion.edicion }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                {% if obra.tonalidad_384 %}
+                <div class="data-row"><span class="campo-tag">384</span>{{ obra.tonalidad_384 }}</div>
+                {% endif %}
+            </section>
+
+            <!-- ================= MATERIAS Y SERIE ================= -->
+            <section id="materias_serie" class="detalle-section">
+                <h3>Materias y Serie</h3>
 
                 {% if obra.materias_650.exists or obra.materias_655.exists %}
                 <div class="materias-container">
@@ -507,30 +498,42 @@
                 <p class="text-muted">No hay relaciones registradas.</p>
                 {% endif %}
 
+                    
+            </section>
+
+            <section id="nuevas_notas" class="detalle-section">
+                <h3>Notas</h3>
+                
+
+            </section>
+                    
+            <!-- ================= RELACIONES ================= -->
+            <section id="relaciones" class="detalle-section">
+                <h3>Relaciones</h3>
                 {% if obra.menciones_serie.all %}
                 <h4 class="subsection-title mt-3">Series</h4>
-                {% for mencion in obra.menciones_serie.all %}
-                <div class="data-row">
-                    <span class="campo-tag">787</span>
-                    <span>
-                        {% if r.encabezamiento_principal %}
-                            {{ r.encabezamiento_principal }}.
-                        {% endif %}
-                        {% if mencion.volumenes.all %}
-                            —
-                            {% for v in mencion.volumenes.all %}
-                                {{ v.volumen }}{% if not forloop.last %} ; {% endif %}
-                            {% endfor %}
-                        {% endif %}
+                    {% for mencion in obra.menciones_serie.all %}
+                    <div class="data-row">
+                        <span class="campo-tag">787</span>
+                        <span>
+                            {% if r.encabezamiento_principal %}
+                                {{ r.encabezamiento_principal }}.
+                            {% endif %}
+                            {% if mencion.volumenes.all %}
+                                —
+                                {% for v in mencion.volumenes.all %}
+                                    {{ v.volumen }}{% if not forloop.last %} ; {% endif %}
+                                {% endfor %}
+                            {% endif %}
 
-                        {% for w in r.numeros_control.all %}
-                            ({{ w.obra_relacionada.num_control }})
-                        {% endfor %}
-                    </span>
-                </div>
-                {% empty %}
-                <p class="text-muted">No hay relaciones 787 registradas.</p>
-                {% endfor %}
+                            {% for w in r.numeros_control.all %}
+                                ({{ w.obra_relacionada.num_control }})
+                            {% endfor %}
+                        </span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No hay relaciones 787 registradas.</p>
+                    {% endfor %}
                 {% endif %}
             </section>
 
@@ -538,20 +541,6 @@
             <!-- ================= EXISTENCIAS ================= -->
             <section id="existencias" class="detalle-section">
                 <h3>Existencias</h3>
-
-
-                    {# 852 #}
-                    {% for u in obra.ubicaciones_852.all %}
-                        {% if u.signatura_original %}
-                        <div class="data-row">
-                            <span class="campo-tag">852</span>
-                            {{ u.signatura_original }}
-                        </div>
-                        {% endif %}
-                    {% endfor %}
-
-                    {# 856 #}
-
                 {% if obra.ubicaciones_852.all %}
                 <div class="ubicaciones-list">
                     {% for ubicacion in obra.ubicaciones_852.all %}

@@ -56,7 +56,7 @@ class ObraGeneralForm(forms.ModelForm):
             'placeholder': 'Escriba o seleccione una forma musical...',
             'autocomplete': 'off',
         }),
-        label='130 $k - Forma Musical'
+        label='130 $k - Subencabezamiento de forma'
     )
     
     # Campos adicionales para autocomplete editable de título uniforme 240

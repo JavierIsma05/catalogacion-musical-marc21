@@ -300,13 +300,40 @@ class ObraFormsetMixin:
 
             # 🔥 1) GUARDAR PADRES 856 ANTES QUE NADA
             if key == 'disponibles_856':
+                 # Limpiar los registros previos en edición para evitar duplicados
+                if getattr(instance, "pk", None):
+                    eliminados, _ = instance.disponibles_856.all().delete()
+                    logger.info(f"🧹 Registros 856 previos eliminados: {eliminados}")
+
                 disponibles_creados = []
 
                 total_forms = int(self.request.POST.get('disponibles_856-TOTAL_FORMS', 0))
 
                 for i in range(total_forms):
+                    prefix_url = f"url_disponible_856_{i}_"
+                    prefix_texto = f"texto_disponible_856_{i}_"
+
+                    tiene_urls = any(
+                        key.startswith(prefix_url)
+                        and self.request.POST.get(key, "").strip()
+                        for key in self.request.POST.keys()
+                    )
+
+                    tiene_textos = any(
+                        key.startswith(prefix_texto)
+                        and self.request.POST.get(key, "").strip()
+                        for key in self.request.POST.keys()
+                    )
+
                     if self.request.POST.get(f'disponibles_856-{i}-DELETE'):
                         continue
+                        
+                    if not tiene_urls and not tiene_textos:
+                        logger.debug(
+                            "⏭️  856-%s omitido: sin URLs ni textos de enlace", i
+                        )
+                        continue
+
 
                     disponible = Disponible856.objects.create(
                         obra=instance
@@ -314,16 +341,22 @@ class ObraFormsetMixin:
                     disponibles_creados.append(disponible)
 
                 logger.info(f"🟢 856 padres creados: {len(disponibles_creados)}")
+                 # 🔥 LLAMADAS CORRECTAS A LOS HANDLERS
+                disponibles_para_urls = list(disponibles_creados)
+                disponibles_para_textos = list(disponibles_creados)
+
 
                 # 🔥 LLAMADAS CORRECTAS A LOS HANDLERS
                 SUBCAMPO_HANDLERS['_save_urls_856'](
                     self.request.POST,
-                    disponibles_creados
+                    #disponibles_creados
+                    disponibles_para_urls
                 )
 
                 SUBCAMPO_HANDLERS['_save_textos_enlace_856'](
                     self.request.POST,
-                    disponibles_creados
+                    #disponibles_creados
+                    disponibles_para_textos
                 )
 
                 continue

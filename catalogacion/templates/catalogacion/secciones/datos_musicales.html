@@ -6,7 +6,7 @@
 
             {# Campo 348 - Formato #}
             {% if '348' in campos_visibles %}
-                        <div class="campo-marc">
+            <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">348</span>
                     <h6>Formato</h6>
@@ -22,15 +22,16 @@
                     </div>
                 </div>
             </div>
-{% endif %}
+            {% endif %}
 
-{% if '382' in campos_visibles and 'medios_interpretacion' in formsets_visibles %}
+            {% if '382' in campos_visibles and 'medios_interpretacion' in formsets_visibles %}
             <!-- Campo 382 - Medio de Interpretación (Repetible) -->
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">382</span>
                     <h6>Medio de Interpretación</h6>
-                    <button type="button" class="campo-add-btn" data-formset-target="medios_382" title="Agregar Medio de Interpretación">
+                    <button type="button" class="campo-add-btn" data-formset-target="medios_382"
+                        title="Agregar Medio de Interpretación">
                         <i class="bi bi-plus"></i>
                     </button>
                     <span class="campo-help-btn" data-field-code="382" tabindex="0" title="Ayuda">
@@ -40,12 +41,12 @@
 
                 {% include 'catalogacion/includes/formset_382_template.html' with formset=medios_interpretacion %}
             </div>
-{% endif %}
+            {% endif %}
 
 
-                        {# Campo 383 - Designación numérica de obra musical #}
-                        {% if '383' in campos_visibles %}
-                        <div class="campo-marc">
+            {# Campo 383 - Designación numérica de obra musical #}
+            {% if '383' in campos_visibles %}
+            <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">383</span>
                     <h6>Designación Numérica</h6>
@@ -96,7 +97,8 @@
                     <!-- <button type="button" class="campo-add-btn" data-formset-target="incipits" title="Agregar Íncipit">
                         <i class="bi bi-plus"></i>
                     </button> -->
-                    <span class="campo-help-btn" data-field-code="031" tabindex="0" title="Ayuda" style="display: inline-flex;gap: inherit;">
+                    <span class="campo-help-btn" data-field-code="031" tabindex="0" title="Ayuda"
+                        style="display: inline-flex;gap: inherit;">
                         <i class="bi bi-question-circle"></i>
                     </span>
                 </div>

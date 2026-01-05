@@ -127,6 +127,7 @@ class NombreRelacionado700Form(forms.ModelForm):
         persona = cleaned_data.get("persona")
         persona_texto = cleaned_data.get("persona_texto", "").strip()
         coords = cleaned_data.get("persona_coordenadas", "").strip()
+        coords_relacion = (cleaned_data.get("coordenadas_biograficas") or "").strip()
         relacion = cleaned_data.get("relacion", "")
         autoria = cleaned_data.get("autoria", "")
         titulo = cleaned_data.get("titulo_obra", "")
@@ -152,6 +153,20 @@ class NombreRelacionado700Form(forms.ModelForm):
                     coordenadas_biograficas=coords or None
                 )
             cleaned_data["persona"] = persona
+
+        # ============================================================
+        # 2️⃣.1️⃣ Sincronizar coordenadas de la autoridad y del 700 $d
+        # ============================================================
+        if persona and coords:
+            if persona.coordenadas_biograficas != coords:
+                persona.coordenadas_biograficas = coords
+                persona.save(update_fields=["coordenadas_biograficas"])
+
+        if persona and not coords_relacion:
+            cleaned_data["coordenadas_biograficas"] = (
+                coords or persona.coordenadas_biograficas or None
+            )
+
 
         # ============================================================
         # 3️⃣ REGISTRAR TÍTULO UNIFORME AUTOMÁTICAMENTE

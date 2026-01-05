@@ -168,52 +168,76 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 <script>
 /**
  * Script para subcampos repetibles del campo 382 (Medios de interpretación)
+ * - Maneja subcampos repetibles ($a)
+ * - Copia automáticamente el valor seleccionado en $a hacia $b (solista)
+ *   * Actualiza si $b fue autocompletado
+ *   * NO sobrescribe si el usuario lo editó manualmente
  * Usa selects nativos del navegador (sin Select2)
  */
 (function() {
+
     function init382Subcampos() {
         const prefix = '{{ formset.prefix }}';
         const container = document.querySelector(`[data-formset-prefix="${prefix}"]`);
         if (!container || container.dataset.subcampos382Initialized) return;
         container.dataset.subcampos382Initialized = 'true';
-        
-        const medioTemplate = document.querySelector('.medio-template-382');
-        if (!medioTemplate) return;
-        
+
         // Obtener las opciones de medios desde el elemento oculto
         const opcionesData = document.getElementById('medios-options-data');
         let opcionesMedio = [];
         if (opcionesData && opcionesData.dataset.opciones) {
             try {
                 opcionesMedio = JSON.parse(opcionesData.dataset.opciones);
-            } catch(e) {
+            } catch (e) {
                 console.error('Error parsing medios options:', e);
             }
         }
-        
+
         // Construir HTML de opciones
         let opcionesHTML = '<option value="">Seleccione un medio...</option>';
         opcionesMedio.forEach(function(item) {
             opcionesHTML += `<option value="${item.codigo}">${item.nombre}</option>`;
         });
-        
-        // Función para actualizar visibilidad de botones de eliminar
+
+        // Actualizar visibilidad de botones eliminar
         function updateDeleteButtonsVisibility(subcampoContainer) {
             const rows = subcampoContainer.querySelectorAll('.subcampo-row:not(.d-none)');
             rows.forEach((row) => {
                 const deleteBtn = row.querySelector('.subcampo-delete-btn');
                 if (deleteBtn) {
-                    if (row.querySelector('.subcampo-add-btn')) {
-                        deleteBtn.style.visibility = 'hidden';
-                    } else {
-                        deleteBtn.style.visibility = 'visible';
-                    }
+                    deleteBtn.style.visibility = row.querySelector('.subcampo-add-btn')
+                        ? 'hidden'
+                        : 'visible';
                 }
             });
         }
-        
+
+        // Marcar como "manual" cuando el usuario edita solista
+        container.addEventListener('input', function(e) {
+            const solistaInput = e.target.closest('input[name$="solista"]');
+            if (!solistaInput) return;
+
+            // Si el usuario borra todo, permitimos volver a autocompletar
+            if (!solistaInput.value.trim()) {
+                solistaInput.dataset.userEdited = 'false';
+                solistaInput.dataset.autoFilled = 'false';
+                solistaInput.dataset.lastAuto = '';
+                return;
+            }
+
+            // Si está escribiendo y el valor NO coincide con el último autollenado => manual
+            const lastAuto = solistaInput.dataset.lastAuto || '';
+            if (solistaInput.value !== lastAuto) {
+                solistaInput.dataset.userEdited = 'true';
+            }
+        });
+
+        // ============================
+        // EVENTOS CLICK (+ / eliminar)
+        // ============================
         container.addEventListener('click', function(e) {
-            // Agregar Medio
+
+            // Agregar medio
             const addMedioBtn = e.target.closest('.add-medio-btn');
             if (addMedioBtn) {
                 const index = addMedioBtn.getAttribute('data-medio-index');
@@ -223,10 +247,13 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                     nuevo.className = 'subcampo-row medio-form-row';
                     nuevo.innerHTML = `
                         <div class="subcampo-placeholder"></div>
-                        <select class="form-select medio-select" name="medio_interpretacion_382_${index}_${Date.now()}">
+                        <select class="form-select medio-select"
+                                name="medio_interpretacion_382_${index}_${Date.now()}">
                             ${opcionesHTML}
                         </select>
-                        <button type="button" class="subcampo-delete-btn delete-medio-btn" title="Eliminar">
+                        <button type="button"
+                                class="subcampo-delete-btn delete-medio-btn"
+                                title="Eliminar">
                             <i class="bi bi-x-lg"></i>
                         </button>
                     `;
@@ -235,11 +262,12 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 }
                 return;
             }
-            
-            // Eliminar Medio (solo si NO tiene el botón +)
-            if (e.target.closest('.delete-medio-btn')) {
-                const row = e.target.closest('.medio-form-row');
-                if (row && !row.classList.contains('medio-template-382') && !row.querySelector('.subcampo-add-btn')) {
+
+            // Eliminar medio
+            const deleteBtn = e.target.closest('.delete-medio-btn');
+            if (deleteBtn) {
+                const row = deleteBtn.closest('.medio-form-row');
+                if (row && !row.querySelector('.subcampo-add-btn')) {
                     const subcampoContainer = row.closest('.subcampo-repetible-container');
                     row.remove();
                     updateDeleteButtonsVisibility(subcampoContainer);
@@ -247,16 +275,60 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 return;
             }
         });
-        
-        // Inicializar visibilidad de todos los contenedores de subcampos
-        container.querySelectorAll('.subcampo-repetible-container').forEach(updateDeleteButtonsVisibility);
+
+        // ==========================================
+        // EVENTO CHANGE → copiar $a → $b (solista)
+        // ==========================================
+        container.addEventListener('change', function(e) {
+            const medioSelect = e.target.closest('.medio-select');
+            if (!medioSelect) return;
+
+            const medioValue = medioSelect.value || '';
+
+            // Fila 382 correspondiente
+            const formRow = medioSelect.closest('.formset-row');
+            if (!formRow) return;
+
+            const solistaInput = formRow.querySelector('input[name$="solista"]');
+            if (!solistaInput) return;
+
+            const userEdited = (solistaInput.dataset.userEdited === 'true');
+            const autoFilled = (solistaInput.dataset.autoFilled === 'true');
+
+            // Regla:
+            // - Si el usuario NO lo ha editado manualmente:
+            //     * si estaba vacío => autollenar
+            //     * si estaba autollenado => actualizar al nuevo valor
+            // - Si el usuario SÍ lo editó => no tocar
+            if (!userEdited) {
+                if (medioValue) {
+                    solistaInput.value = medioValue;
+                    solistaInput.dataset.autoFilled = 'true';
+                    solistaInput.dataset.lastAuto = medioValue;
+                    solistaInput.dataset.userEdited = 'false';
+                } else {
+                    // Si el select vuelve a vacío y el campo era auto, lo limpiamos
+                    if (autoFilled) {
+                        solistaInput.value = '';
+                        solistaInput.dataset.autoFilled = 'false';
+                        solistaInput.dataset.lastAuto = '';
+                        solistaInput.dataset.userEdited = 'false';
+                    }
+                }
+            }
+        });
+
+        // Inicializar visibilidad de botones
+        container
+            .querySelectorAll('.subcampo-repetible-container')
+            .forEach(updateDeleteButtonsVisibility);
     }
-    
-    // Ejecutar cuando el DOM esté listo
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init382Subcampos);
     } else {
         setTimeout(init382Subcampos, 50);
     }
+
 })();
 </script>
