@@ -462,6 +462,52 @@ class AutocompletarEntidadView(View):
 
         return JsonResponse({'results': results})
 
+
+class AutocompletarAutoridadView(View):
+    """
+    API combinada para autocompletar autoridades (personas + entidades)
+    Retorna resultados intercalados con campo `model` indicando 'persona' o 'entidad'
+    """
+    def get(self, request):
+        query = request.GET.get('q', '').strip()
+
+        if len(query) < 2:
+            return JsonResponse({'results': []})
+
+        personas = list(AutoridadPersona.objects.filter(
+            Q(apellidos_nombres__icontains=query) |
+            Q(coordenadas_biograficas__icontains=query)
+        ).values('id', 'apellidos_nombres', 'coordenadas_biograficas')[:10])
+
+        entidades = list(AutoridadEntidad.objects.filter(
+            nombre__icontains=query
+        ).values('id', 'nombre', 'pais')[:10])
+
+        # Construir listas formateadas
+        p_results = []
+        for p in personas:
+            texto = p['apellidos_nombres']
+            if p.get('coordenadas_biograficas'):
+                texto += f" ({p.get('coordenadas_biograficas')})"
+            p_results.append({'id': p['id'], 'model': 'persona', 'text': texto})
+
+        e_results = []
+        for e in entidades:
+            texto = e['nombre'] + (f" ({e['pais']} )" if e.get('pais') else "")
+            e_results.append({'id': e['id'], 'model': 'entidad', 'text': texto})
+
+        # Intercalar resultados: persona, entidad, persona, entidad...
+        results = []
+        i = 0
+        while len(results) < 10 and (i < len(p_results) or i < len(e_results)):
+            if i < len(p_results):
+                results.append(p_results[i])
+            if i < len(e_results) and len(results) < 10:
+                results.append(e_results[i])
+            i += 1
+
+        return JsonResponse({'results': results})
+
 class AutocompletarTituloUniformeView(View):
     """
     API para autocompletar títulos uniformes

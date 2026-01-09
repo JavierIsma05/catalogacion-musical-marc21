@@ -948,6 +948,43 @@ textarea.form-control {
     background: var(--accent);
 }
 
+/* Lista de grupo dentro de autocomplete dropdown */
+.autocomplete-suggestions.list-group {
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: white;
+    border: 1px solid var(--border-color);
+}
+
+.autocomplete-suggestions.list-group .list-group-item {
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.autocomplete-suggestions.list-group .list-group-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-suggestions.list-group .list-group-item:hover {
+    background: var(--gray-50);
+    color: var(--text-primary);
+}
+
+.autocomplete-suggestions.list-group .list-group-item strong {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.autocomplete-suggestions.list-group .list-group-item em {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
 /* Item para crear nuevo registro */
 .autocomplete-item-new {
     color: var(--accent);

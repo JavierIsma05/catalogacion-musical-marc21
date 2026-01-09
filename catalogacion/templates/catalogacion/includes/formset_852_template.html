@@ -36,9 +36,11 @@ Lógica intacta
                 <!-- 852 $a -->
                 <div class="col-half">
                     <label class="form-label small">852 $a – Institución / Persona</label>
-                    <div class="autocomplete-wrapper">
+                    <div class="autocomplete-wrapper position-relative">
                         {{ form.codigo_o_nombre }}
-                        <div class="autocomplete-suggestions autoridad852-suggestions"></div>
+                        {{ form.autoridad_model }}
+                        {{ form.autoridad_id }}
+                        <div class="autocomplete-suggestions autoridad852-suggestions list-group"></div>
                     </div>
                 </div>
 
@@ -121,13 +123,15 @@ Lógica intacta
 
             <div class="campo-grid">
 
-                <div class="col-half">
-                    <label class="form-label small">852 $a – Institución / Persona</label>
-                    <div class="autocomplete-wrapper">
-                        {{ formset.empty_form.codigo_o_nombre }}
-                        <div class="autocomplete-suggestions autoridad852-suggestions"></div>
+                    <div class="col-half">
+                        <label class="form-label small">852 $a – Institución / Persona</label>
+                        <div class="autocomplete-wrapper position-relative">
+                            {{ formset.empty_form.codigo_o_nombre }}
+                            {{ formset.empty_form.autoridad_model }}
+                            {{ formset.empty_form.autoridad_id }}
+                            <div class="autocomplete-suggestions autoridad852-suggestions list-group"></div>
+                        </div>
                     </div>
-                </div>
 
                 <div class="col-half">
                     <label class="form-label small">852 $h – Signatura original</label>
@@ -223,35 +227,55 @@ Lógica intacta
             const query = input.value.trim();
             if (!query) {
                 suggestionBox.innerHTML = "";
-                suggestionBox.style.display = "none";
+                suggestionBox.classList.remove("show");
                 return;
             }
 
-            fetch(`/autoridades852?q=${encodeURIComponent(query)}`)
+            fetch(`/catalogacion/api/autocompletar/autoridad/?q=${encodeURIComponent(query)}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (!data.length) {
-                        suggestionBox.innerHTML = "<div class='no-results'>Sin resultados</div>";
+                    const results = data.results || [];
+                    if (!results.length) {
+                        suggestionBox.innerHTML = "<div class='list-group-item'><em>Sin resultados</em></div>";
                     } else {
-                        suggestionBox.innerHTML = data.map(item => 
-                            `<div class="suggestion-item" data-codigo="${item.codigo}">${item.nombre}</div>`
+                        suggestionBox.innerHTML = results.map(item => 
+                            `<div class="suggestion-item list-group-item" data-id="${item.id}" data-model="${item.model}"><strong>${item.text}</strong></div>`
                         ).join("");
                     }
-                    suggestionBox.style.display = "block";
+                    suggestionBox.classList.add("show");
                 });
         });
 
         suggestionBox.addEventListener("click", function(e) {
             const target = e.target.closest(".suggestion-item");
             if (!target) return;
-            input.value = target.textContent;          // llenar input con nombre
-            input.dataset.codigo = target.dataset.codigo; // opcional: guardar código
+            const text = target.textContent;
+            const model = target.dataset.model; // 'persona' o 'entidad'
+            const id = target.dataset.id;
+
+            input.value = text;
+
+            // Rellenar hidden fields en el mismo formset-row
+            const formRow = input.closest('.formset-row');
+            if (formRow) {
+                const hidModel = formRow.querySelector('input[name$="-autoridad_model"]');
+                const hidId = formRow.querySelector('input[name$="-autoridad_id"]');
+                if (hidModel) hidModel.value = model;
+                if (hidId) hidId.value = id;
+            } else {
+                // Si no encuentra formRow (p.ej. inputs fuera), intentar en wrapper
+                const hidModel = wrapper.querySelector('input[name$="-autoridad_model"]');
+                const hidId = wrapper.querySelector('input[name$="-autoridad_id"]');
+                if (hidModel) hidModel.value = model;
+                if (hidId) hidId.value = id;
+            }
+
             suggestionBox.innerHTML = "";
-            suggestionBox.style.display = "none";
+            suggestionBox.classList.remove("show");
         });
 
         input.addEventListener("blur", function() {
-            setTimeout(() => { suggestionBox.style.display = "none"; }, 200);
+            setTimeout(() => { suggestionBox.classList.remove("show"); }, 200);
         });
     }
 

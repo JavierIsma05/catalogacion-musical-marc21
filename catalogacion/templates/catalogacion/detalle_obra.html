@@ -641,6 +641,7 @@
                         <span class="campo-tag">852</span>
                         <span class="ubicacion-parte">
                             {% if ubicacion.signatura_original %}
+                                - Signatura: 
                                 {{ ubicacion.signatura_original }}
                             {% endif %}
                             {% if ubicacion.estanterias.all %}
@@ -650,7 +651,7 @@
                                 {% endfor %}
                             {% endif %}
                             {% if ubicacion.codigo_o_nombre %}
-                                — {{ ubicacion.codigo_o_nombre }}
+                                — Nombre: {{ ubicacion.codigo_o_nombre }}
                             {% endif %}
                         </span>
                     </div>
