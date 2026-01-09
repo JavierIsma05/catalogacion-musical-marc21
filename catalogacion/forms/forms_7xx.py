@@ -616,6 +616,15 @@ class OtrasRelaciones787Form(forms.ModelForm):
 
         return data
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Permitir que el formulario esté completamente vacío y sea marcado para borrado
+        # evitando errores de "This field is required" a nivel de campo.
+        if 'encabezamiento_principal' in self.fields:
+            self.fields['encabezamiento_principal'].required = False
+        if 'titulo' in self.fields:
+            self.fields['titulo'].required = False
+
 
 class NumeroControl787Form(forms.ModelForm):
     class Meta:
