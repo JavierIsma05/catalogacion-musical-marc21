@@ -99,6 +99,7 @@ class NombreRelacionado700Form(forms.ModelForm):
             'titulo_obra': forms.TextInput(attrs={
                 'class': 'form-control',
                 'data-autocomplete': 'titulo',
+                'placeholder': 'Ej.: Emma Mercedes, Vals N° 3, etc',
                 'autocomplete': 'off'
             }),
         }

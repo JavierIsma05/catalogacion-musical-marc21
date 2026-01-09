@@ -176,15 +176,19 @@ class ObraGeneralForm(forms.ModelForm):
             }),
             'termino_asociado': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'Ej: Doctor, Presbítero'
             }),
             'isbn': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': '978-980-00-2438-6',
             }),
             'ismn': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'M-54001-006-5, 979-0-69204-982-1',
             }),
             'numero_editor': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'B.A. 10574',
             }),
             'numero_parte_130': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -194,28 +198,36 @@ class ObraGeneralForm(forms.ModelForm):
             }),
             'numero_parte_240': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'N° 1, Op. 57',
             }),
             'nombre_parte_240': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'Aria, Rondó',
             }),
             'titulo_principal': forms.TextInput(attrs={
                 'class': 'form-control',
                 'required': True,
+                'placeholder': 'Une revue a Prague'
             }),
             'subtitulo': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'caprice de concert pour le piano, op. 27'
             }),
             'extension': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'Ej: 15 páginas, 5 folios'
             }),
             'otras_caracteristicas': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'Ilustraciones, fotografías'
             }),
             'dimension': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'Ej: 19 x 31 cm'
             }),
             'material_acompanante': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'partes para orquesta, CD'
             }),
             'numero_obra': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -225,7 +237,10 @@ class ObraGeneralForm(forms.ModelForm):
             }),
             
             # TextAreas
-            'mencion_responsabilidad': TextAreaAutosize(attrs={}),
+            'mencion_responsabilidad': TextAreaAutosize(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej.: compuesto por Teresa Carreño',
+            }),
         }
         
         labels = {

@@ -8,203 +8,204 @@ Autocomplete con el mismo look (list-group / list-group-item) como en tu versió
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
 
-    <!-- Management form -->
-    <div style="display:none;">
-        {% for field in formset.management_form %}
-            {{ field }}
-        {% endfor %}
-    </div>
-
-    <div class="formset-forms">
-
-        {% for form in formset %}
-        <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
-
-            {% for hidden in form.hidden_fields %}
-                {{ hidden }}
-            {% endfor %}
-
-            {% if formset.can_delete %}
-            <div class="d-none">
-                {{ form.DELETE }}
+            <!-- Management form -->
+            <div style="display:none;">
+                {% for field in formset.management_form %}
+                    {{ field }}
+                {% endfor %}
             </div>
-            {% endif %}
 
-            <!-- ❌ Eliminar fila 650 -->
-            <button type="button" class="delete-row-btn" title="Eliminar materia">
-                <i class="bi bi-x-lg"></i>
-            </button>
+            <div class="formset-forms">
 
-            <div class="campo-grid">
+                {% for form in formset %}
+                <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
 
-                <!-- 💚 650 $a – AUTOCOMPLETE (MISMO MARKUP QUE TU PLANTILLA) -->
-                <div class="col-full">
-                    <label class="form-label small">650 $a – Materia</label>
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
 
-                    <div class="autocomplete-wrapper position-relative">
-                        <!-- campo visible -->
-                        <input
-                            type="text"
-                            class="form-control materia-input"
-                            name="{{ form.prefix }}-materia_texto"
-                            placeholder="Escriba materia…"
-                            autocomplete="off"
-                            value="{% if form.instance.pk and form.materia.value %}{{ form.instance.materia.termino }}{% endif %}"
-                        >
-
-                        <!-- campo oculto para guardar ID -->
-                        <input
-                            type="hidden"
-                            name="{{ form.prefix }}-materia"
-                            class="materia-id"
-                            value="{% if form.instance.pk and form.materia.value %}{{ form.instance.materia.id }}{% endif %}"
-                        >
-
-                        <!-- ✅ conservar list-group para el look -->
-                        <div class="materia-suggestions autocomplete-suggestions list-group"></div>
-                    </div>
-
-                    {% if form.materia.errors %}
-                    <div class="invalid-feedback d-block">
-                        {{ form.materia.errors }}
+                    {% if formset.can_delete %}
+                    <div class="d-none">
+                        {{ form.DELETE }}
                     </div>
                     {% endif %}
-                </div>
 
-                <!-- ✅ 650 $x – Subdivisiones (estilo 852/856) -->
-                <div class="col-full">
-                    <label class="form-label small">650 $x – Subdivisión de materia</label>
+                    <!-- ❌ Eliminar fila 650 -->
+                    <button type="button" class="delete-row-btn" title="Eliminar materia">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
 
-                    <div class="subcampo-repetible-container subdivisiones-container"
-                         data-subdivisiones-container="{{ forloop.counter0 }}">
+                    <div class="campo-grid">
 
-                        {% if form.instance.pk %}
-                            {% for subdivision in form.instance.subdivisiones.all %}
-                            <div class="subcampo-row subdivision-form-row">
+                        <!-- 💚 650 $a – AUTOCOMPLETE (MISMO MARKUP QUE TU PLANTILLA) -->
+                        <div class="col-full">
+                            <label class="form-label small">650 $a – Materia</label>
 
-                                {% if forloop.first %}
-                                <button type="button"
-                                        class="subcampo-add-btn add-subdivision-btn"
-                                        data-materia-index="{{ forloop.parentloop.counter0 }}"
-                                        title="Agregar subdivisión">
-                                    <i class="bi bi-plus"></i>
-                                </button>
-                                {% else %}
-                                <div class="subcampo-placeholder"></div>
-                                {% endif %}
-
+                            <div class="autocomplete-wrapper position-relative">
+                                <!-- campo visible -->
                                 <input
                                     type="text"
-                                    class="form-control subdivision-input"
-                                    name="subdivision_materia_650_{{ forloop.parentloop.counter0 }}_{{ subdivision.pk }}"
-                                    value="{{ subdivision.subdivision }}"
-                                    placeholder="Subdivisión de materia"
+                                    class="form-control materia-input"
+                                    name="{{ form.prefix }}-materia_texto"
+                                    placeholder="Escriba materia…"
+                                    autocomplete="off"
+                                    value="{% if form.instance.pk and form.materia.value %}{{ form.instance.materia.termino }}{% endif %}"
                                 >
 
-                                <button type="button"
-                                        class="subcampo-delete-btn delete-subdivision-btn"
-                                        title="Eliminar"
-                                        {% if forloop.first and forloop.last %}style="visibility:hidden;"{% endif %}>
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
+                                <!-- campo oculto para guardar ID -->
+                                <input
+                                    type="hidden"
+                                    name="{{ form.prefix }}-materia"
+                                    class="materia-id"
+                                    value="{% if form.instance.pk and form.materia.value %}{{ form.instance.materia.id }}{% endif %}"
+                                >
 
+                                <!-- ✅ conservar list-group para el look -->
+                                <div class="materia-suggestions autocomplete-suggestions list-group"></div>
                             </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="subcampo-row subdivision-form-row">
-                                <button type="button"
-                                        class="subcampo-add-btn add-subdivision-btn"
-                                        data-materia-index="{{ forloop.counter0 }}"
-                                        title="Agregar subdivisión">
-                                    <i class="bi bi-plus"></i>
-                                </button>
 
-                                <input type="text"
-                                       class="form-control subdivision-input"
-                                       name="subdivision_materia_650_{{ forloop.counter0 }}_0"
-                                       placeholder="Subdivisión de materia">
-
-                                <button type="button"
-                                        class="subcampo-delete-btn delete-subdivision-btn"
-                                        title="Eliminar"
-                                        style="visibility:hidden;">
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
+                            {% if form.materia.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.materia.errors }}
                             </div>
-                        {% endif %}
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
-        {% endfor %}
-
-        <!-- EMPTY FORM -->
-        <div class="formset-row empty-form mb-3" style="display:none;">
-            <button type="button" class="delete-row-btn" title="Eliminar materia">
-                <i class="bi bi-x-lg"></i>
-            </button>
-
-            <div class="campo-grid">
-
-                <div class="col-full">
-                    <label class="form-label small">650 $a – Encabezamiento de materia</label>
-
-                    <div class="autocomplete-wrapper position-relative">
-                        <input
-                            type="text"
-                            class="form-control materia-input"
-                            name="{{ formset.prefix }}-__prefix__-materia_texto"
-                            placeholder="Escriba materia…"
-                            autocomplete="off"
-                        >
-
-                        <input
-                            type="hidden"
-                            class="materia-id"
-                            name="{{ formset.prefix }}-__prefix__-materia"
-                        >
-
-                        <!-- ✅ conservar list-group para el look -->
-                        <div class="materia-suggestions autocomplete-suggestions list-group"></div>
-                    </div>
-                </div>
-
-                <div class="col-full">
-                    <label class="form-label small">650 $x – Subdivisión de materia</label>
-
-                    <div class="subcampo-repetible-container subdivisiones-container"
-                         data-subdivisiones-container="__prefix__">
-
-                        <div class="subcampo-row subdivision-form-row">
-                            <button type="button"
-                                    class="subcampo-add-btn add-subdivision-btn"
-                                    data-materia-index="__prefix__"
-                                    title="Agregar subdivisión">
-                                <i class="bi bi-plus"></i>
-                            </button>
-
-                            <input type="text"
-                                   class="form-control subdivision-input"
-                                   name="subdivision_materia_650___prefix___0"
-                                   placeholder="Subdivisión de materia">
-
-                            <button type="button"
-                                    class="subcampo-delete-btn delete-subdivision-btn"
-                                    title="Eliminar"
-                                    style="visibility:hidden;">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
+                            {% endif %}
                         </div>
+
+                        <!-- ✅ 650 $x – Subdivisiones (estilo 852/856) -->
+                        <div class="col-full">
+                            <label class="form-label small">650 $x – Subdivisión de materia</label>
+
+                            <div class="subcampo-repetible-container subdivisiones-container"
+                                data-subdivisiones-container="{{ forloop.counter0 }}">
+
+                                {% if form.instance.pk %}
+                                    {% for subdivision in form.instance.subdivisiones.all %}
+                                    <div class="subcampo-row subdivision-form-row">
+
+                                        {% if forloop.first %}
+                                        <button type="button"
+                                                class="subcampo-add-btn add-subdivision-btn"
+                                                data-materia-index="{{ forloop.parentloop.counter0 }}"
+                                                title="Agregar subdivisión">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                        {% else %}
+                                        <div class="subcampo-placeholder"></div>
+                                        {% endif %}
+
+                                        <input
+                                            type="text"
+                                            class="form-control subdivision-input"
+                                            name="subdivision_materia_650_{{ forloop.parentloop.counter0 }}_{{ subdivision.pk }}"
+                                            value="{{ subdivision.subdivision }}"
+                                            placeholder="Subdivisión de materia"
+                                        >
+
+                                        <button type="button"
+                                                class="subcampo-delete-btn delete-subdivision-btn"
+                                                title="Eliminar"
+                                                {% if forloop.first and forloop.last %}style="visibility:hidden;"{% endif %}>
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="subcampo-row subdivision-form-row">
+                                        <button type="button"
+                                                class="subcampo-add-btn add-subdivision-btn"
+                                                data-materia-index="{{ forloop.counter0 }}"
+                                                title="Agregar subdivisión">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+
+                                        <input type="text"
+                                            class="form-control subdivision-input"
+                                            name="subdivision_materia_650_{{ forloop.counter0 }}_0"
+                                            placeholder="Subdivisión de materia">
+
+                                        <button type="button"
+                                                class="subcampo-delete-btn delete-subdivision-btn"
+                                                title="Eliminar"
+                                                style="visibility:hidden;">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                {% endif %}
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- EMPTY FORM -->
+                <div class="formset-row empty-form mb-3" style="display:none;">
+                    <button type="button" class="delete-row-btn" title="Eliminar materia">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+
+                    <div class="campo-grid">
+
+                        <div class="col-full">
+                            <label class="form-label small">650 $a – Encabezamiento de materia</label>
+
+                            <div class="autocomplete-wrapper position-relative">
+                                <input
+                                    type="text"
+                                    class="form-control materia-input"
+                                    name="{{ formset.prefix }}-__prefix__-materia_texto"
+                                    placeholder="Escriba materia…"
+                                    autocomplete="off"
+                                >
+
+                                <input
+                                    type="hidden"
+                                    class="materia-id"
+                                    name="{{ formset.prefix }}-__prefix__-materia"
+                                >
+
+                                <!-- ✅ conservar list-group para el look -->
+                                <div class="materia-suggestions autocomplete-suggestions list-group"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-full">
+                            <label class="form-label small">650 $x – Subdivisión de materia</label>
+
+                            <div class="subcampo-repetible-container subdivisiones-container"
+                                data-subdivisiones-container="__prefix__">
+
+                                <div class="subcampo-row subdivision-form-row">
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-btn"
+                                            data-materia-index="__prefix__"
+                                            title="Agregar subdivisión">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+
+                                    <input type="text"
+                                        class="form-control subdivision-input"
+                                        name="subdivision_materia_650___prefix___0"
+                                        placeholder="Subdivisión de materia">
+
+                                    <button type="button"
+                                            class="subcampo-delete-btn delete-subdivision-btn"
+                                            title="Eliminar"
+                                            style="visibility:hidden;">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
             </div>
         </div>
 
-    </div>
-</div>
 
 <!-- ✅ AUTOCOMPLETE: tu script original (sin tocarlo) -->
 <script>

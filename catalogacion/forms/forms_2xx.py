@@ -21,12 +21,15 @@ class TituloAlternativoForm(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'Ej. Alma Llanera',
             }),
             'resto_titulo': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'Ej. Venezuela Joropo',
             }),
             'texto_visualizacion': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'Ej. Título en cubierta',
             }),
         }
         labels = {
@@ -45,6 +48,7 @@ class EdicionForm(forms.ModelForm):
         widgets = {
             'edicion': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': '4ta edición, edición revisada',
             }),
         }
 

@@ -57,7 +57,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                                 {% else %}
                                 <div class="subcampo-placeholder"></div>
                                 {% endif %}
-                                <input type="text" class="form-control lugar-input" name="lugar_produccion_264_{{ forloop.parentloop.counter0 }}_{{ lugar.pk }}" value="{{ lugar.lugar }}" placeholder="Ciudad, País">
+                                <input type="text" class="form-control lugar-input" name="lugar_produccion_264_{{ forloop.parentloop.counter0 }}_{{ lugar.pk }}" value="{{ lugar.lugar }}" placeholder="Ciudad">
                                 <button type="button" class="subcampo-delete-btn delete-lugar-btn" title="Eliminar" {% if forloop.first and forloop.last %}style="visibility: hidden;"{% endif %}>
                                     <i class="bi bi-x-lg"></i>
                                 </button>
@@ -67,7 +67,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                                 <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Lugar">
                                     <i class="bi bi-plus"></i>
                                 </button>
-                                <input type="text" class="form-control lugar-input" name="lugar_produccion_264_{{ forloop.counter0 }}_0" placeholder="Ciudad, País">
+                                <input type="text" class="form-control lugar-input" name="lugar_produccion_264_{{ forloop.counter0 }}_0" placeholder="Ciudad">
                                 <button type="button" class="subcampo-delete-btn delete-lugar-btn" title="Eliminar" style="visibility: hidden;">
                                     <i class="bi bi-x-lg"></i>
                                 </button>
@@ -78,7 +78,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="{{ forloop.counter0 }}" title="Agregar Lugar">
                                 <i class="bi bi-plus"></i>
                             </button>
-                            <input type="text" class="form-control lugar-input" name="lugar_produccion_264_{{ forloop.counter0 }}_0" placeholder="Ciudad, País">
+                            <input type="text" class="form-control lugar-input" name="lugar_produccion_264_{{ forloop.counter0 }}_0" placeholder="Ciudad">
                             <button type="button" class="subcampo-delete-btn delete-lugar-btn" title="Eliminar" style="visibility: hidden;">
                                 <i class="bi bi-x-lg"></i>
                             </button>
@@ -202,7 +202,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             <button type="button" class="subcampo-add-btn add-lugar-btn" data-produccion-index="__prefix__" title="Agregar Lugar">
                                 <i class="bi bi-plus"></i>
                             </button>
-                            <input type="text" class="form-control lugar-input" name="lugar_produccion_264___prefix___0" placeholder="Ciudad, País">
+                            <input type="text" class="form-control lugar-input" name="lugar_produccion_264___prefix___0" placeholder="Ciudad">
                             <button type="button" class="subcampo-delete-btn delete-lugar-btn" title="Eliminar" style="visibility: hidden;">
                                 <i class="bi bi-x-lg"></i>
                             </button>
@@ -247,7 +247,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 {# Templates globales para lugares, entidades y fechas (fuera del formset loop) #}
 <div class="subcampo-row lugar-form-row lugar-template-264 d-none">
     <div class="subcampo-placeholder"></div>
-    <input type="text" class="form-control lugar-input" placeholder="Ciudad, País">
+    <input type="text" class="form-control lugar-input" placeholder="Ciudad">
     <button type="button" class="subcampo-delete-btn delete-lugar-btn" title="Eliminar">
         <i class="bi bi-x-lg"></i>
     </button>

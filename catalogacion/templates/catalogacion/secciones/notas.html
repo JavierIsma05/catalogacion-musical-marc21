@@ -23,7 +23,6 @@
                     </span>
                 </div>
 
-                <p class="form-text">Información general que no encaja en otros campos.</p>
 
                 {% include 'catalogacion/includes/formset_500_template.html' with formset=notas_generales %}
             </div>
@@ -48,7 +47,6 @@
                     </span>
                 </div>
 
-                <p class="form-text">Listado de contenidos de la obra.</p>
 
                 {% include 'catalogacion/includes/formset_505_template.html' with formset=contenidos %}
 
@@ -74,7 +72,6 @@
                     </span>
                 </div>
 
-                <p class="form-text">Resumen o sumario del contenido.</p>
 
                 {% include 'catalogacion/includes/formset_520_template.html' with formset=sumarios %}
 
@@ -95,10 +92,7 @@
                     </span>
                 </div>
 
-                <p class="form-text">
-                    Cada registro 545 contiene un solo $a (datos biográficos) y un solo $u (URL).
-                    Puedes agregar múltiples 545.
-                </p>
+    
 
                 <div class="formset-container" data-formset-prefix="{{ datos_biograficos.prefix }}">
 
