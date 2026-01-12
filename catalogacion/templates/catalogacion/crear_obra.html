@@ -572,6 +572,19 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
                 prevTab();
             }
         });
+
+        // ==================== EVENT LISTENERS PARA BOTONES DE TAB ====================
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tabIndex = parseInt(this.getAttribute('data-tab-index'), 10);
+                if (!isNaN(tabIndex)) {
+                    switchTab(tabIndex);
+                }
+            });
+        });
+
+        console.log('✅ Event listeners de tabs agregados correctamente');
     });
 </script>
 <script>
