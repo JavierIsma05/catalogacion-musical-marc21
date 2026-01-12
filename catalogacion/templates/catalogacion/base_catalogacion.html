@@ -53,6 +53,7 @@
 
     let targetInputText = null;
     let targetInputHidden = null;
+    let targetContainer = null;
 
     // 🔍 Abrir modal desde cualquier botón lupa ($w)
     document.addEventListener("click", function (e) {
@@ -62,6 +63,8 @@
         const group = btn.closest(".input-group");
         targetInputText = group.querySelector(".numero-w-input");
         targetInputHidden = group.querySelector(".obra-relacionada-id-input");
+        // Guardar contenedor del formset donde se abrió la búsqueda
+        targetContainer = btn.closest('.formset-row') || btn.closest('.card') || group;
 
         new bootstrap.Modal(
             document.getElementById("modalBuscarObra")
@@ -95,13 +98,35 @@
                         li.textContent = o.num_control;
 
                         li.addEventListener("click", () => {
-                            targetInputText.value = o.num_control;
-                            targetInputHidden.value = o.id;
+                                targetInputText.value = o.num_control;
+                                targetInputHidden.value = o.id;
 
-                            bootstrap.Modal.getInstance(
-                                document.getElementById("modalBuscarObra")
-                            ).hide();
-                        });
+                                // Si tenemos el contenedor objetivo, rellenar $a y $t (visibles y ocultos)
+                                if (targetContainer) {
+                                    const personaWrapper = targetContainer.querySelector('.autocomplete-wrapper[data-autocomplete="persona"]');
+                                    if (personaWrapper) {
+                                        const inp = personaWrapper.querySelector('input');
+                                        if (inp) inp.value = o.compositor || '';
+                                    }
+
+                                    const tituloWrapper = targetContainer.querySelector('.autocomplete-wrapper[data-autocomplete="titulo"]');
+                                    if (tituloWrapper) {
+                                        const inp = tituloWrapper.querySelector('input');
+                                        if (inp) inp.value = o.titulo || '';
+                                    }
+
+                                    // ocultos: encabezamiento_principal y titulo (campos FK)
+                                    const hiddenPersona = targetContainer.querySelector('input[name$="encabezamiento_principal"]');
+                                    if (hiddenPersona) hiddenPersona.value = o.compositor_id || '';
+
+                                    const hiddenTitulo = targetContainer.querySelector('input[name$="titulo"]');
+                                    if (hiddenTitulo) hiddenTitulo.value = o.titulo_id || '';
+                                }
+
+                                bootstrap.Modal.getInstance(
+                                    document.getElementById("modalBuscarObra")
+                                ).hide();
+                            });
 
                         resultados.appendChild(li);
                     });

@@ -147,6 +147,18 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
                     instance=form.instance,
                     prefix=f'funcion700-{form.prefix}',
                 )
+            # Attach a Funcion700FormSet for the empty_form template so
+            # the client-side can clone a proper nested inline formset.
+            try:
+                empty = formset_700.empty_form
+                empty_prefix = empty.prefix
+                empty.funcion700_formset = Funcion700FormSet(
+                    instance=None,
+                    prefix=f'funcion700-{empty_prefix}',
+                )
+            except Exception:
+                # Safety: if empty_form is not available, ignore
+                pass
 
 
         # 382 → nested

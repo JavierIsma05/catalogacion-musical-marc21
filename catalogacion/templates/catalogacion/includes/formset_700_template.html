@@ -5,6 +5,9 @@ Solo HTML (JS va después)
 Orden vertical limpio
 {% endcomment %}
 
+{% load catalogacion_tags %}
+{% get_funciones_persona as funciones_opciones %}
+
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
 
     <!-- Management form -->
@@ -124,7 +127,9 @@ Orden vertical limpio
                             {{ fform.funcion }}
 
                             {% if form.funcion700_formset.can_delete %}
-                                {{ fform.DELETE }}
+                                <div class="d-none">
+                                    {{ fform.DELETE }}
+                                </div>
                                 <button type="button"
                                         class="subcampo-delete-btn delete-funcion-btn"
                                         {% if forloop.first and forloop.last %}style="visibility:hidden"{% endif %}>
@@ -186,23 +191,7 @@ Orden vertical limpio
                     {{ formset.empty_form.persona_coordenadas }}
                 </div>
 
-                <div class="col-full">
-                    <label class="form-label small">700 $t – Título de la obra</label>
-                    <div class="autocomplete-wrapper">
-                        {{ formset.empty_form.titulo_obra }}
-                        <div class="autocomplete-suggestions titulo700-suggestions"></div>
-                    </div>
-                </div>
-
-                <div class="col-full">
-                    <label class="form-label small">700 $i – Relación</label>
-                    {{ formset.empty_form.relacion }}
-                </div>
-
-                <div class="col-full">
-                    <label class="form-label small">700 $j – Autoría</label>
-                    {{ formset.empty_form.autoria }}
-                </div>
+                
 
                 <!-- $c -->
                 <div class="col-full">
@@ -223,25 +212,94 @@ Orden vertical limpio
                     </div>
                 </div>
 
+                <!-- Plantilla oculta para una nueva fila de $e (no tiene el botón +) -->
+                <div class="subcampo-row funcion-form-row funcion-template-700 d-none">
+                    <div class="subcampo-placeholder"></div>
+                    <select class="form-select funcion-select" name="">
+                        <option value="">Seleccione una función...</option>
+                        {% for codigo, nombre in funciones_opciones %}
+                        <option value="{{ codigo }}">{{ nombre }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="subcampo-delete-btn delete-funcion-btn" style="visibility: visible;">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
                 <!-- $e -->
                 <div class="col-full">
                     <label class="form-label small">700 $e – Función</label>
+
                     <div class="subcampo-repetible-container funciones-container" data-funciones-container="__prefix__">
-                        <div class="subcampo-row funcion-form-row">
-                            <button type="button" class="subcampo-add-btn add-funcion-btn"
-                                data-nombre-index="__prefix__">
-                                <i class="bi bi-plus"></i>
-                            </button>
-                            <select class="form-select funcion-select" name="funcion_700___prefix___0">
-                                {% for value, label in formset.empty_form.fields.autoria.choices %}
-                                <option value="{{ value }}">{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="button" class="subcampo-delete-btn delete-funcion-btn"
-                                style="visibility:hidden;">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        </div>
+
+                        {% if formset.empty_form.funcion700_formset %}
+                            {{ formset.empty_form.funcion700_formset.management_form }}
+
+                            {% for fform in formset.empty_form.funcion700_formset %}
+                                <div class="subcampo-row funcion-form-row">
+                                    {% if forloop.first %}
+                                        <button type="button" class="subcampo-add-btn add-funcion-btn" data-nombre-index="__prefix__">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    {% else %}
+                                        <div class="subcampo-placeholder"></div>
+                                    {% endif %}
+
+                                    {{ fform.funcion }}
+
+                                    {% if formset.empty_form.funcion700_formset.can_delete %}
+                                        <div class="d-none">{{ fform.DELETE }}</div>
+                                        <button type="button" class="subcampo-delete-btn delete-funcion-btn" style="visibility:hidden;">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            {% empty %}
+                                <div class="subcampo-row funcion-form-row">
+                                    <button type="button" class="subcampo-add-btn add-funcion-btn" data-nombre-index="__prefix__">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    {{ formset.empty_form.funcion700_formset.empty_form.funcion }}
+                                    <button type="button" class="subcampo-delete-btn delete-funcion-btn" style="visibility:hidden;">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="subcampo-row funcion-form-row">
+                                <button type="button" class="subcampo-add-btn add-funcion-btn" data-nombre-index="__prefix__">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                <select class="form-select funcion-select" name="funcion_700___prefix___0">
+                                    <option value="">Seleccione una función...</option>
+                                    {% for codigo, nombre in funciones_opciones %}
+                                    <option value="{{ codigo }}">{{ nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="subcampo-delete-btn delete-funcion-btn" style="visibility:hidden;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <div class="col-full">
+                    <label class="form-label small">700 $i – Relación</label>
+                    {{ formset.empty_form.relacion }}
+                </div>
+
+                <div class="col-full">
+                    <label class="form-label small">700 $j – Autoría</label>
+                    {{ formset.empty_form.autoria }}
+                </div>
+
+                <div class="col-full">
+                    <label class="form-label small">700 $t – Título de la obra</label>
+                    <div class="autocomplete-wrapper">
+                        {{ formset.empty_form.titulo_obra }}
+                        <div class="autocomplete-suggestions titulo700-suggestions"></div>
                     </div>
                 </div>
 
@@ -392,36 +450,43 @@ Orden vertical limpio
         /* ==========================================
            ➕ 700 $e – FUNCIÓN (INLINE FORMSET CORRECTO)
            ========================================== */
-        const addFuncion = e.target.closest(".add-funcion-btn");
+        const addFuncion = e.target.closest('.add-funcion-btn');
         if (addFuncion) {
-            const container = addFuncion.closest(".funciones-container");
-            if (!container) return;
+            const container = addFuncion.closest('.funciones-container');
+            const template = root.querySelector('.funcion-template-700');
+            if (!container || !template) return;
 
-            const rows = container.querySelectorAll(".funcion-form-row");
-            if (!rows.length) return;
-
-            const last = rows[rows.length - 1];
-            const clone = last.cloneNode(true);
-
-            // limpiar select
-            const select = clone.querySelector("select");
-            if (select) select.selectedIndex = 0;
-
-            // limpiar DELETE
-            const delInput = clone.querySelector('input[type="checkbox"]');
-            if (delInput) delInput.checked = false;
-
-            // mostrar botón eliminar
-            const delBtn = clone.querySelector(".delete-funcion-btn");
-            if (delBtn) delBtn.style.visibility = "visible";
-
-            container.appendChild(clone);
-
-            // 🔥 actualizar TOTAL_FORMS del inline formset
+            // management form del inline formset (ej: name="funcion700-...-TOTAL_FORMS")
             const management = container.querySelector('input[name$="-TOTAL_FORMS"]');
-            if (management) {
-                management.value = parseInt(management.value, 10) + 1;
+            if (!management) return;
+
+            const baseName = management.name.replace(/-TOTAL_FORMS$/, '');
+            const newIndex = parseInt(management.value, 10) || 0;
+
+            const nuevo = template.cloneNode(true);
+            nuevo.classList.remove('d-none', 'funcion-template-700');
+
+            const select = nuevo.querySelector('.funcion-select');
+            if (select) {
+                select.name = `${baseName}-${newIndex}-funcion`;
+                select.selectedIndex = 0;
             }
+
+            const delBtn = nuevo.querySelector('.delete-funcion-btn');
+            if (delBtn) delBtn.style.visibility = 'visible';
+
+            container.appendChild(nuevo);
+
+            // Re-inicializar Select2 en el nuevo select si aplica
+            if (typeof $ !== 'undefined' && $.fn && typeof $.fn.select2 === 'function') {
+                const sel = nuevo.querySelector('select');
+                if (sel && !$(sel).hasClass('select2-hidden-accessible')) {
+                    $(sel).select2({ theme: 'bootstrap-5', width: '100%' });
+                }
+            }
+
+            // incrementar TOTAL_FORMS
+            management.value = newIndex + 1;
             return;
         }
 
@@ -441,6 +506,16 @@ Orden vertical limpio
                 row.remove();
             }
         }
+    });
+
+    // Cuando se agrega desde el gestor global (formset-manager.js), reindexar e inicializar
+    root.addEventListener('formset:added', (ev) => {
+        if (!ev || !ev.detail || ev.detail.prefix !== prefix) return;
+        // small timeout to let DOM settle
+        setTimeout(() => {
+            reindex700();
+            root.querySelectorAll('.formset-row:not(.empty-form)').forEach(row => initPersonaAutocomplete(row));
+        }, 20);
     });
 
     /* ======================================================
