@@ -5,6 +5,9 @@ Solo HTML (JS va después)
 Orden vertical limpio
 {% endcomment %}
 
+{% load catalogacion_tags %}
+{% get_funciones_persona as funciones_opciones %}
+
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
 
     <!-- Management form -->
@@ -121,7 +124,9 @@ Orden vertical limpio
                             {{ fform.funcion }}
 
                             {% if form.funcion700_formset.can_delete %}
-                                {{ fform.DELETE }}
+                                <div class="d-none">
+                                    {{ fform.DELETE }}
+                                </div>
                                 <button type="button"
                                         class="subcampo-delete-btn delete-funcion-btn"
                                         {% if forloop.first %}style="visibility:hidden"{% endif %}>
@@ -543,10 +548,11 @@ Orden vertical limpio
         /* ==========================================
            ➕ 700 $e – FUNCIÓN (INLINE FORMSET CORRECTO)
            ========================================== */
-        const addFuncion = e.target.closest(".add-funcion-btn");
+        const addFuncion = e.target.closest('.add-funcion-btn');
         if (addFuncion) {
-            const container = addFuncion.closest(".funciones-container");
-            if (!container) return;
+            const container = addFuncion.closest('.funciones-container');
+            const template = root.querySelector('.funcion-template-700');
+            if (!container || !template) return;
 
             // Prefix del inline formset y nuevo índice
             const management = container.querySelector('input[name$="-TOTAL_FORMS"]');
@@ -558,8 +564,8 @@ Orden vertical limpio
                 .filter(r => r.style.display !== 'none');
             if (!rows.length) return;
 
-            const last = rows[rows.length - 1];
-            const clone = last.cloneNode(true);
+            const baseName = management.name.replace(/-TOTAL_FORMS$/, '');
+            const newIndex = parseInt(management.value, 10) || 0;
 
             // Limpiar artefactos de Select2 si existieran por clonación
             clone.querySelectorAll('.select2-container').forEach(el => el.remove());
@@ -605,13 +611,14 @@ Orden vertical limpio
             const select = clone.querySelector("select");
             if (select) select.selectedIndex = 0;
 
-            // limpiar DELETE
-            const delInput = clone.querySelector('input[type="checkbox"]');
-            if (delInput) delInput.checked = false;
+            const select = nuevo.querySelector('.funcion-select');
+            if (select) {
+                select.name = `${baseName}-${newIndex}-funcion`;
+                select.selectedIndex = 0;
+            }
 
-            // mostrar botón eliminar
-            const delBtn = clone.querySelector(".delete-funcion-btn");
-            if (delBtn) delBtn.style.visibility = "visible";
+            const delBtn = nuevo.querySelector('.delete-funcion-btn');
+            if (delBtn) delBtn.style.visibility = 'visible';
 
             // asegurar layout tipo 382: el clon NO debe traer [+]
             const addInClone = clone.querySelector('.add-funcion-btn');
@@ -660,6 +667,16 @@ Orden vertical limpio
                 updateFuncionesLayout(funcionesContainer);
             }
         }
+    });
+
+    // Cuando se agrega desde el gestor global (formset-manager.js), reindexar e inicializar
+    root.addEventListener('formset:added', (ev) => {
+        if (!ev || !ev.detail || ev.detail.prefix !== prefix) return;
+        // small timeout to let DOM settle
+        setTimeout(() => {
+            reindex700();
+            root.querySelectorAll('.formset-row:not(.empty-form)').forEach(row => initPersonaAutocomplete(row));
+        }, 20);
     });
 
     /* ======================================================

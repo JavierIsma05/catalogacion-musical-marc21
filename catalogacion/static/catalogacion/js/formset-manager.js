@@ -180,6 +180,15 @@
             }
         }
 
+        // Emitir evento para que otras lógicas (plantillas específicas) puedan
+        // reindexar o reinicializar elementos dentro del formset recién añadido.
+        try {
+            const ev = new CustomEvent('formset:added', { detail: { prefix } });
+            container.dispatchEvent(ev);
+        } catch (err) {
+            // Silenciar si CustomEvent no está soportado
+        }
+
         // Inicializar visibilidad de botones de eliminar en subcampos
         newForm
             .querySelectorAll(".subcampo-repetible-container")

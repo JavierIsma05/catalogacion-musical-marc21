@@ -120,25 +120,6 @@
                     <div class="data-row"><span class="campo-tag">130</span>{{ obra.titulo_uniforme }}</div>
                     {% endif %}
 
-                    {% if obra.titulo_240 %}
-                    <div class="data-row"><span class="campo-tag">240</span>{{ obra.titulo_240 }}</div>
-                    {% endif %}
-
-                    {% if obra.titulo_principal %}
-                    <div class="data-row">
-                        <span class="campo-tag">245</span>
-                        {{ obra.titulo_principal }}{% if obra.subtitulo %} : {{ obra.subtitulo }}{% endif %}
-                    </div>
-                    {% endif %}
-
-                    {% if obra.titulos_alternativos.exists %}
-                        {% for alt in obra.titulos_alternativos.all %}
-                            {% if alt.titulo %}
-                            <div class="data-row"><span class="campo-tag">246</span>{{ alt.titulo }}</div>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-
                     {% if obra.compositor %}
                     <div class="data-row-alt">
                         <span class="campo-tag">100</span>
@@ -500,35 +481,149 @@
 
                     
             </section>
-
+            <!-- ================= NOTAS ================= -->
             <section id="nuevas_notas" class="detalle-section">
                 <h3>Notas</h3>
-                
 
+                <!-- ===== 500 – Nota general (R) ===== -->
+                {% if obra.notas_generales_500.all %}
+                    <h4 class="subsection-title mt-3">Notas generales</h4>
+                    {% for nota in obra.notas_generales_500.all %}
+                    <div class="data-row">
+                        <span class="campo-tag">500</span>
+                        <span>{{ nota.nota_general }}</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No hay notas generales registradas.</p>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- ===== 505 – Contenido (R) ===== -->
+                {% if obra.contenidos_505.all %}
+                    <h4 class="subsection-title mt-3">Contenido</h4>
+                    {% for contenido in obra.contenidos_505.all %}
+                    <div class="data-row">
+                        <span class="campo-tag">505</span>
+                        <span>{{ contenido.contenido }}</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No hay contenidos registrados.</p>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- ===== 520 – Sumario (R) ===== -->
+                {% if obra.sumarios_520.all %}
+                    <h4 class="subsection-title mt-3">Sumario</h4>
+                    {% for sumario in obra.sumarios_520.all %}
+                    <div class="data-row">
+                        <span class="campo-tag">520</span>
+                        <span>{{ sumario.sumario }}</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No hay sumarios registrados.</p>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- ===== 545 – Datos biográficos del compositor (NR) ===== -->
+                {% if obra.datos_biograficos_545 %}
+                    <h4 class="subsection-title mt-3">Datos biográficos</h4>
+
+                    <div class="data-row">
+                        <span class="campo-tag">545</span>
+                        <span>
+                            {% if obra.datos_biograficos_545.texto_biografico %}
+                                {{ obra.datos_biograficos_545.texto_biografico }}
+                            {% endif %}
+
+                            {% if obra.datos_biograficos_545.uri %}
+                                <br>
+                                <a href="{{ obra.datos_biograficos_545.uri }}" target="_blank">
+                                    {{ obra.datos_biograficos_545.uri }}
+                                </a>
+                            {% endif %}
+                        </span>
+                    </div>
+                {% endif %}
             </section>
-                    
+                                
             <!-- ================= RELACIONES ================= -->
             <section id="relaciones" class="detalle-section">
                 <h3>Relaciones</h3>
-                {% if obra.menciones_serie.all %}
-                <h4 class="subsection-title mt-3">Series</h4>
-                    {% for mencion in obra.menciones_serie.all %}
+
+                <!-- ===== 773 – Enlace a documento fuente (R) ===== -->
+                {% if obra.enlaces_documento_fuente_773.all %}
+                    <h4 class="subsection-title mt-3">Documento fuente</h4>
+                    {% for enlace in obra.enlaces_documento_fuente_773.all %}
+                    <div class="data-row">
+                        <span class="campo-tag">773</span>
+                        <span>
+                            {% if enlace.encabezamiento_principal %}
+                                {{ enlace.encabezamiento_principal }}.
+                            {% endif %}
+
+                            {% if enlace.titulo %}
+                                <em>{{ enlace.titulo }}</em>.
+                            {% endif %}
+
+                            {% if enlace.numeros_control.all %}
+                                {% for w in enlace.numeros_control.all %}
+                                    ({{ w.obra_relacionada.num_control }})
+                                {% endfor %}
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No hay enlaces 773 registrados.</p>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- ===== 774 – Unidad constituyente (R) ===== -->
+                {% if obra.enlaces_unidades_774.all %}
+                    <h4 class="subsection-title mt-3">Unidades constituyentes</h4>
+                    {% for enlace in obra.enlaces_unidades_774.all %}
+                    <div class="data-row">
+                        <span class="campo-tag">774</span>
+                        <span>
+                            {% if enlace.encabezamiento_principal %}
+                                {{ enlace.encabezamiento_principal }}.
+                            {% endif %}
+
+                            {% if enlace.titulo %}
+                                <em>{{ enlace.titulo }}</em>.
+                            {% endif %}
+
+                            {% if enlace.numeros_control.all %}
+                                {% for w in enlace.numeros_control.all %}
+                                    ({{ w.obra_relacionada.num_control }})
+                                {% endfor %}
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No hay unidades constituyentes 774 registradas.</p>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- ===== 787 – Otras relaciones (R) ===== -->
+                {% if obra.otras_relaciones_787.all %}
+                    <h4 class="subsection-title mt-3">Otras relaciones</h4>
+                    {% for enlace in obra.otras_relaciones_787.all %}
                     <div class="data-row">
                         <span class="campo-tag">787</span>
                         <span>
-                            {% if r.encabezamiento_principal %}
-                                {{ r.encabezamiento_principal }}.
-                            {% endif %}
-                            {% if mencion.volumenes.all %}
-                                —
-                                {% for v in mencion.volumenes.all %}
-                                    {{ v.volumen }}{% if not forloop.last %} ; {% endif %}
-                                {% endfor %}
+                            {% if enlace.encabezamiento_principal %}
+                                {{ enlace.encabezamiento_principal }}.
                             {% endif %}
 
-                            {% for w in r.numeros_control.all %}
-                                ({{ w.obra_relacionada.num_control }})
-                            {% endfor %}
+                            {% if enlace.titulo %}
+                                <em>{{ enlace.titulo }}</em>.
+                            {% endif %}
+
+                            {% if enlace.numeros_control.all %}
+                                {% for w in enlace.numeros_control.all %}
+                                    ({{ w.obra_relacionada.num_control }})
+                                {% endfor %}
+                            {% endif %}
                         </span>
                     </div>
                     {% empty %}
@@ -536,8 +631,6 @@
                     {% endfor %}
                 {% endif %}
             </section>
-
-
             <!-- ================= EXISTENCIAS ================= -->
             <section id="existencias" class="detalle-section">
                 <h3>Existencias</h3>
@@ -548,6 +641,7 @@
                         <span class="campo-tag">852</span>
                         <span class="ubicacion-parte">
                             {% if ubicacion.signatura_original %}
+                                - Signatura: 
                                 {{ ubicacion.signatura_original }}
                             {% endif %}
                             {% if ubicacion.estanterias.all %}
@@ -557,7 +651,7 @@
                                 {% endfor %}
                             {% endif %}
                             {% if ubicacion.codigo_o_nombre %}
-                                — {{ ubicacion.codigo_o_nombre }}
+                                — Nombre: {{ ubicacion.codigo_o_nombre }}
                             {% endif %}
                         </span>
                     </div>
@@ -623,215 +717,6 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- Motor del canvas -->
 <script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>
 <script src="{% static 'catalogacion/js/incipitInit.js' %}"></script>
-
-<!-- <script>
-    document.addEventListener('DOMContentLoaded', async function () {
-  console.log('🎵 [INCIPIT] Iniciando carga de incipits musicales...');
-
-  // ===== PASO 1: ESPERAR FUENTE MAESTRO =====
-  try {
-    if (document.fonts && document.fonts.load) {
-      console.log('⏳ [INCIPIT] Cargando fuente Maestro...');
-      await document.fonts.load('16px "Maestro"');
-      await document.fonts.ready;
-      console.log('✅ [INCIPIT] Fuente Maestro cargada');
-    }
-  } catch (e) {
-    console.warn('⚠️ [INCIPIT] Error al cargar fuente:', e);
-  }
-
-  // ===== PASO 2: VERIFICAR QUE CANVASINCIPIT EXISTE =====
-  if (typeof CanvasIncipit === 'undefined') {
-    console.error('❌ [INCIPIT] CanvasIncipit no está definido. Verifica que incipitManager.js esté cargado.');
-    return;
-  }
-
-  console.log('✅ [INCIPIT] CanvasIncipit disponible');
-
-  // ===== PASO 3: BUSCAR TODOS LOS CANVAS =====
-  const canvases = document.querySelectorAll('canvas.incipit-view-canvas[data-paec-json-id]');
-  console.log(`📊 [INCIPIT] Canvas encontrados: ${canvases.length}`);
-
-  if (canvases.length === 0) {
-    console.warn('⚠️ [INCIPIT] No se encontraron canvas para renderizar');
-    return;
-  }
-
-  // ===== PASO 4: RENDERIZAR CADA CANVAS =====
-  let successCount = 0;
-  let errorCount = 0;
-
-  canvases.forEach((cv, index) => {
-    const canvasId = cv.id;
-    const jsonId = cv.dataset.paecJsonId;
-
-    console.log(`\n--- [INCIPIT ${index + 1}/${canvases.length}] ---`);
-    console.log('📌 Canvas ID:', canvasId);
-    console.log('📌 JSON ID:', jsonId);
-
-    try {
-      // Buscar el elemento script con el JSON
-      const scriptElement = document.getElementById(jsonId);
-
-      if (!scriptElement) {
-        console.error(`❌ [${canvasId}] No se encontró script con id="${jsonId}"`);
-        console.log('💡 Verifica que el template tenga: <script id="' + jsonId + '" type="application/json">');
-        errorCount++;
-        return;
-      }
-
-      // Leer el contenido del script
-      const rawContent = scriptElement.textContent || scriptElement.innerText || "";
-      console.log('📄 Contenido raw:', rawContent.substring(0, 100) + (rawContent.length > 100 ? '...' : ''));
-
-      if (!rawContent || rawContent.trim() === '') {
-        console.error(`❌ [${canvasId}] El script "${jsonId}" está vacío`);
-        errorCount++;
-        return;
-      }
-
-      // Parsear el JSON (o usar como string directo)
-      let paecFull;
-      try {
-        paecFull = JSON.parse(rawContent);
-      } catch (e) {
-        // Si no es JSON válido, usar como string directo
-        paecFull = rawContent.trim();
-      }
-
-      if (!paecFull) {
-        console.error(`❌ [${canvasId}] PAEC vacío después del parsing`);
-        errorCount++;
-        return;
-      }
-
-      console.log('📝 PAEC completo:', paecFull);
-
-      // Validar formato PAEC básico
-      if (!paecFull.includes('%')) {
-        console.warn(`⚠️ [${canvasId}] PAEC no contiene clave (%). Esto puede causar errores.`);
-      }
-
-      // Inicializar el canvas
-      console.log('🎨 Inicializando canvas...');
-      CanvasIncipit.initializeCanvas(canvasId, 'list', paecFull);
-
-      console.log(`✅ [${canvasId}] Canvas renderizado correctamente`);
-      successCount++;
-
-    } catch (error) {
-      console.error(`❌ [${canvasId}] Error al renderizar:`, error);
-      console.error('Stack:', error.stack);
-      errorCount++;
-
-      // Mostrar error en el canvas
-      try {
-        const ctx = cv.getContext('2d');
-        ctx.fillStyle = '#dc3545';
-        ctx.font = '14px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Error al renderizar íncipit', cv.width / 2, cv.height / 2 - 10);
-        ctx.font = '12px Arial';
-        ctx.fillStyle = '#666';
-        ctx.fillText(error.message, cv.width / 2, cv.height / 2 + 10);
-      } catch (e) {
-        console.error('No se pudo mostrar error en canvas:', e);
-      }
-    }
-  });
-
-  // ===== RESUMEN FINAL =====
-  console.log('\n=================================');
-  console.log('🏁 [INCIPIT] Proceso completado');
-  console.log(`✅ Exitosos: ${successCount}`);
-  console.log(`❌ Errores: ${errorCount}`);
-  console.log('=================================\n');
-});
-
-
-// ============================================
-// FUNCIÓN DE DEPURACIÓN
-// Ejecutar en consola: debugIncipits()
-// ============================================
-window.debugIncipits = function() {
-  console.log('\n========== DEBUG INCIPITS ==========');
-
-  // Verificar CanvasIncipit
-  console.log('1. CanvasIncipit definido:', typeof CanvasIncipit !== 'undefined');
-
-  // Verificar fuente Maestro
-  if (document.fonts && document.fonts.check) {
-    const maestroLoaded = document.fonts.check('16px Maestro');
-    console.log('2. Fuente Maestro cargada:', maestroLoaded);
-  }
-
-  // Listar canvas
-  const canvases = document.querySelectorAll('canvas.incipit-view-canvas');
-  console.log('3. Canvas encontrados:', canvases.length);
-
-  canvases.forEach((cv, i) => {
-    const jsonId = cv.dataset.paecJsonId;
-    const scriptEl = jsonId ? document.getElementById(jsonId) : null;
-    const paecContent = scriptEl ? scriptEl.textContent.substring(0, 80) : 'NO SCRIPT';
-
-    console.log(`\n   Canvas ${i + 1}:`);
-    console.log(`   - ID: ${cv.id}`);
-    console.log(`   - JSON ID: ${jsonId || 'NO DATA-PAEC-JSON-ID'}`);
-    console.log(`   - Script existe: ${!!scriptEl}`);
-    console.log(`   - PAEC: ${paecContent}...`);
-  });
-
-  console.log('\n====================================\n');
-};
-
-
-// ============================================
-// FUNCIÓN PARA REFRESCAR UN CANVAS
-// Uso: refreshCanvas('incipit_view_canvas_123')
-// ============================================
-window.refreshCanvas = function(canvasId) {
-  console.log(`\n🔄 Refrescando canvas: ${canvasId}`);
-
-  const cv = document.getElementById(canvasId);
-  if (!cv) {
-    console.error(`❌ No se encontró canvas con id="${canvasId}"`);
-    return;
-  }
-
-  const jsonId = cv.dataset.paecJsonId;
-  if (!jsonId) {
-    console.error('❌ Canvas no tiene data-paec-json-id');
-    return;
-  }
-
-  const scriptEl = document.getElementById(jsonId);
-  if (!scriptEl) {
-    console.error(`❌ No se encontró script con id="${jsonId}"`);
-    return;
-  }
-
-  let paecFull;
-  try {
-    paecFull = JSON.parse(scriptEl.textContent);
-  } catch (e) {
-    paecFull = scriptEl.textContent.trim();
-  }
-
-  if (!paecFull) {
-    console.error('❌ PAEC vacío');
-    return;
-  }
-
-  console.log('📝 PAEC:', paecFull);
-
-  try {
-    CanvasIncipit.initializeCanvas(canvasId, 'list', paecFull);
-    console.log('✅ Canvas refrescado correctamente');
-  } catch (error) {
-    console.error('❌ Error al refrescar:', error);
-  }
-};
-</script> -->
 
 
 <style>

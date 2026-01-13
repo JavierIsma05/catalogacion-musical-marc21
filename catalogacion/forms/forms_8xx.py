@@ -11,6 +11,7 @@ from catalogacion.models import (
     AutoridadEntidad,
 )
 from .widgets import Select2Widget
+from django.contrib.contenttypes.models import ContentType
 
 
 # ============================================================
@@ -18,6 +19,16 @@ from .widgets import Select2Widget
 # ============================================================
 
 class Ubicacion852Form(forms.ModelForm):
+    # Campos ocultos para referenciar la autoridad seleccionada (persona o entidad)
+    autoridad_model = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput()
+    )
+
+    autoridad_id = forms.IntegerField(
+        required=False,
+        widget=forms.HiddenInput()
+    )
     class Meta:
         model = Ubicacion852
         fields = ['codigo_o_nombre', 'signatura_original']
@@ -41,6 +52,45 @@ class Ubicacion852Form(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['codigo_o_nombre'].required = False
         self.fields['signatura_original'].required = False
+
+    def clean(self):
+        data = super().clean()
+
+        autoridad_model = (data.get('autoridad_model') or '').strip()
+        autoridad_id = data.get('autoridad_id')
+
+        if autoridad_model and autoridad_id:
+            # Resolver ContentType a partir del nombre de modelo lógico
+            if autoridad_model == 'persona':
+                model_name = 'autoridadpersona'
+            elif autoridad_model == 'entidad':
+                model_name = 'autoridadentidad'
+            else:
+                model_name = autoridad_model
+
+            try:
+                ct = ContentType.objects.get(model=model_name)
+                data['autoridad_type'] = ct
+                data['autoridad_id'] = int(autoridad_id)
+            except ContentType.DoesNotExist:
+                # dejar como está; no se asignará autoridad
+                pass
+
+        return data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Si el clean resolvió autoridad_type / autoridad_id, asignarlas
+        autoridad_type = self.cleaned_data.get('autoridad_type')
+        autoridad_id = self.cleaned_data.get('autoridad_id')
+        if autoridad_type and autoridad_id:
+            instance.autoridad_type = autoridad_type
+            instance.autoridad_id = autoridad_id
+
+        if commit:
+            instance.save()
+        return instance
 
 
 

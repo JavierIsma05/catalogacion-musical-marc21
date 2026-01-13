@@ -36,15 +36,12 @@ Lógica intacta
                 <!-- 852 $a -->
                 <div class="col-half">
                     <label class="form-label small">852 $a – Institución / Persona</label>
-
-                    <div class="autocomplete-wrapper">
+                    <div class="autocomplete-wrapper position-relative">
                         {{ form.codigo_o_nombre }}
-                        <div class="autocomplete-suggestions autoridad852-suggestions"></div>
+                        {{ form.autoridad_model }}
+                        {{ form.autoridad_id }}
+                        <div class="autocomplete-suggestions autoridad852-suggestions list-group"></div>
                     </div>
-
-                    <small class="form-text text-muted">
-                        Código o nombre (si no está en Autoridades)
-                    </small>
                 </div>
 
                 <!-- 852 $h -->
@@ -130,10 +127,15 @@ Lógica intacta
 
             <div class="campo-grid">
 
-                <div class="col-half">
-                    <label class="form-label small">852 $a – Institución / Persona</label>
-                    {{ formset.empty_form.codigo_o_nombre }}
-                </div>
+                    <div class="col-half">
+                        <label class="form-label small">852 $a – Institución / Persona</label>
+                        <div class="autocomplete-wrapper position-relative">
+                            {{ formset.empty_form.codigo_o_nombre }}
+                            {{ formset.empty_form.autoridad_model }}
+                            {{ formset.empty_form.autoridad_id }}
+                            <div class="autocomplete-suggestions autoridad852-suggestions list-group"></div>
+                        </div>
+                    </div>
 
                 <div class="col-half">
                     <label class="form-label small">852 $h – Signatura original</label>
@@ -175,30 +177,30 @@ Lógica intacta
         </div>
 
     </div>
+
+  
+
 </div>
 
-
 <script>
-/**
- * 852 $c – Estanterías repetibles (estilo 856)
- * - + solo en la primera fila
- * - X oculto en la primera fila
- * - filas nuevas: placeholder + input + X
- */
 (function () {
     const prefix = "{{ formset.prefix }}";
     const root = document.querySelector(`[data-formset-prefix="${prefix}"]`);
     if (!root) return;
 
-    // Crear fila nueva (sin +, con placeholder)
+    const formsContainer = root.querySelector(".formset-forms");
+    const emptyForm = root.querySelector(".formset-row.empty-form");
+
+    /** Crear fila de estantería */
     function createEstanteriaRow(index) {
         const row = document.createElement("div");
         row.className = "subcampo-row estanteria-form-row mt-2";
+        const timestamp = Date.now();
         row.innerHTML = `
             <div class="subcampo-placeholder"></div>
             <input type="text"
                    class="form-control estanteria-input"
-                   name="estanteria_ubicacion_852_${index}_${Date.now()}"
+                   name="estanteria_ubicacion_852_${index}_${timestamp}"
                    placeholder="Ej: Sala A, Estante 3">
             <button type="button"
                     class="subcampo-delete-btn delete-estanteria-btn"
@@ -209,7 +211,7 @@ Lógica intacta
         return row;
     }
 
-    // Oculta X en la primera fila siempre
+    /** Actualizar visibilidad de X en subcampos */
     function updateDeleteVisibility(container) {
         const rows = container.querySelectorAll(".estanteria-form-row");
         rows.forEach((row, idx) => {
@@ -219,36 +221,145 @@ Lógica intacta
         });
     }
 
-    // Delegación de eventos (funciona también para forms agregados dinámicamente)
-    root.addEventListener("click", function (e) {
+    /** Función de autocomplete/lupa para $a */
+    function initAutoridad852Autocomplete(input, suggestionBox) {
+        if (!input || !suggestionBox) return;
 
+        // Limpiar eventos antiguos
+        input.replaceWith(input.cloneNode(true));
+        input = suggestionBox.parentNode.querySelector("input");
+
+        input.addEventListener("input", function() {
+            const query = input.value.trim();
+            if (!query) {
+                suggestionBox.innerHTML = "";
+                suggestionBox.classList.remove("show");
+                return;
+            }
+
+            fetch(`/catalogacion/api/autocompletar/autoridad/?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    const results = data.results || [];
+                    if (!results.length) {
+                        suggestionBox.innerHTML = "<div class='list-group-item'><em>Sin resultados</em></div>";
+                    } else {
+                        suggestionBox.innerHTML = results.map(item => 
+                            `<div class="suggestion-item list-group-item" data-id="${item.id}" data-model="${item.model}"><strong>${item.text}</strong></div>`
+                        ).join("");
+                    }
+                    suggestionBox.classList.add("show");
+                });
+        });
+
+        suggestionBox.addEventListener("click", function(e) {
+            const target = e.target.closest(".suggestion-item");
+            if (!target) return;
+            const text = target.textContent;
+            const model = target.dataset.model; // 'persona' o 'entidad'
+            const id = target.dataset.id;
+
+            input.value = text;
+
+            // Rellenar hidden fields en el mismo formset-row
+            const formRow = input.closest('.formset-row');
+            if (formRow) {
+                const hidModel = formRow.querySelector('input[name$="-autoridad_model"]');
+                const hidId = formRow.querySelector('input[name$="-autoridad_id"]');
+                if (hidModel) hidModel.value = model;
+                if (hidId) hidId.value = id;
+            } else {
+                // Si no encuentra formRow (p.ej. inputs fuera), intentar en wrapper
+                const hidModel = wrapper.querySelector('input[name$="-autoridad_model"]');
+                const hidId = wrapper.querySelector('input[name$="-autoridad_id"]');
+                if (hidModel) hidModel.value = model;
+                if (hidId) hidId.value = id;
+            }
+
+            suggestionBox.innerHTML = "";
+            suggestionBox.classList.remove("show");
+        });
+
+        input.addEventListener("blur", function() {
+            setTimeout(() => { suggestionBox.classList.remove("show"); }, 200);
+        });
+    }
+
+    /** Inicializar autocomplete en wrapper */
+    function initAutocomplete(wrapper) {
+        const input = wrapper.querySelector("input");
+        const suggestionBox = wrapper.querySelector(".autoridad852-suggestions");
+        initAutoridad852Autocomplete(input, suggestionBox);
+    }
+
+    /** Clonar formulario vacío */
+    function cloneEmptyForm() {
+        const newForm = emptyForm.cloneNode(true);
+        newForm.classList.remove("empty-form");
+        newForm.style.display = "block";
+
+        const timestamp = Date.now();
+        // Actualizar nombres
+        newForm.querySelectorAll("[name]").forEach(el => {
+            el.name = el.name.replace(/__prefix__/g, timestamp);
+        });
+
+        // Actualizar data-attributes de estanterías
+        newForm.querySelectorAll(".subcampo-add-btn").forEach(btn => {
+            btn.setAttribute("data-ubicacion-index", timestamp);
+        });
+        newForm.querySelectorAll(".subcampo-repetible-container").forEach(container => {
+            container.setAttribute("data-estanterias-container", timestamp);
+        });
+
+        // Inicializar autocomplete en $a
+        newForm.querySelectorAll(".autocomplete-wrapper").forEach(initAutocomplete);
+
+        return newForm;
+    }
+
+    /** Eventos principales */
+    root.addEventListener("click", function (e) {
         // Agregar estantería
         const addBtn = e.target.closest(".add-estanteria-btn");
         if (addBtn) {
             const index = addBtn.getAttribute("data-ubicacion-index");
-            const target = root.querySelector(`[data-estanterias-container="${index}"]`);
-            if (!target) return;
-
-            target.appendChild(createEstanteriaRow(index));
-            updateDeleteVisibility(target);
+            const container = root.querySelector(`[data-estanterias-container="${index}"]`);
+            if (!container) return;
+            container.appendChild(createEstanteriaRow(index));
+            updateDeleteVisibility(container);
             return;
         }
 
         // Eliminar estantería
-        const delBtn = e.target.closest(".delete-estanteria-btn");
-        if (delBtn) {
-            const row = delBtn.closest(".estanteria-form-row");
-            const target = delBtn.closest(".estanterias-container");
-            if (!row || !target) return;
-
+        const delEstBtn = e.target.closest(".delete-estanteria-btn");
+        if (delEstBtn) {
+            const row = delEstBtn.closest(".estanteria-form-row");
+            const container = delEstBtn.closest(".subcampo-repetible-container");
+            if (!row || !container) return;
             row.remove();
-            updateDeleteVisibility(target);
+            updateDeleteVisibility(container);
+            return;
+        }
+
+        // Eliminar ubicación 852
+        const delFormBtn = e.target.closest(".delete-row-btn");
+        if (delFormBtn) {
+            const formRow = delFormBtn.closest(".formset-row");
+            if (!formRow) return;
+            formRow.remove();
             return;
         }
     });
 
-    // Inicializar visibilidad de X en contenedores ya cargados
+    /** Inicializar contenedores existentes */
     root.querySelectorAll(".estanterias-container").forEach(updateDeleteVisibility);
+    root.querySelectorAll(".autocomplete-wrapper").forEach(initAutocomplete);
 
+    /** Función global: agregar nueva ubicación 852 */
+    window.addUbicacion852 = function () {
+        const newForm = cloneEmptyForm();
+        formsContainer.appendChild(newForm);
+    };
 })();
 </script>

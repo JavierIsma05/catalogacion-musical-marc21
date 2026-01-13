@@ -36,6 +36,7 @@ from catalogacion.views.autoridades import (
     AutocompletarEntidadView,
     AutocompletarTituloUniformeView,
     AutocompletarMateriaView,
+    AutocompletarAutoridadView,
 )
 from catalogacion.views.utils import autocompletar_forma_musical
 
@@ -100,6 +101,11 @@ urlpatterns = [
         'api/autocompletar/materia/',
         AutocompletarMateriaView.as_view(),
         name='autocompletar_materia'
+    ),
+    path(
+        'api/autocompletar/autoridad/',
+        AutocompletarAutoridadView.as_view(),
+        name='autocompletar_autoridad'
     ),
     path('api/buscar-obras/', api_views.buscar_obras, name='buscar_obras'),
 ]

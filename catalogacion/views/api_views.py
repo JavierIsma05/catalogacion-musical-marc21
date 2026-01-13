@@ -53,6 +53,8 @@ def buscar_obras(request):
                 o.compositor.apellidos_nombres
                 if o.compositor else ""
             ),
+            "compositor_id": (o.compositor.id if o.compositor else None),
+            "titulo_id": (o.titulo_uniforme.id if getattr(o, 'titulo_uniforme', None) else None),
             "tipo": o.get_nivel_bibliografico_display(),
         })
 

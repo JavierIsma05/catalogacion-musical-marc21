@@ -111,13 +111,13 @@
                     <i class="bi bi-person-vcard"></i> Nombres y títulos
                 </button>
                 <button type="button" class="tab-button" data-tab="tab-produccion" data-tab-index="1">
-                    <i class="bi bi-building-gear"></i> Producción / edición
+                    <i class="bi bi-building-gear"></i> Producción/edición
                 </button>
                 <button type="button" class="tab-button" data-tab="tab-datos-musicales" data-tab-index="2">
                     <i class="bi bi-music-note-beamed"></i> Datos musicales
                 </button>
                 <button type="button" class="tab-button" data-tab="tab-materias" data-tab-index="3">
-                    <i class="bi bi-tags"></i> Materias / serie
+                    <i class="bi bi-tags"></i> Materias/serie
                 </button>
                 <button type="button" class="tab-button" data-tab="tab-notas" data-tab-index="4">
                     <i class="bi bi-journal-text"></i> Notas
@@ -129,7 +129,7 @@
                     <i class="bi bi-sticky-fill"></i> Existencias
                 </button>
                 <button type="button" class="tab-button" data-tab="tab-admin" data-tab-index="7">
-                    <i class="bi bi-exclamation-circle"></i> Administración
+                    <i class="bi bi-exclamation-circle"></i> Admin
                 </button>
 
             </div>
@@ -310,6 +310,9 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
 <script src="{% static 'catalogacion/js/formset-manager.js' %}"></script>
 <script src="{% static 'catalogacion/js/form-validator.js' %}"></script>
 <!-- <script src="{% static 'catalogacion/js/subcampo-validators.js' %}"></script> -->
+
+{# Incluir modal de ayuda global para campos MARC21 #}
+{% include 'catalogacion/includes/help_modal.html' %}
 
 <script>
     // ==================== FUNCIONES DE NAVEGACIÓN ENTRE PESTAÑAS ====================

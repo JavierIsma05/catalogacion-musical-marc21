@@ -99,6 +99,7 @@ class NombreRelacionado700Form(forms.ModelForm):
             'titulo_obra': forms.TextInput(attrs={
                 'class': 'form-control',
                 'data-autocomplete': 'titulo',
+                'placeholder': 'Ej.: Emma Mercedes, Vals N° 3, etc',
                 'autocomplete': 'off'
             }),
         }
@@ -614,6 +615,15 @@ class OtrasRelaciones787Form(forms.ModelForm):
             ensure_titulo_uniforme_registrado(titulo)
 
         return data
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Permitir que el formulario esté completamente vacío y sea marcado para borrado
+        # evitando errores de "This field is required" a nivel de campo.
+        if 'encabezamiento_principal' in self.fields:
+            self.fields['encabezamiento_principal'].required = False
+        if 'titulo' in self.fields:
+            self.fields['titulo'].required = False
 
 
 class NumeroControl787Form(forms.ModelForm):

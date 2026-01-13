@@ -270,7 +270,10 @@ class ObraGeneralForm(forms.ModelForm):
                 }
             ),
             # TextAreas
-            "mencion_responsabilidad": TextAreaAutosize(attrs={}),
+            'mencion_responsabilidad': TextAreaAutosize(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej.: compuesto por Teresa Carreño',
+            }),
         }
 
         labels = {

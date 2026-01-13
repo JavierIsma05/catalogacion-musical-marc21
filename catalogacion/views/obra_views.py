@@ -164,6 +164,18 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
                     instance=form.instance,
                     prefix=f"funcion700-{form.prefix}",
                 )
+            # Attach a Funcion700FormSet for the empty_form template so
+            # the client-side can clone a proper nested inline formset.
+            try:
+                empty = formset_700.empty_form
+                empty_prefix = empty.prefix
+                empty.funcion700_formset = Funcion700FormSet(
+                    instance=None,
+                    prefix=f'funcion700-{empty_prefix}',
+                )
+            except Exception:
+                # Safety: if empty_form is not available, ignore
+                pass
 
             # 🔥 Empty formset para nuevas filas (clonado en frontend)
             context["funcion700_empty_formset"] = Funcion700FormSet(
@@ -217,30 +229,6 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
         self.object.save()
 
         # =====================================================
-        # 773 / 774 / 787 $w
-        # =====================================================
-        for enlace in self.object.enlaces_documento_fuente_773.all():
-            for obra_id in self.request.POST.getlist(f"w_773_{enlace.pk}"):
-                if obra_id and int(obra_id) != self.object.pk:
-                    NumeroControl773.objects.create(
-                        enlace_773=enlace, obra_relacionada_id=obra_id
-                    )
-
-        for enlace in self.object.enlaces_unidades_774.all():
-            for obra_id in self.request.POST.getlist(f"w_774_{enlace.pk}"):
-                if obra_id and int(obra_id) != self.object.pk:
-                    NumeroControl774.objects.create(
-                        enlace_774=enlace, obra_relacionada_id=obra_id
-                    )
-
-        for enlace in self.object.otras_relaciones_787.all():
-            for obra_id in self.request.POST.getlist(f"w_787_{enlace.pk}"):
-                if obra_id and int(obra_id) != self.object.pk:
-                    NumeroControl787.objects.create(
-                        enlace_787=enlace, obra_relacionada_id=obra_id
-                    )
-
-        # =====================================================
         # 382 – Medios de interpretación
         # =====================================================
         medios_formset = formsets.get("medios_interpretacion")
@@ -254,8 +242,71 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
 
         # =====================================================
         # 🔥 GUARDAR TODOS LOS FORMSETS (856 INCLUIDO)
+        # IMPORTANTE: Esto debe hacerse ANTES de procesar w_773_/w_774_/w_787_
+        # porque esos procesos necesitan que los enlace ya existan en BD
         # =====================================================
         self._guardar_formsets(formsets, self.object)
+
+        # =====================================================
+        # 773 / 774 / 787 $w (DESPUÉS DE GUARDAR FORMSETS)
+        # =====================================================
+        # Construir mapa de POSTs tipo w_773_{suffix} -> lista de ids
+        w_773_map = {}
+        for k, vals in self.request.POST.lists():
+            if k.startswith('w_773_'):
+                try:
+                    suffix = int(k.split('w_773_')[1])
+                except Exception:
+                    continue
+                w_773_map[suffix] = vals
+        logger.debug(f"POST w_773_map: {w_773_map}")
+
+        for idx, enlace in enumerate(self.object.enlaces_documento_fuente_773.all()):
+            obra_ids = w_773_map.get(enlace.pk) or w_773_map.get(idx) or []
+            logger.debug(f"  w_773 processing: idx={idx}, enlace.pk={enlace.pk}, obra_ids={obra_ids}")
+            for obra_id in obra_ids:
+                logger.debug(f"    obra_id={obra_id}, int(obra_id)={int(obra_id)}, self.object.pk={self.object.pk}")
+                if obra_id and int(obra_id) != self.object.pk:
+                    NumeroControl773.objects.create(
+                        enlace_773=enlace, obra_relacionada_id=obra_id
+                    )
+                    logger.debug(f"    ✅ NC773 creado")
+                else:
+                    logger.debug(f"    ❌ SKIP: igual a self.object")
+
+        w_774_map = {}
+        for k, vals in self.request.POST.lists():
+            if k.startswith('w_774_'):
+                try:
+                    suffix = int(k.split('w_774_')[1])
+                except Exception:
+                    continue
+                w_774_map[suffix] = vals
+
+        for idx, enlace in enumerate(self.object.enlaces_unidades_774.all()):
+            obra_ids = w_774_map.get(enlace.pk) or w_774_map.get(idx) or []
+            for obra_id in obra_ids:
+                if obra_id and int(obra_id) != self.object.pk:
+                    NumeroControl774.objects.create(
+                        enlace_774=enlace, obra_relacionada_id=obra_id
+                    )
+
+        w_787_map = {}
+        for k, vals in self.request.POST.lists():
+            if k.startswith('w_787_'):
+                try:
+                    suffix = int(k.split('w_787_')[1])
+                except Exception:
+                    continue
+                w_787_map[suffix] = vals
+
+        for idx, enlace in enumerate(self.object.otras_relaciones_787.all()):
+            obra_ids = w_787_map.get(enlace.pk) or w_787_map.get(idx) or []
+            for obra_id in obra_ids:
+                if obra_id and int(obra_id) != self.object.pk:
+                    NumeroControl787.objects.create(
+                        enlace_787=enlace, obra_relacionada_id=obra_id
+                    )
 
         messages.success(self.request, "Obra registrada exitosamente.")
         return redirect(self.get_success_url())
