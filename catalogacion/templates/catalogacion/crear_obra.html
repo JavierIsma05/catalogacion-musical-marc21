@@ -56,6 +56,18 @@
                 <ul class="required-fields-list" id="required-fields-list">
                     <!-- Se llena dinámicamente con JavaScript -->
                 </ul>
+
+                <!-- Botones de acción -->
+                <div class="sidebar-actions">
+                    <button type="button" class="sidebar-btn sidebar-btn-save" id="btn-guardar-borrador">
+                        <i class="bi bi-save"></i>
+                        <span>Guardar Borrador</span>
+                    </button>
+                    <button type="button" class="sidebar-btn sidebar-btn-publish" id="btn-publicar-obra">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Publicar Obra</span>
+                    </button>
+                </div>
             </div>
         </div>
     </aside>
@@ -473,6 +485,69 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
         }, { capture: true });
 
         console.log('[FORM] Listener de submit agregado');
+
+        // ==================== BOTONES DE SIDEBAR ====================
+        const btnGuardarBorrador = document.getElementById('btn-guardar-borrador');
+        const btnPublicarObra = document.getElementById('btn-publicar-obra');
+
+        // Guardar Borrador (manual)
+        if (btnGuardarBorrador) {
+            btnGuardarBorrador.addEventListener('click', async function() {
+                if (window.DraftManager) {
+                    // Cambiar estado visual
+                    btnGuardarBorrador.classList.add('saving');
+                    btnGuardarBorrador.innerHTML = '<i class="bi bi-arrow-repeat spin"></i><span>Guardando...</span>';
+                    btnGuardarBorrador.disabled = true;
+
+                    try {
+                        const result = await window.DraftManager.save(false); // guardado manual
+                        
+                        // Mostrar éxito
+                        btnGuardarBorrador.classList.remove('saving');
+                        btnGuardarBorrador.classList.add('saved');
+                        btnGuardarBorrador.innerHTML = '<i class="bi bi-check"></i><span>Guardado</span>';
+                        
+                        // Restaurar después de 2 segundos
+                        setTimeout(() => {
+                            btnGuardarBorrador.classList.remove('saved');
+                            btnGuardarBorrador.innerHTML = '<i class="bi bi-save"></i><span>Guardar Borrador</span>';
+                            btnGuardarBorrador.disabled = false;
+                        }, 2000);
+                    } catch (error) {
+                        console.error('[SIDEBAR] Error al guardar borrador:', error);
+                        btnGuardarBorrador.classList.remove('saving');
+                        btnGuardarBorrador.innerHTML = '<i class="bi bi-exclamation-triangle"></i><span>Error</span>';
+                        btnGuardarBorrador.disabled = false;
+                        
+                        setTimeout(() => {
+                            btnGuardarBorrador.innerHTML = '<i class="bi bi-save"></i><span>Guardar Borrador</span>';
+                        }, 2000);
+                    }
+                }
+            });
+        }
+
+        // Publicar Obra (enviar formulario)
+        if (btnPublicarObra) {
+            btnPublicarObra.addEventListener('click', function() {
+                // Navegar a la última pestaña y hacer submit
+                switchTab(tabs.length - 1); // Ir a la pestaña de administración
+                
+                setTimeout(() => {
+                    const form = document.getElementById('obra-form');
+                    if (form) {
+                        // Disparar el submit del formulario
+                        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                        form.dispatchEvent(submitEvent);
+                        
+                        // Si la validación pasa, enviar
+                        if (!submitEvent.defaultPrevented) {
+                            form.submit();
+                        }
+                    }
+                }, 100);
+            });
+        }
 
         // Atajos de teclado
         document.addEventListener('keydown', function (e) {

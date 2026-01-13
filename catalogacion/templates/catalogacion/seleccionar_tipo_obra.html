@@ -194,6 +194,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const categorias = document.querySelectorAll('.categoria-item');
     const tipoOptions = document.querySelectorAll('.tipo-option');
     const btnContinuar = document.getElementById('btn-continuar');
+    const form = document.getElementById('tipo-form');
+    
+    // Prefijo para localStorage de borradores activos
+    const STORAGE_PREFIX = 'activeDraft:';
     
     // Toggle categorías (acordeón)
     categorias.forEach(categoria => {
@@ -243,6 +247,29 @@ document.addEventListener('DOMContentLoaded', function() {
         categoria.classList.add('active');
         btnContinuar.disabled = false;
     }
+    
+    // Al enviar el formulario: limpiar borrador activo del tipo seleccionado
+    form.addEventListener('submit', function(e) {
+        const tipoSeleccionado = document.querySelector('.tipo-radio-input:checked');
+        if (tipoSeleccionado) {
+            const tipoObra = tipoSeleccionado.value;
+            
+            // Limpiar borrador activo de localStorage para este tipo
+            const key = STORAGE_PREFIX + tipoObra;
+            localStorage.removeItem(key);
+            console.log('[NuevaObra] Borrador activo limpiado:', key);
+            
+            // También limpiar en el backend (borradores antiguos del mismo tipo)
+            fetch('/catalogacion/api/borradores/limpiar-tipo/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                },
+                body: JSON.stringify({ tipo_obra: tipoObra })
+            }).catch(err => console.warn('No se pudieron limpiar borradores del servidor:', err));
+        }
+    });
 });
 </script>
 {% endblock %}

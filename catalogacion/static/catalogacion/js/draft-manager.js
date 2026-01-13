@@ -37,6 +37,7 @@
     CHANGE_DEBOUNCE: 3000, // Esperar 3s después del último cambio
     ROW_ANIMATION_DELAY: 80, // Delay entre crear filas
     DEBUG: false, // Logs de depuración
+    STORAGE_PREFIX: "activeDraft:", // Prefijo para localStorage
   };
 
   const URLS = {
@@ -45,6 +46,8 @@
     get: (id) => `/catalogacion/api/borradores/${id}/`,
     getByObra: (obraId) =>
       `/catalogacion/api/borradores/obra/${obraId}/ultimo/`,
+    getActive: "/catalogacion/api/borradores/activo/",
+    clearType: "/catalogacion/api/borradores/limpiar-tipo/",
     delete: (id) => `/catalogacion/api/borradores/${id}/eliminar/`,
     clearSession: "/catalogacion/api/borradores/limpiar-sesion/",
     searchObras: "/catalogacion/api/buscar-obras/",
@@ -96,6 +99,72 @@
     getObraId() {
       const match = location.pathname.match(/\/obras\/(\d+)\/editar\/?$/);
       return match ? parseInt(match[1], 10) : null;
+    },
+
+    // =========================================================================
+    // GESTIÓN DE BORRADOR ACTIVO (localStorage)
+    // =========================================================================
+
+    /**
+     * Obtiene la clave de localStorage para el borrador activo
+     * En creación: activeDraft:{tipoObra}
+     * En edición: activeDraft:edit:{obraId}
+     */
+    getStorageKey() {
+      const obraId = this.getObraId();
+      if (obraId) {
+        return `${CONFIG.STORAGE_PREFIX}edit:${obraId}`;
+      }
+      const tipoObra = this.getTipoObra();
+      return tipoObra ? `${CONFIG.STORAGE_PREFIX}${tipoObra}` : null;
+    },
+
+    /**
+     * Guarda el ID del borrador activo en localStorage
+     */
+    setActiveDraftId(draftId) {
+      const key = this.getStorageKey();
+      if (key && draftId) {
+        localStorage.setItem(key, String(draftId));
+        this.log(`Borrador activo guardado: ${key} = ${draftId}`);
+      }
+    },
+
+    /**
+     * Obtiene el ID del borrador activo desde localStorage
+     */
+    getActiveDraftId() {
+      const key = this.getStorageKey();
+      if (!key) return null;
+      const id = localStorage.getItem(key);
+      return id ? parseInt(id, 10) : null;
+    },
+
+    /**
+     * Limpia el borrador activo de localStorage
+     */
+    clearActiveDraft() {
+      const key = this.getStorageKey();
+      if (key) {
+        localStorage.removeItem(key);
+        this.log(`Borrador activo limpiado: ${key}`);
+      }
+    },
+
+    /**
+     * Limpia TODOS los borradores activos de creación (no edición)
+     * Útil cuando se quiere empezar completamente de cero
+     */
+    clearAllCreationDrafts() {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key?.startsWith(CONFIG.STORAGE_PREFIX) && !key.includes(":edit:")) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((key) => localStorage.removeItem(key));
+      this.log(`Limpiados ${keysToRemove.length} borradores de creación`);
     },
   };
 
@@ -1091,10 +1160,11 @@
       this.form.addEventListener("input", onChange);
       this.form.addEventListener("change", onChange);
 
-      // Eliminar borrador al publicar
+      // Eliminar borrador al publicar exitosamente
       this.form.addEventListener("submit", (e) => {
         if (e.submitter?.value === "publish" && this.state.draftId) {
           API.delete(this.state.draftId);
+          Utils.clearActiveDraft(); // Limpiar también de localStorage
         }
       });
     },
@@ -1104,7 +1174,9 @@
      */
     _startAutoSave() {
       this.state.autoSaveTimer = setInterval(() => {
-        if (this.state.draftId && this.state.hasChanges) {
+        // Solo autoguardar si hay cambios
+        // Si no hay draftId, el primer autoguardado creará uno nuevo
+        if (this.state.hasChanges) {
           this.save(true);
         }
       }, CONFIG.AUTOSAVE_INTERVAL);
@@ -1114,27 +1186,62 @@
      * Verifica si hay borrador existente para cargar
      */
     async _checkForExistingDraft() {
-      // Desde variable de sesión (lista de borradores)
+      // 1. Si viene de "Continuar" en lista de borradores (sesión)
       if (typeof BORRADOR_A_RECUPERAR !== "undefined" && BORRADOR_A_RECUPERAR) {
+        Utils.log("Cargando borrador desde sesión:", BORRADOR_A_RECUPERAR);
+        // Establecer como borrador activo
+        Utils.setActiveDraftId(BORRADOR_A_RECUPERAR);
         setTimeout(() => this.load(BORRADOR_A_RECUPERAR), 300);
         return;
       }
 
-      // En edición: cargar borrador de la obra
+      // 2. Verificar si debemos empezar desde cero (nueva obra explícita)
+      const params = new URLSearchParams(location.search);
+      if (params.get("nuevo") === "1") {
+        Utils.log("Nueva obra explícita - limpiando borrador activo");
+        Utils.clearActiveDraft();
+        return;
+      }
+
+      // 3. En edición: buscar borrador activo para esta obra
       const obraId = Utils.getObraId();
       if (obraId) {
-        const params = new URLSearchParams(location.search);
-        const draftId = params.get("borrador");
+        // Primero verificar localStorage
+        const activeDraftId = Utils.getActiveDraftId();
+        if (activeDraftId) {
+          Utils.log("Cargando borrador activo de edición:", activeDraftId);
+          setTimeout(() => this.load(activeDraftId), 300);
+          return;
+        }
 
-        if (draftId && !isNaN(parseInt(draftId))) {
-          setTimeout(() => this.load(parseInt(draftId)), 300);
+        // Si no hay en localStorage, buscar en BD
+        const params = new URLSearchParams(location.search);
+        const draftIdParam = params.get("borrador");
+
+        if (draftIdParam && !isNaN(parseInt(draftIdParam))) {
+          const draftId = parseInt(draftIdParam);
+          Utils.setActiveDraftId(draftId);
+          setTimeout(() => this.load(draftId), 300);
         } else {
           const draft = await API.loadByObra(obraId);
           if (draft?.id) {
+            Utils.setActiveDraftId(draft.id);
             setTimeout(() => this.load(draft.id), 300);
           }
         }
+        return;
       }
+
+      // 4. En creación: verificar borrador activo en localStorage
+      const activeDraftId = Utils.getActiveDraftId();
+      if (activeDraftId) {
+        Utils.log("Cargando borrador activo de creación:", activeDraftId);
+        setTimeout(() => this.load(activeDraftId), 300);
+        return;
+      }
+
+      // 5. No hay borrador activo - formulario limpio
+      Utils.log("No hay borrador activo - formulario limpio");
     },
 
     /**
@@ -1144,6 +1251,11 @@
       try {
         const data = Serializer.serialize(this.form);
         const result = await API.save(data, isAuto);
+
+        // Guardar como borrador activo en localStorage
+        if (result.borrador_id) {
+          Utils.setActiveDraftId(result.borrador_id);
+        }
 
         UI.updateSaveIndicator(this.state);
         UI.notify(
@@ -1175,10 +1287,14 @@
         // Validar tipo de obra en creación
         if (!obraId && draft.tipo_obra !== tipoObra) {
           UI.notify("Este borrador es de otro tipo de obra", "error", 5000);
+          Utils.clearActiveDraft(); // Limpiar el borrador inválido
           return;
         }
 
         this.state.draftId = draft.id;
+
+        // Guardar como borrador activo
+        Utils.setActiveDraftId(draft.id);
 
         await Restorer.restore(this.form, draft.datos_formulario);
 
@@ -1190,7 +1306,7 @@
         UI.updateSaveIndicator(this.state);
         UI.notify("Borrador recuperado", "success");
 
-        // Limpiar sesión
+        // Limpiar sesión del servidor
         fetch(URLS.clearSession, {
           method: "POST",
           headers: { "X-CSRFToken": Utils.getCsrf() },
