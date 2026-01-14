@@ -430,6 +430,9 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
 
     fecha_creacion_sistema = models.DateTimeField(auto_now_add=True)
     fecha_modificacion_sistema = models.DateTimeField(auto_now=True)
+    
+    # Portada generada a partir de 856 (imagen o conversión de la primera página de PDF)
+    portada = models.ImageField(upload_to='portadas/', null=True, blank=True)
 
     # Manager personalizado
     objects = ObraGeneralManager()
@@ -788,6 +791,22 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
         if nota and nota.nota_general:
             return nota.nota_general.strip()
         return ""
+
+    @property
+    def first_portada_url(self):
+        """Devuelve la primera URL que apunte a una imagen desde los 856 disponibles, o None."""
+        try:
+            for disp in self.disponibles_856.all():
+                for u in disp.urls_856.all():
+                    url = (u.url or "").strip()
+                    if not url:
+                        continue
+                    low = url.lower()
+                    if low.endswith('.jpg') or low.endswith('.jpeg') or low.endswith('.png') or low.endswith('.gif') or low.endswith('.webp'):
+                        return url
+        except Exception:
+            return None
+        return None
 
     # ===========================================
     # MÉTODOS DE PREPARACIÓN

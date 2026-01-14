@@ -199,4 +199,81 @@ Patrón unificado con 773 / 774
                 return;
             }
 
-            box.classList.remove("show");
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                fetch(`${endpoint}?q=${encodeURIComponent(q)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        box.innerHTML = "";
+                        const results = data.results || [];
+
+                        if (!results.length) {
+                            box.innerHTML = `
+                                <div class="autocomplete-item autocomplete-item-new">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Crear: "${q}"
+                                </div>`;
+                        } else {
+                            results.forEach(item => {
+                                const div = document.createElement("div");
+                                div.className = "autocomplete-item";
+                                div.textContent = item.text;
+                                div.onclick = () => {
+                                    input.value = item.text;
+                                    hide();
+                                };
+                                box.appendChild(div);
+                            });
+
+                            const crear = document.createElement("div");
+                            crear.className = "autocomplete-item autocomplete-item-new";
+                            crear.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${q}"`;
+                            crear.onclick = () => {
+                                input.value = q;
+                                hide();
+                            };
+                            box.appendChild(crear);
+                        }
+
+                        box.classList.add("show");
+                    });
+            }, 300);
+        });
+
+        document.addEventListener("click", e => {
+            if (!wrapper.contains(e.target)) hide();
+        });
+    }
+
+    /* =====================================================
+       HOOK: reinicializar autocomplete al agregar fila
+       (evita duplicar filas por handlers globales)
+       ===================================================== */
+    const THIS_FORMSET_PREFIX = "{{ formset.prefix|escapejs }}";
+
+    // Si existe el gestor central (FormsetManager), él es el único que agrega filas.
+    // Aquí solo reinicializamos autocompletes cuando se agrega una nueva fila.
+    document.addEventListener("formset:added", function (ev) {
+        const detail = ev && ev.detail ? ev.detail : null;
+        if (!detail || detail.prefix !== THIS_FORMSET_PREFIX) return;
+
+        const root = detail.newForm;
+        if (!root || !root.querySelectorAll) return;
+
+        root
+            .querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
+            .forEach((w) => {
+                w.removeAttribute("data-autocomplete-init");
+                initAutocomplete(w);
+            });
+    });
+
+    /* =====================================================
+       INIT INICIAL
+       ===================================================== */
+    document
+        .querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
+        .forEach(initAutocomplete);
+
+})();
+</script>
