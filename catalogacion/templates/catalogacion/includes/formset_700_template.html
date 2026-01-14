@@ -551,8 +551,9 @@ Orden vertical limpio
         const addFuncion = e.target.closest('.add-funcion-btn');
         if (addFuncion) {
             const container = addFuncion.closest('.funciones-container');
+            if (!container) return;
+
             const template = root.querySelector('.funcion-template-700');
-            if (!container || !template) return;
 
             // Prefix del inline formset y nuevo índice
             const management = container.querySelector('input[name$="-TOTAL_FORMS"]');
@@ -564,8 +565,15 @@ Orden vertical limpio
                 .filter(r => r.style.display !== 'none');
             if (!rows.length) return;
 
-            const baseName = management.name.replace(/-TOTAL_FORMS$/, '');
-            const newIndex = parseInt(management.value, 10) || 0;
+            // Construir clon: preferir template, sino clonar la última fila
+            const last = rows[rows.length - 1];
+            let clone;
+            if (template) {
+                clone = template.cloneNode(true);
+            } else {
+                clone = last.cloneNode(true);
+            }
+            clone.style.display = '';
 
             // Limpiar artefactos de Select2 si existieran por clonación
             clone.querySelectorAll('.select2-container').forEach(el => el.remove());
@@ -579,7 +587,6 @@ Orden vertical limpio
             });
 
             // Reindexar name/id/for del inline formset (funcion700-...-X-...)
-            // Detectar oldIndex desde un campo del clon
             let oldIndex = null;
             const anyField = clone.querySelector(`[name^="${inlinePrefix}-"]`) || clone.querySelector(`[id^="id_${inlinePrefix}-"]`);
             const anyName = anyField?.getAttribute('name') || anyField?.getAttribute('id') || '';
@@ -599,7 +606,6 @@ Orden vertical limpio
                 ['name', 'id', 'for'].forEach(attr => {
                     const val = el.getAttribute(attr);
                     if (!val) return;
-                    // inlinePrefix-OLD-... -> inlinePrefix-NEW-... (en name/id/for)
                     el.setAttribute(
                         attr,
                         val.replace(new RegExp(`${inlinePrefix}-${oldIndex}-`, 'g'), `${inlinePrefix}-${newIndex}-`)
@@ -607,17 +613,15 @@ Orden vertical limpio
                 });
             });
 
-            // limpiar select
-            const select = clone.querySelector("select");
-            if (select) select.selectedIndex = 0;
-
-            const select = nuevo.querySelector('.funcion-select');
+            // Ajustar select y nombre final
+            const baseName = management.name.replace(/-TOTAL_FORMS$/, '');
+            const select = clone.querySelector('.funcion-select') || clone.querySelector('select');
             if (select) {
                 select.name = `${baseName}-${newIndex}-funcion`;
                 select.selectedIndex = 0;
             }
 
-            const delBtn = nuevo.querySelector('.delete-funcion-btn');
+            const delBtn = clone.querySelector('.delete-funcion-btn');
             if (delBtn) delBtn.style.visibility = 'visible';
 
             // asegurar layout tipo 382: el clon NO debe traer [+]

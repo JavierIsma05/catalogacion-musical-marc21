@@ -1,7 +1,7 @@
 {% comment %}
 Template 852 – Ubicación Física
-Estilo unificado con 856 (botones + / X, grid, subcampos)
-Lógica intacta
+Estilo unificado con 856
+Autocomplete estable en $a (incluye clonados)
 {% endcomment %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
@@ -16,17 +16,9 @@ Lógica intacta
         {% for form in formset %}
         <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
 
-            {% for hidden in form.hidden_fields %}
-                {{ hidden }}
-            {% endfor %}
+            {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+            {% if formset.can_delete %}<div class="d-none">{{ form.DELETE }}</div>{% endif %}
 
-            {% if formset.can_delete %}
-            <div class="d-none">
-                {{ form.DELETE }}
-            </div>
-            {% endif %}
-
-            <!-- Botón eliminar ubicación 852 -->
             <button type="button" class="delete-row-btn" title="Eliminar ubicación">
                 <i class="bi bi-x-lg"></i>
             </button>
@@ -50,24 +42,20 @@ Lógica intacta
                     {{ form.signatura_original }}
                 </div>
 
-                <!-- 852 $c – Estanterías -->
+                <!-- 852 $c -->
                 <div class="col-full">
                     <label class="form-label small">852 $c – Estantería</label>
 
                     <div class="subcampo-repetible-container estanterias-container"
-                        data-estanterias-container="{{ forloop.counter0 }}" data-borrador-container="estanteria_ubicacion_852" data-borrador-parent="{{ forloop.counter0 }}">
+                         data-estanterias-container="{{ forloop.counter0 }}">
 
                         {% if form.instance.pk %}
-                            {% for estanteria in form.instance.estanterias.all %}
+                            {% for est in form.instance.estanterias.all %}
                             <div class="subcampo-row estanteria-form-row">
-
                                 {% if forloop.first %}
                                 <button type="button"
                                         class="subcampo-add-btn add-estanteria-btn"
-                                        data-ubicacion-index="{{ forloop.parentloop.counter0 }}"
-                                        data-borrador-add="estanteria_ubicacion_852"
-                                        data-borrador-parent="{{ forloop.parentloop.counter0 }}"
-                                        title="Agregar estantería">
+                                        data-ubicacion-index="{{ forloop.parentloop.counter0 }}">
                                     <i class="bi bi-plus"></i>
                                 </button>
                                 {% else %}
@@ -76,14 +64,12 @@ Lógica intacta
 
                                 <input type="text"
                                        class="form-control estanteria-input"
-                                       name="estanteria_ubicacion_852_{{ forloop.parentloop.counter0 }}_{{ estanteria.pk }}"
-                                       value="{{ estanteria.estanteria }}"
-                                       placeholder="Ej: Sala A, Estante 3">
+                                       name="estanteria_ubicacion_852_{{ forloop.parentloop.counter0 }}_{{ est.pk }}"
+                                       value="{{ est.estanteria }}">
 
                                 <button type="button"
                                         class="subcampo-delete-btn delete-estanteria-btn"
-                                        title="Eliminar"
-                                        {% if forloop.first and forloop.last %}style="visibility:hidden;"{% endif %}>
+                                        {% if forloop.first and forloop.last %}style="visibility:hidden"{% endif %}>
                                     <i class="bi bi-x-lg"></i>
                                 </button>
                             </div>
@@ -92,22 +78,17 @@ Lógica intacta
                             <div class="subcampo-row estanteria-form-row">
                                 <button type="button"
                                         class="subcampo-add-btn add-estanteria-btn"
-                                        data-ubicacion-index="{{ forloop.counter0 }}"
-                                        data-borrador-add="estanteria_ubicacion_852"
-                                        data-borrador-parent="{{ forloop.counter0 }}"
-                                        title="Agregar estantería">
+                                        data-ubicacion-index="{{ forloop.counter0 }}">
                                     <i class="bi bi-plus"></i>
                                 </button>
 
                                 <input type="text"
                                        class="form-control estanteria-input"
-                                       name="estanteria_ubicacion_852_{{ forloop.counter0 }}_0"
-                                       placeholder="Ej: Sala A, Estante 3">
+                                       name="estanteria_ubicacion_852_{{ forloop.counter0 }}_0">
 
                                 <button type="button"
                                         class="subcampo-delete-btn delete-estanteria-btn"
-                                        title="Eliminar"
-                                        style="visibility:hidden;">
+                                        style="visibility:hidden">
                                     <i class="bi bi-x-lg"></i>
                                 </button>
                             </div>
@@ -119,23 +100,20 @@ Lógica intacta
         </div>
         {% endfor %}
 
-        <!-- Empty form -->
+        <!-- EMPTY FORM -->
         <div class="formset-row empty-form mb-3" style="display:none;">
-            <button type="button" class="delete-row-btn" title="Eliminar ubicación">
-                <i class="bi bi-x-lg"></i>
-            </button>
+            <button type="button" class="delete-row-btn"><i class="bi bi-x-lg"></i></button>
 
             <div class="campo-grid">
-
-                    <div class="col-half">
-                        <label class="form-label small">852 $a – Institución / Persona</label>
-                        <div class="autocomplete-wrapper position-relative">
-                            {{ formset.empty_form.codigo_o_nombre }}
-                            {{ formset.empty_form.autoridad_model }}
-                            {{ formset.empty_form.autoridad_id }}
-                            <div class="autocomplete-suggestions autoridad852-suggestions list-group"></div>
-                        </div>
+                <div class="col-half">
+                    <label class="form-label small">852 $a – Institución / Persona</label>
+                    <div class="autocomplete-wrapper position-relative">
+                        {{ formset.empty_form.codigo_o_nombre }}
+                        {{ formset.empty_form.autoridad_model }}
+                        {{ formset.empty_form.autoridad_id }}
+                        <div class="autocomplete-suggestions autoridad852-suggestions list-group"></div>
                     </div>
+                </div>
 
                 <div class="col-half">
                     <label class="form-label small">852 $h – Signatura original</label>
@@ -144,222 +122,144 @@ Lógica intacta
 
                 <div class="col-full">
                     <label class="form-label small">852 $c – Estantería</label>
-
                     <div class="subcampo-repetible-container estanterias-container"
-                        data-estanterias-container="__prefix__" data-borrador-container="estanteria_ubicacion_852" data-borrador-parent="__prefix__">
+                         data-estanterias-container="__prefix__">
 
                         <div class="subcampo-row estanteria-form-row">
                             <button type="button"
                                     class="subcampo-add-btn add-estanteria-btn"
-                                    data-ubicacion-index="__prefix__"
-                                    data-borrador-add="estanteria_ubicacion_852"
-                                    data-borrador-parent="__prefix__"
-                                    title="Agregar estantería">
+                                    data-ubicacion-index="__prefix__">
                                 <i class="bi bi-plus"></i>
                             </button>
 
                             <input type="text"
                                    class="form-control estanteria-input"
-                                   name="estanteria_ubicacion_852___prefix___0"
-                                   placeholder="Ej: Sala A, Estante 3">
+                                   name="estanteria_ubicacion_852___prefix___0">
 
                             <button type="button"
                                     class="subcampo-delete-btn delete-estanteria-btn"
-                                    title="Eliminar"
-                                    style="visibility:hidden;">
+                                    style="visibility:hidden">
                                 <i class="bi bi-x-lg"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
     </div>
-
-  
-
 </div>
 
 <script>
 (function () {
-    const prefix = "{{ formset.prefix }}";
-    const root = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+    const root = document.querySelector('[data-formset-prefix="{{ formset.prefix }}"]');
     if (!root) return;
 
     const formsContainer = root.querySelector(".formset-forms");
     const emptyForm = root.querySelector(".formset-row.empty-form");
 
-    /** Crear fila de estantería */
+    function updateDeleteVisibility(container) {
+        container.querySelectorAll(".estanteria-form-row").forEach((row, i) => {
+            const btn = row.querySelector(".delete-estanteria-btn");
+            if (btn) btn.style.visibility = i === 0 ? "hidden" : "visible";
+        });
+    }
+
     function createEstanteriaRow(index) {
         const row = document.createElement("div");
-        row.className = "subcampo-row estanteria-form-row mt-2";
-        const timestamp = Date.now();
+        row.className = "subcampo-row estanteria-form-row";
         row.innerHTML = `
             <div class="subcampo-placeholder"></div>
-            <input type="text"
-                   class="form-control estanteria-input"
-                   name="estanteria_ubicacion_852_${index}_${timestamp}"
-                   placeholder="Ej: Sala A, Estante 3">
-            <button type="button"
-                    class="subcampo-delete-btn delete-estanteria-btn"
-                    title="Eliminar">
+            <input type="text" class="form-control estanteria-input"
+                   name="estanteria_ubicacion_852_${index}_${Date.now()}">
+            <button type="button" class="subcampo-delete-btn delete-estanteria-btn">
                 <i class="bi bi-x-lg"></i>
-            </button>
-        `;
+            </button>`;
         return row;
     }
 
-    /** Actualizar visibilidad de X en subcampos */
-    function updateDeleteVisibility(container) {
-        const rows = container.querySelectorAll(".estanteria-form-row");
-        rows.forEach((row, idx) => {
-            const del = row.querySelector(".delete-estanteria-btn");
-            if (!del) return;
-            del.style.visibility = (idx === 0) ? "hidden" : "visible";
-        });
-    }
+    function initAutoridad852Autocomplete(input, box) {
+        if (!input || !box) return;
+        if (input.dataset.autocompleteInit === "1") return;
+        input.dataset.autocompleteInit = "1";
 
-    /** Función de autocomplete/lupa para $a */
-    function initAutoridad852Autocomplete(input, suggestionBox) {
-        if (!input || !suggestionBox) return;
+        input.addEventListener("input", () => {
+            const q = input.value.trim();
+            if (!q) { box.classList.remove("show"); box.innerHTML = ""; return; }
 
-        // Limpiar eventos antiguos
-        input.replaceWith(input.cloneNode(true));
-        input = suggestionBox.parentNode.querySelector("input");
-
-        input.addEventListener("input", function() {
-            const query = input.value.trim();
-            if (!query) {
-                suggestionBox.innerHTML = "";
-                suggestionBox.classList.remove("show");
-                return;
-            }
-
-            fetch(`/catalogacion/api/autocompletar/autoridad/?q=${encodeURIComponent(query)}`)
-                .then(res => res.json())
-                .then(data => {
-                    const results = data.results || [];
-                    if (!results.length) {
-                        suggestionBox.innerHTML = "<div class='list-group-item'><em>Sin resultados</em></div>";
-                    } else {
-                        suggestionBox.innerHTML = results.map(item => 
-                            `<div class="suggestion-item list-group-item" data-id="${item.id}" data-model="${item.model}"><strong>${item.text}</strong></div>`
-                        ).join("");
-                    }
-                    suggestionBox.classList.add("show");
+            fetch(`/catalogacion/api/autocompletar/autoridad/?q=${encodeURIComponent(q)}`)
+                .then(r => r.json())
+                .then(d => {
+                    box.innerHTML = (d.results || []).map(i =>
+                        `<div class="list-group-item suggestion-item"
+                             data-id="${i.id}" data-model="${i.model}">
+                            <strong>${i.text}</strong>
+                         </div>`).join("");
+                    box.classList.add("show");
                 });
         });
 
-        suggestionBox.addEventListener("click", function(e) {
-            const target = e.target.closest(".suggestion-item");
-            if (!target) return;
-            const text = target.textContent;
-            const model = target.dataset.model; // 'persona' o 'entidad'
-            const id = target.dataset.id;
+        box.addEventListener("click", e => {
+            const item = e.target.closest(".suggestion-item");
+            if (!item) return;
 
-            input.value = text;
-
-            // Rellenar hidden fields en el mismo formset-row
-            const formRow = input.closest('.formset-row');
-            if (formRow) {
-                const hidModel = formRow.querySelector('input[name$="-autoridad_model"]');
-                const hidId = formRow.querySelector('input[name$="-autoridad_id"]');
-                if (hidModel) hidModel.value = model;
-                if (hidId) hidId.value = id;
-            } else {
-                // Si no encuentra formRow (p.ej. inputs fuera), intentar en wrapper
-                const hidModel = wrapper.querySelector('input[name$="-autoridad_model"]');
-                const hidId = wrapper.querySelector('input[name$="-autoridad_id"]');
-                if (hidModel) hidModel.value = model;
-                if (hidId) hidId.value = id;
-            }
-
-            suggestionBox.innerHTML = "";
-            suggestionBox.classList.remove("show");
+            input.value = item.textContent.trim();
+            const row = input.closest(".formset-row");
+            row.querySelector('input[name$="-autoridad_model"]').value = item.dataset.model;
+            row.querySelector('input[name$="-autoridad_id"]').value = item.dataset.id;
+            box.classList.remove("show");
         });
 
-        input.addEventListener("blur", function() {
-            setTimeout(() => { suggestionBox.classList.remove("show"); }, 200);
-        });
+        input.addEventListener("blur", () => setTimeout(() => box.classList.remove("show"), 200));
     }
 
-    /** Inicializar autocomplete en wrapper */
     function initAutocomplete(wrapper) {
-        const input = wrapper.querySelector("input");
-        const suggestionBox = wrapper.querySelector(".autoridad852-suggestions");
-        initAutoridad852Autocomplete(input, suggestionBox);
+        initAutoridad852Autocomplete(
+            wrapper.querySelector("input"),
+            wrapper.querySelector(".autoridad852-suggestions")
+        );
     }
 
-    /** Clonar formulario vacío */
     function cloneEmptyForm() {
-        const newForm = emptyForm.cloneNode(true);
-        newForm.classList.remove("empty-form");
-        newForm.style.display = "block";
+        const f = emptyForm.cloneNode(true);
+        f.classList.remove("empty-form");
+        f.style.display = "block";
+        const idx = Date.now();
 
-        const timestamp = Date.now();
-        // Actualizar nombres
-        newForm.querySelectorAll("[name]").forEach(el => {
-            el.name = el.name.replace(/__prefix__/g, timestamp);
+        f.querySelectorAll("[name]").forEach(el => {
+            el.name = el.name.replace(/__prefix__/g, idx);
         });
+        f.querySelectorAll(".add-estanteria-btn")
+            .forEach(b => b.dataset.ubicacionIndex = idx);
+        f.querySelectorAll(".estanterias-container")
+            .forEach(c => c.dataset.estanteriasContainer = idx);
 
-        // Actualizar data-attributes de estanterías
-        newForm.querySelectorAll(".subcampo-add-btn").forEach(btn => {
-            btn.setAttribute("data-ubicacion-index", timestamp);
-        });
-        newForm.querySelectorAll(".subcampo-repetible-container").forEach(container => {
-            container.setAttribute("data-estanterias-container", timestamp);
-        });
-
-        // Inicializar autocomplete en $a
-        newForm.querySelectorAll(".autocomplete-wrapper").forEach(initAutocomplete);
-
-        return newForm;
+        f.querySelectorAll(".autocomplete-wrapper").forEach(initAutocomplete);
+        return f;
     }
 
-    /** Eventos principales */
-    root.addEventListener("click", function (e) {
-        // Agregar estantería
-        const addBtn = e.target.closest(".add-estanteria-btn");
-        if (addBtn) {
-            const index = addBtn.getAttribute("data-ubicacion-index");
-            const container = root.querySelector(`[data-estanterias-container="${index}"]`);
-            if (!container) return;
-            container.appendChild(createEstanteriaRow(index));
-            updateDeleteVisibility(container);
-            return;
+    root.addEventListener("click", e => {
+        const add = e.target.closest(".add-estanteria-btn");
+        if (add) {
+            const c = root.querySelector(`[data-estanterias-container="${add.dataset.ubicacionIndex}"]`);
+            c.appendChild(createEstanteriaRow(add.dataset.ubicacionIndex));
+            updateDeleteVisibility(c);
         }
 
-        // Eliminar estantería
-        const delEstBtn = e.target.closest(".delete-estanteria-btn");
-        if (delEstBtn) {
-            const row = delEstBtn.closest(".estanteria-form-row");
-            const container = delEstBtn.closest(".subcampo-repetible-container");
-            if (!row || !container) return;
-            row.remove();
-            updateDeleteVisibility(container);
-            return;
+        const del = e.target.closest(".delete-estanteria-btn");
+        if (del) {
+            const c = del.closest(".estanterias-container");
+            del.closest(".estanteria-form-row").remove();
+            updateDeleteVisibility(c);
         }
 
-        // Eliminar ubicación 852
-        const delFormBtn = e.target.closest(".delete-row-btn");
-        if (delFormBtn) {
-            const formRow = delFormBtn.closest(".formset-row");
-            if (!formRow) return;
-            formRow.remove();
-            return;
-        }
+        const delForm = e.target.closest(".delete-row-btn");
+        if (delForm) delForm.closest(".formset-row").remove();
     });
 
-    /** Inicializar contenedores existentes */
-    root.querySelectorAll(".estanterias-container").forEach(updateDeleteVisibility);
     root.querySelectorAll(".autocomplete-wrapper").forEach(initAutocomplete);
+    root.querySelectorAll(".estanterias-container").forEach(updateDeleteVisibility);
 
-    /** Función global: agregar nueva ubicación 852 */
-    window.addUbicacion852 = function () {
-        const newForm = cloneEmptyForm();
-        formsContainer.appendChild(newForm);
-    };
+    window.addUbicacion852 = () => formsContainer.appendChild(cloneEmptyForm());
 })();
 </script>

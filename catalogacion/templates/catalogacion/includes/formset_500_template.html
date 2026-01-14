@@ -1,7 +1,9 @@
 {# FORMSET 500 – Nota general (R): 500 $a #}
 
-<div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
+<div class="formset-container"
+     data-formset-prefix="{{ formset.prefix }}">
 
+  <!-- MANAGEMENT FORM -->
   <div class="d-none">
     {% for hidden in formset.management_form %}
       {{ hidden }}
@@ -9,36 +11,40 @@
   </div>
 
   <div class="formset-forms">
+
     {% for form in formset %}
-      <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
+    <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3">
 
-        {% for hidden in form.hidden_fields %}
-          {{ hidden }}
-        {% endfor %}
+      {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+      {% endfor %}
 
-        {% if formset.can_delete %}
-          <div class="d-none">{{ form.DELETE }}</div>
-        {% endif %}
+      {% if formset.can_delete %}
+        <div class="d-none">{{ form.DELETE }}</div>
+      {% endif %}
 
-        <button type="button" class="delete-row-btn" title="Eliminar nota">
-          <i class="bi bi-x-lg"></i>
-        </button>
+      <button type="button"
+              class="delete-row-btn"
+              title="Eliminar nota">
+        <i class="bi bi-x-lg"></i>
+      </button>
 
-        <div class="card mt-2">
-          <div class="card-body">
-            <label class="form-label small fw-semibold">500 $a – Nota general</label>
-            {{ form.nota_general }}
-            {% if form.nota_general.errors %}
-              <div class="invalid-feedback d-block">{{ form.nota_general.errors }}</div>
-            {% endif %}
-          </div>
+      <div class="card mt-2">
+        <div class="card-body">
+          <label class="form-label small fw-semibold">
+            500 $a – Nota general
+          </label>
+          {{ form.nota_general }}
         </div>
-
       </div>
+
+    </div>
     {% endfor %}
 
-    {# EMPTY FORM #}
-    <div class="formset-row empty-form d-none">
+    <!-- ================= EMPTY FORM (CLONABLE) ================= -->
+    <div class="formset-row empty-form d-none"
+         data-formset-empty="1">
+
       {% for hidden in formset.empty_form.hidden_fields %}
         {{ hidden }}
       {% endfor %}
@@ -47,17 +53,74 @@
         <div class="d-none">{{ formset.empty_form.DELETE }}</div>
       {% endif %}
 
-      <button type="button" class="delete-row-btn" title="Eliminar nota">
+      <button type="button"
+              class="delete-row-btn"
+              title="Eliminar nota">
         <i class="bi bi-x-lg"></i>
       </button>
 
       <div class="card mt-2">
         <div class="card-body">
-          <label class="form-label small fw-semibold">500 $a – Nota general</label>
+          <label class="form-label small fw-semibold">
+            500 $a – Nota general
+          </label>
           {{ formset.empty_form.nota_general }}
         </div>
       </div>
+
     </div>
 
   </div>
 </div>
+<script>
+(function () {
+
+    // Buscar TODOS los botones +
+    document.addEventListener("click", function (e) {
+
+        const addBtn = e.target.closest(".campo-add-btn");
+        if (!addBtn) return;
+
+        const prefix = addBtn.getAttribute("data-formset-target");
+        if (!prefix) return;
+
+        const root = document.querySelector(`[data-formset-prefix="${prefix}"]`);
+        if (!root) return;
+
+        const formsContainer = root.querySelector(".formset-forms");
+        const emptyForm = root.querySelector(".formset-row.empty-form");
+        const totalFormsInput = root.querySelector(
+            `input[name="${prefix}-TOTAL_FORMS"]`
+        );
+
+        if (!formsContainer || !emptyForm || !totalFormsInput) return;
+
+        // Nuevo índice
+        const formIndex = parseInt(totalFormsInput.value, 10);
+
+        // Clonar empty-form
+        const newForm = emptyForm.cloneNode(true);
+        newForm.classList.remove("empty-form", "d-none");
+
+        // Reemplazar __prefix__
+        newForm.querySelectorAll("[name]").forEach(el => {
+            el.name = el.name.replace(/__prefix__/g, formIndex);
+        });
+
+        newForm.querySelectorAll("[id]").forEach(el => {
+            el.id = el.id.replace(/__prefix__/g, formIndex);
+        });
+
+        // Limpiar textarea
+        newForm.querySelectorAll("textarea").forEach(t => t.value = "");
+
+        // Agregar al DOM
+        formsContainer.appendChild(newForm);
+
+        // Incrementar TOTAL_FORMS
+        totalFormsInput.value = formIndex + 1;
+    });
+
+})();
+</script>
+
