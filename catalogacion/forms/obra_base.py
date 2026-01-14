@@ -185,90 +185,109 @@ class ObraGeneralForm(forms.ModelForm):
             "centro_catalogador": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: Biblioteca Central, Archivo Musical UNL",
                     "required": True,
                 }
             ),
             "termino_asociado": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: Doctor, Presbítero… ",
                 }
             ),
             "isbn": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: 978-980-00-2438-6 ",
                 }
             ),
             "ismn": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: 979-0-69204-982-1 ",
                 }
             ),
             "numero_editor": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: B.A. 10574",
                 }
             ),
             "numero_parte_130": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: N°1, Op. 57",
                 }
             ),
             "nombre_parte_130": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: Aria, Rondó…",
                 }
             ),
             "numero_parte_240": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: N°1, Op. 57",
                 }
             ),
             "nombre_parte_240": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: Aria, Rondó…",
                 }
             ),
             "titulo_principal": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: Une revue à Prague",
                     "required": True,
                 }
             ),
             "subtitulo": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: caprice de concert pour le piano, op. 27",
                 }
             ),
             "extension": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: 15 páginas, 5 folios…",
                 }
             ),
             "otras_caracteristicas": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: ilustraciones, fotografías…",
                 }
             ),
             "dimension": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: 19 x 31 cm.",
                 }
             ),
             "material_acompanante": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: partes para orquesta, CD…",
                 }
             ),
             "numero_obra": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: Vals N° 3, Op. 12… ",
                 }
             ),
             "opus": forms.TextInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Ej.: Op. 27, Op. 57…",
                 }
             ),
+
+           
             # TextAreas
             'mencion_responsabilidad': TextAreaAutosize(attrs={
                 'class': 'form-control',
