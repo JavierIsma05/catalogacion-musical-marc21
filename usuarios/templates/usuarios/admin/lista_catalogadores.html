@@ -22,7 +22,7 @@
                 <tr>
                     <th>Nombre</th>
                     <th>Email</th>
-                    <th>Rol</th>
+                    <th>Tipo</th>
                     <th>Estado</th>
                     <th>Registro</th>
                     <th>Acciones</th>
@@ -41,7 +41,9 @@
                     </td>
                     <td class="user-email-cell">{{ catalogador.email }}</td>
                     <td>
-                        <span class="role-badge">{{ catalogador.rol|default:"catalogador" }}</span>
+                        <span class="tipo-badge tipo-{{ catalogador.tipo_catalogador }}">
+                            {{ catalogador.get_tipo_catalogador_display }}
+                        </span>
                     </td>
                     <td>
                         <span class="status-badge {% if catalogador.activo %}active{% else %}inactive{% endif %}">
