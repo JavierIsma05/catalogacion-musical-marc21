@@ -65,6 +65,7 @@ def guardar_borrador_ajax(request):
                 obra_objetivo_id=obra_objetivo_id,
                 datos_formulario=datos_formulario,
                 pestana_actual=pestana_actual,
+                usuario=request.user if request.user.is_authenticated else None,
             )
             mensaje = "Borrador guardado exitosamente"
 
@@ -389,9 +390,11 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, ListView
 
+from usuarios.mixins import CatalogadorRequiredMixin
 
-class ListaBorradoresView(ListView):
-    """Vista para listar todos los borradores activos"""
+
+class ListaBorradoresView(CatalogadorRequiredMixin, ListView):
+    """Vista para listar borradores activos del usuario actual"""
 
     model = BorradorObra
     template_name = "catalogacion/lista_borradores.html"
@@ -399,10 +402,16 @@ class ListaBorradoresView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        """Obtener solo borradores activos ordenados por fecha de modificación"""
+        """Obtener solo borradores activos del usuario, ordenados por fecha de modificación"""
         queryset = BorradorObra.objects.filter(estado="activo").order_by(
             "-fecha_modificacion"
         )
+
+        # Filtrar por el usuario autenticado (solo sus borradores)
+        # Los administradores ven todos los borradores
+        if self.request.user.is_authenticated:
+            if not self.request.user.es_admin:
+                queryset = queryset.filter(usuario=self.request.user)
 
         # Filtrar por búsqueda si hay query
         q = self.request.GET.get("q")
