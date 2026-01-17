@@ -148,6 +148,50 @@
             gap: 0.5rem;
         }
         
+        /* Alerta de cuenta desactivada */
+        .alert-warning-custom {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1px solid #fcd34d;
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+        }
+        
+        .alert-warning-custom .alert-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(245, 158, 11, 0.15);
+            border-radius: 50%;
+            margin-bottom: 0.75rem;
+        }
+        
+        .alert-warning-custom .alert-icon i {
+            font-size: 1.25rem;
+            color: #d97706;
+        }
+        
+        .alert-warning-custom .alert-title {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            margin-bottom: 0.375rem;
+            color: #92400e;
+        }
+        
+        .alert-warning-custom .alert-message {
+            color: #a16207;
+            line-height: 1.5;
+        }
+        
+        .alert-warning-custom .alert-message strong {
+            color: #92400e;
+        }
+        
         /* Footer del sitio */
         .site-footer {
             background: linear-gradient(135deg, var(--login-primary) 0%, #0d3d4d 100%);
@@ -238,7 +282,18 @@
                 <form method="post" action="{% url 'usuarios:login' %}">
                     {% csrf_token %}
                     
-                    {% if form.errors %}
+                    {% if cuenta_desactivada %}
+                    <div class="alert-warning-custom">
+                        <div class="alert-icon">
+                            <i class="bi bi-pause-circle"></i>
+                        </div>
+                        <div class="alert-title">Cuenta desactivada</div>
+                        <div class="alert-message">
+                            La cuenta de <strong>{{ usuario_nombre }}</strong> se encuentra actualmente desactivada. 
+                            Por favor, contacta al administrador del sistema para más información.
+                        </div>
+                    </div>
+                    {% elif form.errors %}
                     <div class="alert-danger">
                         <i class="bi bi-exclamation-circle"></i>
                         Credenciales incorrectas. Intenta de nuevo.
@@ -275,11 +330,6 @@
                 </form>
             </div>
             
-            <div class="login-footer">
-                <small class="text-muted">
-                    ¿No tienes cuenta? <a href="#">Regístrate</a>
-                </small>
-            </div>
         </div>
     </div>
 
