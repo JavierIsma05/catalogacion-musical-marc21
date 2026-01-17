@@ -21,12 +21,15 @@ class TituloAlternativoForm(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'Ej. Alma Llanera',
             }),
             'resto_titulo': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'Ej. Venezuela Joropo',
             }),
             'texto_visualizacion': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'Ej. Título en cubierta',
             }),
         }
         labels = {
@@ -45,6 +48,7 @@ class EdicionForm(forms.ModelForm):
         widgets = {
             'edicion': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': '4ta edición, edición revisada',
             }),
         }
 
@@ -57,7 +61,8 @@ class ProduccionPublicacionForm(forms.ModelForm):
         fields = ['funcion']
         widgets = {
             'funcion': forms.Select(attrs={
-                'class': 'form-select',
+                'class': 'form-select no-select2',
+                'data-no-select2': '1',
             }),
         }
         labels = {
@@ -66,6 +71,13 @@ class ProduccionPublicacionForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # Asegurar que este select sea siempre nativo (sin Select2)
+        self.fields['funcion'].widget.attrs.update({
+            'class': 'form-select no-select2',
+            'data-no-select2': '1',
+        })
+
         # Establecer valor inicial para manuscritos (Producción = 0)
         if not self.instance.pk and not self.initial.get('funcion'):
             self.initial['funcion'] = '0'

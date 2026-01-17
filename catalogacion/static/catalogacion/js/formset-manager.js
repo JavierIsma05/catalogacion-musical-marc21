@@ -75,34 +75,140 @@
         newForm.classList.remove("empty-form");
         newForm.style.display = "";
 
+        // Limpiar cualquier artefacto de Select2 que haya sido inicializado
+        // sobre el template vacío (para evitar inputs "No results found"/IDs duplicados)
+        newForm
+            .querySelectorAll(".select2-container")
+            .forEach((el) => el.remove());
+        newForm.querySelectorAll("select").forEach((select) => {
+            select.classList.remove("select2-hidden-accessible");
+            select.removeAttribute("data-select2-id");
+            select.removeAttribute("tabindex");
+
+            // Si el select está marcado como no-select2, remover también la clase select2
+            // (esto evita que cualquier inicialización posterior lo convierta a Select2).
+            if (
+                select.classList.contains("no-select2") ||
+                select.getAttribute("data-no-select2") === "1"
+            ) {
+                select.classList.remove("select2");
+            }
+
+            const next = select.nextElementSibling;
+            if (next && next.classList && next.classList.contains("select2")) {
+                next.remove();
+            }
+        });
+
         // Insertar antes del template vacío
         formsContainer.insertBefore(newForm, emptyFormTemplate);
 
         // Incrementar contador
         totalFormsInput.value = totalForms + 1;
 
-        // Reinicializar Select2 si existe
+        // Reinicializar Select2 SOLO en campos marcados con .select2
+        // y que NO estén marcados como no-select2.
         if (
             typeof $ !== "undefined" &&
             $.fn &&
             typeof $.fn.select2 === "function"
         ) {
-            newForm
-                .querySelectorAll(".form-select, select.select2")
-                .forEach((select) => {
-                    if (!$(select).hasClass("select2-hidden-accessible")) {
-                        $(select).select2({
-                            theme: "bootstrap-5",
-                            width: "100%",
-                        });
+            newForm.querySelectorAll("select.select2").forEach((select) => {
+                if (
+                    select.classList.contains("no-select2") ||
+                    select.getAttribute("data-no-select2") === "1"
+                ) {
+                    return;
+                }
+                // Siempre reinicializar limpio
+                try {
+                    if ($(select).hasClass("select2-hidden-accessible")) {
+                        $(select).select2("destroy");
                     }
+                } catch (e) {
+                    // ignore
+                }
+
+                $(select).select2({
+                    theme: "bootstrap-5",
+                    width: "100%",
+                    placeholder: function () {
+                        return $(this).data("placeholder");
+                    },
+                    allowClear: true,
                 });
+            });
+
+            // Kill switch: algunos selects NO deben ser Select2 aunque se cuele por clones o scripts.
+            // Caso crítico: 264 (prefix "produccion") indicador/función debe ser dropdown nativo.
+            const forceNativeSelect = (select) => {
+                try {
+                    if ($(select).data("select2")) {
+                        $(select).select2("destroy");
+                    }
+                } catch (e) {
+                    // ignore
+                }
+
+                select.classList.remove("select2-hidden-accessible");
+                select.classList.remove("select2");
+                select.removeAttribute("data-select2-id");
+                select.removeAttribute("tabindex");
+                select.removeAttribute("aria-hidden");
+
+                // Remover cualquier contenedor select2 adyacente o dentro del mismo wrapper
+                const next = select.nextElementSibling;
+                if (
+                    next &&
+                    next.classList &&
+                    next.classList.contains("select2")
+                ) {
+                    next.remove();
+                }
+                const parent = select.parentElement;
+                if (parent) {
+                    parent
+                        .querySelectorAll(".select2-container")
+                        .forEach((el) => el.remove());
+                }
+            };
+
+            if (prefix === "produccion") {
+                newForm
+                    .querySelectorAll('select[name$="-funcion"]')
+                    .forEach(forceNativeSelect);
+            }
+        }
+
+        // Emitir evento para que otras lógicas (plantillas específicas) puedan
+        // reindexar o reinicializar elementos dentro del formset recién añadido.
+        try {
+            const ev = new CustomEvent('formset:added', { detail: { prefix } });
+            container.dispatchEvent(ev);
+        } catch (err) {
+            // Silenciar si CustomEvent no está soportado
         }
 
         // Inicializar visibilidad de botones de eliminar en subcampos
         newForm
             .querySelectorAll(".subcampo-repetible-container")
             .forEach(updateSubcampoDeleteVisibility);
+
+        // Notificar a scripts específicos (por ejemplo, autocompletes de 773/774)
+        // que se añadió una nueva fila al formset.
+        try {
+            document.dispatchEvent(
+                new CustomEvent("formset:added", {
+                    detail: {
+                        prefix,
+                        container,
+                        newForm,
+                    },
+                })
+            );
+        } catch (e) {
+            // ignore
+        }
     }
 
     /**

@@ -5,6 +5,9 @@ Solo HTML (JS va después)
 Orden vertical limpio
 {% endcomment %}
 
+{% load catalogacion_tags %}
+{% get_funciones_persona as funciones_opciones %}
+
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
 
     <!-- Management form -->
@@ -44,9 +47,6 @@ Orden vertical limpio
                         {{ form.persona_texto }}
                         <div class="autocomplete-suggestions persona700-suggestions"></div>
                     </div>
-                    <small class="form-text text-muted">
-                        Escriba para buscar personas existentes o crear una nueva.
-                    </small>
                 </div>
                 <!-- 700 $d – Coordenadas biográficas -->
                 <div class="col-full">
@@ -58,14 +58,14 @@ Orden vertical limpio
                 <div class="col-full">
                     <label class="form-label small">700 $c – Término asociado</label>
                     <div class="subcampo-repetible-container terminos-container"
-                        data-terminos-container="{{ forloop.counter0 }}">
+                        data-terminos-container="{{ forloop.counter0 }}" data-borrador-container="termino_asociado_700" data-borrador-parent="{{ forloop.counter0 }}">
 
                         {% if form.instance.pk %}
                         {% for termino in form.instance.terminos_asociados.all %}
                         <div class="subcampo-row termino-form-row">
                             {% if forloop.first %}
                             <button type="button" class="subcampo-add-btn add-termino-btn"
-                                data-nombre-index="{{ forloop.parentloop.counter0 }}">
+                                data-nombre-index="{{ forloop.parentloop.counter0 }}" data-borrador-add="termino_asociado_700" data-borrador-parent="{{ forloop.parentloop.counter0 }}">
                                 <i class="bi bi-plus"></i>
                             </button>
                             {% else %}
@@ -84,7 +84,7 @@ Orden vertical limpio
                         {% else %}
                         <div class="subcampo-row termino-form-row">
                             <button type="button" class="subcampo-add-btn add-termino-btn"
-                                data-nombre-index="{{ forloop.counter0 }}">
+                                data-nombre-index="{{ forloop.counter0 }}" data-borrador-add="termino_asociado_700" data-borrador-parent="{{ forloop.counter0 }}">
                                 <i class="bi bi-plus"></i>
                             </button>
                             <input type="text" class="form-control termino-input"
@@ -104,7 +104,7 @@ Orden vertical limpio
                 <div class="col-full">
                     <label class="form-label small">700 $e – Función</label>
 
-                    <div class="subcampo-repetible-container funciones-container">
+                    <div class="subcampo-repetible-container funciones-container" data-borrador-container="funcion_700" data-borrador-parent="{{ forloop.counter0 }}">
 
                         {{ form.funcion700_formset.management_form }}
 
@@ -114,20 +114,22 @@ Orden vertical limpio
                             {% if forloop.first %}
                             <button type="button"
                                     class="subcampo-add-btn add-funcion-btn"
-                                    data-nombre-index="{{ forloop.parentloop.counter0 }}">
+                                    data-nombre-index="{{ forloop.parentloop.counter0 }}" data-borrador-add="funcion_700" data-borrador-parent="{{ forloop.parentloop.counter0 }}">
                                 <i class="bi bi-plus"></i>
                             </button>
                             {% else %}
-                            <div class="subcampo-placeholder"></div>
+                            <div class="subcampo-placeholder" aria-hidden="true"></div>
                             {% endif %}
 
                             {{ fform.funcion }}
 
                             {% if form.funcion700_formset.can_delete %}
-                                {{ fform.DELETE }}
+                                <div class="d-none">
+                                    {{ fform.DELETE }}
+                                </div>
                                 <button type="button"
                                         class="subcampo-delete-btn delete-funcion-btn"
-                                        {% if forloop.first and forloop.last %}style="visibility:hidden"{% endif %}>
+                                        {% if forloop.first %}style="visibility:hidden"{% endif %}>
                                     <i class="bi bi-x-lg"></i>
                                 </button>
                             {% endif %}
@@ -186,11 +188,70 @@ Orden vertical limpio
                     {{ formset.empty_form.persona_coordenadas }}
                 </div>
 
+                <!-- 700 $c -->
                 <div class="col-full">
-                    <label class="form-label small">700 $t – Título de la obra</label>
-                    <div class="autocomplete-wrapper">
-                        {{ formset.empty_form.titulo_obra }}
-                        <div class="autocomplete-suggestions titulo700-suggestions"></div>
+                    <label class="form-label small">700 $c – Término asociado</label>
+                    <div class="subcampo-repetible-container terminos-container" data-terminos-container="__prefix__" data-borrador-container="termino_asociado_700" data-borrador-parent="__prefix__">
+                        <div class="subcampo-row termino-form-row">
+                            <button type="button" class="subcampo-add-btn add-termino-btn"
+                                data-nombre-index="__prefix__" data-borrador-add="termino_asociado_700" data-borrador-parent="__prefix__">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <input type="text" class="form-control termino-input"
+                                name="termino_asociado_700___prefix___0" placeholder="Dr., Lic., etc.">
+                            <button type="button" class="subcampo-delete-btn delete-termino-btn"
+                                style="visibility:hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 700 $e – Función (INLINE FORMSET) -->
+                <div class="col-full">
+                    <label class="form-label small">700 $e – Función</label>
+                    <div class="subcampo-repetible-container funciones-container" data-funciones-container="__prefix__" data-borrador-container="funcion_700" data-borrador-parent="__prefix__">
+
+                        {% if funcion700_empty_formset %}
+                            {{ funcion700_empty_formset.management_form }}
+
+                            {% for fform in funcion700_empty_formset %}
+                            <div class="subcampo-row funcion-form-row">
+                                {% if forloop.first %}
+                                <button type="button" class="subcampo-add-btn add-funcion-btn"
+                                    data-nombre-index="__prefix__" data-borrador-add="funcion_700" data-borrador-parent="__prefix__">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                {% else %}
+                                <div class="subcampo-placeholder" aria-hidden="true"></div>
+                                {% endif %}
+
+                                {{ fform.funcion }}
+
+                                {% if funcion700_empty_formset.can_delete %}
+                                    {{ fform.DELETE }}
+                                    <button type="button" class="subcampo-delete-btn delete-funcion-btn"
+                                        {% if forloop.first %}style="visibility:hidden"{% endif %}>
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="subcampo-row funcion-form-row">
+                                <button type="button" class="subcampo-add-btn add-funcion-btn"
+                                    data-nombre-index="__prefix__" data-borrador-add="funcion_700" data-borrador-parent="__prefix__">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                <select class="form-select funcion-select" name="funcion700-__prefix__-0-funcion">
+                                    <option value="">---------</option>
+                                </select>
+                                <button type="button" class="subcampo-delete-btn delete-funcion-btn" style="visibility:hidden;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        {% endif %}
+
                     </div>
                 </div>
 
@@ -204,44 +265,11 @@ Orden vertical limpio
                     {{ formset.empty_form.autoria }}
                 </div>
 
-                <!-- $c -->
                 <div class="col-full">
-                    <label class="form-label small">700 $c – Término asociado</label>
-                    <div class="subcampo-repetible-container terminos-container" data-terminos-container="__prefix__">
-                        <div class="subcampo-row termino-form-row">
-                            <button type="button" class="subcampo-add-btn add-termino-btn"
-                                data-nombre-index="__prefix__">
-                                <i class="bi bi-plus"></i>
-                            </button>
-                            <input type="text" class="form-control termino-input"
-                                name="termino_asociado_700___prefix___0" placeholder="Dr., Lic., etc.">
-                            <button type="button" class="subcampo-delete-btn delete-termino-btn"
-                                style="visibility:hidden;">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- $e -->
-                <div class="col-full">
-                    <label class="form-label small">700 $e – Función</label>
-                    <div class="subcampo-repetible-container funciones-container" data-funciones-container="__prefix__">
-                        <div class="subcampo-row funcion-form-row">
-                            <button type="button" class="subcampo-add-btn add-funcion-btn"
-                                data-nombre-index="__prefix__">
-                                <i class="bi bi-plus"></i>
-                            </button>
-                            <select class="form-select funcion-select" name="funcion_700___prefix___0">
-                                {% for value, label in formset.empty_form.fields.autoria.choices %}
-                                <option value="{{ value }}">{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="button" class="subcampo-delete-btn delete-funcion-btn"
-                                style="visibility:hidden;">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        </div>
+                    <label class="form-label small">700 $t – Título de la obra</label>
+                    <div class="autocomplete-wrapper">
+                        {{ formset.empty_form.titulo_obra }}
+                        <div class="autocomplete-suggestions titulo700-suggestions"></div>
                     </div>
                 </div>
 
@@ -345,17 +373,41 @@ Orden vertical limpio
                     if (!val) return;
                     el.setAttribute(
                         attr,
-                        val.replace(/-\d+-/, `-${index}-`)
+                        val.replace(/-\d+-/g, `-${index}-`)
                            .replace(/__prefix__/g, index)
                     );
                 });
+            });
+
+            // ✅ Reindexar nombres custom de 700$c (no son formset Django)
+            row.querySelectorAll('input[name^="termino_asociado_700_"]').forEach(input => {
+                const name = input.getAttribute('name');
+                if (!name) return;
+                // termino_asociado_700_{idx}_...
+                input.setAttribute('name', name.replace(/^termino_asociado_700_\d+_/, `termino_asociado_700_${index}_`));
             });
 
             row.querySelectorAll("[data-nombre-index]").forEach(btn =>
                 btn.dataset.nombreIndex = index
             );
 
+            // ✅ Reindexar contenedores y relaciones de borrador
+            row.querySelectorAll("[data-borrador-parent]").forEach(el => {
+                el.dataset.borradorParent = index;
+            });
+
+            row.querySelectorAll(".terminos-container").forEach(cont => {
+                cont.dataset.terminosContainer = index;
+                cont.dataset.borradorParent = index;
+            });
+
+            row.querySelectorAll(".funciones-container").forEach(cont => {
+                cont.dataset.funcionesContainer = index;
+                cont.dataset.borradorParent = index;
+            });
+
             initPersonaAutocomplete(row);
+            normalize700Row(row);
         });
 
         if (totalInput) totalInput.value = rows.length;
@@ -364,6 +416,110 @@ Orden vertical limpio
     /* ======================================================
        EVENTOS
        ====================================================== */
+
+    function forceNativeSelect(select) {
+        if (!select) return;
+
+        // Si Select2 ya está aplicado, destruirlo
+        if (window.$ && $.fn && typeof $.fn.select2 === 'function') {
+            try {
+                if ($(select).data('select2')) {
+                    $(select).select2('destroy');
+                }
+            } catch (e) {
+                // ignore
+            }
+        }
+
+        // Limpiar clases/attrs típicos de Select2
+        select.classList.remove('select2-hidden-accessible');
+        select.classList.remove('select2');
+        select.removeAttribute('data-select2-id');
+        select.removeAttribute('tabindex');
+
+        // El contenedor de Select2 suele estar como siguiente hermano
+        let sib = select.nextElementSibling;
+        while (sib && sib.classList && (sib.classList.contains('select2') || sib.classList.contains('select2-container'))) {
+            const toRemove = sib;
+            sib = sib.nextElementSibling;
+            toRemove.remove();
+        }
+
+        const wrapper = select.parentElement;
+        if (wrapper) {
+            wrapper.querySelectorAll('.select2-container').forEach(el => el.remove());
+        }
+    }
+
+    function normalize700Row(row) {
+        if (!row) return;
+        // 700 $j – Autoría debe ser select nativo
+        row.querySelectorAll('select[name$="-autoria"]').forEach(forceNativeSelect);
+        // 700 $e – Función (inline formset) debe ser select nativo
+        row.querySelectorAll('.funciones-container select').forEach(forceNativeSelect);
+    }
+
+    function updateFuncionesLayout(funcionesContainer) {
+        if (!funcionesContainer) return;
+
+        // En duplicaciones/clonados puede venir vacío: recalcular desde la fila 700
+        let parentIndex = funcionesContainer.dataset.borradorParent;
+        if (parentIndex === undefined || parentIndex === null || parentIndex === '') {
+            const formRow = funcionesContainer.closest('.formset-row');
+            if (formRow) {
+                const rows = Array.from(root.querySelectorAll('.formset-row:not(.empty-form)'));
+                const idx = rows.indexOf(formRow);
+                if (idx >= 0) parentIndex = String(idx);
+            }
+        }
+        const visibleRows = Array.from(funcionesContainer.querySelectorAll('.funcion-form-row'))
+            .filter(r => r.style.display !== 'none');
+
+        if (!visibleRows.length) return;
+
+        visibleRows.forEach((row, idx) => {
+            const isFirst = idx === 0;
+            const addBtn = row.querySelector('.add-funcion-btn');
+            const placeholder = row.querySelector('.subcampo-placeholder');
+            const delBtn = row.querySelector('.delete-funcion-btn');
+
+            // Izquierda: solo primera fila con [+], resto placeholder (como 382)
+            if (isFirst) {
+                if (!addBtn) {
+                    const newBtn = document.createElement('button');
+                    newBtn.type = 'button';
+                    newBtn.className = 'subcampo-add-btn add-funcion-btn';
+                    if (parentIndex !== undefined) newBtn.dataset.nombreIndex = parentIndex;
+                    newBtn.dataset.borradorAdd = 'funcion_700';
+                    if (parentIndex !== undefined) newBtn.dataset.borradorParent = parentIndex;
+                    newBtn.innerHTML = '<i class="bi bi-plus"></i>';
+                    if (placeholder) {
+                        placeholder.replaceWith(newBtn);
+                    } else {
+                        row.insertBefore(newBtn, row.firstChild);
+                    }
+                }
+            } else {
+                if (addBtn) {
+                    const newPh = document.createElement('div');
+                    newPh.className = 'subcampo-placeholder';
+                    newPh.setAttribute('aria-hidden', 'true');
+                    addBtn.replaceWith(newPh);
+                } else if (!placeholder) {
+                    const newPh = document.createElement('div');
+                    newPh.className = 'subcampo-placeholder';
+                    newPh.setAttribute('aria-hidden', 'true');
+                    row.insertBefore(newPh, row.firstChild);
+                }
+            }
+
+            // Derecha: primera fila sin [X], resto con [X]
+            if (delBtn) {
+                delBtn.style.visibility = isFirst ? 'hidden' : 'visible';
+            }
+        });
+    }
+
     root.addEventListener("click", e => {
 
         /* ==========================================
@@ -392,36 +548,105 @@ Orden vertical limpio
         /* ==========================================
            ➕ 700 $e – FUNCIÓN (INLINE FORMSET CORRECTO)
            ========================================== */
-        const addFuncion = e.target.closest(".add-funcion-btn");
+        const addFuncion = e.target.closest('.add-funcion-btn');
         if (addFuncion) {
-            const container = addFuncion.closest(".funciones-container");
+            const container = addFuncion.closest('.funciones-container');
             if (!container) return;
 
-            const rows = container.querySelectorAll(".funcion-form-row");
+            const template = root.querySelector('.funcion-template-700');
+
+            // Prefix del inline formset y nuevo índice
+            const management = container.querySelector('input[name$="-TOTAL_FORMS"]');
+            if (!management || !management.name) return;
+            const inlinePrefix = management.name.replace(/-TOTAL_FORMS$/, "");
+            const newIndex = parseInt(management.value, 10) || 0;
+
+            const rows = Array.from(container.querySelectorAll(".funcion-form-row"))
+                .filter(r => r.style.display !== 'none');
             if (!rows.length) return;
 
+            // Construir clon: preferir template, sino clonar la última fila
             const last = rows[rows.length - 1];
-            const clone = last.cloneNode(true);
+            let clone;
+            if (template) {
+                clone = template.cloneNode(true);
+            } else {
+                clone = last.cloneNode(true);
+            }
+            clone.style.display = '';
 
-            // limpiar select
-            const select = clone.querySelector("select");
-            if (select) select.selectedIndex = 0;
+            // Limpiar artefactos de Select2 si existieran por clonación
+            clone.querySelectorAll('.select2-container').forEach(el => el.remove());
+            clone.querySelectorAll('select').forEach(select => {
+                select.classList.remove('select2-hidden-accessible');
+                select.classList.remove('select2');
+                select.removeAttribute('data-select2-id');
+                select.removeAttribute('tabindex');
+                const next = select.nextElementSibling;
+                if (next && next.classList && next.classList.contains('select2')) next.remove();
+            });
 
-            // limpiar DELETE
-            const delInput = clone.querySelector('input[type="checkbox"]');
-            if (delInput) delInput.checked = false;
+            // Reindexar name/id/for del inline formset (funcion700-...-X-...)
+            let oldIndex = null;
+            const anyField = clone.querySelector(`[name^="${inlinePrefix}-"]`) || clone.querySelector(`[id^="id_${inlinePrefix}-"]`);
+            const anyName = anyField?.getAttribute('name') || anyField?.getAttribute('id') || '';
+            const m = anyName.match(new RegExp(`^id_?${inlinePrefix}-([0-9]+)-`));
+            if (m && m[1] != null) oldIndex = m[1];
 
-            // mostrar botón eliminar
-            const delBtn = clone.querySelector(".delete-funcion-btn");
-            if (delBtn) delBtn.style.visibility = "visible";
+            // Fallback: tomar del último select real
+            if (oldIndex == null) {
+                const lastSelect = last.querySelector('select');
+                const nm = lastSelect?.getAttribute('name') || '';
+                const m2 = nm.match(new RegExp(`^${inlinePrefix}-([0-9]+)-`));
+                if (m2 && m2[1] != null) oldIndex = m2[1];
+            }
+            if (oldIndex == null) oldIndex = String(Math.max(0, rows.length - 1));
+
+            clone.querySelectorAll('[name], [id], label[for]').forEach(el => {
+                ['name', 'id', 'for'].forEach(attr => {
+                    const val = el.getAttribute(attr);
+                    if (!val) return;
+                    el.setAttribute(
+                        attr,
+                        val.replace(new RegExp(`${inlinePrefix}-${oldIndex}-`, 'g'), `${inlinePrefix}-${newIndex}-`)
+                    );
+                });
+            });
+
+            // Ajustar select y nombre final
+            const baseName = management.name.replace(/-TOTAL_FORMS$/, '');
+            const select = clone.querySelector('.funcion-select') || clone.querySelector('select');
+            if (select) {
+                select.name = `${baseName}-${newIndex}-funcion`;
+                select.selectedIndex = 0;
+            }
+
+            const delBtn = clone.querySelector('.delete-funcion-btn');
+            if (delBtn) delBtn.style.visibility = 'visible';
+
+            // asegurar layout tipo 382: el clon NO debe traer [+]
+            const addInClone = clone.querySelector('.add-funcion-btn');
+            if (addInClone) {
+                const ph = document.createElement('div');
+                ph.className = 'subcampo-placeholder';
+                ph.setAttribute('aria-hidden', 'true');
+                addInClone.replaceWith(ph);
+            } else if (!clone.querySelector('.subcampo-placeholder')) {
+                const ph = document.createElement('div');
+                ph.className = 'subcampo-placeholder';
+                ph.setAttribute('aria-hidden', 'true');
+                clone.insertBefore(ph, clone.firstChild);
+            }
 
             container.appendChild(clone);
 
             // 🔥 actualizar TOTAL_FORMS del inline formset
-            const management = container.querySelector('input[name$="-TOTAL_FORMS"]');
-            if (management) {
-                management.value = parseInt(management.value, 10) + 1;
-            }
+            management.value = newIndex + 1;
+
+            // 700$e debe ser nativo: forzar limpieza anti-Select2
+            clone.querySelectorAll('select').forEach(forceNativeSelect);
+
+            updateFuncionesLayout(container);
             return;
         }
 
@@ -440,7 +665,22 @@ Orden vertical limpio
             } else {
                 row.remove();
             }
+
+            const funcionesContainer = delBtn.closest('.funciones-container');
+            if (funcionesContainer) {
+                updateFuncionesLayout(funcionesContainer);
+            }
         }
+    });
+
+    // Cuando se agrega desde el gestor global (formset-manager.js), reindexar e inicializar
+    root.addEventListener('formset:added', (ev) => {
+        if (!ev || !ev.detail || ev.detail.prefix !== prefix) return;
+        // small timeout to let DOM settle
+        setTimeout(() => {
+            reindex700();
+            root.querySelectorAll('.formset-row:not(.empty-form)').forEach(row => initPersonaAutocomplete(row));
+        }, 20);
     });
 
     /* ======================================================
@@ -449,7 +689,29 @@ Orden vertical limpio
     root.querySelectorAll(".formset-row:not(.empty-form)")
         .forEach(row => initPersonaAutocomplete(row));
 
+    // Forzar selects nativos en filas existentes (evita Select2 indeseado en $e/$j)
+    root.querySelectorAll('.formset-row:not(.empty-form)').forEach(normalize700Row);
+
+    // Normalizar layout de 700 $e al cargar
+    root.querySelectorAll('.funciones-container').forEach(updateFuncionesLayout);
+
     reindex700();
+
+    // Reindexar automáticamente si se agregan/eliminan filas 700 (duplicación/clonado)
+    const formsHost = root.querySelector('.formset-forms');
+    if (formsHost) {
+        let reindexTimer = null;
+        const observer = new MutationObserver(() => {
+            clearTimeout(reindexTimer);
+            reindexTimer = setTimeout(() => {
+                reindex700();
+                root.querySelectorAll('.funciones-container').forEach(updateFuncionesLayout);
+                root.querySelectorAll('.formset-row:not(.empty-form)').forEach(normalize700Row);
+            }, 0);
+        });
+
+        observer.observe(formsHost, { childList: true, subtree: true });
+    }
 
 })();
 </script>

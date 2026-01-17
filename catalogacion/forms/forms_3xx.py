@@ -17,6 +17,7 @@ class MedioInterpretacion382Form(forms.ModelForm):
         widgets = {
             'solista': forms.TextInput(attrs={
                 'class': 'form-control',
+                'placeholder': 'Ej.: piano, piano y orquesta…',
             }),
         }
         labels = {

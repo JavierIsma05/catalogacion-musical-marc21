@@ -4,6 +4,34 @@ from catalogacion.models import ObraGeneral
 
 @require_GET
 def buscar_obras(request):
+    obra_id = (request.GET.get("id") or "").strip()
+    if obra_id:
+        try:
+            o = (
+                ObraGeneral.objects
+                .select_related("compositor", "titulo_uniforme")
+                .get(id=obra_id)
+            )
+        except (ObraGeneral.DoesNotExist, ValueError):
+            return JsonResponse({"results": []})
+
+        return JsonResponse(
+            {
+                "results": [
+                    {
+                        "id": o.id,
+                        "num_control": o.num_control,
+                        "titulo": o.titulo_principal or "",
+                        "compositor": (
+                            o.compositor.apellidos_nombres
+                            if o.compositor else ""
+                        ),
+                        "tipo": o.get_nivel_bibliografico_display(),
+                    }
+                ]
+            }
+        )
+
     q = (request.GET.get("q") or "").strip()
     if len(q) < 2:
         return JsonResponse({"results": []})
@@ -25,6 +53,8 @@ def buscar_obras(request):
                 o.compositor.apellidos_nombres
                 if o.compositor else ""
             ),
+            "compositor_id": (o.compositor.id if o.compositor else None),
+            "titulo_id": (o.titulo_uniforme.id if getattr(o, 'titulo_uniforme', None) else None),
             "tipo": o.get_nivel_bibliografico_display(),
         })
 

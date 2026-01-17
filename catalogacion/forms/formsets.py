@@ -331,6 +331,8 @@ DatosBiograficos545FormSet = inlineformset_factory(
     DatosBiograficos545,
     form=DatosBiograficos545Form,
     extra=1,
+    max_num=1,
+    validate_max=True,
     can_delete=True,
 )
 

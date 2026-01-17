@@ -18,7 +18,10 @@ class NotaGeneral500Form(forms.ModelForm):
         model = NotaGeneral500
         fields = ['nota_general']
         widgets = {
-            'nota_general': TextAreaAutosize(attrs={}),
+            'nota_general': TextAreaAutosize(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej.: Datos tomados de portada y encabezado de música…',
+            }),
         }
         labels = {
             'nota_general': '500 $a - Nota general',
@@ -33,6 +36,8 @@ class Contenido505Form(forms.ModelForm):
         fields = ['contenido']
         widgets = {
             'contenido': TextAreaAutosize(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej.: Emma Mercedes / Alfonso Dolberg. Violetas y rosas. Para llamarte mía / Segundo Cueva Celi…',
                 'rows': 5,
             }),
         }
@@ -49,6 +54,8 @@ class Sumario520Form(forms.ModelForm):
         fields = ['sumario']
         widgets = {
             'sumario': TextAreaAutosize(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej.: Allegro, Andante, Vivace…',
                 'rows': 4,
             }),
         }
@@ -62,14 +69,14 @@ class DatosBiograficos545Form(forms.ModelForm):
         fields = ['texto_biografico', 'uri']
         widgets = {
             'texto_biografico': forms.Textarea(
-                attrs={'class': 'form-control', 'rows': 3}
+                attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Ej.: Teresa Carreño (Caracas, 22/12/1853 – Nueva York, 12/06/1917)…'}
             ),
             'uri': forms.URLInput(
-                attrs={'class': 'form-control'}
+                attrs={'class': 'form-control','placeholder': 'Ej.: https://es.wikipedia.org/wiki/Teresa_Carre%C3%B1o'}
             ),
         }
         labels = {
             'texto_biografico': '545 $a – Datos biográficos',
-            'uri': '545 $u – URI',
+            'uri': '545 $u – URL',
         }
 

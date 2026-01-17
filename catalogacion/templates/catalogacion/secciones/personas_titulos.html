@@ -63,8 +63,7 @@
                 {% if 'funciones_compositor' in formsets_visibles %}
                 <div class="mt-3">
                     <div class="d-flex align-items-center mb-2">
-                        <span class="badge-marc me-2">100$e</span>
-                        <label class="form-label small mb-0">Función</label>
+                        <label class="form-label mb-0">100 $e - Función</label>
                     </div>
                     {% include 'catalogacion/includes/formset_100e_template.html' with formset=funciones_compositor %}
                 </div>
@@ -295,8 +294,7 @@
                     </span>
                 </div>
 
-                <p class="form-text">Personas relacionadas con la obra: intérpretes, arreglistas, editores, etc. Incluye
-                    subcampos no repetibles ($a, $d, $i, $j, $t) y repetibles ($c, $e).</p>
+               
 
                 {% include 'catalogacion/includes/formset_700_template.html' with formset=nombres_relacionados_700 %}
             </div>
@@ -320,7 +318,6 @@
                     </span>
                 </div>
 
-                <p class="form-text">Orquestas, coros, editoriales, etc.</p>
 
                 {% include 'catalogacion/includes/formset_710_template.html' with formset=entidades_relacionadas_710 titulo="Entidad" %}
             </div>

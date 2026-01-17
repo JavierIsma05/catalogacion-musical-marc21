@@ -8,104 +8,9 @@
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <h6>Convenciones MARC21</h6>
-                <ul>
-                    <li><strong>R</strong> = Repetible (puede haber múltiples instancias)</li>
-                    <li><strong>NR</strong> = No repetible (solo una instancia)</li>
-                    <li><strong>$a, $b, $c...</strong> = Subcampos del campo</li>
-                    <li><strong>##</strong> = Indicadores (controlan presentación)</li>
-                </ul>
-                
-                <hr>
-                
-                <h6>Bloques principales</h6>
-                <div class="accordion" id="accordionHelp">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#help0xx">
-                                Bloque 0XX - Números y códigos
-                            </button>
-                        </h2>
-                        <div id="help0xx" class="accordion-collapse collapse show" data-bs-parent="#accordionHelp">
-                            <div class="accordion-body">
-                                <ul class="small">
-                                    <li><strong>020</strong> - ISBN</li>
-                                    <li><strong>024</strong> - ISMN</li>
-                                    <li><strong>028</strong> - Número de editor</li>
-                                    <li><strong>031</strong> - Íncipit musical</li>
-                                    <li><strong>041</strong> - Código de idioma</li>
-                                    <li><strong>044</strong> - País de publicación</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#help1xx">
-                                Bloque 1XX - Punto de acceso principal
-                            </button>
-                        </h2>
-                        <div id="help1xx" class="accordion-collapse collapse" data-bs-parent="#accordionHelp">
-                            <div class="accordion-body">
-                                <ul class="small">
-                                    <li><strong>100</strong> - Compositor (obras individuales)</li>
-                                    <li><strong>130</strong> - Título uniforme (colecciones sin autor)</li>
-                                    <li><strong>240</strong> - Título uniforme subordinado al 100</li>
-                                </ul>
-                                <div class="alert alert-warning small mb-0">
-                                    <strong>Regla:</strong> Solo puede haber 100 ó 130, no ambos simultáneamente.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#help2xx">
-                                Bloque 2XX - Títulos y publicación
-                            </button>
-                        </h2>
-                        <div id="help2xx" class="accordion-collapse collapse" data-bs-parent="#accordionHelp">
-                            <div class="accordion-body">
-                                <ul class="small">
-                                    <li><strong>245</strong> - Título principal (obligatorio)</li>
-                                    <li><strong>246</strong> - Títulos alternativos</li>
-                                    <li><strong>250</strong> - Edición</li>
-                                    <li><strong>264</strong> - Producción/Publicación</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#help7xx">
-                                Bloque 7XX - Enlaces jerárquicos
-                            </button>
-                        </h2>
-                        <div id="help7xx" class="accordion-collapse collapse" data-bs-parent="#accordionHelp">
-                            <div class="accordion-body">
-                                <ul class="small">
-                                    <li><strong>700</strong> - Compositores adicionales</li>
-                                    <li><strong>710</strong> - Entidades corporativas</li>
-                                    <li><strong>773</strong> - Documento fuente (colección padre)</li>
-                                    <li><strong>774</strong> - Unidades constituyentes (obras contenidas)</li>
-                                    <li><strong>787</strong> - Otras relaciones</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <hr>
-                
-                <h6>Recursos adicionales</h6>
-                <ul class="small">
-                    <li><a href="https://www.loc.gov/marc/bibliographic/" target="_blank">MARC21 Bibliographic (Library of Congress)</a></li>
-                    <li><a href="https://www.bne.es/es/servicios/catalogacion-marc21" target="_blank">Guía MARC21 - BNE</a></li>
-                </ul>
+            <div class="modal-body" id="helpModalContent">
+                <!-- El contenido de ayuda se inyecta dinámicamente por field_help.js -->
+                <div class="small text-muted">Seleccione un campo y haga clic en el icono de ayuda para ver la descripción contextual aquí.</div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -114,10 +19,4 @@
     </div>
 </div>
 
-<!-- Botón flotante de ayuda -->
-<button type="button" class="btn btn-primary btn-lg rounded-circle position-fixed" 
-        style="bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 1000;"
-        data-bs-toggle="modal" data-bs-target="#helpModal"
-        title="Ayuda MARC21">
-    <i class="bi bi-question-lg"></i>
-</button>
+

@@ -53,10 +53,10 @@ El subcampo $a usa las opciones de CODIGOS_LENGUAJE del modelo
                 {# Subcampo $a - Idiomas (Repetible) con botón + a la izquierda #}
                 <div class="col-full">
                     <label class="form-label small">041 $a - Código de idioma</label>
-                    <div class="subcampo-repetible-container idiomas-041-container" data-idiomas-container="{{ forloop.counter0 }}">
+                        <div class="subcampo-repetible-container idiomas-041-container" data-idiomas-container="{{ forloop.counter0 }}" data-borrador-container="idioma_lengua" data-borrador-parent="{{ forloop.counter0 }}">
                         {# Fila inicial #}
                         <div class="subcampo-row idioma-form-row">
-                            <button type="button" class="subcampo-add-btn add-idioma-btn" data-lengua-index="{{ forloop.counter0 }}" title="Agregar Idioma">
+                            <button type="button" class="subcampo-add-btn add-idioma-btn" data-lengua-index="{{ forloop.counter0 }}" data-borrador-add="idioma_lengua" data-borrador-parent="{{ forloop.counter0 }}" title="Agregar Idioma">
                                 <i class="bi bi-plus"></i>
                             </button>
                             <select class="form-select idioma-select-041" name="idioma_lengua_{{ forloop.counter0 }}_0">
@@ -98,9 +98,9 @@ El subcampo $a usa las opciones de CODIGOS_LENGUAJE del modelo
                 
                 <div class="col-full">
                     <label class="form-label small">041 $a - Código de idioma</label>
-                    <div class="subcampo-repetible-container idiomas-041-container" data-idiomas-container="__prefix__">
+                    <div class="subcampo-repetible-container idiomas-041-container" data-idiomas-container="__prefix__" data-borrador-container="idioma_lengua" data-borrador-parent="__prefix__">
                         <div class="subcampo-row idioma-form-row">
-                            <button type="button" class="subcampo-add-btn add-idioma-btn" data-lengua-index="__prefix__" title="Agregar Idioma">
+                            <button type="button" class="subcampo-add-btn add-idioma-btn" data-lengua-index="__prefix__" data-borrador-add="idioma_lengua" data-borrador-parent="__prefix__" title="Agregar Idioma">
                                 <i class="bi bi-plus"></i>
                             </button>
                             <select class="form-select idioma-select-041" name="idioma_lengua___prefix___0">

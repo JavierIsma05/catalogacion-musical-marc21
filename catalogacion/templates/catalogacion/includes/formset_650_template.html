@@ -2,8 +2,8 @@
 Template para campo 650 - Materia (Tema)
 Estilo unificado con 852 y 856
 Campo repetible + subcampo $x repetible
-Lógica intacta
 Autocomplete con el mismo look (list-group / list-group-item) como en tu versión
+Botón de agregar subdivisión a la izquierda usando input-group para estabilidad
 {% endcomment %}
 
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
@@ -25,24 +25,20 @@ Autocomplete con el mismo look (list-group / list-group-item) como en tu versió
             {% endfor %}
 
             {% if formset.can_delete %}
-            <div class="d-none">
-                {{ form.DELETE }}
-            </div>
+            <div class="d-none">{{ form.DELETE }}</div>
             {% endif %}
 
-            <!-- ❌ Eliminar fila 650 -->
+            <!-- Eliminar fila 650 -->
             <button type="button" class="delete-row-btn" title="Eliminar materia">
                 <i class="bi bi-x-lg"></i>
             </button>
 
             <div class="campo-grid">
 
-                <!-- 💚 650 $a – AUTOCOMPLETE (MISMO MARKUP QUE TU PLANTILLA) -->
+                <!-- 650 $a – AUTOCOMPLETE -->
                 <div class="col-full">
-                    <label class="form-label small">650 $a – Encabezamiento de materia</label>
-
+                    <label class="form-label small">650 $a – Materia</label>
                     <div class="autocomplete-wrapper position-relative">
-                        <!-- campo visible -->
                         <input
                             type="text"
                             class="form-control materia-input"
@@ -51,85 +47,83 @@ Autocomplete con el mismo look (list-group / list-group-item) como en tu versió
                             autocomplete="off"
                             value="{% if form.instance.pk and form.materia.value %}{{ form.instance.materia.termino }}{% endif %}"
                         >
-
-                        <!-- campo oculto para guardar ID -->
                         <input
                             type="hidden"
                             name="{{ form.prefix }}-materia"
                             class="materia-id"
                             value="{% if form.instance.pk and form.materia.value %}{{ form.instance.materia.id }}{% endif %}"
                         >
-
-                        <!-- ✅ conservar list-group para el look -->
                         <div class="materia-suggestions autocomplete-suggestions list-group"></div>
                     </div>
-
                     {% if form.materia.errors %}
-                    <div class="invalid-feedback d-block">
-                        {{ form.materia.errors }}
-                    </div>
+                    <div class="invalid-feedback d-block">{{ form.materia.errors }}</div>
                     {% endif %}
                 </div>
 
-                <!-- ✅ 650 $x – Subdivisiones (estilo 852/856) -->
+                <!-- 650 $x – Subdivisiones -->
                 <div class="col-full">
                     <label class="form-label small">650 $x – Subdivisión de materia</label>
-
                     <div class="subcampo-repetible-container subdivisiones-container"
-                         data-subdivisiones-container="{{ forloop.counter0 }}">
+                         data-subdivisiones-container="{{ forloop.counter0 }}"
+                         data-borrador-container="subdivision_materia_650"
+                         data-borrador-parent="{{ forloop.counter0 }}">
 
                         {% if form.instance.pk %}
                             {% for subdivision in form.instance.subdivisiones.all %}
-                            <div class="subcampo-row subdivision-form-row">
+                            <div class="subcampo-row subdivision-form-row d-flex mb-2">
+                                <div class="input-group">
+                                    {% if forloop.first %}
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary"
+                                            data-materia-index="{{ forloop.parentloop.counter0 }}"
+                                            data-borrador-add="subdivision_materia_650"
+                                            data-borrador-parent="{{ forloop.parentloop.counter0 }}"
+                                            title="Agregar subdivisión">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    {% else %}
+                                    <div class="subcampo-placeholder"></div>
+                                    {% endif %}
 
-                                {% if forloop.first %}
-                                <button type="button"
-                                        class="subcampo-add-btn add-subdivision-btn"
-                                        data-materia-index="{{ forloop.parentloop.counter0 }}"
-                                        title="Agregar subdivisión">
-                                    <i class="bi bi-plus"></i>
-                                </button>
-                                {% else %}
-                                <div class="subcampo-placeholder"></div>
-                                {% endif %}
+                                    <input type="text"
+                                           class="form-control subdivision-input"
+                                           name="subdivision_materia_650_{{ forloop.parentloop.counter0 }}_{{ subdivision.pk }}"
+                                           value="{{ subdivision.subdivision }}"
+                                           placeholder="Subdivisión de materia">
 
-                                <input
-                                    type="text"
-                                    class="form-control subdivision-input"
-                                    name="subdivision_materia_650_{{ forloop.parentloop.counter0 }}_{{ subdivision.pk }}"
-                                    value="{{ subdivision.subdivision }}"
-                                    placeholder="Subdivisión de materia"
-                                >
-
-                                <button type="button"
-                                        class="subcampo-delete-btn delete-subdivision-btn"
-                                        title="Eliminar"
-                                        {% if forloop.first and forloop.last %}style="visibility:hidden;"{% endif %}>
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
-
+                                    <button type="button"
+                                            class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
+                                            title="Eliminar"
+                                            {% if forloop.first and forloop.last %}style="visibility:hidden;"{% endif %}>
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
                             </div>
                             {% endfor %}
                         {% else %}
-                            <div class="subcampo-row subdivision-form-row">
-                                <button type="button"
-                                        class="subcampo-add-btn add-subdivision-btn"
-                                        data-materia-index="{{ forloop.counter0 }}"
-                                        title="Agregar subdivisión">
-                                    <i class="bi bi-plus"></i>
-                                </button>
+                            <div class="subcampo-row subdivision-form-row d-flex mb-2">
+                                <div class="input-group">
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary"
+                                            data-materia-index="{{ forloop.counter0 }}"
+                                            data-borrador-add="subdivision_materia_650"
+                                            data-borrador-parent="{{ forloop.counter0 }}"
+                                            title="Agregar subdivisión">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
 
-                                <input type="text"
-                                       class="form-control subdivision-input"
-                                       name="subdivision_materia_650_{{ forloop.counter0 }}_0"
-                                       placeholder="Subdivisión de materia">
+                                    <input type="text"
+                                           class="form-control subdivision-input"
+                                           name="subdivision_materia_650_{{ forloop.counter0 }}_0"
+                                           placeholder="Subdivisión de materia">
 
-                                <button type="button"
-                                        class="subcampo-delete-btn delete-subdivision-btn"
-                                        title="Eliminar"
-                                        style="visibility:hidden;">
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
+                                    <button type="button"
+                                            class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
+                                            title="Eliminar"
+                                            style="visibility:hidden;">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
                             </div>
                         {% endif %}
 
@@ -145,12 +139,10 @@ Autocomplete con el mismo look (list-group / list-group-item) como en tu versió
             <button type="button" class="delete-row-btn" title="Eliminar materia">
                 <i class="bi bi-x-lg"></i>
             </button>
-
             <div class="campo-grid">
 
                 <div class="col-full">
                     <label class="form-label small">650 $a – Encabezamiento de materia</label>
-
                     <div class="autocomplete-wrapper position-relative">
                         <input
                             type="text"
@@ -159,44 +151,47 @@ Autocomplete con el mismo look (list-group / list-group-item) como en tu versió
                             placeholder="Escriba materia…"
                             autocomplete="off"
                         >
-
                         <input
                             type="hidden"
                             class="materia-id"
                             name="{{ formset.prefix }}-__prefix__-materia"
                         >
-
-                        <!-- ✅ conservar list-group para el look -->
                         <div class="materia-suggestions autocomplete-suggestions list-group"></div>
                     </div>
                 </div>
 
                 <div class="col-full">
                     <label class="form-label small">650 $x – Subdivisión de materia</label>
-
                     <div class="subcampo-repetible-container subdivisiones-container"
-                         data-subdivisiones-container="__prefix__">
+                         data-subdivisiones-container="__prefix__"
+                         data-borrador-container="subdivision_materia_650"
+                         data-borrador-parent="__prefix__">
 
-                        <div class="subcampo-row subdivision-form-row">
-                            <button type="button"
-                                    class="subcampo-add-btn add-subdivision-btn"
-                                    data-materia-index="__prefix__"
-                                    title="Agregar subdivisión">
-                                <i class="bi bi-plus"></i>
-                            </button>
+                        <div class="subcampo-row subdivision-form-row d-flex mb-2">
+                            <div class="input-group">
+                                <button type="button"
+                                        class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary"
+                                        data-materia-index="__prefix__"
+                                        data-borrador-add="subdivision_materia_650"
+                                        data-borrador-parent="__prefix__"
+                                        title="Agregar subdivisión">
+                                    <i class="bi bi-plus"></i>
+                                </button>
 
-                            <input type="text"
-                                   class="form-control subdivision-input"
-                                   name="subdivision_materia_650___prefix___0"
-                                   placeholder="Subdivisión de materia">
+                                <input type="text"
+                                       class="form-control subdivision-input"
+                                       name="subdivision_materia_650___prefix___0"
+                                       placeholder="Subdivisión de materia">
 
-                            <button type="button"
-                                    class="subcampo-delete-btn delete-subdivision-btn"
-                                    title="Eliminar"
-                                    style="visibility:hidden;">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
+                                <button type="button"
+                                        class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
+                                        title="Eliminar"
+                                        style="visibility:hidden;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -206,208 +201,126 @@ Autocomplete con el mismo look (list-group / list-group-item) como en tu versió
     </div>
 </div>
 
-<!-- ✅ AUTOCOMPLETE: tu script original (sin tocarlo) -->
+<!-- ====================== JS ====================== -->
 <script>
-    (function () {
+(function() {
+    const PREFIX = "{{ formset.prefix }}";
+    const container = document.querySelector(`[data-formset-prefix="${PREFIX}"]`);
+    if (!container) return;
 
-        function initMateriaAutocomplete(input) {
-            if (input.dataset.materiaInit === "1") return;
-            input.dataset.materiaInit = "1";
+    function initMateriaAutocomplete(input) {
+        if (!input || input.dataset.materiaInit === "1") return;
+        input.dataset.materiaInit = "1";
 
-            const wrapper = input.closest(".autocomplete-wrapper");
-            const suggestionsBox = wrapper.querySelector('.materia-suggestions');
-            const hiddenIdInput = wrapper.querySelector('.materia-id');
+        const wrapper = input.closest(".autocomplete-wrapper");
+        const suggestionsBox = wrapper.querySelector(".materia-suggestions");
+        const hiddenIdInput = wrapper.querySelector(".materia-id");
+        let debounceTimer = null, selectedIndex = -1;
 
-            let debounceTimer = null;
-            let selectedIndex = -1;
-
-            function hide() {
-                suggestionsBox.classList.remove("show");
-                suggestionsBox.innerHTML = "";
-                selectedIndex = -1;
-            }
-
-            function marcar(items) {
-                items.forEach((el, i) => {
-                    el.classList.toggle("selected", i === selectedIndex);
+        function hide() { suggestionsBox.classList.remove("show"); suggestionsBox.innerHTML = ""; selectedIndex=-1; }
+        function marcar(items){ items.forEach((el,i)=>el.classList.toggle("selected", i===selectedIndex)); }
+        function seleccionar(item){
+            input.value = item.text;
+            hiddenIdInput.value = item.id || "";
+            hiddenIdInput.dataset.nuevo = item.nuevo ? "1":"0";
+            hiddenIdInput.dispatchEvent(new Event("change"));
+            hide();
+        }
+        function mostrar(results, query){
+            suggestionsBox.innerHTML="";
+            selectedIndex=-1;
+            if(!results.length){
+                const div = document.createElement("div");
+                div.className="autocomplete-item autocomplete-item-new list-group-item";
+                div.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${query}"`;
+                div.onclick = ()=>seleccionar({id:"",text:query,nuevo:true});
+                suggestionsBox.appendChild(div);
+            } else {
+                results.forEach(r=>{
+                    const div=document.createElement("div");
+                    div.className="autocomplete-item list-group-item";
+                    div.innerHTML=`<strong>${r.text}</strong>`;
+                    div.onclick=()=>seleccionar({id:r.id,text:r.text,nuevo:false});
+                    suggestionsBox.appendChild(div);
                 });
+                const nuevo=document.createElement("div");
+                nuevo.className="autocomplete-item autocomplete-item-new list-group-item";
+                nuevo.innerHTML=`<i class="bi bi-plus-circle me-2"></i> Crear: "${query}"`;
+                nuevo.onclick=()=>seleccionar({id:"",text:query,nuevo:true});
+                suggestionsBox.appendChild(nuevo);
             }
-
-            function seleccionar(item) {
-                input.value = item.text;
-
-                if (item.nuevo) {
-                    hiddenIdInput.value = "";
-                    hiddenIdInput.dataset.nuevo = "1";
-                } else {
-                    hiddenIdInput.value = item.id || "";
-                    hiddenIdInput.dataset.nuevo = "0";
-                }
-
-                hiddenIdInput.dispatchEvent(new Event("change"));
-                hide();
-            }
-
-            function mostrar(resultados, query) {
-                suggestionsBox.innerHTML = "";
-                selectedIndex = -1;
-
-                if (!resultados || resultados.length === 0) {
-                    suggestionsBox.innerHTML = `
-                        <div class="autocomplete-item autocomplete-item-new list-group-item">
-                            <i class="bi bi-plus-circle me-2"></i> Crear: "${query}"
-                        </div>`;
-                    const nuevoEl = suggestionsBox.querySelector(".autocomplete-item-new");
-                    nuevoEl.addEventListener("click", function () {
-                        seleccionar({ id: "", text: query, nuevo: true });
-                    });
-                } else {
-                    resultados.forEach(r => {
-                        const item = document.createElement("div");
-                        item.className = "autocomplete-item list-group-item";
-                        item.innerHTML = `<strong>${r.text}</strong>`;
-                        item.addEventListener("click", () => seleccionar({ id: r.id, text: r.text, nuevo: false }));
-                        suggestionsBox.appendChild(item);
-                    });
-
-                    const nuevo = document.createElement("div");
-                    nuevo.className = "autocomplete-item autocomplete-item-new list-group-item";
-                    nuevo.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${query}"`;
-                    nuevo.addEventListener("click", () => seleccionar({ id: "", text: query, nuevo: true }));
-                    suggestionsBox.appendChild(nuevo);
-                }
-
-                suggestionsBox.classList.add("show");
-            }
-
-            function buscar(query) {
-                fetch(`/catalogacion/api/autocompletar/materia/?q=${encodeURIComponent(query)}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        mostrar(data.results || [], query);
-                    })
-                    .catch(() => hide());
-            }
-
-            input.addEventListener("input", function () {
-                const q = input.value.trim();
-
-                hiddenIdInput.value = "";
-                hiddenIdInput.removeAttribute("data-nuevo");
-
-                if (q.length < 2) {
-                    hide();
-                    return;
-                }
-
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => buscar(q), 250);
-            });
-
-            input.addEventListener("keydown", function (e) {
-                const items = suggestionsBox.querySelectorAll(".autocomplete-item");
-                if (!items.length) return;
-
-                if (e.key === "ArrowDown") {
-                    e.preventDefault();
-                    selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
-                    marcar(items);
-                }
-                if (e.key === "ArrowUp") {
-                    e.preventDefault();
-                    selectedIndex = Math.max(selectedIndex - 1, 0);
-                    marcar(items);
-                }
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    if (items[selectedIndex]) items[selectedIndex].click();
-                }
-                if (e.key === "Escape") hide();
-            });
-
-            document.addEventListener("click", function (e) {
-                if (!wrapper.contains(e.target)) hide();
-            });
+            suggestionsBox.classList.add("show");
         }
+        function buscar(q){ fetch(`/catalogacion/api/autocompletar/materia/?q=${encodeURIComponent(q)}`)
+            .then(r=>r.json()).then(d=>mostrar(d.results||[],q)).catch(()=>hide()); }
 
-        // inicializar existentes
-        document.querySelectorAll('.materia-input').forEach(initMateriaAutocomplete);
-
-        // si tu botón global de agregar fila usa .campo-add-btn, reinicializamos luego de clonar
-        document.addEventListener("click", function (e) {
-            if (e.target.closest('.campo-add-btn')) {
-                setTimeout(() => {
-                    document.querySelectorAll('.materia-input').forEach(initMateriaAutocomplete);
-                }, 80);
-            }
+        input.addEventListener("input", e=>{
+            const q=input.value.trim();
+            hiddenIdInput.value=""; hiddenIdInput.removeAttribute("data-nuevo");
+            if(q.length<2){ hide(); return; }
+            clearTimeout(debounceTimer); debounceTimer=setTimeout(()=>buscar(q),250);
         });
 
-        // EXPO: para el script de subdivisiones (si lo necesitas)
-        window.initMateriaAutocomplete = initMateriaAutocomplete;
+        input.addEventListener("keydown", e=>{
+            const items = suggestionsBox.querySelectorAll(".autocomplete-item");
+            if(!items.length) return;
+            if(e.key==="ArrowDown"){ e.preventDefault(); selectedIndex=Math.min(selectedIndex+1,items.length-1); marcar(items); }
+            if(e.key==="ArrowUp"){ e.preventDefault(); selectedIndex=Math.max(selectedIndex-1,0); marcar(items); }
+            if(e.key==="Enter"){ e.preventDefault(); if(items[selectedIndex]) items[selectedIndex].click(); }
+            if(e.key==="Escape") hide();
+        });
 
-    })();
-</script>
-
-<!-- ✅ SUBDIVISIONES $x (estilo 852/856) -->
-<script>
-(function () {
-    const prefix = "{{ formset.prefix }}";
-    const root = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-    if (!root) return;
-
-    function createSubdivisionRow(index) {
-        const row = document.createElement("div");
-        row.className = "subcampo-row subdivision-form-row mt-2";
-        row.innerHTML = `
-            <div class="subcampo-placeholder"></div>
-            <input type="text"
-                   class="form-control subdivision-input"
-                   name="subdivision_materia_650_${index}_${Date.now()}"
-                   placeholder="Subdivisión de materia">
-            <button type="button"
-                    class="subcampo-delete-btn delete-subdivision-btn"
-                    title="Eliminar">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        `;
-        return row;
+        document.addEventListener("click", e=>{ if(!wrapper.contains(e.target)) hide(); });
     }
 
-    function updateDeleteVisibility(container) {
-        const rows = container.querySelectorAll(".subdivision-form-row");
-        rows.forEach((row, idx) => {
-            const del = row.querySelector(".delete-subdivision-btn");
-            if (del) del.style.visibility = (idx === 0) ? "hidden" : "visible";
+    function updateDeleteVisibility(cont){
+        const rows=cont.querySelectorAll(".subdivision-form-row");
+        rows.forEach((row, idx)=>{
+            const btn=row.querySelector(".delete-subdivision-btn");
+            if(btn) btn.style.visibility=(idx===0)?"hidden":"visible";
         });
     }
 
-    root.addEventListener("click", function (e) {
-
-        // ➕ Agregar subdivisión
-        const addBtn = e.target.closest(".add-subdivision-btn");
-        if (addBtn) {
-            const index = addBtn.getAttribute("data-materia-index");
-            const cont = root.querySelector(`[data-subdivisiones-container="${index}"]`);
-            if (!cont) return;
-
-            cont.appendChild(createSubdivisionRow(index));
+    container.addEventListener("click", e=>{
+        const addBtn=e.target.closest(".add-subdivision-btn");
+        if(addBtn){
+            const cont=addBtn.closest(".subdivisiones-container");
+            const index=cont.dataset.subdivisionesContainer;
+            const newInput=document.createElement("div");
+            newInput.className="subcampo-row subdivision-form-row d-flex mb-2";
+            newInput.innerHTML=`
+                <div class="input-group">
+                    <button type="button" class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary" 
+                        data-materia-index="${index}" 
+                        data-borrador-add="subdivision_materia_650" 
+                        data-borrador-parent="${index}" 
+                        title="Agregar subdivisión"><i class="bi bi-plus"></i></button>
+                    <input type="text" class="form-control subdivision-input" name="subdivision_materia_650_${index}_${Date.now()}" placeholder="Subdivisión de materia">
+                    <button type="button" class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger" title="Eliminar"><i class="bi bi-x-lg"></i></button>
+                </div>
+            `;
+            cont.appendChild(newInput);
             updateDeleteVisibility(cont);
             return;
         }
 
-        // ❌ Eliminar subdivisión
-        const delBtn = e.target.closest(".delete-subdivision-btn");
-        if (delBtn) {
-            const row = delBtn.closest(".subdivision-form-row");
-            const cont = delBtn.closest(".subdivisiones-container");
-            if (!row || !cont) return;
-
-            row.remove();
+        const delBtn=e.target.closest(".delete-subdivision-btn");
+        if(delBtn){
+            const row=delBtn.closest(".subdivision-form-row");
+            const cont=delBtn.closest(".subdivisiones-container");
+            if(row) row.remove();
             updateDeleteVisibility(cont);
             return;
+        }
+
+        const delRowBtn=e.target.closest(".delete-row-btn");
+        if(delRowBtn){
+            const row=delRowBtn.closest(".formset-row");
+            if(row) row.remove();
         }
     });
 
-    root.querySelectorAll(".subdivisiones-container").forEach(updateDeleteVisibility);
+    container.querySelectorAll(".materia-input").forEach(initMateriaAutocomplete);
+
 })();
 </script>

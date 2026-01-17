@@ -225,7 +225,7 @@
 }
 
 /* ============================================
-   SIDEBAR DE NAVEGACIÓN
+   SIDEBAR DE NAVEGACIÓN (interno del detalle)
    ============================================ */
 .detalle-sidebar {
     width: 240px;
@@ -237,7 +237,7 @@
     overflow-y: auto;
 }
 
-.sidebar-nav {
+.detalle-sidebar .sidebar-nav {
     background: white;
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -245,13 +245,13 @@
     overflow: hidden;
 }
 
-.nav-header {
+.detalle-sidebar .nav-header {
     padding: 0.875rem 1rem;
     background: var(--gray-50);
     border-bottom: 1px solid var(--border-color);
 }
 
-.nav-header h6 {
+.detalle-sidebar .nav-header h6 {
     font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -260,17 +260,17 @@
     margin: 0;
 }
 
-.nav-list {
+.detalle-sidebar .nav-list {
     list-style: none;
     margin: 0;
     padding: 0.5rem;
 }
 
-.nav-list li {
+.detalle-sidebar .nav-list li {
     margin-bottom: 0.125rem;
 }
 
-.nav-link {
+.detalle-sidebar .nav-link {
     display: flex;
     align-items: center;
     gap: 0.625rem;
@@ -284,25 +284,25 @@
     transition: var(--transition);
 }
 
-.nav-link:hover {
+.detalle-sidebar .nav-link:hover {
     background: var(--gray-100);
     color: var(--text-primary);
 }
 
-.nav-link.active {
+.detalle-sidebar .nav-link.active {
     background: var(--gray-100);
     color: var(--accent);
     border-left-color: var(--accent);
     font-weight: 600;
 }
 
-.nav-link i {
+.detalle-sidebar .nav-link i {
     font-size: 0.875rem;
     width: 16px;
     opacity: 0.7;
 }
 
-.nav-link.active i {
+.detalle-sidebar .nav-link.active i {
     opacity: 1;
 }
 
