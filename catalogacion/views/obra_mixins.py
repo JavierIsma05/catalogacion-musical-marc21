@@ -296,7 +296,27 @@ class ObraFormsetMixin:
                     logger.debug("⏭️  disponibles_856: sin URLs ni textos, se omite")
                     continue
             else:
-                if all(not form.has_changed() for form in formset.forms):
+                # 🔥 CASO ESPECIAL 264: Guardar si hay subcampos aunque el principal esté vacío
+                if key == "produccion_publicacion":
+                    # Verificar si hay datos en subcampos del POST
+                    tiene_lugares = any(k.startswith("lugar_produccion_264_") and self.request.POST.get(k, "").strip() for k in self.request.POST.keys())
+                    tiene_entidades = any(k.startswith("entidad_produccion_264_") and self.request.POST.get(k, "").strip() for k in self.request.POST.keys())
+                    tiene_fechas = any(k.startswith("fecha_produccion_264_") and self.request.POST.get(k, "").strip() for k in self.request.POST.keys())
+                    
+                    print(f"🔥 DEBUG VALIDACIÓN 264: lugares={tiene_lugares}, entidades={tiene_entidades}, fechas={tiene_fechas}")
+                    
+                    # Mostrar todos los keys del POST relacionados con 264
+                    keys_264 = [k for k in self.request.POST.keys() if any(x in k for x in ["lugar_produccion_264_", "entidad_produccion_264_", "fecha_produccion_264_"])]
+                    print(f"🔥 DEBUG VALIDACIÓN 264: keys encontrados={keys_264}")
+                    
+                    if tiene_lugares or tiene_entidades or tiene_fechas:
+                        logger.info(f"  🔥 264: GUARDAR POR SUBCAMPOS (lugares={tiene_lugares}, entidades={tiene_entidades}, fechas={tiene_fechas})")
+                        # Forzar guardado aunque el principal esté vacío
+                        pass
+                    elif all(not form.has_changed() for form in formset.forms):
+                        logger.debug(f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)")
+                        continue
+                elif all(not form.has_changed() for form in formset.forms):
                     logger.debug(f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)")
                     continue
 
@@ -423,6 +443,19 @@ class ObraFormsetMixin:
                     elif hasattr(obj, "obra"):
                         obj.obra = instance
 
+                    # 🔥 CASO ESPECIAL 264: Si el formulario está vacío pero hay subcampos, crear de todos modos
+                    if key == "produccion_publicacion" and not form.has_changed():
+                        # Verificar si hay subcampos en el POST
+                        tiene_lugares = any(k.startswith("lugar_produccion_264_") and self.request.POST.get(k, "").strip() for k in self.request.POST.keys())
+                        tiene_entidades = any(k.startswith("entidad_produccion_264_") and self.request.POST.get(k, "").strip() for k in self.request.POST.keys())
+                        tiene_fechas = any(k.startswith("fecha_produccion_264_") and self.request.POST.get(k, "").strip() for k in self.request.POST.keys())
+                        
+                        if tiene_lugares or tiene_entidades or tiene_fechas:
+                            logger.info(f"  🔥 264: CREANDO ProduccionPublicacion vacía para subcampos")
+                            # Forzar la creación aunque esté vacía
+                            obj.funcion = '0'  # Valor por defecto para manuscritos
+                            logger.info(f"  📝 264: ProduccionPublicacion creada con función='{obj.funcion}'")
+
                     obj.save()
                     logger.info(f"📝 Guardado formset {key}: {obj.pk}")
 
@@ -471,7 +504,11 @@ class ObraFormsetMixin:
             if key in formset_subcampo_mapping:
                 for handler_name in formset_subcampo_mapping[key]:
                     handler = SUBCAMPO_HANDLERS[handler_name]
-                    handler(self.request.POST, formset)
+                    # 🔥 CASO ESPECIAL 264: Pasar la obra como parámetro
+                    if key == "produccion_publicacion":
+                        handler(self.request.POST, formset, instance)
+                    else:
+                        handler(self.request.POST, formset)
 
 
 class ObraSuccessMessageMixin:

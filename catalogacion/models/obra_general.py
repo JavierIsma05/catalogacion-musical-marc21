@@ -902,13 +902,537 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
         """
         return self.codigo_informacion
 
-    def exportar_marc21_control(self):
+    def test_guardado_264(self):
         """
-        Exporta la cabecera y campos de control en formato MARC21
+        Función de prueba para verificar si el 264 se guarda correctamente
         """
-        return {
-            "Leader": self.generar_leader(),
-            "001": self.num_control,
-            "005": self.campo_005_marc(),
-            "008": self.campo_008_marc(),
+        print("🧪 TEST DE GUARDADO 264")
+        
+        # Importar modelos
+        from .bloque_2xx import ProduccionPublicacion, Lugar264, NombreEntidad264, Fecha264
+        
+        # Verificar estado actual
+        print(f"📊 Estado actual del 264 para obra {self.pk}:")
+        print(f"   ProduccionPublicacion: {ProduccionPublicacion.objects.filter(obra=self).count()}")
+        print(f"   Lugar264: {Lugar264.objects.filter(produccion_publicacion__obra=self).count()}")
+        print(f"   NombreEntidad264: {NombreEntidad264.objects.filter(produccion_publicacion__obra=self).count()}")
+        print(f"   Fecha264: {Fecha264.objects.filter(produccion_publicacion__obra=self).count()}")
+        
+        # Simular guardado
+        print("\n🔧 Simulando guardado del 264...")
+        
+        # Crear una ProduccionPublicacion de prueba
+        try:
+            prod = ProduccionPublicacion.objects.create(
+                obra=self,
+                funcion='0'  # Producción para manuscritos
+            )
+            print(f"✅ ProduccionPublicacion creada: ID={prod.pk}")
+            
+            # Crear subcampos de prueba
+            lugar = Lugar264.objects.create(
+                produccion_publicacion=prod,
+                lugar="CIUDAD DE PRUEBA"
+            )
+            print(f"✅ Lugar264 creado: ID={lugar.pk}")
+            
+            entidad = NombreEntidad264.objects.create(
+                produccion_publicacion=prod,
+                nombre="EDITORIAL DE PRUEBA"
+            )
+            print(f"✅ NombreEntidad264 creado: ID={entidad.pk}")
+            
+            fecha = Fecha264.objects.create(
+                produccion_publicacion=prod,
+                fecha="2023"
+            )
+            print(f"✅ Fecha264 creado: ID={fecha.pk}")
+            
+            print("\n🎯 VERIFICACIÓN FINAL:")
+            print(f"   ProduccionPublicacion: {ProduccionPublicacion.objects.filter(obra=self).count()}")
+            print(f"   Lugar264: {Lugar264.objects.filter(produccion_publicacion__obra=self).count()}")
+            print(f"   NombreEntidad264: {NombreEntidad264.objects.filter(produccion_publicacion__obra=self).count()}")
+            print(f"   Fecha264: {Fecha264.objects.filter(produccion_publicacion__obra=self).count()}")
+            
+            # Limpiar datos de prueba
+            print("\n🧹 Limpiando datos de prueba...")
+            fecha.delete()
+            entidad.delete()
+            lugar.delete()
+            prod.delete()
+            print("✅ Datos de prueba eliminados")
+            
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error en prueba: {e}")
+            return False
+
+    def test_diagnostico_264(self):
+        """
+        Función de prueba rápida para diagnosticar el 264 sin afectar el autocompletado
+        """
+        print("🧪 TEST RÁPIDO - DIAGNÓSTICO 264")
+        return self.diagnosticar_guardado_264()
+
+    def diagnosticar_guardado_264(self):
+        """
+        Diagnóstico específico para verificar si los datos del 264 se guardan correctamente
+        """
+        print("=" * 80)
+        print("🔍 DIAGNÓSTICO DE GUARDADO 264 - VERIFICACIÓN DE BASE DE DATOS")
+        print("=" * 80)
+        print(f"📋 Obra: {self.titulo_principal} (ID: {self.pk})")
+        print()
+        
+        # Importar modelos necesarios
+        try:
+            from .bloque_2xx import ProduccionPublicacion, Lugar264, NombreEntidad264, Fecha264
+        except ImportError as e:
+            print(f"❌ Error importando modelos: {e}")
+            return
+        
+        # 1. Verificar ProduccionPublicacion
+        print("🔍 1. PRODUCCIÓN PUBLICACIÓN (264 principal):")
+        producciones = ProduccionPublicacion.objects.filter(obra=self)
+        print(f"   📊 Total ProduccionPublicacion para esta obra: {producciones.count()}")
+        
+        if producciones.exists():
+            for i, prod in enumerate(producciones, 1):
+                print(f"   ✅ Producción {i}: ID={prod.pk}, función='{prod.funcion}'")
+                print(f"      📝 Creada: {prod.fecha_creacion}")
+                print(f"      📝 Modificada: {prod.fecha_actualizacion if hasattr(prod, 'fecha_actualizacion') else 'N/A'}")
+        else:
+            print("   ❌ NO HAY ProduccionPublicacion para esta obra")
+            print("   🔹 Esto explica por qué el autocompletado del 264 no funciona")
+        print()
+        
+        # 2. Verificar Lugar264
+        print("🔍 2. LUGARES (264$a):")
+        if producciones.exists():
+            for prod in producciones:
+                lugares = Lugar264.objects.filter(produccion_publicacion=prod)
+                print(f"   📊 Lugares para Producción ID={prod.pk}: {lugares.count()}")
+                
+                if lugares.exists():
+                    for i, lugar in enumerate(lugares, 1):
+                        print(f"      ✅ Lugar {i}: ID={lugar.pk}, texto='{lugar.lugar}'")
+                        print(f"         📝 Creado: {lugar.fecha_creacion}")
+                else:
+                    print(f"      ❌ NO hay lugares para esta producción")
+        else:
+            print("   ❌ No se pueden verificar lugares porque no hay producciones")
+        print()
+        
+        # 3. Verificar NombreEntidad264
+        print("🔍 3. ENTIDADES (264$b):")
+        if producciones.exists():
+            for prod in producciones:
+                entidades = NombreEntidad264.objects.filter(produccion_publicacion=prod)
+                print(f"   📊 Entidades para Producción ID={prod.pk}: {entidades.count()}")
+                
+                if entidades.exists():
+                    for i, entidad in enumerate(entidades, 1):
+                        print(f"      ✅ Entidad {i}: ID={entidad.pk}, nombre='{entidad.nombre}'")
+                        print(f"         📝 Creada: {entidad.fecha_creacion}")
+                else:
+                    print(f"      ❌ NO hay entidades para esta producción")
+        else:
+            print("   ❌ No se pueden verificar entidades porque no hay producciones")
+        print()
+        
+        # 4. Verificar Fecha264
+        print("🔍 4. FECHAS (264$c):")
+        if producciones.exists():
+            for prod in producciones:
+                fechas = Fecha264.objects.filter(produccion_publicacion=prod)
+                print(f"   📊 Fechas para Producción ID={prod.pk}: {fechas.count()}")
+                
+                if fechas.exists():
+                    for i, fecha in enumerate(fechas, 1):
+                        print(f"      ✅ Fecha {i}: ID={fecha.pk}, texto='{fecha.fecha}'")
+                        print(f"         📝 Creada: {fecha.fecha_creacion}")
+                else:
+                    print(f"      ❌ NO hay fechas para esta producción")
+        else:
+            print("   ❌ No se pueden verificar fechas porque no hay producciones")
+        print()
+        
+        # 5. Verificación total en toda la BD
+        print("🔍 5. VERIFICACIÓN TOTAL EN TODA LA BASE DE DATOS:")
+        total_prods = ProduccionPublicacion.objects.all().count()
+        total_lugares = Lugar264.objects.all().count()
+        total_entidades = NombreEntidad264.objects.all().count()
+        total_fechas = Fecha264.objects.all().count()
+        
+        print(f"   📊 Total ProduccionPublicacion en BD: {total_prods}")
+        print(f"   📊 Total Lugar264 en BD: {total_lugares}")
+        print(f"   📊 Total NombreEntidad264 en BD: {total_entidades}")
+        print(f"   📊 Total Fecha264 en BD: {total_fechas}")
+        print()
+        
+        # 6. Diagnóstico final
+        print("🔍 6. DIAGNÓSTICO FINAL:")
+        problemas = []
+        
+        if producciones.count() == 0:
+            problemas.append("❌ No hay ProduccionPublicacion - DEBES CREARLA PRIMERO")
+        else:
+            prod = producciones.first()
+            if Lugar264.objects.filter(produccion_publicacion=prod).count() == 0:
+                problemas.append("❌ No hay Lugar264 (264$a) - DEBES AGREGAR")
+            if NombreEntidad264.objects.filter(produccion_publicacion=prod).count() == 0:
+                problemas.append("❌ No hay NombreEntidad264 (264$b) - DEBES AGREGAR")
+            if Fecha264.objects.filter(produccion_publicacion=prod).count() == 0:
+                problemas.append("❌ No hay Fecha264 (264$c) - DEBES AGREGAR")
+        
+        if problemas:
+            print("   🚨 PROBLEMAS ENCONTRADOS:")
+            for problema in problemas:
+                print(f"      {problema}")
+        else:
+            print("   ✅ Todos los datos del 264 están presentes - Debería funcionar")
+        
+        print("=" * 80)
+        return len(problemas) == 0
+
+    def diagnosticar_datos_faltantes_773(self):
+        """
+        Función de diagnóstico para mostrar qué datos faltan para el autocompletado 773
+        """
+        print("=" * 80)
+        print("🔍 DIAGNÓSTICO COMPLETO DE DATOS FALTANTES PARA AUTOCOMPLETADO 773")
+        print("=" * 80)
+        print(f"📋 Obra: {self.titulo_principal} (ID: {self.pk})")
+        print()
+        
+        # 264 - Producción/Publicación
+        print("🔍 CAMPO 264 - Producción/Publicación:")
+        prod_count = self.producciones_publicaciones.count()
+        print(f"   📊 Total ProduccionPublicacion: {prod_count}")
+        
+        if prod_count == 0:
+            print("   ❌ NO HAY DATOS - Debes agregar:")
+            print("      • 1 ProduccionPublicacion")
+            print("      • 1+ Lugar264 (264$a)")
+            print("      • 1+ NombreEntidad264 (264$b)")
+            print("      • 1+ Fecha264 (264$c)")
+        else:
+            prod = self.producciones_publicaciones.first()
+            print(f"   ✅ ProduccionPublicacion encontrada (ID: {prod.pk})")
+            print(f"   📍 Lugares: {prod.lugares.count()}")
+            print(f"   🏢 Entidades: {prod.entidades.count()}")
+            print(f"   📅 Fechas: {prod.fechas.count()}")
+        print()
+        
+        # 382 - Medium de interpretación
+        print("🔍 CAMPO 382 - Medium de interpretación:")
+        medios_count = self.medios_interpretacion_382.count()
+        print(f"   📊 Total MedioInterpretacion382: {medios_count}")
+        
+        if medios_count == 0:
+            print("   ❌ NO HAY DATOS - Debes agregar:")
+            print("      • 1 MedioInterpretacion382")
+            print("      • 1+ MedioInterpretacion382_a (382$a)")
+            print("      • solista (382$b)")
+        else:
+            medio = self.medios_interpretacion_382.first()
+            print(f"   ✅ MedioInterpretacion382 encontrado (ID: {medio.pk})")
+            print(f"   🎵 Medios (382$a): {medio.medios.count()}")
+            print(f"   🎤 Solista (382$b): '{medio.solista}'")
+            
+            if medio.medios.count() == 0:
+                print("   ❌ FALTAN LOS MEDIOS (382$a) - Debes agregar MedioInterpretacion382_a")
+        print()
+        
+        # 545 - Datos biográficos
+        print("🔍 CAMPO 545 - Datos biográficos:")
+        tiene_545 = hasattr(self, 'datos_biograficos_545') and self.datos_biograficos_545
+        print(f"   📊 Tiene DatosBiograficos545: {tiene_545}")
+        
+        if tiene_545:
+            nota = self.datos_biograficos_545
+            print(f"   ✅ DatosBiograficos545 encontrado (ID: {nota.pk})")
+            print(f"   📝 Texto: '{nota.texto_biografico[:50]}...'")
+            print(f"   🔗 URI: '{nota.uri}'")
+        else:
+            print("   ❌ NO HAY DATOS - Debes agregar:")
+            print("      • 1 DatosBiograficos545")
+            print("      • texto_biografico (545$a)")
+            print("      • uri (545$u) - opcional")
+        print()
+        
+        # Resumen
+        print("📋 RESUMEN DE ACCIONES NECESARIAS:")
+        acciones = []
+        
+        if prod_count == 0:
+            acciones.append("🔹 Agregar ProduccionPublicacion con lugares, entidades y fechas")
+        
+        if medios_count == 0:
+            acciones.append("🔹 Agregar MedioInterpretacion382 con medios y solista")
+        elif medios_count > 0 and self.medios_interpretacion_382.first().medios.count() == 0:
+            acciones.append("🔹 Agregar MedioInterpretacion382_a al MedioInterpretacion382 existente")
+        
+        if not tiene_545:
+            acciones.append("🔹 Agregar DatosBiograficos545 con texto_biografico")
+        
+        if acciones:
+            for accion in acciones:
+                print(f"   {accion}")
+        else:
+            print("   ✅ Todos los datos están presentes para autocompletado")
+        
+        print("=" * 80)
+        return acciones
+
+    def obtener_campos_para_heredar_773(self):
+        """
+        Devuelve los campos heredables para el formulario 773 desde la obra padre.
+        Solo devuelve los campos reales que existen en el formulario.
+        """
+        # Llamar al diagnóstico específico del 264 para verificar guardado
+        print("🔍 DIAGNÓSTICO ESPECÍFICO 264 - VERIFICANDO GUARDADO EN BD:")
+        self.diagnosticar_guardado_264()
+        
+        # Llamar al diagnóstico general para mostrar qué datos faltan
+        self.diagnosticar_datos_faltantes_773()
+        
+        campos_heredables = {}
+        
+        print(f"🔍 DEBUG GENERAL: ObraGeneral ID = {self.pk}")
+        print(f"🔍 DEBUG GENERAL: Título = {self.titulo_principal}")
+        
+        # 100 - Autor/Compositor principal (SIEMPRE devolver, aunque sea vacío)
+        campos_heredables['100'] = {
+            'compositor_id': self.compositor.pk if self.compositor else None,
+            'compositor_texto': str(self.compositor) if self.compositor else None,
+            'apellidos_nombres': self.compositor.apellidos_nombres if self.compositor else None,
+            'coordenadas_biograficas': self.compositor.coordenadas_biograficas if self.compositor else None,
+            'funciones': []
         }
+        
+        # Agregar funciones del compositor (subcampo $e - repetible)
+        if self.compositor:
+            funciones = self.funciones_compositor.all()
+            if funciones.exists():
+                campos_heredables['100']['funciones'] = [
+                    {
+                        'funcion': func.funcion,
+                        'funcion_display': func.get_funcion_display()
+                    } for func in funciones
+                ]
+        
+        # 245 - Título principal (SOLO los campos reales del formulario)
+        campos_heredables['245'] = {
+            'titulo_principal': self.titulo_principal or None,
+            'subtitulo': self.subtitulo or None,
+            'mencion_responsabilidad': self.mencion_responsabilidad or None,
+        }
+        
+        # 264 - Producción/Publicación (SOLO los campos reales del formset)
+        print(f"🔍 DEBUG 264: Verificando producciones_publicaciones...")
+        prod_264 = self.producciones_publicaciones.first()
+        campos_heredables['264'] = {
+            'lugar_produccion_264': None,
+            'entidad_produccion_264': None,
+            'fecha_produccion_264': None
+        }
+        
+        # Debug: verificar si hay datos en la base de datos
+        prod_count = self.producciones_publicaciones.count()
+        print(f"🔍 DEBUG 264: Total producciones_publicaciones = {prod_count}")
+        
+        if prod_264:
+            # Debug: mostrar qué encontramos
+            print(f"🔍 DEBUG 264: prod_264 encontrado = {prod_264} (ID: {prod_264.pk})")
+            
+            # Lugar (264$a) - ACCESO DIRECTO
+            try:
+                lugares_count = prod_264.lugares.count()
+                print(f"🔍 DEBUG 264: Total lugares = {lugares_count}")
+                lugar_264 = prod_264.lugares.first()
+                if lugar_264:
+                    campos_heredables['264']['lugar_produccion_264'] = lugar_264.lugar
+                    print(f"🔍 DEBUG 264: lugar encontrado = {lugar_264.lugar} (ID: {lugar_264.pk})")
+                else:
+                    print("🔍 DEBUG 264: No hay lugares (first() returned None)")
+            except Exception as e:
+                print(f"🔍 DEBUG 264: Error accediendo a lugares = {e}")
+            
+            # Entidad (264$b) - ACCESO DIRECTO
+            try:
+                entidades_count = prod_264.entidades.count()
+                print(f"🔍 DEBUG 264: Total entidades = {entidades_count}")
+                entidad_264 = prod_264.entidades.first()
+                if entidad_264:
+                    campos_heredables['264']['entidad_produccion_264'] = entidad_264.nombre
+                    print(f"🔍 DEBUG 264: entidad encontrada = {entidad_264.nombre} (ID: {entidad_264.pk})")
+                else:
+                    print("🔍 DEBUG 264: No hay entidades (first() returned None)")
+            except Exception as e:
+                print(f"🔍 DEBUG 264: Error accediendo a entidades = {e}")
+            
+            # Fecha (264$c) - ACCESO DIRECTO
+            try:
+                fechas_count = prod_264.fechas.count()
+                print(f"🔍 DEBUG 264: Total fechas = {fechas_count}")
+                fecha_264 = prod_264.fechas.first()
+                if fecha_264:
+                    campos_heredables['264']['fecha_produccion_264'] = fecha_264.fecha
+                    print(f"🔍 DEBUG 264: fecha encontrada = {fecha_264.fecha} (ID: {fecha_264.pk})")
+                else:
+                    print("🔍 DEBUG 264: No hay fechas (first() returned None)")
+            except Exception as e:
+                print(f"🔍 DEBUG 264: Error accediendo a fechas = {e}")
+        else:
+            print("🔍 DEBUG 264: No hay producciones_publicaciones")
+            
+            # Verificación adicional: si hay producciones en la base de datos
+            try:
+                from .bloque_2xx import ProduccionPublicacion
+                total_prods = ProduccionPublicacion.objects.filter(obra=self).count()
+                print(f"🔍 DEBUG 264: Verificación directa - Total ProduccionPublicacion para esta obra = {total_prods}")
+                
+                if total_prods > 0:
+                    prod_direct = ProduccionPublicacion.objects.filter(obra=self).first()
+                    print(f"🔍 DEBUG 264: ProduccionPublicacion directa encontrada = {prod_direct} (ID: {prod_direct.pk})")
+                    print(f"🔍 DEBUG 264: Lugares directos = {prod_direct.lugares.count()}")
+                    print(f"🔍 DEBUG 264: Entidades directas = {prod_direct.entidades.count()}")
+                    print(f"🔍 DEBUG 264: Fechas directas = {prod_direct.fechas.count()}")
+            except Exception as e:
+                print(f"🔍 DEBUG 264: Error en verificación directa = {e}")
+        
+        # 382 - Medium de interpretación (SOLO los campos reales del formset)
+        print(f"🔍 DEBUG 382: Verificando medios_interpretacion_382...")
+        medios_382 = self.medios_interpretacion_382.all()
+        campos_heredables['382'] = {
+            'solista': None,
+            'medio_interpretacion_382': None,
+            'medio_display': None
+        }
+        
+        # Debug: verificar si hay datos en la base de datos
+        print(f"🔍 DEBUG 382: Total medios_interpretacion_382 = {medios_382.count()}")
+        
+        if medios_382.exists():
+            primer_medio = medios_382.first()
+            print(f"🔍 DEBUG 382: primer_medio encontrado = {primer_medio} (ID: {primer_medio.pk})")
+            
+            # Solista (382$b) - ACCESO DIRECTO
+            try:
+                campos_heredables['382']['solista'] = primer_medio.solista
+                print(f"🔍 DEBUG 382: solista = {primer_medio.solista}")
+            except Exception as e:
+                print(f"🔍 DEBUG 382: Error accediendo a solista = {e}")
+            
+            # Medio (382$a) - ACCESO DIRECTO
+            try:
+                primer_subcampo = primer_medio.medios.first()
+                if primer_subcampo:
+                    campos_heredables['382']['medio_interpretacion_382'] = primer_subcampo.medio
+                    campos_heredables['382']['medio_display'] = str(primer_subcampo)
+                    print(f"🔍 DEBUG 382: medio encontrado = {primer_subcampo.medio} (ID: {primer_subcampo.pk})")
+                    print(f"🔍 DEBUG 382: medio display = {str(primer_subcampo)}")
+                else:
+                    print("🔍 DEBUG 382: No hay subcampos_a (medios) - first() returned None")
+            except Exception as e:
+                print(f"🔍 DEBUG 382: Error accediendo a medios = {e}")
+        else:
+            print("🔍 DEBUG 382: No hay medios_interpretacion_382")
+        
+        # 545 - Nota biográfica/histórica (campo simple)
+        print(f"🔍 DEBUG 545: Verificando datos_biograficos_545...")
+        nota_545 = getattr(self, 'datos_biograficos_545', None)
+        campos_heredables['545'] = {
+            'datos_biograficos_545': None,
+            'uri_545': None
+        }
+        
+        # Debug: verificar si hay datos en la base de datos
+        print(f"🔍 DEBUG 545: hasattr(self, 'datos_biograficos_545') = {hasattr(self, 'datos_biograficos_545')}")
+        
+        if nota_545:
+            try:
+                campos_heredables['545']['datos_biograficos_545'] = nota_545.texto_biografico
+                campos_heredables['545']['uri_545'] = nota_545.uri
+                print(f"🔍 DEBUG 545: nota biográfica encontrada = {nota_545.texto_biografico[:100]}... (ID: {nota_545.pk})")
+                print(f"🔍 DEBUG 545: URI encontrada = {nota_545.uri} (ID: {nota_545.pk})")
+            except Exception as e:
+                print(f"🔍 DEBUG 545: Error accediendo a texto_biografico = {e}")
+        else:
+            print("🔍 DEBUG 545: No hay datos_biograficos_545")
+            # Intentar verificar si hay alguna instancia en la base de datos
+            try:
+                from .bloque_5xx import DatosBiograficos545
+                existe = DatosBiograficos545.objects.filter(obra=self).exists()
+                print(f"🔍 DEBUG 545: ¿Existe DatosBiograficos545 para esta obra? = {existe}")
+                if existe:
+                    db_545 = DatosBiograficos545.objects.get(obra=self)
+                    print(f"🔍 DEBUG 545: Datos en BD = {db_545.texto_biografico[:100] if db_545.texto_biografico else 'None'}...")
+                    print(f"🔍 DEBUG 545: URI en BD = {db_545.uri}")
+            except Exception as e:
+                print(f"🔍 DEBUG 545: Error verificando BD = {e}")
+        
+        # 852 - Localización (SOLO los campos reales del formset)
+        ubicacion_852 = self.ubicaciones_852.first()
+        campos_heredables['852'] = {
+            'codigo_o_nombre': None,
+            'signatura_original': None,
+            'estanteria': None
+        }
+        
+        if ubicacion_852:
+            print(f"🔍 DEBUG 852: ubicación encontrada = {ubicacion_852}")
+            
+            # 852 $a - Institución/Persona
+            campos_heredables['852']['codigo_o_nombre'] = ubicacion_852.codigo_o_nombre
+            print(f"🔍 DEBUG 852: código_o_nombre = {ubicacion_852.codigo_o_nombre}")
+            
+            # 852 $h - Signatura original
+            campos_heredables['852']['signatura_original'] = ubicacion_852.signatura_original
+            print(f"🔍 DEBUG 852: signatura_original = {ubicacion_852.signatura_original}")
+            
+            # 852 $c - Estantería (si existe)
+            if ubicacion_852.estanterias.exists():
+                estanteria = ubicacion_852.estanterias.first()
+                campos_heredables['852']['estanteria'] = estanteria.estanteria
+                print(f"🔍 DEBUG 852: estantería encontrada = {estanteria.estanteria}")
+            else:
+                print("🔍 DEBUG 852: No hay estanterías")
+        else:
+            print("🔍 DEBUG 852: No hay ubicaciones_852")
+        
+        # 856 - Acceso electrónico (SOLO los campos reales del formset)
+        enlaces_856 = self.disponibles_856.all()
+        campos_heredables['856'] = {
+            'url_disponible_856': None,
+            'texto_disponible_856': None
+        }
+        
+        if enlaces_856.exists():
+            primer_enlace = enlaces_856.first()
+            print(f"🔍 DEBUG 856: primer_enlace encontrado = {primer_enlace}")
+            
+            # 856 $u - URL (primera que encuentre)
+            urls = primer_enlace.urls_856.all()
+            if urls.exists():
+                primera_url = urls.first()
+                campos_heredables['856']['url_disponible_856'] = primera_url.url
+                print(f"🔍 DEBUG 856: URL encontrada = {primera_url.url}")
+            else:
+                print("🔍 DEBUG 856: No hay URLs")
+            
+            # 856 $y - Texto del enlace (primero que encuentre)
+            textos = primer_enlace.textos_enlace_856.all()
+            if textos.exists():
+                primer_texto = textos.first()
+                campos_heredables['856']['texto_disponible_856'] = primer_texto.texto_enlace
+                print(f"🔍 DEBUG 856: Texto encontrado = {primer_texto.texto_enlace}")
+            else:
+                print("🔍 DEBUG 856: No hay textos de enlace")
+        else:
+            print("🔍 DEBUG 856: No hay disponibles_856")
+        
+        print(f"🔍 DEBUG FINAL: campos_heredables = {campos_heredables}")
+        return campos_heredables
