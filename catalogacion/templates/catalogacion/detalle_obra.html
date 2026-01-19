@@ -687,30 +687,80 @@
 <!-- ================= JS ================= -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const links = document.querySelectorAll('.nav-link');
+    console.log('🔍 Inicializando navegación del sidebar de detalle...');
+    
+    const links = document.querySelectorAll('.detalle-sidebar .nav-link');
     const sections = document.querySelectorAll('.detalle-section');
-    if (!links.length || !sections.length) return;
+    
+    console.log('📊 Links encontrados:', links.length);
+    console.log('📊 Secciones encontradas:', sections.length);
+    
+    if (!links.length || !sections.length) {
+        console.warn('⚠️ No se encontraron links o secciones para la navegación');
+        return;
+    }
+
+    // Función para actualizar link activo
+    function updateActiveLink(targetId) {
+        links.forEach(link => {
+            const isActive = link.getAttribute('href') === `#${targetId}`;
+            link.classList.toggle('active', isActive);
+            console.log(`🔄 Link ${link.getAttribute('href')} -> ${isActive ? 'activo' : 'inactivo'}`);
+        });
+    }
 
     links.forEach(link => {
         link.addEventListener('click', e => {
             e.preventDefault();
-            const target = document.querySelector(link.getAttribute('href'));
-            if (!target) return;
-            window.scrollTo({ top: target.offsetTop - 90, behavior: 'smooth' });
+            const targetId = link.getAttribute('href').substring(1); // quitar el #
+            const target = document.getElementById(targetId);
+            
+            console.log(`🎯 Click en link: ${targetId}`);
+            
+            if (!target) {
+                console.error(`❌ No se encontró la sección con ID: ${targetId}`);
+                return;
+            }
+            
+            // Actualizar link activo inmediatamente
+            updateActiveLink(targetId);
+            
+            // Hacer scroll suave
+            const offsetTop = target.offsetTop - 90;
+            console.log(`📍 Haciendo scroll a: ${offsetTop}px`);
+            
+            window.scrollTo({
+                top: offsetTop,
+                behavior: 'smooth'
+            });
         });
     });
 
+    // Observer para detectar sección visible al hacer scroll
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                links.forEach(l =>
-                    l.classList.toggle('active', l.getAttribute('href') === `#${entry.target.id}`)
-                );
+                console.log(`👁️ Sección visible: ${entry.target.id}`);
+                updateActiveLink(entry.target.id);
             }
         });
-    }, { rootMargin: '-40% 0px -40% 0px' });
+    }, { 
+        rootMargin: '-40% 0px -40% 0px',
+        threshold: 0.1
+    });
 
-    sections.forEach(s => observer.observe(s));
+    sections.forEach(section => {
+        console.log(`🔍 Observando sección: ${section.id}`);
+        observer.observe(section);
+    });
+
+    // Activar primer link por defecto
+    const firstLink = links[0];
+    if (firstLink) {
+        const firstId = firstLink.getAttribute('href').substring(1);
+        console.log(`🚀 Activando primer link: ${firstId}`);
+        updateActiveLink(firstId);
+    }
 });
 </script>
 

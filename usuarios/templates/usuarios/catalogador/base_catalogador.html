@@ -100,7 +100,7 @@
                 <i class="bi-file-text"></i>
                 <span>Títulos Uniformes</span>
             </a>
-            <a class="nav-link {% if request.resolver_match.url_name == 'lista_obras' %}active{% endif %}"
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_obras' or request.resolver_match.url_name == 'detalle_obra' or request.resolver_match.url_name == 'editar_obra' %}active{% endif %}"
                href="{% url 'catalogacion:lista_obras' %}"
                data-tooltip="Editar Obras">
                 <i class="bi bi-brush"></i>
