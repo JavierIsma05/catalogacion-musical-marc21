@@ -1096,6 +1096,77 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
         print("=" * 80)
         return len(problemas) == 0
 
+    def diagnosticar_bd_sqlite_264(self):
+        """
+        🔥 DIAGNÓSTICO COMPLETO: Verificar directamente en la BD SQLite
+        """
+        print("\n" + "="*80)
+        print("🔥 DIAGNÓSTICO COMPLETO DE BD SQLITE - CAMPO 264")
+        print("="*80)
+        
+        from .bloque_2xx import ProduccionPublicacion, Lugar264, NombreEntidad264, Fecha264
+        
+        print(f"\n📋 OBRA: {self} (ID: {self.pk})")
+        
+        # Consulta directa a la BD
+        producciones = ProduccionPublicacion.objects.filter(obra=self)
+        print(f"\n🔍 PRODUCCIONES PUBLICACIÓN:")
+        print(f"   Total: {producciones.count()}")
+        
+        for prod in producciones:
+            print(f"   - ID: {prod.pk}, Función: {prod.funcion}")
+            
+            lugares = Lugar264.objects.filter(produccion_publicacion=prod)
+            print(f"     Lugares ({lugares.count()}):")
+            for lug in lugares:
+                print(f"       - ID: {lug.pk}, Lugar: '{lug.lugar}'")
+            
+            entidades = NombreEntidad264.objects.filter(produccion_publicacion=prod)
+            print(f"     Entidades ({entidades.count()}):")
+            for ent in entidades:
+                print(f"       - ID: {ent.pk}, Nombre: '{ent.nombre}'")
+            
+            fechas = Fecha264.objects.filter(produccion_publicacion=prod)
+            print(f"     Fechas ({fechas.count()}):")
+            for fec in fechas:
+                print(f"       - ID: {fec.pk}, Fecha: '{fec.fecha}'")
+        
+        # Consulta SQL cruda
+        from django.db import connection
+        cursor = connection.cursor()
+        
+        print(f"\n🔍 CONSULTA SQL CRUDA:")
+        try:
+            cursor.execute("""
+                SELECT pp.id, pp.funcion, pp.obra_id,
+                       l.id as lugar_id, l.lugar,
+                       e.id as entidad_id, e.nombre,
+                       f.id as fecha_id, f.fecha
+                FROM catalogacion_produccionpublicacion pp
+                LEFT JOIN catalogacion_lugar264 l ON l.produccion_publicacion_id = pp.id
+                LEFT JOIN catalogacion_nombreentidad264 e ON e.produccion_publicacion_id = pp.id
+                LEFT JOIN catalogacion_fecha264 f ON f.produccion_publicacion_id = pp.id
+                WHERE pp.obra_id = %s
+                ORDER BY pp.id
+            """, [self.pk])
+            
+            rows = cursor.fetchall()
+            print(f"   Filas encontradas: {len(rows)}")
+            
+            for row in rows:
+                print(f"   - Producción ID: {row[0]}, Función: {row[1]}, Obra ID: {row[2]}")
+                if row[3]:
+                    print(f"     Lugar ID: {row[3]}, Valor: '{row[4]}'")
+                if row[5]:
+                    print(f"     Entidad ID: {row[5]}, Valor: '{row[6]}'")
+                if row[7]:
+                    print(f"     Fecha ID: {row[7]}, Valor: '{row[8]}'")
+                    
+        except Exception as e:
+            print(f"   ❌ Error en consulta SQL: {e}")
+        
+        print("="*80)
+
     def diagnosticar_datos_faltantes_773(self):
         """
         Función de diagnóstico para mostrar qué datos faltan para el autocompletado 773
