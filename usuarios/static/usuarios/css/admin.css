@@ -271,6 +271,42 @@
     border: 1px solid var(--admin-border);
 }
 
+/* Tipo Catalogador Badge */
+.tipo-badge {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    border-radius: 12px;
+    text-transform: capitalize;
+}
+
+.tipo-badge.tipo-investigador_unl {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+}
+
+.tipo-badge.tipo-investigador_externo {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    color: white;
+}
+
+.tipo-badge.tipo-colaborador {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.tipo-badge.tipo-pasante {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.tipo-badge.tipo-otros {
+    background: var(--admin-bg);
+    color: var(--admin-text);
+    border: 1px solid var(--admin-border);
+}
+
 /* ============================================
    STATUS BADGES SIMPLES
    ============================================ */

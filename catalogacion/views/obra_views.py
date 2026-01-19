@@ -171,7 +171,7 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
                 empty_prefix = empty.prefix
                 empty.funcion700_formset = Funcion700FormSet(
                     instance=None,
-                    prefix=f'funcion700-{empty_prefix}',
+                    prefix=f"funcion700-{empty_prefix}",
                 )
             except Exception:
                 # Safety: if empty_form is not available, ignore
@@ -226,6 +226,11 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
         # GUARDAR OBRA PRINCIPAL (UNA SOLA VEZ)
         # =====================================================
         self.object = form.save(commit=False)
+
+        # Asignar el catalogador (usuario que crea la obra)
+        if self.request.user.is_authenticated:
+            self.object.catalogador = self.request.user
+
         self.object.save()
 
         # =====================================================
@@ -253,9 +258,9 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
         # Construir mapa de POSTs tipo w_773_{suffix} -> lista de ids
         w_773_map = {}
         for k, vals in self.request.POST.lists():
-            if k.startswith('w_773_'):
+            if k.startswith("w_773_"):
                 try:
-                    suffix = int(k.split('w_773_')[1])
+                    suffix = int(k.split("w_773_")[1])
                 except Exception:
                     continue
                 w_773_map[suffix] = vals
@@ -263,22 +268,26 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
 
         for idx, enlace in enumerate(self.object.enlaces_documento_fuente_773.all()):
             obra_ids = w_773_map.get(enlace.pk) or w_773_map.get(idx) or []
-            logger.debug(f"  w_773 processing: idx={idx}, enlace.pk={enlace.pk}, obra_ids={obra_ids}")
+            logger.debug(
+                f"  w_773 processing: idx={idx}, enlace.pk={enlace.pk}, obra_ids={obra_ids}"
+            )
             for obra_id in obra_ids:
-                logger.debug(f"    obra_id={obra_id}, int(obra_id)={int(obra_id)}, self.object.pk={self.object.pk}")
+                logger.debug(
+                    f"    obra_id={obra_id}, int(obra_id)={int(obra_id)}, self.object.pk={self.object.pk}"
+                )
                 if obra_id and int(obra_id) != self.object.pk:
                     NumeroControl773.objects.create(
                         enlace_773=enlace, obra_relacionada_id=obra_id
                     )
-                    logger.debug(f"    ✅ NC773 creado")
+                    logger.debug("    ✅ NC773 creado")
                 else:
-                    logger.debug(f"    ❌ SKIP: igual a self.object")
+                    logger.debug("    ❌ SKIP: igual a self.object")
 
         w_774_map = {}
         for k, vals in self.request.POST.lists():
-            if k.startswith('w_774_'):
+            if k.startswith("w_774_"):
                 try:
-                    suffix = int(k.split('w_774_')[1])
+                    suffix = int(k.split("w_774_")[1])
                 except Exception:
                     continue
                 w_774_map[suffix] = vals
@@ -293,9 +302,9 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
 
         w_787_map = {}
         for k, vals in self.request.POST.lists():
-            if k.startswith('w_787_'):
+            if k.startswith("w_787_"):
                 try:
-                    suffix = int(k.split('w_787_')[1])
+                    suffix = int(k.split("w_787_")[1])
                 except Exception:
                     continue
                 w_787_map[suffix] = vals
@@ -463,6 +472,10 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
         # Actualizar la obra principal
         self.object = form.save(commit=False)
 
+        # Registrar quién modificó la obra
+        if self.request.user.is_authenticated:
+            self.object.modificado_por = self.request.user
+
         self.object.save()
 
         # Guardar todos los formsets y sus subcampos
@@ -513,12 +526,18 @@ class ListaObrasView(CatalogadorRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        """Obtener queryset con búsqueda y optimizaciones"""
+        """Obtener queryset con búsqueda y optimizaciones, filtrado por usuario"""
         queryset = (
             ObraGeneral.objects.activos()
-            .select_related("compositor", "titulo_uniforme")
+            .select_related("compositor", "titulo_uniforme", "catalogador")
             .order_by("-fecha_creacion_sistema")
         )
+
+        # Filtrar por el usuario autenticado (solo sus obras)
+        # Los administradores ven todas las obras
+        if self.request.user.is_authenticated:
+            if not self.request.user.es_admin:
+                queryset = queryset.filter(catalogador=self.request.user)
 
         # Filtro de búsqueda
         q = self.request.GET.get("q")

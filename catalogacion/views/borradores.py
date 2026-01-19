@@ -65,6 +65,7 @@ def guardar_borrador_ajax(request):
                 obra_objetivo_id=obra_objetivo_id,
                 datos_formulario=datos_formulario,
                 pestana_actual=pestana_actual,
+                usuario=request.user if request.user.is_authenticated else None,
             )
             mensaje = "Borrador guardado exitosamente"
 
@@ -387,11 +388,13 @@ def autoguardar_borrador_ajax(request):
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import DeleteView, ListView
+from django.views.generic import DeleteView, DetailView, ListView
+
+from usuarios.mixins import CatalogadorRequiredMixin
 
 
-class ListaBorradoresView(ListView):
-    """Vista para listar todos los borradores activos"""
+class ListaBorradoresView(CatalogadorRequiredMixin, ListView):
+    """Vista para listar borradores activos del usuario actual"""
 
     model = BorradorObra
     template_name = "catalogacion/lista_borradores.html"
@@ -399,10 +402,16 @@ class ListaBorradoresView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        """Obtener solo borradores activos ordenados por fecha de modificación"""
+        """Obtener solo borradores activos del usuario, ordenados por fecha de modificación"""
         queryset = BorradorObra.objects.filter(estado="activo").order_by(
             "-fecha_modificacion"
         )
+
+        # Filtrar por el usuario autenticado (solo sus borradores)
+        # Los administradores ven todos los borradores
+        if self.request.user.is_authenticated:
+            if not self.request.user.es_admin:
+                queryset = queryset.filter(usuario=self.request.user)
 
         # Filtrar por búsqueda si hay query
         q = self.request.GET.get("q")
@@ -607,3 +616,135 @@ def limpiar_borrador_tipo_ajax(request):
         return JsonResponse({"success": False, "error": "JSON inválido"}, status=400)
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+
+class VistaPreviaBorradorView(CatalogadorRequiredMixin, DetailView):
+    """
+    Vista previa de un borrador.
+    Muestra cómo se vería la obra si se publicara, basándose en los datos del JSON.
+    """
+
+    model = BorradorObra
+    template_name = "catalogacion/preview_borrador.html"
+    context_object_name = "borrador"
+
+    def get_queryset(self):
+        """Solo borradores activos del usuario actual"""
+        queryset = BorradorObra.objects.filter(estado="activo")
+        if self.request.user.is_authenticated and not self.request.user.es_admin:
+            queryset = queryset.filter(usuario=self.request.user)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        borrador = self.object
+        datos = borrador.datos_formulario or {}
+
+        # El JSON tiene estructura: {campos: {}, formsets: {}, subcampos: {}}
+        # 'campos' contiene los nombres de los inputs directamente
+        campos_raw = datos.get("campos", {})
+        formsets_raw = datos.get("formsets", {})
+
+        # Información del tipo de obra
+        tipos_obra = {
+            "coleccion_manuscrita": "Colección Manuscrita",
+            "obra_en_coleccion_manuscrita": "Obra en Colección Manuscrita",
+            "obra_manuscrita_individual": "Obra Manuscrita Individual",
+            "coleccion_impresa": "Colección Impresa",
+            "obra_en_coleccion_impresa": "Obra en Colección Impresa",
+            "obra_impresa_individual": "Obra Impresa Individual",
+        }
+        context["tipo_obra_display"] = tipos_obra.get(
+            borrador.tipo_obra, borrador.tipo_obra
+        )
+
+        # Mapeo de campos MARC para mostrar en la vista previa
+        context["preview_data"] = self._build_preview_data(campos_raw, formsets_raw)
+
+        return context
+
+    def _build_preview_data(self, campos, formsets_raw):
+        """Construye un diccionario estructurado para la vista previa"""
+
+        # Procesar formsets del formato Django a listas de diccionarios
+        def parse_formset(prefix, formset_data):
+            """Extrae filas de un formset raw"""
+            if not formset_data:
+                return []
+            rows = formset_data.get("rows", [])
+            return [row for row in rows if row and not row.get("DELETE")]
+
+        preview = {
+            # Información básica - Campo 245
+            "titulo_principal": campos.get("titulo_principal", ""),
+            "subtitulo": campos.get("subtitulo", ""),
+            "mencion_responsabilidad": campos.get("mencion_responsabilidad", ""),
+            # Compositor - Campo 100
+            "compositor": campos.get("compositor", ""),
+            "compositor_texto": campos.get("compositor_texto", ""),
+            "compositor_coordenadas": campos.get("compositor_coordenadas", ""),
+            # Título uniforme - Campo 240
+            "titulo_240": campos.get("titulo_240", ""),
+            "titulo_240_texto": campos.get("titulo_240_texto", ""),
+            "forma_240": campos.get("forma_240", ""),
+            "forma_240_texto": campos.get("forma_240_texto", ""),
+            "medio_interpretacion_240": campos.get("medio_interpretacion_240", ""),
+            "tonalidad_240": campos.get("tonalidad_240", ""),
+            "arreglo_240": campos.get("arreglo_240", ""),
+            # Tipo de registro
+            "tipo_registro": campos.get("tipo_registro", ""),
+            "nivel_bibliografico": campos.get("nivel_bibliografico", ""),
+            # Campos de identificación
+            "isbn": campos.get("isbn", ""),
+            "ismn": campos.get("ismn", ""),
+            "numero_editor": campos.get("numero_editor", ""),
+            # Descripción física - Campo 300
+            "extension": campos.get("extension", ""),
+            "otras_caracteristicas": campos.get("otras_caracteristicas", ""),
+            "dimension": campos.get("dimension", ""),
+            "material_acompanante": campos.get("material_acompanante", ""),
+            # Formato y técnica - Campo 340, 348
+            "formato": campos.get("formato", ""),
+            "ms_imp": campos.get("ms_imp", ""),
+            # Números musicales - Campo 383, 384
+            "numero_obra": campos.get("numero_obra", ""),
+            "opus": campos.get("opus", ""),
+            "tonalidad_384": campos.get("tonalidad_384", ""),
+            # Centro catalogador - Campo 040
+            "centro_catalogador": campos.get("centro_catalogador", "UNL"),
+            # Formsets procesados
+            "titulos_alternativos": parse_formset(
+                "titulos_alt", formsets_raw.get("titulos_alt")
+            ),
+            "nombres_700": parse_formset(
+                "nombres_700", formsets_raw.get("nombres_700")
+            ),
+            "entidades_710": parse_formset(
+                "entidades_710", formsets_raw.get("entidades_710")
+            ),
+            "producciones": parse_formset("produccion", formsets_raw.get("produccion")),
+            "ediciones": parse_formset("edicion", formsets_raw.get("edicion")),
+            "notas_generales": parse_formset(
+                "notas_generales", formsets_raw.get("notas_generales")
+            ),
+            "contenidos": parse_formset("contenido", formsets_raw.get("contenido")),
+            "sumarios": parse_formset("sumario", formsets_raw.get("sumario")),
+            "medios_interpretacion": parse_formset(
+                "medios_382", formsets_raw.get("medios_382")
+            ),
+            "incipits": parse_formset("incipit", formsets_raw.get("incipit")),
+            "materias_650": parse_formset(
+                "materias_650", formsets_raw.get("materias_650")
+            ),
+            "materias_655": parse_formset(
+                "materias_655", formsets_raw.get("materias_655")
+            ),
+            "series": parse_formset("serie", formsets_raw.get("serie")),
+            "ubicaciones": parse_formset("ubicacion", formsets_raw.get("ubicacion")),
+            "urls_856": parse_formset("url_856", formsets_raw.get("url_856")),
+            "enlaces_773": parse_formset("enlace_773", formsets_raw.get("enlace_773")),
+            "enlaces_774": parse_formset("enlace_774", formsets_raw.get("enlace_774")),
+            "enlaces_787": parse_formset("enlace_787", formsets_raw.get("enlace_787")),
+        }
+
+        return preview

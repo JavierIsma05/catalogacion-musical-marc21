@@ -69,6 +69,16 @@ urlpatterns = [
         name="api_guardar_borrador",
     ),
     path(
+        "borradores/<int:pk>/editar/",
+        borradores_views.recuperar_borrador_view,
+        name="editar_borrador",
+    ),
+    path(
+        "borradores/<int:pk>/preview/",
+        borradores_views.VistaPreviaBorradorView.as_view(),
+        name="preview_borrador",
+    ),
+    path(
         "api/borradores/autoguardar/",
         borradores_views.autoguardar_borrador_ajax,
         name="api_autoguardar_borrador",

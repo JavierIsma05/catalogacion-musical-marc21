@@ -22,7 +22,7 @@
                 <tr>
                     <th>Nombre</th>
                     <th>Email</th>
-                    <th>Rol</th>
+                    <th>Tipo</th>
                     <th>Estado</th>
                     <th>Registro</th>
                     <th>Acciones</th>
@@ -41,7 +41,9 @@
                     </td>
                     <td class="user-email-cell">{{ catalogador.email }}</td>
                     <td>
-                        <span class="role-badge">{{ catalogador.rol|default:"catalogador" }}</span>
+                        <span class="tipo-badge tipo-{{ catalogador.tipo_catalogador }}">
+                            {{ catalogador.get_tipo_catalogador_display }}
+                        </span>
                     </td>
                     <td>
                         <span class="status-badge {% if catalogador.activo %}active{% else %}inactive{% endif %}">
@@ -55,14 +57,22 @@
                                class="action-btn edit" title="Editar">
                                 <i class="bi bi-pencil"></i>
                             </a>
+                            {% if catalogador.activo %}
+                            <button type="button" 
+                                    class="action-btn toggle"
+                                    title="Desactivar"
+                                    onclick="confirmarDesactivar({{ catalogador.pk }}, '{{ catalogador.nombre_completo|default:catalogador.email }}')">
+                                <i class="bi bi-pause"></i>
+                            </button>
+                            {% else %}
                             <form action="{% url 'usuarios:toggle_activo_catalogador' catalogador.pk %}" 
                                   method="post" class="toggle-form">
                                 {% csrf_token %}
-                                <button type="submit" class="action-btn toggle"
-                                        title="{% if catalogador.activo %}Desactivar{% else %}Activar{% endif %}">
-                                    <i class="bi bi-{% if catalogador.activo %}pause{% else %}play{% endif %}"></i>
+                                <button type="submit" class="action-btn toggle" title="Activar">
+                                    <i class="bi bi-play"></i>
                                 </button>
                             </form>
+                            {% endif %}
                             <a href="{% url 'usuarios:eliminar_catalogador' catalogador.pk %}" 
                                class="action-btn delete" title="Eliminar">
                                 <i class="bi bi-trash"></i>
@@ -115,4 +125,179 @@
     </div>
     {% endif %}
 </div>
+
+<!-- Modal de confirmación para desactivar -->
+<div class="modal fade" id="modalDesactivar" tabindex="-1" aria-labelledby="modalDesactivarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-desactivar">
+            <div class="modal-header">
+                <div class="modal-icon-wrapper warning">
+                    <i class="bi bi-pause-circle"></i>
+                </div>
+                <h5 class="modal-title" id="modalDesactivarLabel">Confirmar desactivación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message">¿Estás seguro de que deseas desactivar al catalogador <strong id="catalogador-nombre"></strong>?</p>
+                <p class="modal-note">El usuario no podrá acceder al sistema mientras esté desactivado.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i>
+                    Cancelar
+                </button>
+                <form id="form-desactivar" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-modal-confirm warning">
+                        <i class="bi bi-pause-circle"></i>
+                        Sí, desactivar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ============================================
+   MODAL DE CONFIRMACIÓN - ESTILOS
+   ============================================ */
+.modal-desactivar {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.modal-desactivar .modal-header {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-bottom: none;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.modal-icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.modal-icon-wrapper.warning {
+    background: rgba(217, 119, 6, 0.15);
+    color: #d97706;
+}
+
+.modal-icon-wrapper i {
+    font-size: 1.5rem;
+}
+
+.modal-desactivar .modal-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #92400e;
+    margin: 0;
+    flex: 1;
+}
+
+.modal-desactivar .btn-close {
+    opacity: 0.6;
+    margin: 0;
+}
+
+.modal-desactivar .btn-close:hover {
+    opacity: 1;
+}
+
+.modal-desactivar .modal-body {
+    padding: 1.5rem;
+}
+
+.modal-message {
+    font-size: 0.9375rem;
+    color: var(--admin-text);
+    margin-bottom: 0.75rem;
+}
+
+.modal-message strong {
+    color: var(--admin-primary);
+}
+
+.modal-note {
+    font-size: 0.8125rem;
+    color: var(--admin-text-light);
+    margin: 0;
+    padding: 0.75rem;
+    background: var(--admin-bg);
+    border-radius: 6px;
+    border-left: 3px solid #d97706;
+}
+
+.modal-desactivar .modal-footer {
+    background: var(--admin-bg);
+    border-top: 1px solid var(--admin-border-light);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.btn-modal-cancel,
+.btn-modal-confirm {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: none;
+}
+
+.btn-modal-cancel {
+    background: var(--admin-white);
+    color: var(--admin-text);
+    border: 1.5px solid var(--admin-border);
+}
+
+.btn-modal-cancel:hover {
+    background: var(--admin-bg);
+}
+
+.btn-modal-confirm.warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.btn-modal-confirm.warning:hover {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.3);
+}
+
+.btn-modal-confirm i,
+.btn-modal-cancel i {
+    font-size: 0.9rem;
+}
+</style>
+
+<script>
+function confirmarDesactivar(catalogadorId, catalogadorNombre) {
+    document.getElementById('catalogador-nombre').textContent = catalogadorNombre;
+    const actionUrl = "{% url 'usuarios:toggle_activo_catalogador' pk=0 %}".replace('0', catalogadorId);
+    document.getElementById('form-desactivar').action = actionUrl;
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalDesactivar'));
+    modal.show();
+}
+</script>
 {% endblock %}

@@ -57,11 +57,17 @@
                     <!-- Se llena dinámicamente con JavaScript -->
                 </ul>
 
+                <!-- Indicador de autoguardado -->
+                <div class="autosave-indicator" id="autosave-indicator">
+                    <i class="bi bi-cloud-check"></i>
+                    <span id="autosave-status">Guardado automático activo</span>
+                </div>
+
                 <!-- Botones de acción -->
                 <div class="sidebar-actions">
-                    <button type="button" class="sidebar-btn sidebar-btn-save" id="btn-guardar-borrador">
-                        <i class="bi bi-save"></i>
-                        <span>Guardar Borrador</span>
+                    <button type="button" class="sidebar-btn sidebar-btn-preview" id="btn-vista-previa">
+                        <i class="bi bi-eye"></i>
+                        <span>Vista Previa</span>
                     </button>
                     <button type="button" class="sidebar-btn sidebar-btn-publish" id="btn-publicar-obra">
                         <i class="bi bi-check-circle-fill"></i>
@@ -229,13 +235,39 @@
                         <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
                             <i class="bi bi-arrow-left"></i> Anterior
                         </button>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary" onclick="confirmarPublicacion()">
                             <i class="bi bi-check-circle-fill"></i> Registrar Obra
                         </button>
                     </div>
                 </div>
             </div> <!-- /tabs-content -->
         </form>
+    </div>
+</div>
+
+<!-- ================= MODAL CONFIRMAR PUBLICACIÓN ================= -->
+<div class="modal fade" id="modalConfirmarPublicacion" tabindex="-1" aria-labelledby="modalConfirmarPublicacionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmarPublicacionLabel">
+                    <i class="bi bi-check-circle text-success"></i> Confirmar registro
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">¿Estás seguro de que deseas registrar esta obra en el catálogo?</p>
+                <p class="text-muted small mb-0">Una vez registrada, podrás editarla desde la sección "Editar Obras".</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-success" id="btnConfirmarRegistro">
+                    <i class="bi bi-check-circle-fill"></i> Sí, registrar
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -269,6 +301,46 @@
     // Pasar tipo de obra al JavaScript
     window.TIPO_OBRA_ACTUAL = '{{ tipo_obra }}';
 
+    // ==================== MODAL DE CONFIRMACIÓN PARA PUBLICAR ====================
+    // Variable global para controlar si estamos publicando
+    window.permitirSalida = false;
+
+    function confirmarPublicacion() {
+        const modalEl = document.getElementById('modalConfirmarPublicacion');
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        } else {
+            console.error('Modal de confirmación no encontrado');
+        }
+    }
+
+    // Manejar confirmación del modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnConfirmar = document.getElementById('btnConfirmarRegistro');
+        if (btnConfirmar) {
+            btnConfirmar.addEventListener('click', function() {
+                // Marcar que permitimos la salida
+                window.permitirSalida = true;
+                
+                // Notificar al sistema de borradores
+                if (window.BorradorSystem && typeof window.BorradorSystem.permitirPublicacion === 'function') {
+                    window.BorradorSystem.permitirPublicacion();
+                }
+                
+                // Cerrar modal
+                const modalEl = document.getElementById('modalConfirmarPublicacion');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+                
+                // Pequeño delay y luego enviar formulario
+                setTimeout(function() {
+                    document.getElementById('obra-form').submit();
+                }, 100);
+            });
+        }
+    });
+
     // ==================== SISTEMA DE PESTAÑAS (NUEVA UI) ====================
     // Orden de secciones:
     // 0: Personas y títulos
@@ -301,7 +373,7 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
 <script src="{% static 'catalogacion/js/compositor-autocomplete.js' %}"></script>
 <script src="{% static 'catalogacion/js/titulos-formas-autocomplete.js' %}"></script>
 <script src="{% static 'catalogacion/js/required-fields-tracker.js' %}"></script>
-<script src="{% static 'catalogacion/js/draft-manager.js' %}"></script>
+<script src="{% static 'catalogacion/js/borrador-system.js' %}"></script>
 <script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>
 <script src="{% static 'catalogacion/js/incipit-031-adapter.js' %}"></script>
 <script src="{% static 'catalogacion/js/autoridades-titulos-autocomplete.js' %}"></script>
@@ -490,65 +562,83 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
         console.log('[FORM] Listener de submit agregado');
 
         // ==================== BOTONES DE SIDEBAR ====================
-        const btnGuardarBorrador = document.getElementById('btn-guardar-borrador');
+        const btnVistaPrevia = document.getElementById('btn-vista-previa');
         const btnPublicarObra = document.getElementById('btn-publicar-obra');
+        const autosaveIndicator = document.getElementById('autosave-indicator');
+        const autosaveStatus = document.getElementById('autosave-status');
 
-        // Guardar Borrador (manual)
-        if (btnGuardarBorrador) {
-            btnGuardarBorrador.addEventListener('click', async function() {
-                if (window.DraftManager) {
-                    // Cambiar estado visual
-                    btnGuardarBorrador.classList.add('saving');
-                    btnGuardarBorrador.innerHTML = '<i class="bi bi-arrow-repeat spin"></i><span>Guardando...</span>';
-                    btnGuardarBorrador.disabled = true;
+        // Función para actualizar el indicador de autoguardado
+        function updateAutosaveIndicator(status, message) {
+            if (!autosaveIndicator || !autosaveStatus) return;
+            
+            autosaveIndicator.classList.remove('saving', 'saved', 'error');
+            
+            if (status === 'saving') {
+                autosaveIndicator.classList.add('saving');
+                autosaveIndicator.querySelector('i').className = 'bi bi-arrow-repeat spin';
+                autosaveStatus.textContent = message || 'Guardando...';
+            } else if (status === 'saved') {
+                autosaveIndicator.classList.add('saved');
+                autosaveIndicator.querySelector('i').className = 'bi bi-cloud-check-fill';
+                autosaveStatus.textContent = message || 'Guardado';
+                
+                // Volver al estado normal después de 3 segundos
+                setTimeout(() => {
+                    autosaveIndicator.classList.remove('saved');
+                    autosaveIndicator.querySelector('i').className = 'bi bi-cloud-check';
+                    autosaveStatus.textContent = 'Guardado automático activo';
+                }, 3000);
+            } else if (status === 'error') {
+                autosaveIndicator.classList.add('error');
+                autosaveIndicator.querySelector('i').className = 'bi bi-exclamation-triangle';
+                autosaveStatus.textContent = message || 'Error al guardar';
+            }
+        }
 
+        // Exponer la función para que DraftManager la use
+        window.updateAutosaveIndicator = updateAutosaveIndicator;
+
+        // Vista Previa del Borrador
+        if (btnVistaPrevia) {
+            btnVistaPrevia.addEventListener('click', async function() {
+                // Primero guardar el borrador actual
+                if (window.BorradorSystem) {
+                    updateAutosaveIndicator('saving', 'Guardando para vista previa...');
                     try {
-                        const result = await window.DraftManager.save(false); // guardado manual
+                        const resultado = await window.BorradorSystem.guardar();
                         
-                        // Mostrar éxito
-                        btnGuardarBorrador.classList.remove('saving');
-                        btnGuardarBorrador.classList.add('saved');
-                        btnGuardarBorrador.innerHTML = '<i class="bi bi-check"></i><span>Guardado</span>';
-                        
-                        // Restaurar después de 2 segundos
-                        setTimeout(() => {
-                            btnGuardarBorrador.classList.remove('saved');
-                            btnGuardarBorrador.innerHTML = '<i class="bi bi-save"></i><span>Guardar Borrador</span>';
-                            btnGuardarBorrador.disabled = false;
-                        }, 2000);
+                        if (resultado && resultado.success) {
+                            updateAutosaveIndicator('saved', 'Guardado');
+                            
+                            // Obtener el ID del borrador (del resultado o del estado)
+                            const borradorId = resultado.borradorId || window.BorradorSystem.getBorradorId();
+                            if (borradorId) {
+                                // Abrir vista previa en nueva pestaña
+                                window.open(`/catalogacion/borradores/${borradorId}/preview/`, '_blank');
+                            } else {
+                                updateAutosaveIndicator('error', 'ID no disponible');
+                                alert('No se pudo obtener el ID del borrador. Intente nuevamente.');
+                            }
+                        } else {
+                            const errorMsg = resultado?.error || 'Error desconocido';
+                            updateAutosaveIndicator('error', 'Error al guardar');
+                            alert(`No se pudo guardar el borrador: ${errorMsg}`);
+                        }
                     } catch (error) {
-                        console.error('[SIDEBAR] Error al guardar borrador:', error);
-                        btnGuardarBorrador.classList.remove('saving');
-                        btnGuardarBorrador.innerHTML = '<i class="bi bi-exclamation-triangle"></i><span>Error</span>';
-                        btnGuardarBorrador.disabled = false;
-                        
-                        setTimeout(() => {
-                            btnGuardarBorrador.innerHTML = '<i class="bi bi-save"></i><span>Guardar Borrador</span>';
-                        }, 2000);
+                        console.error('[SIDEBAR] Error al guardar para vista previa:', error);
+                        updateAutosaveIndicator('error', 'Error al guardar');
+                        alert('Error al guardar el borrador. Verifique la consola para más detalles.');
                     }
+                } else {
+                    alert('Sistema de borradores no disponible.');
                 }
             });
         }
 
-        // Publicar Obra (enviar formulario)
+        // Publicar Obra (mostrar modal de confirmación)
         if (btnPublicarObra) {
             btnPublicarObra.addEventListener('click', function() {
-                // Navegar a la última pestaña y hacer submit
-                switchTab(tabs.length - 1); // Ir a la pestaña de administración
-                
-                setTimeout(() => {
-                    const form = document.getElementById('obra-form');
-                    if (form) {
-                        // Disparar el submit del formulario
-                        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-                        form.dispatchEvent(submitEvent);
-                        
-                        // Si la validación pasa, enviar
-                        if (!submitEvent.defaultPrevented) {
-                            form.submit();
-                        }
-                    }
-                }, 100);
+                confirmarPublicacion();
             });
         }
 

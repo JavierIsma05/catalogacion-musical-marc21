@@ -1,0 +1,1013 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Formato MARC21 - {{ obra.titulo_principal }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Layout principal */
+    .marc-container {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 24px;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    @media (max-width: 900px) {
+        .marc-container {
+            grid-template-columns: 1fr;
+        }
+        .marc-sidebar {
+            position: relative !important;
+            top: 0 !important;
+        }
+    }
+    
+    /* Sidebar */
+    .marc-sidebar {
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+    
+    .sidebar-card {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+        border-radius: 12px;
+        padding: 20px;
+        color: white;
+        margin-bottom: 16px;
+    }
+    
+    .sidebar-card h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #a8d0f0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .sidebar-card .obra-titulo {
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.3;
+        margin-bottom: 8px;
+    }
+    
+    .sidebar-card .obra-compositor {
+        font-size: 14px;
+        color: #c8e0f0;
+    }
+    
+    .sidebar-card .num-control {
+        display: inline-block;
+        background: rgba(255,255,255,0.15);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        margin-top: 12px;
+    }
+    
+    /* Navegación rápida */
+    .nav-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        padding: 16px;
+    }
+    
+    .nav-section h4 {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+    
+    .nav-links {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .nav-links a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        color: #333;
+        text-decoration: none;
+        font-size: 13px;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+    
+    .nav-links a:hover {
+        background: #e8f4fc;
+        color: #1e3a5f;
+    }
+    
+    .nav-links a .badge {
+        background: #e0e0e0;
+        color: #666;
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: auto;
+    }
+    
+    /* Contenido principal */
+    .marc-content {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .marc-header {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+        color: white;
+        padding: 24px 32px;
+    }
+    
+    .marc-header h1 {
+        font-size: 24px;
+        margin: 0 0 8px 0;
+    }
+    
+    .marc-header .subtitle {
+        font-size: 14px;
+        opacity: 0.85;
+    }
+    
+    .marc-body {
+        padding: 24px 32px;
+    }
+    
+    /* Secciones MARC */
+    .marc-section {
+        margin-bottom: 28px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .marc-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+    
+    .marc-section h2 {
+        font-size: 16px;
+        color: #1e3a5f;
+        margin: 0 0 16px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .marc-section h2 .section-tag {
+        background: #e8f4fc;
+        color: #2d5a87;
+        font-size: 12px;
+        padding: 3px 10px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+    
+    /* Campo MARC individual */
+    .marc-field {
+        display: grid;
+        grid-template-columns: 65px 40px 1fr;
+        gap: 8px;
+        padding: 10px 14px;
+        margin-bottom: 6px;
+        background: #f8fafc;
+        border-radius: 6px;
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        font-size: 13px;
+        line-height: 1.5;
+        align-items: start;
+    }
+    
+    .marc-field:hover {
+        background: #f0f7fc;
+    }
+    
+    .marc-field .tag {
+        font-weight: 700;
+        color: #1e3a5f;
+    }
+    
+    .marc-field .indicators {
+        color: #888;
+        text-align: center;
+    }
+    
+    .marc-field .content {
+        color: #333;
+        word-break: break-word;
+    }
+    
+    .marc-field .content .subfield {
+        color: #0066cc;
+        font-weight: 600;
+    }
+    
+    /* Campo líder especial */
+    .leader-field {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 2px solid #f59e0b;
+    }
+    
+    .leader-field .tag {
+        color: #92400e;
+    }
+    
+    /* Explicación del LDR */
+    .ldr-explanation {
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        font-size: 13px;
+    }
+    
+    .ldr-explanation h4 {
+        color: #92400e;
+        margin: 0 0 12px 0;
+        font-size: 14px;
+    }
+    
+    .ldr-explanation table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .ldr-explanation td {
+        padding: 4px 8px;
+        border-bottom: 1px solid #fde68a;
+        vertical-align: top;
+    }
+    
+    .ldr-explanation td:first-child {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 600;
+        color: #78350f;
+        width: 100px;
+    }
+    
+    /* Campo de control */
+    .control-field {
+        background: #f0fdf4;
+        border-left: 3px solid #22c55e;
+    }
+    
+    .control-field .tag {
+        color: #166534;
+    }
+    
+    /* Campos repetibles */
+    .marc-field-group {
+        margin-bottom: 12px;
+    }
+    
+    .marc-field-group .group-label {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 6px;
+        padding-left: 14px;
+        font-weight: 600;
+    }
+    
+    /* Subcampos anidados */
+    .nested-subfields {
+        margin-left: 113px;
+        padding: 8px 14px;
+        background: #fff;
+        border-left: 2px solid #ddd;
+        font-size: 12px;
+    }
+    
+    .nested-subfields .subfield-item {
+        padding: 3px 0;
+    }
+    
+    /* Badges para indicadores */
+    .indicator-badge {
+        display: inline-block;
+        background: #e5e7eb;
+        color: #374151;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 3px;
+        margin-left: 8px;
+        font-family: sans-serif;
+    }
+    
+    /* Botón volver */
+    .btn-volver {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #1e3a5f;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s;
+        margin-bottom: 20px;
+    }
+    
+    .btn-volver:hover {
+        background: #2d5a87;
+        color: white;
+    }
+    
+    /* Nota vacía */
+    .empty-note {
+        color: #999;
+        font-style: italic;
+        font-family: sans-serif;
+        font-size: 12px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="marc-container">
+    <!-- Sidebar -->
+    <aside class="marc-sidebar">
+        <!-- Info de la obra -->
+        <div class="sidebar-card">
+            <h3>📘 Registro MARC21</h3>
+            <div class="obra-titulo">{{ obra.titulo_principal }}</div>
+            {% if obra.compositor %}
+            <div class="obra-compositor">{{ obra.compositor }}</div>
+            {% endif %}
+            <div class="num-control">{{ obra.num_control }}</div>
+        </div>
+        
+        <!-- Navegación -->
+        <nav class="nav-section">
+            <h4>⚡ Navegación rápida</h4>
+            <div class="nav-links">
+                <a href="#leader"><span>📌</span> Leader (LDR)</a>
+                <a href="#control"><span>🔢</span> Campos de control (00X)</a>
+                <a href="#bloque0xx"><span>🆔</span> Identificación (0XX)</a>
+                <a href="#bloque1xx"><span>👤</span> Puntos de acceso (1XX)</a>
+                <a href="#bloque2xx"><span>📝</span> Título y edición (2XX)</a>
+                <a href="#bloque3xx"><span>📐</span> Descripción física (3XX)</a>
+                <a href="#bloque4xx"><span>📚</span> Series (4XX)</a>
+                <a href="#bloque5xx"><span>📋</span> Notas (5XX)</a>
+                <a href="#bloque6xx"><span>🏷️</span> Materias (6XX)</a>
+                <a href="#bloque7xx"><span>🔗</span> Asientos secundarios (7XX)</a>
+                <a href="#bloque8xx"><span>📍</span> Ubicación (8XX)</a>
+            </div>
+        </nav>
+        
+        <!-- Acciones -->
+        <div style="margin-top: 16px;">
+            <a href="{% url 'catalogo_publico:detalle' obra.pk %}" class="btn-volver">
+                ← Volver al resumen
+            </a>
+        </div>
+    </aside>
+    
+    <!-- Contenido principal -->
+    <main class="marc-content">
+        <div class="marc-header">
+            <h1>Formato MARC21 Completo</h1>
+            <div class="subtitle">Visualización de todos los campos del registro bibliográfico</div>
+        </div>
+        
+        <div class="marc-body">
+            
+            <!-- =========================================== -->
+            <!-- LEADER (LDR) -->
+            <!-- =========================================== -->
+            <section class="marc-section" id="leader">
+                <h2><span class="section-tag">LDR</span> Leader (Cabecera del registro)</h2>
+                
+                <!-- Explicación del LDR -->
+av
+                    <h4>📖 ¿Qué es el Leader (LDR)?</h4>
+                    <p style="margin-bottom: 12px;">
+                        El <strong>Leader</strong> (líder) es un campo fijo de 24 caracteres que aparece al inicio de cada registro MARC21. 
+                        Contiene información codificada sobre la estructura y el tipo del registro. No tiene etiqueta numérica 
+                        y es obligatorio en todo registro MARC.
+                    </p>
+                    <table>
+                        <tr>
+                            <td>Pos. 00-04</td>
+                            <td><strong>Longitud del registro</strong> - Se calcula automáticamente (00000 = pendiente)</td>
+                        </tr>
+                        <tr>
+                            <td>Pos. 05</td>
+                            <td><strong>Estado:</strong> n = nuevo, c = corregido, d = eliminado</td>
+                        </tr>
+                        <tr>
+                            <td>Pos. 06</td>
+                            <td><strong>Tipo de registro:</strong> c = música impresa, d = música manuscrita</td>
+                        </tr>
+                        <tr>
+                            <td>Pos. 07</td>
+                            <td><strong>Nivel bibliográfico:</strong> m = monografía, c = colección, a = parte componente</td>
+                        </tr>
+                        <tr>
+                            <td>Pos. 08</td>
+                            <td><strong>Tipo de control:</strong> # = no especificado, a = archivístico</td>
+                        </tr>
+                        <tr>
+                            <td>Pos. 09</td>
+                            <td><strong>Esquema de caracteres:</strong> a = UCS/Unicode</td>
+                        </tr>
+                        <tr>
+                            <td>Pos. 10-11</td>
+                            <td><strong>Conteo de indicadores y subcampos</strong> - Siempre "22"</td>
+                        </tr>
+                        <tr>
+                            <td>Pos. 12-16</td>
+                            <td><strong>Dirección base de datos</strong> - Se calcula automáticamente</td>
+                        </tr>
+                        <tr>
+                            <td>Pos. 17</td>
+                            <td><strong>Nivel de codificación:</strong> # = completo, 3 = abreviado</td>
+                        </tr>
+                        <tr>
+                            <td>Pos. 18</td>
+                            <td><strong>Forma de catalogación:</strong> i = ISBD</td>
+                        </tr>
+                        <tr>
+                            <td>Pos. 19</td>
+                            <td><strong>Requisito de registro relacionado:</strong> # = no especificado</td>
+                        </tr>
+                        <tr>
+                            <td>Pos. 20-23</td>
+                            <td><strong>Mapa de entrada</strong> - Siempre "4500"</td>
+                        </tr>
+                    </table>
+                </div> -->
+                
+                <div class="marc-field leader-field">
+                    <span class="tag">LDR</span>
+                    <span class="indicators"></span>
+                    <span class="content">00000n{{ obra.tipo_registro }}{{ obra.nivel_bibliografico }} a2200000 i 4500</span>
+                </div>
+                
+                <div style="font-size: 12px; color: #666; margin-top: 8px; padding-left: 14px;">
+                    <strong>Interpretación para este registro:</strong>
+                    Tipo = <strong>{{ obra.get_tipo_registro_display }}</strong> |
+                    Nivel = <strong>{{ obra.get_nivel_bibliografico_display }}</strong> |
+                    Estado = <strong>{{ obra.estado_registro }}</strong> (nuevo)
+                </div>
+            </section>
+            
+            <!-- =========================================== -->
+            <!-- CAMPOS DE CONTROL (00X) -->
+            <!-- =========================================== -->
+            <section class="marc-section" id="control">
+                <h2><span class="section-tag">00X</span> Campos de control</h2>
+                
+                <!-- 001 - Número de control -->
+                <div class="marc-field control-field">
+                    <span class="tag">001</span>
+                    <span class="indicators"></span>
+                    <span class="content">{{ obra.num_control }}</span>
+                </div>
+                
+                <!-- 005 - Fecha/hora última transacción -->
+                <div class="marc-field control-field">
+                    <span class="tag">005</span>
+                    <span class="indicators"></span>
+                    <span class="content">{{ obra.fecha_hora_ultima_transaccion }}</span>
+                </div>
+                
+                <!-- 008 - Código de información -->
+                <div class="marc-field control-field">
+                    <span class="tag">008</span>
+                    <span class="indicators"></span>
+                    <span class="content">{{ obra.codigo_informacion }}</span>
+                </div>
+            </section>
+            
+            <!-- =========================================== -->
+            <!-- BLOQUE 0XX - IDENTIFICACIÓN -->
+            <!-- =========================================== -->
+            <section class="marc-section" id="bloque0xx">
+                <h2><span class="section-tag">0XX</span> Números y códigos de identificación</h2>
+                
+                <!-- 020 - ISBN -->
+                {% if obra.isbn %}
+                <div class="marc-field">
+                    <span class="tag">020</span>
+                    <span class="indicators">##</span>
+                    <span class="content"><span class="subfield">$a</span>{{ obra.isbn }}</span>
+                </div>
+                {% endif %}
+                
+                <!-- 024 - ISMN -->
+                {% if obra.ismn %}
+                <div class="marc-field">
+                    <span class="tag">024</span>
+                    <span class="indicators">2#</span>
+                    <span class="content"><span class="subfield">$a</span>{{ obra.ismn }}</span>
+                </div>
+                {% endif %}
+                
+                <!-- 028 - Número de editor -->
+                {% if obra.numero_editor %}
+                <div class="marc-field">
+                    <span class="tag">028</span>
+                    <span class="indicators">{{ obra.tipo_numero_028|default:"2" }}{{ obra.control_nota_028|default:"0" }}</span>
+                    <span class="content"><span class="subfield">$a</span>{{ obra.numero_editor }}</span>
+                </div>
+                {% endif %}
+                
+                <!-- 031 - Íncipits musicales (R) -->
+                {% for incipit in obra.incipits_musicales.all %}
+                <div class="marc-field-group">
+                    {% if forloop.first %}<div class="group-label">031 — Íncipits musicales ({{ obra.incipits_musicales.count }} registros)</div>{% endif %}
+                    <div class="marc-field">
+                        <span class="tag">031</span>
+                        <span class="indicators">##</span>
+                        <span class="content">
+                            <span class="subfield">$a</span>{{ incipit.numero_obra }}
+                            <span class="subfield">$b</span>{{ incipit.numero_movimiento }}
+                            <span class="subfield">$c</span>{{ incipit.numero_pasaje }}
+                            {% if incipit.titulo_encabezamiento %}<span class="subfield">$d</span>{{ incipit.titulo_encabezamiento }}{% endif %}
+                            {% if incipit.personaje %}<span class="subfield">$e</span>{{ incipit.personaje }}{% endif %}
+                            {% if incipit.clave %}<span class="subfield">$g</span>{{ incipit.clave }}{% endif %}
+                            {% if incipit.voz_instrumento %}<span class="subfield">$m</span>{{ incipit.voz_instrumento }}{% endif %}
+                            {% if incipit.armadura %}<span class="subfield">$n</span>{{ incipit.armadura }}{% endif %}
+                            {% if incipit.tiempo %}<span class="subfield">$o</span>{{ incipit.tiempo }}{% endif %}
+                            {% if incipit.notacion_musical %}<span class="subfield">$p</span>{{ incipit.notacion_musical|truncatechars:80 }}{% endif %}
+                        </span>
+                    </div>
+                    <!-- URLs del incipit (R) -->
+                    {% for url in incipit.urls.all %}
+                    <div class="nested-subfields">
+                        <div class="subfield-item"><span class="subfield">$u</span> {{ url.url }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% empty %}
+                <div class="empty-note">No hay íncipits musicales registrados (campo 031)</div>
+                {% endfor %}
+                
+                <!-- 040 - Centro catalogador -->
+                <div class="marc-field">
+                    <span class="tag">040</span>
+                    <span class="indicators">##</span>
+                    <span class="content">
+                        <span class="subfield">$a</span>{{ obra.centro_catalogador }}
+                        <span class="subfield">$b</span>spa
+                        <span class="subfield">$c</span>{{ obra.centro_catalogador }}
+                    </span>
+                </div>
+                
+                <!-- 041 - Códigos de lengua (R) -->
+                {% for codigo in obra.codigos_lengua.all %}
+                <div class="marc-field">
+                    <span class="tag">041</span>
+                    <span class="indicators">{{ codigo.indicacion_traduccion }}{{ codigo.fuente_codigo }}</span>
+                    <span class="content">
+                        {% for idioma in codigo.idiomas.all %}<span class="subfield">$a</span>{{ idioma.codigo_idioma }} {% endfor %}
+                    </span>
+                </div>
+                {% endfor %}
+                
+                <!-- 044 - Códigos de país (R) -->
+                {% if obra.codigos_pais_entidad.exists %}
+                <div class="marc-field">
+                    <span class="tag">044</span>
+                    <span class="indicators">##</span>
+                    <span class="content">
+                        {% for pais in obra.codigos_pais_entidad.all %}<span class="subfield">$a</span>{{ pais.codigo_pais }} {% endfor %}
+                    </span>
+                </div>
+                {% endif %}
+            </section>
+            
+            <!-- =========================================== -->
+            <!-- BLOQUE 1XX - PUNTOS DE ACCESO PRINCIPALES -->
+            <!-- =========================================== -->
+            <section class="marc-section" id="bloque1xx">
+                <h2><span class="section-tag">1XX</span> Puntos de acceso principales</h2>
+                
+                <!-- 100 - Compositor (punto de acceso principal) -->
+                {% if obra.compositor %}
+                <div class="marc-field">
+                    <span class="tag">100</span>
+                    <span class="indicators">1#</span>
+                    <span class="content">
+                        <span class="subfield">$a</span>{{ obra.compositor.apellidos_nombres }}{% if obra.compositor.coordenadas_biograficas %}, <span class="subfield">$d</span>{{ obra.compositor.coordenadas_biograficas }}{% endif %}
+                        {% if obra.termino_asociado %}<span class="subfield">$c</span>{{ obra.termino_asociado }}{% endif %}
+                        {% for funcion in obra.funciones_compositor.all %}<span class="subfield">$e</span>{{ funcion.get_funcion_display }}{% endfor %}
+                        {% if obra.autoria %}<span class="subfield">$j</span>{{ obra.get_autoria_display }}{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+                
+                <!-- 130 - Título uniforme (sin compositor) -->
+                {% if obra.titulo_uniforme and not obra.compositor %}
+                <div class="marc-field">
+                    <span class="tag">130</span>
+                    <span class="indicators">0#</span>
+                    <span class="content">
+                        <span class="subfield">$a</span>{{ obra.titulo_uniforme }}
+                        {% if obra.forma_130 %}<span class="subfield">$k</span>{{ obra.forma_130 }}{% endif %}
+                        {% if obra.medio_interpretacion_130 %}<span class="subfield">$m</span>{{ obra.get_medio_interpretacion_130_display }}{% endif %}
+                        {% if obra.numero_parte_130 %}<span class="subfield">$n</span>{{ obra.numero_parte_130 }}{% endif %}
+                        {% if obra.arreglo_130 %}<span class="subfield">$o</span>{{ obra.get_arreglo_130_display }}{% endif %}
+                        {% if obra.nombre_parte_130 %}<span class="subfield">$p</span>{{ obra.nombre_parte_130 }}{% endif %}
+                        {% if obra.tonalidad_130 %}<span class="subfield">$r</span>{{ obra.get_tonalidad_130_display }}{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+                
+                {% if not obra.compositor and not obra.titulo_uniforme %}
+                <div class="empty-note">No hay punto de acceso principal registrado</div>
+                {% endif %}
+            </section>
+            
+            <!-- =========================================== -->
+            <!-- BLOQUE 2XX - TÍTULO Y EDICIÓN -->
+            <!-- =========================================== -->
+            <section class="marc-section" id="bloque2xx">
+                <h2><span class="section-tag">2XX</span> Título, edición y publicación</h2>
+                
+                <!-- 240 - Título uniforme (con compositor) -->
+                {% if obra.titulo_240 and obra.compositor %}
+                <div class="marc-field">
+                    <span class="tag">240</span>
+                    <span class="indicators">10</span>
+                    <span class="content">
+                        <span class="subfield">$a</span>{{ obra.titulo_240 }}
+                        {% if obra.forma_240 %}<span class="subfield">$k</span>{{ obra.forma_240 }}{% endif %}
+                        {% if obra.medio_interpretacion_240 %}<span class="subfield">$m</span>{{ obra.get_medio_interpretacion_240_display }}{% endif %}
+                        {% if obra.numero_parte_240 %}<span class="subfield">$n</span>{{ obra.numero_parte_240 }}{% endif %}
+                        {% if obra.arreglo_240 %}<span class="subfield">$o</span>{{ obra.get_arreglo_240_display }}{% endif %}
+                        {% if obra.nombre_parte_240 %}<span class="subfield">$p</span>{{ obra.nombre_parte_240 }}{% endif %}
+                        {% if obra.tonalidad_240 %}<span class="subfield">$r</span>{{ obra.get_tonalidad_240_display }}{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+                
+                <!-- 245 - Título principal -->
+                <div class="marc-field">
+                    <span class="tag">245</span>
+                    <span class="indicators">{% if obra.compositor %}1{% else %}0{% endif %}0</span>
+                    <span class="content">
+                        <span class="subfield">$a</span>{{ obra.titulo_principal }}{% if obra.subtitulo %} : <span class="subfield">$b</span>{{ obra.subtitulo }}{% endif %}{% if obra.mencion_responsabilidad %} / <span class="subfield">$c</span>{{ obra.mencion_responsabilidad }}{% endif %}
+                    </span>
+                </div>
+                
+                <!-- 246 - Títulos alternativos (R) -->
+                {% for titulo_alt in obra.titulos_alternativos.all %}
+                <div class="marc-field">
+                    <span class="tag">246</span>
+                    <span class="indicators">3#</span>
+                    <span class="content">
+                        {% if titulo_alt.texto_visualizacion %}<span class="subfield">$i</span>{{ titulo_alt.texto_visualizacion }}: {% endif %}
+                        <span class="subfield">$a</span>{{ titulo_alt.titulo }}
+                        {% if titulo_alt.resto_titulo %}<span class="subfield">$b</span>{{ titulo_alt.resto_titulo }}{% endif %}
+                    </span>
+                </div>
+                {% endfor %}
+                
+                <!-- 250 - Edición (R) -->
+                {% for edicion in obra.ediciones.all %}
+                <div class="marc-field">
+                    <span class="tag">250</span>
+                    <span class="indicators">##</span>
+                    <span class="content"><span class="subfield">$a</span>{{ edicion.edicion }}</span>
+                </div>
+                {% endfor %}
+                
+                <!-- 264 - Producción/Publicación (R) -->
+                {% for prod in obra.producciones_publicaciones.all %}
+                <div class="marc-field">
+                    <span class="tag">264</span>
+                    <span class="indicators">#{{ prod.funcion }}</span>
+                    <span class="content">
+                        {% for lugar in prod.lugares.all %}<span class="subfield">$a</span>{{ lugar.lugar }} {% endfor %}
+                        {% for entidad in prod.entidades.all %}<span class="subfield">$b</span>{{ entidad.nombre_entidad }} {% endfor %}
+                        {% for fecha in prod.fechas.all %}<span class="subfield">$c</span>{{ fecha.fecha }} {% endfor %}
+                    </span>
+                </div>
+                {% empty %}
+                <div class="empty-note">No hay información de publicación registrada (campo 264)</div>
+                {% endfor %}
+            </section>
+            
+            <!-- =========================================== -->
+            <!-- BLOQUE 3XX - DESCRIPCIÓN FÍSICA -->
+            <!-- =========================================== -->
+            <section class="marc-section" id="bloque3xx">
+                <h2><span class="section-tag">3XX</span> Descripción física y técnica</h2>
+                
+                <!-- 300 - Descripción física -->
+                {% if obra.extension or obra.otras_caracteristicas or obra.dimension or obra.material_acompanante %}
+                <div class="marc-field">
+                    <span class="tag">300</span>
+                    <span class="indicators">##</span>
+                    <span class="content">
+                        {% if obra.extension %}<span class="subfield">$a</span>{{ obra.extension }}{% endif %}
+                        {% if obra.otras_caracteristicas %} ; <span class="subfield">$b</span>{{ obra.otras_caracteristicas }}{% endif %}
+                        {% if obra.dimension %} ; <span class="subfield">$c</span>{{ obra.dimension }}{% endif %}
+                        {% if obra.material_acompanante %} + <span class="subfield">$e</span>{{ obra.material_acompanante }}{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+                
+                <!-- 340 - Técnica -->
+                {% if obra.ms_imp %}
+                <div class="marc-field">
+                    <span class="tag">340</span>
+                    <span class="indicators">##</span>
+                    <span class="content"><span class="subfield">$d</span>{{ obra.get_ms_imp_display }}</span>
+                </div>
+                {% endif %}
+                
+                <!-- 348 - Formato de música notada -->
+                {% if obra.formato %}
+                <div class="marc-field">
+                    <span class="tag">348</span>
+                    <span class="indicators">##</span>
+                    <span class="content"><span class="subfield">$a</span>{{ obra.get_formato_display }}</span>
+                </div>
+                {% endif %}
+                
+                <!-- 382 - Medio de interpretación (R) -->
+                {% for medio382 in obra.medios_interpretacion_382.all %}
+                <div class="marc-field">
+                    <span class="tag">382</span>
+                    <span class="indicators">##</span>
+                    <span class="content">
+                        {% for medio_a in medio382.medios.all %}<span class="subfield">$a</span>{{ medio_a.get_medio_display }} {% endfor %}
+                        {% if medio382.solista %}<span class="subfield">$b</span>{{ medio382.solista }}{% endif %}
+                    </span>
+                </div>
+                {% endfor %}
+                
+                <!-- 383 - Número de obra -->
+                {% if obra.numero_obra or obra.opus %}
+                <div class="marc-field">
+                    <span class="tag">383</span>
+                    <span class="indicators">##</span>
+                    <span class="content">
+                        {% if obra.numero_obra %}<span class="subfield">$a</span>{{ obra.numero_obra }}{% endif %}
+                        {% if obra.opus %}<span class="subfield">$b</span>{{ obra.opus }}{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+                
+                <!-- 384 - Tonalidad -->
+                {% if obra.tonalidad_384 %}
+                <div class="marc-field">
+                    <span class="tag">384</span>
+                    <span class="indicators">##</span>
+                    <span class="content"><span class="subfield">$a</span>{{ obra.get_tonalidad_384_display }}</span>
+                </div>
+                {% endif %}
+            </section>
+            
+            <!-- =========================================== -->
+            <!-- BLOQUE 4XX - SERIES -->
+            <!-- =========================================== -->
+            <section class="marc-section" id="bloque4xx">
+                <h2><span class="section-tag">4XX</span> Menciones de serie</h2>
+                
+                <!-- 490 - Mención de serie (R) -->
+                {% for serie in obra.menciones_serie.all %}
+                <div class="marc-field">
+                    <span class="tag">490</span>
+                    <span class="indicators">0#</span>
+                    <span class="content">
+                        {% for titulo in serie.titulos.all %}<span class="subfield">$a</span>{{ titulo.titulo_serie }} {% endfor %}
+                        {% for volumen in serie.volumenes.all %}; <span class="subfield">$v</span>{{ volumen.volumen }} {% endfor %}
+                    </span>
+                </div>
+                {% empty %}
+                <div class="empty-note">No hay menciones de serie registradas (campo 490)</div>
+                {% endfor %}
+            </section>
+            
+            <!-- =========================================== -->
+            <!-- BLOQUE 5XX - NOTAS -->
+            <!-- =========================================== -->
+            <section class="marc-section" id="bloque5xx">
+                <h2><span class="section-tag">5XX</span> Notas</h2>
+                
+                <!-- 500 - Notas generales (R) -->
+                {% for nota in obra.notas_generales_500.all %}
+                <div class="marc-field">
+                    <span class="tag">500</span>
+                    <span class="indicators">##</span>
+                    <span class="content"><span class="subfield">$a</span>{{ nota.nota_general }}</span>
+                </div>
+                {% endfor %}
+                
+                <!-- 505 - Contenido (R) -->
+                {% for contenido in obra.contenidos_505.all %}
+                <div class="marc-field">
+                    <span class="tag">505</span>
+                    <span class="indicators">00</span>
+                    <span class="content"><span class="subfield">$a</span>{{ contenido.contenido }}</span>
+                </div>
+                {% endfor %}
+                
+                <!-- 520 - Sumario (R) -->
+                {% for sumario in obra.sumarios_520.all %}
+                <div class="marc-field">
+                    <span class="tag">520</span>
+                    <span class="indicators">##</span>
+                    <span class="content"><span class="subfield">$a</span>{{ sumario.sumario }}</span>
+                </div>
+                {% endfor %}
+                
+                <!-- 545 - Datos biográficos -->
+                {% if datos_biograficos %}
+                <div class="marc-field">
+                    <span class="tag">545</span>
+                    <span class="indicators">0#</span>
+                    <span class="content">
+                        {% if datos_biograficos.texto_biografico %}<span class="subfield">$a</span>{{ datos_biograficos.texto_biografico }}{% endif %}
+                        {% if datos_biograficos.uri %}<span class="subfield">$u</span>{{ datos_biograficos.uri }}{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+                
+                {% if not obra.notas_generales_500.exists and not obra.contenidos_505.exists and not obra.sumarios_520.exists and not datos_biograficos %}
+                <div class="empty-note">No hay notas registradas en este bloque</div>
+                {% endif %}
+            </section>
+            
+            <!-- =========================================== -->
+            <!-- BLOQUE 6XX - MATERIAS -->
+            <!-- =========================================== -->
+            <section class="marc-section" id="bloque6xx">
+                <h2><span class="section-tag">6XX</span> Puntos de acceso de materia</h2>
+                
+                <!-- 650 - Materias temáticas (R) -->
+                {% for materia in obra.materias_650.all %}
+                <div class="marc-field">
+                    <span class="tag">650</span>
+                    <span class="indicators">04</span>
+                    <span class="content">
+                        <span class="subfield">$a</span>{{ materia.materia }}
+                        {% for subdiv in materia.subdivisiones.all %}<span class="subfield">$x</span>{{ subdiv.subdivision }}{% endfor %}
+                    </span>
+                </div>
+                {% endfor %}
+                
+                <!-- 655 - Género/Forma (R) -->
+                {% for genero in obra.materias_655.all %}
+                <div class="marc-field">
+                    <span class="tag">655</span>
+                    <span class="indicators">#4</span>
+                    <span class="content">
+                        <span class="subfield">$a</span>{{ genero.materia }}
+                        {% for subdiv in genero.subdivisiones.all %}<span class="subfield">$x</span>{{ subdiv.subdivision }}{% endfor %}
+                    </span>
+                </div>
+                {% endfor %}
+                
+                {% if not obra.materias_650.exists and not obra.materias_655.exists %}
+                <div class="empty-note">No hay materias registradas (campos 650/655)</div>
+                {% endif %}
+            </section>
+            
+            <!-- =========================================== -->
+            <!-- BLOQUE 7XX - ASIENTOS SECUNDARIOS -->
+            <!-- =========================================== -->
+            <section class="marc-section" id="bloque7xx">
+                <h2><span class="section-tag">7XX</span> Asientos secundarios y enlaces</h2>
+                
+                <!-- 700 - Nombres relacionados (R) -->
+                {% for nombre in obra.nombres_relacionados_700.all %}
+                <div class="marc-field">
+                    <span class="tag">700</span>
+                    <span class="indicators">1#</span>
+                    <span class="content">
+                        {% if nombre.persona %}<span class="subfield">$a</span>{{ nombre.persona.apellidos_nombres }}{% if nombre.persona.coordenadas_biograficas %}, <span class="subfield">$d</span>{{ nombre.persona.coordenadas_biograficas }}{% endif %}{% endif %}
+                        {% for termino in nombre.terminos_asociados.all %}<span class="subfield">$c</span>{{ termino.termino }}{% endfor %}
+                        {% for funcion in nombre.funciones.all %}<span class="subfield">$e</span>{{ funcion }}{% endfor %}
+                        {% if nombre.relacion %}<span class="subfield">$i</span>{{ nombre.relacion }}{% endif %}
+                        {% if nombre.autoria %}<span class="subfield">$j</span>{{ nombre.get_autoria_display }}{% endif %}
+                        {% if nombre.titulo_obra %}<span class="subfield">$t</span>{{ nombre.titulo_obra }}{% endif %}
+                    </span>
+                </div>
+                {% endfor %}
+                
+                <!-- 710 - Entidades relacionadas (R) -->
+                {% for entidad in obra.entidades_relacionadas_710.all %}
+                <div class="marc-field">
+                    <span class="tag">710</span>
+                    <span class="indicators">2#</span>
+                    <span class="content">
+                        {% if entidad.entidad %}<span class="subfield">$a</span>{{ entidad.entidad }}{% endif %}
+                        {% if entidad.funcion %}<span class="subfield">$e</span>{{ entidad.get_funcion_display }}{% endif %}
+                    </span>
+                </div>
+                {% endfor %}
+                
+                <!-- 773 - Enlaces a documento fuente (R) -->
+                {% for enlace773 in obra.enlaces_documento_fuente_773.all %}
+                <div class="marc-field">
+                    <span class="tag">773</span>
+                    <span class="indicators">1#</span>
+                    <span class="content">
+                        {% if enlace773.encabezamiento_principal %}<span class="subfield">$a</span>{{ enlace773.encabezamiento_principal }}{% endif %}
+                        {% if enlace773.titulo %}<span class="subfield">$t</span>{{ enlace773.titulo }}{% endif %}
+                        {% for numctrl in enlace773.numeros_control.all %}<span class="subfield">$w</span>{{ numctrl }}{% endfor %}
+                    </span>
+                </div>
+                {% endfor %}
+                
+                <!-- 774 - Unidades constituyentes (R) -->
+                {% for enlace774 in obra.enlaces_unidades_774.all %}
+                <div class="marc-field">
+                    <span class="tag">774</span>
+                    <span class="indicators">1#</span>
+                    <span class="content">
+                        {% if enlace774.encabezamiento_principal %}<span class="subfield">$a</span>{{ enlace774.encabezamiento_principal }}{% endif %}
+                        {% if enlace774.titulo %}<span class="subfield">$t</span>{{ enlace774.titulo }}{% endif %}
+                        {% for numctrl in enlace774.numeros_control.all %}<span class="subfield">$w</span>{{ numctrl }}{% endfor %}
+                    </span>
+                </div>
+                {% endfor %}
+                
+                <!-- 787 - Otras relaciones (R) -->
+                {% for otra787 in obra.otras_relaciones_787.all %}
+                <div class="marc-field">
+                    <span class="tag">787</span>
+                    <span class="indicators">1#</span>
+                    <span class="content">
+                        {% if otra787.encabezamiento_principal %}<span class="subfield">$a</span>{{ otra787.encabezamiento_principal }}{% endif %}
+                        {% if otra787.titulo %}<span class="subfield">$t</span>{{ otra787.titulo }}{% endif %}
+                        {% for numctrl in otra787.numeros_control.all %}<span class="subfield">$w</span>{{ numctrl }}{% endfor %}
+                    </span>
+                </div>
+                {% endfor %}
+                
+                {% if not obra.nombres_relacionados_700.exists and not obra.entidades_relacionadas_710.exists and not obra.enlaces_documento_fuente_773.exists and not obra.enlaces_unidades_774.exists and not obra.otras_relaciones_787.exists %}
+                <div class="empty-note">No hay asientos secundarios registrados en este bloque</div>
+                {% endif %}
+            </section>
+            
+            <!-- =========================================== -->
+            <!-- BLOQUE 8XX - UBICACIÓN Y DISPONIBILIDAD -->
+            <!-- =========================================== -->
+            <section class="marc-section" id="bloque8xx">
+                <h2><span class="section-tag">8XX</span> Ubicación y acceso electrónico</h2>
+                
+                <!-- 852 - Ubicación (R) -->
+                {% for ubicacion in obra.ubicaciones_852.all %}
+                <div class="marc-field">
+                    <span class="tag">852</span>
+                    <span class="indicators">##</span>
+                    <span class="content">
+                        {% if ubicacion.autoridad %}<span class="subfield">$a</span>{{ ubicacion.autoridad }}{% elif ubicacion.codigo_o_nombre %}<span class="subfield">$a</span>{{ ubicacion.codigo_o_nombre }}{% endif %}
+                        {% if ubicacion.signatura_original %}<span class="subfield">$h</span>{{ ubicacion.signatura_original }}{% endif %}
+                        {% for estanteria in ubicacion.estanterias.all %}<span class="subfield">$c</span>{{ estanteria.estanteria }}{% endfor %}
+                    </span>
+                </div>
+                {% endfor %}
+                
+                <!-- 856 - Recursos disponibles (R) -->
+                {% for disponible in obra.disponibles_856.all %}
+                    {% for url856 in disponible.urls_856.all %}
+                    <div class="marc-field">
+                        <span class="tag">856</span>
+                        <span class="indicators">4#</span>
+                        <span class="content">
+                            <span class="subfield">$u</span>{% if url856.archivo %}{{ url856.archivo.url }}{% else %}{{ url856.url }}{% endif %}
+                            {% for texto in disponible.textos_enlace_856.all %}<span class="subfield">$y</span>{{ texto.texto_enlace }}{% endfor %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                {% empty %}
+                <div class="empty-note">No hay recursos electrónicos disponibles (campo 856)</div>
+                {% endfor %}
+                
+                <!-- Signatura generada -->
+                {% if obra.signatura_completa %}
+                <div class="marc-field" style="background: #fef3c7; border-left: 3px solid #f59e0b;">
+                    <span class="tag">092</span>
+                    <span class="indicators">##</span>
+                    <span class="content" style="color: #92400e;">{{ obra.campo_092_marc }}</span>
+                </div>
+                {% endif %}
+            </section>
+            
+        </div><!-- /.marc-body -->
+    </main>
+</div>
+{% endblock %}

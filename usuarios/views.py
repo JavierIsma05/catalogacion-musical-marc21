@@ -1,5 +1,6 @@
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth import authenticate
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
@@ -18,6 +19,32 @@ class CustomLoginView(LoginView):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Iniciar Sesión'
         return context
+    
+    def form_valid(self, form):
+        """Verificar si el usuario está activo antes de permitir login"""
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        
+        # Buscar el usuario por email
+        try:
+            user = CustomUser.objects.get(email=username)
+            # Verificar si el usuario existe y la contraseña es correcta
+            if user.check_password(password):
+                # Verificar si está activo
+                if not user.activo:
+                    # Usuario desactivado - mostrar mensaje especial
+                    return self.render_to_response(
+                        self.get_context_data(
+                            form=form,
+                            cuenta_desactivada=True,
+                            usuario_nombre=user.nombre_completo or user.email
+                        )
+                    )
+        except CustomUser.DoesNotExist:
+            pass
+        
+        # Continuar con el login normal
+        return super().form_valid(form)
     
     def get_success_url(self):
         """Redirige según el rol del usuario"""

@@ -1,0 +1,647 @@
+{% extends 'catalogacion/base_catalogacion.html' %}
+{% load static %}
+
+{% block title %}Vista Previa: {{ borrador.titulo_temporal }} {% endblock %}
+{% block page_title %}Vista Previa del Borrador{% endblock %}
+
+{% block catalogacion_css %}
+<link rel="stylesheet" href="{% static 'catalogacion/css/detalle-obra.css' %}">
+
+<style>
+/* Estilos específicos para la vista previa - con prefijo para no afectar sidebar */
+.preview-page .preview-alert {
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+}
+
+.preview-page .preview-alert-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.preview-page .preview-alert-text {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.preview-page .preview-alert-text i {
+    font-size: 1.25rem;
+}
+
+.preview-page .preview-alert-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.preview-page .empty-value {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+.preview-page .preview-info-box {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    font-size: 0.8rem;
+}
+
+.preview-page .preview-info-box p {
+    margin: 0 0 0.5rem 0;
+    color: #64748b;
+}
+
+.preview-page .preview-info-box p:last-child {
+    margin-bottom: 0;
+}
+
+.preview-page .subsection-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #475569;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.preview-page .materia-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    margin: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.preview-page .materia-badge-650 {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.preview-page .materia-badge-655 {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.preview-page .incipit-card {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.preview-page .ubicacion-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.preview-page .ubicacion-item:last-child {
+    border-bottom: none;
+}
+</style>
+{% endblock %}
+
+{% block catalogacion_content %}
+<div class="preview-page">
+<div class="detalle-container">
+
+    <!-- ============= ALERTA DE VISTA PREVIA ============= -->
+    <div class="alert alert-warning preview-alert">
+        <div class="preview-alert-content">
+            <div class="preview-alert-text">
+                <i class="bi bi-eye-fill"></i>
+                <div>
+                    <strong>Vista Previa del Borrador</strong>
+                    <p class="mb-0 small">Así se verá tu registro una vez publicado. Los datos mostrados son de solo lectura.</p>
+                </div>
+            </div>
+            <div class="preview-alert-actions">
+                <a href="{% url 'catalogacion:editar_borrador' borrador.pk %}" class="btn btn-dark btn-sm">
+                    <i class="bi bi-pencil"></i> Continuar Editando
+                </a>
+                <a href="{% url 'catalogacion:lista_borradores' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Volver a Borradores
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============= ENCABEZADO ============= -->
+    <div class="detalle-header">
+        <div class="header-content">
+            <div class="header-breadcrumb">
+                <a href="{% url 'usuarios:catalogador_dashboard' %}">Inicio</a>
+                <span class="separator">›</span>
+                <a href="{% url 'catalogacion:lista_borradores' %}">Borradores</a>
+                <span class="separator">›</span>
+                <span class="current">Vista Previa</span>
+            </div>
+
+            <div class="header-main">
+                <div class="header-info">
+                    <span class="badge bg-primary">{{ tipo_obra_display }}</span>
+                    {% if preview_data.titulo_principal %}
+                    <h2 class="mt-2 mb-0">{{ preview_data.titulo_principal }}</h2>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= BODY ================= -->
+    <div class="detalle-body">
+
+        <!-- ========== SIDEBAR ========== -->
+        <aside class="detalle-sidebar">
+            <nav class="sidebar-nav">
+                <div class="nav-header"><h6>Contenido</h6></div>
+                <ul class="nav-list">
+                    <li><a href="#admin" class="nav-link">Administración</a></li>
+                    <li><a href="#nombres_titulos" class="nav-link">Nombres y Títulos</a></li>
+                    <li><a href="#edicion_produccion" class="nav-link">Producción / Edición</a></li>
+                    <li><a href="#datos_musicales" class="nav-link">Datos Musicales</a></li>
+                    <li><a href="#materias_serie" class="nav-link">Materias y Serie</a></li>
+                    <li><a href="#notas" class="nav-link">Notas</a></li>
+                    <li><a href="#relaciones" class="nav-link">Relaciones</a></li>
+                    <li><a href="#existencias" class="nav-link">Existencias</a></li>
+                </ul>
+            </nav>
+
+            <!-- Info del borrador -->
+            <div class="preview-info-box">
+                <p><strong>Creado:</strong> {{ borrador.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                <p><strong>Modificado:</strong> {{ borrador.fecha_modificacion|date:"d/m/Y H:i" }}</p>
+            </div>
+        </aside>
+
+        <!-- ========== CONTENIDO PRINCIPAL ========== -->
+        <main class="detalle-main">
+            
+            <!-- ================= ADMINISTRACIÓN ================= -->
+            <section id="admin" class="detalle-section">
+                <h3>Administración</h3>
+                <div class="data-row">
+                    <span class="campo-tag">040</span>
+                    <span>Centro catalogador:</span>
+                    <strong>{{ preview_data.centro_catalogador|default:"UNL" }}</strong>
+                </div>
+                
+                {% if preview_data.tipo_registro %}
+                <div class="data-row">
+                    <span class="campo-tag">LDR</span>
+                    <span>Tipo de registro:</span>
+                    <strong>
+                        {% if preview_data.tipo_registro == 'd' %}Música manuscrita notada{% elif preview_data.tipo_registro == 'c' %}Música impresa notada{% else %}{{ preview_data.tipo_registro }}{% endif %}
+                    </strong>
+                </div>
+                {% endif %}
+                
+                {% if preview_data.nivel_bibliografico %}
+                <div class="data-row">
+                    <span class="campo-tag">LDR</span>
+                    <span>Nivel bibliográfico:</span>
+                    <strong>
+                        {% if preview_data.nivel_bibliografico == 'c' %}Colección{% elif preview_data.nivel_bibliografico == 'a' %}Parte componente{% elif preview_data.nivel_bibliografico == 'm' %}Monografía{% else %}{{ preview_data.nivel_bibliografico }}{% endif %}
+                    </strong>
+                </div>
+                {% endif %}
+            </section>
+            
+            <!-- ================= NOMBRES Y TÍTULOS ================= -->
+            <section id="nombres_titulos" class="detalle-section">
+                <h3>Nombres y Títulos</h3>
+
+                {% if preview_data.compositor_texto %}
+                <div class="data-row-alt">
+                    <span class="campo-tag">100</span>
+                    <div class="data-cell">
+                        <div class="linea-principal">
+                            <strong>{{ preview_data.compositor_texto }}</strong>
+                            {% if preview_data.compositor_coordenadas %}
+                            <span class="text-muted">({{ preview_data.compositor_coordenadas }})</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if preview_data.titulo_240 or preview_data.titulo_240_texto %}
+                <div class="data-row-alt">
+                    <span class="campo-tag">240</span>
+                    <div class="data-cell">
+                        <div class="linea-principal">
+                            <strong>{{ preview_data.titulo_240_texto|default:preview_data.titulo_240 }}</strong>
+                            {% if preview_data.forma_240_texto %} ; {{ preview_data.forma_240_texto }}{% endif %}
+                            {% if preview_data.medio_interpretacion_240 %} ; {{ preview_data.medio_interpretacion_240 }}{% endif %}
+                            {% if preview_data.tonalidad_240 %} ; {{ preview_data.tonalidad_240 }}{% endif %}
+                            {% if preview_data.arreglo_240 %} ; {{ preview_data.arreglo_240 }}{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if preview_data.titulo_principal %}
+                <div class="data-row-alt">
+                    <span class="campo-tag">245</span>
+                    <div class="data-cell">
+                        <div class="linea-principal">
+                            <strong>{{ preview_data.titulo_principal }}</strong>
+                            {% if preview_data.subtitulo %} : {{ preview_data.subtitulo }}{% endif %}
+                        </div>
+                        {% if preview_data.mencion_responsabilidad %}
+                        <div class="linea-secundaria text-muted">
+                            / {{ preview_data.mencion_responsabilidad }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="data-row">
+                    <span class="campo-tag">245</span>
+                    <span class="empty-value">Sin título principal</span>
+                </div>
+                {% endif %}
+
+                {% for titulo in preview_data.titulos_alternativos %}
+                    {% if titulo.titulo %}
+                    <div class="data-row-alt">
+                        <span class="campo-tag">246</span>
+                        <div class="data-cell">
+                            <div class="linea-principal">{{ titulo.titulo }}</div>
+                            {% if titulo.resto_titulo %}
+                            <div class="linea-secundaria text-muted">{{ titulo.resto_titulo }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Nombres relacionados (700) -->
+                {% for nombre in preview_data.nombres_700 %}
+                    {% if nombre.persona_texto %}
+                    <div class="data-row-alt">
+                        <span class="campo-tag">700</span>
+                        <div class="data-cell">
+                            <div class="linea-principal">
+                                {{ nombre.persona_texto }}
+                                {% if nombre.persona_coordenadas %}<span class="text-muted">({{ nombre.persona_coordenadas }})</span>{% endif %}
+                            </div>
+                            {% if nombre.titulo_obra %}
+                            <div class="linea-secundaria text-muted">{{ nombre.titulo_obra }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Entidades (710) -->
+                {% for entidad in preview_data.entidades_710 %}
+                    {% if entidad.entidad_texto %}
+                    <div class="data-row-alt">
+                        <span class="campo-tag">710</span>
+                        <div class="data-cell">
+                            <div class="linea-principal">{{ entidad.entidad_texto }}</div>
+                            {% if entidad.funcion %}<div class="linea-secundaria text-muted">{{ entidad.funcion }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </section>
+
+            <!-- ================= PRODUCCIÓN / EDICIÓN ================= -->
+            <section id="edicion_produccion" class="detalle-section">
+                <h3>Producción / Edición</h3>
+
+                {% if preview_data.ms_imp %}
+                <div class="data-row">
+                    <span class="campo-tag">340</span>
+                    <span>{{ preview_data.ms_imp }}</span>
+                </div>
+                {% endif %}
+
+                {% for prod in preview_data.producciones %}
+                    {% if prod.lugar or prod.entidad or prod.fecha %}
+                    <div class="data-row">
+                        <span class="campo-tag">264</span>
+                        <span>
+                            {% if prod.lugar %}{{ prod.lugar }}{% endif %}
+                            {% if prod.entidad %} : {{ prod.entidad }}{% endif %}
+                            {% if prod.fecha %}, {{ prod.fecha }}{% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                {% empty %}
+                <p class="text-muted">No hay información de producción registrada.</p>
+                {% endfor %}
+
+                {% for edicion in preview_data.ediciones %}
+                    {% if edicion.edicion %}
+                    <div class="data-row">
+                        <span class="campo-tag">250</span>
+                        <span>{{ edicion.edicion }}</span>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+                {% if preview_data.extension or preview_data.dimension %}
+                <div class="data-row">
+                    <span class="campo-tag">300</span>
+                    <span>
+                        {{ preview_data.extension }}
+                        {% if preview_data.otras_caracteristicas %} ; {{ preview_data.otras_caracteristicas }}{% endif %}
+                        {% if preview_data.dimension %} ; {{ preview_data.dimension }}{% endif %}
+                        {% if preview_data.material_acompanante %} + {{ preview_data.material_acompanante }}{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- ================= DATOS MUSICALES ================= -->
+            <section id="datos_musicales" class="detalle-section">
+                <h3>Datos Musicales</h3>
+                
+                {% if preview_data.formato %}
+                <div class="data-row">
+                    <span class="campo-tag">348</span>
+                    <span>Formato: {{ preview_data.formato }}</span>
+                </div>
+                {% endif %}
+
+                {% for medio in preview_data.medios_interpretacion %}
+                    {% if medio.medio or medio.medio_texto %}
+                    <div class="data-row">
+                        <span class="campo-tag">382</span>
+                        <span>{{ medio.medio_texto|default:medio.medio }}{% if medio.solista %} (solista){% endif %}</span>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+                {% if preview_data.numero_obra or preview_data.opus %}
+                <div class="data-row">
+                    <span class="campo-tag">383</span>
+                    <span>
+                        {% if preview_data.numero_obra %}{{ preview_data.numero_obra }}{% endif %}
+                        {% if preview_data.opus %}{% if preview_data.numero_obra %} / {% endif %}Op. {{ preview_data.opus }}{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+
+                {% if preview_data.tonalidad_384 %}
+                <div class="data-row">
+                    <span class="campo-tag">384</span>
+                    <span>{{ preview_data.tonalidad_384 }}</span>
+                </div>
+                {% endif %}
+
+                {% if preview_data.incipits %}
+                <div class="mt-4">
+                    <h4 class="subsection-title">Íncipit Musical (031)</h4>
+                    {% for incipit in preview_data.incipits %}
+                        {% if incipit.numero_obra or incipit.titulo_movimiento %}
+                        <div class="incipit-card">
+                            <div class="incipit-header">
+                                <strong>
+                                    Obra {{ incipit.numero_obra|default:"1" }}, 
+                                    mov. {{ incipit.numero_movimiento|default:"1" }}, 
+                                    pas. {{ incipit.numero_pasaje|default:"1" }}
+                                </strong>
+                            </div>
+                            {% if incipit.titulo_movimiento %}
+                            <div class="text-muted mt-1">{{ incipit.titulo_movimiento }}</div>
+                            {% endif %}
+                            {% if incipit.pae_code %}
+                            <div class="mt-2" style="font-family: monospace; font-size: 0.85rem; color: #475569;">
+                                {{ incipit.pae_code|truncatechars:100 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if not preview_data.formato and not preview_data.medios_interpretacion and not preview_data.numero_obra and not preview_data.opus and not preview_data.tonalidad_384 and not preview_data.incipits %}
+                <p class="text-muted">No hay datos musicales registrados.</p>
+                {% endif %}
+            </section>
+
+            <!-- ================= MATERIAS Y SERIE ================= -->
+            <section id="materias_serie" class="detalle-section">
+                <h3>Materias y Serie</h3>
+
+                {% if preview_data.materias_650 or preview_data.materias_655 %}
+                <div class="mb-3">
+                    {% for mat in preview_data.materias_650 %}
+                        {% if mat.termino or mat.termino_texto %}
+                        <span class="materia-badge materia-badge-650">
+                            <small class="opacity-75">650</small>
+                            {{ mat.termino_texto|default:mat.termino }}
+                        </span>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for mat in preview_data.materias_655 %}
+                        {% if mat.termino or mat.termino_texto %}
+                        <span class="materia-badge materia-badge-655">
+                            <small class="opacity-75">655</small>
+                            {{ mat.termino_texto|default:mat.termino }}
+                        </span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No hay materias registradas.</p>
+                {% endif %}
+
+                {% for serie in preview_data.series %}
+                    {% if serie.titulo_serie %}
+                    <div class="data-row mt-3">
+                        <span class="campo-tag">490</span>
+                        <span>{{ serie.titulo_serie }}{% if serie.numero_volumen %} ; {{ serie.numero_volumen }}{% endif %}</span>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </section>
+
+            <!-- ================= NOTAS ================= -->
+            <section id="notas" class="detalle-section">
+                <h3>Notas</h3>
+
+                {% if preview_data.notas_generales %}
+                    <h4 class="subsection-title">Notas generales</h4>
+                    {% for nota in preview_data.notas_generales %}
+                        {% if nota.nota_general or nota.nota %}
+                        <div class="data-row">
+                            <span class="campo-tag">500</span>
+                            <span>{{ nota.nota_general|default:nota.nota }}</span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if preview_data.contenidos %}
+                    <h4 class="subsection-title">Contenido</h4>
+                    {% for contenido in preview_data.contenidos %}
+                        {% if contenido.contenido %}
+                        <div class="data-row">
+                            <span class="campo-tag">505</span>
+                            <span>{{ contenido.contenido }}</span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if preview_data.sumarios %}
+                    <h4 class="subsection-title">Sumario</h4>
+                    {% for sumario in preview_data.sumarios %}
+                        {% if sumario.sumario %}
+                        <div class="data-row">
+                            <span class="campo-tag">520</span>
+                            <span>{{ sumario.sumario }}</span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if not preview_data.notas_generales and not preview_data.contenidos and not preview_data.sumarios %}
+                <p class="text-muted">No hay notas registradas.</p>
+                {% endif %}
+            </section>
+                                
+            <!-- ================= RELACIONES ================= -->
+            <section id="relaciones" class="detalle-section">
+                <h3>Relaciones</h3>
+
+                {% if preview_data.enlaces_773 %}
+                    <h4 class="subsection-title">Documento fuente (773)</h4>
+                    {% for enlace in preview_data.enlaces_773 %}
+                        {% if enlace.titulo or enlace.numero_control %}
+                        <div class="data-row">
+                            <span class="campo-tag">773</span>
+                            <span>
+                                {% if enlace.encabezamiento %}{{ enlace.encabezamiento }}. {% endif %}
+                                {% if enlace.titulo %}<em>{{ enlace.titulo }}</em>. {% endif %}
+                                {% if enlace.numero_control %}({{ enlace.numero_control }}){% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if preview_data.enlaces_774 %}
+                    <h4 class="subsection-title">Unidades constituyentes (774)</h4>
+                    {% for enlace in preview_data.enlaces_774 %}
+                        {% if enlace.titulo or enlace.numero_control %}
+                        <div class="data-row">
+                            <span class="campo-tag">774</span>
+                            <span>
+                                {% if enlace.encabezamiento %}{{ enlace.encabezamiento }}. {% endif %}
+                                {% if enlace.titulo %}<em>{{ enlace.titulo }}</em>. {% endif %}
+                                {% if enlace.numero_control %}({{ enlace.numero_control }}){% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if preview_data.enlaces_787 %}
+                    <h4 class="subsection-title">Otras relaciones (787)</h4>
+                    {% for enlace in preview_data.enlaces_787 %}
+                        {% if enlace.titulo or enlace.numero_control %}
+                        <div class="data-row">
+                            <span class="campo-tag">787</span>
+                            <span>
+                                {% if enlace.encabezamiento %}{{ enlace.encabezamiento }}. {% endif %}
+                                {% if enlace.titulo %}<em>{{ enlace.titulo }}</em>. {% endif %}
+                                {% if enlace.numero_control %}({{ enlace.numero_control }}){% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if not preview_data.enlaces_773 and not preview_data.enlaces_774 and not preview_data.enlaces_787 %}
+                <p class="text-muted">No hay relaciones registradas.</p>
+                {% endif %}
+            </section>
+
+            <!-- ================= EXISTENCIAS ================= -->
+            <section id="existencias" class="detalle-section">
+                <h3>Existencias</h3>
+                
+                {% if preview_data.ubicaciones %}
+                <div class="ubicaciones-list">
+                    {% for ubicacion in preview_data.ubicaciones %}
+                        {% if ubicacion.institucion or ubicacion.signatura %}
+                        <div class="ubicacion-item">
+                            <span class="campo-tag">852</span>
+                            <span>
+                                {% if ubicacion.institucion %}{{ ubicacion.institucion }}{% endif %}
+                                {% if ubicacion.signatura %} — Signatura: {{ ubicacion.signatura }}{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No hay ubicaciones registradas.</p>
+                {% endif %}
+
+                {% if preview_data.urls_856 %}
+                <h4 class="subsection-title mt-4">Disponible en línea</h4>
+                {% for url in preview_data.urls_856 %}
+                    {% if url.url %}
+                    <div class="data-row">
+                        <span class="campo-tag">856</span>
+                        <a href="{{ url.url }}" class="text-primary" target="_blank">
+                            {% if url.nota %}{{ url.nota }}{% else %}{{ url.url }}{% endif %}
+                            <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                {% endif %}
+            </section>
+
+        </main>
+    </div>
+</div>
+</div>
+
+<!-- ================= JS para navegación del sidebar interno ================= -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const links = document.querySelectorAll('.detalle-sidebar .nav-link');
+    const sections = document.querySelectorAll('.detalle-section');
+    if (!links.length || !sections.length) return;
+
+    links.forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            const target = document.querySelector(link.getAttribute('href'));
+            if (!target) return;
+            window.scrollTo({ top: target.offsetTop - 90, behavior: 'smooth' });
+        });
+    });
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                links.forEach(l =>
+                    l.classList.toggle('active', l.getAttribute('href') === `#${entry.target.id}`)
+                );
+            }
+        });
+    }, { rootMargin: '-40% 0px -40% 0px' });
+
+    sections.forEach(s => observer.observe(s));
+});
+</script>
+
+{% endblock catalogacion_content %}

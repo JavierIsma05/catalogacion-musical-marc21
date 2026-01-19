@@ -428,9 +428,27 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     # METADATOS DEL SISTEMA
     # ===========================================
 
+    catalogador = models.ForeignKey(
+        "usuarios.CustomUser",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="obras_catalogadas",
+        help_text="Usuario que creó el registro",
+    )
+
+    modificado_por = models.ForeignKey(
+        "usuarios.CustomUser",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="obras_modificadas",
+        help_text="Último usuario que modificó el registro",
+    )
+
     fecha_creacion_sistema = models.DateTimeField(auto_now_add=True)
     fecha_modificacion_sistema = models.DateTimeField(auto_now=True)
-    
+
     # Manager personalizado
     objects = ObraGeneralManager()
 
@@ -788,7 +806,6 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
         if nota and nota.nota_general:
             return nota.nota_general.strip()
         return ""
-
 
     # ===========================================
     # MÉTODOS DE PREPARACIÓN
