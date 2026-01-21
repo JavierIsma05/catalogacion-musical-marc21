@@ -260,10 +260,10 @@
                     Acciones
                 </h5>
                 <div class="detalle-actions-grid mb-3">
-                    <button class="btn btn-outline-secondary btn-sm w-100" type="button" disabled>
+                    <a href="{% url 'catalogo_publico:formato_marc21' pk=obra.pk %}" class="btn btn-outline-secondary btn-sm w-100">
                         <i class="bi bi-code-square"></i>
                         Ver formato MARC21
-                    </button>
+                    </a>
                     <button class="btn btn-outline-secondary btn-sm w-100" type="button" disabled>
                         <i class="bi bi-download"></i>
                         Descargar documento

@@ -60,12 +60,12 @@
         <div class="detalle-header-left">
             <h1 class="detalle-main-title">Vista detallada</h1>
             <div class="detalle-actions">
-                <a href="{% url 'catalogo_publico:detalle_obra' pk=obra.pk %}" class="btn btn-outline-secondary btn-sm">
+                <a href="{% url 'catalogo_publico:detalle' pk=obra.pk %}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left"></i> Volver al resumen
                 </a>
-                <button class="btn btn-outline-primary btn-sm" disabled>
+                <a href="{% url 'catalogo_publico:formato_marc21' pk=obra.pk %}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-code-square"></i> Ver MARC21
-                </button>
+                </a>
                 <button class="btn btn-outline-primary btn-sm" disabled>
                     <i class="bi bi-download"></i> Descargar
                 </button>
