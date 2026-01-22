@@ -28,11 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*", "testserver", "localhost", "127.0.0.1", ".ngrok-free.app"]
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://*.ngrok-free.app",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-]
+CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app"]
 
 # Application definition
 
@@ -46,6 +42,7 @@ INSTALLED_APPS = [
     "catalogacion",
     "usuarios",
     "catalogo_publico",
+    "digitalizacion",
 ]
 
 MIDDLEWARE = [
@@ -61,6 +58,8 @@ MIDDLEWARE = [
 AUTH_USER_MODEL = "usuarios.CustomUser"
 
 ROOT_URLCONF = "marc21_project.urls"
+import os
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -71,6 +70,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.media",
             ],
         },
     },
@@ -128,6 +128,7 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",  # Carpeta global de estáticos
     BASE_DIR / "catalogacion" / "static",  # Estáticos específicos de catalogación
+    BASE_DIR / "digitalizacion" / "static",  # Estáticos específicos de digitalización
 ]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -176,3 +177,4 @@ LOGOUT_REDIRECT_URL = "/"
 
 # URL del login (para que el decorador @login_required sepa a dónde mandarte)
 LOGIN_URL = "/usuarios/login/"
+X_FRAME_OPTIONS = "SAMEORIGIN"
