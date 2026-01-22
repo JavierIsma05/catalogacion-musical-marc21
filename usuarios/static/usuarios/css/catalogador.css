@@ -253,11 +253,11 @@
     .catalogador-welcome {
         padding: 1.5rem;
     }
-    
+
     .quick-actions {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .catalogador-stats {
         grid-template-columns: repeat(2, 1fr);
     }
