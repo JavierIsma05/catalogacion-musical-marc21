@@ -7,7 +7,10 @@
 <div class="card mb-3">
   <div class="card-body">
     <h5 class="mb-1">{{ coleccion.titulo_principal }}</h5>
-    <p class="text-muted mb-0">Colección (ID: {{ coleccion.id }})</p>
+    <div class="text-muted small">
+      <strong>{{ coleccion.signatura_publica_display }}</strong>
+      {% if coleccion.autor_publico_principal %} · {{ coleccion.autor_publico_principal }}{% endif %}
+    </div>
     <div class="text-muted small mt-2">
       Este es el <strong>visor de colección</strong> (muestra <strong>todo</strong> el documento).
       Para ver una <strong>obra</strong> por segmento, entra por <a href="{% url 'digitalizacion:segmentar' coleccion.id %}">Asignar segmentos</a>.
@@ -23,7 +26,7 @@
       <div class="d-flex gap-2 flex-wrap">
         {% for s in segments %}
           <a class="btn btn-sm btn-outline-secondary" href="{% url 'digitalizacion:visor_obra' s.obra_id %}">
-            Obra {{ s.obra_id }} ({{ s.start_page }}–{{ s.end_page }})
+            {{ s.obra.signatura_publica_display }} — {{ s.obra.titulo_principal }}{% if s.obra.autor_publico_principal %} · {{ s.obra.autor_publico_principal }}{% endif %} (págs. {{ s.start_page }}–{{ s.end_page }})
           </a>
         {% endfor %}
       </div>
@@ -77,6 +80,6 @@
   <div class="d-flex gap-2 mb-3">
     <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:coleccion_home' coleccion.id %}">Volver a la guía</a>
     <!-- <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:dashboard' %}">Digitalización</a> -->
-    <a class="btn btn-outline-primary" href="{% url 'digitalizacion:subir_pdf' coleccion.id %}">Subir PDF</a>
+    <!-- <a class="btn btn-outline-primary" href="{% url 'digitalizacion:subir_pdf' coleccion.id %}">Subir PDF</a> -->
   </div>
 {% endblock %}

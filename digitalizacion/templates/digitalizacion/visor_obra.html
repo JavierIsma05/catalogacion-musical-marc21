@@ -7,7 +7,10 @@
 <div class="card mb-3">
   <div class="card-body">
     <h5 class="mb-1">{{ obra.titulo_principal }}</h5>
-    <p class="text-muted mb-0">{{ obra.signatura_publica_display }}</p>
+    <div class="text-muted small">
+      <strong>{{ obra.signatura_publica_display }}</strong>
+      {% if obra.autor_publico_principal %} · {{ obra.autor_publico_principal }}{% endif %}
+    </div>
     {% if start_page and end_page %}
       <small class="text-muted">Rango (MVP): {{ start_page }}–{{ end_page }}</small>
     {% endif %}

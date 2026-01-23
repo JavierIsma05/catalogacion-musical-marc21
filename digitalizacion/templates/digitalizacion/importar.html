@@ -13,7 +13,7 @@
 <div class="card mb-3">
   <div class="card-body">
     <h5 class="mb-1">{{ coleccion.titulo_principal }}</h5>
-    <div class="text-muted small">Colección (signatura): <strong>{{ coleccion.signatura }}</strong></div>
+    <div class="text-muted small">Colección (signatura): <strong>{{ coleccion.signatura_publica_display }}</strong></div>
   </div>
 </div>
 
@@ -35,7 +35,7 @@
     <pre class="mb-0">{{ inbox_path }}</pre>
 
     <div class="mt-2 small text-muted">
-      Nota: La signatura <strong>{{ coleccion.signatura }}</strong> es el identificador oficial. En la versión final, el sistema usará esta signatura para organizar los archivos en la nube.
+      Nota: La signatura <strong>{{ coleccion.signatura_publica_display }}</strong> es el identificador oficial. En la versión final, el sistema usará esta signatura para organizar los archivos en la nube.
     </div>
   </div>
 </div>

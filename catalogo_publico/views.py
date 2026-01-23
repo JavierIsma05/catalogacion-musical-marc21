@@ -3,6 +3,11 @@ from django.views.generic import DetailView, ListView, TemplateView
 
 from catalogacion.models import ObraGeneral
 
+from django.core.files.storage import default_storage
+from django.urls import reverse
+
+from digitalizacion.models import DigitalPage, WorkSegment
+
 
 class HomePublicoView(TemplateView):
     """Página de inicio pública del catálogo"""
@@ -37,6 +42,7 @@ class ListaObrasPublicaView(ListView):
                 "titulo_240",
                 "forma_130",
                 "forma_240",
+                "digital_set",
             )
             .prefetch_related(
                 "medios_interpretacion_382__medios",
@@ -78,12 +84,96 @@ class ListaObrasPublicaView(ListView):
         context["titulo"] = "Catálogo de Obras"
         context["busqueda"] = self.request.GET.get("q", "")
         context["tipo_seleccionado"] = self.request.GET.get("tipo", "")
-        # Opciones de tipos de registro para el filtro
         context["tipos_obra"] = [
             ("d", "Manuscritos"),
             ("c", "Impresos"),
         ]
+
+        obras = context.get("obras")
+        obras_list = list(obras) if obras is not None else []
+        obra_ids = [o.id for o in obras_list]
+        if not obra_ids:
+            return context
+
+        # 1) Primer segmento por obra (si existe)
+        segments = (
+            WorkSegment.objects.filter(obra_id__in=obra_ids)
+            .select_related("digital_set")
+            .order_by("obra_id", "start_page")
+        )
+        first_segment_by_obra = {}
+        for seg in segments:
+            if seg.obra_id not in first_segment_by_obra:
+                first_segment_by_obra[seg.obra_id] = seg
+
+        # 2) Decide ds + página + visor_url por obra
+        wanted_pairs = []
+        wanted_meta = {}  # obra_id -> {ds_id, page, visor_url, pdf_path}
+        for o in obras_list:
+            seg = first_segment_by_obra.get(o.id)
+
+            if seg:
+                ds = seg.digital_set
+                page_n = seg.start_page
+                visor_url = reverse("digitalizacion:visor_obra", kwargs={"obra_id": o.id})
+                pdf_path = getattr(ds, "pdf_path", "") if ds else ""
+            else:
+                ds = getattr(o, "digital_set", None)
+                page_n = 1
+                visor_url = reverse("digitalizacion:visor_coleccion", kwargs={"pk": o.id})
+                pdf_path = getattr(ds, "pdf_path", "") if ds else ""
+
+            ds_id = ds.id if ds else None
+            if ds_id:
+                wanted_pairs.append((ds_id, page_n))
+
+            wanted_meta[o.id] = {
+                "ds_id": ds_id,
+                "page": page_n,
+                "visor_url": visor_url,  # dejamos link aunque no haya cover; el template decide
+                "pdf_path": pdf_path,
+            }
+
+        # 3) Buscar derivative JPG para esas páginas
+        from django.db.models import Q
+        q = Q()
+        for ds_id, page_n in wanted_pairs:
+            q |= Q(digital_set_id=ds_id, page_number=page_n)
+
+        dp_map = {}
+        if q:
+            pages = DigitalPage.objects.filter(q).only("digital_set_id", "page_number", "derivative_path")
+            for dp in pages:
+                if dp.derivative_path:
+                    dp_map[(dp.digital_set_id, dp.page_number)] = dp.derivative_path
+
+        # 4) Inyectar cover_url + visor_url en cada obra
+        for o in obras_list:
+            meta = wanted_meta.get(o.id, {})
+            ds_id = meta.get("ds_id")
+            page_n = meta.get("page", 1)
+
+            derivative_path = dp_map.get((ds_id, page_n)) if ds_id else None
+
+            cover_url = None
+            cover_kind = None  # "jpg" | "pdf"
+
+            if derivative_path:
+                cover_url = default_storage.url(derivative_path)
+                cover_kind = "jpg"
+            else:
+                pdf_path = meta.get("pdf_path") or ""
+                if pdf_path:
+                    # Nota: esto no es una miniatura real; es fallback funcional
+                    cover_url = default_storage.url(pdf_path)
+                    cover_kind = "pdf"
+
+            o.cover_url = cover_url
+            o.cover_kind = cover_kind
+            o.visor_url = meta.get("visor_url")
+
         return context
+
 
 
 class DetalleObraPublicaView(DetailView):
@@ -145,6 +235,7 @@ class VistaDetalladaObraView(DetailView):
                 "titulo_240",
                 "forma_130",
                 "forma_240",
+                "digital_set",
             )
             .prefetch_related(
                 "medios_interpretacion_382__medios",
@@ -180,8 +271,33 @@ class VistaDetalladaObraView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["titulo"] = f"Vista detallada: {self.object}"
+        obra = self.object
+        context["titulo"] = f"Vista detallada: {obra}"
+
+        # Resolver PDF y start_page:
+        seg = (
+            WorkSegment.objects.filter(obra=obra)
+            .select_related("digital_set")
+            .order_by("start_page")
+            .first()
+        )
+
+        if seg and seg.digital_set:
+            ds = seg.digital_set
+            start_page = seg.start_page or 1
+        else:
+            ds = getattr(obra, "digital_set", None)
+            start_page = 1
+
+        pdf_url = None
+        if ds and getattr(ds, "pdf_path", ""):
+            pdf_url = default_storage.url(ds.pdf_path)
+
+        context["pdf_url"] = pdf_url
+        context["pdf_start_page"] = start_page
+
         return context
+
 
 
 class FormatoMARC21View(DetailView):

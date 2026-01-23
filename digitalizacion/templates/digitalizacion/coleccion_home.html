@@ -7,8 +7,12 @@
 <div class="card mb-3">
   <div class="card-body">
     <h5 class="mb-1">{{ coleccion.titulo_principal }}</h5>
-    <div class="text-muted small">Colección (signatura): <strong>{{ coleccion.signatura }}</strong></div>
+      <div class="text-muted small">
+        <strong>{{ coleccion.signatura_publica_display }}</strong>
+        {% if coleccion.autor_publico_principal %} · {{ coleccion.autor_publico_principal }}{% endif %}
+      </div>
   </div>
+
 </div>
 
 <div class="card">
@@ -143,7 +147,7 @@
                 <a
                   class="btn btn-sm btn-outline-secondary"
                   href="{% url 'digitalizacion:visor_obra' segments.0.obra_id %}">
-                  Ver obra: {{ segments.0.obra.titulo_principal }}
+                  Ver obra: {{ segments.0.obra.signatura_publica_display }} — {{ segments.0.obra.titulo_principal }}{% if segments.0.obra.autor_publico_principal %} · {{ segments.0.obra.autor_publico_principal }}{% endif %}
                 </a>
               {% elif segments|length > 1 %}
                 {# Si hay varios segmentos, mostrar dropdown #}
@@ -160,7 +164,7 @@
                     {% for seg in segments %}
                       <li>
                         <a class="dropdown-item" href="{% url 'digitalizacion:visor_obra' seg.obra_id %}">
-                          {{ seg.obra.titulo_principal }} (págs. {{ seg.start_page }}–{{ seg.end_page }})
+                          {{ seg.obra.signatura_publica_display }} — {{ seg.obra.titulo_principal }}{% if seg.obra.autor_publico_principal %} · {{ seg.obra.autor_publico_principal }}{% endif %} (págs. {{ seg.start_page }}–{{ seg.end_page }})
                         </a>
                       </li>
                     {% endfor %}

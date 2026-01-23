@@ -121,11 +121,33 @@
         <article class="obra-catalog-card">
             <div class="obra-cover">
                 <div class="cover-frame">
-                    <div class="cover-placeholder">
-                        <i class="bi bi-image"></i>
-                        <span>Portada pendiente</span>
+                    {# COVER: solo la imagen es clickeable y abre el visor #}
+                    <div class="mb-3">
+                    {% if obra.cover_url and obra.visor_url %}
+                        <a href="{{ obra.visor_url }}" title="Abrir visor">
+                        {% if obra.cover_kind == "jpg" %}
+                            <img src="{{ obra.cover_url }}"
+                                alt="Portada"
+                                class="w-100 rounded"
+                                style="aspect-ratio: 4/3; object-fit: cover;">
+                        {% elif obra.cover_kind == "pdf" %}
+                            <div class="w-100 rounded border bg-light d-flex align-items-center justify-content-center"
+                                style="aspect-ratio: 4/3;">
+                            <span class="text-muted">PDF</span>
+                            </div>
+                        {% endif %}
+                        </a>
+                    {% else %}
+                        <div class="w-100 rounded bg-light d-flex align-items-center justify-content-center"
+                            style="aspect-ratio: 4/3;">
+                        <span class="text-muted">Sin portada</span>
+                        </div>
+                    {% endif %}
                     </div>
+
+
                 </div>
+
                 <a href="{% url 'catalogo_publico:detalle' obra.pk %}" class="btn btn-outline-secondary btn-sm w-100 mt-2">Ver</a>
             </div>
             <div class="obra-details">

@@ -26,8 +26,9 @@
           <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
              href="{% url 'digitalizacion:coleccion_home' c.id %}">
             <div>
-              <div class="fw-semibold">{{ c }}</div>
-              <small class="text-muted">ID: {{ c.id }}</small>
+              <div class="fw-semibold">{{ c.titulo_principal }}</div>
+              <small class="text-muted">{{ c.signatura_publica_display }}</small>
+              {% if c.autor_publico_principal %} · {{ c.autor_publico_principal }}{% endif %}
             </div>
             <div class="d-flex gap-2 align-items-center">
               {% if c.digital_set %}
