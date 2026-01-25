@@ -46,6 +46,14 @@
                             <span>Catálogo</span>
                         </a>
                     </li>
+                    {% if user.is_authenticated and user.puede_catalogar %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'usuarios:catalogador_dashboard' %}">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Catalogar</span>
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
 
                 <ul class="navbar-nav">

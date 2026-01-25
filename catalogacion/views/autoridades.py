@@ -569,3 +569,27 @@ class AutocompletarMateriaView(View):
 
         return JsonResponse({"results": resultados})
 
+
+class AutocompletarGeneroView(View):
+    """
+    API para autocompletar géneros/formas musicales (campo 655)
+    """
+    def get(self, request):
+        q = request.GET.get("q", "")
+        resultados = []
+
+        if q:
+            generos = AutoridadFormaMusical.objects.filter(
+                forma__icontains=q
+            ).order_by("forma")
+        else:
+            generos = AutoridadFormaMusical.objects.all().order_by("forma")[:20]
+
+        for g in generos:
+            resultados.append({
+                "id": g.id,
+                "text": g.forma,
+            })
+
+        return JsonResponse({"results": resultados})
+

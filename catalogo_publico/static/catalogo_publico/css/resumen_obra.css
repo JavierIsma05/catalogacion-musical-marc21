@@ -74,7 +74,7 @@
 }
 
 .resumen-section {
-    padding: 1rem 1.25rem;
+    padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--pro-border-light);
 }
 
@@ -88,11 +88,11 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--pro-text-secondary);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.375rem;
     border-bottom: 1px solid var(--pro-border-light);
 }
 
@@ -106,13 +106,13 @@
 }
 
 /* ============================================
-   ITEMS COMPACTOS
+   ITEMS COMPACTOS - REDUCIR ESPACIADO
    ============================================ */
 .resumen-item {
     display: grid;
     grid-template-columns: 160px 1fr;
-    gap: 1rem;
-    padding: 0.625rem 0;
+    gap: 0.75rem;
+    padding: 0.375rem 0;
 }
 
 .resumen-item:last-child {
@@ -127,13 +127,13 @@
     font-size: 0.75rem;
     font-weight: 500;
     color: var(--pro-text-secondary);
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
 .resumen-value {
     font-size: 0.8125rem;
     color: var(--pro-text);
-    line-height: 1.5;
+    line-height: 1.4;
     font-weight: 400;
 }
 
@@ -144,7 +144,7 @@
 
 .resumen-meta {
     display: block;
-    margin-top: 0.25rem;
+    margin-top: 0.125rem;
     font-size: 0.75rem;
     color: var(--pro-text-muted);
 }
@@ -313,8 +313,8 @@
 }
 
 .row.g-3 {
-    --bs-gutter-x: 1.25rem;
-    --bs-gutter-y: 1.25rem;
+    --bs-gutter-x: 1rem;
+    --bs-gutter-y: 1rem;
 }
 
 /* ============================================

@@ -1162,7 +1162,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         choices=[
                             ("parte", "Parte"),
-                            ("partitura", "Partitura"),
+                            ("partitura de piano", "Partitura de piano"),
                             ("partitura de coro", "Partitura de coro"),
                             ("partitura piano vocal", "Partitura piano vocal"),
                         ],

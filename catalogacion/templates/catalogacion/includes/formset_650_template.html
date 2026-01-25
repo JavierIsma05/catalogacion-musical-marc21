@@ -210,6 +210,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
 
     function initMateriaAutocomplete(input) {
         if (!input || input.dataset.materiaInit === "1") return;
+        console.log('Inicializando autocomplete para input:', input);
         input.dataset.materiaInit = "1";
 
         const wrapper = input.closest(".autocomplete-wrapper");
@@ -251,8 +252,17 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
             }
             suggestionsBox.classList.add("show");
         }
-        function buscar(q){ fetch(`/catalogacion/api/autocompletar/materia/?q=${encodeURIComponent(q)}`)
-            .then(r=>r.json()).then(d=>mostrar(d.results||[],q)).catch(()=>hide()); }
+        function buscar(q){ 
+            console.log('Buscando materia con query:', q);
+            fetch(`/catalogacion/api/autocompletar/materia/?q=${encodeURIComponent(q)}`)
+                .then(r=>r.json()).then(d=>{
+                    console.log('Respuesta recibida:', d);
+                    mostrar(d.results||[],q);
+                }).catch(err=>{
+                    console.error('Error en búsqueda:', err);
+                    hide();
+                }); 
+        }
 
         input.addEventListener("input", e=>{
             const q=input.value.trim();
@@ -320,6 +330,29 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
         }
     });
 
+    container.addEventListener('formset:added', (ev) => {
+        if (!ev || !ev.detail || ev.detail.prefix !== PREFIX) return;
+        
+        console.log('formset:added evento recibido en 650', ev.detail);
+        
+        // small timeout to let DOM settle
+        setTimeout(() => {
+            // Inicializar autocomplete en los nuevos inputs
+            const newInputs = container.querySelectorAll(".materia-input");
+            console.log('Inputs de materia encontrados:', newInputs.length);
+            newInputs.forEach((input, index) => {
+                console.log(`Inicializando input ${index}:`, input);
+                initMateriaAutocomplete(input);
+            });
+            
+            // Inicializar subdivisiones en las nuevas filas
+            const subdivisionContainers = container.querySelectorAll(".subdivisiones-container");
+            console.log('Contenedores de subdivisiones encontrados:', subdivisionContainers.length);
+            subdivisionContainers.forEach(updateDeleteVisibility);
+        }, 50);
+    });
+
+    // Inicializar autocomplete para inputs existentes
     container.querySelectorAll(".materia-input").forEach(initMateriaAutocomplete);
 
 })();

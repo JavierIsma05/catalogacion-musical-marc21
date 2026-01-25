@@ -1,40 +1,62 @@
 /**
- * Estilos mejorados para detalle de obra
- * Diseño profesional siguiendo especificaciones del documento
+ * Estilos profesionales para detalle de obra
+ * Diseño moderno y elegante con mejor legibilidad
+ * Basado en principios de diseño minimalista y jerarquía clara
  */
 
 /* ============================================
-   CONTENEDOR PRINCIPAL
+   CONTENEDOR PRINCIPAL - DISEÑO MODERNO
    ============================================ */
 .detalle-container {
     max-width: 1600px;
     margin: 0 auto;
-    background: var(--gray-50);
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
 }
 
 /* ============================================
-   HEADER COMPACTO Y ELEGANTE
+   HEADER - DISEÑO ELEGANTE CON GRADIENTES
    ============================================ */
 .detalle-header {
-    background: white;
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-bottom: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     margin-bottom: 1.5rem;
+    border-radius: 8px 8px 0 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.detalle-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #007bff 0%, #6610f2 100%);
 }
 
 .header-content {
     max-width: 1600px;
     margin: 0 auto;
-    padding: 1.25rem 2rem;
+    padding: 1.5rem 2rem;
+    position: relative;
 }
 
 .header-breadcrumb {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
+    font-size: 0.8rem;
+    color: #6c757d;
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    border: 1px solid #e9ecef;
 }
 
 .header-breadcrumb a {
@@ -218,22 +240,22 @@
    ============================================ */
 .detalle-body {
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
     max-width: 1600px;
     margin: 0 auto;
-    padding: 0 2rem 2rem;
+    padding: 0 1.5rem 1.5rem;
 }
 
 /* ============================================
    SIDEBAR DE NAVEGACIÓN (interno del detalle)
    ============================================ */
 .detalle-sidebar {
-    width: 240px;
+    width: 220px;
     flex-shrink: 0;
     position: sticky;
-    top: 1.5rem;
+    top: 1rem;
     align-self: flex-start;
-    max-height: calc(100vh - 3rem);
+    max-height: calc(100vh - 2rem);
     overflow-y: auto;
 }
 
@@ -246,7 +268,7 @@
 }
 
 .detalle-sidebar .nav-header {
-    padding: 0.875rem 1rem;
+    padding: 0.75rem 0.875rem;
     background: var(--gray-50);
     border-bottom: 1px solid var(--border-color);
 }
@@ -263,7 +285,7 @@
 .detalle-sidebar .nav-list {
     list-style: none;
     margin: 0;
-    padding: 0.5rem;
+    padding: 0.375rem;
 }
 
 .detalle-sidebar .nav-list li {
@@ -315,21 +337,34 @@
 }
 
 /* ============================================
-   SECCIONES
+   SECCIONES - DISEÑO MODERNO CON SOMBRAS
    ============================================ */
 .detalle-section {
     background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
     padding: 1.5rem;
-    margin-bottom: 1.25rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     scroll-margin-top: 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+.detalle-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #007bff 0%, #6610f2 100%);
+    opacity: 0.8;
 }
 
 .section-header {
-    margin-bottom: 1.25rem;
-    padding-bottom: 0.875rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -352,29 +387,54 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--text-secondary);
-    margin: 1.5rem 0 0.875rem 0;
+    margin: 1rem 0 0.75rem 0;
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
 
 /* ============================================
-   CAMPO TAG - Etiqueta MARC
+   CAMPO TAG - Etiqueta MARC MEJORADA
    ============================================ */
 .campo-tag {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 36px;
-    height: 20px;
-    padding: 0 0.375rem;
-    background: var(--gray-800);
+    min-width: 40px;
+    height: 24px;
+    padding: 0 0.5rem;
+    background: linear-gradient(135deg, #495057 0%, #343a40 100%);
     color: white;
     font-family: 'Courier New', monospace;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    border-radius: 3px;
+    border-radius: 4px;
     letter-spacing: 0.03em;
     flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   DATA CELL - Contenido de filas con múltiples líneas
+   ============================================ */
+.data-cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.linea-principal {
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.linea-secundaria {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-left: 0.5rem;
 }
 
 /* ============================================
@@ -383,14 +443,14 @@
 .data-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 .data-item-alt {
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
-    padding: 0.75rem;
+    padding: 0.5rem;
     background: var(--gray-50);
     border-left: 2px solid var(--gray-300);
     border-radius: 3px;
@@ -425,14 +485,14 @@
 .colaboradores-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 .colaborador-item {
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
-    padding: 0.875rem;
+    padding: 0.75rem;
     background: var(--gray-50);
     border-left: 3px solid var(--accent);
     border-radius: 3px;
@@ -490,20 +550,30 @@
 .data-grid-compact {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 .data-row {
     display: flex;
     align-items: baseline;
     gap: 0.75rem;
-    padding: 0.625rem 0;
-    border-bottom: 1px solid var(--gray-100);
+    padding: 0.625rem 0.75rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
     font-size: 0.875rem;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.data-row:hover {
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
 }
 
 .data-row:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .data-row.full {
