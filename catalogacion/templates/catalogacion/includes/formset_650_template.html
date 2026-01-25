@@ -209,13 +209,41 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
     if (!container) return;
 
     function initMateriaAutocomplete(input) {
-        if (!input || input.dataset.materiaInit === "1") return;
-        console.log('Inicializando autocomplete para input:', input);
+        if (!input) {
+            console.log('🚫 Input es null o undefined');
+            return;
+        }
+        
+        // 🔥 CLAVE: Verificar el flag correctamente
+        if (input.dataset.materiaInit === "1") {
+            console.log('🚫 Input ya está inicializado, saltando:', input);
+            return;
+        }
+        
+        console.log('✅ Inicializando autocomplete para input:', input);
         input.dataset.materiaInit = "1";
 
         const wrapper = input.closest(".autocomplete-wrapper");
+        if (!wrapper) {
+            console.log('🚫 No se encontró wrapper para input:', input);
+            return;
+        }
+        
         const suggestionsBox = wrapper.querySelector(".materia-suggestions");
         const hiddenIdInput = wrapper.querySelector(".materia-id");
+        
+        if (!suggestionsBox) {
+            console.log('🚫 No se encontró suggestionsBox para input:', input);
+            return;
+        }
+        
+        if (!hiddenIdInput) {
+            console.log('🚫 No se encontró hiddenIdInput para input:', input);
+            return;
+        }
+        
+        console.log('✅ Todos los elementos encontrados para input:', input);
+        
         let debounceTimer = null, selectedIndex = -1;
 
         function hide() { suggestionsBox.classList.remove("show"); suggestionsBox.innerHTML = ""; selectedIndex=-1; }
@@ -265,10 +293,23 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
         }
 
         input.addEventListener("input", e=>{
-            const q=input.value.trim();
-            hiddenIdInput.value=""; hiddenIdInput.removeAttribute("data-nuevo");
-            if(q.length<2){ hide(); return; }
-            clearTimeout(debounceTimer); debounceTimer=setTimeout(()=>buscar(q),250);
+            const q = input.value.trim();
+            hiddenIdInput.value = ""; 
+            hiddenIdInput.removeAttribute("data-nuevo");
+            
+            console.log('🔍 Input event - query:', q, 'input:', input);
+            
+            if(q.length < 2){ 
+                console.log('🚫 Query muy corto, ocultando sugerencias');
+                hide(); 
+                return; 
+            }
+            
+            clearTimeout(debounceTimer); 
+            debounceTimer = setTimeout(() => {
+                console.log('🔍 Iniciando búsqueda para:', q);
+                buscar(q);
+            }, 250);
         });
 
         input.addEventListener("keydown", e=>{
@@ -337,17 +378,29 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
         
         // small timeout to let DOM settle
         setTimeout(() => {
-            // Inicializar autocomplete en los nuevos inputs
-            const newInputs = container.querySelectorAll(".materia-input");
-            console.log('Inputs de materia encontrados:', newInputs.length);
+            // 🔥 CLAVE: Buscar SOLO en el nuevo formulario agregado
+            const newForm = ev.detail.newForm;
+            if (!newForm) {
+                console.log('🚫 No se encontró newForm en el evento');
+                return;
+            }
+            
+            console.log('🔍 Nuevo formulario encontrado:', newForm);
+            
+            // Inicializar autocomplete SOLO en los inputs del nuevo formulario
+            const newInputs = newForm.querySelectorAll(".materia-input");
+            console.log('Inputs de materia encontrados en nuevo formulario:', newInputs.length);
+            
             newInputs.forEach((input, index) => {
-                console.log(`Inicializando input ${index}:`, input);
+                console.log(`Inicializando input ${index} del nuevo formulario:`, input);
+                // 🔥 CLAVE: Limpiar el flag para permitir reinicialización
+                delete input.dataset.materiaInit;
                 initMateriaAutocomplete(input);
             });
             
             // Inicializar subdivisiones en las nuevas filas
-            const subdivisionContainers = container.querySelectorAll(".subdivisiones-container");
-            console.log('Contenedores de subdivisiones encontrados:', subdivisionContainers.length);
+            const subdivisionContainers = newForm.querySelectorAll(".subdivisiones-container");
+            console.log('Contenedores de subdivisiones encontrados en nuevo formulario:', subdivisionContainers.length);
             subdivisionContainers.forEach(updateDeleteVisibility);
         }, 50);
     });

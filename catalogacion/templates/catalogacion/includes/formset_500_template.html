@@ -42,8 +42,7 @@
     {% endfor %}
 
     <!-- ================= EMPTY FORM (CLONABLE) ================= -->
-    <div class="formset-row empty-form d-none"
-         data-formset-empty="1">
+    <div class="formset-row empty-form mb-3" style="display:none;">
 
       {% for hidden in formset.empty_form.hidden_fields %}
         {{ hidden }}
@@ -72,55 +71,4 @@
 
   </div>
 </div>
-<script>
-(function () {
-
-    // Buscar TODOS los botones +
-    document.addEventListener("click", function (e) {
-
-        const addBtn = e.target.closest(".campo-add-btn");
-        if (!addBtn) return;
-
-        const prefix = addBtn.getAttribute("data-formset-target");
-        if (!prefix) return;
-
-        const root = document.querySelector(`[data-formset-prefix="${prefix}"]`);
-        if (!root) return;
-
-        const formsContainer = root.querySelector(".formset-forms");
-        const emptyForm = root.querySelector(".formset-row.empty-form");
-        const totalFormsInput = root.querySelector(
-            `input[name="${prefix}-TOTAL_FORMS"]`
-        );
-
-        if (!formsContainer || !emptyForm || !totalFormsInput) return;
-
-        // Nuevo índice
-        const formIndex = parseInt(totalFormsInput.value, 10);
-
-        // Clonar empty-form
-        const newForm = emptyForm.cloneNode(true);
-        newForm.classList.remove("empty-form", "d-none");
-
-        // Reemplazar __prefix__
-        newForm.querySelectorAll("[name]").forEach(el => {
-            el.name = el.name.replace(/__prefix__/g, formIndex);
-        });
-
-        newForm.querySelectorAll("[id]").forEach(el => {
-            el.id = el.id.replace(/__prefix__/g, formIndex);
-        });
-
-        // Limpiar textarea
-        newForm.querySelectorAll("textarea").forEach(t => t.value = "");
-
-        // Agregar al DOM
-        formsContainer.appendChild(newForm);
-
-        // Incrementar TOTAL_FORMS
-        totalFormsInput.value = formIndex + 1;
-    });
-
-})();
-</script>
 

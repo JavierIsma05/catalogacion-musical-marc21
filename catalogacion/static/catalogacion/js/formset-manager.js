@@ -11,13 +11,19 @@
      * Inicializa todos los formsets en la página
      */
     function initAllFormsets() {
+        console.log('FormsetManager: Inicializando todos los formsets...');
+        
         // Buscar todos los botones de agregar campo y conectarlos
         document
             .querySelectorAll(".campo-add-btn[data-formset-target]")
             .forEach((button) => {
-                if (button.dataset.formsetManagerInitialized) return;
-
-                const prefix = button.dataset.formsetTarget;
+                // Remover TODOS los listeners existentes clonando el botón
+                const newButton = button.cloneNode(true);
+                button.parentNode.replaceChild(newButton, button);
+                
+                const prefix = newButton.dataset.formsetTarget;
+                console.log(`FormsetManager: Inicializando botón para prefix "${prefix}"`);
+                
                 const container = document.querySelector(
                     `[data-formset-prefix="${prefix}"]`
                 );
@@ -29,8 +35,17 @@
                     return;
                 }
 
-                button.addEventListener("click", () => addNewForm(prefix));
-                button.dataset.formsetManagerInitialized = "true";
+                // Crear handler único
+                const clickHandler = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log(`FormsetManager: Click detectado para prefix "${prefix}"`);
+                    addNewForm(prefix);
+                };
+                
+                newButton.addEventListener("click", clickHandler);
+                newButton.dataset.formsetManagerInitialized = "true";
+                console.log(`FormsetManager: Botón inicializado para prefix "${prefix}"`);
             });
 
         // Delegar eventos de eliminación en el documento
@@ -44,10 +59,25 @@
      * Agrega un nuevo formulario al formset
      */
     function addNewForm(prefix) {
+        console.log(`FormsetManager: Agregando nuevo formulario para prefix "${prefix}"`);
+        
+        // Prevenir múltiples ejecuciones con un flag
+        if (window._formsetAdding && window._formsetAdding[prefix]) {
+            console.log(`FormsetManager: Ya se está agregando para ${prefix}, ignorando...`);
+            return;
+        }
+        
+        // Marcar que estamos agregando
+        if (!window._formsetAdding) window._formsetAdding = {};
+        window._formsetAdding[prefix] = true;
+        
         const container = document.querySelector(
             `[data-formset-prefix="${prefix}"]`
         );
-        if (!container) return;
+        if (!container) {
+            window._formsetAdding[prefix] = false;
+            return;
+        }
 
         const totalFormsInput = container.querySelector(
             `#id_${prefix}-TOTAL_FORMS`
@@ -59,13 +89,16 @@
             console.error(
                 `FormsetManager: Faltan elementos para prefix "${prefix}"`
             );
+            window._formsetAdding[prefix] = false;
             return;
         }
 
         const totalForms = parseInt(totalFormsInput.value, 10) || 0;
+        console.log(`FormsetManager: Formularios actuales: ${totalForms}`);
 
         // Clonar el template vacío
         const newForm = emptyFormTemplate.cloneNode(true);
+        console.log('FormsetManager: Template clonado');
 
         // Reemplazar __prefix__ con el nuevo índice
         newForm.innerHTML = newForm.innerHTML.replace(
@@ -75,139 +108,32 @@
         newForm.classList.remove("empty-form");
         newForm.style.display = "";
 
-        // Limpiar cualquier artefacto de Select2 que haya sido inicializado
-        // sobre el template vacío (para evitar inputs "No results found"/IDs duplicados)
-        newForm
-            .querySelectorAll(".select2-container")
-            .forEach((el) => el.remove());
-        newForm.querySelectorAll("select").forEach((select) => {
-            select.classList.remove("select2-hidden-accessible");
-            select.removeAttribute("data-select2-id");
-            select.removeAttribute("tabindex");
-
-            // Si el select está marcado como no-select2, remover también la clase select2
-            // (esto evita que cualquier inicialización posterior lo convierta a Select2).
-            if (
-                select.classList.contains("no-select2") ||
-                select.getAttribute("data-no-select2") === "1"
-            ) {
-                select.classList.remove("select2");
-            }
-
-            const next = select.nextElementSibling;
-            if (next && next.classList && next.classList.contains("select2")) {
-                next.remove();
-            }
-        });
-
         // Insertar antes del template vacío
         formsContainer.insertBefore(newForm, emptyFormTemplate);
 
         // Incrementar contador
         totalFormsInput.value = totalForms + 1;
+        console.log(`FormsetManager: Nuevo total de formularios: ${totalForms + 1}`);
 
-        // Reinicializar Select2 SOLO en campos marcados con .select2
-        // y que NO estén marcados como no-select2.
-        if (
-            typeof $ !== "undefined" &&
-            $.fn &&
-            typeof $.fn.select2 === "function"
-        ) {
-            newForm.querySelectorAll("select.select2").forEach((select) => {
-                if (
-                    select.classList.contains("no-select2") ||
-                    select.getAttribute("data-no-select2") === "1"
-                ) {
-                    return;
-                }
-                // Siempre reinicializar limpio
-                try {
-                    if ($(select).hasClass("select2-hidden-accessible")) {
-                        $(select).select2("destroy");
-                    }
-                } catch (e) {
-                    // ignore
-                }
-
-                $(select).select2({
-                    theme: "bootstrap-5",
-                    width: "100%",
-                    placeholder: function () {
-                        return $(this).data("placeholder");
-                    },
-                    allowClear: true,
-                });
-            });
-
-            // Kill switch: algunos selects NO deben ser Select2 aunque se cuele por clones o scripts.
-            // Caso crítico: 264 (prefix "produccion") indicador/función debe ser dropdown nativo.
-            const forceNativeSelect = (select) => {
-                try {
-                    if ($(select).data("select2")) {
-                        $(select).select2("destroy");
-                    }
-                } catch (e) {
-                    // ignore
-                }
-
-                select.classList.remove("select2-hidden-accessible");
-                select.classList.remove("select2");
-                select.removeAttribute("data-select2-id");
-                select.removeAttribute("tabindex");
-                select.removeAttribute("aria-hidden");
-
-                // Remover cualquier contenedor select2 adyacente o dentro del mismo wrapper
-                const next = select.nextElementSibling;
-                if (
-                    next &&
-                    next.classList &&
-                    next.classList.contains("select2")
-                ) {
-                    next.remove();
-                }
-                const parent = select.parentElement;
-                if (parent) {
-                    parent
-                        .querySelectorAll(".select2-container")
-                        .forEach((el) => el.remove());
-                }
-            };
-
-            if (prefix === "produccion") {
-                newForm
-                    .querySelectorAll('select[name$="-funcion"]')
-                    .forEach(forceNativeSelect);
-            }
-        }
+        // Liberar el flag después de un pequeño delay
+        setTimeout(() => {
+            window._formsetAdding[prefix] = false;
+        }, 100);
 
         // Emitir evento para que otras lógicas (plantillas específicas) puedan
         // reindexar o reinicializar elementos dentro del formset recién añadido.
         try {
-            const ev = new CustomEvent('formset:added', { detail: { prefix } });
+            const ev = new CustomEvent('formset:added', { 
+                detail: { 
+                    prefix,
+                    newForm: newForm,
+                    totalForms: totalForms + 1
+                } 
+            });
             container.dispatchEvent(ev);
+            console.log(`FormsetManager: Evento formset:added emitido para ${prefix}`, { prefix, newForm, totalForms: totalForms + 1 });
         } catch (err) {
-            // Silenciar si CustomEvent no está soportado
-        }
-
-        // Inicializar visibilidad de botones de eliminar en subcampos
-        newForm
-            .querySelectorAll(".subcampo-repetible-container")
-            .forEach(updateSubcampoDeleteVisibility);
-
-        // Notificar a scripts específicos (por ejemplo, autocompletes de 773/774)
-        // que se añadió una nueva fila al formset.
-        try {
-            document.dispatchEvent(
-                new CustomEvent("formset:added", {
-                    detail: {
-                        prefix,
-                        container,
-                        newForm,
-                    },
-                })
-            );
-        } catch (e) {
-            // ignore
+            console.warn('FormsetManager: Error al emitir evento formset:added', err);
         }
     }
 

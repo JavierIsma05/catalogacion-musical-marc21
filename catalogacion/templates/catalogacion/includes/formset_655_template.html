@@ -166,16 +166,51 @@ Botón + a la izquierda (input-group) — ESTABLE
 
 <script>
 (function(){
-    const container=document.querySelector('[data-formset-prefix="{{ formset.prefix }}"]');
-    if(!container) return;
+    const PREFIX = "{{ formset.prefix }}";
+    const container = document.querySelector(`[data-formset-prefix="${PREFIX}"]`);
+    if(!container) {
+        console.log('🚫 No se encontró container para 655 con prefix:', PREFIX);
+        return;
+    }
+    
+    console.log('✅ Container 655 encontrado:', container);
 
     function initGeneroAutocomplete(input) {
-        if (!input || input.dataset.generoInit === "1") return;
+        if (!input) {
+            console.log('🚫 Input es null o undefined');
+            return;
+        }
+        
+        // 🔥 CLAVE: Verificar el flag correctamente
+        if (input.dataset.generoInit === "1") {
+            console.log('🚫 Input ya está inicializado, saltando:', input);
+            return;
+        }
+        
+        console.log('✅ Inicializando autocomplete para input:', input);
         input.dataset.generoInit = "1";
 
         const wrapper = input.closest(".autocomplete-wrapper");
+        if (!wrapper) {
+            console.log('🚫 No se encontró wrapper para input:', input);
+            return;
+        }
+        
         const suggestionsBox = wrapper.querySelector(".genero-suggestions");
         const hiddenIdInput = wrapper.querySelector(".genero-id");
+        
+        if (!suggestionsBox) {
+            console.log('🚫 No se encontró suggestionsBox para input:', input);
+            return;
+        }
+        
+        if (!hiddenIdInput) {
+            console.log('🚫 No se encontró hiddenIdInput para input:', input);
+            return;
+        }
+        
+        console.log('✅ Todos los elementos encontrados para input:', input);
+        
         let debounceTimer = null, selectedIndex = -1;
 
         function hide() { 
@@ -228,12 +263,23 @@ Botón + a la izquierda (input-group) — ESTABLE
         }
 
         input.addEventListener("input", e=>{
-            const q=input.value.trim();
-            hiddenIdInput.value=""; 
+            const q = input.value.trim();
+            hiddenIdInput.value = ""; 
             hiddenIdInput.removeAttribute("data-nuevo");
-            if(q.length<2){ hide(); return; }
+            
+            console.log('🔍 Input event en 655 - query:', q, 'input:', input);
+            
+            if(q.length < 2){ 
+                console.log('🚫 Query muy corto, ocultando sugerencias');
+                hide(); 
+                return; 
+            }
+            
             clearTimeout(debounceTimer); 
-            debounceTimer=setTimeout(()=>buscar(q),250);
+            debounceTimer = setTimeout(() => {
+                console.log('🔍 Iniciando búsqueda de género para:', q);
+                buscar(q);
+            }, 250);
         });
 
         input.addEventListener("keydown", e=>{
@@ -271,23 +317,36 @@ Botón + a la izquierda (input-group) — ESTABLE
     container.addEventListener("click", function(e){
         const addBtn=e.target.closest(".add-subdivision-btn");
         if(addBtn){
-            console.log("Botón + clickeado en 655");
+            console.log("🔥 Botón + subdivisión clickeado en 655");
             const cont=addBtn.closest(".subdivisiones-container");
             const rows=cont.querySelectorAll(".subdivision-form-row");
-            console.log("Filas encontradas:", rows.length);
+            console.log("🔍 Filas encontradas:", rows.length);
             const clone=rows[0].cloneNode(true);
-            console.log("Clon creado");
+            console.log("✅ Clon creado");
 
             clone.querySelector(".subdivision-input").value="";
             clone.querySelector(".subdivision-input").name =
                 clone.querySelector(".subdivision-input").name.replace(/_\d+$/, `_${rows.length}`);
 
-            clone.querySelector(".add-subdivision-btn")?.remove();
-            clone.querySelector(".genero-input")?.removeAttribute("data-genero-init");
-            initGeneroAutocomplete(clone.querySelector(".genero-input"));
+            // 🔥 CORRECCIÓN: Buscar y limpiar SOLO si existe .genero-input en el clon
+            const generoInput = clone.querySelector(".genero-input");
+            if (generoInput) {
+                console.log('🔍 Limpiando flag generoInit en input clonado:', generoInput);
+                delete generoInput.dataset.generoInit;
+                initGeneroAutocomplete(generoInput);
+            } else {
+                console.log('ℹ️ No se encontró .genero-input en el clon (esto es normal)');
+            }
+            
+            // Remover el botón + del clon
+            const cloneAddBtn = clone.querySelector(".add-subdivision-btn");
+            if (cloneAddBtn) {
+                cloneAddBtn.remove();
+            }
+            
             cont.appendChild(clone);
             updateDeleteButtons(cont);
-            console.log("Clon agregado al contenedor");
+            console.log("✅ Clon de subdivisión agregado al contenedor");
             return;
         }
 
@@ -302,15 +361,39 @@ Botón + a la izquierda (input-group) — ESTABLE
 
     // Cuando se agrega desde el gestor global (formset-manager.js), reindexar e inicializar
     container.addEventListener('formset:added', (ev) => {
-        if (!ev || !ev.detail || ev.detail.prefix !== PREFIX) return;
+        if (!ev || !ev.detail || ev.detail.prefix !== PREFIX) {
+            console.log('🚫 Evento formset:added no es para este prefix:', PREFIX);
+            return;
+        }
+        
+        console.log('🔥 formset:added evento recibido en 655', ev.detail);
         
         // small timeout to let DOM settle
         setTimeout(() => {
-            // Inicializar autocomplete en los nuevos inputs
-            container.querySelectorAll(".genero-input").forEach(initGeneroAutocomplete);
+            // 🔥 CLAVE: Buscar SOLO en el nuevo formulario agregado
+            const newForm = ev.detail.newForm;
+            if (!newForm) {
+                console.log('🚫 No se encontró newForm en el evento 655');
+                return;
+            }
+            
+            console.log('🔍 Nuevo formulario 655 encontrado:', newForm);
+            
+            // Inicializar autocomplete SOLO en los inputs del nuevo formulario
+            const newInputs = newForm.querySelectorAll(".genero-input");
+            console.log('🔍 Inputs de género encontrados en nuevo formulario 655:', newInputs.length);
+            
+            newInputs.forEach((input, index) => {
+                console.log(`🔄 Inicializando input ${index} del nuevo formulario 655:`, input);
+                // 🔥 CLAVE: Limpiar el flag para permitir reinicialización
+                delete input.dataset.generoInit;
+                initGeneroAutocomplete(input);
+            });
             
             // Inicializar subdivisiones en las nuevas filas
-            container.querySelectorAll(".subdivisiones-container").forEach(updateDeleteButtons);
+            const subdivisionContainers = newForm.querySelectorAll(".subdivisiones-container");
+            console.log('🔍 Contenedores de subdivisiones encontrados en nuevo formulario 655:', subdivisionContainers.length);
+            subdivisionContainers.forEach(updateDeleteButtons);
         }, 50);
     });
 
