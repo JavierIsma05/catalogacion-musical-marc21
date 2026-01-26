@@ -1,14 +1,20 @@
 {% extends "usuarios/catalogador/base_catalogador.html" %}
 
 {% block title %}Digitalización{% endblock %}
-{% block page_title %}Digitalización{% endblock %}
+{% block page_title %}Importar Imágenes{% endblock %}
 
 {% block content %}
 <div class="card mb-3">
   <div class="card-body">
-    <form method="get" class="d-flex gap-2">
-      <input type="text" class="form-control" name="q" placeholder="Buscar colección por título / compositor / ID"
+    <form method="get" class="d-flex gap-2 flex-wrap">
+      <input type="text" class="form-control" style="max-width: 400px;" name="q"
+             placeholder="Buscar por título / compositor / signatura"
              value="{{ q|default:'' }}">
+      <select name="tipo" class="form-select" style="max-width: 200px;">
+        <option value="todos" {% if filtro_tipo == "todos" %}selected{% endif %}>Todos</option>
+        <option value="colecciones" {% if filtro_tipo == "colecciones" %}selected{% endif %}>Colecciones</option>
+        <option value="obras_sueltas" {% if filtro_tipo == "obras_sueltas" %}selected{% endif %}>Obras sueltas</option>
+      </select>
       <button class="btn btn-primary" type="submit">
         <i class="bi bi-search"></i> Buscar
       </button>
@@ -18,37 +24,48 @@
 
 <div class="card">
   <div class="card-body">
-    <h6 class="mb-3">Colecciones</h6>
+    <h6 class="mb-3">
+      {% if filtro_tipo == "colecciones" %}Colecciones
+      {% elif filtro_tipo == "obras_sueltas" %}Obras sueltas
+      {% else %}Obras y colecciones{% endif %}
+    </h6>
 
-    {% if colecciones %}
+    {% if obras %}
       <div class="list-group">
-        {% for c in colecciones %}
+        {% for o in obras %}
           <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-             href="{% url 'digitalizacion:coleccion_home' c.id %}">
+             href="{% url 'digitalizacion:obra_home' o.id %}">
             <div>
-              <div class="fw-semibold">{{ c.titulo_principal }}</div>
-              <small class="text-muted">{{ c.signatura_publica_display }}</small>
-              {% if c.autor_publico_principal %} · {{ c.autor_publico_principal }}{% endif %}
+              <div class="fw-semibold">{{ o.titulo_principal }}</div>
+              <small class="text-muted">{{ o.signatura_publica_display }}</small>
+              {% if o.autor_publico_principal %} · {{ o.autor_publico_principal }}{% endif %}
             </div>
             <div class="d-flex gap-2 align-items-center">
-              {% if c.digital_set %}
-                {% if c.digital_set.estado == "NUEVO" %}
+              {# Tipo de obra #}
+              {% if o.nivel_bibliografico == "c" %}
+                <span class="badge bg-primary">Colección</span>
+              {% else %}
+                <span class="badge bg-info">Obra</span>
+              {% endif %}
+
+              {# Estado de digitalización #}
+              {% if o.digital_set %}
+                {% if o.digital_set.estado == "NUEVO" %}
                   <span class="badge bg-secondary">Nuevo</span>
-                {% elif c.digital_set.estado == "IMPORTADO" %}
-                  <span class="badge bg-info">Importado</span>
-                {% elif c.digital_set.estado == "SEGMENTADO" %}
+                {% elif o.digital_set.estado == "IMPORTADO" %}
+                  <span class="badge bg-warning text-dark">Importado</span>
+                {% elif o.digital_set.estado == "SEGMENTADO" %}
                   <span class="badge bg-success">Segmentado</span>
                 {% endif %}
               {% else %}
                 <span class="badge bg-light text-dark">Sin iniciar</span>
               {% endif %}
-              <span class="badge bg-secondary">Abrir</span>
             </div>
           </a>
         {% endfor %}
       </div>
     {% else %}
-      <p class="text-muted mb-0">No se encontraron colecciones.</p>
+      <p class="text-muted mb-0">No se encontraron resultados.</p>
     {% endif %}
   </div>
 </div>

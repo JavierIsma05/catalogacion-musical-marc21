@@ -12,7 +12,7 @@
       {% if obra.autor_publico_principal %} · {{ obra.autor_publico_principal }}{% endif %}
     </div>
     {% if start_page and end_page %}
-      <small class="text-muted">Rango (MVP): {{ start_page }}–{{ end_page }}</small>
+      <small class="text-muted">Segmento: páginas {{ start_page }}–{{ end_page }}</small>
     {% endif %}
   </div>
 </div>
@@ -93,10 +93,10 @@
 
 {% endif %}
 <div class="d-flex gap-2 mb-3">
-  {% if coleccion %}
-    <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:coleccion_home' coleccion.id %}">Volver</a>
-    <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:segmentar' coleccion.id %}">Segmentación</a>
-    <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:visor_coleccion' coleccion.id %}">Visor colección</a>
+  {% if coleccion_padre %}
+    <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:obra_home' coleccion_padre.id %}">Volver a la guía</a>
+    <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:segmentar' coleccion_padre.id %}">Segmentación</a>
+    <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:visor_digital' coleccion_padre.id %}">Visor colección</a>
   {% else %}
     <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:dashboard' %}">Digitalización</a>
   {% endif %}

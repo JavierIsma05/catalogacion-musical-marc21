@@ -430,40 +430,33 @@
     </div>
 
     <!-- Visor de PDF -->
-    {% for disponible in obra.disponibles_856.all %}
-        {% for url in disponible.urls_856.all %}
-            <h3 class="mt-5">Visor de PDF</h3>
-
-            {% if pdf_url %}
-                <div class="ratio ratio-16x9">
-                    <iframe
-                    src="{{ pdf_url }}#page={{ pdf_start_page|default:1 }}"
-                    title="Visor PDF"
-                    style="border:0;"
-                    allowfullscreen>
-                    </iframe>
-                </div>
-            {% else %}
-                <p class="text-muted">No hay un PDF asociado a esta obra/colección.</p>
-            {% endif %}
-
-        {% endfor %}
-    {% empty %}
-    <!-- Estado vacío si no hay PDF -->
     <section class="pdf-viewer-section">
         <div class="pdf-viewer-header">
             <h3 class="pdf-viewer-title">
                 <i class="bi bi-file-pdf"></i> Documento
             </h3>
         </div>
-        <div class="pdf-viewer-container">
-            <div class="pdf-viewer-empty">
-                <i class="bi bi-file-earmark-x"></i>
-                <p>No hay documento disponible para esta obra</p>
+        {% if pdf_url %}
+            <div class="ratio ratio-16x9">
+                <iframe
+                    src="{{ pdf_url }}#page={{ pdf_start_page|default:1 }}"
+                    title="Visor PDF"
+                    style="border:0;"
+                    allowfullscreen>
+                </iframe>
             </div>
-        </div>
+            <div class="small text-muted mt-2">
+                Mostrando desde página {{ pdf_start_page|default:1 }}
+            </div>
+        {% else %}
+            <div class="pdf-viewer-container">
+                <div class="pdf-viewer-empty">
+                    <i class="bi bi-file-earmark-x"></i>
+                    <p>No hay documento disponible para esta obra</p>
+                </div>
+            </div>
+        {% endif %}
     </section>
-    {% endfor %}
 </div>
 
 <script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>

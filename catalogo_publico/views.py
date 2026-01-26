@@ -107,21 +107,30 @@ class ListaObrasPublicaView(ListView):
                 first_segment_by_obra[seg.obra_id] = seg
 
         # 2) Decide ds + página + visor_url por obra
+        # PRIORIDAD: DigitalSet propio > Segmento en colección
         wanted_pairs = []
         wanted_meta = {}  # obra_id -> {ds_id, page, visor_url, pdf_path}
         for o in obras_list:
-            seg = first_segment_by_obra.get(o.id)
-
-            if seg:
-                ds = seg.digital_set
-                page_n = seg.start_page
+            # PRIORIDAD 1: DigitalSet propio de la obra
+            ds_propio = getattr(o, "digital_set", None)
+            if ds_propio:
+                ds = ds_propio
+                page_n = 1
                 visor_url = reverse("digitalizacion:visor_obra", kwargs={"obra_id": o.id})
                 pdf_path = getattr(ds, "pdf_path", "") if ds else ""
             else:
-                ds = getattr(o, "digital_set", None)
-                page_n = 1
-                visor_url = reverse("digitalizacion:visor_coleccion", kwargs={"pk": o.id})
-                pdf_path = getattr(ds, "pdf_path", "") if ds else ""
+                # PRIORIDAD 2: Segmento en colección
+                seg = first_segment_by_obra.get(o.id)
+                if seg:
+                    ds = seg.digital_set
+                    page_n = seg.start_page
+                    visor_url = reverse("digitalizacion:visor_obra", kwargs={"obra_id": o.id})
+                    pdf_path = getattr(ds, "pdf_path", "") if ds else ""
+                else:
+                    ds = None
+                    page_n = 1
+                    visor_url = reverse("digitalizacion:visor_digital", kwargs={"pk": o.id})
+                    pdf_path = ""
 
             ds_id = ds.id if ds else None
             if ds_id:
@@ -275,6 +284,16 @@ class VistaDetalladaObraView(DetailView):
         context["titulo"] = f"Vista detallada: {obra}"
 
         # Resolver PDF y start_page:
+        # PRIORIDAD 1: DigitalSet propio de la obra (si existe)
+        ds_propio = getattr(obra, "digital_set", None)
+        if ds_propio and getattr(ds_propio, "pdf_path", ""):
+            # La obra tiene su propio PDF - usarlo
+            pdf_url = default_storage.url(ds_propio.pdf_path)
+            context["pdf_url"] = pdf_url
+            context["pdf_start_page"] = 1
+            return context
+
+        # PRIORIDAD 2: Buscar segmento en colección
         seg = (
             WorkSegment.objects.filter(obra=obra)
             .select_related("digital_set")
@@ -286,7 +305,7 @@ class VistaDetalladaObraView(DetailView):
             ds = seg.digital_set
             start_page = seg.start_page or 1
         else:
-            ds = getattr(obra, "digital_set", None)
+            ds = None
             start_page = 1
 
         pdf_url = None

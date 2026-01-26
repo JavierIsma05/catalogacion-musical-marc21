@@ -21,31 +21,64 @@ import os
 import shutil
 from PIL import Image
 
+from catalogacion.models.utils import signatura_para_archivo
+
 # Path(settings.MEDIA_ROOT) es backend/media/
 
-def repo_root_for_collection(coleccion_id: int) -> Path:
-    return Path(settings.MEDIA_ROOT) / "digitalizacion" / f"coleccion_{coleccion_id}"
+
+def nombre_carpeta_obra(obra) -> str:
+    """
+    Genera el nombre de carpeta para una obra.
+    Usa la signatura si está completa, sino fallback a obra_{id}.
+    """
+    return signatura_para_archivo(obra) or f"obra_{obra.id}"
 
 
-# relative_to(MEDIA_ROOT) produce una ruta “portable” que sirve en cualquier servidor.
+def repo_root_for_obra(obra) -> Path:
+    """Retorna la ruta del repositorio para una obra."""
+    return Path(settings.MEDIA_ROOT) / "digitalizacion" / nombre_carpeta_obra(obra)
+
+
+# relative_to(MEDIA_ROOT) produce una ruta "portable" que sirve en cualquier servidor.
 def to_media_relpath(path: Path) -> str:
     """Convierte Path absoluto dentro de MEDIA_ROOT a ruta relativa (con /)."""
     rel = path.relative_to(Path(settings.MEDIA_ROOT))
     return str(rel).replace("\\", "/")
 
 
-def default_inbox_for_collection(coleccion_id: int) -> Path:
+def default_inbox_for_obra(obra) -> Path:
     """
-    MVP: carpeta INBOX local.
-    Puedes mover esto a settings luego.
+    Retorna la ruta del inbox para una obra.
+    Usa la signatura si está completa, sino fallback a obra_{id}.
     """
     base = Path(getattr(settings, "DIGITALIZACION_INBOX_BASE", Path(settings.MEDIA_ROOT) / "inbox"))
-    return base / f"coleccion_{coleccion_id}"
+    return base / nombre_carpeta_obra(obra)
 
 
-def default_repo_for_collection(coleccion_id: int) -> Path:
+def default_repo_for_obra(obra) -> Path:
+    """Retorna la ruta del repositorio para una obra."""
     base = Path(getattr(settings, "DIGITALIZACION_REPO_BASE", Path(settings.MEDIA_ROOT) / "digitalizacion"))
-    return base / f"coleccion_{coleccion_id}"
+    return base / nombre_carpeta_obra(obra)
+
+
+def jpg_to_tiff(src_jpg: Path, dst_tif: Path) -> bool:
+    """
+    Convierte JPG a TIFF con compresión LZW (sin pérdida).
+
+    Args:
+        src_jpg: Ruta al JPG de alta resolución
+        dst_tif: Ruta destino para el TIFF
+
+    Returns:
+        bool: True si la conversión fue exitosa
+    """
+    try:
+        im = Image.open(src_jpg)
+        im.save(dst_tif, "TIFF", compression="lzw")
+        return True
+    except Exception:
+        return False
+
 
 class DigitalizacionDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "digitalizacion/dashboard.html"
@@ -53,10 +86,22 @@ class DigitalizacionDashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         q = (self.request.GET.get("q") or "").strip()
+        filtro_tipo = self.request.GET.get("tipo", "todos")
 
-        qs = ObraGeneral.objects.filter(nivel_bibliografico="c").prefetch_related("digital_set").order_by("-id")
+        # Base queryset
+        qs = ObraGeneral.objects.prefetch_related("digital_set").order_by("-id")
+
+        # Filtrar por tipo
+        if filtro_tipo == "colecciones":
+            qs = qs.filter(nivel_bibliografico="c")
+        elif filtro_tipo == "obras_sueltas":
+            # Obras que no son colecciones y no pertenecen a ninguna colección (sin 773)
+            qs = qs.exclude(nivel_bibliografico="c").filter(
+                enlaces_documento_fuente_773__isnull=True
+            )
+        # else: "todos" - mostrar todo lo que tiene o puede tener DigitalSet
+
         if q:
-            # Ajusta campos según tu modelo real (titulo, compositor, num_control, etc.)
             qs = qs.filter(
                 Q(titulo_principal__icontains=q)
                 | Q(num_control__icontains=q)
@@ -65,127 +110,153 @@ class DigitalizacionDashboardView(LoginRequiredMixin, TemplateView):
             )
 
         ctx["q"] = q
-        ctx["colecciones"] = qs[:50]
+        ctx["filtro_tipo"] = filtro_tipo
+        ctx["obras"] = qs[:50]
         return ctx
 
 
-class ColeccionDigitalizacionHomeView(LoginRequiredMixin, TemplateView):
-    template_name = "digitalizacion/coleccion_home.html"
+class ObraDigitalizacionHomeView(LoginRequiredMixin, TemplateView):
+    """Vista home de digitalización para cualquier obra (colección u obra suelta)"""
+    template_name = "digitalizacion/obra_home.html"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        coleccion = ObraGeneral.objects.get(pk=kwargs["pk"], nivel_bibliografico="c")
-        ctx["coleccion"] = coleccion
+        obra = get_object_or_404(ObraGeneral, pk=kwargs["pk"])
+        ds = DigitalSet.objects.filter(obra=obra).first()
+
+        # Determinar si es colección o obra suelta
+        es_coleccion = obra.nivel_bibliografico == "c"
+
+        ctx["obra"] = obra
+        ctx["digital_set"] = ds
+        ctx["es_coleccion"] = es_coleccion
         return ctx
 
 
-class ImportarColeccionView(LoginRequiredMixin, TemplateView):
+class ImportarObraView(LoginRequiredMixin, TemplateView):
+    """Vista de importación TIFF para cualquier obra (colección u obra suelta)"""
     template_name = "digitalizacion/importar.html"
 
-    def get_coleccion(self):
-        # pk viene de la URL: /coleccion/<pk>/importar/
-        return get_object_or_404(
-            ObraGeneral, pk=self.kwargs["pk"], nivel_bibliografico="c"
-        )
+    def get_obra(self):
+        return get_object_or_404(ObraGeneral, pk=self.kwargs["pk"])
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
-        coleccion = self.get_coleccion()
-        inbox = default_inbox_for_collection(coleccion.id)
-        repo = default_repo_for_collection(coleccion.id)
+        obra = self.get_obra()
+        nombre_carpeta = nombre_carpeta_obra(obra)
+        inbox = default_inbox_for_obra(obra)
+        repo = default_repo_for_obra(obra)
 
-        digital_set = DigitalSet.objects.filter(coleccion=coleccion).first()
+        digital_set = DigitalSet.objects.filter(obra=obra).first()
+        es_coleccion = obra.nivel_bibliografico == "c"
 
         ctx.update(
             {
-                "coleccion": coleccion,
+                "obra": obra,
+                "nombre_carpeta_inbox": nombre_carpeta,
                 "inbox_path": str(inbox),
                 "repo_path": str(repo),
                 "digital_set": digital_set,
                 "pages_count": digital_set.pages.count() if digital_set else 0,
+                "es_coleccion": es_coleccion,
             }
         )
         return ctx
 
     def post(self, request, *args, **kwargs):
         """
-        POST = ejecutar importación.
-        En MVP vamos a:
-        - leer archivos .tif/.tiff de la carpeta INBOX
-        - ordenarlos por nombre (por ahora)
-        - registrar páginas en DB
-        NOTA: por ahora NO copiamos ni renombramos.
+        POST = ejecutar importación de JPG.
+        Flujo: JPG → copiar a source/ → generar TIFF en master/ → generar JPG derivado en iiif/jpg/
         """
-        coleccion = self.get_coleccion()
-        inbox = default_inbox_for_collection(coleccion.id)
-        repo = default_repo_for_collection(coleccion.id)
+        obra = self.get_obra()
+        nombre_carpeta = nombre_carpeta_obra(obra)
+        inbox = default_inbox_for_obra(obra)
+        repo = default_repo_for_obra(obra)
+        es_coleccion = obra.nivel_bibliografico == "c"
 
         if not inbox.exists():
             messages.error(request, f"No existe la carpeta INBOX: {inbox}")
-            return redirect("digitalizacion:importar", pk=coleccion.id)
+            return redirect("digitalizacion:importar", pk=obra.id)
 
-        tiffs = sorted(
+        # Buscar JPG en vez de TIFF
+        jpgs = sorted(
             [
                 p
                 for p in inbox.iterdir()
-                if p.is_file() and p.suffix.lower() in [".tif", ".tiff"]
+                if p.is_file() and p.suffix.lower() in [".jpg", ".jpeg"]
             ]
         )
 
-        if not tiffs:
-            messages.warning(request, "No se encontraron TIFF en la carpeta INBOX.")
-            return redirect("digitalizacion:importar", pk=coleccion.id)
+        if not jpgs:
+            messages.warning(request, "No se encontraron imágenes JPG en la carpeta INBOX.")
+            return redirect("digitalizacion:importar", pk=obra.id)
 
-        digital_set, _ = DigitalSet.objects.get_or_create(coleccion=coleccion)
+        # Crear/obtener DigitalSet
+        tipo_ds = "COLECCION" if es_coleccion else "OBRA_SUELTA"
+        digital_set, _ = DigitalSet.objects.get_or_create(
+            obra=obra,
+            defaults={"tipo": tipo_ds}
+        )
         digital_set.inbox_path = str(inbox)
         digital_set.repository_path = str(repo)
 
-        created = 0
-        # Crear carpetas destino
+        # Crear directorios con nueva estructura
+        source_dir = repo / "source"
         master_dir = repo / "master"
-        deriv_dir = repo / "derivatives"
+        iiif_dir = repo / "iiif" / "jpg"
+        source_dir.mkdir(parents=True, exist_ok=True)
         master_dir.mkdir(parents=True, exist_ok=True)
-        deriv_dir.mkdir(parents=True, exist_ok=True)
-
-        digital_set, _ = DigitalSet.objects.get_or_create(coleccion=coleccion)
-        digital_set.inbox_path = str(inbox)
-        digital_set.repository_path = str(repo)
+        iiif_dir.mkdir(parents=True, exist_ok=True)
 
         created = 0
+        for idx, src in enumerate(jpgs, start=1):
+            # Nombres de archivo
+            base_name = f"{nombre_carpeta}_p{idx:03d}"
+            source_name = f"{base_name}.jpg"
+            master_name = f"{base_name}.tif"
+            deriv_name = f"{base_name}.jpg"
 
-        for idx, src in enumerate(tiffs, start=1):
-            # nombres estándar
-            master_name = f"coleccion_{coleccion.id}_p{idx:03d}.tif"
-            jpg_name = f"coleccion_{coleccion.id}_p{idx:03d}.jpg"
-
+            dst_source = source_dir / source_name
             dst_master = master_dir / master_name
-            dst_jpg = deriv_dir / jpg_name
+            dst_deriv = iiif_dir / deriv_name
 
-            # 1) copiar master
-            shutil.copy2(src, dst_master)
+            # 1) Copiar JPG original a source/
+            shutil.copy2(src, dst_source)
 
-            # 2) generar jpg derivado (para visor web)
+            # 2) Generar TIFF normalizado en master/
+            tiff_ok = jpg_to_tiff(dst_source, dst_master)
+            if not tiff_ok:
+                messages.warning(request, f"No se pudo generar TIFF para p{idx:03d}")
+
+            # 3) Generar JPG derivado para visor (menor calidad/tamaño)
+            deriv_ok = False
             try:
-                im = Image.open(dst_master)
+                im = Image.open(dst_source)
                 if im.mode not in ("RGB", "L"):
                     im = im.convert("RGB")
-                else:
-                    im = im.convert("RGB")
-                im.save(dst_jpg, "JPEG", quality=85, optimize=True)
+                # Redimensionar si es muy grande (max 2000px en el lado mayor)
+                max_size = 2000
+                if max(im.size) > max_size:
+                    im.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+                im.save(dst_deriv, "JPEG", quality=85, optimize=True)
+                deriv_ok = True
             except Exception as e:
-                messages.warning(request, f"No se pudo generar JPG para p{idx:03d}: {e}")
-                # Aún así guardamos master. derivative_path queda vacío.
-                dst_jpg = None
+                messages.warning(request, f"No se pudo generar derivado para p{idx:03d}: {e}")
 
-            # 3) guardar en DB (rutas relativas a MEDIA_ROOT)
-            master_rel = to_media_relpath(dst_master)
-            deriv_rel = to_media_relpath(dst_jpg) if dst_jpg else ""
+            # 4) Guardar en BD (rutas relativas a MEDIA_ROOT)
+            source_rel = to_media_relpath(dst_source)
+            master_rel = to_media_relpath(dst_master) if tiff_ok else ""
+            deriv_rel = to_media_relpath(dst_deriv) if deriv_ok else ""
 
             obj, was_created = DigitalPage.objects.update_or_create(
                 digital_set=digital_set,
                 page_number=idx,
-                defaults={"master_path": master_rel, "derivative_path": deriv_rel},
+                defaults={
+                    "source_path": source_rel,
+                    "master_path": master_rel,
+                    "derivative_path": deriv_rel,
+                },
             )
             if was_created:
                 created += 1
@@ -194,30 +265,31 @@ class ImportarColeccionView(LoginRequiredMixin, TemplateView):
         digital_set.estado = "IMPORTADO"
         digital_set.save()
 
-
         messages.success(
             request,
-            f"Importación completa. Páginas detectadas: {len(tiffs)}. Nuevas: {created}.",
+            f"Importación completa. Páginas procesadas: {len(jpgs)}. Nuevas: {created}.",
         )
-        return redirect("digitalizacion:importar", pk=coleccion.id)
+        return redirect("digitalizacion:importar", pk=obra.id)
 
 
-class SegmentarColeccionView(LoginRequiredMixin, TemplateView):
+class SegmentarObraView(LoginRequiredMixin, TemplateView):
+    """Vista de segmentación para colecciones (asignar obras a rangos de páginas)"""
     template_name = "digitalizacion/segmentar.html"
 
-    def get_coleccion_ds(self):
-        coleccion = get_object_or_404(
+    def get_obra_ds(self):
+        # Solo colecciones pueden segmentarse
+        obra = get_object_or_404(
             ObraGeneral, pk=self.kwargs["pk"], nivel_bibliografico="c"
         )
-        ds = DigitalSet.objects.filter(coleccion=coleccion).first()
-        return coleccion, ds
+        ds = DigitalSet.objects.filter(obra=obra).first()
+        return obra, ds
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        coleccion, ds = self.get_coleccion_ds()
+        obra, ds = self.get_obra_ds()
         max_pages = ds.pdf_total_pages if ds and ds.pdf_path and ds.pdf_total_pages else (ds.total_pages if ds else 0)
 
-        ctx["coleccion"] = coleccion
+        ctx["obra"] = obra
         ctx["digital_set"] = ds
         ctx["pages"] = ds.pages.all() if ds else []
         ctx["segments"] = ds.segments.select_related("obra").all() if ds else []
@@ -226,12 +298,12 @@ class SegmentarColeccionView(LoginRequiredMixin, TemplateView):
         return ctx
 
     def post(self, request, *args, **kwargs):
-        coleccion, ds = self.get_coleccion_ds()
+        obra_coleccion, ds = self.get_obra_ds()
         if not ds:
             messages.error(
-                request, "Primero debes importar el escaneo de la colección."
+                request, "Primero debes importar el escaneo."
             )
-            return redirect("digitalizacion:importar", pk=coleccion.id)
+            return redirect("digitalizacion:importar", pk=obra_coleccion.id)
 
         obra_id = request.POST.get("obra_id")
         start_page = request.POST.get("start_page")
@@ -240,7 +312,7 @@ class SegmentarColeccionView(LoginRequiredMixin, TemplateView):
 
         if not (obra_id and start_page and end_page):
             messages.error(request, "Faltan datos (obra, inicio, fin).")
-            return redirect("digitalizacion:segmentar", pk=coleccion.id)
+            return redirect("digitalizacion:segmentar", pk=obra_coleccion.id)
 
         try:
             obra_id = int(obra_id)
@@ -248,21 +320,21 @@ class SegmentarColeccionView(LoginRequiredMixin, TemplateView):
             end_page = int(end_page)
         except ValueError:
             messages.error(request, "Inicio/fin inválidos.")
-            return redirect("digitalizacion:segmentar", pk=coleccion.id)
+            return redirect("digitalizacion:segmentar", pk=obra_coleccion.id)
 
         if start_page > end_page:
             messages.error(request, "Inicio no puede ser mayor que fin.")
-            return redirect("digitalizacion:segmentar", pk=coleccion.id)
+            return redirect("digitalizacion:segmentar", pk=obra_coleccion.id)
 
         # Si hay PDF cargado, manda el PDF
         total = ds.pdf_total_pages if ds.pdf_path and ds.pdf_total_pages else ds.total_pages
         if start_page < 1 or end_page > total:
             messages.error(request, f"Rango fuera de límites. Total páginas: {total}.")
-            return redirect("digitalizacion:segmentar", pk=coleccion.id)
+            return redirect("digitalizacion:segmentar", pk=obra_coleccion.id)
 
-        obra = get_object_or_404(ObraGeneral, pk=obra_id)
+        obra_segmento = get_object_or_404(ObraGeneral, pk=obra_id)
         WorkSegment.objects.create(
-            obra=obra,
+            obra=obra_segmento,
             digital_set=ds,
             start_page=start_page,
             end_page=end_page,
@@ -273,62 +345,73 @@ class SegmentarColeccionView(LoginRequiredMixin, TemplateView):
             request,
             f"Segmento creado: Obra {obra_id} ({start_page}-{end_page}) [{tipo}].",
         )
-        return redirect("digitalizacion:segmentar", pk=coleccion.id)
+        return redirect("digitalizacion:segmentar", pk=obra_coleccion.id)
 
 
-class VisorColeccionView(LoginRequiredMixin, TemplateView):
-    template_name = "digitalizacion/visor_coleccion.html"
+class VisorObraDigitalView(LoginRequiredMixin, TemplateView):
+    """Visor del documento digitalizado (para colecciones o obras sueltas)"""
+    template_name = "digitalizacion/visor_digital.html"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        coleccion = get_object_or_404(
-            ObraGeneral, pk=self.kwargs["pk"], nivel_bibliografico="c"
-        )
-        ds = DigitalSet.objects.filter(coleccion=coleccion).first()
-        ctx["coleccion"] = coleccion
+        obra = get_object_or_404(ObraGeneral, pk=self.kwargs["pk"])
+        ds = DigitalSet.objects.filter(obra=obra).first()
+        es_coleccion = obra.nivel_bibliografico == "c"
+
+        ctx["obra"] = obra
         ctx["digital_set"] = ds
         ctx["pages"] = ds.pages.all() if ds else []
-        ctx["segments"] = ds.segments.select_related("obra").all() if ds else []
+        ctx["segments"] = ds.segments.select_related("obra").all() if ds and es_coleccion else []
+        ctx["es_coleccion"] = es_coleccion
         return ctx
 
 
-class SubirPdfColeccionView(LoginRequiredMixin, TemplateView):
+class SubirPdfObraView(LoginRequiredMixin, TemplateView):
+    """Vista para subir PDF a cualquier obra (colección u obra suelta)"""
     template_name = "digitalizacion/subir_pdf.html"
 
-    def get_coleccion_ds(self):
-        coleccion = get_object_or_404(
-            ObraGeneral, pk=self.kwargs["pk"], nivel_bibliografico="c"
+    def get_obra_ds(self):
+        obra = get_object_or_404(ObraGeneral, pk=self.kwargs["pk"])
+        es_coleccion = obra.nivel_bibliografico == "c"
+        tipo_ds = "COLECCION" if es_coleccion else "OBRA_SUELTA"
+
+        ds, _ = DigitalSet.objects.get_or_create(
+            obra=obra,
+            defaults={"tipo": tipo_ds}
         )
-        ds, _ = DigitalSet.objects.get_or_create(coleccion=coleccion)
-        repo = default_repo_for_collection(coleccion.id)
+        repo = default_repo_for_obra(obra)
         ds.repository_path = ds.repository_path or str(repo)
         ds.save()
-        return coleccion, ds, repo
+        return obra, ds, repo
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        coleccion, ds, repo = self.get_coleccion_ds()
-        ctx["coleccion"] = coleccion
+        obra, ds, repo = self.get_obra_ds()
+        ctx["obra"] = obra
         ctx["digital_set"] = ds
+        ctx["es_coleccion"] = obra.nivel_bibliografico == "c"
         return ctx
 
     def post(self, request, *args, **kwargs):
-        coleccion, ds, repo = self.get_coleccion_ds()
+        obra, ds, repo = self.get_obra_ds()
 
         f = request.FILES.get("pdf")
         if not f:
             messages.error(request, "Debes seleccionar un PDF.")
-            return redirect("digitalizacion:subir_pdf", pk=coleccion.id)
+            return redirect("digitalizacion:subir_pdf", pk=obra.id)
 
         if not f.name.lower().endswith(".pdf"):
             messages.error(request, "El archivo debe ser PDF.")
-            return redirect("digitalizacion:subir_pdf", pk=coleccion.id)
+            return redirect("digitalizacion:subir_pdf", pk=obra.id)
 
-        master_dir = repo / "master"
-        master_dir.mkdir(parents=True, exist_ok=True)
+        # Guardar PDF en access/pdf/ (nueva estructura)
+        access_dir = repo / "access" / "pdf"
+        access_dir.mkdir(parents=True, exist_ok=True)
 
-        pdf_name = f"coleccion_{coleccion.id}.pdf"
-        dst = master_dir / pdf_name
+        # Nombre del PDF usando signatura (ej: UNL-BLMP-EC-Ms-M000001.pdf)
+        nombre_carpeta = nombre_carpeta_obra(obra)
+        pdf_name = f"{nombre_carpeta}.pdf"
+        dst = access_dir / pdf_name
 
         with open(dst, "wb+") as out:
             for chunk in f.chunks():
@@ -343,10 +426,11 @@ class SubirPdfColeccionView(LoginRequiredMixin, TemplateView):
         ds.save()
 
         messages.success(request, "PDF cargado correctamente.")
-        return redirect("digitalizacion:visor_coleccion", pk=coleccion.id)
+        return redirect("digitalizacion:visor_digital", pk=obra.id)
 
 
-class VisorObraView(LoginRequiredMixin, TemplateView):
+class VisorObraSegmentoView(LoginRequiredMixin, TemplateView):
+    """Visor de una obra (prioriza DigitalSet propio sobre segmentos de colección)"""
     template_name = "digitalizacion/visor_obra.html"
 
     def get_context_data(self, **kwargs):
@@ -354,32 +438,54 @@ class VisorObraView(LoginRequiredMixin, TemplateView):
 
         obra = get_object_or_404(ObraGeneral, pk=self.kwargs["obra_id"])
 
-        # Segmentos asignados a esta obra (puede haber más de uno)
+        # PRIORIDAD 1: Verificar si la obra tiene su propio DigitalSet
+        # Esto tiene prioridad porque si alguien subió un PDF específico para esta obra,
+        # ese es el que debe mostrarse (no el de la colección)
+        ds_propio = DigitalSet.objects.filter(obra=obra).first()
+        if ds_propio:
+            # La obra tiene su propio DigitalSet - usarlo
+            ctx.update(
+                {
+                    "obra": obra,
+                    "segments": [],
+                    "digital_set": ds_propio,
+                    "coleccion_padre": None,
+                    "pages": ds_propio.pages.all(),
+                    "start_page": 1,
+                    "end_page": ds_propio.total_pages or ds_propio.pdf_total_pages,
+                    "es_obra_suelta": True,
+                }
+            )
+            return ctx
+
+        # PRIORIDAD 2: Buscar segmentos en colecciones
         segments = (
             WorkSegment.objects.filter(obra=obra)
-            .select_related("digital_set", "digital_set__coleccion")
+            .select_related("digital_set", "digital_set__obra")
             .order_by("start_page")
         )
 
         if not segments.exists():
+            # No tiene DigitalSet propio ni segmentos
             ctx.update(
                 {
                     "obra": obra,
                     "segments": [],
                     "digital_set": None,
-                    "coleccion": None,
+                    "coleccion_padre": None,
                     "pages": [],
                     "start_page": None,
+                    "es_obra_suelta": False,
                 }
             )
             return ctx
 
-        # MVP: asumimos que los segmentos de una obra apuntan al mismo DigitalSet (misma colección)
+        # Obra dentro de una colección - usar segmento
         first_seg = segments.first()
         ds = first_seg.digital_set
-        coleccion = ds.coleccion
+        coleccion_padre = ds.obra  # La colección a la que pertenece
 
-        # tomamos solo el primer rango como “inicio”
+        # tomamos solo el primer rango como "inicio"
         start_page = first_seg.start_page
         end_page = first_seg.end_page
 
@@ -392,10 +498,11 @@ class VisorObraView(LoginRequiredMixin, TemplateView):
                 "obra": obra,
                 "segments": segments,
                 "digital_set": ds,
-                "coleccion": coleccion,
+                "coleccion_padre": coleccion_padre,
                 "pages": pages,
                 "start_page": start_page,
                 "end_page": end_page,
+                "es_obra_suelta": False,
             }
         )
         return ctx
@@ -403,16 +510,16 @@ class VisorObraView(LoginRequiredMixin, TemplateView):
 
 def api_buscar_obras(request):
     q = (request.GET.get("q") or "").strip()
-    coleccion_id = request.GET.get("coleccion_id")
+    obra_id = request.GET.get("obra_id")  # ID de la colección
 
     if len(q) < 2:
         return JsonResponse({"results": []})
 
-    # Normalizar coleccion_id
+    # Normalizar obra_id
     try:
-        coleccion_id = int(coleccion_id) if coleccion_id else None
+        obra_id = int(obra_id) if obra_id else None
     except ValueError:
-        coleccion_id = None
+        obra_id = None
 
     qs = ObraGeneral.objects.exclude(nivel_bibliografico="c").filter(
         Q(num_control__icontains=q)
@@ -422,8 +529,8 @@ def api_buscar_obras(request):
     )
 
     # Excluir obras ya segmentadas en esta colección (si hay DS)
-    if coleccion_id:
-        ds = DigitalSet.objects.filter(coleccion_id=coleccion_id).first()
+    if obra_id:
+        ds = DigitalSet.objects.filter(obra_id=obra_id).first()
         if ds:
             segmented_ids = WorkSegment.objects.filter(digital_set=ds).values_list(
                 "obra_id", flat=True
@@ -449,7 +556,67 @@ def api_buscar_obras(request):
 @require_POST
 def eliminar_segmento(request, segment_id):
     seg = get_object_or_404(WorkSegment, pk=segment_id)
-    coleccion_id = seg.digital_set.coleccion_id
+    obra_id = seg.digital_set.obra_id
     seg.delete()
     messages.success(request, "Segmento eliminado.")
-    return redirect("digitalizacion:segmentar", pk=coleccion_id)
+    return redirect("digitalizacion:segmentar", pk=obra_id)
+
+
+class EliminarPdfObraView(LoginRequiredMixin, View):
+    """Elimina solo el PDF de una obra/colección, manteniendo TIFF/JPG"""
+
+    def post(self, request, pk):
+        obra = get_object_or_404(ObraGeneral, pk=pk)
+        ds = DigitalSet.objects.filter(obra=obra).first()
+
+        if ds and ds.pdf_path:
+            # Eliminar archivo físico
+            pdf_file = Path(settings.MEDIA_ROOT) / ds.pdf_path
+            if pdf_file.exists():
+                pdf_file.unlink()
+
+            # Limpiar campos en BD
+            ds.pdf_path = ""
+            ds.pdf_total_pages = 0
+            ds.save()
+            messages.success(request, "PDF eliminado correctamente.")
+        else:
+            messages.warning(request, "No hay PDF para eliminar.")
+
+        return redirect("digitalizacion:obra_home", pk=pk)
+
+
+class EliminarDigitalSetView(LoginRequiredMixin, View):
+    """Elimina todo el DigitalSet (PDF + TIFF + JPG + registros)"""
+
+    def post(self, request, pk):
+        obra = get_object_or_404(ObraGeneral, pk=pk)
+        ds = DigitalSet.objects.filter(obra=obra).first()
+
+        if not ds:
+            messages.warning(request, "No hay digitalización para eliminar.")
+            return redirect("digitalizacion:obra_home", pk=pk)
+
+        # Verificar que no haya segmentos que dependan de este DigitalSet
+        if ds.segments.exists():
+            messages.error(
+                request,
+                "No se puede eliminar: hay segmentos asignados a esta colección. "
+                "Elimina los segmentos primero."
+            )
+            return redirect("digitalizacion:obra_home", pk=pk)
+
+        # Eliminar carpeta - usar repository_path guardado si existe, sino calcular
+        if ds.repository_path:
+            repo_dir = Path(ds.repository_path)
+        else:
+            repo_dir = repo_root_for_obra(obra)
+
+        if repo_dir.exists():
+            shutil.rmtree(repo_dir)
+
+        # Eliminar DigitalSet (CASCADE elimina DigitalPages automáticamente)
+        ds.delete()
+        messages.success(request, "Digitalización eliminada completamente.")
+
+        return redirect("digitalizacion:obra_home", pk=pk)

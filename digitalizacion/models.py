@@ -9,12 +9,17 @@ class DigitalSet(models.Model):
         ("SEGMENTADO", "Segmentado"),
     )
 
-    coleccion = models.OneToOneField(
+    TIPOS = (
+        ("COLECCION", "Colección"),
+        ("OBRA_SUELTA", "Obra suelta"),
+    )
+
+    obra = models.OneToOneField(
         ObraGeneral,
         on_delete=models.CASCADE,
         related_name="digital_set",
-        limit_choices_to={"nivel_bibliografico": "c"},
     )
+    tipo = models.CharField(max_length=20, choices=TIPOS, default="COLECCION")
     estado = models.CharField(max_length=20, choices=ESTADOS, default="NUEVO")
     total_pages = models.PositiveIntegerField(default=0)
 
@@ -28,7 +33,18 @@ class DigitalSet(models.Model):
     pdf_total_pages = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"DigitalSet Colección {self.coleccion_id} ({self.total_pages} páginas)"
+        tipo_str = "Colección" if self.tipo == "COLECCION" else "Obra"
+        return f"DigitalSet {tipo_str} {self.obra_id} ({self.total_pages} páginas)"
+
+    @property
+    def es_coleccion(self):
+        """Indica si este DigitalSet es de una colección (requiere segmentación)"""
+        return self.tipo == "COLECCION"
+
+    @property
+    def es_obra_suelta(self):
+        """Indica si este DigitalSet es de una obra suelta (no requiere segmentación)"""
+        return self.tipo == "OBRA_SUELTA"
 
 
 class DigitalPage(models.Model):
@@ -37,10 +53,14 @@ class DigitalPage(models.Model):
     )
     page_number = models.PositiveIntegerField()
 
-    master_path = models.CharField(max_length=700)  # .tif
+    # Rutas de archivos (relativas a MEDIA_ROOT)
+    source_path = models.CharField(
+        max_length=700, blank=True, default=""
+    )  # JPG original del escáner (source/)
+    master_path = models.CharField(max_length=700, blank=True, default="")  # TIFF normalizado (master/)
     derivative_path = models.CharField(
         max_length=700, blank=True, default=""
-    )  # .jpg opcional
+    )  # JPG para visor (iiif/jpg/)
 
     class Meta:
         unique_together = ("digital_set", "page_number")

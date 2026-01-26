@@ -1,7 +1,7 @@
 {% extends "usuarios/catalogador/base_catalogador.html" %}
 
-{% block title %}Digitalización – Colección{% endblock %}
-{% block page_title %}Digitalización – Colección{% endblock %}
+{% block title %}Importar Imágenes – Colección{% endblock %}
+{% block page_title %}Importar Imágenes – Colección{% endblock %}
 
 {% block content %}
 <div class="card mb-3">
@@ -36,9 +36,9 @@
       {# Paso 1 #}
       <div class="list-group-item d-flex justify-content-between align-items-start">
         <div class="me-3">
-          <div class="fw-semibold">📥 Paso 1 · Importar TIFF / PDF</div>
+          <div class="fw-semibold">📥 Paso 1 · Importar JPG / PDF</div>
           <div class="text-muted small">
-            TIFF: importar desde INBOX (temporal). PDF: subir archivo.
+            JPG: importar desde INBOX (temporal). PDF: subir archivo.
           </div>
         </div>
         <div class="text-end">
@@ -52,7 +52,7 @@
             {% endwith %}
           </div>
           <div class="d-flex gap-2 justify-content-end flex-wrap">
-            <a class="btn btn-sm btn-primary" href="{% url 'digitalizacion:importar' coleccion.id %}">Importar TIFF (INBOX)</a>
+            <a class="btn btn-sm btn-primary" href="{% url 'digitalizacion:importar' coleccion.id %}">Importar JPG (INBOX)</a>
             <a class="btn btn-sm btn-outline-primary" href="{% url 'digitalizacion:subir_pdf' coleccion.id %}">Subir PDF</a>
           </div>
         </div>
@@ -64,10 +64,10 @@
           <div class="fw-semibold">✅ Paso 2 · Revisar importación</div>
           <div class="text-muted small">
             {% if coleccion.digital_set %}
-              TIFF: {{ coleccion.digital_set.total_pages|default:0 }} páginas.
+              JPG: {{ coleccion.digital_set.total_pages|default:0 }} páginas.
               {% if coleccion.digital_set.pdf_path %} · PDF: cargado{% else %} · PDF: no cargado{% endif %}
             {% else %}
-              Importa TIFF o sube PDF para continuar.
+              Importa JPG o sube PDF para continuar.
             {% endif %}
           </div>
         </div>
