@@ -38,7 +38,7 @@
     <h6 class="mb-2">Cómo importar imágenes</h6>
     <ol class="mb-2">
       <li>Crea la carpeta <code class="bg-light px-2 py-1 rounded">{{ nombre_carpeta_inbox }}</code> dentro del INBOX.</li>
-      <li>Copia los archivos <strong>JPG de alta resolución</strong> generados por el escáner.</li>
+      <li>Copia los archivos <strong>TIFF</strong> generados por el escáner.</li>
       <li>Presiona <strong>Importar desde INBOX</strong>.</li>
     </ol>
 
@@ -49,12 +49,8 @@
 
     <div class="alert alert-warning py-2 mb-2">
       <div class="small">
-        <strong>⚠️ Importante:</strong> Suba imágenes JPG de alta resolución generadas por el escáner.
-        El sistema generará automáticamente:
-        <ul class="mb-0 mt-1">
-          <li>TIFF normalizado para preservación</li>
-          <li>JPG derivado para visualización web</li>
-        </ul>
+        <strong>⚠️ Importante:</strong> Suba imágenes TIFF generadas por el escáner.
+        El sistema generará automáticamente JPG derivados para visualización web.
       </div>
     </div>
 
@@ -86,7 +82,7 @@
     </form>
 
     <div class="mt-3 small text-muted">
-      El sistema procesará los JPG y generará TIFF de preservación + derivados para el visor web.
+      El sistema copiará los TIFF al repositorio y generará JPG derivados para el visor web.
     </div>
   </div>
 </div>

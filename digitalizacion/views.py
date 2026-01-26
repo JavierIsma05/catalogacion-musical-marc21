@@ -61,25 +61,6 @@ def default_repo_for_obra(obra) -> Path:
     return base / nombre_carpeta_obra(obra)
 
 
-def jpg_to_tiff(src_jpg: Path, dst_tif: Path) -> bool:
-    """
-    Convierte JPG a TIFF con compresión LZW (sin pérdida).
-
-    Args:
-        src_jpg: Ruta al JPG de alta resolución
-        dst_tif: Ruta destino para el TIFF
-
-    Returns:
-        bool: True si la conversión fue exitosa
-    """
-    try:
-        im = Image.open(src_jpg)
-        im.save(dst_tif, "TIFF", compression="lzw")
-        return True
-    except Exception:
-        return False
-
-
 class DigitalizacionDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "digitalizacion/dashboard.html"
 
@@ -166,8 +147,8 @@ class ImportarObraView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         """
-        POST = ejecutar importación de JPG.
-        Flujo: JPG → copiar a source/ → generar TIFF en master/ → generar JPG derivado en iiif/jpg/
+        POST = ejecutar importación de TIFF.
+        Flujo: TIFF → copiar a master/ → generar JPG derivado en iiif/jpg/
         """
         obra = self.get_obra()
         nombre_carpeta = nombre_carpeta_obra(obra)
@@ -179,17 +160,17 @@ class ImportarObraView(LoginRequiredMixin, TemplateView):
             messages.error(request, f"No existe la carpeta INBOX: {inbox}")
             return redirect("digitalizacion:importar", pk=obra.id)
 
-        # Buscar JPG en vez de TIFF
-        jpgs = sorted(
+        # Buscar TIFF en la carpeta INBOX
+        tiffs = sorted(
             [
                 p
                 for p in inbox.iterdir()
-                if p.is_file() and p.suffix.lower() in [".jpg", ".jpeg"]
+                if p.is_file() and p.suffix.lower() in [".tif", ".tiff"]
             ]
         )
 
-        if not jpgs:
-            messages.warning(request, "No se encontraron imágenes JPG en la carpeta INBOX.")
+        if not tiffs:
+            messages.warning(request, "No se encontraron imágenes TIFF en la carpeta INBOX.")
             return redirect("digitalizacion:importar", pk=obra.id)
 
         # Crear/obtener DigitalSet
@@ -201,38 +182,29 @@ class ImportarObraView(LoginRequiredMixin, TemplateView):
         digital_set.inbox_path = str(inbox)
         digital_set.repository_path = str(repo)
 
-        # Crear directorios con nueva estructura
-        source_dir = repo / "source"
+        # Crear directorios
         master_dir = repo / "master"
         iiif_dir = repo / "iiif" / "jpg"
-        source_dir.mkdir(parents=True, exist_ok=True)
         master_dir.mkdir(parents=True, exist_ok=True)
         iiif_dir.mkdir(parents=True, exist_ok=True)
 
         created = 0
-        for idx, src in enumerate(jpgs, start=1):
+        for idx, src in enumerate(tiffs, start=1):
             # Nombres de archivo
             base_name = f"{nombre_carpeta}_p{idx:03d}"
-            source_name = f"{base_name}.jpg"
             master_name = f"{base_name}.tif"
             deriv_name = f"{base_name}.jpg"
 
-            dst_source = source_dir / source_name
             dst_master = master_dir / master_name
             dst_deriv = iiif_dir / deriv_name
 
-            # 1) Copiar JPG original a source/
-            shutil.copy2(src, dst_source)
+            # 1) Copiar TIFF a master/
+            shutil.copy2(src, dst_master)
 
-            # 2) Generar TIFF normalizado en master/
-            tiff_ok = jpg_to_tiff(dst_source, dst_master)
-            if not tiff_ok:
-                messages.warning(request, f"No se pudo generar TIFF para p{idx:03d}")
-
-            # 3) Generar JPG derivado para visor (menor calidad/tamaño)
+            # 2) Generar JPG derivado para visor (menor calidad/tamaño)
             deriv_ok = False
             try:
-                im = Image.open(dst_source)
+                im = Image.open(dst_master)
                 if im.mode not in ("RGB", "L"):
                     im = im.convert("RGB")
                 # Redimensionar si es muy grande (max 2000px en el lado mayor)
@@ -244,16 +216,14 @@ class ImportarObraView(LoginRequiredMixin, TemplateView):
             except Exception as e:
                 messages.warning(request, f"No se pudo generar derivado para p{idx:03d}: {e}")
 
-            # 4) Guardar en BD (rutas relativas a MEDIA_ROOT)
-            source_rel = to_media_relpath(dst_source)
-            master_rel = to_media_relpath(dst_master) if tiff_ok else ""
+            # 3) Guardar en BD (rutas relativas a MEDIA_ROOT)
+            master_rel = to_media_relpath(dst_master)
             deriv_rel = to_media_relpath(dst_deriv) if deriv_ok else ""
 
             obj, was_created = DigitalPage.objects.update_or_create(
                 digital_set=digital_set,
                 page_number=idx,
                 defaults={
-                    "source_path": source_rel,
                     "master_path": master_rel,
                     "derivative_path": deriv_rel,
                 },
@@ -267,7 +237,7 @@ class ImportarObraView(LoginRequiredMixin, TemplateView):
 
         messages.success(
             request,
-            f"Importación completa. Páginas procesadas: {len(jpgs)}. Nuevas: {created}.",
+            f"Importación completa. Páginas procesadas: {len(tiffs)}. Nuevas: {created}.",
         )
         return redirect("digitalizacion:importar", pk=obra.id)
 
