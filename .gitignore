@@ -270,3 +270,15 @@ debug_form_response.html
 *.bak
 
 claude.md
+
+# Media uploads (Django)
+media/
+media/**
+
+# Archivos pesados de pruebas
+*.pdf
+*.tif
+*.tiff
+*.jpg
+*.jpeg
+*.png
