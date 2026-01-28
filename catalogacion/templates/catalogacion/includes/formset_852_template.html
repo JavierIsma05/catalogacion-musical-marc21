@@ -28,7 +28,7 @@ Autocomplete estable en $a (incluye clonados)
                 <!-- 852 $a -->
                 <div class="col-half">
                     <label class="form-label small">852 $a – Institución / Persona</label>
-                    <div class="autocomplete-wrapper position-relative">
+                    <div class="autocomplete-wrapper" data-autocomplete="persona">
                         {{ form.codigo_o_nombre }}
                         {{ form.autoridad_model }}
                         {{ form.autoridad_id }}
@@ -107,7 +107,7 @@ Autocomplete estable en $a (incluye clonados)
             <div class="campo-grid">
                 <div class="col-half">
                     <label class="form-label small">852 $a – Institución / Persona</label>
-                    <div class="autocomplete-wrapper position-relative">
+                    <div class="autocomplete-wrapper" data-autocomplete="persona">
                         {{ formset.empty_form.codigo_o_nombre }}
                         {{ formset.empty_form.autoridad_model }}
                         {{ formset.empty_form.autoridad_id }}
@@ -178,66 +178,77 @@ Autocomplete estable en $a (incluye clonados)
         return row;
     }
 
-    function initAutoridad852Autocomplete(input, box) {
+    // Delegación de eventos para autocomplete - funciona en todos los inputs existentes y futuros
+    root.addEventListener("input", e => {
+        const wrapper = e.target.closest(".autocomplete-wrapper[data-autocomplete='persona']");
+        if (!wrapper) return;
+
+        const input = wrapper.querySelector("input");
+        const box = wrapper.querySelector(".autoridad852-suggestions");
         if (!input || !box) return;
-        if (input.dataset.autocompleteInit === "1") return;
-        input.dataset.autocompleteInit = "1";
 
-        input.addEventListener("input", () => {
-            const q = input.value.trim();
-            if (!q) { box.classList.remove("show"); box.innerHTML = ""; return; }
+        const q = input.value.trim();
+        if (!q) { 
+            box.classList.remove("show"); 
+            box.innerHTML = ""; 
+            return; 
+        }
 
-            fetch(`/catalogacion/api/autocompletar/autoridad/?q=${encodeURIComponent(q)}`)
-                .then(r => r.json())
-                .then(d => {
-                    box.innerHTML = (d.results || []).map(i =>
-                        `<div class="list-group-item suggestion-item"
-                             data-id="${i.id}" data-model="${i.model}">
-                            <strong>${i.text}</strong>
-                         </div>`).join("");
-                    box.classList.add("show");
-                });
-        });
+        console.log('Formset 852: Buscando autoridad con query:', q);
+        fetch(`/catalogacion/api/autocompletar/autoridad/?q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(d => {
+                console.log('Formset 852: Respuesta recibida:', d);
+                box.innerHTML = (d.results || []).map(i =>
+                    `<div class="list-group-item suggestion-item"
+                         data-id="${i.id}" data-model="${i.model}">
+                        <strong>${i.text}</strong>
+                     </div>`).join("");
+                box.classList.add("show");
+            })
+            .catch(err => {
+                console.error('Formset 852: Error en búsqueda:', err);
+                box.classList.remove("show");
+            });
+    });
 
-        box.addEventListener("click", e => {
-            const item = e.target.closest(".suggestion-item");
-            if (!item) return;
+    // Delegación de eventos para click en sugerencias
+    root.addEventListener("click", e => {
+        const item = e.target.closest(".suggestion-item");
+        if (!item) return;
 
-            input.value = item.textContent.trim();
-            const row = input.closest(".formset-row");
-            row.querySelector('input[name$="-autoridad_model"]').value = item.dataset.model;
-            row.querySelector('input[name$="-autoridad_id"]').value = item.dataset.id;
-            box.classList.remove("show");
-        });
+        const box = item.closest(".autoridad852-suggestions");
+        if (!box) return;
 
-        input.addEventListener("blur", () => setTimeout(() => box.classList.remove("show"), 200));
-    }
+        const wrapper = box.closest(".autocomplete-wrapper");
+        if (!wrapper) return;
 
-    function initAutocomplete(wrapper) {
-        initAutoridad852Autocomplete(
-            wrapper.querySelector("input"),
-            wrapper.querySelector(".autoridad852-suggestions")
-        );
-    }
+        const input = wrapper.querySelector("input");
+        if (!input) return;
 
-    function cloneEmptyForm() {
-        const f = emptyForm.cloneNode(true);
-        f.classList.remove("empty-form");
-        f.style.display = "block";
-        const idx = Date.now();
+        input.value = item.textContent.trim();
+        const row = input.closest(".formset-row");
+        if (row) {
+            const modelInput = row.querySelector('input[name$="-autoridad_model"]');
+            const idInput = row.querySelector('input[name$="-autoridad_id"]');
+            if (modelInput) modelInput.value = item.dataset.model;
+            if (idInput) idInput.value = item.dataset.id;
+        }
+        box.classList.remove("show");
+    });
 
-        f.querySelectorAll("[name]").forEach(el => {
-            el.name = el.name.replace(/__prefix__/g, idx);
-        });
-        f.querySelectorAll(".add-estanteria-btn")
-            .forEach(b => b.dataset.ubicacionIndex = idx);
-        f.querySelectorAll(".estanterias-container")
-            .forEach(c => c.dataset.estanteriasContainer = idx);
+    // Delegación de eventos para blur (ocultar sugerencias)
+    root.addEventListener("blur", e => {
+        const wrapper = e.target.closest(".autocomplete-wrapper[data-autocomplete='persona']");
+        if (!wrapper) return;
 
-        f.querySelectorAll(".autocomplete-wrapper").forEach(initAutocomplete);
-        return f;
-    }
+        const box = wrapper.querySelector(".autoridad852-suggestions");
+        if (box) {
+            setTimeout(() => box.classList.remove("show"), 200);
+        }
+    }, true); // Usar capture phase
 
+    // Eventos de estanterías (mantener lógica existente)
     root.addEventListener("click", e => {
         const add = e.target.closest(".add-estanteria-btn");
         if (add) {
@@ -257,9 +268,15 @@ Autocomplete estable en $a (incluye clonados)
         if (delForm) delForm.closest(".formset-row").remove();
     });
 
-    root.querySelectorAll(".autocomplete-wrapper").forEach(initAutocomplete);
+    // Inicialización de estanterías existentes
     root.querySelectorAll(".estanterias-container").forEach(updateDeleteVisibility);
 
-    window.addUbicacion852 = () => formsContainer.appendChild(cloneEmptyForm());
+    // Función global para agregar ubicaciones (mantener compatibilidad)
+    window.addUbicacion852 = () => {
+        const f = emptyForm.cloneNode(true);
+        f.classList.remove("empty-form");
+        f.style.display = "block";
+        formsContainer.appendChild(f);
+    };
 })();
 </script>

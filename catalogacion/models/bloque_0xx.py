@@ -3,7 +3,10 @@ Modelos MARC21 - Bloque 0XX
 Campos de control, números de identificación y códigos
 """
 from django.db import models
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 from .constantes import CODIGOS_LENGUAJE, CODIGOS_PAIS
+
 
 
 class IncipitMusical(models.Model):
@@ -349,3 +352,5 @@ class CodigoPaisEntidad(models.Model):
     def get_marc_format(self):
         """Retorna el subcampo en formato MARC"""
         return f"$a{self.codigo_pais}"
+
+

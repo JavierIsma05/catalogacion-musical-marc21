@@ -38,7 +38,7 @@
     {% endfor %}
 
     {# EMPTY FORM #}
-    <div class="formset-row empty-form d-none">
+    <div class="formset-row empty-form mb-3" style="display:none;">
       {% for hidden in formset.empty_form.hidden_fields %}
         {{ hidden }}
       {% endfor %}

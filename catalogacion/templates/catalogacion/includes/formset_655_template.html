@@ -30,14 +30,18 @@ Botón + a la izquierda (input-group) — ESTABLE
                         <input type="text"
                                class="form-control genero-input"
                                name="{{ form.prefix }}-materia_texto"
+                               placeholder="Escriba género/forma…"
                                autocomplete="off"
-                               value="{{ form.instance.materia.forma|default:'' }}">
+                               value="{% if form.instance.pk and form.materia.value %}{{ form.instance.materia.forma }}{% endif %}">
                         <input type="hidden"
                                class="genero-id"
                                name="{{ form.prefix }}-materia"
-                               value="{{ form.instance.materia.id|default:'' }}">
-                        <div class="genero-suggestions list-group autocomplete-suggestions"></div>
+                               value="{% if form.instance.pk and form.materia.value %}{{ form.instance.materia.id }}{% endif %}">
+                        <div class="genero-suggestions autocomplete-suggestions list-group"></div>
                     </div>
+                    {% if form.materia.errors %}
+                    <div class="invalid-feedback d-block">{{ form.materia.errors }}</div>
+                    {% endif %}
                 </div>
 
                 <!-- 655 $x -->
@@ -57,7 +61,10 @@ Botón + a la izquierda (input-group) — ESTABLE
                                         <i class="bi bi-plus"></i>
                                     </button>
                                     {% else %}
-                                    <span class="input-group-text bg-transparent border-0"></span>
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
                                     {% endif %}
 
                                     <input type="text"
@@ -121,7 +128,7 @@ Botón + a la izquierda (input-group) — ESTABLE
                         <input type="hidden"
                                class="genero-id"
                                name="{{ formset.prefix }}-__prefix__-materia">
-                        <div class="genero-suggestions list-group autocomplete-suggestions"></div>
+                        <div class="genero-suggestions autocomplete-suggestions list-group"></div>
                     </div>
                 </div>
 
@@ -159,8 +166,146 @@ Botón + a la izquierda (input-group) — ESTABLE
 
 <script>
 (function(){
-    const container=document.querySelector('[data-formset-prefix="{{ formset.prefix }}"]');
-    if(!container) return;
+    const PREFIX = "{{ formset.prefix }}";
+    const container = document.querySelector(`[data-formset-prefix="${PREFIX}"]`);
+    if(!container) {
+        console.log('🚫 No se encontró container para 655 con prefix:', PREFIX);
+        return;
+    }
+    
+    console.log('✅ Container 655 encontrado:', container);
+
+    function initGeneroAutocomplete(input) {
+        if (!input) {
+            console.log('🚫 Input es null o undefined');
+            return;
+        }
+        
+        // 🔥 CLAVE: Verificar el flag correctamente
+        if (input.dataset.generoInit === "1") {
+            console.log('🚫 Input ya está inicializado, saltando:', input);
+            return;
+        }
+        
+        console.log('✅ Inicializando autocomplete para input:', input);
+        input.dataset.generoInit = "1";
+
+        const wrapper = input.closest(".autocomplete-wrapper");
+        if (!wrapper) {
+            console.log('🚫 No se encontró wrapper para input:', input);
+            return;
+        }
+        
+        const suggestionsBox = wrapper.querySelector(".genero-suggestions");
+        const hiddenIdInput = wrapper.querySelector(".genero-id");
+        
+        if (!suggestionsBox) {
+            console.log('🚫 No se encontró suggestionsBox para input:', input);
+            return;
+        }
+        
+        if (!hiddenIdInput) {
+            console.log('🚫 No se encontró hiddenIdInput para input:', input);
+            return;
+        }
+        
+        console.log('✅ Todos los elementos encontrados para input:', input);
+        
+        let debounceTimer = null, selectedIndex = -1;
+
+        function hide() { 
+            suggestionsBox.classList.remove("show"); 
+            suggestionsBox.innerHTML = ""; 
+            selectedIndex = -1; 
+        }
+
+        function marcar(items){ 
+            items.forEach((el,i)=>el.classList.toggle("selected", i===selectedIndex)); 
+        }
+
+        function seleccionar(item){
+            input.value = item.text;
+            hiddenIdInput.value = item.id || "";
+            hiddenIdInput.dataset.nuevo = item.nuevo ? "1":"0";
+            hiddenIdInput.dispatchEvent(new Event("change"));
+            hide();
+        }
+
+        function mostrar(results, query){
+            suggestionsBox.innerHTML="";
+            selectedIndex=-1;
+            if(!results.length){
+                const div = document.createElement("div");
+                div.className="autocomplete-item autocomplete-item-new list-group-item";
+                div.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${query}"`;
+                div.onclick = ()=>seleccionar({id:"",text:query,nuevo:true});
+                suggestionsBox.appendChild(div);
+            } else {
+                results.forEach(r=>{
+                    const div=document.createElement("div");
+                    div.className="autocomplete-item list-group-item";
+                    div.innerHTML=`<strong>${r.text}</strong>`;
+                    div.onclick=()=>seleccionar({id:r.id,text:r.text,nuevo:false});
+                    suggestionsBox.appendChild(div);
+                });
+                const nuevo=document.createElement("div");
+                nuevo.className="autocomplete-item autocomplete-item-new list-group-item";
+                nuevo.innerHTML=`<i class="bi bi-plus-circle me-2"></i> Crear: "${query}"`;
+                nuevo.onclick=()=>seleccionar({id:"",text:query,nuevo:true});
+                suggestionsBox.appendChild(nuevo);
+            }
+            suggestionsBox.classList.add("show");
+        }
+
+        function buscar(q){ 
+            fetch(`/catalogacion/api/autocompletar/genero/?q=${encodeURIComponent(q)}`)
+                .then(r=>r.json()).then(d=>mostrar(d.results||[],q)).catch(()=>hide()); 
+        }
+
+        input.addEventListener("input", e=>{
+            const q = input.value.trim();
+            hiddenIdInput.value = ""; 
+            hiddenIdInput.removeAttribute("data-nuevo");
+            
+            console.log('🔍 Input event en 655 - query:', q, 'input:', input);
+            
+            if(q.length < 2){ 
+                console.log('🚫 Query muy corto, ocultando sugerencias');
+                hide(); 
+                return; 
+            }
+            
+            clearTimeout(debounceTimer); 
+            debounceTimer = setTimeout(() => {
+                console.log('🔍 Iniciando búsqueda de género para:', q);
+                buscar(q);
+            }, 250);
+        });
+
+        input.addEventListener("keydown", e=>{
+            const items = suggestionsBox.querySelectorAll(".autocomplete-item");
+            if(!items.length) return;
+            if(e.key==="ArrowDown"){ 
+                e.preventDefault(); 
+                selectedIndex=Math.min(selectedIndex+1,items.length-1); 
+                marcar(items); 
+            }
+            if(e.key==="ArrowUp"){ 
+                e.preventDefault(); 
+                selectedIndex=Math.max(selectedIndex-1,0); 
+                marcar(items); 
+            }
+            if(e.key==="Enter"){ 
+                e.preventDefault(); 
+                if(items[selectedIndex]) items[selectedIndex].click(); 
+            }
+            if(e.key==="Escape") hide();
+        });
+
+        document.addEventListener("click", e=>{ 
+            if(!wrapper.contains(e.target)) hide(); 
+        });
+    }
 
     function updateDeleteButtons(cont){
         cont.querySelectorAll(".subdivision-form-row").forEach((row,i)=>{
@@ -169,20 +314,40 @@ Botón + a la izquierda (input-group) — ESTABLE
         });
     }
 
-    container.addEventListener("click", e=>{
+    container.addEventListener("click", function(e){
         const addBtn=e.target.closest(".add-subdivision-btn");
         if(addBtn){
+            console.log("🔥 Botón + subdivisión clickeado en 655");
             const cont=addBtn.closest(".subdivisiones-container");
             const rows=cont.querySelectorAll(".subdivision-form-row");
+            console.log("🔍 Filas encontradas:", rows.length);
             const clone=rows[0].cloneNode(true);
+            console.log("✅ Clon creado");
 
             clone.querySelector(".subdivision-input").value="";
             clone.querySelector(".subdivision-input").name =
                 clone.querySelector(".subdivision-input").name.replace(/_\d+$/, `_${rows.length}`);
 
-            clone.querySelector(".add-subdivision-btn")?.remove();
+            // 🔥 CORRECCIÓN: Buscar y limpiar SOLO si existe .genero-input en el clon
+            const generoInput = clone.querySelector(".genero-input");
+            if (generoInput) {
+                console.log('🔍 Limpiando flag generoInit en input clonado:', generoInput);
+                delete generoInput.dataset.generoInit;
+                initGeneroAutocomplete(generoInput);
+            } else {
+                console.log('ℹ️ No se encontró .genero-input en el clon (esto es normal)');
+            }
+            
+            // Remover el botón + del clon
+            const cloneAddBtn = clone.querySelector(".add-subdivision-btn");
+            if (cloneAddBtn) {
+                cloneAddBtn.remove();
+            }
+            
             cont.appendChild(clone);
             updateDeleteButtons(cont);
+            console.log("✅ Clon de subdivisión agregado al contenedor");
+            return;
         }
 
         const delBtn=e.target.closest(".subcampo-delete-btn");
@@ -193,5 +358,47 @@ Botón + a la izquierda (input-group) — ESTABLE
             updateDeleteButtons(cont);
         }
     });
+
+    // Cuando se agrega desde el gestor global (formset-manager.js), reindexar e inicializar
+    container.addEventListener('formset:added', (ev) => {
+        if (!ev || !ev.detail || ev.detail.prefix !== PREFIX) {
+            console.log('🚫 Evento formset:added no es para este prefix:', PREFIX);
+            return;
+        }
+        
+        console.log('🔥 formset:added evento recibido en 655', ev.detail);
+        
+        // small timeout to let DOM settle
+        setTimeout(() => {
+            // 🔥 CLAVE: Buscar SOLO en el nuevo formulario agregado
+            const newForm = ev.detail.newForm;
+            if (!newForm) {
+                console.log('🚫 No se encontró newForm en el evento 655');
+                return;
+            }
+            
+            console.log('🔍 Nuevo formulario 655 encontrado:', newForm);
+            
+            // Inicializar autocomplete SOLO en los inputs del nuevo formulario
+            const newInputs = newForm.querySelectorAll(".genero-input");
+            console.log('🔍 Inputs de género encontrados en nuevo formulario 655:', newInputs.length);
+            
+            newInputs.forEach((input, index) => {
+                console.log(`🔄 Inicializando input ${index} del nuevo formulario 655:`, input);
+                // 🔥 CLAVE: Limpiar el flag para permitir reinicialización
+                delete input.dataset.generoInit;
+                initGeneroAutocomplete(input);
+            });
+            
+            // Inicializar subdivisiones en las nuevas filas
+            const subdivisionContainers = newForm.querySelectorAll(".subdivisiones-container");
+            console.log('🔍 Contenedores de subdivisiones encontrados en nuevo formulario 655:', subdivisionContainers.length);
+            subdivisionContainers.forEach(updateDeleteButtons);
+        }, 50);
+    });
+
+    // Inicializar autocomplete para inputs existentes
+    container.querySelectorAll(".genero-input").forEach(initGeneroAutocomplete);
+
 })();
 </script>

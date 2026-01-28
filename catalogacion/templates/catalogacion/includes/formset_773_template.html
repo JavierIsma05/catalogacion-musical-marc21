@@ -106,6 +106,14 @@ FORMSET 773 – Documento Fuente (R)
                             <input type="hidden"
                                 class="obra-relacionada-id-input"
                                 name="w_773_{{ enlace.pk }}">
+
+                            <!-- 🔥 Botón autocompletar -->
+                            <button type="button"
+                                    class="btn btn-success btn-autocompletar-773 d-none"
+                                    data-enlace-id="{{ enlace.pk }}"
+                                    title="Autocompletar campos desde obra padre">
+                                <i class="bi bi-magic"></i> Auto
+                            </button>
                         </div>
                     </div>
 
@@ -292,4 +300,981 @@ FORMSET 773 – Documento Fuente (R)
         .forEach(initAutocomplete);
 
 })();
+</script>
+
+<script>
+(function() {
+    'use strict';
+
+    // =====================================================
+    // 🔥 AUTOCOMPLETADO 773 - CAMPOS HEREDABLES
+    // =====================================================
+    
+    class Autocompletado773 {
+        constructor() {
+            this.init();
+        }
+
+        init() {
+            this.bindEvents();
+        }
+
+        bindEvents() {
+            // Evento para botones de buscar obra
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.btn-buscar-obra')) {
+                    this.handleBuscarObra(e.target.closest('.btn-buscar-obra'));
+                }
+                
+                if (e.target.closest('.btn-autocompletar-773')) {
+                    this.handleAutocompletar(e.target.closest('.btn-autocompletar-773'));
+                }
+            });
+
+            // Evento cuando cambia el input de obra relacionada
+            document.addEventListener('change', (e) => {
+                if (e.target.classList.contains('obra-relacionada-id-input')) {
+                    this.handleObraSeleccionada(e.target);
+                }
+            });
+        }
+
+        handleBuscarObra(btn) {
+            const enlaceId = btn.dataset.enlaceId;
+            const input = document.querySelector(`input[name="w_773_${enlaceId}"]`);
+            const visibleInput = btn.parentElement.querySelector('.numero-w-input');
+            const autoBtn = btn.parentElement.querySelector('.btn-autocompletar-773');
+
+            console.log('🔍 handleBuscarObra iniciado para enlaceId:', enlaceId);
+            console.log('📍 Input encontrado:', input);
+            console.log('📍 Visible input encontrado:', visibleInput);
+            console.log('📍 AutoBtn encontrado:', autoBtn);
+
+            // Solución directa: Monitorear el input constantemente
+            // Cuando tu modal actualice el input, activaremos el autocompletado
+            
+            let ultimoValor = input.value;
+            
+            // Monitorear cambios en el input cada 500ms
+            const monitorInterval = setInterval(() => {
+                const valorActual = input.value;
+                
+                if (valorActual && valorActual !== ultimoValor && valorActual !== '') {
+                    console.log('🔄 ¡CAMBIO DETECTADO! Valor anterior:', ultimoValor, 'Nuevo valor:', valorActual);
+                    
+                    // Actualizar input visible
+                    if (visibleInput) {
+                        visibleInput.value = valorActual;
+                    }
+                    
+                    // Mostrar y configurar botón de autocompletar
+                    if (autoBtn) {
+                        autoBtn.classList.remove('d-none');
+                        autoBtn.dataset.obraId = valorActual;
+                        
+                        console.log('🪄 Botón autocompletar configurado con obraId:', valorActual);
+                        
+                        // 🔥 AUTOCOMPLETAR AUTOMÁTICAMENTE
+                        setTimeout(() => {
+                            console.log('🚀 INICIANDO AUTOCOMPLETADO...');
+                            this.handleAutocompletar(autoBtn);
+                        }, 1000);
+                    }
+                    
+                    ultimoValor = valorActual;
+                }
+            }, 500);
+
+            // Limpiar después de 60 segundos
+            setTimeout(() => {
+                clearInterval(monitorInterval);
+                console.log('⏰ Monitoreo detenido después de 60 segundos');
+            }, 60000);
+
+            // También monitorear el evento change del input
+            input.addEventListener('change', (e) => {
+                console.log('📝 Evento change detectado:', e.target.value);
+                if (e.target.value && e.target.value !== '') {
+                    if (autoBtn) {
+                        autoBtn.classList.remove('d-none');
+                        autoBtn.dataset.obraId = e.target.value;
+                        
+                        setTimeout(() => {
+                            console.log('🚀 AUTOCOMPLETADO POR EVENTO CHANGE...');
+                            this.handleAutocompletar(autoBtn);
+                        }, 1000);
+                    }
+                }
+            });
+
+            // También monitorear el evento input (para cambios en tiempo real)
+            input.addEventListener('input', (e) => {
+                if (e.target.value && e.target.value.length > 0) {
+                    console.log('⌨️ Evento input detectado:', e.target.value);
+                }
+            });
+        }
+
+        handleObraSeleccionada(input) {
+            const obraId = input.value;
+            const enlaceId = input.name.replace('w_773_', '');
+            const autoBtn = document.querySelector(`.btn-autocompletar-773[data-enlace-id="${enlaceId}"]`);
+            
+            if (obraId && autoBtn) {
+                autoBtn.classList.remove('d-none');
+                autoBtn.dataset.obraId = obraId;
+            } else if (autoBtn) {
+                autoBtn.classList.add('d-none');
+            }
+        }
+
+        async handleAutocompletar(btn) {
+            const obraId = btn.dataset.obraId;
+            
+            if (!obraId) {
+                this.mostrarMensaje('Seleccione primero una obra padre', 'warning');
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Cargando...';
+
+                console.log('🚀 Iniciando autocompletado para obraId:', obraId);
+
+                const response = await fetch('/catalogacion/api/obras/autocomplete/773/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': this.getCSRFToken()
+                    },
+                    body: JSON.stringify({ obra_id: obraId })
+                });
+
+                console.log('📡 Respuesta recibida:', response.status);
+
+                const data = await response.json();
+                console.log('📦 Datos recibidos:', data);
+
+                if (data.success) {
+                    console.log('🔍 CAMPOS RECIBIDOS DE LA API:');
+                    console.log('  - Campo 100:', data.campos_heredables['100']);
+                    console.log('  - Campo 245:', data.campos_heredables['245']);
+                    console.log('  - Campo 264:', data.campos_heredables['264']);
+                    console.log('  - Campo 382:', data.campos_heredables['382']);
+                    console.log('  - Campo 545:', data.campos_heredables['545']);
+                    console.log('  - Campo 852:', data.campos_heredables['852']);
+                    console.log('  - Campo 856:', data.campos_heredables['856']);
+                    
+                    await this.poblarCamposHeredables(data.campos_heredables);
+                    this.mostrarMensaje(
+                        `Campos heredados de "${data.obra.titulo}" (${data.obra.num_control})`,
+                        'success'
+                    );
+                } else {
+                    this.mostrarMensaje(data.error || 'Error al obtener campos', 'error');
+                }
+
+            } catch (error) {
+                console.error('❌ Error en autocompletado:', error);
+                this.mostrarMensaje('Error de conexión', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-magic"></i> Auto';
+            }
+        }
+
+        async poblarCamposHeredables(campos) {
+            console.log('🚀 INICIANDO PROCESO DE AUTOCOMPLETADO DE CAMPOS HEREDABLES');
+            console.log('================================================================');
+            
+            // Validar que tenemos datos
+            if (!campos || typeof campos !== 'object') {
+                console.error('❌ Datos de campos inválidos:', campos);
+                this.mostrarMensaje('Error: Datos inválidos recibidos', 'error');
+                return;
+            }
+            
+            // 🔥 DIAGNÓSTICO COMPLETO - MOSTRAR TODOS LOS INPUTS
+            console.log('🔍 DIAGNÓSTICO COMPLETO DEL FORMULARIO:');
+            console.log('=====================================');
+            
+            // Mostrar todos los inputs del formulario
+            const allInputs = document.querySelectorAll('input, textarea, select');
+            console.log(`📋 TOTAL DE ELEMENTOS ENCONTRADOS: ${allInputs.length}`);
+            
+            allInputs.forEach((input, index) => {
+                const tagName = input.tagName.toLowerCase();
+                const inputType = input.type || 'N/A';
+                const inputName = input.name || 'SIN_NOMBRE';
+                const inputValue = input.value || 'VACÍO';
+                const inputId = input.id || 'SIN_ID';
+                const inputClass = input.className || 'SIN_CLASE';
+                
+                console.log(`${index + 1}. [${tagName}] name="${inputName}" type="${inputType}" value="${inputValue}" id="${inputId}" class="${inputClass}"`);
+            });
+            
+            console.log('=====================================');
+            console.log('🔍 CAMPOS RECIBIDOS DE LA API:');
+            
+            // Lista de campos esperados
+            const camposEsperados = ['100', '245', '264', '382', '545', '852', '856'];
+            let camposProcesados = 0;
+            let camposExitosos = 0;
+            
+            camposEsperados.forEach(campoCodigo => {
+                const campoData = campos[campoCodigo];
+                console.log(`  - Campo ${campoCodigo}:`, campoData ? '✅ RECIBIDO' : '❌ AUSENTE', campoData || '');
+                
+                if (campoData) {
+                    camposProcesados++;
+                    try {
+                        switch (campoCodigo) {
+                            case '100':
+                                this.poblarCampo100(campoData);
+                                break;
+                            case '245':
+                                this.poblarCampo245(campoData);
+                                break;
+                            case '264':
+                                this.poblarCampo264(campoData);
+                                break;
+                            case '382':
+                                this.poblarCampo382(campoData);
+                                break;
+                            case '545':
+                                this.poblarCampo545(campoData);
+                                break;
+                            case '852':
+                                this.poblarCampo852(campoData);
+                                break;
+                            case '856':
+                                this.poblarCampo856(campoData);
+                                break;
+                            default:
+                                console.warn(`⚠️ Campo ${campoCodigo} no tiene implementación`);
+                                break;
+                        }
+                        camposExitosos++;
+                        console.log(`✅ Campo ${campoCodigo} procesado exitosamente`);
+                    } catch (error) {
+                        console.error(`❌ Error procesando campo ${campoCodigo}:`, error);
+                    }
+                }
+            });
+            
+            console.log('=====================================');
+            console.log('📊 RESUMEN DEL PROCESAMIENTO:');
+            console.log(`  - Campos esperados: ${camposEsperados.length}`);
+            console.log(`  - Campos recibidos: ${camposProcesados}`);
+            console.log(`  - Campos procesados exitosamente: ${camposExitosos}`);
+            console.log(`  - Tasa de éxito: ${((camposExitosos / camposEsperados.length) * 100).toFixed(1)}%`);
+            console.log('=====================================');
+            
+            // Mostrar mensaje de éxito si se procesó al menos un campo
+            if (camposExitosos > 0) {
+                this.mostrarMensaje(
+                    `Se autocompletaron ${camposExitosos} de ${camposEsperados.length} campos exitosamente`,
+                    'success'
+                );
+            } else {
+                this.mostrarMensaje('No se pudo autocompletar ningún campo', 'warning');
+            }
+            
+            // Disparar eventos adicionales para asegurar que el formulario se actualice
+            setTimeout(() => {
+                console.log('🔄 Disparando eventos de actualización del formulario...');
+                
+                // Disparar evento change en todos los inputs que tienen valores
+                const inputsConValor = document.querySelectorAll('input[value], textarea[value], select[value]');
+                inputsConValor.forEach(input => {
+                    if (input.value && input.value.trim()) {
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+                
+                // Disparar evento de formulario si existe
+                const form = document.querySelector('form');
+                if (form) {
+                    form.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                
+                console.log('✅ Eventos de actualización completados');
+            }, 500);
+        }
+
+        poblarCampo100(campo) {
+        console.log('🎨 Poblando campo 100 con:', campo);
+        
+        // 🔥 SELECTORES EXACTOS según los nombres reales del formulario
+        const compositorHidden = document.querySelector('input[name="compositor"]'); // hidden ID
+        const compositorTexto = document.querySelector('input[name="compositor_texto"]'); // texto visible
+        const compositorCoordenadas = document.querySelector('input[name="compositor_coordenadas"]'); // coordenadas
+        
+        console.log('📍 Inputs 100 encontrados:');
+        console.log('  - compositorHidden:', compositorHidden);
+        console.log('  - compositorTexto:', compositorTexto);
+        console.log('  - compositorCoordenadas:', compositorCoordenadas);
+        
+        // Mostrar todos los inputs relacionados con 100 para diagnóstico
+        const all100Inputs = document.querySelectorAll('input[name*="compositor"], input[name*="100"]');
+        console.log('🔍 TODOS los inputs relacionados con 100:');
+        all100Inputs.forEach((input, index) => {
+            console.log(`  ${index + 1}. name="${input.name}" type="${input.type}" value="${input.value}" id="${input.id}"`);
+        });
+        
+        // Poblar ID del compositor (campo hidden)
+        if (compositorHidden && campo.compositor_id) {
+            compositorHidden.value = campo.compositor_id;
+            console.log('✅ Compositor ID actualizado:', campo.compositor_id);
+            
+            setTimeout(() => {
+                compositorHidden.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('❌ No se encontró input hidden de compositor o no hay datos');
+        }
+        
+        // Poblar texto del compositor (campo visible)
+        if (compositorTexto && campo.compositor_texto && !compositorTexto.value.trim()) {
+            compositorTexto.value = campo.compositor_texto;
+            console.log('✅ Compositor texto actualizado:', campo.compositor_texto);
+            
+            setTimeout(() => {
+                compositorTexto.dispatchEvent(new Event('change', { bubbles: true }));
+                compositorTexto.dispatchEvent(new Event('input', { bubbles: true }));
+                compositorTexto.dispatchEvent(new Event('blur', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('❌ No se encontró input de texto o ya tiene valor');
+        }
+        
+        // Poblar coordenadas biográficas ($c)
+        if (compositorCoordenadas && campo.coordenadas_biograficas && !compositorCoordenadas.value.trim()) {
+            compositorCoordenadas.value = campo.coordenadas_biograficas;
+            console.log('✅ Coordenadas biográficas actualizadas:', campo.coordenadas_biograficas);
+            
+            setTimeout(() => {
+                compositorCoordenadas.dispatchEvent(new Event('change', { bubbles: true }));
+                compositorCoordenadas.dispatchEvent(new Event('input', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('❌ No se encontró input de coordenadas o ya tiene valor');
+        }
+        
+        // Poblar funciones del compositor ($e - repetible)
+        if (campo.funciones && campo.funciones.length > 0) {
+            console.log('🎭 Funciones del compositor ($e):', campo.funciones);
+            
+            // Buscar formset de funciones 100e
+            const formsetFunciones = document.querySelector('[data-formset-prefix*="funciones_compositor"]');
+            if (formsetFunciones) {
+                console.log('📋 Formset de funciones encontrado');
+                
+                // Agregar filas si es necesario y poblar
+                campo.funciones.forEach((funcion, index) => {
+                    const existingRows = formsetFunciones.querySelectorAll('.formset-row:not(.empty-form)').length;
+                    if (existingRows <= index) {
+                        this.agregarFilaFormset(formsetFunciones);
+                        console.log('➕ Agregando nueva fila de función para índice:', index);
+                    }
+                    
+                    const rows = formsetFunciones.querySelectorAll('.formset-row:not(.empty-form)');
+                    const row = rows[index];
+                    
+                    if (row) {
+                        const funcionSelect = row.querySelector('select[name*="funcion"]');
+                        if (funcionSelect && !funcionSelect.value) {
+                            funcionSelect.value = funcion.funcion;
+                            console.log('✅ Función ($e) actualizada:', funcion.funcion_display);
+                            
+                            setTimeout(() => {
+                                funcionSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                            }, 100);
+                        }
+                    }
+                });
+            } else {
+                console.log('❌ No se encontró formset de funciones 100e');
+            }
+        } else {
+            console.log('❌ No hay datos de funciones');
+        }
+    }
+
+    poblarCampo245(campo) {
+        console.log('🎨 Poblando campo 245 (Título Principal) con:', campo);
+        
+        // Buscar los 3 campos REALES del formulario 245
+        const tituloPrincipal = document.querySelector('input[name="titulo_principal"], #id_titulo_principal');
+        const subtitulo = document.querySelector('input[name="subtitulo"], #id_subtitulo');
+        const mencionResponsabilidad = document.querySelector('input[name="mencion_responsabilidad"], #id_mencion_responsabilidad');
+        
+        console.log('📍 Inputs 245 encontrados:');
+        console.log('  - tituloPrincipal:', tituloPrincipal);
+        console.log('  - subtitulo:', subtitulo);
+        console.log('  - mencionResponsabilidad:', mencionResponsabilidad);
+        
+        // Poblar título principal
+        if (tituloPrincipal && campo.titulo_principal && !tituloPrincipal.value.trim()) {
+            tituloPrincipal.value = campo.titulo_principal;
+            console.log('✅ Título principal actualizado:', campo.titulo_principal);
+            setTimeout(() => {
+                tituloPrincipal.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        }
+        
+        // Poblar subtítulo
+        if (subtitulo && campo.subtitulo && !subtitulo.value.trim()) {
+            subtitulo.value = campo.subtitulo;
+            console.log('✅ Subtítulo actualizado:', campo.subtitulo);
+            setTimeout(() => {
+                subtitulo.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        }
+        
+        // Poblar mención de responsabilidad
+        if (mencionResponsabilidad && campo.mencion_responsabilidad && !mencionResponsabilidad.value.trim()) {
+            mencionResponsabilidad.value = campo.mencion_responsabilidad;
+            console.log('✅ Mención de responsabilidad actualizada:', campo.mencion_responsabilidad);
+            setTimeout(() => {
+                mencionResponsabilidad.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        }
+    }
+
+    poblarCampo264(campo) {
+        console.log('🏢 Poblar campo 264 (Publicación) con:', campo);
+        console.log('🔍 DEBUG 264: Datos recibidos:', JSON.stringify(campo, null, 2));
+        
+        // Buscar el formset de 264
+        const formset264 = document.querySelector('[data-formset-prefix*="producciones_publicaciones"]');
+        console.log('🔍 DEBUG 264: Buscando formset con selector [data-formset-prefix*="producciones_publicaciones"]');
+        console.log('🔍 DEBUG 264: Formset encontrado:', formset264);
+        
+        if (!formset264) {
+            console.log('❌ No se encontró formset de 264');
+            // Intentar otros selectores posibles
+            const alternatives = [
+                '[data-formset-prefix*="264"]',
+                '.formset-container[data-formset-prefix*="produccion"]',
+                '#formset-producciones_publicaciones'
+            ];
+            for (const alt of alternatives) {
+                const altFormset = document.querySelector(alt);
+                if (altFormset) {
+                    console.log(`🔍 DEBUG 264: Encontrado con selector alternativo: ${alt}`);
+                    break;
+                }
+            }
+            return;
+        }
+        
+        console.log('✅ Formset 264 encontrado:', formset264);
+        
+        // Buscar la primera fila del formset (o crear una si no existe)
+        let primeraFila = formset264.querySelector('.formset-row:not(.empty-form)');
+        console.log('🔍 DEBUG 264: Primera fila encontrada:', primeraFila);
+        
+        if (!primeraFila) {
+            console.log('🔄 No hay filas en 264, agregando una...');
+            const addBtn = formset264.querySelector('.add-row-btn, [data-formset-add]');
+            console.log('🔍 DEBUG 264: Botón agregar encontrado:', addBtn);
+            
+            if (addBtn) {
+                addBtn.click();
+                console.log('🔍 DEBUG 264: Click en botón agregar');
+                // Esperar un poco a que se cree la fila
+                setTimeout(() => {
+                    primeraFila = formset264.querySelector('.formset-row:not(.empty-form)');
+                    console.log('🔍 DEBUG 264: Después de timeout, fila encontrada:', primeraFila);
+                    if (primeraFila) {
+                        this.poblarCampos264Fila(primeraFila, campo);
+                    }
+                }, 300);
+            } else {
+                console.log('❌ No se encontró botón para agregar fila 264');
+            }
+        } else {
+            this.poblarCampos264Fila(primeraFila, campo);
+        }
+    }
+    
+    poblarCampos264Fila(fila, campo) {
+        console.log('🏢 Poblando campos 264 en fila:', fila);
+        console.log('📦 Datos recibidos:', JSON.stringify(campo, null, 2));
+        
+        // Buscar inputs de lugar (264$a)
+        const lugarInput = fila.querySelector('input[name*="lugar_produccion_264"]');
+        console.log('🔍 DEBUG 264: Buscando input[name*="lugar_produccion_264"]');
+        console.log('🔍 DEBUG 264: Lugar input encontrado:', lugarInput);
+        console.log('🔍 DEBUG 264: Valor actual lugar:', lugarInput?.value);
+        console.log('🔍 DEBUG 264: Valor a asignar lugar:', campo.lugar_produccion_264);
+        
+        if (lugarInput && campo.lugar_produccion_264 && !lugarInput.value.trim()) {
+            lugarInput.value = campo.lugar_produccion_264;
+            console.log('✅ Lugar de publicación actualizado:', campo.lugar_produccion_264);
+            setTimeout(() => {
+                lugarInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('🔍 DEBUG 264: No se actualizó lugar - condiciones:', {
+                lugarInput: !!lugarInput,
+                tieneValor: !!campo.lugar_produccion_264,
+                vacio: !lugarInput?.value?.trim()
+            });
+        }
+        
+        // Buscar inputs de entidad (264$b)
+        const entidadInput = fila.querySelector('input[name*="entidad_produccion_264"]');
+        console.log('🔍 DEBUG 264: Buscando input[name*="entidad_produccion_264"]');
+        console.log('🔍 DEBUG 264: Entidad input encontrado:', entidadInput);
+        console.log('🔍 DEBUG 264: Valor actual entidad:', entidadInput?.value);
+        console.log('🔍 DEBUG 264: Valor a asignar entidad:', campo.entidad_produccion_264);
+        
+        if (entidadInput && campo.entidad_produccion_264 && !entidadInput.value.trim()) {
+            entidadInput.value = campo.entidad_produccion_264;
+            console.log('✅ Editorial actualizada:', campo.entidad_produccion_264);
+            setTimeout(() => {
+                entidadInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('🔍 DEBUG 264: No se actualizó entidad - condiciones:', {
+                entidadInput: !!entidadInput,
+                tieneValor: !!campo.entidad_produccion_264,
+                vacio: !entidadInput?.value?.trim()
+            });
+        }
+        
+        // Buscar inputs de fecha (264$c)
+        const fechaInput = fila.querySelector('input[name*="fecha_produccion_264"]');
+        console.log('🔍 DEBUG 264: Buscando input[name*="fecha_produccion_264"]');
+        console.log('🔍 DEBUG 264: Fecha input encontrado:', fechaInput);
+        console.log('🔍 DEBUG 264: Valor actual fecha:', fechaInput?.value);
+        console.log('🔍 DEBUG 264: Valor a asignar fecha:', campo.fecha_produccion_264);
+        
+        if (fechaInput && campo.fecha_produccion_264 && !fechaInput.value.trim()) {
+            fechaInput.value = campo.fecha_produccion_264;
+            console.log('✅ Fecha de publicación actualizada:', campo.fecha_produccion_264);
+            setTimeout(() => {
+                fechaInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('🔍 DEBUG 264: No se actualizó fecha - condiciones:', {
+                fechaInput: !!fechaInput,
+                tieneValor: !!campo.fecha_produccion_264,
+                vacio: !fechaInput?.value?.trim()
+            });
+        }
+        
+        console.log('📍 Inputs 264 procesados:');
+        console.log('  - lugarInput:', lugarInput);
+        console.log('  - entidadInput:', entidadInput);
+        console.log('  - fechaInput:', fechaInput);
+    }
+
+    poblarCampo382(campo) {
+        console.log('🎼 Poblar campo 382 (Medium de interpretación) con:', campo);
+        console.log('🔍 DEBUG 382: Datos recibidos:', JSON.stringify(campo, null, 2));
+        
+        // Buscar el formset de 382
+        const formset382 = document.querySelector('[data-formset-prefix*="medios_interpretacion_382"]');
+        console.log('🔍 DEBUG 382: Buscando formset con selector [data-formset-prefix*="medios_interpretacion_382"]');
+        console.log('🔍 DEBUG 382: Formset encontrado:', formset382);
+        
+        if (!formset382) {
+            console.log('❌ No se encontró formset de 382');
+            // Intentar otros selectores posibles
+            const alternatives = [
+                '[data-formset-prefix*="382"]',
+                '.formset-container[data-formset-prefix*="medios"]',
+                '#formset-medios_interpretacion_382'
+            ];
+            for (const alt of alternatives) {
+                const altFormset = document.querySelector(alt);
+                if (altFormset) {
+                    console.log(`🔍 DEBUG 382: Encontrado con selector alternativo: ${alt}`);
+                    break;
+                }
+            }
+            return;
+        }
+        
+        console.log('✅ Formset 382 encontrado:', formset382);
+        
+        // Buscar la primera fila del formset (o crear una si no existe)
+        let primeraFila = formset382.querySelector('.formset-row:not(.empty-form)');
+        console.log('🔍 DEBUG 382: Primera fila encontrada:', primeraFila);
+        
+        if (!primeraFila) {
+            console.log('🔄 No hay filas en 382, agregando una...');
+            const addBtn = formset382.querySelector('.add-row-btn, [data-formset-add]');
+            console.log('🔍 DEBUG 382: Botón agregar encontrado:', addBtn);
+            
+            if (addBtn) {
+                addBtn.click();
+                console.log('🔍 DEBUG 382: Click en botón agregar');
+                // Esperar un poco a que se cree la fila
+                setTimeout(() => {
+                    primeraFila = formset382.querySelector('.formset-row:not(.empty-form)');
+                    console.log('🔍 DEBUG 382: Después de timeout, fila encontrada:', primeraFila);
+                    if (primeraFila) {
+                        this.poblarCampos382Fila(primeraFila, campo);
+                    }
+                }, 300);
+            } else {
+                console.log('❌ No se encontró botón para agregar fila 382');
+            }
+        } else {
+            this.poblarCampos382Fila(primeraFila, campo);
+        }
+    }
+    
+    poblarCampos382Fila(fila, campo) {
+        console.log('🎼 Poblando campos 382 en fila:', fila);
+        console.log('📦 Datos recibidos:', JSON.stringify(campo, null, 2));
+        
+        // Buscar input de solista (382$b)
+        const solistaInput = fila.querySelector('input[name*="solista"]');
+        console.log('🔍 DEBUG 382: Buscando input[name*="solista"]');
+        console.log('🔍 DEBUG 382: Solista input encontrado:', solistaInput);
+        console.log('🔍 DEBUG 382: Valor actual solista:', solistaInput?.value);
+        console.log('🔍 DEBUG 382: Valor a asignar solista:', campo.solista);
+        
+        if (solistaInput && campo.solista !== undefined && !solistaInput.value.trim()) {
+            solistaInput.value = campo.solista;
+            console.log('✅ Solista actualizado:', campo.solista);
+            setTimeout(() => {
+                solistaInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('🔍 DEBUG 382: No se actualizó solista - condiciones:', {
+                solistaInput: !!solistaInput,
+                tieneValor: campo.solista !== undefined,
+                vacio: !solistaInput?.value?.trim()
+            });
+        }
+        
+        // Buscar select de medio (382$a)
+        if (campo.medio_interpretacion_382) {
+            const medioSelect = fila.querySelector('select[name*="medio_interpretacion_382"]');
+            console.log('🔍 DEBUG 382: Buscando select[name*="medio_interpretacion_382"]');
+            console.log('🔍 DEBUG 382: Medio select encontrado:', medioSelect);
+            console.log('🔍 DEBUG 382: Valor actual medio:', medioSelect?.value);
+            console.log('🔍 DEBUG 382: Valor a asignar medio:', campo.medio_interpretacion_382);
+            
+            if (medioSelect && !medioSelect.value) {
+                medioSelect.value = campo.medio_interpretacion_382;
+                console.log('✅ Medium de interpretación actualizado:', campo.medio_display);
+                setTimeout(() => {
+                    medioSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                }, 100);
+            } else {
+                console.log('🔍 DEBUG 382: No se actualizó medio - condiciones:', {
+                    medioSelect: !!medioSelect,
+                    vacio: !medioSelect?.value?.trim()
+                });
+            }
+        } else {
+            console.log('🔍 DEBUG 382: No hay medio_interpretacion_382 en los datos');
+        }
+        
+        console.log('📍 Inputs 382 procesados:');
+        console.log('  - solistaInput:', solistaInput);
+        console.log('  - medioSelect:', fila.querySelector('select[name*="medio_interpretacion_382"]'));
+    }
+
+    poblarCampo545(campo) {
+        console.log('📝 Poblar campo 545 (Nota biográfica) con:', campo);
+        console.log('🔍 DEBUG 545: Datos recibidos:', JSON.stringify(campo, null, 2));
+        
+        // Buscar el campo REAL de nota biográfica - EL FORMSET USA PREFIJO "biograficos_545"
+        const notaBiografica = document.querySelector('textarea[name*="texto_biografico"][name*="biograficos_545"], input[name*="texto_biografico"][name*="biograficos_545"]');
+        console.log('🔍 DEBUG 545: Buscando textarea/input con name*="texto_biografico"[name*="biograficos_545"]');
+        console.log('🔍 DEBUG 545: Input encontrado:', notaBiografica);
+        console.log('🔍 DEBUG 545: Valor actual:', notaBiografica?.value);
+        console.log('🔍 DEBUG 545: Valor a asignar:', campo.datos_biograficos_545);
+        
+        // Buscar también el campo URI
+        const uriField = document.querySelector('input[name*="uri"][name*="biograficos_545"]');
+        console.log('🔍 DEBUG 545: Buscando input[name*="uri"][name*="biograficos_545"]');
+        console.log('🔍 DEBUG 545: URI field encontrado:', uriField);
+        console.log('🔍 DEBUG 545: Valor actual URI:', uriField?.value);
+        console.log('🔍 DEBUG 545: Valor a asignar URI:', campo.uri_545);
+        
+        // Intentar otros selectores posibles
+        if (!notaBiografica || !uriField) {
+            console.log('🔍 DEBUG 545: Intentando selectores alternativos...');
+            const alternatives = [
+                'textarea[name*="texto_biografico"]',
+                'input[name*="texto_biografico"]',
+                'textarea[name*="biograficos_545"]',
+                'input[name*="biograficos_545"]',
+                'textarea[id*="texto_biografico"]',
+                'input[id*="texto_biografico"]',
+                '[name*="545"]',
+                '[data-formset-prefix*="biograficos_545"] textarea',
+                '[data-formset-prefix*="biograficos_545"] input'
+            ];
+            for (const alt of alternatives) {
+                const altElement = document.querySelector(alt);
+                if (altElement) {
+                    console.log(`🔍 DEBUG 545: Encontrado con selector alternativo: ${alt}`);
+                    console.log(`🔍 DEBUG 545: Elemento encontrado:`, altElement);
+                    break;
+                }
+            }
+        }
+        
+        // Poblar nota biográfica
+        if (notaBiografica && campo.datos_biograficos_545 && !notaBiografica.value.trim()) {
+            notaBiografica.value = campo.datos_biograficos_545;
+            console.log('✅ Nota biográfica actualizada:', campo.datos_biograficos_545);
+            setTimeout(() => {
+                notaBiografica.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('🔍 DEBUG 545: No se actualizó nota biográfica - condiciones:', {
+                notaBiografica: !!notaBiografica,
+                tieneValor: !!campo.datos_biograficos_545,
+                vacio: !notaBiografica?.value?.trim(),
+                valorActual: notaBiografica?.value?.substring(0, 50)
+            });
+        }
+        
+        // Poblar URI
+        if (uriField && campo.uri_545 && !uriField.value.trim()) {
+            uriField.value = campo.uri_545;
+            console.log('✅ URI actualizada:', campo.uri_545);
+            setTimeout(() => {
+                uriField.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('🔍 DEBUG 545: No se actualizó URI - condiciones:', {
+                uriField: !!uriField,
+                tieneValor: !!campo.uri_545,
+                vacio: !uriField?.value?.trim(),
+                valorActual: uriField?.value?.substring(0, 50)
+            });
+        }
+    }
+
+    poblarCampo852(campo) {
+        console.log('📍 Poblar campo 852 (Localización) con:', campo);
+        console.log('🔍 DEBUG 852: Datos recibidos:', JSON.stringify(campo, null, 2));
+        
+        // Buscar el formset de 852
+        const formset852 = document.querySelector('[data-formset-prefix*="ubicaciones_852"]');
+        console.log('🔍 DEBUG 852: Buscando formset con selector [data-formset-prefix*="ubicaciones_852"]');
+        console.log('🔍 DEBUG 852: Formset encontrado:', formset852);
+        
+        if (!formset852) {
+            console.log('❌ No se encontró formset de 852');
+            return;
+        }
+        
+        console.log('✅ Formset 852 encontrado:', formset852);
+        
+        // Buscar la primera fila del formset (o crear una si no existe)
+        let primeraFila = formset852.querySelector('.formset-row:not(.empty-form)');
+        console.log('🔍 DEBUG 852: Primera fila encontrada:', primeraFila);
+        
+        if (!primeraFila) {
+            console.log('🔄 No hay filas en 852, agregando una...');
+            const addBtn = formset852.querySelector('.add-row-btn, [data-formset-add]');
+            console.log('🔍 DEBUG 852: Botón agregar encontrado:', addBtn);
+            
+            if (addBtn) {
+                addBtn.click();
+                setTimeout(() => {
+                    primeraFila = formset852.querySelector('.formset-row:not(.empty-form)');
+                    console.log('🔍 DEBUG 852: Después de timeout, fila encontrada:', primeraFila);
+                    if (primeraFila) {
+                        this.poblarCampos852Fila(primeraFila, campo);
+                    }
+                }, 300);
+            }
+        } else {
+            this.poblarCampos852Fila(primeraFila, campo);
+        }
+    }
+    
+    poblarCampos852Fila(fila, campo) {
+        console.log('📍 Poblando campos 852 en fila:', fila);
+        console.log('📦 Datos recibidos:', JSON.stringify(campo, null, 2));
+        
+        // Buscar inputs de localización con los nombres reales del formset
+        const codigoInput = fila.querySelector('input[name*="codigo_o_nombre"]');
+        const signaturaInput = fila.querySelector('input[name*="signatura_original"]');
+        const estanteriaInput = fila.querySelector('input[name*="estanteria"]');
+        
+        console.log('🔍 DEBUG 852: Inputs encontrados:');
+        console.log('  - codigoInput:', codigoInput);
+        console.log('  - signaturaInput:', signaturaInput);
+        console.log('  - estanteriaInput:', estanteriaInput);
+        
+        // Poblar código o nombre (852 $a)
+        if (codigoInput && campo.codigo_o_nombre && !codigoInput.value.trim()) {
+            codigoInput.value = campo.codigo_o_nombre;
+            console.log('✅ Código/Nombre actualizado:', campo.codigo_o_nombre);
+            setTimeout(() => {
+                codigoInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('🔍 DEBUG 852: No se actualizó código - condiciones:', {
+                codigoInput: !!codigoInput,
+                tieneValor: !!campo.codigo_o_nombre,
+                vacio: !codigoInput?.value?.trim()
+            });
+        }
+        
+        // Poblar signatura (852 $h)
+        if (signaturaInput && campo.signatura_original && !signaturaInput.value.trim()) {
+            signaturaInput.value = campo.signatura_original;
+            console.log('✅ Signatura actualizada:', campo.signatura_original);
+            setTimeout(() => {
+                signaturaInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('🔍 DEBUG 852: No se actualizó signatura - condiciones:', {
+                signaturaInput: !!signaturaInput,
+                tieneValor: !!campo.signatura_original,
+                vacio: !signaturaInput?.value?.trim()
+            });
+        }
+        
+        // Poblar estantería (852 $c)
+        if (estanteriaInput && campo.estanteria && !estanteriaInput.value.trim()) {
+            estanteriaInput.value = campo.estanteria;
+            console.log('✅ Estantería actualizada:', campo.estanteria);
+            setTimeout(() => {
+                estanteriaInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('🔍 DEBUG 852: No se actualizó estantería - condiciones:', {
+                estanteriaInput: !!estanteriaInput,
+                tieneValor: !!campo.estanteria,
+                vacio: !estanteriaInput?.value?.trim()
+            });
+        }
+    }
+
+    poblarCampo856(campo) {
+        console.log('🌐 Poblar campo 856 (Acceso electrónico) con:', campo);
+        console.log('🔍 DEBUG 856: Datos recibidos:', JSON.stringify(campo, null, 2));
+        
+        // Buscar el formset de 856
+        const formset856 = document.querySelector('[data-formset-prefix*="disponibles_856"]');
+        console.log('🔍 DEBUG 856: Buscando formset con selector [data-formset-prefix*="disponibles_856"]');
+        console.log('🔍 DEBUG 856: Formset encontrado:', formset856);
+        
+        if (!formset856) {
+            console.log('❌ No se encontró formset de 856');
+            return;
+        }
+        
+        console.log('✅ Formset 856 encontrado:', formset856);
+        
+        // Buscar la primera fila del formset (o crear una si no existe)
+        let primeraFila = formset856.querySelector('.formset-row:not(.empty-form)');
+        console.log('🔍 DEBUG 856: Primera fila encontrada:', primeraFila);
+        
+        if (!primeraFila) {
+            console.log('🔄 No hay filas en 856, agregando una...');
+            const addBtn = formset856.querySelector('.add-row-btn, [data-formset-add]');
+            console.log('🔍 DEBUG 856: Botón agregar encontrado:', addBtn);
+            
+            if (addBtn) {
+                addBtn.click();
+                setTimeout(() => {
+                    primeraFila = formset856.querySelector('.formset-row:not(.empty-form)');
+                    console.log('🔍 DEBUG 856: Después de timeout, fila encontrada:', primeraFila);
+                    if (primeraFila) {
+                        this.poblarCampos856Fila(primeraFila, campo);
+                    }
+                }, 300);
+            }
+        } else {
+            this.poblarCampos856Fila(primeraFila, campo);
+        }
+    }
+    
+    poblarCampos856Fila(fila, campo) {
+        console.log('🌐 Poblando campos 856 en fila:', fila);
+        console.log('📦 Datos recibidos:', JSON.stringify(campo, null, 2));
+        
+        // Buscar inputs con los nombres reales del formset
+        const urlInput = fila.querySelector('input[name*="url_disponible_856"]');
+        const textoInput = fila.querySelector('input[name*="texto_disponible_856"]');
+        
+        console.log('🔍 DEBUG 856: Inputs encontrados:');
+        console.log('  - urlInput:', urlInput);
+        console.log('  - textoInput:', textoInput);
+        
+        // Poblar URL (856 $u)
+        if (urlInput && campo.url_disponible_856 && !urlInput.value.trim()) {
+            urlInput.value = campo.url_disponible_856;
+            console.log('✅ URL actualizada:', campo.url_disponible_856);
+            setTimeout(() => {
+                urlInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('🔍 DEBUG 856: No se actualizó URL - condiciones:', {
+                urlInput: !!urlInput,
+                tieneValor: !!campo.url_disponible_856,
+                vacio: !urlInput?.value?.trim()
+            });
+        }
+        
+        // Poblar texto de enlace (856 $y)
+        if (textoInput && campo.texto_disponible_856 && !textoInput.value.trim()) {
+            textoInput.value = campo.texto_disponible_856;
+            console.log('✅ Texto de enlace actualizado:', campo.texto_disponible_856);
+            setTimeout(() => {
+                textoInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 100);
+        } else {
+            console.log('🔍 DEBUG 856: No se actualizó texto - condiciones:', {
+                textoInput: !!textoInput,
+                tieneValor: !!campo.texto_disponible_856,
+                vacio: !textoInput?.value?.trim()
+            });
+        }
+    }
+
+    agregarFilaFormset(formset) {
+        // Buscar botón de agregar fila del formset
+        const addBtn = formset.querySelector('.add-row-btn, [data-formset-add]');
+        if (addBtn) {
+            addBtn.click();
+        }
+    }
+
+    getCSRFToken() {
+        const cookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+        return cookie ? cookie.split('=')[1] : '';
+    }
+
+    mostrarMensaje(mensaje, tipo) {
+        // Usar sistema de notificaciones existente o crear toast simple
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${tipo === 'error' ? 'danger' : tipo} position-fixed top-0 end-0 m-3`;
+        toast.style.zIndex = '9999';
+        toast.textContent = mensaje;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 5000);
+    }
+}
+
+// Inicializar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => new Autocompletado773());
+} else {
+    new Autocompletado773();
+}
+
+})(); // Cierre del IIFE
 </script>

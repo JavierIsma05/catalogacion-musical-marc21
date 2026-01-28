@@ -74,19 +74,24 @@ def obtener_pais_principal(obra):
         str: Código del país en mayúsculas o 'EC' por defecto
     """
     try:
-        primer_pais = obra.codigos_pais_entidad.order_by('orden').first()
-        return (primer_pais.codigo_pais if primer_pais else 'EC').upper()
-    except Exception:
+        paises = obra.codigos_pais_entidad.all()
+        print(f"🔍 DEBUG: Países encontrados para obra {obra.num_control}: {[p.codigo_pais for p in paises]}")
+        primer_pais = obra.codigos_pais_entidad.order_by('id').first()
+        resultado = (primer_pais.codigo_pais if primer_pais else 'EC').upper()
+        print(f"🔍 DEBUG: País seleccionado: {resultado}")
+        return resultado
+    except Exception as e:
+        print(f"❌ ERROR en obtener_pais_principal: {e}")
         return 'EC'
 
 
 def generar_signatura_completa(obra):
     """
     Genera la signatura completa para el campo 092.
-    
+
     Args:
         obra: Instancia de ObraGeneral
-    
+
     Returns:
         str: Signatura en formato UNL-BLMP-EC-Ms-M000001
     """
@@ -95,13 +100,13 @@ def generar_signatura_completa(obra):
         obra.num_control,
     ]):
         return "Pendiente de generar"
-    
+
     # Determinar Ms o Imp según tipo_registro
     ms_imp = 'Ms' if obra.tipo_registro == 'd' else 'Imp'
-    
+
     # Obtener país
     pais = obtener_pais_principal(obra)
-    
+
     return (
         f"{obra.centro_catalogador}-"
         f"BLMP-"
@@ -109,6 +114,25 @@ def generar_signatura_completa(obra):
         f"{ms_imp}-"
         f"{obra.num_control}"
     )
+
+
+def signatura_para_archivo(obra):
+    """
+    Genera un nombre de archivo/carpeta seguro basado en la signatura.
+
+    Args:
+        obra: Instancia de ObraGeneral
+
+    Returns:
+        str | None: Signatura en formato UNL-BLMP-EC-Ms-M000001, o None si incompleta
+    """
+    if not all([obra.centro_catalogador, obra.num_control]):
+        return None
+
+    ms_imp = 'Ms' if obra.tipo_registro == 'd' else 'Imp'
+    pais = obtener_pais_principal(obra)
+
+    return f"{obra.centro_catalogador}-BLMP-{pais}-{ms_imp}-{obra.num_control}"
 
 
 def validar_obra_coleccion(obra):

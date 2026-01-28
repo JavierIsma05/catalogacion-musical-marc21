@@ -1,0 +1,85 @@
+{% extends "usuarios/catalogador/base_catalogador.html" %}
+{% block title %}Visor colección{% endblock %}
+{% block page_title %}Visor colección{% endblock %}
+
+{% block content %}
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h5 class="mb-1">{{ coleccion.titulo_principal }}</h5>
+    <div class="text-muted small">
+      <strong>{{ coleccion.signatura_publica_display }}</strong>
+      {% if coleccion.autor_publico_principal %} · {{ coleccion.autor_publico_principal }}{% endif %}
+    </div>
+    <div class="text-muted small mt-2">
+      Este es el <strong>visor de colección</strong> (muestra <strong>todo</strong> el documento).
+      Para ver una <strong>obra</strong> por segmento, entra por <a href="{% url 'digitalizacion:segmentar' coleccion.id %}">Asignar segmentos</a>.
+    </div>
+  </div>
+</div>
+
+{% if segments %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h6 class="mb-2">Obras (segmentos)</h6>
+      <div class="small text-muted mb-2">Accesos directos al visor por obra.</div>
+      <div class="d-flex gap-2 flex-wrap">
+        {% for s in segments %}
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'digitalizacion:visor_obra' s.obra_id %}">
+            {{ s.obra.signatura_publica_display }} — {{ s.obra.titulo_principal }}{% if s.obra.autor_publico_principal %} · {{ s.obra.autor_publico_principal }}{% endif %} (págs. {{ s.start_page }}–{{ s.end_page }})
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{% if not digital_set %}
+  <div class="alert alert-warning">
+    No hay importación todavía.
+    <a href="{% url 'digitalizacion:importar' coleccion.id %}">Importar</a>
+  </div>
+
+{% else %}
+
+  {% if digital_set.pdf_path %}
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="mb-2">PDF (iframe)</h6>
+        <iframe
+        src="/media/{{ digital_set.pdf_path }}"
+        style="width:100%;height:80vh;border:1px solid #ddd;">
+      </iframe>
+      </div>
+    </div>
+
+  {% else %}
+
+    <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Imágenes (JPG derivados)</h6>
+
+        {% for p in pages %}
+          {% if p.derivative_path %}
+            <div class="mb-3">
+              <div class="small text-muted mb-1">p{{ p.page_number|stringformat:"03d" }}</div>
+              <img src="/media/{{ p.derivative_path }}" class="img-fluid border rounded">
+            </div>
+          {% else %}
+            <div class="alert alert-warning">
+              p{{ p.page_number|stringformat:"03d" }} sin derivado JPG.
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% endif %}
+  <div class="d-flex gap-2 mb-3">
+    <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:coleccion_home' coleccion.id %}">Volver a la guía</a>
+    <!-- <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:dashboard' %}">Digitalización</a> -->
+    <!-- <a class="btn btn-outline-primary" href="{% url 'digitalizacion:subir_pdf' coleccion.id %}">Subir PDF</a> -->
+  </div>
+{% endblock %}

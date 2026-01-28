@@ -14,6 +14,10 @@ from catalogacion.views import (
     SeleccionarTipoObraView,
 )
 from catalogacion.views import borradores as borradores_views
+from catalogacion.views.api_views import (
+    Autocompletado773View,
+    buscar_obras,
+)
 
 app_name = "catalogacion"
 
@@ -118,5 +122,16 @@ urlpatterns = [
         "api/borradores/limpiar-tipo/",
         borradores_views.limpiar_borrador_tipo_ajax,
         name="api_limpiar_borrador_tipo",
+    ),
+    # API de autocompletado 773
+    path(
+        "api/obras/buscar/",
+        buscar_obras,
+        name="api_buscar_obras",
+    ),
+    path(
+        "api/obras/autocomplete/773/",
+        Autocompletado773View.as_view(),
+        name="api_autocompletado_773",
     ),
 ]

@@ -209,12 +209,41 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
     if (!container) return;
 
     function initMateriaAutocomplete(input) {
-        if (!input || input.dataset.materiaInit === "1") return;
+        if (!input) {
+            console.log('🚫 Input es null o undefined');
+            return;
+        }
+        
+        // 🔥 CLAVE: Verificar el flag correctamente
+        if (input.dataset.materiaInit === "1") {
+            console.log('🚫 Input ya está inicializado, saltando:', input);
+            return;
+        }
+        
+        console.log('✅ Inicializando autocomplete para input:', input);
         input.dataset.materiaInit = "1";
 
         const wrapper = input.closest(".autocomplete-wrapper");
+        if (!wrapper) {
+            console.log('🚫 No se encontró wrapper para input:', input);
+            return;
+        }
+        
         const suggestionsBox = wrapper.querySelector(".materia-suggestions");
         const hiddenIdInput = wrapper.querySelector(".materia-id");
+        
+        if (!suggestionsBox) {
+            console.log('🚫 No se encontró suggestionsBox para input:', input);
+            return;
+        }
+        
+        if (!hiddenIdInput) {
+            console.log('🚫 No se encontró hiddenIdInput para input:', input);
+            return;
+        }
+        
+        console.log('✅ Todos los elementos encontrados para input:', input);
+        
         let debounceTimer = null, selectedIndex = -1;
 
         function hide() { suggestionsBox.classList.remove("show"); suggestionsBox.innerHTML = ""; selectedIndex=-1; }
@@ -251,14 +280,36 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
             }
             suggestionsBox.classList.add("show");
         }
-        function buscar(q){ fetch(`/catalogacion/api/autocompletar/materia/?q=${encodeURIComponent(q)}`)
-            .then(r=>r.json()).then(d=>mostrar(d.results||[],q)).catch(()=>hide()); }
+        function buscar(q){ 
+            console.log('Buscando materia con query:', q);
+            fetch(`/catalogacion/api/autocompletar/materia/?q=${encodeURIComponent(q)}`)
+                .then(r=>r.json()).then(d=>{
+                    console.log('Respuesta recibida:', d);
+                    mostrar(d.results||[],q);
+                }).catch(err=>{
+                    console.error('Error en búsqueda:', err);
+                    hide();
+                }); 
+        }
 
         input.addEventListener("input", e=>{
-            const q=input.value.trim();
-            hiddenIdInput.value=""; hiddenIdInput.removeAttribute("data-nuevo");
-            if(q.length<2){ hide(); return; }
-            clearTimeout(debounceTimer); debounceTimer=setTimeout(()=>buscar(q),250);
+            const q = input.value.trim();
+            hiddenIdInput.value = ""; 
+            hiddenIdInput.removeAttribute("data-nuevo");
+            
+            console.log('🔍 Input event - query:', q, 'input:', input);
+            
+            if(q.length < 2){ 
+                console.log('🚫 Query muy corto, ocultando sugerencias');
+                hide(); 
+                return; 
+            }
+            
+            clearTimeout(debounceTimer); 
+            debounceTimer = setTimeout(() => {
+                console.log('🔍 Iniciando búsqueda para:', q);
+                buscar(q);
+            }, 250);
         });
 
         input.addEventListener("keydown", e=>{
@@ -320,6 +371,41 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
         }
     });
 
+    container.addEventListener('formset:added', (ev) => {
+        if (!ev || !ev.detail || ev.detail.prefix !== PREFIX) return;
+        
+        console.log('formset:added evento recibido en 650', ev.detail);
+        
+        // small timeout to let DOM settle
+        setTimeout(() => {
+            // 🔥 CLAVE: Buscar SOLO en el nuevo formulario agregado
+            const newForm = ev.detail.newForm;
+            if (!newForm) {
+                console.log('🚫 No se encontró newForm en el evento');
+                return;
+            }
+            
+            console.log('🔍 Nuevo formulario encontrado:', newForm);
+            
+            // Inicializar autocomplete SOLO en los inputs del nuevo formulario
+            const newInputs = newForm.querySelectorAll(".materia-input");
+            console.log('Inputs de materia encontrados en nuevo formulario:', newInputs.length);
+            
+            newInputs.forEach((input, index) => {
+                console.log(`Inicializando input ${index} del nuevo formulario:`, input);
+                // 🔥 CLAVE: Limpiar el flag para permitir reinicialización
+                delete input.dataset.materiaInit;
+                initMateriaAutocomplete(input);
+            });
+            
+            // Inicializar subdivisiones en las nuevas filas
+            const subdivisionContainers = newForm.querySelectorAll(".subdivisiones-container");
+            console.log('Contenedores de subdivisiones encontrados en nuevo formulario:', subdivisionContainers.length);
+            subdivisionContainers.forEach(updateDeleteVisibility);
+        }, 50);
+    });
+
+    // Inicializar autocomplete para inputs existentes
     container.querySelectorAll(".materia-input").forEach(initMateriaAutocomplete);
 
 })();
