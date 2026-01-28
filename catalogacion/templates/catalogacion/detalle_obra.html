@@ -101,7 +101,7 @@
                     <strong>{{ obra.centro_catalogador }}</strong>
                 </div>
                 {% endif %}
-            </section> 
+            </section>
             <!-- ================= NOMBRES Y TÍTULOS ================= -->
             <section id="nombres_titulos" class="detalle-section">
                 <h3>Nombres y Títulos</h3>
@@ -350,7 +350,7 @@
                                 <canvas
                                     id="incipit_view_canvas_{{ incipit.pk }}"
                                     class="incipit-view-canvas"
-                                    width="800"
+                                    widtzzzh="800"
                                     height="320"
                                     data-paec-json-id="paec_json_{{ incipit.pk }}">
                                 </canvas>
@@ -421,7 +421,7 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-                  
+
                     {% if obra.ediciones.all %}
                         {% for edicion in obra.ediciones.all %}
                         <div class="data-row">
@@ -470,7 +470,7 @@
                 <p class="text-muted">No hay materias registradas.</p>
                 {% endif %}
 
-                    
+
             </section>
             <!-- ================= NOTAS ================= -->
             <section id="nuevas_notas" class="detalle-section">
@@ -531,7 +531,7 @@
                     </div>
                 {% endif %}
             </section>
-                                
+
             <!-- ================= RELACIONES ================= -->
             <section id="relaciones" class="detalle-section">
                 <h3>Relaciones</h3>
@@ -668,13 +668,13 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🔍 Inicializando navegación del sidebar de detalle...');
-    
+
     const links = document.querySelectorAll('.detalle-sidebar .nav-link');
     const sections = document.querySelectorAll('.detalle-section');
-    
+
     console.log('📊 Links encontrados:', links.length);
     console.log('📊 Secciones encontradas:', sections.length);
-    
+
     if (!links.length || !sections.length) {
         console.warn('⚠️ No se encontraron links o secciones para la navegación');
         return;
@@ -694,21 +694,21 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const targetId = link.getAttribute('href').substring(1); // quitar el #
             const target = document.getElementById(targetId);
-            
+
             console.log(`🎯 Click en link: ${targetId}`);
-            
+
             if (!target) {
                 console.error(`❌ No se encontró la sección con ID: ${targetId}`);
                 return;
             }
-            
+
             // Actualizar link activo inmediatamente
             updateActiveLink(targetId);
-            
+
             // Hacer scroll suave
             const offsetTop = target.offsetTop - 90;
             console.log(`📍 Haciendo scroll a: ${offsetTop}px`);
-            
+
             window.scrollTo({
                 top: offsetTop,
                 behavior: 'smooth'
@@ -724,7 +724,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateActiveLink(entry.target.id);
             }
         });
-    }, { 
+    }, {
         rootMargin: '-40% 0px -40% 0px',
         threshold: 0.1
     });

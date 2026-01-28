@@ -18,38 +18,22 @@
 /* ============================================
    ÍNCIPIT MUSICAL - COMPACTO
    ============================================ */
-.incipit-canvas-wrap {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: 0.25rem;
-  background: #fff;
-  padding: 0.25rem;
-  border-radius: 4px;
-  border: 1px solid #e0e0e0;
-}
 
 .incipit-view-canvas {
   width: 100%;
-  max-width: 600px;
-  height: 110px;      /* balance entre compacto y legible */
+  max-width: 500px;
+  height: 150px;      /* balance entre compacto y legible */
   display: block;
-  background: #fff;
+  background: transparent;
   pointer-events: none;
   cursor: default;
-}
-
-.obra-incipit-card {
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  padding: 0.5rem;
 }
 
 .obra-incipit-card .obra-card-label {
   font-weight: 600;
   color: #495057;
   margin-bottom: 0;
+
 }
 
 /* ============================================
@@ -146,12 +130,12 @@
 
 .compact-label {
   font-weight: 600;
-  color: var(--pro-text-secondary);
+  color: var(--pro-text-text);
   white-space: nowrap;
 }
 
 .compact-value {
-  color: var(--pro-text);
+  color: var(--pro-text-secondary);
   font-weight: 400;
 }
 </style>
@@ -235,7 +219,7 @@
                             <img src="{{ obra.cover_url }}"
                                 alt="Portada"
                                 class="w-100 rounded"
-                                style="aspect-ratio: 4/3; object-fit: cover;">
+                                style="object-fit: cover;">
                         {% elif obra.cover_kind == "pdf" %}
                             <div class="w-100 rounded border bg-light d-flex align-items-center justify-content-center"
                                 style="aspect-ratio: 4/3;">
@@ -315,15 +299,15 @@
                                     {# Mostrar canvas del primer íncipit #}
                                     <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
 
-                                    <div class="incipit-canvas-wrap" style="margin-top: 0;">
+
                                         <canvas
                                             id="incipit_view_canvas_{{ primer_incipit.pk }}"
                                             class="incipit-view-canvas"
-                                            width="800"
+                                            width="500"
                                             height="180"
                                             data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
                                         </canvas>
-                                    </div>
+
 
                                     {# Información textual del íncipit #}
                                     {% if primer_incipit.titulo_encabezamiento %}

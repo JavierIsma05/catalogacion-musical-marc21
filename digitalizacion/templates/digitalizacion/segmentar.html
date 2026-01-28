@@ -24,7 +24,7 @@
 <div class="row g-3">
 
 
-  <div class="col-lg-5">
+  <div class="col-lg-5" data-segmented-ids="{% for s in segments %}{{ s.obra_id }}{% if not forloop.last %},{% endif %}{% endfor %}">
     <div class="card mb-3">
       <div class="card-body">
         <h6 class="mb-1">Crear segmento</h6>
@@ -67,7 +67,6 @@
 
           <div class="d-flex gap-2 mt-3 flex-wrap">
             <button class="btn btn-primary" type="submit">Guardar segmento</button>
-            <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:obra_home' obra.id %}">Volver a la guía</a>
           </div>
         </form>
       </div>
@@ -78,29 +77,30 @@
         <h6 class="mb-2">Segmentos existentes</h6>
 
         {% if segments %}
-          <ul class="list-group">
-            {% for s in segments %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div class="me-3">
-                  <a class="fw-semibold text-decoration-none" href="{% url 'digitalizacion:visor_obra' s.obra_id %}">
-                    {{ s.obra.signatura_publica_display }} — {{ s.obra.titulo_principal }}
-                  </a>
-                  <div class="small text-muted">
-                    {% if s.obra.autor_publico_principal %}{{ s.obra.autor_publico_principal }} · {% endif %}Págs. {{ s.start_page }}–{{ s.end_page }} · {{ s.tipo }}
-                  </div>
-                </div>
-                <form method="post" action="{% url 'digitalizacion:segmento_eliminar' s.id %}">
-                  {% csrf_token %}
-                  <button class="btn btn-sm btn-outline-danger">Eliminar</button>
-                </form>
-              </li>
-            {% endfor %}
-          </ul>
+        <ul class="list-group">
+          {% for s in segments %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="me-3">
+              <a class="fw-semibold text-decoration-none" href="{% url 'digitalizacion:visor_obra' s.obra_id %}">
+                {{ s.obra.signatura_publica_display }} — {{ s.obra.titulo_principal }}
+              </a>
+              <div class="small text-muted">
+                {% if s.obra.autor_publico_principal %}{{ s.obra.autor_publico_principal }} · {% endif %}Págs. {{ s.start_page }}–{{ s.end_page }} · {{ s.tipo }}
+              </div>
+            </div>
+            <form method="post" action="{% url 'digitalizacion:segmento_eliminar' s.id %}">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+            </form>
+          </li>
+          {% endfor %}
+        </ul>
         {% else %}
-          <p class="text-muted mb-0">Aún no hay segmentos.</p>
+        <p class="text-muted mb-0">Aún no hay segmentos.</p>
         {% endif %}
       </div>
     </div>
+    <a class="btn btn-outline-secondary" href="{% url 'digitalizacion:obra_home' obra.id %}">Volver a la guía</a>
   </div>
 
 

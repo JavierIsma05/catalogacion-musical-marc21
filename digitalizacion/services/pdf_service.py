@@ -4,12 +4,35 @@ Servicio para generar y cachear PDFs de segmentos.
 Prioridad:
 1. Generar desde imágenes JPG (derivative_path)
 2. Extraer del PDF de la colección (fallback)
+
+Estructura de archivos:
+digitalizacion/{colección}/access/segment_pdfs/
 """
 
 from pathlib import Path
 from django.conf import settings
 from django.utils import timezone
 from PIL import Image
+
+
+def _get_segment_output_dir(ds) -> Path:
+    """
+    Obtiene el directorio de salida para PDFs de segmentos.
+    Usa la carpeta de la colección para mantener la jerarquía.
+    """
+    if ds.repository_path:
+        # Usar carpeta de la colección
+        repo = Path(ds.repository_path)
+    else:
+        # Fallback: derivar del pdf_path
+        # pdf_path es algo como: digitalizacion/UNL-xxx/access/pdf/nombre.pdf
+        pdf_full = Path(settings.MEDIA_ROOT) / ds.pdf_path
+        # Subir 3 niveles: pdf -> access -> carpeta_colección
+        repo = pdf_full.parent.parent.parent
+
+    output_dir = repo / "access" / "segment_pdfs"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    return output_dir
 
 
 def get_or_create_segment_pdf(segment) -> str | None:
@@ -33,10 +56,8 @@ def get_or_create_segment_pdf(segment) -> str | None:
         if cached.exists():
             return segment.cached_pdf_path
 
-    # Generar PDF parcial
-    output_dir = Path(settings.MEDIA_ROOT) / "digitalizacion" / "segment_pdfs"
-    output_dir.mkdir(parents=True, exist_ok=True)
-
+    # Generar PDF parcial dentro de la carpeta de la colección
+    output_dir = _get_segment_output_dir(ds)
     output_name = f"segment_{segment.id}_p{segment.start_page}-{segment.end_page}.pdf"
     output_path = output_dir / output_name
 
@@ -97,10 +118,8 @@ def get_or_create_segment_pdf_from_images(segment) -> str | None:
     if not image_paths:
         return None
 
-    # Generar PDF
-    output_dir = Path(settings.MEDIA_ROOT) / "digitalizacion" / "segment_pdfs"
-    output_dir.mkdir(parents=True, exist_ok=True)
-
+    # Generar PDF dentro de la carpeta de la colección
+    output_dir = _get_segment_output_dir(ds)
     output_name = f"segment_{segment.id}_p{segment.start_page}-{segment.end_page}_fromjpg.pdf"
     output_path = output_dir / output_name
 

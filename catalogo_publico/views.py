@@ -163,6 +163,11 @@ class ListaObrasPublicaView(ListView):
                     dp_map[(dp.digital_set_id, dp.page_number)] = dp.derivative_path
 
         # 4) Inyectar cover_url + visor_url en cada obra
+        from digitalizacion.services.thumbnail_service import (
+            get_pdf_thumbnail_for_digital_set,
+            get_pdf_thumbnail_for_segment
+        )
+
         for o in obras_list:
             meta = wanted_meta.get(o.id, {})
             ds_id = meta.get("ds_id")
@@ -178,10 +183,26 @@ class ListaObrasPublicaView(ListView):
                 cover_kind = "jpg"
             else:
                 pdf_path = meta.get("pdf_path") or ""
-                if pdf_path:
-                    # Nota: esto no es una miniatura real; es fallback funcional
-                    cover_url = default_storage.url(pdf_path)
-                    cover_kind = "pdf"
+                if pdf_path and ds_id:
+                    # Intentar generar thumbnail del PDF
+                    thumb_path = None
+                    ds_propio = getattr(o, "digital_set", None)
+                    if ds_propio and ds_propio.id == ds_id:
+                        # Es DigitalSet propio - generar thumbnail de página 1
+                        thumb_path = get_pdf_thumbnail_for_digital_set(ds_propio)
+                    else:
+                        # Es segmento de colección - usar primera página del segmento
+                        seg = first_segment_by_obra.get(o.id)
+                        if seg:
+                            thumb_path = get_pdf_thumbnail_for_segment(seg)
+
+                    if thumb_path:
+                        cover_url = default_storage.url(thumb_path)
+                        cover_kind = "jpg"  # El thumbnail es JPG
+                    else:
+                        # Fallback: mostrar placeholder PDF
+                        cover_url = default_storage.url(pdf_path)
+                        cover_kind = "pdf"
 
             o.cover_url = cover_url
             o.cover_kind = cover_kind

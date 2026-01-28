@@ -2,9 +2,14 @@
   const input = document.getElementById("obraSearch");
   const hidden = document.getElementById("obraIdHidden");
   const results = document.getElementById("obraResults");
-  console.log("SEGMENTAR JS CARGADO ✅");
 
   if (!input || !hidden || !results) return;
+
+  // Obtener IDs de obras ya segmentadas en esta colección
+  const segmentedIdsAttr = document.querySelector("[data-segmented-ids]")?.getAttribute("data-segmented-ids") || "";
+  const segmentedIds = new Set(
+    segmentedIdsAttr.split(",").filter(id => id.trim()).map(id => parseInt(id.trim(), 10))
+  );
 
   let timer = null;
 
@@ -49,8 +54,19 @@
           list.forEach(o => {
             const btn = document.createElement("button");
             btn.type = "button";
-            btn.className = "list-group-item list-group-item-action";
-            btn.textContent = o.label;
+
+            const isSegmented = segmentedIds.has(o.id);
+
+            if (isSegmented) {
+              btn.className = "list-group-item list-group-item-action d-flex justify-content-between align-items-center";
+              btn.innerHTML = `
+                <span>${o.label}</span>
+                <span class="badge bg-success">Ya asignado</span>
+              `;
+            } else {
+              btn.className = "list-group-item list-group-item-action";
+              btn.textContent = o.label;
+            }
 
             btn.addEventListener("click", () => {
               hidden.value = o.id;

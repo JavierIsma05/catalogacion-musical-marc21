@@ -31,6 +31,7 @@ class DigitalSet(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     pdf_path = models.CharField(max_length=700, blank=True, default="")
     pdf_total_pages = models.PositiveIntegerField(default=0)
+    pdf_thumb_path = models.CharField(max_length=700, blank=True, default="")
 
     def __str__(self):
         tipo_str = "Colección" if self.tipo == "COLECCION" else "Obra"
@@ -95,6 +96,7 @@ class WorkSegment(models.Model):
     # Cache de PDF generado para este segmento
     cached_pdf_path = models.CharField(max_length=700, blank=True, default="")
     cached_pdf_generated_at = models.DateTimeField(null=True, blank=True)
+    cached_thumb_path = models.CharField(max_length=700, blank=True, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)
 

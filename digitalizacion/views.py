@@ -395,6 +395,10 @@ class SubirPdfObraView(LoginRequiredMixin, TemplateView):
         ds.pdf_path = to_media_relpath(dst)
         ds.save()
 
+        # Generar thumbnail de la primera página del PDF
+        from digitalizacion.services.thumbnail_service import get_pdf_thumbnail_for_digital_set
+        get_pdf_thumbnail_for_digital_set(ds)
+
         messages.success(request, "PDF cargado correctamente.")
         return redirect("digitalizacion:visor_digital", pk=obra.id)
 
@@ -527,7 +531,8 @@ def api_buscar_obras(request):
             "num_control": o.num_control,
             "titulo": o.titulo_principal,
             "signatura": o.signatura_publica_display,
-            "label": f"{o.signatura_publica_display} — {o.titulo_principal}",
+            "label": f"{o.signatura_publica_display} — {o.titulo_principal} - {o.autor_publico_principal}",
+
         }
         for o in qs
     ]

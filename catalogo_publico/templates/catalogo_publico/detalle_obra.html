@@ -432,9 +432,9 @@
             </h3>
         </div>
         {% if pdf_url %}
-            <div class="ratio ratio-16x9">
+            <div class="ratio ratio-16x9 pdf-viewer-container">
                 <iframe
-                    src="{{ pdf_url }}#toolbar=0&page={{ pdf_start_page|default:1 }}"
+                    src="{{ pdf_url }}#&page={{ pdf_start_page|default:1 }}"
                     title="Visor PDF"
                     style="border:0;"
                     allowfullscreen>
