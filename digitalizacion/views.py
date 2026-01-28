@@ -463,6 +463,16 @@ class VisorObraSegmentoView(LoginRequiredMixin, TemplateView):
             digital_set=ds, page_number__gte=start_page, page_number__lte=end_page
         ).order_by("page_number")
 
+        # Generar PDF segmentado (prioridad: imágenes > PDF de colección)
+        segment_pdf_url = None
+        segment_total_pages = None
+        from digitalizacion.services.pdf_service import get_segment_pdf
+        segment_pdf_path = get_segment_pdf(first_seg)
+        if segment_pdf_path:
+            from django.core.files.storage import default_storage
+            segment_pdf_url = default_storage.url(segment_pdf_path)
+            segment_total_pages = end_page - start_page + 1
+
         ctx.update(
             {
                 "obra": obra,
@@ -473,6 +483,8 @@ class VisorObraSegmentoView(LoginRequiredMixin, TemplateView):
                 "start_page": start_page,
                 "end_page": end_page,
                 "es_obra_suelta": False,
+                "segment_pdf_url": segment_pdf_url,
+                "segment_total_pages": segment_total_pages,
             }
         )
         return ctx

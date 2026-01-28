@@ -92,6 +92,10 @@ class WorkSegment(models.Model):
     end_page = models.PositiveIntegerField()
     tipo = models.CharField(max_length=20, choices=TIPOS, default="OBRA")
 
+    # Cache de PDF generado para este segmento
+    cached_pdf_path = models.CharField(max_length=700, blank=True, default="")
+    cached_pdf_generated_at = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
