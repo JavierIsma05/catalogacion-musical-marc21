@@ -1,7 +1,18 @@
+from pathlib import Path
+
+from django.conf import settings
 from django.db.models import Q
+from django.http import FileResponse, Http404
+from django.shortcuts import get_object_or_404
+from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
 
 from catalogacion.models import ObraGeneral
+
+from django.core.files.storage import default_storage
+from django.urls import reverse
+
+from digitalizacion.models import DigitalPage, DigitalSet, WorkSegment
 
 
 class HomePublicoView(TemplateView):
@@ -37,6 +48,7 @@ class ListaObrasPublicaView(ListView):
                 "titulo_240",
                 "forma_130",
                 "forma_240",
+                "digital_set",
             )
             .prefetch_related(
                 "medios_interpretacion_382__medios",
@@ -78,12 +90,105 @@ class ListaObrasPublicaView(ListView):
         context["titulo"] = "Catálogo de Obras"
         context["busqueda"] = self.request.GET.get("q", "")
         context["tipo_seleccionado"] = self.request.GET.get("tipo", "")
-        # Opciones de tipos de registro para el filtro
         context["tipos_obra"] = [
             ("d", "Manuscritos"),
             ("c", "Impresos"),
         ]
+
+        obras = context.get("obras")
+        obras_list = list(obras) if obras is not None else []
+        obra_ids = [o.id for o in obras_list]
+        if not obra_ids:
+            return context
+
+        # 1) Primer segmento por obra (si existe)
+        segments = (
+            WorkSegment.objects.filter(obra_id__in=obra_ids)
+            .select_related("digital_set")
+            .order_by("obra_id", "start_page")
+        )
+        first_segment_by_obra = {}
+        for seg in segments:
+            if seg.obra_id not in first_segment_by_obra:
+                first_segment_by_obra[seg.obra_id] = seg
+
+        # 2) Decide ds + página + visor_url por obra
+        # PRIORIDAD: DigitalSet propio > Segmento en colección
+        wanted_pairs = []
+        wanted_meta = {}  # obra_id -> {ds_id, page, visor_url, pdf_path}
+        for o in obras_list:
+            # PRIORIDAD 1: DigitalSet propio de la obra
+            ds_propio = getattr(o, "digital_set", None)
+            if ds_propio:
+                ds = ds_propio
+                page_n = 1
+                visor_url = reverse("digitalizacion:visor_obra", kwargs={"obra_id": o.id})
+                pdf_path = getattr(ds, "pdf_path", "") if ds else ""
+            else:
+                # PRIORIDAD 2: Segmento en colección
+                seg = first_segment_by_obra.get(o.id)
+                if seg:
+                    ds = seg.digital_set
+                    page_n = seg.start_page
+                    visor_url = reverse("digitalizacion:visor_obra", kwargs={"obra_id": o.id})
+                    pdf_path = getattr(ds, "pdf_path", "") if ds else ""
+                else:
+                    ds = None
+                    page_n = 1
+                    visor_url = reverse("digitalizacion:visor_digital", kwargs={"pk": o.id})
+                    pdf_path = ""
+
+            ds_id = ds.id if ds else None
+            if ds_id:
+                wanted_pairs.append((ds_id, page_n))
+
+            wanted_meta[o.id] = {
+                "ds_id": ds_id,
+                "page": page_n,
+                "visor_url": visor_url,  # dejamos link aunque no haya cover; el template decide
+                "pdf_path": pdf_path,
+            }
+
+        # 3) Buscar derivative JPG para esas páginas
+        from django.db.models import Q
+        q = Q()
+        for ds_id, page_n in wanted_pairs:
+            q |= Q(digital_set_id=ds_id, page_number=page_n)
+
+        dp_map = {}
+        if q:
+            pages = DigitalPage.objects.filter(q).only("digital_set_id", "page_number", "derivative_path")
+            for dp in pages:
+                if dp.derivative_path:
+                    dp_map[(dp.digital_set_id, dp.page_number)] = dp.derivative_path
+
+        # 4) Inyectar cover_url + visor_url en cada obra
+        for o in obras_list:
+            meta = wanted_meta.get(o.id, {})
+            ds_id = meta.get("ds_id")
+            page_n = meta.get("page", 1)
+
+            derivative_path = dp_map.get((ds_id, page_n)) if ds_id else None
+
+            cover_url = None
+            cover_kind = None  # "jpg" | "pdf"
+
+            if derivative_path:
+                cover_url = default_storage.url(derivative_path)
+                cover_kind = "jpg"
+            else:
+                pdf_path = meta.get("pdf_path") or ""
+                if pdf_path:
+                    # Nota: esto no es una miniatura real; es fallback funcional
+                    cover_url = default_storage.url(pdf_path)
+                    cover_kind = "pdf"
+
+            o.cover_url = cover_url
+            o.cover_kind = cover_kind
+            o.visor_url = meta.get("visor_url")
+
         return context
+
 
 
 class DetalleObraPublicaView(DetailView):
@@ -102,6 +207,7 @@ class DetalleObraPublicaView(DetailView):
                 "titulo_240",
                 "forma_130",
                 "forma_240",
+                "digital_set",
             )
             .prefetch_related(
                 "medios_interpretacion_382__medios",
@@ -126,6 +232,29 @@ class DetalleObraPublicaView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["titulo"] = f"Detalle: {self.object}"
+
+        # Determinar si hay PDF disponible para descarga
+        obra = self.object
+        has_pdf = False
+
+        # Prioridad 1: DigitalSet propio
+        ds_propio = getattr(obra, "digital_set", None)
+        if ds_propio and getattr(ds_propio, "pdf_path", ""):
+            has_pdf = True
+        else:
+            # Prioridad 2: Segmento en colección
+            seg = WorkSegment.objects.filter(obra=obra).select_related("digital_set").first()
+            if seg and seg.digital_set:
+                # Hay PDF si hay imágenes (genera PDF) o si hay PDF de colección
+                from digitalizacion.models import DigitalPage
+                has_images = DigitalPage.objects.filter(
+                    digital_set=seg.digital_set,
+                    page_number__gte=seg.start_page,
+                    page_number__lte=seg.end_page
+                ).exclude(derivative_path="").exists()
+                has_pdf = has_images or bool(getattr(seg.digital_set, "pdf_path", ""))
+
+        context["has_pdf"] = has_pdf
         return context
 
 
@@ -145,6 +274,7 @@ class VistaDetalladaObraView(DetailView):
                 "titulo_240",
                 "forma_130",
                 "forma_240",
+                "digital_set",
             )
             .prefetch_related(
                 "medios_interpretacion_382__medios",
@@ -180,8 +310,54 @@ class VistaDetalladaObraView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["titulo"] = f"Vista detallada: {self.object}"
+        obra = self.object
+        context["titulo"] = f"Vista detallada: {obra}"
+
+        # Resolver PDF y start_page:
+        # PRIORIDAD 1: DigitalSet propio de la obra (si existe)
+        ds_propio = getattr(obra, "digital_set", None)
+        if ds_propio and getattr(ds_propio, "pdf_path", ""):
+            # La obra tiene su propio PDF - usarlo
+            pdf_url = default_storage.url(ds_propio.pdf_path)
+            context["pdf_url"] = pdf_url
+            context["pdf_start_page"] = 1
+            context["has_pdf"] = True
+            return context
+
+        # PRIORIDAD 2: Buscar segmento en colección
+        seg = (
+            WorkSegment.objects.filter(obra=obra)
+            .select_related("digital_set")
+            .order_by("start_page")
+            .first()
+        )
+
+        if seg and seg.digital_set:
+            # Usar PDF segmentado (prioridad: imágenes > PDF colección)
+            from digitalizacion.services.pdf_service import get_segment_pdf
+            segment_pdf_path = get_segment_pdf(seg)
+            if segment_pdf_path:
+                pdf_url = default_storage.url(segment_pdf_path)
+                context["pdf_url"] = pdf_url
+                context["pdf_start_page"] = 1  # Ya es PDF segmentado
+                context["has_pdf"] = True
+                return context
+
+            # Fallback: PDF de colección completo
+            ds = seg.digital_set
+            if getattr(ds, "pdf_path", ""):
+                pdf_url = default_storage.url(ds.pdf_path)
+                context["pdf_url"] = pdf_url
+                context["pdf_start_page"] = seg.start_page or 1
+                context["has_pdf"] = True
+                return context
+
+        context["pdf_url"] = None
+        context["pdf_start_page"] = 1
+        context["has_pdf"] = False
+
         return context
+
 
 
 class FormatoMARC21View(DetailView):
@@ -257,3 +433,40 @@ class FormatoMARC21View(DetailView):
             context["datos_biograficos"] = None
 
         return context
+
+
+class DescargarPDFObraView(View):
+    """Vista para descargar el PDF de una obra (segmentado si corresponde)"""
+
+    def get(self, request, pk):
+        obra = get_object_or_404(ObraGeneral.objects.activos(), pk=pk)
+
+        # Prioridad 1: DigitalSet propio de la obra
+        ds = DigitalSet.objects.filter(obra=obra).first()
+        if ds and ds.pdf_path:
+            return self._serve_pdf(ds.pdf_path, obra)
+
+        # Prioridad 2: Segmento en colección (genera PDF segmentado)
+        from digitalizacion.services.pdf_service import get_segment_pdf
+        segment = WorkSegment.objects.filter(obra=obra).first()
+        if segment:
+            segment_pdf = get_segment_pdf(segment)
+            if segment_pdf:
+                return self._serve_pdf(segment_pdf, obra)
+
+        raise Http404("No hay PDF disponible para esta obra")
+
+    def _serve_pdf(self, rel_path, obra):
+        """Sirve un archivo PDF para descarga"""
+        pdf_path = Path(settings.MEDIA_ROOT) / rel_path
+        if not pdf_path.exists():
+            raise Http404("PDF no encontrado")
+
+        # Nombre seguro para descarga basado en la signatura
+        sig = obra.signatura_publica_display or f"obra_{obra.id}"
+        # Reemplazar caracteres problemáticos
+        filename = sig.replace(" ", "_").replace(".", "-").replace("/", "-") + ".pdf"
+
+        response = FileResponse(open(pdf_path, "rb"), content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return response

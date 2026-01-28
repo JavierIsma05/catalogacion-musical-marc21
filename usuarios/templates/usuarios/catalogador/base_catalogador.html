@@ -20,7 +20,7 @@
     <link href="{% static 'catalogacion/css/styles.css' %}" rel="stylesheet">
     <!-- CSS Catalogador específico -->
     <link href="{% static 'usuarios/css/catalogador.css' %}" rel="stylesheet">
-    
+
     <link href="{% static 'usuarios/css/base-catalogador.css' %}" rel="stylesheet">
 
     {% block extra_css %}{% endblock %}
@@ -44,57 +44,64 @@
                 <i class="bi bi-chevron-left"></i>
             </button>
         </div>
-        
+
         <div class="sidebar-nav">
-            <a class="nav-link {% if request.resolver_match.url_name == 'catalogador_dashboard' %}active{% endif %}" 
+            <a class="nav-link {% if request.resolver_match.url_name == 'catalogador_dashboard' %}active{% endif %}"
                href="{% url 'usuarios:catalogador_dashboard' %}"
                data-tooltip="Inicio">
                 <i class="bi bi-house-door"></i>
                 <span>Inicio</span>
             </a>
-            <a class="nav-link {% if request.resolver_match.url_name == 'seleccionar_tipo' %}active{% endif %}" 
+            <a class="nav-link {% if request.resolver_match.url_name == 'seleccionar_tipo' %}active{% endif %}"
                href="{% url 'catalogacion:seleccionar_tipo' %}"
                data-tooltip="Nueva Obra">
                 <i class="bi bi-plus-circle"></i>
                 <span>Nueva Obra</span>
             </a>
+            <a class="nav-link {% if request.resolver_match.app_name == 'digitalizacion' %}active{% endif %}"
+               href="{% url 'digitalizacion:dashboard' %}"
+               data-tooltip="Digitalización">
+                <i class="bi bi-file-earmark-image"></i>
+                <span>Importar Imágenes</span>
+            </a>
+
             <a class="nav-link {% if request.resolver_match.url_name == 'lista_borradores' %}active{% endif %}"
                href="{% url 'catalogacion:lista_borradores' %}"
                data-tooltip="Borradores">
-                <i class="bi bi-file-earmark-text"></i>
-                <span>Borradores</span>
+               <i class="bi bi-file-earmark-text"></i>
+               <span>Borradores</span>
             </a>
-            <!-- <a class="nav-link {% if request.resolver_match.url_name == 'lista_obras' %}active{% endif %}" 
+            <!-- <a class="nav-link {% if request.resolver_match.url_name == 'lista_obras' %}active{% endif %}"
                href="{% url 'catalogacion:lista_obras' %}"
                data-tooltip="Mis Obras">
                 <i class="bi bi-collection"></i>
                 <span>Mis Obras</span>
             </a> -->
-            <a class="nav-link {% if request.resolver_match.url_name == 'lista_personas' %}active{% endif %}" 
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_personas' %}active{% endif %}"
                href="{% url 'autoridades:lista_personas' %}"
                data-tooltip="Personas">
                 <i class="bi bi-person-badge"></i>
                 <span>Personas</span>
             </a>
-            <a class="nav-link {% if request.resolver_match.url_name == 'lista_entidades' %}active{% endif %}" 
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_entidades' %}active{% endif %}"
                href="{% url 'autoridades:lista_entidades' %}"
                data-tooltip="Entidades">
                 <i class="bi bi-building"></i>
                 <span>Entidades</span>
             </a>
-            <a class="nav-link {% if request.resolver_match.url_name == 'lista_formas_musicales' %}active{% endif %}" 
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_formas_musicales' %}active{% endif %}"
                href="{% url 'autoridades:lista_formas_musicales' %}"
                data-tooltip="Formas Musicales">
                 <i class="bi bi-music-note-list"></i>
                 <span>Formas Musicales</span>
             </a>
-            <a class="nav-link {% if request.resolver_match.url_name == 'lista_materias' %}active{% endif %}" 
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_materias' %}active{% endif %}"
                href="{% url 'autoridades:lista_materias' %}"
                data-tooltip="Materias">
                 <i class="bi bi-tags"></i>
                 <span>Materias</span>
             </a>
-            <a class="nav-link {% if request.resolver_match.url_name == 'lista_titulos_uniformes' %}active{% endif %}" 
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_titulos_uniformes' %}active{% endif %}"
                href="{% url 'autoridades:lista_titulos_uniformes' %}"
                data-tooltip="Títulos Uniformes">
                 <i class="bi-file-text"></i>
@@ -107,7 +114,6 @@
                 <span>Editar Obras</span>
             </a>
         </div>
-        
         <div class="sidebar-footer">
             <a href="{% url 'catalogo_publico:home' %}" class="nav-link" data-tooltip="Ver Sitio Público">
                 <i class="bi bi-globe"></i>
@@ -157,7 +163,7 @@
                 </div>
                 {% endfor %}
             {% endif %}
-            
+
             {% block content %}{% endblock %}
         </main>
     </div>
@@ -181,7 +187,7 @@
             const sidebarOverlay = document.getElementById('sidebarOverlay');
             const expandBtn = document.getElementById('expandBtn');
             const tooltip = document.getElementById('sidebarTooltip');
-            
+
             // Aplicar estado guardado SIN transición para evitar flash visual
             const savedState = localStorage.getItem('sidebarCollapsed');
             if (savedState === 'true' && window.innerWidth > 992) {
@@ -193,7 +199,7 @@
                     });
                 });
             }
-            
+
             // Toggle sidebar en desktop (contraer)
             sidebarToggle.addEventListener('click', function() {
                 sidebar.classList.toggle('collapsed');
@@ -208,38 +214,38 @@
 
             // Tooltips para sidebar colapsado
             const navLinksWithTooltip = sidebar.querySelectorAll('.nav-link[data-tooltip]');
-            
+
             navLinksWithTooltip.forEach(link => {
                 link.addEventListener('mouseenter', function(e) {
                     if (sidebar.classList.contains('collapsed') && window.innerWidth > 992) {
                         const rect = this.getBoundingClientRect();
                         const tooltipText = this.getAttribute('data-tooltip');
-                        
+
                         tooltip.textContent = tooltipText;
                         tooltip.style.top = (rect.top + rect.height / 2) + 'px';
                         tooltip.classList.add('visible');
                     }
                 });
-                
+
                 link.addEventListener('mouseleave', function() {
                     tooltip.classList.remove('visible');
                 });
             });
-            
+
             // Toggle sidebar en móvil
             mobileToggle.addEventListener('click', function() {
                 sidebar.classList.add('mobile-open');
                 sidebarOverlay.classList.add('active');
                 document.body.style.overflow = 'hidden';
             });
-            
+
             // Cerrar sidebar al hacer clic en overlay
             sidebarOverlay.addEventListener('click', function() {
                 sidebar.classList.remove('mobile-open');
                 sidebarOverlay.classList.remove('active');
                 document.body.style.overflow = '';
             });
-            
+
             // Cerrar sidebar en móvil al seleccionar un enlace
             const navLinks = sidebar.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
@@ -251,7 +257,7 @@
                     }
                 });
             });
-            
+
             // Resetear al cambiar tamaño de ventana
             window.addEventListener('resize', function() {
                 if (window.innerWidth > 992) {
@@ -262,7 +268,7 @@
             });
         });
     </script>
-    
+
     {% block extra_js %}{% endblock %}
 </body>
 

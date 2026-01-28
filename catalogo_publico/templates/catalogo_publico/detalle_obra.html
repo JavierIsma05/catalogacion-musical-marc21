@@ -47,7 +47,7 @@
             </li>
             <li class="breadcrumb-item">
                 <a href="{% url 'catalogo_publico:detalle' obra.pk %}">
-                    
+
                     {{ obra.signatura_publica_display }}
                 </a>
             </li>
@@ -141,7 +141,7 @@
 
                 {% if obra.nombres_relacionados_700.exists or obra.entidades_relacionadas_710.exists %}
                 <div class="detalle-subheader">Colaboradores</div>
-                
+
                 {% for nombre in obra.nombres_relacionados_700.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Nombre</span>
@@ -425,55 +425,37 @@
     </div>
 
     <!-- Visor de PDF -->
-    {% for disponible in obra.disponibles_856.all %}
-        {% for url in disponible.urls_856.all %}
-            {% if url.url %}
-            <section class="pdf-viewer-section">
-                <div class="pdf-viewer-header">
-                    <h3 class="pdf-viewer-title">
-                        <i class="bi bi-file-pdf"></i> 
-                        {% for texto in disponible.textos_enlace_856.all %}
-                            {{ texto.texto_enlace }}
-                        {% empty %}
-                            Documento disponible
-                        {% endfor %}
-                    </h3>
-                    <div class="pdf-viewer-actions">
-                        <a href="{{ url.url }}" target="_blank" class="btn btn-sm">
-                            <i class="bi bi-box-arrow-up-right"></i> Abrir en nueva pestaña
-                        </a>
-                        <a href="{{ url.url }}" download class="btn btn-sm">
-                            <i class="bi bi-download"></i> Descargar
-                        </a>
-                    </div>
-                </div>
-                <div class="pdf-viewer-container">
-                    <iframe 
-                        src="{{ url.url }}" 
-                        class="pdf-viewer-frame"
-                        title="Visor de documento PDF"
-                        loading="lazy">
-                    </iframe>
-                </div>
-            </section>
-            {% endif %}
-        {% endfor %}
-    {% empty %}
-    <!-- Estado vacío si no hay PDF -->
     <section class="pdf-viewer-section">
         <div class="pdf-viewer-header">
             <h3 class="pdf-viewer-title">
                 <i class="bi bi-file-pdf"></i> Documento
             </h3>
         </div>
-        <div class="pdf-viewer-container">
-            <div class="pdf-viewer-empty">
-                <i class="bi bi-file-earmark-x"></i>
-                <p>No hay documento disponible para esta obra</p>
+        {% if pdf_url %}
+            <div class="ratio ratio-16x9">
+                <iframe
+                    src="{{ pdf_url }}#toolbar=0&page={{ pdf_start_page|default:1 }}"
+                    title="Visor PDF"
+                    style="border:0;"
+                    allowfullscreen>
+                </iframe>
             </div>
-        </div>
+            <div class="small text-muted mt-2">
+                {% if pdf_start_page == 1 %}
+                    Documento completo
+                {% else %}
+                    Mostrando desde página {{ pdf_start_page }}
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="pdf-viewer-container">
+                <div class="pdf-viewer-empty">
+                    <i class="bi bi-file-earmark-x"></i>
+                    <p>No hay documento disponible para esta obra</p>
+                </div>
+            </div>
+        {% endif %}
     </section>
-    {% endfor %}
 </div>
 
 <script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>
