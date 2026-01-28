@@ -19,53 +19,56 @@
 }
 
 /* ============================================
-   HEADER COMPACTO
+   HEADER COMPACTO - MÁXIMA COMPACTACIÓN CON TIPOGRAFÍA CONSISTENTE
    ============================================ */
 .resumen-header {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--pro-border);
 }
 
 .resumen-header h1 {
-    font-size: 1.125rem;
+    font-size: 0.8125rem; /* Igual que los valores de los tags para consistencia */
     font-weight: 600;
     color: var(--pro-text);
     margin: 0;
     letter-spacing: -0.01em;
+    line-height: 1.3;
+    text-transform: uppercase; /* Consistente con los labels de los tags */
 }
 
 .resumen-top-tags {
     display: flex;
-    gap: 1rem;
+    gap: 0.875rem;
     align-items: center;
 }
 
 .detalle-top-tag {
     background: var(--pro-white);
     border: 1px solid var(--pro-border);
-    padding: 0.5rem 0.875rem;
-    min-width: 140px;
+    padding: 0.3125rem 0.625rem;
+    min-width: 130px;
 }
 
 .detalle-top-tag small {
     display: block;
-    font-size: 0.625rem;
+    font-size: 0.75rem; /* Mismo tamaño que los labels de las secciones */
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--pro-text-muted);
-    margin-bottom: 0.25rem;
-    font-weight: 500;
+    color: var(--pro-text-secondary);
+    margin-bottom: 0.125rem;
 }
 
 .detalle-top-tag span {
-    font-size: 0.8125rem;
+    font-size: 0.8125rem; /* Mismo tamaño que los valores de las secciones */
     font-weight: 600;
     color: var(--pro-text);
+    line-height: 1.3;
 }
 
 /* ============================================
-   TARJETA UNIFICADA - DISEÑO COMPACTO
+   TARJETA UNIFICADA - DISEÑO TIPO FICHA CATALOGRÁFICA
    ============================================ */
 .resumen-unified-card {
     background: var(--pro-white);
@@ -74,7 +77,7 @@
 }
 
 .resumen-section {
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 1rem;
     border-bottom: 1px solid var(--pro-border-light);
 }
 
@@ -88,12 +91,12 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--pro-text-secondary);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3125rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding-bottom: 0.375rem;
-    border-bottom: 1px solid var(--pro-border-light);
+    padding-bottom: 0rem;
+    line-height: 1.2;
 }
 
 .resumen-section-title i {
@@ -106,13 +109,14 @@
 }
 
 /* ============================================
-   ITEMS COMPACTOS - REDUCIR ESPACIADO
+   ITEMS COMPACTOS - ESPACIADO MÍNIMO COMO FICHA CATALOGRÁFICA
    ============================================ */
 .resumen-item {
     display: grid;
-    grid-template-columns: 160px 1fr;
-    gap: 0.75rem;
-    padding: 0.375rem 0;
+    grid-template-columns: 140px 1fr;
+    gap: 0.5rem;
+    padding: 0.1875rem 0;
+    align-items: center;
 }
 
 .resumen-item:last-child {
@@ -127,14 +131,16 @@
     font-size: 0.75rem;
     font-weight: 500;
     color: var(--pro-text-secondary);
-    line-height: 1.4;
+    line-height: 1.25;
+    margin: 0;
 }
 
 .resumen-value {
     font-size: 0.8125rem;
     color: var(--pro-text);
-    line-height: 1.4;
+    line-height: 1.25;
     font-weight: 400;
+    margin: 0;
 }
 
 .resumen-value.text-muted {
@@ -144,33 +150,35 @@
 
 .resumen-meta {
     display: block;
-    margin-top: 0.125rem;
+    margin-top: 0.0625rem;
     font-size: 0.75rem;
     color: var(--pro-text-muted);
+    line-height: 1.25;
 }
 
 .campo-vacio {
     font-size: 0.75rem;
     color: var(--pro-text-muted);
     font-style: italic;
+    margin: 0.125rem 0;
 }
 
 /* ============================================
-   ÍNCIPIT MUSICAL
+   ÍNCIPIT MUSICAL - COMPACTO
    ============================================ */
 .detalle-incipit {
     background: var(--pro-white);
     border: 1px solid var(--pro-border);
     border-left: 3px solid var(--pro-accent);
-    padding: 0.875rem 1rem;
+    padding: 0.625rem 1rem;
 }
 
 .detalle-incipit-text {
     font-size: 0.8125rem;
     color: var(--pro-text);
-    margin-bottom: 0.625rem;
+    margin-bottom: 0.5rem;
     font-weight: 500;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
 .detalle-incipit-code {
@@ -178,17 +186,17 @@
     font-size: 0.75rem;
     color: var(--pro-text-secondary);
     background: var(--pro-surface);
-    padding: 0.625rem 0.75rem;
+    padding: 0.5rem 0.75rem;
     margin: 0;
     overflow-x: auto;
     border: 1px solid var(--pro-border-light);
-    line-height: 1.6;
+    line-height: 1.5;
     white-space: pre-wrap;
     word-break: break-all;
 }
 
 /* ============================================
-   SIDEBAR PROFESIONAL
+   SIDEBAR PROFESIONAL - COMPACTO
    ============================================ */
 .sticky-sidebar {
     position: sticky;
@@ -198,7 +206,7 @@
 .detalle-sidebar-card {
     background: var(--pro-white);
     border: 1px solid var(--pro-border);
-    padding: 1.25rem;
+    padding: 1rem;
     box-shadow: var(--pro-shadow);
 }
 
@@ -208,12 +216,13 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--pro-text-secondary);
-    margin-bottom: 1rem;
+    margin-bottom: 0.875rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding-bottom: 0.75rem;
+    padding-bottom: 0.625rem;
     border-bottom: 1px solid var(--pro-border-light);
+    line-height: 1.2;
 }
 
 .detalle-sidebar-title i {
@@ -224,15 +233,16 @@
 .detalle-actions-grid {
     display: flex;
     flex-direction: column;
-    gap: 0.625rem;
+    gap: 0.5rem;
 }
 
 .detalle-actions-grid .btn {
     font-size: 0.75rem;
-    padding: 0.625rem 0.875rem;
+    padding: 0.5rem 0.875rem;
     font-weight: 500;
     border: 1px solid var(--pro-border);
     transition: all 0.2s ease;
+    line-height: 1.3;
 }
 
 .detalle-actions-grid .btn-outline-secondary {
@@ -270,13 +280,14 @@
 }
 
 /* ============================================
-   BREADCRUMB PROFESIONAL
+   BREADCRUMB PROFESIONAL - COMPACTO
    ============================================ */
 .breadcrumb {
     font-size: 0.75rem;
     padding: 0;
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.875rem;
     background: transparent;
+    line-height: 1.3;
 }
 
 .breadcrumb-item a {
@@ -305,16 +316,16 @@
 }
 
 /* ============================================
-   AJUSTES DE CONTAINER
+   AJUSTES DE CONTAINER - ULTRA COMPACTO
    ============================================ */
 .container.py-3 {
-    padding-top: 1.5rem !important;
-    padding-bottom: 1.5rem !important;
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
 }
 
 .row.g-3 {
     --bs-gutter-x: 1rem;
-    --bs-gutter-y: 1rem;
+    --bs-gutter-y: 0.75rem;
 }
 
 /* ============================================

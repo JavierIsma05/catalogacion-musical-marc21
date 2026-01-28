@@ -155,7 +155,7 @@
 }
 
 /* ============================================
-   LAYOUT EN 2 COLUMNAS
+   LAYOUT EN 2 COLUMNAS - SECCIONES INDEPENDIENTES
    ============================================ */
 .detalle-content {
     display: grid;
@@ -202,18 +202,16 @@
 }
 
 /* ============================================
-   CAMPOS OPTIMIZADOS
+   CAMPOS OPTIMIZADOS - SIN LÍNEAS DIVISORIAS
    ============================================ */
 .detalle-field {
     display: grid;
     grid-template-columns: 180px 1fr;
     gap: 0.75rem;
     padding: 0.375rem 0;
-    border-bottom: 1px solid var(--pro-border-light);
 }
 
 .detalle-field:last-child {
-    border-bottom: none;
     padding-bottom: 0;
 }
 
@@ -270,30 +268,30 @@
 }
 
 /* ============================================
-   ÍNCIPIT MUSICAL
+   ÍNCIPIT MUSICAL - COMPACTO
    ============================================ */
 .detalle-field-incipit {
     grid-template-columns: 1fr;
-    padding: 0.75rem 0;
+    padding: 0.375rem 0;
 }
 
 .detalle-field-incipit .detalle-field-label {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
 }
 
 .detalle-incipit-content {
     background: var(--pro-surface);
     border: 1px solid var(--pro-border);
     border-left: 2px solid var(--pro-accent);
-    padding: 0.875rem 1rem;
+    padding: 0.5rem 0.75rem;
 }
 
 .detalle-incipit-line {
     font-size: 0.8125rem;
     color: var(--pro-text);
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.25rem;
     font-weight: 500;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
 .detalle-incipit-line:last-child {

@@ -234,7 +234,6 @@ class ObraFormsetMixin:
         formsets = {}
 
         formsets_inhabilitados = {
-            "codigos_pais",
             "codigos_lengua",
         }
 
@@ -261,6 +260,9 @@ class ObraFormsetMixin:
             if key in formsets_inhabilitados:
                 logger.debug(f"  ⏭️  {key}: SALTADO (inhabilitado en UI V2)")
                 continue
+            
+            if key == "codigos_pais":
+                logger.info(f"  🔍 PROCESANDO {key}: Campo 044 de países")
 
             formset = context.get(key)
 
@@ -457,6 +459,11 @@ class ObraFormsetMixin:
                             logger.info(f"  📝 264: ProduccionPublicacion creada con función='{obj.funcion}'")
 
                     obj.save()
+                    
+                    # Log específico para países
+                    if key == "codigos_pais":
+                        logger.info(f"🌍 PAÍS GUARDADO: {obj.codigo_pais} - Obra: {obj.obra.num_control}")
+                    
                     logger.info(f"📝 Guardado formset {key}: {obj.pk}")
 
                     # ------------------------------

@@ -17,13 +17,13 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: .5rem;
+  margin-top: 0.25rem;
 }
 
 .incipit-view-canvas{
   width: 100%;
   max-width: 700px;
-  height: 250px;      /* tamaño visual */
+  height: 180px;      /* reducido de 250px para compactar */
   display: block;
   background: #ffffffdc;
 }
@@ -60,12 +60,12 @@
         <div class="detalle-header-left">
             <h1 class="detalle-main-title">Vista detallada</h1>
             <div class="detalle-actions">
-                <a href="{% url 'catalogo_publico:detalle' pk=obra.pk %}" class="btn btn-outline-secondary btn-sm">
+                <a href="{% url 'catalogo_publico:detalle' obra.pk %}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left"></i> Volver al resumen
                 </a>
-                <button class="btn btn-outline-primary btn-sm" disabled>
+                <a href="{% url 'catalogo_publico:formato_marc21' obra.pk %}" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-code-square"></i> Ver MARC21
-                </button>
+                </a>
                 <button class="btn btn-outline-primary btn-sm" disabled>
                     <i class="bi bi-download"></i> Descargar
                 </button>
@@ -212,41 +212,35 @@
                 </div>
 
                 <div class="detalle-field detalle-field-incipit">
+                    <span class="detalle-field-label">Íncipit musical</span>
+                    <div class="detalle-incipit-content">
+                        {% with primer_incipit=obra.incipits_musicales.first %}
+                            {% if primer_incipit and primer_incipit.paec_full %}
+                                {# Mostrar canvas del primer íncipit #}
+                                <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
 
+                                <div class="incipit-canvas-wrap" style="margin-top: 0.25rem;">
+                                    <canvas
+                                        id="incipit_view_canvas_{{ primer_incipit.pk }}"
+                                        class="incipit-view-canvas"
+                                        width="800"
+                                        height="240"  /* reducido de 320 para compactar */
+                                        data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
+                                    </canvas>
+                                </div>
 
-                <section class="obra-info-card obra-incipit-card">
-                        <p class="obra-card-label">Íncipit musical</p>
-                        <div class="obra-card-body">
-                            {% with primer_incipit=obra.incipits_musicales.first %}
-                                {% if primer_incipit and primer_incipit.paec_full %}
-                                    {# Mostrar canvas del primer íncipit #}
-                                    <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
-
-                                    <div class="incipit-canvas-wrap" style="margin-top: 0.5rem;">
-                                        <canvas
-                                            id="incipit_view_canvas_{{ primer_incipit.pk }}"
-                                            class="incipit-view-canvas"
-                                            width="800"
-                                            height="320"
-                                            data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
-                                        </canvas>
-                                    </div>
-
-                                    {# Información textual del íncipit #}
-                                    {% if primer_incipit.titulo_encabezamiento %}
-                                    <p class="obra-inline-line" style="margin-top: 0.5rem; font-size: 0.9em; color: #666;">
-                                        {{ primer_incipit.titulo_encabezamiento }}
-                                    </p>
-                                    {% endif %}
-
-                                {% else %}
-                                    <p class="meta-empty">Sin íncipit registrado</p>
+                                {# Información textual del íncipit #}
+                                {% if primer_incipit.titulo_encabezamiento %}
+                                <p class="detalle-incipit-line" style="margin-top: 0.25rem;">
+                                    {{ primer_incipit.titulo_encabezamiento }}
+                                </p>
                                 {% endif %}
-                            {% endwith %}
-                        </div>
-                </section>
 
-
+                            {% else %}
+                                <p class="detalle-field-value text-muted">Sin íncipit registrado</p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
                 </div>
             </div>
         </section>
@@ -344,8 +338,8 @@
             </div>
         </section>
 
-        <!-- Full width: Relaciones -->
-        <section class="detalle-section detalle-section-full">
+        <!-- Columna 1: Relaciones -->
+        <section class="detalle-section">
             <h2 class="detalle-section-title">
                 <i class="bi bi-diagram-3"></i> Relaciones
             </h2>
@@ -382,8 +376,8 @@
             </div>
         </section>
 
-        <!-- Full width: Notas -->
-        <section class="detalle-section detalle-section-full">
+        <!-- Columna 2: Notas -->
+        <section class="detalle-section">
             <h2 class="detalle-section-title">
                 <i class="bi bi-journal-text"></i> Notas
             </h2>
@@ -427,6 +421,7 @@
                 {% endif %}
             </div>
         </section>
+
     </div>
 
     <!-- Visor de PDF -->
