@@ -1,0 +1,370 @@
+{% extends 'catalogo_publico/base_publico.html' %}
+{% load static %}
+
+{% block title %}Vista MARC Crudo - Catálogo Musical MARC21{% endblock %}
+
+{% block extra_css %}
+<style>
+.marc-raw-container {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+}
+
+.marc-raw-title {
+    color: #f8f9fa;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+}
+
+.marc-raw-content {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 15px;
+    color: #c9d1d9;
+    font-size: 13px;
+    line-height: 1.4;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 0;
+}
+
+.marc-raw-content::-webkit-scrollbar {
+    height: 8px;
+}
+
+.marc-raw-content::-webkit-scrollbar-track {
+    background: #21262d;
+    border-radius: 4px;
+}
+
+.marc-raw-content::-webkit-scrollbar-thumb {
+    background: #424a53;
+    border-radius: 4px;
+}
+
+.marc-raw-content::-webkit-scrollbar-thumb:hover {
+    background: #586069;
+}
+
+.marc-format-selector {
+    background: rgba(56, 139, 253, 0.05);
+    border: 1px solid rgba(56, 139, 253, 0.2);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.format-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.format-btn {
+    background: #21262d;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.format-btn:hover {
+    background: #30363d;
+    border-color: #58a6ff;
+    color: #58a6ff;
+    transform: translateY(-1px);
+}
+
+.format-btn.active {
+    background: #0969da;
+    border-color: #0969da;
+    color: white;
+    box-shadow: 0 2px 8px rgba(9, 105, 218, 0.3);
+}
+
+.format-description {
+    font-size: 13px;
+    color: #8b949e;
+    font-style: italic;
+}
+
+.format-description span {
+    background: rgba(56, 139, 253, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border-left: 3px solid #388bfd;
+}
+
+.marc-info-header {
+    background: rgba(56, 139, 253, 0.1);
+    border: 1px solid rgba(56, 139, 253, 0.3);
+    border-radius: 6px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+}
+
+.marc-info-title {
+    color: #58a6ff;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.marc-info-subtitle {
+    color: #8b949e;
+    font-size: 14px;
+    margin: 0;
+}
+
+.marc-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.marc-btn {
+    background: #21262d;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.marc-btn:hover {
+    background: #30363d;
+    border-color: #58a6ff;
+    color: #58a6ff;
+    text-decoration: none;
+}
+
+.marc-btn i {
+    font-size: 14px;
+}
+
+.page-header-crudo {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e1e2e 100%);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.page-header-crudo h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.page-header-crudo .header-subtitle {
+    margin: 5px 0 0 0;
+    opacity: 0.8;
+    font-size: 14px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header técnico -->
+    <div class="page-header-crudo">
+        <h1>
+            <i class="bi bi-code-slash"></i>
+            Vista MARC Crudo
+        </h1>
+        <p class="header-subtitle">Inspección técnica del registro bibliográfico</p>
+    </div>
+
+    <!-- Información del registro -->
+    <div class="marc-info-header">
+        <div class="marc-info-title">{{ obra.titulo_destacado_display|default:"Registro MARC21" }}</div>
+        <p class="marc-info-subtitle">
+            Signatura: {{ obra.signatura_publica_display|default:"N/A" }} | 
+            ID: {{ obra.pk|default:"N/A" }}
+        </p>
+    </div>
+
+    <!-- Selector de formato -->
+    <div class="marc-format-selector">
+        <div class="format-buttons">
+            <button type="button" class="format-btn active" onclick="showFormat('mnemonic')">
+                <i class="bi bi-code-slash"></i>
+                Formato Mnemónico (Moderno)
+            </button>
+            <button type="button" class="format-btn" onclick="showFormat('hexadecimal')">
+                <i class="bi bi-cpu"></i>
+                Formato Hexadecimal (BNV)
+            </button>
+        </div>
+        <div class="format-description">
+            <span id="format-desc">Formato mnemónico moderno - Legible para catalogadores</span>
+        </div>
+    </div>
+
+    <!-- Contenido MARC mnemónico -->
+    <div class="marc-raw-container" id="mnemonic-content">
+        <div class="marc-raw-title">
+            <i class="bi bi-file-text"></i>
+            Registro MARC21 - Formato Mnemónico
+        </div>
+        
+        <pre class="marc-raw-content">{{ marc_mnemonic_content|default:"No hay contenido MARC disponible" }}</pre>
+        
+        <div class="marc-actions">
+            <button class="marc-btn" onclick="copyToClipboard('mnemonic')">
+                <i class="bi bi-clipboard"></i>
+                Copiar
+            </button>
+            <a href="{% url 'catalogo_publico:detalle' obra.pk %}" class="marc-btn">
+                <i class="bi bi-arrow-left"></i>
+                Volver a vista normal
+            </a>
+        </div>
+    </div>
+
+    <!-- Contenido MARC hexadecimal -->
+    <div class="marc-raw-container" id="hexadecimal-content" style="display: none;">
+        <div class="marc-raw-title">
+            <i class="bi bi-cpu"></i>
+            Registro MARC21 - Formato Hexadecimal (Estilo BNV)
+        </div>
+        
+        <pre class="marc-raw-content">{{ marc_hexadecimal_content|default:"No hay contenido MARC disponible" }}</pre>
+        
+        <div class="marc-actions">
+            <button class="marc-btn" onclick="copyToClipboard('hexadecimal')">
+                <i class="bi bi-clipboard"></i>
+                Copiar
+            </button>
+            <a href="{% url 'catalogo_publico:detalle' obra.pk %}" class="marc-btn">
+                <i class="bi bi-arrow-left"></i>
+                Volver a vista normal
+            </a>
+        </div>
+    </div>
+
+    <!-- Nota técnica -->
+    <div class="alert alert-info mt-4">
+        <h6><i class="bi bi-info-circle"></i> Nota para catalogadores</h6>
+        <p class="mb-0">
+            Esta vista muestra el registro MARC21 en su formato crudo/mnemónico. 
+            Cada línea representa un campo con su etiqueta, indicadores y subcampos. 
+            Este formato es útil para depuración técnica y análisis detallado de la estructura del registro.
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showFormat(format) {
+    // Ocultar ambos contenidos
+    document.getElementById('mnemonic-content').style.display = 'none';
+    document.getElementById('hexadecimal-content').style.display = 'none';
+    
+    // Quitar clase activa de todos los botones
+    document.querySelectorAll('.format-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Mostrar el contenido seleccionado y activar el botón
+    if (format === 'mnemonic') {
+        document.getElementById('mnemonic-content').style.display = 'block';
+        document.querySelector('button[onclick="showFormat(\'mnemonic\')"]').classList.add('active');
+        document.getElementById('format-desc').textContent = 'Formato mnemónico moderno - Legible para catalogadores';
+        document.getElementById('format-desc').style.borderLeftColor = '#388bfd';
+    } else if (format === 'hexadecimal') {
+        document.getElementById('hexadecimal-content').style.display = 'block';
+        document.querySelector('button[onclick="showFormat(\'hexadecimal\')"]').classList.add('active');
+        document.getElementById('format-desc').textContent = 'Formato hexadecimal - Estilo Biblioteca Nacional de Venezuela';
+        document.getElementById('format-desc').style.borderLeftColor = '#f59e0b';
+    }
+}
+
+function copyToClipboard(format) {
+    let content;
+    if (format === 'mnemonic') {
+        content = document.querySelector('#mnemonic-content .marc-raw-content').textContent;
+    } else if (format === 'hexadecimal') {
+        content = document.querySelector('#hexadecimal-content .marc-raw-content').textContent;
+    }
+    
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(content).then(() => {
+            showNotification(`Contenido MARC (${format}) copiado al portapapeles`);
+        }).catch(err => {
+            console.error('Error al copiar:', err);
+            fallbackCopy(content);
+        });
+    } else {
+        fallbackCopy(content);
+    }
+}
+
+function fallbackCopy(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showNotification('Contenido MARC copiado al portapapeles');
+    } catch (err) {
+        console.error('Error al copiar:', err);
+        showNotification('Error al copiar el contenido', 'error');
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 3000);
+}
+
+// Inicializar con formato mnemónico al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    showFormat('mnemonic');
+});
+</script>
+{% endblock %}

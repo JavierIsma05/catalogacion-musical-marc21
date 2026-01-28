@@ -7,6 +7,7 @@ from .views import (
     HomePublicoView,
     ListaObrasPublicaView,
     VistaDetalladaObraView,
+    VistaMARCCrudoView,
 )
 
 app_name = "catalogo_publico"
@@ -20,4 +21,5 @@ urlpatterns = [
     ),
     path("obras/<int:pk>/marc21/", FormatoMARC21View.as_view(), name="formato_marc21"),
     path("obras/<int:pk>/descargar-pdf/", DescargarPDFObraView.as_view(), name="descargar_pdf"),
+    path("obras/<int:pk>/marc-crudo/", VistaMARCCrudoView.as_view(), name="vista_marc_crudo"),
 ]
