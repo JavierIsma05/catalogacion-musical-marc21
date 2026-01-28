@@ -298,8 +298,6 @@
                                 {% if primer_incipit and primer_incipit.paec_full %}
                                     {# Mostrar canvas del primer íncipit #}
                                     <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
-
-
                                         <canvas
                                             id="incipit_view_canvas_{{ primer_incipit.pk }}"
                                             class="incipit-view-canvas"

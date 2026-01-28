@@ -13,19 +13,15 @@
   font-weight: normal;
   font-style: normal;
 }
-.incipit-canvas-wrap{
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: 0.25rem;
-}
 
-.incipit-view-canvas{
+.incipit-view-canvas {
   width: 100%;
-  max-width: 700px;
-  height: 180px;      /* reducido de 250px para compactar */
+  max-width: 500px;
+  height: 150px;      /* balance entre compacto y legible */
   display: block;
-  background: #ffffffdc;
+  background: transparent;
+  pointer-events: none;
+  cursor: default;
 }
 </style>
 {% endblock %}
@@ -213,34 +209,31 @@
 
                 <div class="detalle-field detalle-field-incipit">
                     <span class="detalle-field-label">Íncipit musical</span>
-                    <div class="detalle-incipit-content">
-                        {% with primer_incipit=obra.incipits_musicales.first %}
-                            {% if primer_incipit and primer_incipit.paec_full %}
-                                {# Mostrar canvas del primer íncipit #}
-                                <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
+                    <div class="obra-card-body">
+                            {% with primer_incipit=obra.incipits_musicales.first %}
+                                {% if primer_incipit and primer_incipit.paec_full %}
+                                    {# Mostrar canvas del primer íncipit #}
+                                    <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
+                                        <canvas
+                                            id="incipit_view_canvas_{{ primer_incipit.pk }}"
+                                            class="incipit-view-canvas"
+                                            width="500"
+                                            height="180"
+                                            data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
+                                        </canvas>
 
-                                <div class="incipit-canvas-wrap" style="margin-top: 0.25rem;">
-                                    <canvas
-                                        id="incipit_view_canvas_{{ primer_incipit.pk }}"
-                                        class="incipit-view-canvas"
-                                        width="800"
-                                        height="240"  /* reducido de 320 para compactar */
-                                        data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
-                                    </canvas>
-                                </div>
 
-                                {# Información textual del íncipit #}
-                                {% if primer_incipit.titulo_encabezamiento %}
-                                <p class="detalle-incipit-line" style="margin-top: 0.25rem;">
-                                    {{ primer_incipit.titulo_encabezamiento }}
-                                </p>
+                                    {# Información textual del íncipit #}
+                                    {% if primer_incipit.titulo_encabezamiento %}
+                                        <p class="obra-inline-line" style="margin-top: 0.125rem; font-size: 0.9em; color: #666;">
+                                            {{ primer_incipit.titulo_encabezamiento }}
+                                        </p>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="meta-empty">Sin íncipit registrado</p>
                                 {% endif %}
-
-                            {% else %}
-                                <p class="detalle-field-value text-muted">Sin íncipit registrado</p>
-                            {% endif %}
-                        {% endwith %}
-                    </div>
+                            {% endwith %}
+                        </div>
                 </div>
             </div>
         </section>

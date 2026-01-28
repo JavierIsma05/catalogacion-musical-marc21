@@ -27,10 +27,10 @@
 
 .incipit-view-canvas {
   width: 100%;
-  max-width: 600px;
-  height: 190px; /* Restaurado a 190px - el pentagrama estaba bien */
+  max-width: 500px;
+  height: 150px;      /* balance entre compacto y legible */
   display: block;
-  background: #fff;
+  background: transparent;
   pointer-events: none;
   cursor: default;
 }
@@ -45,7 +45,8 @@
 .obra-incipit-card .obra-card-label {
   font-weight: 600;
   color: #495057;
-  margin-bottom: 0.1875rem; /* Reducido a 0.1875rem para mayor densidad */
+  margin-bottom: 0;
+
 }
 </style>
 {% endblock %}
@@ -219,33 +220,30 @@
                     <section class="obra-info-card obra-incipit-card">
 
                     <div class="obra-card-body">
-                        {% with primer_incipit=obra.incipits_musicales.first %}
-                            {% if primer_incipit and primer_incipit.paec_full %}
-                                {# Mostrar canvas del primer íncipit #}
-                                <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
+                            {% with primer_incipit=obra.incipits_musicales.first %}
+                                {% if primer_incipit and primer_incipit.paec_full %}
+                                    {# Mostrar canvas del primer íncipit #}
+                                    <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
+                                        <canvas
+                                            id="incipit_view_canvas_{{ primer_incipit.pk }}"
+                                            class="incipit-view-canvas"
+                                            width="500"
+                                            height="180"
+                                            data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
+                                        </canvas>
 
-                                <div class="incipit-canvas-wrap" style="margin-top: 0.5rem;">
-                                    <canvas
-                                        id="incipit_view_canvas_{{ primer_incipit.pk }}"
-                                        class="incipit-view-canvas"
-                                        width="800"
-                                        height="320"
-                                        data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
-                                    </canvas>
-                                </div>
 
-                                {# Información textual del íncipit #}
-                                {% if primer_incipit.titulo_encabezamiento %}
-                                <p class="obra-inline-line" style="margin-top: 0rem; font-size: 0.9em; color: #666;">
-                                    {{ primer_incipit.titulo_encabezamiento }}
-                                </p>
+                                    {# Información textual del íncipit #}
+                                    {% if primer_incipit.titulo_encabezamiento %}
+                                        <p class="obra-inline-line" style="margin-top: 0.125rem; font-size: 0.9em; color: #666;">
+                                            {{ primer_incipit.titulo_encabezamiento }}
+                                        </p>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="meta-empty">Sin íncipit registrado</p>
                                 {% endif %}
-
-                            {% else %}
-                                <p class="meta-empty">Sin íncipit registrado</p>
-                            {% endif %}
-                        {% endwith %}
-                    </div>
+                            {% endwith %}
+                        </div>
                 </section>
 
                 </div>
