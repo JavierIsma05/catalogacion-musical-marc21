@@ -13,6 +13,10 @@ from .obra_views import (
     DetalleObraView,
     ListaObrasView,
     EliminarObraView,
+    PapeleraObrasView,
+    RestaurarObraView,
+    PurgarObraView,
+    PurgarTodoView,
 )
 
 # Views de autoridades
@@ -43,6 +47,10 @@ __all__ = [
     'DetalleObraView',
     'ListaObrasView',
     'EliminarObraView',
+    'PapeleraObrasView',
+    'RestaurarObraView',
+    'PurgarObraView',
+    'PurgarTodoView',
     
     # Autoridades - Personas
     'ListaPersonasView',

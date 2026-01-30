@@ -11,6 +11,10 @@ from catalogacion.views import (
     EliminarObraView,
     IndexView,
     ListaObrasView,
+    PapeleraObrasView,
+    PurgarObraView,
+    PurgarTodoView,
+    RestaurarObraView,
     SeleccionarTipoObraView,
 )
 from catalogacion.views import borradores as borradores_views
@@ -45,6 +49,27 @@ urlpatterns = [
                 ),
             ]
         ),
+    ),
+    # Papelera de obras eliminadas
+    path(
+        "papelera/",
+        PapeleraObrasView.as_view(),
+        name="papelera_obras",
+    ),
+    path(
+        "papelera/<int:pk>/restaurar/",
+        RestaurarObraView.as_view(),
+        name="restaurar_obra",
+    ),
+    path(
+        "papelera/<int:pk>/purgar/",
+        PurgarObraView.as_view(),
+        name="purgar_obra",
+    ),
+    path(
+        "papelera/purgar-todo/",
+        PurgarTodoView.as_view(),
+        name="purgar_todo",
     ),
     # Interfaz de borradores
     path(

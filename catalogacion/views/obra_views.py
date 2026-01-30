@@ -555,16 +555,208 @@ class EliminarObraView(CatalogadorRequiredMixin, DeleteView):
     """
     Vista para eliminar (soft delete) una obra.
     No elimina físicamente, solo marca como inactiva.
+    Valida relaciones PROTECT antes de eliminar.
     """
 
     model = ObraGeneral
+    template_name = "catalogacion/confirmar_eliminar_obra.html"
     success_url = reverse_lazy("catalogacion:lista_obras")
 
-    def delete(self, request, *args, **kwargs):
-        """Realizar soft delete de la obra"""
-        self.object = self.get_object()
-        self.object.soft_delete()
+    def get_context_data(self, **kwargs):
+        """Agregar información de relaciones al contexto"""
+        context = super().get_context_data(**kwargs)
+        obra = self.object
+
+        # Verificar relaciones que bloquean la eliminación
+        from catalogacion.models import (
+            NumeroControl773,
+            NumeroControl774,
+            NumeroControl787,
+        )
+
+        relaciones_773 = NumeroControl773.objects.filter(
+            obra_relacionada=obra
+        ).select_related("enlace_773__obra")
+        relaciones_774 = NumeroControl774.objects.filter(
+            obra_relacionada=obra
+        ).select_related("enlace_774__obra")
+        relaciones_787 = NumeroControl787.objects.filter(
+            obra_relacionada=obra
+        ).select_related("enlace_787__obra")
+
+        context["tiene_relaciones_protect"] = (
+            relaciones_773.exists()
+            or relaciones_774.exists()
+            or relaciones_787.exists()
+        )
+        context["relaciones_773"] = relaciones_773
+        context["relaciones_774"] = relaciones_774
+        context["relaciones_787"] = relaciones_787
+
+        return context
+
+    def form_valid(self, form):
+        """Realizar soft delete de la obra con validación de relaciones.
+
+        Nota: En Django 4.0+ DeleteView usa form_valid() en lugar de delete().
+        """
+        # Verificar relaciones PROTECT antes de eliminar
+        from catalogacion.models import (
+            NumeroControl773,
+            NumeroControl774,
+            NumeroControl787,
+        )
+
+        if (
+            NumeroControl773.objects.filter(obra_relacionada=self.object).exists()
+            or NumeroControl774.objects.filter(obra_relacionada=self.object).exists()
+            or NumeroControl787.objects.filter(obra_relacionada=self.object).exists()
+        ):
+            messages.error(
+                self.request,
+                f'No se puede eliminar "{self.object.titulo_principal}". '
+                "Existen obras que hacen referencia a esta.",
+            )
+            return redirect("catalogacion:lista_obras")
+
+        # Realizar soft delete con usuario (NO llamar a super() que haría delete real)
+        self.object.soft_delete(usuario=self.request.user.get_username())
         messages.success(
-            request, f'Obra "{self.object.titulo_principal}" eliminada exitosamente.'
+            self.request,
+            f'Obra "{self.object.titulo_principal}" movida a la papelera. '
+            "Puede restaurarla en los próximos 30 días.",
         )
         return redirect(self.success_url)
+
+
+class PapeleraObrasView(CatalogadorRequiredMixin, ListView):
+    """
+    Vista para mostrar obras eliminadas (papelera).
+    Permite restaurar o purgar permanentemente.
+    """
+
+    model = ObraGeneral
+    template_name = "catalogacion/papelera_obras.html"
+    context_object_name = "obras"
+    paginate_by = 20
+
+    def get_queryset(self):
+        """Obtener solo obras eliminadas (activo=False)"""
+        return (
+            ObraGeneral.objects.filter(activo=False)
+            .select_related("compositor", "catalogador")
+            .order_by("-fecha_eliminacion")
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from django.utils import timezone
+        from datetime import timedelta
+
+        # Calcular obras que se purgarán pronto (más de 25 días)
+        limite_alerta = timezone.now() - timedelta(days=25)
+        context["obras_por_purgar"] = self.get_queryset().filter(
+            fecha_eliminacion__lt=limite_alerta
+        ).count()
+        context["dias_retencion"] = 30
+        return context
+
+
+class RestaurarObraView(CatalogadorRequiredMixin, DetailView):
+    """Vista para restaurar una obra desde la papelera"""
+
+    model = ObraGeneral
+
+    def get_queryset(self):
+        """Solo permitir restaurar obras eliminadas"""
+        return ObraGeneral.objects.filter(activo=False)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.restore()
+        messages.success(
+            request,
+            f'Obra "{self.object.titulo_principal}" restaurada exitosamente.',
+        )
+        return redirect("catalogacion:papelera_obras")
+
+
+class PurgarObraView(CatalogadorRequiredMixin, DetailView):
+    """Vista para eliminar permanentemente una obra de la papelera"""
+
+    model = ObraGeneral
+
+    def get_queryset(self):
+        """Solo permitir purgar obras eliminadas"""
+        return ObraGeneral.objects.filter(activo=False)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        titulo = self.object.titulo_principal
+
+        # Verificar relaciones PROTECT antes de eliminar físicamente
+        if (
+            NumeroControl773.objects.filter(obra_relacionada=self.object).exists()
+            or NumeroControl774.objects.filter(obra_relacionada=self.object).exists()
+            or NumeroControl787.objects.filter(obra_relacionada=self.object).exists()
+        ):
+            messages.error(
+                request,
+                f'No se puede purgar "{titulo}". '
+                "Existen obras que hacen referencia a esta.",
+            )
+            return redirect("catalogacion:papelera_obras")
+
+        # Eliminación física real
+        self.object.delete()
+        messages.success(
+            request,
+            f'Obra "{titulo}" eliminada permanentemente de la base de datos.',
+        )
+        return redirect("catalogacion:papelera_obras")
+
+
+class PurgarTodoView(CatalogadorRequiredMixin, TemplateView):
+    """Vista para purgar todas las obras antiguas de la papelera"""
+
+    def post(self, request, *args, **kwargs):
+        from django.utils import timezone
+        from datetime import timedelta
+
+        # Obtener obras eliminadas hace más de 30 días
+        limite = timezone.now() - timedelta(days=30)
+        obras_a_purgar = ObraGeneral.objects.filter(
+            activo=False,
+            fecha_eliminacion__lt=limite,
+        )
+
+        # Filtrar las que no tienen relaciones PROTECT
+        obras_purgadas = 0
+        obras_protegidas = 0
+
+        for obra in obras_a_purgar:
+            tiene_relaciones = (
+                NumeroControl773.objects.filter(obra_relacionada=obra).exists()
+                or NumeroControl774.objects.filter(obra_relacionada=obra).exists()
+                or NumeroControl787.objects.filter(obra_relacionada=obra).exists()
+            )
+            if not tiene_relaciones:
+                obra.delete()
+                obras_purgadas += 1
+            else:
+                obras_protegidas += 1
+
+        if obras_purgadas > 0:
+            messages.success(
+                request,
+                f"Se purgaron {obras_purgadas} obra(s) permanentemente.",
+            )
+        if obras_protegidas > 0:
+            messages.warning(
+                request,
+                f"{obras_protegidas} obra(s) no se pudieron purgar por tener referencias.",
+            )
+        if obras_purgadas == 0 and obras_protegidas == 0:
+            messages.info(request, "No hay obras antiguas para purgar.")
+
+        return redirect("catalogacion:papelera_obras")
