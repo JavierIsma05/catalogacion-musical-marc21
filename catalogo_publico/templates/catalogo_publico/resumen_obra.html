@@ -72,17 +72,22 @@
         </ol>
     </nav>
 
-    <!-- Encabezado resumido compacto -->
-    <div class="resumen-header d-flex flex-column flex-lg-row align-items-lg-start justify-content-between gap-2 mb-2">
-        <div>
-            <h1 class="mt-0 mb-0">Resumen de la obra</h1>
+    <!-- Header -->
+    <div class="detalle-header">
+        <div class="detalle-header-left">
+            <h1 class="detalle-main-title">Resumen de la obra</h1>
+            <div class="detalle-actions">
+                <a href="{% url 'catalogo_publico:lista_obras' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Volver a la lista
+                </a>
+            </div>
         </div>
-        <div class="resumen-top-tags">
-            <div class="detalle-top-tag neutral">
+        <div class="detalle-header-right">
+            <div class="detalle-meta-tag">
                 <small>Signatura</small>
                 <span>{{ obra.signatura_publica_display }}</span>
             </div>
-            <div class="detalle-top-tag neutral">
+            <div class="detalle-meta-tag">
                 <small>Colección</small>
                 {% if obra.coleccion_publica_display %}
                     <span>{{ obra.coleccion_publica_display }}</span>
@@ -96,156 +101,132 @@
     <div class="row g-3 align-items-start">
         <div class="col-lg-9">
             <div class="resumen-unified-card">
+                <!-- Lista simple de campos sin secciones -->
+                
                 <!-- Compositor -->
-                <div class="resumen-section">
-                    <div class="resumen-section-title">
-                        <i class="bi bi-person"></i>
-                        Compositor
-                    </div>
-                    <div class="resumen-item">
-                        <div class="resumen-label">Nombre</div>
-                        <div class="resumen-value">{{ obra.autor_publico_principal }}</div>
-                    </div>
-                    {% if obra.autor_publico_nota %}
-                    <div class="resumen-item">
-                        <div class="resumen-label">Nota</div>
-                        <div class="resumen-value text-muted">{{ obra.autor_publico_nota }}</div>
-                    </div>
-                    {% endif %}
+                <div class="resumen-field">
+                    <span class="resumen-field-label">Compositor</span>
+                    <span class="resumen-field-value">
+                        {% if obra.compositor %}
+                            {{ obra.compositor.apellidos_nombres }}{% if obra.compositor.coordenadas_biograficas %} ({{ obra.compositor.coordenadas_biograficas }}){% endif %}{% if obra.autoria %} <em class="text-muted">[{{ obra.get_autoria_display|lower }}]</em>{% endif %}
+                        {% else %}
+                            <span class="text-muted">Sin compositor registrado</span>
+                        {% endif %}
+                    </span>
                 </div>
 
                 <!-- Títulos -->
-                <div class="resumen-section">
-                    <div class="resumen-section-title">
-                        <i class="bi bi-fonts"></i>
-                        Títulos
+                {% if obra.titulo_uniforme %}
+                    <!-- Si hay 130, solo se muestra este -->
+                    <div class="resumen-field">
+                        <span class="resumen-field-label">Título uniforme (punto de acceso principal)</span>
+                        <span class="resumen-field-value">
+                            {{ obra.titulo_uniforme }}{% if obra.medio_interpretacion_130 %}, {{ obra.get_medio_interpretacion_130_display }}{% endif %}{% if obra.tonalidad_130 %}, {{ obra.get_tonalidad_130_display }}{% endif %}{% if obra.nombre_parte_130 %}, {{ obra.nombre_parte_130 }}{% endif %}{% if obra.numero_parte_130 %}, {{ obra.numero_parte_130 }}{% endif %}{% if obra.forma_130 %}, {{ obra.forma_130 }}{% endif %}{% if obra.arreglo_130 %}, {{ obra.get_arreglo_130_display }}{% endif %}
+                        </span>
                     </div>
-                    {% if obra.titulo_uniforme_130_display %}
-                        <div class="resumen-item">
-                            <div class="resumen-label">Título uniforme</div>
-                            <div class="resumen-value">{{ obra.titulo_uniforme_130_display }}</div>
-                        </div>
-                    {% else %}
-                        {% if obra.titulo_uniforme_240_display %}
-                        <div class="resumen-item">
-                            <div class="resumen-label">Título uniforme</div>
-                            <div class="resumen-value">{{ obra.titulo_uniforme_240_display }}</div>
-                        </div>
-                        {% endif %}
-                        {% if obra.titulo_245_display %}
-                        <div class="resumen-item">
-                            <div class="resumen-label">Título en fuente</div>
-                            <div class="resumen-value">{{ obra.titulo_245_display }}</div>
-                        </div>
-                        {% endif %}
-                        {% if not obra.titulo_uniforme_240_display and not obra.titulo_245_display %}
-                        <p class="campo-vacio mb-0">Sin títulos registrados</p>
-                        {% endif %}
+                {% else %}
+                    {% if obra.titulo_240 %}
+                    <div class="resumen-field">
+                        <span class="resumen-field-label">Título uniforme</span>
+                        <span class="resumen-field-value">
+                            {{ obra.titulo_240 }}{% if obra.medio_interpretacion_240 %}, {{ obra.get_medio_interpretacion_240_display }}{% endif %}{% if obra.tonalidad_240 %}, {{ obra.get_tonalidad_240_display }}{% endif %}{% if obra.nombre_parte_240 %}, {{ obra.nombre_parte_240 }}{% endif %}{% if obra.numero_parte_240 %}, {{ obra.numero_parte_240 }}{% endif %}{% if obra.forma_240 %}, {{ obra.forma_240 }}{% endif %}{% if obra.arreglo_240 %}, {{ obra.get_arreglo_240_display }}{% endif %}
+                        </span>
+                    </div>
                     {% endif %}
+                    <div class="resumen-field">
+                        <span class="resumen-field-label">Título en fuente</span>
+                        <span class="resumen-field-value">
+                            {% if obra.titulo_principal %}
+                                {{ obra.titulo_principal }}{% if obra.subtitulo %} : {{ obra.subtitulo }}{% endif %}{% if obra.mencion_responsabilidad %} / {{ obra.mencion_responsabilidad }}{% endif %}
+                            {% else %}
+                                <span class="text-muted">Sin título registrado</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                {% endif %}
+
+                <!-- Producción -->
+                <div class="resumen-field">
+                    <span class="resumen-field-label">Manuscrito/Impreso</span>
+                    <span class="resumen-field-value">{{ obra.tecnica_340_publica_display }}</span>
                 </div>
 
-                <!-- Producción y descripción física -->
-                <div class="resumen-section">
-                    <div class="resumen-section-title">
-                        <i class="bi bi-file-earmark-text"></i>
-                        Producción y descripción física
-                    </div>
-                    <div class="resumen-item">
-                        <div class="resumen-label">Manuscrito/Impreso</div>
-                        <div class="resumen-value">{{ obra.tecnica_340_publica_display }}</div>
-                    </div>
-                    <div class="resumen-item">
-                        <div class="resumen-label">Producción de la obra</div>
-                        <div class="resumen-value">{{ obra.publicacion_publica_display }}</div>
-                    </div>
-                    <div class="resumen-item">
-                        <div class="resumen-label">Descripción física</div>
-                        <div class="resumen-value">{{ obra.descripcion_fisica_publica_display }}</div>
-                    </div>
+                <div class="resumen-field">
+                    <span class="resumen-field-label">Producción de la obra</span>
+                    <span class="resumen-field-value">{{ obra.publicacion_publica_display }}</span>
                 </div>
 
-                <!-- Características musicales -->
-                <div class="resumen-section">
-                    <div class="resumen-section-title">
-                        <i class="bi bi-music-note-beamed"></i>
-                        Características musicales
-                    </div>
-                    <div class="resumen-item">
-                        <div class="resumen-label">Materia (Género/Forma)</div>
-                        <div class="resumen-value">{{ obra.temas_publico_display }}</div>
-                    </div>
-                    <div class="resumen-item">
-                        <div class="resumen-label">Medio de interpretación</div>
-                        <div class="resumen-value">
-                            {% with medios=obra.medios_interpretacion_resumen %}
-                                <span>{{ medios.0 }}</span>
-                                {% if medios.1 %}
-                                    <span class="resumen-meta">Solista: {{ medios.1 }}</span>
-                                {% endif %}
-                            {% endwith %}
-                        </div>
-                    </div>
-                    <div class="resumen-item">
-                        <div class="resumen-label">Tonalidad</div>
+                <div class="resumen-field">
+                    <span class="resumen-field-label">Descripción física</span>
+                    <span class="resumen-field-value">{{ obra.descripcion_fisica_publica_display }}</span>
+                </div>
+
+                <!-- Datos musicales -->
+                <div class="resumen-field">
+                    <span class="resumen-field-label">Materia (Género/Forma)</span>
+                    <span class="resumen-field-value">{{ obra.temas_publico_display }}</span>
+                </div>
+
+                <div class="resumen-field">
+                    <span class="resumen-field-label">Medio de interpretación</span>
+                    <span class="resumen-field-value">
+                        {% with medios=obra.medios_interpretacion_resumen %}
+                            {% if medios.0 != "Sin medios registrados" %}
+                                {{ medios.0 }}{% if medios.1 %} <span class="text-muted">| Solista: {{ medios.1 }}</span>{% endif %}
+                            {% else %}
+                                <span class="text-muted">Sin medio de interpretación registrado</span>
+                            {% endif %}
+                        {% endwith %}
+                    </span>
+                </div>
+
+                <div class="resumen-field">
+                    <span class="resumen-field-label">Tonalidad</span>
+                    <span class="resumen-field-value">
                         {% if obra.tonalidad_publica_display %}
-                            <div class="resumen-value">{{ obra.tonalidad_publica_display }}</div>
+                            {{ obra.tonalidad_publica_display }}
                         {% else %}
-                            <div class="resumen-value text-muted">Sin tonalidad registrada</div>
+                            <span class="text-muted">Sin tonalidad registrada</span>
                         {% endif %}
+                    </span>
+                </div>
+
+                <!-- Íncipit musical -->
+                <div class="resumen-field resumen-field-incipit">
+                    <span class="resumen-field-label">Íncipit musical</span>
+                    <div class="resumen-field-value">
+                        {% with primer_incipit=obra.incipits_musicales.first %}
+                            {% if primer_incipit and primer_incipit.paec_full %}
+                                <div class="incipit-info text-muted" style="font-size: 0.9em; margin-bottom: 0.5rem;">
+                                    {{ primer_incipit.numero_obra }}.{{ primer_incipit.numero_movimiento }}.{{ primer_incipit.numero_pasaje }}{% if primer_incipit.titulo_encabezamiento %}; {{ primer_incipit.titulo_encabezamiento }}{% endif %}{% if primer_incipit.voz_instrumento %}; {{ primer_incipit.voz_instrumento }}{% endif %}{% if primer_incipit.clave or primer_incipit.armadura or primer_incipit.tiempo %}; {% if primer_incipit.clave %}{{ primer_incipit.clave }}{% endif %}{% if primer_incipit.armadura %} {{ primer_incipit.armadura }}{% endif %}{% if primer_incipit.tiempo %} {{ primer_incipit.tiempo }}{% endif %}{% endif %}
+                                </div>
+                                <div class="incipit-canvas-container">
+                                    <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
+                                    <canvas
+                                        id="incipit_view_canvas_{{ primer_incipit.pk }}"
+                                        class="incipit-view-canvas"
+                                        width="500"
+                                        height="180"
+                                        data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
+                                    </canvas>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">Sin íncipit musical registrado</span>
+                            {% endif %}
+                        {% endwith %}
                     </div>
                 </div>
 
                 <!-- Nota general -->
-                <div class="resumen-section">
-                    <div class="resumen-section-title">
-                        <i class="bi bi-journal-text"></i>
-                        Nota general
-                    </div>
-                    {% if obra.nota_general_resumen %}
-                        <div class="resumen-item">
-                            <div class="resumen-label">Primera nota</div>
-                            <div class="resumen-value">{{ obra.nota_general_resumen }}</div>
-                        </div>
-                    {% else %}
-                        <p class="campo-vacio mb-0">Sin notas generales registradas</p>
-                    {% endif %}
-                </div>
-
-                <!-- Íncipit musical -->
-                <div class="resumen-section resumen-section-incipit">
-                    <div class="resumen-section-title">
-                        <i class="bi bi-music-note-list"></i>
-                        Íncipit musical
-                    </div>
-                    <section class="obra-info-card obra-incipit-card">
-
-                    <div class="obra-card-body">
-                            {% with primer_incipit=obra.incipits_musicales.first %}
-                                {% if primer_incipit and primer_incipit.paec_full %}
-                                    {# Mostrar canvas del primer íncipit #}
-                                    <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
-                                        <canvas
-                                            id="incipit_view_canvas_{{ primer_incipit.pk }}"
-                                            class="incipit-view-canvas"
-                                            width="500"
-                                            height="180"
-                                            data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
-                                        </canvas>
-
-
-                                    {# Información textual del íncipit #}
-                                    {% if primer_incipit.titulo_encabezamiento %}
-                                        <p class="obra-inline-line" style="margin-top: 0.125rem; font-size: 0.9em; color: #666;">
-                                            {{ primer_incipit.titulo_encabezamiento }}
-                                        </p>
-                                    {% endif %}
-                                {% else %}
-                                    <p class="meta-empty">Sin íncipit registrado</p>
-                                {% endif %}
-                            {% endwith %}
-                        </div>
-                </section>
-
+                <div class="resumen-field">
+                    <span class="resumen-field-label">Nota general</span>
+                    <span class="resumen-field-value">
+                        {% if obra.nota_general_resumen %}
+                            {{ obra.nota_general_resumen }}
+                        {% else %}
+                            <span class="text-muted">Sin notas generales registradas</span>
+                        {% endif %}
+                    </span>
                 </div>
             </div>
         </div>
