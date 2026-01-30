@@ -309,9 +309,12 @@ FORMSET 773 – Documento Fuente (R)
     // =====================================================
     // 🔥 AUTOCOMPLETADO 773 - CAMPOS HEREDABLES
     // =====================================================
-    
+
     class Autocompletado773 {
         constructor() {
+            this.isProcessing = false;  // Bandera para prevenir ejecuciones múltiples
+            this.activeIntervals = new Map();  // Almacenar intervals activos por enlaceId
+            this.boundInputs = new WeakSet();  // Rastrear inputs con listeners ya agregados
             this.init();
         }
 
@@ -325,7 +328,7 @@ FORMSET 773 – Documento Fuente (R)
                 if (e.target.closest('.btn-buscar-obra')) {
                     this.handleBuscarObra(e.target.closest('.btn-buscar-obra'));
                 }
-                
+
                 if (e.target.closest('.btn-autocompletar-773')) {
                     this.handleAutocompletar(e.target.closest('.btn-autocompletar-773'));
                 }
@@ -340,79 +343,116 @@ FORMSET 773 – Documento Fuente (R)
         }
 
         handleBuscarObra(btn) {
-            const enlaceId = btn.dataset.enlaceId;
-            const input = document.querySelector(`input[name="w_773_${enlaceId}"]`);
+            const enlaceId = btn.dataset.enlaceId || 'default';
+            const input = document.querySelector(`input[name="w_773_${enlaceId}"]`) ||
+                          btn.parentElement.querySelector('.obra-relacionada-id-input');
             const visibleInput = btn.parentElement.querySelector('.numero-w-input');
             const autoBtn = btn.parentElement.querySelector('.btn-autocompletar-773');
 
-            console.log('🔍 handleBuscarObra iniciado para enlaceId:', enlaceId);
-            console.log('📍 Input encontrado:', input);
-            console.log('📍 Visible input encontrado:', visibleInput);
-            console.log('📍 AutoBtn encontrado:', autoBtn);
+            if (!input) {
+                console.warn('⚠️ No se encontró input para enlaceId:', enlaceId);
+                return;
+            }
 
-            // Solución directa: Monitorear el input constantemente
-            // Cuando tu modal actualice el input, activaremos el autocompletado
-            
+            console.log('🔍 handleBuscarObra iniciado para enlaceId:', enlaceId);
+
+            // Limpiar interval anterior si existe para este enlaceId
+            if (this.activeIntervals.has(enlaceId)) {
+                clearInterval(this.activeIntervals.get(enlaceId));
+                this.activeIntervals.delete(enlaceId);
+                console.log('🧹 Interval anterior limpiado para:', enlaceId);
+            }
+
             let ultimoValor = input.value;
-            
+            let autocompletadoRealizado = false;
+
             // Monitorear cambios en el input cada 500ms
             const monitorInterval = setInterval(() => {
+                // Si ya se realizó el autocompletado, detener el monitoreo
+                if (autocompletadoRealizado) {
+                    clearInterval(monitorInterval);
+                    this.activeIntervals.delete(enlaceId);
+                    console.log('✅ Monitoreo detenido - autocompletado ya realizado');
+                    return;
+                }
+
                 const valorActual = input.value;
-                
+
                 if (valorActual && valorActual !== ultimoValor && valorActual !== '') {
                     console.log('🔄 ¡CAMBIO DETECTADO! Valor anterior:', ultimoValor, 'Nuevo valor:', valorActual);
-                    
+
                     // Actualizar input visible
                     if (visibleInput) {
                         visibleInput.value = valorActual;
                     }
-                    
+
                     // Mostrar y configurar botón de autocompletar
                     if (autoBtn) {
                         autoBtn.classList.remove('d-none');
                         autoBtn.dataset.obraId = valorActual;
-                        
-                        console.log('🪄 Botón autocompletar configurado con obraId:', valorActual);
-                        
-                        // 🔥 AUTOCOMPLETAR AUTOMÁTICAMENTE
+
+                        // Marcar como realizado ANTES de llamar
+                        autocompletadoRealizado = true;
+
+                        // Limpiar interval inmediatamente
+                        clearInterval(monitorInterval);
+                        this.activeIntervals.delete(enlaceId);
+
+                        // Autocompletar automáticamente
                         setTimeout(() => {
                             console.log('🚀 INICIANDO AUTOCOMPLETADO...');
                             this.handleAutocompletar(autoBtn);
-                        }, 1000);
+                        }, 500);
                     }
-                    
+
                     ultimoValor = valorActual;
                 }
             }, 500);
 
-            // Limpiar después de 60 segundos
+            // Guardar referencia al interval
+            this.activeIntervals.set(enlaceId, monitorInterval);
+
+            // Limpiar después de 30 segundos (reducido de 60)
             setTimeout(() => {
-                clearInterval(monitorInterval);
-                console.log('⏰ Monitoreo detenido después de 60 segundos');
-            }, 60000);
+                if (this.activeIntervals.has(enlaceId)) {
+                    clearInterval(this.activeIntervals.get(enlaceId));
+                    this.activeIntervals.delete(enlaceId);
+                    console.log('⏰ Monitoreo detenido por timeout para:', enlaceId);
+                }
+            }, 30000);
 
-            // También monitorear el evento change del input
-            input.addEventListener('change', (e) => {
-                console.log('📝 Evento change detectado:', e.target.value);
-                if (e.target.value && e.target.value !== '') {
-                    if (autoBtn) {
-                        autoBtn.classList.remove('d-none');
-                        autoBtn.dataset.obraId = e.target.value;
-                        
-                        setTimeout(() => {
-                            console.log('🚀 AUTOCOMPLETADO POR EVENTO CHANGE...');
-                            this.handleAutocompletar(autoBtn);
-                        }, 1000);
+            // Agregar event listener solo si no existe ya
+            if (!this.boundInputs.has(input)) {
+                this.boundInputs.add(input);
+
+                input.addEventListener('change', (e) => {
+                    // Evitar si ya está procesando
+                    if (this.isProcessing) {
+                        console.log('⏸️ Ignorando evento change - ya está procesando');
+                        return;
                     }
-                }
-            });
 
-            // También monitorear el evento input (para cambios en tiempo real)
-            input.addEventListener('input', (e) => {
-                if (e.target.value && e.target.value.length > 0) {
-                    console.log('⌨️ Evento input detectado:', e.target.value);
-                }
-            });
+                    console.log('📝 Evento change detectado:', e.target.value);
+                    if (e.target.value && e.target.value !== '') {
+                        if (autoBtn && !autocompletadoRealizado) {
+                            autoBtn.classList.remove('d-none');
+                            autoBtn.dataset.obraId = e.target.value;
+                            autocompletadoRealizado = true;
+
+                            // Limpiar interval si existe
+                            if (this.activeIntervals.has(enlaceId)) {
+                                clearInterval(this.activeIntervals.get(enlaceId));
+                                this.activeIntervals.delete(enlaceId);
+                            }
+
+                            setTimeout(() => {
+                                console.log('🚀 AUTOCOMPLETADO POR EVENTO CHANGE...');
+                                this.handleAutocompletar(autoBtn);
+                            }, 500);
+                        }
+                    }
+                });
+            }
         }
 
         handleObraSeleccionada(input) {
@@ -430,11 +470,19 @@ FORMSET 773 – Documento Fuente (R)
 
         async handleAutocompletar(btn) {
             const obraId = btn.dataset.obraId;
-            
+
             if (!obraId) {
                 this.mostrarMensaje('Seleccione primero una obra padre', 'warning');
                 return;
             }
+
+            // Prevenir ejecuciones múltiples
+            if (this.isProcessing) {
+                console.log('⏸️ Autocompletado ya en proceso, ignorando llamada duplicada');
+                return;
+            }
+
+            this.isProcessing = true;
 
             try {
                 btn.disabled = true;
@@ -465,7 +513,7 @@ FORMSET 773 – Documento Fuente (R)
                     console.log('  - Campo 545:', data.campos_heredables['545']);
                     console.log('  - Campo 852:', data.campos_heredables['852']);
                     console.log('  - Campo 856:', data.campos_heredables['856']);
-                    
+
                     await this.poblarCamposHeredables(data.campos_heredables);
                     this.mostrarMensaje(
                         `Campos heredados de "${data.obra.titulo}" (${data.obra.num_control})`,
@@ -481,6 +529,11 @@ FORMSET 773 – Documento Fuente (R)
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="bi bi-magic"></i> Auto';
+                // Liberar la bandera después de un pequeño delay para evitar re-disparos inmediatos
+                setTimeout(() => {
+                    this.isProcessing = false;
+                    console.log('✅ Autocompletado finalizado, listo para nuevo proceso');
+                }, 1000);
             }
         }
 
@@ -580,27 +633,9 @@ FORMSET 773 – Documento Fuente (R)
             } else {
                 this.mostrarMensaje('No se pudo autocompletar ningún campo', 'warning');
             }
-            
-            // Disparar eventos adicionales para asegurar que el formulario se actualice
-            setTimeout(() => {
-                console.log('🔄 Disparando eventos de actualización del formulario...');
-                
-                // Disparar evento change en todos los inputs que tienen valores
-                const inputsConValor = document.querySelectorAll('input[value], textarea[value], select[value]');
-                inputsConValor.forEach(input => {
-                    if (input.value && input.value.trim()) {
-                        input.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                });
-                
-                // Disparar evento de formulario si existe
-                const form = document.querySelector('form');
-                if (form) {
-                    form.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-                
-                console.log('✅ Eventos de actualización completados');
-            }, 500);
+
+            // NOTA: Se eliminó la cascada de eventos que causaba el loop
+            console.log('✅ Proceso de autocompletado finalizado');
         }
 
         poblarCampo100(campo) {
