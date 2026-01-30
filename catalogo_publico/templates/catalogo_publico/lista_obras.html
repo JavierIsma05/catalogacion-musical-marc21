@@ -279,14 +279,12 @@
                             <span class="tag-label">Signatura</span>
                             <span class="tag-value">{{ obra.signatura_publica_display }}</span>
                         </div>
+                        {% if obra.signatura_coleccion_padre %}
                         <div class="obra-tag">
                             <span class="tag-label">Colección</span>
-                            {% if obra.coleccion_publica_display %}
-                                <span class="tag-value">{{ obra.coleccion_publica_display }}</span>
-                            {% else %}
-                                <span class="tag-value meta-empty">Sin colección asociada</span>
-                            {% endif %}
+                            <span class="tag-value">{{ obra.signatura_coleccion_padre }}</span>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
 

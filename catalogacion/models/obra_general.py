@@ -697,10 +697,40 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
 
     @property
     def coleccion_publica_display(self):
+        """Retorna el título de la colección padre (773 $t)."""
         colecciones = [
             str(enlace.titulo) for enlace in self.enlaces_documento_fuente_773.all()
         ]
         return "; ".join(colecciones)
+
+    @property
+    def signatura_coleccion_padre(self):
+        """
+        Retorna la signatura de la colección padre via 773 $w.
+        Si la obra pertenece a una colección, devuelve la signatura de esa colección.
+        """
+        from catalogacion.models import NumeroControl773
+
+        # Buscar el primer enlace 773 que tenga obra_relacionada
+        for enlace in self.enlaces_documento_fuente_773.all():
+            numero_control = enlace.numeros_control.select_related("obra_relacionada").first()
+            if numero_control and numero_control.obra_relacionada:
+                return numero_control.obra_relacionada.signatura_publica_display
+        return None
+
+    @property
+    def obra_coleccion_padre(self):
+        """
+        Retorna la obra padre (colección) via 773 $w.
+        Útil para obtener otros datos del padre.
+        """
+        from catalogacion.models import NumeroControl773
+
+        for enlace in self.enlaces_documento_fuente_773.all():
+            numero_control = enlace.numeros_control.select_related("obra_relacionada").first()
+            if numero_control and numero_control.obra_relacionada:
+                return numero_control.obra_relacionada
+        return None
 
     @property
     def tiene_incipit(self):
