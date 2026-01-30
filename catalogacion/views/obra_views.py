@@ -4,7 +4,10 @@ Este módulo contiene las vistas CRUD para obras musicales siguiendo el estánda
 """
 
 import logging
+import shutil
+from pathlib import Path
 
+from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q
@@ -37,6 +40,106 @@ from usuarios.mixins import CatalogadorRequiredMixin
 
 # Configurar logger
 logger = logging.getLogger("catalogacion")
+
+
+def limpiar_archivos_obra(obra):
+    """
+    Elimina todos los archivos media asociados a una obra.
+    Debe llamarse ANTES de eliminar la obra de la base de datos.
+
+    Limpia:
+    - Carpeta de digitalización (media/digitalizacion/{nombre_carpeta}/)
+    - Archivos de DigitalSet (PDF, thumbnails)
+    - Archivos de WorkSegment (PDFs cacheados)
+    """
+    from digitalizacion.models import DigitalSet
+
+    archivos_eliminados = 0
+    carpetas_eliminadas = 0
+
+    try:
+        # Obtener el DigitalSet si existe
+        digital_set = getattr(obra, "digital_set", None)
+        if not digital_set:
+            try:
+                digital_set = DigitalSet.objects.get(obra=obra)
+            except DigitalSet.DoesNotExist:
+                digital_set = None
+
+        if digital_set:
+            # Calcular la carpeta del repositorio
+            from digitalizacion.views import nombre_carpeta_obra
+
+            nombre_carpeta = nombre_carpeta_obra(obra)
+            repo_dir = Path(settings.MEDIA_ROOT) / "digitalizacion" / nombre_carpeta
+
+            # Eliminar carpeta completa del repositorio
+            if repo_dir.exists():
+                shutil.rmtree(repo_dir)
+                carpetas_eliminadas += 1
+                logger.info(f"Carpeta eliminada: {repo_dir}")
+
+            # Eliminar archivos individuales que puedan estar fuera de la carpeta
+            # (por si hay rutas absolutas o archivos en otras ubicaciones)
+            for path_attr in ["pdf_path", "pdf_thumb_path"]:
+                rel_path = getattr(digital_set, path_attr, "")
+                if rel_path:
+                    abs_path = Path(settings.MEDIA_ROOT) / rel_path
+                    if abs_path.exists() and abs_path.is_file():
+                        abs_path.unlink()
+                        archivos_eliminados += 1
+
+            # Limpiar archivos de WorkSegments
+            for segment in digital_set.segments.all():
+                for path_attr in ["cached_pdf_path", "cached_thumb_path"]:
+                    rel_path = getattr(segment, path_attr, "")
+                    if rel_path:
+                        abs_path = Path(settings.MEDIA_ROOT) / rel_path
+                        if abs_path.exists() and abs_path.is_file():
+                            abs_path.unlink()
+                            archivos_eliminados += 1
+
+        logger.info(
+            f"Limpieza de archivos para obra {obra.pk}: "
+            f"{carpetas_eliminadas} carpetas, {archivos_eliminados} archivos"
+        )
+        return True
+
+    except Exception as e:
+        logger.error(f"Error limpiando archivos de obra {obra.pk}: {e}")
+        return False
+
+
+def eliminar_obra_permanentemente(obra):
+    """
+    Elimina una obra permanentemente de la base de datos.
+    Maneja manualmente las relaciones SET_NULL para evitar problemas con db_table.
+
+    Args:
+        obra: Instancia de ObraGeneral a eliminar
+
+    Returns:
+        bool: True si se eliminó correctamente
+    """
+    from catalogacion.models.borradores import BorradorObra
+
+    try:
+        # 1. Limpiar archivos media
+        limpiar_archivos_obra(obra)
+
+        # 2. Manejar manualmente las relaciones SET_NULL
+        # (evita que Django use el nombre de tabla incorrecto)
+        BorradorObra.objects.filter(obra_objetivo=obra).update(obra_objetivo=None)
+        BorradorObra.objects.filter(obra_creada=obra).update(obra_creada=None)
+
+        # 3. Ahora podemos eliminar la obra (CASCADE se encarga del resto)
+        obra.delete()
+
+        return True
+
+    except Exception as e:
+        logger.error(f"Error eliminando obra {obra.pk}: {e}")
+        raise
 
 
 class SeleccionarTipoObraView(CatalogadorRequiredMixin, TemplateView):
@@ -707,8 +810,8 @@ class PurgarObraView(CatalogadorRequiredMixin, DetailView):
             )
             return redirect("catalogacion:papelera_obras")
 
-        # Eliminación física real
-        self.object.delete()
+        # Eliminar obra permanentemente (incluye limpieza de archivos y SET_NULL manual)
+        eliminar_obra_permanentemente(self.object)
         messages.success(
             request,
             f'Obra "{titulo}" eliminada permanentemente de la base de datos.',
@@ -741,7 +844,7 @@ class PurgarTodoView(CatalogadorRequiredMixin, TemplateView):
                 or NumeroControl787.objects.filter(obra_relacionada=obra).exists()
             )
             if not tiene_relaciones:
-                obra.delete()
+                eliminar_obra_permanentemente(obra)
                 obras_purgadas += 1
             else:
                 obras_protegidas += 1

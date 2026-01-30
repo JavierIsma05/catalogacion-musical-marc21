@@ -459,7 +459,6 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     class Meta:
         verbose_name = "Obra Musical"
         verbose_name_plural = "Obras Musicales"
-        db_table = "catalogacion_obra_general"
         ordering = ["-num_control"]
         indexes = [
             models.Index(fields=["num_control"]),
