@@ -25,14 +25,16 @@
                             <small class="d-block">Nivel: {{ obra.nivel_bibliografico }}</small>
                         {% endif %}
 
-                        {% if obra.estado == 'borrador' %}
-                            <span class="badge bg-warning text-dark">Borrador</span>
+                        {% if obra.estado_registro == 'n' %}
+                            <span class="badge bg-warning text-dark">Nuevo</span>
                         {% endif %}
                     </div>
 
                     <div>
                         <a href="{% url 'catalogacion:detalle_obra' obra.pk %}" class="btn btn-outline-secondary btn-sm">Ver</a>
                         <a href="{% url 'catalogacion:editar_obra' obra.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                        
+                        
                     </div>
 
                 </div>

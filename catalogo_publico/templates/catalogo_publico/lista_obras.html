@@ -179,7 +179,7 @@
                     <input type="text"
                            class="form-control"
                            name="q"
-                           placeholder="Buscar por título, compositor..."
+                           placeholder="Buscar por título, compositor, signatura (ej: UNL, M000001)..."
                            value="{{ busqueda }}">
                 </div>
             </div>
@@ -211,13 +211,13 @@
         <article class="obra-catalog-card">
             <div class="obra-cover">
                 <div class="cover-frame">
-                    {# COVER: solo la imagen es clickeable y abre el visor #}
+                    {# COVER: solo la imagen es clickeable y abre el detalle de la obra #}
                     <div class="mb-3">
-                    {% if obra.cover_url and obra.visor_url %}
-                        <a href="{{ obra.visor_url }}" title="Abrir visor">
+                    {% if obra.cover_url %}
+                        <a href="{% url 'catalogo_publico:detalle_obra' obra.pk %}" title="Ver detalles de la obra">
                         {% if obra.cover_kind == "jpg" %}
                             <img src="{{ obra.cover_url }}"
-                                alt="Portada"
+                                alt="Portada de {{ obra.titulo_principal }}"
                                 class="w-100 rounded"
                                 style="object-fit: cover;">
                         {% elif obra.cover_kind == "pdf" %}

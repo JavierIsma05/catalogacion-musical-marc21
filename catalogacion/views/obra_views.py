@@ -551,20 +551,22 @@ class ListaObrasView(CatalogadorRequiredMixin, ListView):
         return queryset
 
 
-class EliminarObraView(CatalogadorRequiredMixin, DeleteView):
-    """
-    Vista para eliminar (soft delete) una obra.
-    No elimina físicamente, solo marca como inactiva.
-    """
-
-    model = ObraGeneral
-    success_url = reverse_lazy("catalogacion:lista_obras")
-
-    def delete(self, request, *args, **kwargs):
-        """Realizar soft delete de la obra"""
-        self.object = self.get_object()
-        self.object.soft_delete()
-        messages.success(
-            request, f'Obra "{self.object.titulo_principal}" eliminada exitosamente.'
-        )
-        return redirect(self.success_url)
+# COMENTADO: Funcionalidad de borrado desactivada temporalmente
+# class EliminarObraView(CatalogadorRequiredMixin, DeleteView):
+#     """
+#     Vista para eliminar (soft delete) una obra.
+#     No elimina físicamente, solo marca como inactiva.
+#     """
+#
+#     model = ObraGeneral
+#     template_name = 'catalogacion/confirmar_eliminar_obra.html'
+#     success_url = reverse_lazy("catalogacion:lista_obras")
+#
+#     def delete(self, request, *args, **kwargs):
+#         """Realizar soft delete de la obra"""
+#         self.object = self.get_object()
+#         self.object.soft_delete()
+#         messages.success(
+#             request, f'Obra "{self.object.titulo_principal}" eliminada exitosamente.'
+#         )
+#         return redirect(self.success_url)

@@ -1055,3 +1055,13 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
                 )
 
         return campos_heredables
+
+    # COMENTADO: Funcionalidad de borrado desactivada temporalmente
+    # def soft_delete(self):
+    #     """
+    #     Marca la obra como inactiva (soft delete).
+    #     No elimina físicamente el registro, solo cambia el estado.
+    #     """
+    #     self.estado_registro = 'd'  # 'd' = deleted según MARC21
+    #     self.fecha_hora_ultima_transaccion = actualizar_fecha_hora_transaccion()
+    #     self.save(update_fields=['estado_registro', 'fecha_hora_ultima_transaccion'])

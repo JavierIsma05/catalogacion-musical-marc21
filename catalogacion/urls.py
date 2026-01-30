@@ -8,7 +8,7 @@ from catalogacion.views import (
     CrearObraView,
     DetalleObraView,
     EditarObraView,
-    EliminarObraView,
+    # EliminarObraView,  # COMENTADO: Funcionalidad de borrado desactivada temporalmente
     IndexView,
     ListaObrasView,
     SeleccionarTipoObraView,
@@ -38,11 +38,12 @@ urlpatterns = [
                 path("crear/<str:tipo>/", CrearObraView.as_view(), name="crear_obra"),
                 path("<int:pk>/", DetalleObraView.as_view(), name="detalle_obra"),
                 path("<int:pk>/editar/", EditarObraView.as_view(), name="editar_obra"),
-                path(
-                    "<int:pk>/eliminar/",
-                    EliminarObraView.as_view(),
-                    name="eliminar_obra",
-                ),
+                # COMENTADO: Funcionalidad de borrado desactivada temporalmente
+                # path(
+                #     "<int:pk>/eliminar/",
+                #     EliminarObraView.as_view(),
+                #     name="eliminar_obra",
+                # ),
             ]
         ),
     ),

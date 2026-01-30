@@ -76,6 +76,8 @@ class ListaObrasPublicaView(ListView):
             queryset = queryset.filter(
                 Q(titulo_principal__icontains=busqueda)
                 | Q(compositor__apellidos_nombres__icontains=busqueda)
+                | Q(centro_catalogador__icontains=busqueda)  # Búsqueda por signatura (parte 1)
+                | Q(num_control__icontains=busqueda)        # Búsqueda por signatura (parte 2)
             )
 
         # Filtro por tipo de obra

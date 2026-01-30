@@ -12,7 +12,7 @@ from .obra_views import (
     EditarObraView,
     DetalleObraView,
     ListaObrasView,
-    EliminarObraView,
+    # EliminarObraView,  # COMENTADO: Funcionalidad de borrado desactivada temporalmente
 )
 
 # Views de autoridades
@@ -42,7 +42,7 @@ __all__ = [
     'EditarObraView',
     'DetalleObraView',
     'ListaObrasView',
-    'EliminarObraView',
+    # 'EliminarObraView',  # COMENTADO: Funcionalidad de borrado desactivada temporalmente
     
     # Autoridades - Personas
     'ListaPersonasView',
