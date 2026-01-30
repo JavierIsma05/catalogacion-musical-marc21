@@ -176,7 +176,7 @@
     width: 140px;
     flex-shrink: 0;
     background: var(--pro-surface);
-    padding: 1rem;
+    padding: 0.75rem 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
@@ -247,6 +247,8 @@
     padding: 0.1rem 1.25rem;
     border-bottom: 1px solid var(--pro-border-light);
     margin-bottom: 0;  /* eliminado para pegar con el info-stack */
+    background: var(--pro-surface);
+    padding: 10px;
 }
 
 .obra-main-title {
@@ -264,6 +266,7 @@
     flex-wrap: wrap;
     gap: 0.75rem;
     justify-content: flex-end;
+    margin-top: 10px;
 }
 
 .obra-tag {
@@ -320,19 +323,18 @@
 }
 
 .obra-info-card .obra-card-label {
-    font-size: 0.6875rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--pro-text-secondary);
+    color: var(--pro-text-primary);
     margin: 0;
-    padding: 0.5rem 0.75rem;  /* reducido de 0.75rem 1rem */
-    background: var(--pro-surface);
+    padding: 0.1rem 0.75rem;  /* reducido de 0.75rem 1rem */
+
     border-bottom: 1px solid var(--pro-border-light);
 }
 
 .obra-info-card .obra-card-body {
-    padding: 0.5rem 0.75rem;  /* reducido de 0.75rem 1rem */
+    padding: 0.1rem 0.75rem;  /* reducido de 0.75rem 1rem */
 }
 
 /* Cards de información - SIN LÍNEAS DIVISORIAS */
@@ -350,17 +352,16 @@
 
 /* Card de íncipit */
 .obra-incipit-card {
-    background: var(--pro-surface);
     border: none;
-    padding: 0.75rem 1rem;  /* reducido de 1rem 1.25rem */
     grid-column: 1 / -1;
+    border-radius: 6px;
+    padding: 0.5rem;
 }
 
 /* Labels de las cards */
 .obra-card-label {
     font-size: 0.6875rem;
     letter-spacing: 0.05em;
-    text-transform: uppercase;
     color: var(--pro-text-muted);
     margin: 0 0 0.5rem 0;
     font-weight: 500;
@@ -372,8 +373,9 @@
 .obra-card-label::before {
     content: '';
     width: 2px;
-    height: 10px;
+    height: 12px;
     background: var(--pro-accent);
+    margin-bottom: 1.5px;
 }
 
 /* Contenido de las cards */

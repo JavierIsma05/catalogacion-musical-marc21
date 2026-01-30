@@ -13,19 +13,15 @@
   font-weight: normal;
   font-style: normal;
 }
-.incipit-canvas-wrap{
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: 0.25rem;
-}
 
-.incipit-view-canvas{
+.incipit-view-canvas {
   width: 100%;
-  max-width: 700px;
-  height: 180px;      /* reducido de 250px para compactar */
+  max-width: 500px;
+  height: 150px;      /* balance entre compacto y legible */
   display: block;
-  background: #ffffffdc;
+  background: transparent;
+  pointer-events: none;
+  cursor: default;
 }
 </style>
 {% endblock %}
@@ -47,7 +43,7 @@
             </li>
             <li class="breadcrumb-item">
                 <a href="{% url 'catalogo_publico:detalle' obra.pk %}">
-                    
+
                     {{ obra.signatura_publica_display }}
                 </a>
             </li>
@@ -60,10 +56,10 @@
         <div class="detalle-header-left">
             <h1 class="detalle-main-title">Vista detallada</h1>
             <div class="detalle-actions">
-                <a href="{% url 'catalogo_publico:detalle' obra.pk %}" class="btn btn-outline-secondary btn-sm">
+                <a href="{% url 'catalogo_publico:detalle' pk=obra.pk %}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left"></i> Volver al resumen
                 </a>
-                <a href="{% url 'catalogo_publico:vista_marc_crudo' obra.pk %}" class="btn btn-outline-primary btn-sm">
+                <a href="{% url 'catalogo_publico:formato_marc21' pk=obra.pk %}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-code-square"></i> Ver MARC21
                 </a>
                 <button class="btn btn-outline-primary btn-sm" disabled>
@@ -141,7 +137,7 @@
 
                 {% if obra.nombres_relacionados_700.exists or obra.entidades_relacionadas_710.exists %}
                 <div class="detalle-subheader">Colaboradores</div>
-                
+
                 {% for nombre in obra.nombres_relacionados_700.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Nombre</span>
@@ -213,34 +209,31 @@
 
                 <div class="detalle-field detalle-field-incipit">
                     <span class="detalle-field-label">Íncipit musical</span>
-                    <div class="detalle-incipit-content">
-                        {% with primer_incipit=obra.incipits_musicales.first %}
-                            {% if primer_incipit and primer_incipit.paec_full %}
-                                {# Mostrar canvas del primer íncipit #}
-                                <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
+                    <div class="obra-card-body">
+                            {% with primer_incipit=obra.incipits_musicales.first %}
+                                {% if primer_incipit and primer_incipit.paec_full %}
+                                    {# Mostrar canvas del primer íncipit #}
+                                    <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
+                                        <canvas
+                                            id="incipit_view_canvas_{{ primer_incipit.pk }}"
+                                            class="incipit-view-canvas"
+                                            width="500"
+                                            height="180"
+                                            data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
+                                        </canvas>
 
-                                <div class="incipit-canvas-wrap" style="margin-top: 0.25rem;">
-                                    <canvas
-                                        id="incipit_view_canvas_{{ primer_incipit.pk }}"
-                                        class="incipit-view-canvas"
-                                        width="800"
-                                        height="240"  /* reducido de 320 para compactar */
-                                        data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
-                                    </canvas>
-                                </div>
 
-                                {# Información textual del íncipit #}
-                                {% if primer_incipit.titulo_encabezamiento %}
-                                <p class="detalle-incipit-line" style="margin-top: 0.25rem;">
-                                    {{ primer_incipit.titulo_encabezamiento }}
-                                </p>
+                                    {# Información textual del íncipit #}
+                                    {% if primer_incipit.titulo_encabezamiento %}
+                                        <p class="obra-inline-line" style="margin-top: 0.125rem; font-size: 0.9em; color: #666;">
+                                            {{ primer_incipit.titulo_encabezamiento }}
+                                        </p>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="meta-empty">Sin íncipit registrado</p>
                                 {% endif %}
-
-                            {% else %}
-                                <p class="detalle-field-value text-muted">Sin íncipit registrado</p>
-                            {% endif %}
-                        {% endwith %}
-                    </div>
+                            {% endwith %}
+                        </div>
                 </div>
             </div>
         </section>
@@ -425,55 +418,37 @@
     </div>
 
     <!-- Visor de PDF -->
-    {% for disponible in obra.disponibles_856.all %}
-        {% for url in disponible.urls_856.all %}
-            {% if url.url %}
-            <section class="pdf-viewer-section">
-                <div class="pdf-viewer-header">
-                    <h3 class="pdf-viewer-title">
-                        <i class="bi bi-file-pdf"></i> 
-                        {% for texto in disponible.textos_enlace_856.all %}
-                            {{ texto.texto_enlace }}
-                        {% empty %}
-                            Documento disponible
-                        {% endfor %}
-                    </h3>
-                    <div class="pdf-viewer-actions">
-                        <a href="{{ url.url }}" target="_blank" class="btn btn-sm">
-                            <i class="bi bi-box-arrow-up-right"></i> Abrir en nueva pestaña
-                        </a>
-                        <a href="{{ url.url }}" download class="btn btn-sm">
-                            <i class="bi bi-download"></i> Descargar
-                        </a>
-                    </div>
-                </div>
-                <div class="pdf-viewer-container">
-                    <iframe 
-                        src="{{ url.url }}" 
-                        class="pdf-viewer-frame"
-                        title="Visor de documento PDF"
-                        loading="lazy">
-                    </iframe>
-                </div>
-            </section>
-            {% endif %}
-        {% endfor %}
-    {% empty %}
-    <!-- Estado vacío si no hay PDF -->
     <section class="pdf-viewer-section">
         <div class="pdf-viewer-header">
             <h3 class="pdf-viewer-title">
                 <i class="bi bi-file-pdf"></i> Documento
             </h3>
         </div>
-        <div class="pdf-viewer-container">
-            <div class="pdf-viewer-empty">
-                <i class="bi bi-file-earmark-x"></i>
-                <p>No hay documento disponible para esta obra</p>
+        {% if pdf_url %}
+            <div class="ratio ratio-16x9 pdf-viewer-container">
+                <iframe
+                    src="{{ pdf_url }}#&page={{ pdf_start_page|default:1 }}"
+                    title="Visor PDF"
+                    style="border:0;"
+                    allowfullscreen>
+                </iframe>
             </div>
-        </div>
+            <div class="small text-muted mt-2">
+                {% if pdf_start_page == 1 %}
+                    Documento completo
+                {% else %}
+                    Mostrando desde página {{ pdf_start_page }}
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="pdf-viewer-container">
+                <div class="pdf-viewer-empty">
+                    <i class="bi bi-file-earmark-x"></i>
+                    <p>No hay documento disponible para esta obra</p>
+                </div>
+            </div>
+        {% endif %}
     </section>
-    {% endfor %}
 </div>
 
 <script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>

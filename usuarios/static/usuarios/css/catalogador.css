@@ -107,6 +107,11 @@
     color: #2f3545;
 }
 
+.quick-action-card.digitalizacion .action-icon {
+    background: rgba(108,99,255,0.14);
+    color: #6c63ff;
+}
+
 .quick-action-card h3 {
     font-size: 1rem;
     font-weight: 600;
@@ -248,11 +253,11 @@
     .catalogador-welcome {
         padding: 1.5rem;
     }
-    
+
     .quick-actions {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .catalogador-stats {
         grid-template-columns: repeat(2, 1fr);
     }
