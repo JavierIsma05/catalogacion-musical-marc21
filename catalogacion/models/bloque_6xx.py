@@ -11,6 +11,7 @@ class Materia650(models.Model):
     Subcampos:
       $a Materia (NR)
       $x Subdivisión de materia (R)
+      $z Subdivisión cronológica (R)
     """
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -63,6 +64,32 @@ class SubdivisionMateria650(models.Model):
         return self.subdivision
 
 
+class SubdivisionCronologica650(models.Model):
+    """
+    650 $z — Subdivisión cronológica (R)
+    """
+    materia650 = models.ForeignKey(
+        Materia650,
+        on_delete=models.CASCADE,
+        related_name='subdivisiones_cronologicas',
+    )
+
+    subdivision = models.CharField(
+        max_length=200,
+        help_text="650 $z — Subdivisión cronológica (R)"
+    )
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "650 $z — Subdivisión cronológica"
+        verbose_name_plural = "650 $z — Subdivisiones cronológicas (R)"
+        ordering = ['materia650', 'id']
+
+    def __str__(self):
+        return self.subdivision
+
+
 class MateriaGenero655(models.Model):
     """
     655 #4 — Materia (Género/Forma)
@@ -70,6 +97,7 @@ class MateriaGenero655(models.Model):
     Subcampos:
       $a Término género/forma (NR)
       $x Subdivisión general (R)
+      $z Subdivisión cronológica (R)
     """
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -116,6 +144,32 @@ class SubdivisionGeneral655(models.Model):
     class Meta:
         verbose_name = "655 $x — Subdivisión general"
         verbose_name_plural = "655 $x — Subdivisiones generales (R)"
+        ordering = ['materia655', 'id']
+
+    def __str__(self):
+        return self.subdivision
+
+
+class SubdivisionCronologica655(models.Model):
+    """
+    655 $z — Subdivisión cronológica (R)
+    """
+    materia655 = models.ForeignKey(
+        MateriaGenero655,
+        on_delete=models.CASCADE,
+        related_name='subdivisiones_cronologicas',
+    )
+
+    subdivision = models.CharField(
+        max_length=200,
+        help_text="655 $z — Subdivisión cronológica (R)"
+    )
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "655 $z — Subdivisión cronológica"
+        verbose_name_plural = "655 $z — Subdivisiones cronológicas (R)"
         ordering = ['materia655', 'id']
 
     def __str__(self):

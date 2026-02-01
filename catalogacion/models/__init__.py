@@ -111,8 +111,10 @@ from .bloque_5xx import (
 from .bloque_6xx import (
     Materia650,
     SubdivisionMateria650,
+    SubdivisionCronologica650,
     MateriaGenero655,
     SubdivisionGeneral655,
+    SubdivisionCronologica655,
 )
 
 # ============================================
@@ -240,8 +242,10 @@ __all__ = [
     # -------------------------------
     'Materia650',
     'SubdivisionMateria650',
+    'SubdivisionCronologica650',
     'MateriaGenero655',
     'SubdivisionGeneral655',
+    'SubdivisionCronologica655',
 
     # -------------------------------
     # 7XX
