@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('catalogacion', '0003_alter_obrageneral_formato'),
+        ('catalogacion', '0001_initial'),
     ]
 
     operations = [

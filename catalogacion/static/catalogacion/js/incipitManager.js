@@ -730,21 +730,27 @@ function CanvasClass() {
   this.clickOnCanvas = function (context, event) {
     var cursor = context.getCursorPosition(context, event);
 
+    // Buscar la nota más cercana al punto de click
+    var clickedIndex = null;
+    var minDistance = Infinity;
+
     for (var i = 0; i < context.drawXPosition.length; i++) {
-      if (i == context.drawXPosition.length - 1) {
-        if (
-          cursor.x >= context.drawXPosition[i] - 10 &&
-          cursor.x < context.drawXPosition[i] + 30
-        ) {
-          cursor.x = i;
-        }
-      } else if (
-        cursor.x >= context.drawXPosition[i] - 10 &&
-        cursor.x < context.drawXPosition[i + 1] - 10
-      ) {
-        cursor.x = i;
+      var scaledPos = context.ratioX(context, context.drawXPosition[i]);
+      var distance = Math.abs(cursor.x - scaledPos);
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        clickedIndex = i;
       }
     }
+
+    // Si el click está muy lejos de cualquier nota, no seleccionar
+    var maxClickDistance = context.ratioX(context, 25);
+    if (minDistance > maxClickDistance) {
+      clickedIndex = null;
+    }
+
+    cursor.x = clickedIndex;
 
     if (!context.clickExistingElement(context, cursor.x)) {
       context.addNote(context, cursor);
@@ -755,10 +761,11 @@ function CanvasClass() {
   this.hoverOnCanvas = function (context, event) {
     var cursor = context.getCursorPosition(context, event);
 
-    if (
-      cursor.x >=
-      context.setDrawPosition(context, context.drawXPosition.length, true)
-    ) {
+    // Escalar la posición de referencia igual que en clickOnCanvas
+    var nextDrawPos = context.setDrawPosition(context, context.drawXPosition.length, true);
+    var scaledNextPos = context.ratioX(context, nextDrawPos);
+
+    if (cursor.x >= scaledNextPos) {
       cursor.x = context.drawXPosition.length;
     } else {
       cursor.x = null;
@@ -868,7 +875,7 @@ function CanvasClass() {
         context.gCanvasElement.height
     );
 
-    cursor.x = Math.floor(x) + 20; //+ to adjust click position
+    cursor.x = Math.floor(x); // posición sin offset manual
     cursor.y = Math.floor(y / context.stepY);
 
     if (cursor.y > context.maxStepY) {
@@ -1031,13 +1038,13 @@ function CanvasClass() {
         tempEle.yPosition
       );
 
-      notePosition.x = context.setDrawPosition(
+      // Escalar la posición igual que drawPentagram
+      var unscaledX = context.setDrawPosition(
         context,
         context.drawIncipitElements.length,
         true
       );
-
-      notePosition.x += context.shadowOffsetX;
+      notePosition.x = context.ratioX(context, unscaledX);
 
       var tempFont = noteToDraw.value;
       if (tempEle.yPosition < 9 && !tempEle.isClef)
@@ -1591,20 +1598,20 @@ function CanvasClass() {
     }
 
     // 3ª línea auxiliar (más alejada)
-    if (
-      (upOrDown === -1 && yPosition <= 0) || // arriba
-      (upOrDown === 1 && yPosition >= 18) // abajo
-    ) {
-      pixelsToAdd = context.stepY * 2 * 5 * upOrDown + context.stepY / 2;
-      context.gDrawingContext.moveTo(
-        xPosition + context.ratioX(context, -5),
-        halfScreenYpx + pixelsToAdd
-      );
-      context.gDrawingContext.lineTo(
-        xPosition + context.ratioX(context, 18),
-        halfScreenYpx + pixelsToAdd
-      );
-    }
+    // if (
+    //   (upOrDown === -1 && yPosition <= 0) || // arriba
+    //   (upOrDown === 1 && yPosition >= 18) // abajo
+    // ) {
+    //   pixelsToAdd = context.stepY * 2 * 5 * upOrDown + context.stepY / 2;
+    //   context.gDrawingContext.moveTo(
+    //     xPosition + context.ratioX(context, -5),
+    //     halfScreenYpx + pixelsToAdd
+    //   );
+    //   context.gDrawingContext.lineTo(
+    //     xPosition + context.ratioX(context, 18),
+    //     halfScreenYpx + pixelsToAdd
+    //   );
+    // }
   };
 
   //Main function that draw incipit
