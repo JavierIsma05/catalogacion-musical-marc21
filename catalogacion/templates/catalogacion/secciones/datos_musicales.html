@@ -4,6 +4,22 @@
         <div class="card-body">
 
 
+            {# Campo 031 - Íncipit musical (Repetible) #}
+            {% if 'incipits_musicales' in formsets_visibles %}
+            <div class="campo-marc">
+                <div class="campo-titulo">
+                    <span class="badge-marc">031</span>
+                    <h6>Íncipit Musical</h6>
+                    <span class="campo-help-btn" data-field-code="031" tabindex="0" title="Ayuda"
+                        style="display: inline-flex;gap: inherit;">
+                        <i class="bi bi-question-circle"></i>
+                    </span>
+                </div>
+
+                {% include 'catalogacion/includes/campo_031_template.html' with formset=incipits_musicales %}
+            </div>
+            {% endif %}
+
             {# Campo 348 - Formato #}
             {% if '348' in campos_visibles %}
             <div class="campo-marc">
@@ -86,24 +102,6 @@
                         {{ form.tonalidad_384 }}
                     </div>
                 </div>
-            </div>
-            {% endif %}
-            {# Campo 031 - Íncipit musical (Repetible) #}
-            {% if 'incipits_musicales' in formsets_visibles %}
-            <div class="campo-marc">
-                <div class="campo-titulo">
-                    <span class="badge-marc">031</span>
-                    <h6>Íncipit Musical</h6>
-                    <!-- <button type="button" class="campo-add-btn" data-formset-target="incipits" title="Agregar Íncipit">
-                        <i class="bi bi-plus"></i>
-                    </button> -->
-                    <span class="campo-help-btn" data-field-code="031" tabindex="0" title="Ayuda"
-                        style="display: inline-flex;gap: inherit;">
-                        <i class="bi bi-question-circle"></i>
-                    </span>
-                </div>
-
-                {% include 'catalogacion/includes/campo_031_template.html' with formset=incipits_musicales %}
             </div>
             {% endif %}
 

@@ -178,3 +178,7 @@ LOGOUT_REDIRECT_URL = "/"
 # URL del login (para que el decorador @login_required sepa a dónde mandarte)
 LOGIN_URL = "/usuarios/login/"
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://industrious-unofficious-weston.ngrok-free.dev",
+]
