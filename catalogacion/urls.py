@@ -21,6 +21,7 @@ from catalogacion.views import borradores as borradores_views
 from catalogacion.views.api_views import (
     Autocompletado773View,
     buscar_obras,
+    obtener_obras_774,
 )
 
 app_name = "catalogacion"
@@ -158,5 +159,10 @@ urlpatterns = [
         "api/obras/autocomplete/773/",
         Autocompletado773View.as_view(),
         name="api_autocompletado_773",
+    ),
+    path(
+        "api/obras/774-entries/",
+        obtener_obras_774,
+        name="api_obtener_obras_774",
     ),
 ]

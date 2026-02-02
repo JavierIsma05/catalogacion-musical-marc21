@@ -277,17 +277,35 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">
+                <h5 class="modal-title" id="modalBuscarObraTitle">
                     <i class="bi bi-search"></i> Buscar obra registrada
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
-                <input type="text" id="buscarObraInput" class="form-control mb-3"
-                    placeholder="Buscar por número de control (001)">
+                <!-- Fase 1: Búsqueda -->
+                <div id="buscarObraPhase1">
+                    <input type="text" id="buscarObraInput" class="form-control mb-3"
+                        placeholder="Buscar por N° control, título, compositor o signatura">
+                    <ul class="list-group" id="buscarObraResultados"></ul>
+                </div>
 
-                <ul class="list-group" id="buscarObraResultados"></ul>
+                <!-- Fase 2: Selección de obra 774 -->
+                <div id="buscarObraPhase2" class="d-none">
+                    <div class="alert alert-info mb-3">
+                        <i class="bi bi-collection"></i>
+                        <strong>Colección:</strong>
+                        <span id="coleccionSeleccionadaInfo"></span>
+                    </div>
+                    <p class="mb-2">Seleccione la obra que desea catalogar:</p>
+                    <ul class="list-group" id="obras774Lista"></ul>
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-outline-secondary" id="btnVolverBusqueda">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </button>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -672,11 +690,201 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
 </script>
 <script>
     (function () {
-
+        // ===== ESTADO DEL MODAL =====
         let targetTextInput = null;
         let targetHiddenInput = null;
+        let targetContainer = null;
+        let coleccionSeleccionada = null;
 
-        // Abrir modal al hacer click en 🔍
+        // ===== ELEMENTOS DEL DOM =====
+        const modalEl = document.getElementById("modalBuscarObra");
+        const phase1 = document.getElementById("buscarObraPhase1");
+        const phase2 = document.getElementById("buscarObraPhase2");
+        const inputBuscar = document.getElementById("buscarObraInput");
+        const resultados = document.getElementById("buscarObraResultados");
+        const obras774Lista = document.getElementById("obras774Lista");
+        const coleccionInfo = document.getElementById("coleccionSeleccionadaInfo");
+        const btnVolver = document.getElementById("btnVolverBusqueda");
+        const modalTitle = document.getElementById("modalBuscarObraTitle");
+
+        if (!inputBuscar || !resultados) return;
+
+        // ===== FUNCIONES DE FASE =====
+        function showPhase1() {
+            phase1.classList.remove("d-none");
+            phase2.classList.add("d-none");
+            modalTitle.innerHTML = '<i class="bi bi-search"></i> Buscar obra registrada';
+            inputBuscar.value = "";
+            resultados.innerHTML = "";
+            coleccionSeleccionada = null;
+        }
+
+        function showPhase2(coleccion, obras774) {
+            phase1.classList.add("d-none");
+            phase2.classList.remove("d-none");
+            modalTitle.innerHTML = '<i class="bi bi-collection"></i> Seleccionar obra de la colección';
+            coleccionInfo.textContent = `${coleccion.num_control} — ${coleccion.titulo || 'Sin título'}`;
+            coleccionSeleccionada = coleccion;
+
+            // Renderizar lista de obras 774
+            obras774Lista.innerHTML = "";
+            obras774.forEach(obra => {
+                const li = document.createElement("li");
+                li.className = "list-group-item list-group-item-action";
+                li.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>${obra.titulo_texto || 'Sin título'}</strong>
+                            ${obra.compositor_texto ? `<br><small class="text-muted">${obra.compositor_texto}</small>` : ''}
+                        </div>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </div>
+                `;
+                li.addEventListener("click", () => selectObra774(coleccion, obra));
+                obras774Lista.appendChild(li);
+            });
+        }
+
+        // ===== SELECCIÓN DE OBRA 774 =====
+        async function selectObra774(coleccion, obra774) {
+            // 1. Rellenar campo 773 $w (número de control de la colección padre)
+            if (targetTextInput) {
+                targetTextInput.value = coleccion.num_control;
+            }
+            if (targetHiddenInput) {
+                targetHiddenInput.value = coleccion.id;
+            }
+
+            // 2. Rellenar campo 100 (compositor) desde la obra 774
+            const compositorTexto = document.getElementById("id_compositor_texto");
+            const compositorId = document.getElementById("id_compositor");
+            if (compositorTexto && obra774.compositor_texto) {
+                compositorTexto.value = obra774.compositor_texto;
+            }
+            if (compositorId && obra774.compositor_id) {
+                compositorId.value = obra774.compositor_id;
+            }
+
+            // 3. Rellenar campo 245 (título principal) desde la obra 774
+            const tituloPrincipal = document.getElementById("id_titulo_principal");
+            if (tituloPrincipal && obra774.titulo_texto) {
+                tituloPrincipal.value = obra774.titulo_texto;
+            }
+
+            // 4. Llamar API de autocompletado773 para heredar campos 264, 382, 852, 856
+            try {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+                const response = await fetch('/catalogacion/api/obras/autocomplete/773/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ obra_id: coleccion.id })
+                });
+                const data = await response.json();
+
+                if (data.success && data.campos_heredables) {
+                    poblarCamposHeredables(data.campos_heredables);
+                }
+            } catch (error) {
+                console.error('Error al obtener campos heredables:', error);
+            }
+
+            // 5. Cerrar modal
+            bootstrap.Modal.getInstance(modalEl).hide();
+
+            // 6. Notificar al usuario
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Datos copiados',
+                    text: `Se copiaron los datos de "${obra774.titulo_texto || 'la obra'}" y su colección padre.`,
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            }
+        }
+
+        // ===== POBLAR CAMPOS HEREDABLES =====
+        function poblarCamposHeredables(campos) {
+            // 264 - Producción/Publicación
+            if (campos['264']) {
+                const c264 = campos['264'];
+                const lugarInput = document.querySelector('input[name="lugar_produccion"]');
+                const entidadInput = document.querySelector('input[name="entidad_produccion"]');
+                const fechaInput = document.querySelector('input[name="fecha_produccion"]');
+
+                if (lugarInput && c264.lugares?.length) {
+                    lugarInput.value = c264.lugares[0].lugar || '';
+                }
+                if (entidadInput && c264.entidades?.length) {
+                    entidadInput.value = c264.entidades[0].entidad || '';
+                }
+                if (fechaInput && c264.fechas?.length) {
+                    fechaInput.value = c264.fechas[0].fecha || '';
+                }
+            }
+
+            // 382 - Medio de interpretación
+            if (campos['382']?.medios?.length) {
+                const medioInput = document.querySelector('input[name="medio_interpretacion"]');
+                if (medioInput) {
+                    medioInput.value = campos['382'].medios.map(m => m.medio).join(', ');
+                }
+            }
+
+            // 852 - Localización
+            if (campos['852']) {
+                const c852 = campos['852'];
+                const codigoInput = document.querySelector('input[name="codigo_o_nombre"]');
+                const signaturaInput = document.querySelector('input[name="signatura_original"]');
+
+                if (codigoInput && c852.codigo_o_nombre) {
+                    codigoInput.value = c852.codigo_o_nombre;
+                }
+                if (signaturaInput && c852.signatura_original) {
+                    signaturaInput.value = c852.signatura_original;
+                }
+            }
+
+            // 856 - Acceso electrónico (primer URL disponible)
+            if (campos['856']?.urls?.length) {
+                const urlInput = document.querySelector('input[name="url_856"]');
+                if (urlInput) {
+                    urlInput.value = campos['856'].urls[0].url || '';
+                }
+            }
+        }
+
+        // ===== CARGAR OBRAS 774 =====
+        async function load774Entries(obraId, obraData) {
+            try {
+                const response = await fetch(`/catalogacion/api/obras/774-entries/?obra_id=${obraId}`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    // No es colección o error
+                    return { isCollection: false, error: data.error };
+                }
+
+                if (!data.obras_774 || data.obras_774.length === 0) {
+                    return { isCollection: true, hasEntries: false };
+                }
+
+                return {
+                    isCollection: true,
+                    hasEntries: true,
+                    coleccion: data.coleccion,
+                    obras: data.obras_774
+                };
+            } catch (error) {
+                console.error('Error cargando obras 774:', error);
+                return { isCollection: false, error: 'Error de conexión' };
+            }
+        }
+
+        // ===== ABRIR MODAL =====
         document.addEventListener("click", function (e) {
             const btn = e.target.closest(".btn-buscar-obra");
             if (!btn) return;
@@ -686,19 +894,14 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
 
             targetTextInput = group.querySelector(".numero-w-input");
             targetHiddenInput = group.querySelector(".obra-relacionada-id-input");
+            targetContainer = btn.closest('.formset-row') || btn.closest('.card') || group;
 
-            const modal = new bootstrap.Modal(
-                document.getElementById("modalBuscarObra")
-            );
-            modal.show();
+            showPhase1();
+            new bootstrap.Modal(modalEl).show();
         });
 
-        // Buscar obras
-        const inputBuscar = document.getElementById("buscarObraInput");
-        const resultados = document.getElementById("buscarObraResultados");
-
-        if (!inputBuscar || !resultados) return;
-
+        // ===== BÚSQUEDA DE OBRAS =====
+        let searchTimer = null;
         inputBuscar.addEventListener("input", function () {
             const q = this.value.trim();
 
@@ -707,52 +910,122 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
                 return;
             }
 
-            fetch(`/catalogacion/api/buscar-obras/?q=${encodeURIComponent(q)}`)
-                .then(r => r.json())
-                .then(data => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/catalogacion/api/obras/buscar/?q=${encodeURIComponent(q)}`);
+                    const data = await response.json();
+
                     resultados.innerHTML = "";
 
                     if (!data.results.length) {
                         resultados.innerHTML = `
-                        <li class="list-group-item text-muted">
-                            Sin resultados
-                        </li>`;
+                            <li class="list-group-item text-muted">
+                                Sin resultados
+                            </li>`;
                         return;
                     }
 
                     data.results.forEach(o => {
                         const li = document.createElement("li");
                         li.className = "list-group-item list-group-item-action";
+
+                        // Mostrar badge si es colección
+                        const isColeccion = o.nivel_bibliografico === 'c';
+                        const badge = isColeccion
+                            ? '<span class="badge bg-info ms-2">Colección</span>'
+                            : '';
+
                         li.innerHTML = `
-                        <div>
-                            <strong>${o.num_control}</strong>
-                            ${o.titulo ? `— ${o.titulo}` : ""}
-                        </div>
-                        ${o.compositor ? `
-                            <small class="text-muted">
-                                ${o.compositor}
-                            </small>
-                        ` : ""}
-                    `;
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>${o.num_control}</strong>${badge}
+                                    ${o.titulo ? `<br><span class="text-dark">${o.titulo}</span>` : ''}
+                                    ${o.compositor ? `<br><small class="text-muted">${o.compositor}</small>` : ''}
+                                    ${o.signatura ? `<br><small class="text-muted"><i class="bi bi-geo-alt"></i> ${o.signatura}</small>` : ''}
+                                </div>
+                                <i class="bi bi-chevron-right text-muted"></i>
+                            </div>
+                        `;
 
+                        li.addEventListener("click", async () => {
+                            // Verificar si es colección y tiene obras 774
+                            if (isColeccion) {
+                                const result = await load774Entries(o.id, o);
 
-                        li.addEventListener("click", () => {
-                            if (targetTextInput) {
-                                targetTextInput.value = o.num_control;
+                                if (result.isCollection && result.hasEntries) {
+                                    // Mostrar fase 2 con selector de obras
+                                    showPhase2(result.coleccion, result.obras);
+                                } else if (result.isCollection && !result.hasEntries) {
+                                    // Colección sin obras registradas
+                                    if (typeof Swal !== 'undefined') {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Colección sin obras',
+                                            text: 'Esta colección no tiene obras registradas en el campo 774. Agregue las obras primero.',
+                                            confirmButtonText: 'Entendido'
+                                        });
+                                    } else {
+                                        alert('Esta colección no tiene obras registradas en el campo 774.');
+                                    }
+                                } else {
+                                    // No es colección o error - comportamiento normal
+                                    selectObraNormal(o);
+                                }
+                            } else {
+                                // No es colección - comportamiento normal
+                                selectObraNormal(o);
                             }
-                            if (targetHiddenInput) {
-                                targetHiddenInput.value = o.id;
-                            }
-
-                            bootstrap.Modal
-                                .getInstance(document.getElementById("modalBuscarObra"))
-                                .hide();
                         });
 
                         resultados.appendChild(li);
                     });
-                });
+                } catch (error) {
+                    console.error('Error en búsqueda:', error);
+                }
+            }, 300);
         });
+
+        // ===== SELECCIÓN NORMAL (NO COLECCIÓN) =====
+        function selectObraNormal(o) {
+            if (targetTextInput) {
+                targetTextInput.value = o.num_control;
+            }
+            if (targetHiddenInput) {
+                targetHiddenInput.value = o.id;
+            }
+
+            // Rellenar $a y $t si hay contenedor
+            if (targetContainer) {
+                const personaWrapper = targetContainer.querySelector('.autocomplete-wrapper[data-autocomplete="persona"]');
+                if (personaWrapper) {
+                    const inp = personaWrapper.querySelector('input');
+                    if (inp) inp.value = o.compositor || '';
+                }
+
+                const tituloWrapper = targetContainer.querySelector('.autocomplete-wrapper[data-autocomplete="titulo"]');
+                if (tituloWrapper) {
+                    const inp = tituloWrapper.querySelector('input');
+                    if (inp) inp.value = o.titulo || '';
+                }
+
+                const hiddenPersona = targetContainer.querySelector('input[name$="encabezamiento_principal"]');
+                if (hiddenPersona) hiddenPersona.value = o.compositor_id || '';
+
+                const hiddenTitulo = targetContainer.querySelector('input[name$="titulo"]');
+                if (hiddenTitulo) hiddenTitulo.value = o.titulo_id || '';
+            }
+
+            bootstrap.Modal.getInstance(modalEl).hide();
+        }
+
+        // ===== BOTÓN VOLVER =====
+        if (btnVolver) {
+            btnVolver.addEventListener("click", showPhase1);
+        }
+
+        // ===== RESET AL CERRAR MODAL =====
+        modalEl.addEventListener("hidden.bs.modal", showPhase1);
 
     })();
 </script>
