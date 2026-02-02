@@ -9,78 +9,85 @@
     // Configuración de campos obligatorios por tipo de obra
     // Solo se incluyen campos editables por el usuario (040, 092, 100/130, 245, 340, 382)
     // Los campos 001, 005 y 008 son automáticos y no se rastrean
+    // Para 382: $a (medio) es REQUERIDO, $b (solista) es opcional
     const REQUIRED_FIELDS_CONFIG = {
         coleccion_manuscrita: [
-            { id: "id_centro_catalogador", label: "040", tab: 6 },
+            { id: "id_centro_catalogador", label: "040", tab: 7 },
             { id: "id_titulo_uniforme_texto", label: "130", tab: 0, hidden: true },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
-            id: "id_medios_382-0-solista", // ← FORMSET, no input
-            label: "382",
-            tab: 2,
-            hidden: true,
+                id: "id_medio_interpretacion_382", // ← Verificar subcampo $a (medio)
+                label: "382",
+                tab: 2,
+                hidden: true,
+                special: true,
             },
         ],
         obra_en_coleccion_manuscrita: [
-            { id: "id_centro_catalogador", label: "040", tab: 6 },
-            { id: "id_compositor_texto", label: "100", tab: 0,hidden: true  },
+            { id: "id_centro_catalogador", label: "040", tab: 7 },
+            { id: "id_compositor_texto", label: "100", tab: 0, hidden: true },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
-                id: "id_medios_382-0-solista", // ← FORMSET, no input
+                id: "id_medio_interpretacion_382", // ← Verificar subcampo $a (medio)
                 label: "382",
                 tab: 2,
                 hidden: true,
+                special: true,
             },
         ],
         obra_manuscrita_individual: [
-            { id: "id_centro_catalogador", label: "040", tab: 6 },
-            { id: "id_compositor_texto", label: "100", tab: 0,hidden: true  },
+            { id: "id_centro_catalogador", label: "040", tab: 7 },
+            { id: "id_compositor_texto", label: "100", tab: 0, hidden: true },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
-                id: "id_medios_382-0-solista", // ← FORMSET, no input
+                id: "id_medio_interpretacion_382", // ← Verificar subcampo $a (medio)
                 label: "382",
                 tab: 2,
                 hidden: true,
+                special: true,
             },
         ],
 
         coleccion_impresa: [
-            { id: "id_centro_catalogador", label: "040", tab: 6 },
+            { id: "id_centro_catalogador", label: "040", tab: 7 },
             { id: "id_compositor_texto", label: "100", tab: 0 },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
-            id: "id_medios_382-0-solista", // ← FORMSET, no input
-            label: "382",
-            tab: 2,
-            hidden: true,
-        },
-        ],
-        obra_en_coleccion_impresa: [
-            { id: "id_centro_catalogador", label: "040", tab: 6 },
-            { id: "id_compositor_texto", label: "100", tab: 0 },
-            { id: "id_titulo_principal", label: "245", tab: 0 },
-            { id: "id_ms_imp", label: "340", tab: 1 },
-            {
-                id: "id_medios_382-0-solista", // ← FORMSET, no input
+                id: "id_medio_interpretacion_382", // ← Verificar subcampo $a (medio)
                 label: "382",
                 tab: 2,
                 hidden: true,
+                special: true,
+            },
+        ],
+        obra_en_coleccion_impresa: [
+            { id: "id_centro_catalogador", label: "040", tab: 7 },
+            { id: "id_compositor_texto", label: "100", tab: 0 },
+            { id: "id_titulo_principal", label: "245", tab: 0 },
+            { id: "id_ms_imp", label: "340", tab: 1 },
+            {
+                id: "id_medio_interpretacion_382", // ← Verificar subcampo $a (medio)
+                label: "382",
+                tab: 2,
+                hidden: true,
+                special: true,
             },
         ],
         obra_impresa_individual: [
-            { id: "id_centro_catalogador", label: "040", tab: 6 },
+            { id: "id_centro_catalogador", label: "040", tab: 7 },
             { id: "id_compositor_texto", label: "100 - Compositor", tab: 0 },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
-                id: "id_medios_382-0-solista", // ← FORMSET, no input
+                id: "id_medio_interpretacion_382", // ← Verificar subcampo $a (medio)
                 label: "382",
                 tab: 2,
                 hidden: true,
+                special: true,
             },
         ],
     };
@@ -202,14 +209,26 @@
 
                     // Le damos un tiempo para que la transición visual termine
                     setTimeout(() => {
-                        const fieldElement = document.getElementById(field.id);
+                        let fieldElement = null;
+
+                        // Manejar campos especiales (como 382)
+                        if (field.special && field.id === "id_medio_interpretacion_382") {
+                            // Buscar el contenedor del formset 382 o el primer select de medio
+                            fieldElement = document.querySelector('[data-formset-prefix="medios_382"]') ||
+                                           document.querySelector('.medio-select');
+                        } else {
+                            fieldElement = document.getElementById(field.id);
+                        }
 
                         if (fieldElement) {
                             fieldElement.scrollIntoView({
                                 behavior: "smooth",
                                 block: "center",
                             });
-                            fieldElement.focus({ preventScroll: true });
+                            // Solo hacer focus si es un input/select
+                            if (fieldElement.tagName === 'INPUT' || fieldElement.tagName === 'SELECT') {
+                                fieldElement.focus({ preventScroll: true });
+                            }
                         } else {
                             console.warn("⚠ No se encontró el input de campo:", field.id);
                         }
@@ -338,39 +357,35 @@
      */
     function checkSpecialField(field) {
         if (field.id === "id_medio_interpretacion_382") {
-            // Verificar si hay al menos un medio de interpretación con subcampo $a
+            // Verificar si hay al menos un medio de interpretación con subcampo $a seleccionado
+            // El subcampo $a es REQUERIDO, $b (solista) es OPCIONAL
 
-            // Buscar inputs dinámicos de subcampos $a
-            const medioInputs = document.querySelectorAll(
-                '[id^="medio_interpretacion_382_"]'
-            );
+            // Buscar selects de medio ($a) por su clase
+            const medioSelects = document.querySelectorAll('.medio-select');
 
-            // Verificar si alguno tiene valor
-            for (let input of medioInputs) {
-                if (input.value && input.value.trim() !== "") {
+            // Verificar si alguno tiene valor seleccionado
+            for (let select of medioSelects) {
+                // Ignorar el template vacío
+                if (select.closest('.empty-form') || select.closest('.d-none')) {
+                    continue;
+                }
+                if (select.value && select.value.trim() !== "") {
                     return true;
                 }
             }
 
-            // También verificar en el formset estándar
-            const formsetForms = document.querySelectorAll(
-                '[id*="medios_382"] .formset-row:not(.empty-form)'
+            // También verificar por nombre (dinámico)
+            const medioSelectsByName = document.querySelectorAll(
+                '[name^="medio_interpretacion_382_"]'
             );
-            for (let form of formsetForms) {
-                // Verificar si no está marcado para eliminar
-                const deleteCheckbox = form.querySelector('[name*="DELETE"]');
-                if (deleteCheckbox && deleteCheckbox.checked) {
+
+            for (let select of medioSelectsByName) {
+                // Ignorar el template vacío
+                if (select.closest('.empty-form') || select.closest('.d-none')) {
                     continue;
                 }
-
-                // Buscar inputs de medios dentro de este form
-                const medioInputsInForm = form.querySelectorAll(
-                    '[id^="medio_interpretacion_382_"]'
-                );
-                for (let input of medioInputsInForm) {
-                    if (input.value && input.value.trim() !== "") {
-                        return true;
-                    }
+                if (select.value && select.value.trim() !== "") {
+                    return true;
                 }
             }
 

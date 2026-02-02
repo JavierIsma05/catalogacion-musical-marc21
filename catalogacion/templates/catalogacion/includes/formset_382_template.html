@@ -11,7 +11,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
             {{ hidden }}
         {% endfor %}
     </div>
-    
+
     <div class="formset-forms">
         {% get_medios_interpretacion as medios_list %}
         {% for form in formset %}
@@ -24,30 +24,21 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                     {{ form.DELETE }}
                 </div>
             {% endif %}
-            
+
             <button type="button" class="delete-row-btn" title="Eliminar registro 382">
                 <i class="bi bi-x-lg"></i>
             </button>
-            
+
             {% if form.non_field_errors %}
             <div class="alert alert-danger mb-3">
                 {{ form.non_field_errors }}
             </div>
             {% endif %}
-            
+
             <div class="campo-grid">
-                {# Subcampo $b - Solista (No Repetible) #}
+                {# Subcampo $a - Medios (Repetible) - REQUERIDO #}
                 <div class="col-full">
-                    <label class="form-label" for="{{ form.solista.id_for_label }}">{{ form.solista.label }}</label>
-                    {{ form.solista }}
-                    {% if form.solista.errors %}
-                        <div class="invalid-feedback d-block">{{ form.solista.errors }}</div>
-                    {% endif %}
-                </div>
-                
-                {# Subcampo $a - Medios (Repetible) con botón + a la izquierda #}
-                <div class="col-full">
-                    <label class="form-label small">382 $a - Medio de interpretación</label>
+                    <label class="form-label small">382 $a - Medio de interpretación <span class="text-danger">*</span></label>
                     <div class="subcampo-repetible-container medios-container" data-medios-container="{{ forloop.counter0 }}" data-borrador-container="medio_interpretacion_382" data-borrador-parent="{{ forloop.counter0 }}">
                         {% if form.instance.pk %}
                             {# Cargar medios existentes #}
@@ -104,10 +95,19 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                         {% endif %}
                     </div>
                 </div>
+
+                {# Subcampo $b - Solista (No Repetible) - OPCIONAL #}
+                <div class="col-full">
+                    <label class="form-label" for="{{ form.solista.id_for_label }}">{{ form.solista.label }} <span class="text-muted small">(opcional)</span></label>
+                    {{ form.solista }}
+                    {% if form.solista.errors %}
+                        <div class="invalid-feedback d-block">{{ form.solista.errors }}</div>
+                    {% endif %}
+                </div>
             </div>
         </div>
         {% endfor %}
-        
+
         <div class="formset-row empty-form mb-3" style="display:none;">
             <div style="display:none;">
                 {% for hidden in formset.empty_form.hidden_fields %}
@@ -118,14 +118,9 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 <i class="bi bi-x-lg"></i>
             </button>
             <div class="campo-grid">
-                {# Subcampo $b - Solista (No Repetible) #}
+                {# Subcampo $a - Medios (Repetible) - REQUERIDO #}
                 <div class="col-full">
-                    <label class="form-label" for="{{ formset.empty_form.solista.id_for_label }}">{{ formset.empty_form.solista.label }}</label>
-                    {{ formset.empty_form.solista }}
-                </div>
-                
-                <div class="col-full">
-                    <label class="form-label small">382 $a - Medio de interpretación</label>
+                    <label class="form-label small">382 $a - Medio de interpretación <span class="text-danger">*</span></label>
                     <div class="subcampo-repetible-container medios-container" data-medios-container="__prefix__" data-borrador-container="medio_interpretacion_382" data-borrador-parent="__prefix__">
                         <div class="subcampo-row medio-form-row">
                             <button type="button" class="subcampo-add-btn add-medio-btn" data-medio-index="__prefix__" data-borrador-add="medio_interpretacion_382" data-borrador-parent="__prefix__" title="Agregar Medio">
@@ -142,6 +137,12 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             </button>
                         </div>
                     </div>
+                </div>
+
+                {# Subcampo $b - Solista (No Repetible) - OPCIONAL #}
+                <div class="col-full">
+                    <label class="form-label" for="{{ formset.empty_form.solista.id_for_label }}">{{ formset.empty_form.solista.label }} <span class="text-muted small">(opcional)</span></label>
+                    {{ formset.empty_form.solista }}
                 </div>
             </div>
         </div>
@@ -169,9 +170,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 /**
  * Script para subcampos repetibles del campo 382 (Medios de interpretación)
  * - Maneja subcampos repetibles ($a)
- * - Copia automáticamente el valor seleccionado en $a hacia $b (solista)
- *   * Actualiza si $b fue autocompletado
- *   * NO sobrescribe si el usuario lo editó manualmente
+ * - $b (solista) es independiente y NO se auto-rellena
  * Usa selects nativos del navegador (sin Select2)
  */
 (function() {
@@ -211,26 +210,6 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 }
             });
         }
-
-        // Marcar como "manual" cuando el usuario edita solista
-        container.addEventListener('input', function(e) {
-            const solistaInput = e.target.closest('input[name$="solista"]');
-            if (!solistaInput) return;
-
-            // Si el usuario borra todo, permitimos volver a autocompletar
-            if (!solistaInput.value.trim()) {
-                solistaInput.dataset.userEdited = 'false';
-                solistaInput.dataset.autoFilled = 'false';
-                solistaInput.dataset.lastAuto = '';
-                return;
-            }
-
-            // Si está escribiendo y el valor NO coincide con el último autollenado => manual
-            const lastAuto = solistaInput.dataset.lastAuto || '';
-            if (solistaInput.value !== lastAuto) {
-                solistaInput.dataset.userEdited = 'true';
-            }
-        });
 
         // ============================
         // EVENTOS CLICK (+ / eliminar)
@@ -273,48 +252,6 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                     updateDeleteButtonsVisibility(subcampoContainer);
                 }
                 return;
-            }
-        });
-
-        // ==========================================
-        // EVENTO CHANGE → copiar $a → $b (solista)
-        // ==========================================
-        container.addEventListener('change', function(e) {
-            const medioSelect = e.target.closest('.medio-select');
-            if (!medioSelect) return;
-
-            const medioValue = medioSelect.value || '';
-
-            // Fila 382 correspondiente
-            const formRow = medioSelect.closest('.formset-row');
-            if (!formRow) return;
-
-            const solistaInput = formRow.querySelector('input[name$="solista"]');
-            if (!solistaInput) return;
-
-            const userEdited = (solistaInput.dataset.userEdited === 'true');
-            const autoFilled = (solistaInput.dataset.autoFilled === 'true');
-
-            // Regla:
-            // - Si el usuario NO lo ha editado manualmente:
-            //     * si estaba vacío => autollenar
-            //     * si estaba autollenado => actualizar al nuevo valor
-            // - Si el usuario SÍ lo editó => no tocar
-            if (!userEdited) {
-                if (medioValue) {
-                    solistaInput.value = medioValue;
-                    solistaInput.dataset.autoFilled = 'true';
-                    solistaInput.dataset.lastAuto = medioValue;
-                    solistaInput.dataset.userEdited = 'false';
-                } else {
-                    // Si el select vuelve a vacío y el campo era auto, lo limpiamos
-                    if (autoFilled) {
-                        solistaInput.value = '';
-                        solistaInput.dataset.autoFilled = 'false';
-                        solistaInput.dataset.lastAuto = '';
-                        solistaInput.dataset.userEdited = 'false';
-                    }
-                }
             }
         });
 
