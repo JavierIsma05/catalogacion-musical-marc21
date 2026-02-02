@@ -772,6 +772,7 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
             }
 
             // 4. Llamar API de autocompletado773 para heredar campos 264, 382, 852, 856
+            let resultadoPoblado = { poblados: [], omitidos: [] };
             try {
                 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
                 const response = await fetch('/catalogacion/api/obras/autocomplete/773/', {
@@ -785,7 +786,7 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
                 const data = await response.json();
 
                 if (data.success && data.campos_heredables) {
-                    poblarCamposHeredables(data.campos_heredables);
+                    resultadoPoblado = poblarCamposHeredables(data.campos_heredables);
                 }
             } catch (error) {
                 console.error('Error al obtener campos heredables:', error);
@@ -794,67 +795,213 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
             // 5. Cerrar modal
             bootstrap.Modal.getInstance(modalEl).hide();
 
-            // 6. Notificar al usuario
+            // 6. Notificar al usuario con detalle de campos copiados
             if (typeof Swal !== 'undefined') {
+                // Construir mensaje detallado
+                let htmlContent = `<p>Se copiaron los datos de "<strong>${obra774.titulo_texto || 'la obra'}</strong>".</p>`;
+
+                // Campos principales (100 y 245)
+                htmlContent += `<p class="mb-1"><strong>Campos de la obra:</strong></p>`;
+                htmlContent += `<ul class="text-start small mb-2">`;
+                htmlContent += `<li>100 $a (compositor)</li>`;
+                htmlContent += `<li>245 $a (título)</li>`;
+                htmlContent += `</ul>`;
+
+                // Campos heredados de la colección
+                if (resultadoPoblado.poblados.length > 0) {
+                    htmlContent += `<p class="mb-1"><strong>Campos de la colección padre:</strong></p>`;
+                    htmlContent += `<ul class="text-start small mb-0">`;
+                    resultadoPoblado.poblados.forEach(c => {
+                        htmlContent += `<li>${c}</li>`;
+                    });
+                    htmlContent += `</ul>`;
+                }
+
+                // Campos omitidos (solo mostrar si hay alguno relevante)
+                const omitidosRelevantes = resultadoPoblado.omitidos.filter(o => !o.includes('no existe'));
+                if (omitidosRelevantes.length > 0) {
+                    htmlContent += `<p class="mt-2 mb-1 text-warning"><small><strong>Campos no disponibles:</strong></small></p>`;
+                    htmlContent += `<ul class="text-start small text-muted mb-0">`;
+                    omitidosRelevantes.forEach(c => {
+                        htmlContent += `<li>${c}</li>`;
+                    });
+                    htmlContent += `</ul>`;
+                }
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Datos copiados',
-                    text: `Se copiaron los datos de "${obra774.titulo_texto || 'la obra'}" y su colección padre.`,
-                    timer: 3000,
-                    showConfirmButton: false
+                    html: htmlContent,
+                    confirmButtonText: 'Entendido'
                 });
             }
         }
 
         // ===== POBLAR CAMPOS HEREDABLES =====
         function poblarCamposHeredables(campos) {
+            console.log('📋 Poblando campos heredables:', campos);
+            let camposPoblados = [];
+            let camposOmitidos = [];
+
+            // Helper para poblar un campo con validación
+            function poblarCampo(selector, valor, nombreCampo) {
+                const input = document.querySelector(selector);
+                if (input && valor) {
+                    input.value = valor;
+                    // Disparar evento change para notificar cambios
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push(nombreCampo);
+                    return true;
+                } else if (!input) {
+                    camposOmitidos.push(`${nombreCampo} (campo no existe)`);
+                }
+                return false;
+            }
+
             // 264 - Producción/Publicación
             if (campos['264']) {
                 const c264 = campos['264'];
-                const lugarInput = document.querySelector('input[name="lugar_produccion"]');
-                const entidadInput = document.querySelector('input[name="entidad_produccion"]');
-                const fechaInput = document.querySelector('input[name="fecha_produccion"]');
 
-                if (lugarInput && c264.lugares?.length) {
-                    lugarInput.value = c264.lugares[0].lugar || '';
+                // Buscar por clase CSS (formsets dinámicos) o por patrón de nombre
+                const lugarInput = document.querySelector('.lugar-input') ||
+                                   document.querySelector('input[name^="lugar_produccion_264"]');
+                const entidadInput = document.querySelector('.entidad-input') ||
+                                     document.querySelector('input[name^="entidad_produccion_264"]');
+                const fechaInput = document.querySelector('.fecha-input') ||
+                                   document.querySelector('input[name^="fecha_produccion_264"]');
+
+                if (lugarInput && c264.lugar_produccion_264) {
+                    lugarInput.value = c264.lugar_produccion_264;
+                    lugarInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('264$a (lugar)');
+                } else if (!lugarInput) {
+                    camposOmitidos.push('264$a (lugar) - campo no existe');
                 }
-                if (entidadInput && c264.entidades?.length) {
-                    entidadInput.value = c264.entidades[0].entidad || '';
+
+                if (entidadInput && c264.entidad_produccion_264) {
+                    entidadInput.value = c264.entidad_produccion_264;
+                    entidadInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('264$b (entidad)');
+                } else if (!entidadInput) {
+                    camposOmitidos.push('264$b (entidad) - campo no existe');
                 }
-                if (fechaInput && c264.fechas?.length) {
-                    fechaInput.value = c264.fechas[0].fecha || '';
+
+                if (fechaInput && c264.fecha_produccion_264) {
+                    fechaInput.value = c264.fecha_produccion_264;
+                    fechaInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('264$c (fecha)');
+                } else if (!fechaInput) {
+                    camposOmitidos.push('264$c (fecha) - campo no existe');
                 }
             }
 
-            // 382 - Medio de interpretación
-            if (campos['382']?.medios?.length) {
-                const medioInput = document.querySelector('input[name="medio_interpretacion"]');
-                if (medioInput) {
-                    medioInput.value = campos['382'].medios.map(m => m.medio).join(', ');
+            // 382 - Medio de interpretación (es un SELECT, no INPUT)
+            if (campos['382']) {
+                const c382 = campos['382'];
+                // Buscar select con clase medio-select o por patrón de nombre
+                const medioSelect = document.querySelector('.medio-select') ||
+                                    document.querySelector('select[name^="medio_interpretacion_382"]');
+
+                if (medioSelect && c382.medio_interpretacion_382) {
+                    // Es un select, intentar seleccionar la opción que coincida
+                    const opciones = medioSelect.querySelectorAll('option');
+                    let encontrado = false;
+                    opciones.forEach(opt => {
+                        if (opt.value === c382.medio_interpretacion_382 ||
+                            opt.textContent.trim() === c382.medio_display) {
+                            opt.selected = true;
+                            encontrado = true;
+                        }
+                    });
+                    if (encontrado) {
+                        medioSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                        camposPoblados.push('382$a (medio)');
+                    } else {
+                        camposOmitidos.push('382$a (medio) - valor no encontrado en opciones');
+                    }
+                } else if (!medioSelect) {
+                    camposOmitidos.push('382$a (medio) - campo no existe');
+                }
+
+                // Checkbox de solista si existe
+                const solistaCheck = document.querySelector('input[name*="solista"]');
+                if (solistaCheck && c382.solista !== null && c382.solista !== undefined) {
+                    solistaCheck.checked = c382.solista;
+                    solistaCheck.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('382 (solista)');
                 }
             }
 
             // 852 - Localización
             if (campos['852']) {
                 const c852 = campos['852'];
-                const codigoInput = document.querySelector('input[name="codigo_o_nombre"]');
-                const signaturaInput = document.querySelector('input[name="signatura_original"]');
+
+                // Buscar por ID de Django formset o por nombre
+                const codigoInput = document.querySelector('input[id*="codigo_o_nombre"]') ||
+                                    document.querySelector('input[name*="codigo_o_nombre"]');
+                const signaturaInput = document.querySelector('input[id*="signatura_original"]') ||
+                                       document.querySelector('input[name*="signatura_original"]');
+                const estanteriaInput = document.querySelector('.estanteria-input') ||
+                                        document.querySelector('input[name^="estanteria_ubicacion_852"]');
 
                 if (codigoInput && c852.codigo_o_nombre) {
                     codigoInput.value = c852.codigo_o_nombre;
+                    codigoInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('852$a (código/nombre)');
+                } else if (!codigoInput) {
+                    camposOmitidos.push('852$a (código/nombre) - campo no existe');
                 }
+
                 if (signaturaInput && c852.signatura_original) {
                     signaturaInput.value = c852.signatura_original;
+                    signaturaInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('852$h (signatura)');
+                } else if (!signaturaInput) {
+                    camposOmitidos.push('852$h (signatura) - campo no existe');
+                }
+
+                if (estanteriaInput && c852.estanteria) {
+                    estanteriaInput.value = c852.estanteria;
+                    estanteriaInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('852$c (estantería)');
+                } else if (!estanteriaInput) {
+                    camposOmitidos.push('852$c (estantería) - campo no existe');
                 }
             }
 
-            // 856 - Acceso electrónico (primer URL disponible)
-            if (campos['856']?.urls?.length) {
-                const urlInput = document.querySelector('input[name="url_856"]');
-                if (urlInput) {
-                    urlInput.value = campos['856'].urls[0].url || '';
+            // 856 - Acceso electrónico
+            if (campos['856']) {
+                const c856 = campos['856'];
+
+                // Buscar por clase CSS o patrón de nombre
+                const urlInput = document.querySelector('.url-input') ||
+                                 document.querySelector('input[name^="url_disponible_856"]');
+
+                if (urlInput && c856.url_disponible_856) {
+                    urlInput.value = c856.url_disponible_856;
+                    urlInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('856$u (URL)');
+                } else if (!urlInput) {
+                    camposOmitidos.push('856$u (URL) - campo no existe');
+                }
+
+                // Texto del enlace si existe
+                const textoInput = document.querySelector('input[name^="texto_disponible_856"]') ||
+                                   document.querySelector('.texto-enlace-input');
+                if (textoInput && c856.texto_disponible_856) {
+                    textoInput.value = c856.texto_disponible_856;
+                    textoInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('856$y (texto enlace)');
                 }
             }
+
+            // Log de resumen
+            console.log('✅ Campos poblados:', camposPoblados);
+            if (camposOmitidos.length > 0) {
+                console.log('⚠️ Campos omitidos:', camposOmitidos);
+            }
+
+            return { poblados: camposPoblados, omitidos: camposOmitidos };
         }
 
         // ===== CARGAR OBRAS 774 =====
