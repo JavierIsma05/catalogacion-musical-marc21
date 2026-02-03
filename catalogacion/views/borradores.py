@@ -363,6 +363,7 @@ def autoguardar_borrador_ajax(request):
             obra_objetivo_id=obra_objetivo_id,
             datos_formulario=datos_formulario,
             pestana_actual=pestana_actual,
+            usuario=request.user if request.user.is_authenticated else None,
         )
 
         return JsonResponse(

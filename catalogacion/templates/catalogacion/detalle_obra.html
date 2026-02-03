@@ -15,19 +15,14 @@
   font-style: normal;
 }
 
-.incipit-canvas-wrap{
+.incipit-view-canvas {
   width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: .5rem;
-}
-
-.incipit-view-canvas{
-  width: 100%;
-  max-width: 700px;
-  height: 250px;      /* tamaño visual */
+  max-width: 500px;
+  height: 150px;
   display: block;
-  background: #ffffffdc;
+  background: transparent;
+  pointer-events: none;
+  cursor: default;
 }
 
 
@@ -59,11 +54,46 @@
                     </div>
                     {% endif %}
 
+                    {# Badges de tipo y publicación #}
+                    <div class="d-flex align-items-center gap-2 ms-3">
+                        {% if obra.nivel_bibliografico == "c" %}
+                            <span class="badge bg-primary">Colección</span>
+                        {% else %}
+                            <span class="badge bg-info">Obra</span>
+                        {% endif %}
+                        {% if obra.publicada %}
+                            <span class="badge bg-success" title="Visible en catálogo público">
+                                <i class="bi bi-globe"></i> Publicada
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary" title="No visible en catálogo público">
+                                <i class="bi bi-eye-slash"></i> Sin publicar
+                            </span>
+                        {% endif %}
+                    </div>
+
                 </div>
 
-                <a href="{% url 'catalogacion:editar_obra' pk=obra.pk %}" class="btn-action">
-                    <i class="bi bi-pencil"></i> Editar
-                </a>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'catalogacion:editar_obra' pk=obra.pk %}" class="btn-action">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    {% if obra.publicada %}
+                        <form method="post" action="{% url 'catalogacion:despublicar_obra' pk=obra.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-warning btn-sm" title="Retirar del catálogo público">
+                                <i class="bi bi-eye-slash"></i> Despublicar
+                            </button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{% url 'catalogacion:publicar_obra' pk=obra.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm" title="Hacer visible en catálogo público">
+                                <i class="bi bi-globe"></i> Publicar
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
 
         </div>
@@ -346,18 +376,34 @@
                             {# ========== MÉTODO CORRECTO: json_script con ID fijo ========== #}
                             <script id="paec_json_{{ incipit.pk }}" type="application/json">{{ incipit.paec_full|safe }}</script>
 
-                            <div class="incipit-canvas-wrap">
-                                <canvas
-                                    id="incipit_view_canvas_{{ incipit.pk }}"
-                                    class="incipit-view-canvas"
-                                    widtzzzh="800"
-                                    height="320"
-                                    data-paec-json-id="paec_json_{{ incipit.pk }}">
-                                </canvas>
-                            </div>
+                            <div class="obra-card-body">
+                            {% with primer_incipit=obra.incipits_musicales.first %}
+                                {% if primer_incipit and primer_incipit.paec_full %}
+                                    {# Mostrar canvas del primer íncipit #}
+                                    <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
+                                        <canvas
+                                            id="incipit_view_canvas_{{ primer_incipit.pk }}"
+                                            class="incipit-view-canvas"
+                                            width="500"
+                                            height="180"
+                                            data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
+                                        </canvas>
+
+
+                                    {# Información textual del íncipit #}
+                                    {% if primer_incipit.titulo_encabezamiento %}
+                                        <p class="obra-inline-line" style="margin-top: 0.125rem; font-size: 0.9em; color: #666;">
+                                            {{ primer_incipit.titulo_encabezamiento }}
+                                        </p>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="meta-empty">Sin íncipit registrado</p>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
 
                             {# ========== PANEL DE DEBUG (quitar en producción) ========== #}
-                            <div class="debug-panel" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
+                            <!-- <div class="debug-panel" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
                                 <div style="font-size: 12px; font-family: monospace;">
                                     <div style="margin-bottom: 0.5rem;">
                                         <strong style="color: #0066cc;">🔍 DEBUG INCIPIT {{ incipit.pk }}</strong>
@@ -391,7 +437,7 @@
                                         </tr>
                                     </table>
                                 </div>
-                            </div>
+                            </div> -->
 
                             {% elif incipit.notacion_musical %}
                             {# ========== FALLBACK: si paec_full está vacío pero hay body ========== #}

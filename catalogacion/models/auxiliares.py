@@ -53,6 +53,15 @@ class SoftDeleteMixin(models.Model):
         self.eliminado_por = None
         self.save()
 
+    @property
+    def dias_desde_eliminacion(self):
+        """Retorna dias desde la eliminacion logica"""
+        if not self.fecha_eliminacion:
+            return 0
+        from django.utils import timezone
+        diferencia = timezone.now() - self.fecha_eliminacion
+        return diferencia.days
+
 
 # ============================================
 # AUDITORÍA DE CAMBIOS

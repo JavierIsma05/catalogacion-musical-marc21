@@ -449,6 +449,18 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     fecha_creacion_sistema = models.DateTimeField(auto_now_add=True)
     fecha_modificacion_sistema = models.DateTimeField(auto_now=True)
 
+    # Estado de publicación
+    publicada = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="Indica si la obra está publicada en el catálogo público",
+    )
+    fecha_publicacion = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Fecha y hora en que se publicó la obra",
+    )
+
     # Manager personalizado
     objects = ObraGeneralManager()
 
@@ -459,7 +471,6 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     class Meta:
         verbose_name = "Obra Musical"
         verbose_name_plural = "Obras Musicales"
-        db_table = "catalogacion_obra_general"
         ordering = ["-num_control"]
         indexes = [
             models.Index(fields=["num_control"]),
@@ -512,6 +523,44 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     def es_parte_de_coleccion(self):
         """Retorna True si forma parte de una colección"""
         return self.nivel_bibliografico == "a"
+
+    @property
+    def estado_publicacion_display(self):
+        """Retorna el estado de publicación para mostrar en UI"""
+        return "Publicada" if self.publicada else "Sin publicar"
+
+    @property
+    def estado_publicacion_badge_class(self):
+        """Retorna la clase CSS del badge según estado de publicación"""
+        return "bg-success" if self.publicada else "bg-secondary"
+
+    def publicar(self, usuario=None):
+        """
+        Publica la obra en el catálogo público.
+
+        Args:
+            usuario: Usuario que publica la obra (opcional)
+        """
+        from django.utils import timezone
+
+        self.publicada = True
+        self.fecha_publicacion = timezone.now()
+        if usuario:
+            self.modificado_por = usuario
+        self.save(update_fields=["publicada", "fecha_publicacion", "modificado_por", "fecha_modificacion_sistema"])
+
+    def despublicar(self, usuario=None):
+        """
+        Retira la obra del catálogo público.
+
+        Args:
+            usuario: Usuario que despublica la obra (opcional)
+        """
+        self.publicada = False
+        self.fecha_publicacion = None
+        if usuario:
+            self.modificado_por = usuario
+        self.save(update_fields=["publicada", "fecha_publicacion", "modificado_por", "fecha_modificacion_sistema"])
 
     @property
     def signatura_completa(self):
@@ -698,10 +747,40 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
 
     @property
     def coleccion_publica_display(self):
+        """Retorna el título de la colección padre (773 $t)."""
         colecciones = [
             str(enlace.titulo) for enlace in self.enlaces_documento_fuente_773.all()
         ]
         return "; ".join(colecciones)
+
+    @property
+    def signatura_coleccion_padre(self):
+        """
+        Retorna la signatura de la colección padre via 773 $w.
+        Si la obra pertenece a una colección, devuelve la signatura de esa colección.
+        """
+        from catalogacion.models import NumeroControl773
+
+        # Buscar el primer enlace 773 que tenga obra_relacionada
+        for enlace in self.enlaces_documento_fuente_773.all():
+            numero_control = enlace.numeros_control.select_related("obra_relacionada").first()
+            if numero_control and numero_control.obra_relacionada:
+                return numero_control.obra_relacionada.signatura_publica_display
+        return None
+
+    @property
+    def obra_coleccion_padre(self):
+        """
+        Retorna la obra padre (colección) via 773 $w.
+        Útil para obtener otros datos del padre.
+        """
+        from catalogacion.models import NumeroControl773
+
+        for enlace in self.enlaces_documento_fuente_773.all():
+            numero_control = enlace.numeros_control.select_related("obra_relacionada").first()
+            if numero_control and numero_control.obra_relacionada:
+                return numero_control.obra_relacionada
+        return None
 
     @property
     def tiene_incipit(self):

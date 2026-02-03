@@ -37,7 +37,7 @@
         <input type="text"
                class="form-control mb-3"
                id="buscarObraInput"
-               placeholder="Buscar por número de control (001)…">
+               placeholder="Buscar por N° control, título, compositor o signatura">
 
         <ul class="list-group" id="buscarObraResultados"></ul>
       </div>
@@ -87,7 +87,7 @@
 
         clearTimeout(timer);
         timer = setTimeout(() => {
-            fetch(`/catalogacion/api/buscar-obras/?q=${encodeURIComponent(q)}`)
+            fetch(`/catalogacion/api/obras/buscar/?q=${encodeURIComponent(q)}`)
                 .then(r => r.json())
                 .then(data => {
                     resultados.innerHTML = "";

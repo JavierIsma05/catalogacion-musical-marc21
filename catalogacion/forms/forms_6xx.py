@@ -37,6 +37,9 @@ class Materia650Form(forms.ModelForm):
 
         if self.instance.pk and self.instance.materia:
             self.fields["materia_texto"].initial = self.instance.materia.termino
+        elif not self.instance.pk:
+            # Valor por defecto para nuevos registros
+            self.fields["materia_texto"].initial = "Música para piano"
 
     def clean(self):
         cleaned = super().clean()

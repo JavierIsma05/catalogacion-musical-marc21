@@ -7,16 +7,23 @@ from django.urls import include, path
 from catalogacion.views import (
     CrearObraView,
     DetalleObraView,
+    DespublicarObraView,
     EditarObraView,
-    # EliminarObraView,  # COMENTADO: Funcionalidad de borrado desactivada temporalmente
+    EliminarObraView,  # COMENTADO: Funcionalidad de borrado desactivada temporalmente
     IndexView,
     ListaObrasView,
+    PapeleraObrasView,
+    PublicarObraView,
+    PurgarObraView,
+    PurgarTodoView,
+    RestaurarObraView,
     SeleccionarTipoObraView,
 )
 from catalogacion.views import borradores as borradores_views
 from catalogacion.views.api_views import (
     Autocompletado773View,
     buscar_obras,
+    obtener_obras_774,
 )
 
 app_name = "catalogacion"
@@ -38,14 +45,44 @@ urlpatterns = [
                 path("crear/<str:tipo>/", CrearObraView.as_view(), name="crear_obra"),
                 path("<int:pk>/", DetalleObraView.as_view(), name="detalle_obra"),
                 path("<int:pk>/editar/", EditarObraView.as_view(), name="editar_obra"),
-                # COMENTADO: Funcionalidad de borrado desactivada temporalmente
-                # path(
-                #     "<int:pk>/eliminar/",
-                #     EliminarObraView.as_view(),
-                #     name="eliminar_obra",
-                # ),
+                path(
+                    "<int:pk>/eliminar/",
+                    EliminarObraView.as_view(),
+                    name="eliminar_obra",
+                ),
+                path(
+                    "<int:pk>/publicar/",
+                    PublicarObraView.as_view(),
+                    name="publicar_obra",
+                ),
+                path(
+                    "<int:pk>/despublicar/",
+                    DespublicarObraView.as_view(),
+                    name="despublicar_obra",
+                ),
             ]
         ),
+    ),
+    # Papelera de obras eliminadas
+    path(
+        "papelera/",
+        PapeleraObrasView.as_view(),
+        name="papelera_obras",
+    ),
+    path(
+        "papelera/<int:pk>/restaurar/",
+        RestaurarObraView.as_view(),
+        name="restaurar_obra",
+    ),
+    path(
+        "papelera/<int:pk>/purgar/",
+        PurgarObraView.as_view(),
+        name="purgar_obra",
+    ),
+    path(
+        "papelera/purgar-todo/",
+        PurgarTodoView.as_view(),
+        name="purgar_todo",
     ),
     # Interfaz de borradores
     path(
@@ -134,5 +171,10 @@ urlpatterns = [
         "api/obras/autocomplete/773/",
         Autocompletado773View.as_view(),
         name="api_autocompletado_773",
+    ),
+    path(
+        "api/obras/774-entries/",
+        obtener_obras_774,
+        name="api_obtener_obras_774",
     ),
 ]

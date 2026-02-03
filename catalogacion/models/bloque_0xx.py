@@ -324,10 +324,10 @@ class CodigoPaisEntidad(models.Model):
     )
 
     codigo_pais = models.CharField(
-        max_length=2,
+        max_length=5,
         choices=CODIGOS_PAIS,
         default='ec',
-        help_text="044 $a — Código ISO 3166-1 alfa-2 del país"
+        help_text="044 $a — Código MARC21 del país"
     )
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)

@@ -63,16 +63,51 @@
                     <span id="autosave-status">Guardado automático activo</span>
                 </div>
 
+                <!-- Estado de publicación (solo en edición) -->
+                {% if object and object.pk %}
+                <div class="publication-status mb-3 text-center">
+                    {% if object.publicada %}
+                        <span class="badge bg-success">
+                            <i class="bi bi-globe"></i> Publicada
+                        </span>
+                    {% else %}
+                        <span class="badge bg-secondary">
+                            <i class="bi bi-eye-slash"></i> Sin publicar
+                        </span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
                 <!-- Botones de acción -->
                 <div class="sidebar-actions">
-                    <!-- <button type="button" class="sidebar-btn sidebar-btn-preview" id="btn-vista-previa">
-                        <i class="bi bi-eye"></i>
-                        <span>Vista Previa</span>
-                    </button> -->
-                    <button type="button" class="sidebar-btn sidebar-btn-publish" id="btn-publicar-obra">
-                        <i class="bi bi-check-circle-fill"></i>
-                        <span>Publicar Obra</span>
-                    </button>
+                    {% if object and object.pk %}
+                        {# Modo edición #}
+                        <button type="button" class="sidebar-btn sidebar-btn-secondary" id="btn-registrar-obra">
+                            <i class="bi bi-floppy"></i>
+                            <span>Guardar cambios</span>
+                        </button>
+                        {% if object.publicada %}
+                            <button type="button" class="sidebar-btn sidebar-btn-warning" id="btn-despublicar-obra">
+                                <i class="bi bi-eye-slash"></i>
+                                <span>Despublicar</span>
+                            </button>
+                        {% else %}
+                            <button type="button" class="sidebar-btn sidebar-btn-publish" id="btn-publicar-obra">
+                                <i class="bi bi-globe"></i>
+                                <span>Publicar Obra</span>
+                            </button>
+                        {% endif %}
+                    {% else %}
+                        {# Modo creación #}
+                        <button type="button" class="sidebar-btn sidebar-btn-secondary" id="btn-registrar-obra">
+                            <i class="bi bi-floppy"></i>
+                            <span>Registrar Obra</span>
+                        </button>
+                        <button type="button" class="sidebar-btn sidebar-btn-publish" id="btn-publicar-obra">
+                            <i class="bi bi-globe"></i>
+                            <span>Publicar Obra</span>
+                        </button>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -88,6 +123,7 @@
                 id="id_tipo_registro">
             <input type="hidden" name="nivel_bibliografico" value="{{ form.nivel_bibliografico.value|default:'' }}"
                 id="id_nivel_bibliografico">
+            <input type="hidden" name="accion" id="id_accion" value="registrar">
 
             <!-- Header del formulario -->
             <div class="card mb-3">
@@ -235,13 +271,59 @@
                         <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
                             <i class="bi bi-arrow-left"></i> Anterior
                         </button>
-                        <button type="button" class="btn btn-primary" onclick="confirmarPublicacion()">
-                            <i class="bi bi-check-circle-fill"></i> Registrar Obra
-                        </button>
+                        {% if object and object.pk %}
+                            {# Modo edición #}
+                            <button type="button" class="btn btn-secondary me-2" onclick="confirmarRegistro()">
+                                <i class="bi bi-floppy"></i> Guardar cambios
+                            </button>
+                            {% if object.publicada %}
+                                <button type="button" class="btn btn-warning" onclick="confirmarDespublicacion()">
+                                    <i class="bi bi-eye-slash"></i> Despublicar
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-success" onclick="confirmarPublicacion()">
+                                    <i class="bi bi-globe"></i> Publicar Obra
+                                </button>
+                            {% endif %}
+                        {% else %}
+                            {# Modo creación #}
+                            <button type="button" class="btn btn-secondary me-2" onclick="confirmarRegistro()">
+                                <i class="bi bi-floppy"></i> Registrar Obra
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="confirmarPublicacion()">
+                                <i class="bi bi-globe"></i> Publicar Obra
+                            </button>
+                        {% endif %}
                     </div>
                 </div>
             </div> <!-- /tabs-content -->
         </form>
+    </div>
+</div>
+
+<!-- ================= MODAL CONFIRMAR REGISTRO ================= -->
+<div class="modal fade" id="modalConfirmarRegistro" tabindex="-1" aria-labelledby="modalConfirmarRegistroLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmarRegistroLabel">
+                    <i class="bi bi-floppy text-secondary"></i> Confirmar registro
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">¿Estás seguro de que deseas <strong>registrar</strong> esta obra?</p>
+                <p class="text-muted small mb-0">La obra quedará guardada pero <strong>no será visible</strong> en el catálogo público hasta que la publiques.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-secondary" id="btnConfirmarSoloRegistro">
+                    <i class="bi bi-floppy"></i> Sí, registrar
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -251,20 +333,46 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalConfirmarPublicacionLabel">
-                    <i class="bi bi-check-circle text-success"></i> Confirmar registro
+                    <i class="bi bi-globe text-success"></i> Confirmar publicación
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-2">¿Estás seguro de que deseas registrar esta obra en el catálogo?</p>
-                <p class="text-muted small mb-0">Una vez registrada, podrás editarla desde la sección "Editar Obras".</p>
+                <p class="mb-2">¿Estás seguro de que deseas <strong>publicar</strong> esta obra?</p>
+                <p class="text-muted small mb-0">La obra será visible inmediatamente en el <strong>catálogo público</strong>.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     Cancelar
                 </button>
                 <button type="button" class="btn btn-success" id="btnConfirmarRegistro">
-                    <i class="bi bi-check-circle-fill"></i> Sí, registrar
+                    <i class="bi bi-globe"></i> Sí, publicar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= MODAL CONFIRMAR DESPUBLICACIÓN ================= -->
+<div class="modal fade" id="modalConfirmarDespublicacion" tabindex="-1" aria-labelledby="modalConfirmarDespublicacionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmarDespublicacionLabel">
+                    <i class="bi bi-eye-slash text-warning"></i> Confirmar despublicación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">¿Estás seguro de que deseas <strong>retirar</strong> esta obra del catálogo público?</p>
+                <p class="text-muted small mb-0">La obra dejará de ser visible para el público pero se mantendrán todos los datos.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-warning" id="btnConfirmarDespublicar">
+                    <i class="bi bi-eye-slash"></i> Sí, despublicar
                 </button>
             </div>
         </div>
@@ -277,17 +385,35 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">
+                <h5 class="modal-title" id="modalBuscarObraTitle">
                     <i class="bi bi-search"></i> Buscar obra registrada
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
-                <input type="text" id="buscarObraInput" class="form-control mb-3"
-                    placeholder="Buscar por número de control (001)">
+                <!-- Fase 1: Búsqueda -->
+                <div id="buscarObraPhase1">
+                    <input type="text" id="buscarObraInput" class="form-control mb-3"
+                        placeholder="Buscar por N° control, título, compositor o signatura">
+                    <ul class="list-group" id="buscarObraResultados"></ul>
+                </div>
 
-                <ul class="list-group" id="buscarObraResultados"></ul>
+                <!-- Fase 2: Selección de obra 774 -->
+                <div id="buscarObraPhase2" class="d-none">
+                    <div class="alert alert-info mb-3">
+                        <i class="bi bi-collection"></i>
+                        <strong>Colección:</strong>
+                        <span id="coleccionSeleccionadaInfo"></span>
+                    </div>
+                    <p class="mb-2">Seleccione la obra que desea catalogar:</p>
+                    <ul class="list-group" id="obras774Lista"></ul>
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-outline-secondary" id="btnVolverBusqueda">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </button>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -301,9 +427,19 @@
     // Pasar tipo de obra al JavaScript
     window.TIPO_OBRA_ACTUAL = '{{ tipo_obra }}';
 
-    // ==================== MODAL DE CONFIRMACIÓN PARA PUBLICAR ====================
+    // ==================== MODAL DE CONFIRMACIÓN PARA REGISTRAR/PUBLICAR ====================
     // Variable global para controlar si estamos publicando
     window.permitirSalida = false;
+
+    function confirmarRegistro() {
+        const modalEl = document.getElementById('modalConfirmarRegistro');
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        } else {
+            console.error('Modal de confirmación de registro no encontrado');
+        }
+    }
 
     function confirmarPublicacion() {
         const modalEl = document.getElementById('modalConfirmarPublicacion');
@@ -311,33 +447,87 @@
             const modal = new bootstrap.Modal(modalEl);
             modal.show();
         } else {
-            console.error('Modal de confirmación no encontrado');
+            console.error('Modal de confirmación de publicación no encontrado');
         }
     }
 
-    // Manejar confirmación del modal
+    function confirmarDespublicacion() {
+        const modalEl = document.getElementById('modalConfirmarDespublicacion');
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        } else {
+            console.error('Modal de confirmación de despublicación no encontrado');
+        }
+    }
+
+    function enviarFormulario(accion) {
+        // Marcar que permitimos la salida
+        window.permitirSalida = true;
+
+        // Establecer la acción
+        document.getElementById('id_accion').value = accion;
+
+        // Notificar al sistema de borradores
+        if (window.BorradorSystem && typeof window.BorradorSystem.permitirPublicacion === 'function') {
+            window.BorradorSystem.permitirPublicacion();
+        }
+
+        // Pequeño delay y luego enviar formulario
+        setTimeout(function() {
+            document.getElementById('obra-form').submit();
+        }, 100);
+    }
+
+    // Manejar confirmación de los modales
     document.addEventListener('DOMContentLoaded', function() {
-        const btnConfirmar = document.getElementById('btnConfirmarRegistro');
-        if (btnConfirmar) {
-            btnConfirmar.addEventListener('click', function() {
-                // Marcar que permitimos la salida
-                window.permitirSalida = true;
-                
-                // Notificar al sistema de borradores
-                if (window.BorradorSystem && typeof window.BorradorSystem.permitirPublicacion === 'function') {
-                    window.BorradorSystem.permitirPublicacion();
-                }
-                
-                // Cerrar modal
+        // Botón "Sí, registrar" (solo registrar sin publicar)
+        const btnSoloRegistro = document.getElementById('btnConfirmarSoloRegistro');
+        if (btnSoloRegistro) {
+            btnSoloRegistro.addEventListener('click', function() {
+                const modalEl = document.getElementById('modalConfirmarRegistro');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+                enviarFormulario('registrar');
+            });
+        }
+
+        // Botón "Sí, publicar" (registrar y publicar)
+        const btnPublicar = document.getElementById('btnConfirmarRegistro');
+        if (btnPublicar) {
+            btnPublicar.addEventListener('click', function() {
                 const modalEl = document.getElementById('modalConfirmarPublicacion');
                 const modal = bootstrap.Modal.getInstance(modalEl);
                 if (modal) modal.hide();
-                
-                // Pequeño delay y luego enviar formulario
-                setTimeout(function() {
-                    document.getElementById('obra-form').submit();
-                }, 100);
+                enviarFormulario('publicar');
             });
+        }
+
+        // Botón "Sí, despublicar"
+        const btnDespublicar = document.getElementById('btnConfirmarDespublicar');
+        if (btnDespublicar) {
+            btnDespublicar.addEventListener('click', function() {
+                const modalEl = document.getElementById('modalConfirmarDespublicacion');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+                enviarFormulario('despublicar');
+            });
+        }
+
+        // Botones del sidebar
+        const btnSidebarRegistrar = document.getElementById('btn-registrar-obra');
+        if (btnSidebarRegistrar) {
+            btnSidebarRegistrar.addEventListener('click', confirmarRegistro);
+        }
+
+        const btnSidebarPublicar = document.getElementById('btn-publicar-obra');
+        if (btnSidebarPublicar) {
+            btnSidebarPublicar.addEventListener('click', confirmarPublicacion);
+        }
+
+        const btnSidebarDespublicar = document.getElementById('btn-despublicar-obra');
+        if (btnSidebarDespublicar) {
+            btnSidebarDespublicar.addEventListener('click', confirmarDespublicacion);
         }
     });
 
@@ -672,11 +862,348 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
 </script>
 <script>
     (function () {
-
+        // ===== ESTADO DEL MODAL =====
         let targetTextInput = null;
         let targetHiddenInput = null;
+        let targetContainer = null;
+        let coleccionSeleccionada = null;
 
-        // Abrir modal al hacer click en 🔍
+        // ===== ELEMENTOS DEL DOM =====
+        const modalEl = document.getElementById("modalBuscarObra");
+        const phase1 = document.getElementById("buscarObraPhase1");
+        const phase2 = document.getElementById("buscarObraPhase2");
+        const inputBuscar = document.getElementById("buscarObraInput");
+        const resultados = document.getElementById("buscarObraResultados");
+        const obras774Lista = document.getElementById("obras774Lista");
+        const coleccionInfo = document.getElementById("coleccionSeleccionadaInfo");
+        const btnVolver = document.getElementById("btnVolverBusqueda");
+        const modalTitle = document.getElementById("modalBuscarObraTitle");
+
+        if (!inputBuscar || !resultados) return;
+
+        // ===== FUNCIONES DE FASE =====
+        function showPhase1() {
+            phase1.classList.remove("d-none");
+            phase2.classList.add("d-none");
+            modalTitle.innerHTML = '<i class="bi bi-search"></i> Buscar obra registrada';
+            inputBuscar.value = "";
+            resultados.innerHTML = "";
+            coleccionSeleccionada = null;
+        }
+
+        function showPhase2(coleccion, obras774) {
+            phase1.classList.add("d-none");
+            phase2.classList.remove("d-none");
+            modalTitle.innerHTML = '<i class="bi bi-collection"></i> Seleccionar obra de la colección';
+            coleccionInfo.textContent = `${coleccion.num_control} — ${coleccion.titulo || 'Sin título'}`;
+            coleccionSeleccionada = coleccion;
+
+            // Renderizar lista de obras 774
+            obras774Lista.innerHTML = "";
+            obras774.forEach(obra => {
+                const li = document.createElement("li");
+                li.className = "list-group-item list-group-item-action";
+                li.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>${obra.titulo_texto || 'Sin título'}</strong>
+                            ${obra.compositor_texto ? `<br><small class="text-muted">${obra.compositor_texto}</small>` : ''}
+                        </div>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </div>
+                `;
+                li.addEventListener("click", () => selectObra774(coleccion, obra));
+                obras774Lista.appendChild(li);
+            });
+        }
+
+        // ===== SELECCIÓN DE OBRA 774 =====
+        async function selectObra774(coleccion, obra774) {
+            // 1. Rellenar campo 773 $w (número de control de la colección padre)
+            if (targetTextInput) {
+                targetTextInput.value = coleccion.num_control;
+            }
+            if (targetHiddenInput) {
+                targetHiddenInput.value = coleccion.id;
+            }
+
+            // 2. Rellenar campo 100 (compositor) desde la obra 774
+            const compositorTexto = document.getElementById("id_compositor_texto");
+            const compositorId = document.getElementById("id_compositor");
+            if (compositorTexto && obra774.compositor_texto) {
+                compositorTexto.value = obra774.compositor_texto;
+            }
+            if (compositorId && obra774.compositor_id) {
+                compositorId.value = obra774.compositor_id;
+            }
+
+            // 3. Rellenar campo 245 (título principal) desde la obra 774
+            const tituloPrincipal = document.getElementById("id_titulo_principal");
+            if (tituloPrincipal && obra774.titulo_texto) {
+                tituloPrincipal.value = obra774.titulo_texto;
+            }
+
+            // 4. Llamar API de autocompletado773 para heredar campos 264, 382, 852, 856
+            let resultadoPoblado = { poblados: [], omitidos: [] };
+            try {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+                const response = await fetch('/catalogacion/api/obras/autocomplete/773/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ obra_id: coleccion.id })
+                });
+                const data = await response.json();
+
+                if (data.success && data.campos_heredables) {
+                    resultadoPoblado = poblarCamposHeredables(data.campos_heredables);
+                }
+            } catch (error) {
+                console.error('Error al obtener campos heredables:', error);
+            }
+
+            // 5. Cerrar modal
+            bootstrap.Modal.getInstance(modalEl).hide();
+
+            // 6. Notificar al usuario con detalle de campos copiados
+            if (typeof Swal !== 'undefined') {
+                // Construir mensaje detallado
+                let htmlContent = `<p>Se copiaron los datos de "<strong>${obra774.titulo_texto || 'la obra'}</strong>".</p>`;
+
+                // Campos principales (100 y 245)
+                htmlContent += `<p class="mb-1"><strong>Campos de la obra:</strong></p>`;
+                htmlContent += `<ul class="text-start small mb-2">`;
+                htmlContent += `<li>100 $a (compositor)</li>`;
+                htmlContent += `<li>245 $a (título)</li>`;
+                htmlContent += `</ul>`;
+
+                // Campos heredados de la colección
+                if (resultadoPoblado.poblados.length > 0) {
+                    htmlContent += `<p class="mb-1"><strong>Campos de la colección padre:</strong></p>`;
+                    htmlContent += `<ul class="text-start small mb-0">`;
+                    resultadoPoblado.poblados.forEach(c => {
+                        htmlContent += `<li>${c}</li>`;
+                    });
+                    htmlContent += `</ul>`;
+                }
+
+                // Campos omitidos (solo mostrar si hay alguno relevante)
+                const omitidosRelevantes = resultadoPoblado.omitidos.filter(o => !o.includes('no existe'));
+                if (omitidosRelevantes.length > 0) {
+                    htmlContent += `<p class="mt-2 mb-1 text-warning"><small><strong>Campos no disponibles:</strong></small></p>`;
+                    htmlContent += `<ul class="text-start small text-muted mb-0">`;
+                    omitidosRelevantes.forEach(c => {
+                        htmlContent += `<li>${c}</li>`;
+                    });
+                    htmlContent += `</ul>`;
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Datos copiados',
+                    html: htmlContent,
+                    confirmButtonText: 'Entendido'
+                });
+            }
+        }
+
+        // ===== POBLAR CAMPOS HEREDABLES =====
+        function poblarCamposHeredables(campos) {
+            console.log('📋 Poblando campos heredables:', campos);
+            let camposPoblados = [];
+            let camposOmitidos = [];
+
+            // Helper para poblar un campo con validación
+            function poblarCampo(selector, valor, nombreCampo) {
+                const input = document.querySelector(selector);
+                if (input && valor) {
+                    input.value = valor;
+                    // Disparar evento change para notificar cambios
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push(nombreCampo);
+                    return true;
+                } else if (!input) {
+                    camposOmitidos.push(`${nombreCampo} (campo no existe)`);
+                }
+                return false;
+            }
+
+            // 264 - Producción/Publicación
+            if (campos['264']) {
+                const c264 = campos['264'];
+
+                // Buscar por clase CSS (formsets dinámicos) o por patrón de nombre
+                const lugarInput = document.querySelector('.lugar-input') ||
+                                   document.querySelector('input[name^="lugar_produccion_264"]');
+                const entidadInput = document.querySelector('.entidad-input') ||
+                                     document.querySelector('input[name^="entidad_produccion_264"]');
+                const fechaInput = document.querySelector('.fecha-input') ||
+                                   document.querySelector('input[name^="fecha_produccion_264"]');
+
+                if (lugarInput && c264.lugar_produccion_264) {
+                    lugarInput.value = c264.lugar_produccion_264;
+                    lugarInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('264$a (lugar)');
+                } else if (!lugarInput) {
+                    camposOmitidos.push('264$a (lugar) - campo no existe');
+                }
+
+                if (entidadInput && c264.entidad_produccion_264) {
+                    entidadInput.value = c264.entidad_produccion_264;
+                    entidadInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('264$b (entidad)');
+                } else if (!entidadInput) {
+                    camposOmitidos.push('264$b (entidad) - campo no existe');
+                }
+
+                if (fechaInput && c264.fecha_produccion_264) {
+                    fechaInput.value = c264.fecha_produccion_264;
+                    fechaInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('264$c (fecha)');
+                } else if (!fechaInput) {
+                    camposOmitidos.push('264$c (fecha) - campo no existe');
+                }
+            }
+
+            // 382 - Medio de interpretación (es un SELECT, no INPUT)
+            if (campos['382']) {
+                const c382 = campos['382'];
+                // Buscar select con clase medio-select o por patrón de nombre
+                const medioSelect = document.querySelector('.medio-select') ||
+                                    document.querySelector('select[name^="medio_interpretacion_382"]');
+
+                if (medioSelect && c382.medio_interpretacion_382) {
+                    // Es un select, intentar seleccionar la opción que coincida
+                    const opciones = medioSelect.querySelectorAll('option');
+                    let encontrado = false;
+                    opciones.forEach(opt => {
+                        if (opt.value === c382.medio_interpretacion_382 ||
+                            opt.textContent.trim() === c382.medio_display) {
+                            opt.selected = true;
+                            encontrado = true;
+                        }
+                    });
+                    if (encontrado) {
+                        medioSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                        camposPoblados.push('382$a (medio)');
+                    } else {
+                        camposOmitidos.push('382$a (medio) - valor no encontrado en opciones');
+                    }
+                } else if (!medioSelect) {
+                    camposOmitidos.push('382$a (medio) - campo no existe');
+                }
+
+                // Checkbox de solista si existe
+                const solistaCheck = document.querySelector('input[name*="solista"]');
+                if (solistaCheck && c382.solista !== null && c382.solista !== undefined) {
+                    solistaCheck.checked = c382.solista;
+                    solistaCheck.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('382 (solista)');
+                }
+            }
+
+            // 852 - Localización
+            if (campos['852']) {
+                const c852 = campos['852'];
+
+                // Buscar por ID de Django formset o por nombre
+                const codigoInput = document.querySelector('input[id*="codigo_o_nombre"]') ||
+                                    document.querySelector('input[name*="codigo_o_nombre"]');
+                const signaturaInput = document.querySelector('input[id*="signatura_original"]') ||
+                                       document.querySelector('input[name*="signatura_original"]');
+                const estanteriaInput = document.querySelector('.estanteria-input') ||
+                                        document.querySelector('input[name^="estanteria_ubicacion_852"]');
+
+                if (codigoInput && c852.codigo_o_nombre) {
+                    codigoInput.value = c852.codigo_o_nombre;
+                    codigoInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('852$a (código/nombre)');
+                } else if (!codigoInput) {
+                    camposOmitidos.push('852$a (código/nombre) - campo no existe');
+                }
+
+                if (signaturaInput && c852.signatura_original) {
+                    signaturaInput.value = c852.signatura_original;
+                    signaturaInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('852$h (signatura)');
+                } else if (!signaturaInput) {
+                    camposOmitidos.push('852$h (signatura) - campo no existe');
+                }
+
+                if (estanteriaInput && c852.estanteria) {
+                    estanteriaInput.value = c852.estanteria;
+                    estanteriaInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('852$c (estantería)');
+                } else if (!estanteriaInput) {
+                    camposOmitidos.push('852$c (estantería) - campo no existe');
+                }
+            }
+
+            // 856 - Acceso electrónico
+            if (campos['856']) {
+                const c856 = campos['856'];
+
+                // Buscar por clase CSS o patrón de nombre
+                const urlInput = document.querySelector('.url-input') ||
+                                 document.querySelector('input[name^="url_disponible_856"]');
+
+                if (urlInput && c856.url_disponible_856) {
+                    urlInput.value = c856.url_disponible_856;
+                    urlInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('856$u (URL)');
+                } else if (!urlInput) {
+                    camposOmitidos.push('856$u (URL) - campo no existe');
+                }
+
+                // Texto del enlace si existe
+                const textoInput = document.querySelector('input[name^="texto_disponible_856"]') ||
+                                   document.querySelector('.texto-enlace-input');
+                if (textoInput && c856.texto_disponible_856) {
+                    textoInput.value = c856.texto_disponible_856;
+                    textoInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    camposPoblados.push('856$y (texto enlace)');
+                }
+            }
+
+            // Log de resumen
+            console.log('✅ Campos poblados:', camposPoblados);
+            if (camposOmitidos.length > 0) {
+                console.log('⚠️ Campos omitidos:', camposOmitidos);
+            }
+
+            return { poblados: camposPoblados, omitidos: camposOmitidos };
+        }
+
+        // ===== CARGAR OBRAS 774 =====
+        async function load774Entries(obraId, obraData) {
+            try {
+                const response = await fetch(`/catalogacion/api/obras/774-entries/?obra_id=${obraId}`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    // No es colección o error
+                    return { isCollection: false, error: data.error };
+                }
+
+                if (!data.obras_774 || data.obras_774.length === 0) {
+                    return { isCollection: true, hasEntries: false };
+                }
+
+                return {
+                    isCollection: true,
+                    hasEntries: true,
+                    coleccion: data.coleccion,
+                    obras: data.obras_774
+                };
+            } catch (error) {
+                console.error('Error cargando obras 774:', error);
+                return { isCollection: false, error: 'Error de conexión' };
+            }
+        }
+
+        // ===== ABRIR MODAL =====
         document.addEventListener("click", function (e) {
             const btn = e.target.closest(".btn-buscar-obra");
             if (!btn) return;
@@ -686,19 +1213,14 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
 
             targetTextInput = group.querySelector(".numero-w-input");
             targetHiddenInput = group.querySelector(".obra-relacionada-id-input");
+            targetContainer = btn.closest('.formset-row') || btn.closest('.card') || group;
 
-            const modal = new bootstrap.Modal(
-                document.getElementById("modalBuscarObra")
-            );
-            modal.show();
+            showPhase1();
+            new bootstrap.Modal(modalEl).show();
         });
 
-        // Buscar obras
-        const inputBuscar = document.getElementById("buscarObraInput");
-        const resultados = document.getElementById("buscarObraResultados");
-
-        if (!inputBuscar || !resultados) return;
-
+        // ===== BÚSQUEDA DE OBRAS =====
+        let searchTimer = null;
         inputBuscar.addEventListener("input", function () {
             const q = this.value.trim();
 
@@ -707,52 +1229,122 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
                 return;
             }
 
-            fetch(`/catalogacion/api/buscar-obras/?q=${encodeURIComponent(q)}`)
-                .then(r => r.json())
-                .then(data => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/catalogacion/api/obras/buscar/?q=${encodeURIComponent(q)}`);
+                    const data = await response.json();
+
                     resultados.innerHTML = "";
 
                     if (!data.results.length) {
                         resultados.innerHTML = `
-                        <li class="list-group-item text-muted">
-                            Sin resultados
-                        </li>`;
+                            <li class="list-group-item text-muted">
+                                Sin resultados
+                            </li>`;
                         return;
                     }
 
                     data.results.forEach(o => {
                         const li = document.createElement("li");
                         li.className = "list-group-item list-group-item-action";
+
+                        // Mostrar badge si es colección
+                        const isColeccion = o.nivel_bibliografico === 'c';
+                        const badge = isColeccion
+                            ? '<span class="badge bg-info ms-2">Colección</span>'
+                            : '';
+
                         li.innerHTML = `
-                        <div>
-                            <strong>${o.num_control}</strong>
-                            ${o.titulo ? `— ${o.titulo}` : ""}
-                        </div>
-                        ${o.compositor ? `
-                            <small class="text-muted">
-                                ${o.compositor}
-                            </small>
-                        ` : ""}
-                    `;
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>${o.num_control}</strong>${badge}
+                                    ${o.titulo ? `<br><span class="text-dark">${o.titulo}</span>` : ''}
+                                    ${o.compositor ? `<br><small class="text-muted">${o.compositor}</small>` : ''}
+                                    ${o.signatura ? `<br><small class="text-muted"><i class="bi bi-geo-alt"></i> ${o.signatura}</small>` : ''}
+                                </div>
+                                <i class="bi bi-chevron-right text-muted"></i>
+                            </div>
+                        `;
 
+                        li.addEventListener("click", async () => {
+                            // Verificar si es colección y tiene obras 774
+                            if (isColeccion) {
+                                const result = await load774Entries(o.id, o);
 
-                        li.addEventListener("click", () => {
-                            if (targetTextInput) {
-                                targetTextInput.value = o.num_control;
+                                if (result.isCollection && result.hasEntries) {
+                                    // Mostrar fase 2 con selector de obras
+                                    showPhase2(result.coleccion, result.obras);
+                                } else if (result.isCollection && !result.hasEntries) {
+                                    // Colección sin obras registradas
+                                    if (typeof Swal !== 'undefined') {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Colección sin obras',
+                                            text: 'Esta colección no tiene obras registradas en el campo 774. Agregue las obras primero.',
+                                            confirmButtonText: 'Entendido'
+                                        });
+                                    } else {
+                                        alert('Esta colección no tiene obras registradas en el campo 774.');
+                                    }
+                                } else {
+                                    // No es colección o error - comportamiento normal
+                                    selectObraNormal(o);
+                                }
+                            } else {
+                                // No es colección - comportamiento normal
+                                selectObraNormal(o);
                             }
-                            if (targetHiddenInput) {
-                                targetHiddenInput.value = o.id;
-                            }
-
-                            bootstrap.Modal
-                                .getInstance(document.getElementById("modalBuscarObra"))
-                                .hide();
                         });
 
                         resultados.appendChild(li);
                     });
-                });
+                } catch (error) {
+                    console.error('Error en búsqueda:', error);
+                }
+            }, 300);
         });
+
+        // ===== SELECCIÓN NORMAL (NO COLECCIÓN) =====
+        function selectObraNormal(o) {
+            if (targetTextInput) {
+                targetTextInput.value = o.num_control;
+            }
+            if (targetHiddenInput) {
+                targetHiddenInput.value = o.id;
+            }
+
+            // Rellenar $a y $t si hay contenedor
+            if (targetContainer) {
+                const personaWrapper = targetContainer.querySelector('.autocomplete-wrapper[data-autocomplete="persona"]');
+                if (personaWrapper) {
+                    const inp = personaWrapper.querySelector('input');
+                    if (inp) inp.value = o.compositor || '';
+                }
+
+                const tituloWrapper = targetContainer.querySelector('.autocomplete-wrapper[data-autocomplete="titulo"]');
+                if (tituloWrapper) {
+                    const inp = tituloWrapper.querySelector('input');
+                    if (inp) inp.value = o.titulo || '';
+                }
+
+                const hiddenPersona = targetContainer.querySelector('input[name$="encabezamiento_principal"]');
+                if (hiddenPersona) hiddenPersona.value = o.compositor_id || '';
+
+                const hiddenTitulo = targetContainer.querySelector('input[name$="titulo"]');
+                if (hiddenTitulo) hiddenTitulo.value = o.titulo_id || '';
+            }
+
+            bootstrap.Modal.getInstance(modalEl).hide();
+        }
+
+        // ===== BOTÓN VOLVER =====
+        if (btnVolver) {
+            btnVolver.addEventListener("click", showPhase1);
+        }
+
+        // ===== RESET AL CERRAR MODAL =====
+        modalEl.addEventListener("hidden.bs.modal", showPhase1);
 
     })();
 </script>

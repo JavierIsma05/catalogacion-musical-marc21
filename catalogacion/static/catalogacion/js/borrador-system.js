@@ -608,6 +608,7 @@
       const result = await response.json();
 
       if (result.success) {
+        const esPrimerGuardado = !state.borradorId;
         state.borradorId = result.borrador_id;
         state.hasUnsavedChanges = false;
         mostrarNotificacion(
@@ -616,6 +617,12 @@
           esAutoguardado ? 2000 : 3000
         );
         actualizarIndicadorGuardado();
+
+        // Agregar estado al historial para detectar botón atrás (solo la primera vez)
+        if (esPrimerGuardado) {
+          window.history.pushState({ borrador: true }, "", window.location.href);
+        }
+
         return { success: true, borradorId: state.borradorId };
       } else {
         console.error("Error guardando:", result.error);
@@ -803,8 +810,152 @@
     }, CONFIG.AUTOSAVE_INTERVAL);
   }
 
-  // El beforeunload ahora se maneja desde el template para tener más control
-  // sobre cuándo mostrar el diálogo del navegador
+  // ========================================
+  // ALERTAS DE SALIDA
+  // ========================================
+
+  /**
+   * Muestra un diálogo informativo cuando el usuario intenta salir
+   */
+  async function mostrarDialogoSalida(accion, onContinue) {
+    // Usar SweetAlert2 si está disponible
+    if (typeof Swal !== "undefined") {
+      const result = await Swal.fire({
+        icon: "info",
+        title: "Borrador guardado",
+        html: `
+          <div class="text-start">
+            <p>Tu avance está guardado como <strong>borrador</strong>.</p>
+            <ul>
+              <li>Para continuar luego, ve a <strong>Borradores</strong> desde el menú.</li>
+              <li>Si ${accion}, podrás recuperar este borrador más tarde.</li>
+            </ul>
+          </div>
+        `,
+        showCancelButton: true,
+        showDenyButton: true,
+        confirmButtonText:
+          '<i class="bi bi-file-earmark-text"></i> Ir a Borradores',
+        denyButtonText: '<i class="bi bi-box-arrow-right"></i> Salir',
+        cancelButtonText: "Cancelar",
+        focusCancel: true,
+        customClass: {
+          confirmButton: "btn btn-primary",
+          denyButton: "btn btn-secondary",
+          cancelButton: "btn btn-outline-secondary",
+        },
+      });
+
+      if (result.isConfirmed) {
+        state.allowUnloadOnce = true;
+        window.location.href = "/catalogacion/borradores/";
+      } else if (result.isDenied) {
+        onContinue();
+      }
+    } else {
+      // Fallback a confirm nativo
+      if (
+        confirm(
+          "Tu avance está guardado como borrador.\n\n¿Salir de todos modos?"
+        )
+      ) {
+        onContinue();
+      }
+    }
+  }
+
+  /**
+   * Instala interceptores para alertar al usuario antes de salir
+   */
+  function instalarAlertasSalida() {
+    // 1. Evento beforeunload (navegador nativo - para cerrar pestaña/ventana)
+    window.addEventListener("beforeunload", (e) => {
+      if (state.allowUnloadOnce) {
+        state.allowUnloadOnce = false;
+        return;
+      }
+      // Solo mostrar si hay borrador activo o cambios sin guardar
+      if (state.hasUnsavedChanges || state.borradorId) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    });
+
+    // 2. Interceptar F5 / Ctrl+R
+    window.addEventListener(
+      "keydown",
+      async (e) => {
+        const isReload =
+          e.key === "F5" ||
+          ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r");
+        if (!isReload || !state.borradorId) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        await mostrarDialogoSalida("recargas la página", () => {
+          state.allowUnloadOnce = true;
+          window.location.reload();
+        });
+      },
+      true
+    );
+
+    // 3. Interceptar clicks en enlaces internos
+    document.addEventListener(
+      "click",
+      async (e) => {
+        const link = e.target.closest("a[href]");
+        if (!link || !state.borradorId) return;
+
+        const href = link.getAttribute("href");
+        if (!href || href.startsWith("#") || href.startsWith("javascript:"))
+          return;
+        if (
+          link.getAttribute("target") &&
+          link.getAttribute("target") !== "_self"
+        )
+          return;
+        if (link.hasAttribute("download")) return;
+
+        // Verificar si es navegación a otra página
+        try {
+          const dest = new URL(href, window.location.href);
+          // Si es la misma URL (solo cambia el hash), permitir
+          if (
+            dest.href.split("#")[0] === window.location.href.split("#")[0]
+          ) {
+            return;
+          }
+        } catch {
+          return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        await mostrarDialogoSalida("sales de la página", () => {
+          state.allowUnloadOnce = true;
+          window.location.href = href;
+        });
+      },
+      true
+    );
+
+    // 4. Interceptar botón atrás del navegador
+    window.addEventListener("popstate", async (e) => {
+      // Solo interceptar si hay un borrador guardado
+      if (!state.borradorId) return;
+
+      // Volver a agregar el estado actual al historial para poder interceptar de nuevo
+      window.history.pushState({ borrador: true }, "", window.location.href);
+
+      await mostrarDialogoSalida("vuelves atrás", () => {
+        state.allowUnloadOnce = true;
+        // Navegar a la página de borradores en vez de ir atrás (más predecible)
+        window.location.href = "/catalogacion/borradores/";
+      });
+    });
+  }
 
   // ========================================
   // INICIALIZACIÓN
@@ -861,6 +1012,7 @@
       }
 
       iniciarAutoguardado();
+      instalarAlertasSalida();
 
       form.addEventListener("input", onFormChange);
       form.addEventListener("change", onFormChange);

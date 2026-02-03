@@ -8,43 +8,136 @@
 
 <div class="container">
 
+    <!-- Enlace a papelera -->
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'catalogacion:papelera_obras' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-trash3"></i> Ver papelera
+        </a>
+    </div>
+
     {% if obras %}
         <div class="list-group mt-4">
             {% for obra in obras %}
-                <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        {# Contenido principal #}
+                        <div class="flex-grow-1">
+                            {# Fila 1: Título + Badges #}
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h6 class="mb-0">{{ obra.titulo_principal }}</h6>
+                                {% if obra.nivel_bibliografico == "c" %}
+                                    <span class="badge bg-primary">Colección</span>
+                                {% else %}
+                                    <span class="badge bg-info">Obra</span>
+                                {% endif %}
+                                {% if obra.publicada %}
+                                    <span class="badge bg-success" title="Visible en catálogo público">
+                                        <i class="bi bi-globe"></i> Publicada
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary" title="No visible en catálogo público">
+                                        <i class="bi bi-eye-slash"></i> Sin publicar
+                                    </span>
+                                {% endif %}
+                            </div>
 
-                    <div>
-                        <strong>{{ obra.titulo_principal }}</strong>
-                        <br>
+                            {# Fila 2: Metadatos en línea #}
+                            <div class="d-flex flex-wrap gap-3 text-muted small">
+                                <span>
+                                    <i class="bi bi-bookmark"></i>
+                                    {{ obra.signatura_publica_display|default:"Sin signatura" }}
+                                </span>
+                                {% if obra.compositor %}
+                                <span>
+                                    <i class="bi bi-person"></i>
+                                    {{ obra.compositor }}
+                                </span>
+                                {% endif %}
+                                {% if obra.num_control %}
 
-                        {% if obra.compositor %}
-                            <small>Compositor: {{ obra.compositor }}</small>
-                        {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
 
-                        {% if obra.nivel_bibliografico %}
-                            <small class="d-block">Nivel: {{ obra.nivel_bibliografico }}</small>
-                        {% endif %}
-
-                        {% if obra.estado_registro == 'n' %}
-                            <span class="badge bg-warning text-dark">Nuevo</span>
-                        {% endif %}
+                        {# Botones de acción #}
+                        <div class="d-flex gap-1 ms-3">
+                            <a href="{% url 'catalogacion:detalle_obra' obra.pk %}" class="btn btn-outline-secondary btn-sm" title="Ver detalles">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'catalogacion:editar_obra' obra.pk %}" class="btn btn-primary btn-sm" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button type="button"
+                                    class="btn btn-outline-danger btn-sm"
+                                    onclick="confirmarEliminacion({{ obra.pk }}, '{{ obra.titulo_principal|escapejs }}', '{{ obra.num_control|default:''|escapejs }}')"
+                                    title="Eliminar obra">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
                     </div>
-
-                    <div>
-                        <a href="{% url 'catalogacion:detalle_obra' obra.pk %}" class="btn btn-outline-secondary btn-sm">Ver</a>
-                        <a href="{% url 'catalogacion:editar_obra' obra.pk %}" class="btn btn-primary btn-sm">Editar</a>
-                        
-                        
-                    </div>
-
                 </div>
             {% endfor %}
         </div>
 
     {% else %}
-        <p class="mt-4">No hay obras registradas aún.</p>
+        <div class="alert alert-info mt-4">
+            <i class="bi bi-info-circle"></i>
+            No hay obras registradas aún.
+        </div>
     {% endif %}
 
 </div>
 
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de eliminar la obra?</p>
+                <div class="alert alert-warning">
+                    <strong id="obra-titulo"></strong>
+                    <br>
+                    <small class="text-muted" id="obra-num-control"></small>
+                </div>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-info-circle"></i>
+                    Esta acción realiza una eliminación lógica. El registro no se elimina físicamente.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="delete-form" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block catalogacion_js %}
+{{ block.super }}
+<script>
+function confirmarEliminacion(obraId, titulo, numControl) {
+    document.getElementById('obra-titulo').textContent = titulo || 'Sin título';
+    document.getElementById('obra-num-control').textContent = numControl || '';
+
+    // Construir URL de eliminación
+    const deleteUrl = "{% url 'catalogacion:eliminar_obra' pk=99999 %}".replace('99999', obraId);
+    document.getElementById('delete-form').action = deleteUrl;
+
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+</script>
 {% endblock %}

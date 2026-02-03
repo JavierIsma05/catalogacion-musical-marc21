@@ -12,7 +12,13 @@ from .obra_views import (
     EditarObraView,
     DetalleObraView,
     ListaObrasView,
-    # EliminarObraView,  # COMENTADO: Funcionalidad de borrado desactivada temporalmente
+    EliminarObraView,
+    PapeleraObrasView,
+    RestaurarObraView,
+    PurgarObraView,
+    PurgarTodoView,
+    PublicarObraView,
+    DespublicarObraView,
 )
 
 # Views de autoridades
@@ -42,7 +48,13 @@ __all__ = [
     'EditarObraView',
     'DetalleObraView',
     'ListaObrasView',
-    # 'EliminarObraView',  # COMENTADO: Funcionalidad de borrado desactivada temporalmente
+    'EliminarObraView',
+    'PapeleraObrasView',
+    'RestaurarObraView',
+    'PurgarObraView',
+    'PurgarTodoView',
+    'PublicarObraView',
+    'DespublicarObraView',
     
     # Autoridades - Personas
     'ListaPersonasView',

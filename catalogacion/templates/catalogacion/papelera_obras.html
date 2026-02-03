@@ -1,0 +1,151 @@
+{% extends 'catalogacion/base_catalogacion.html' %}
+{% load static %}
+
+{% block title %}Papelera - Obras eliminadas{% endblock %}
+{% block page_title %}Papelera{% endblock %}
+
+{% block catalogacion_content %}
+
+<div class="container">
+
+    <!-- Cabecera con info y acciones -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <p class="text-muted mb-0">
+                <i class="bi bi-info-circle"></i>
+                Las obras permanecen en la papelera por {{ dias_retencion }} dias antes de ser eliminadas permanentemente.
+            </p>
+            {% if obras_por_purgar > 0 %}
+            <p class="text-warning mb-0">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>{{ obras_por_purgar }}</strong> obra(s) seran purgadas pronto (mas de 25 dias en papelera).
+            </p>
+            {% endif %}
+        </div>
+        <div>
+            <a href="{% url 'catalogacion:lista_obras' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a obras
+            </a>
+            {% if obras %}
+            <form method="post" action="{% url 'catalogacion:purgar_todo' %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('¿Purgar TODAS las obras con mas de 30 dias? Esta accion es irreversible.')">
+                    <i class="bi bi-trash3"></i> Purgar antiguas (+30 dias)
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if obras %}
+        <div class="list-group">
+            {% for obra in obras %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        {# Contenido principal #}
+                        <div class="flex-grow-1">
+                            {# Fila 1: Título + Badges #}
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h6 class="mb-0 text-muted">{{ obra.titulo_principal }}</h6>
+                                {% if obra.nivel_bibliografico == "c" %}
+                                    <span class="badge bg-primary">Colección</span>
+                                {% else %}
+                                    <span class="badge bg-info">Obra</span>
+                                {% endif %}
+                            </div>
+
+                            {# Fila 2: Metadatos en línea #}
+                            <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
+                                <span>
+                                    <i class="bi bi-bookmark"></i>
+                                    {{ obra.signatura_publica_display|default:"Sin signatura" }}
+                                </span>
+                                {% if obra.compositor %}
+                                <span>
+                                    <i class="bi bi-person"></i>
+                                    {{ obra.compositor }}
+                                </span>
+                                {% endif %}
+                                {% if obra.num_control %}
+                                <span>
+                                    <i class="bi bi-hash"></i>
+                                    {{ obra.num_control }}
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            {# Fila 3: Info de eliminación #}
+                            {% if obra.fecha_eliminacion %}
+                            <div class="d-flex flex-wrap gap-3 small">
+                                <span class="text-muted">
+                                    <i class="bi bi-calendar-x"></i>
+                                    Eliminada: {{ obra.fecha_eliminacion|date:"d/m/Y H:i" }}
+                                    {% if obra.eliminado_por %}por {{ obra.eliminado_por }}{% endif %}
+                                </span>
+                                {% with dias=obra.dias_desde_eliminacion %}
+                                <span class="{% if dias > 25 %}text-danger fw-bold{% else %}text-muted{% endif %}">
+                                    <i class="bi bi-clock"></i>
+                                    {{ dias }} día(s) en papelera
+                                    {% if dias > 25 %}- Se purgará pronto{% endif %}
+                                </span>
+                                {% endwith %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        {# Botones de acción #}
+                        <div class="d-flex gap-1 ms-3">
+                            <form method="post" action="{% url 'catalogacion:restaurar_obra' obra.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm" title="Restaurar obra">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'catalogacion:purgar_obra' obra.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('¿Eliminar PERMANENTEMENTE esta obra? Esta acción NO se puede deshacer.')"
+                                        title="Eliminar permanentemente">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Paginacion -->
+        {% if page_obj.has_other_pages %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item disabled">
+                    <span class="page-link">Pagina {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-trash"></i>
+            La papelera esta vacia. No hay obras eliminadas.
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
