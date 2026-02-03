@@ -87,28 +87,27 @@ FORMSET 773 – Documento Fuente (R)
                         </label>
 
                         <div class="input-group">
-                            <!-- Visible (solo muestra el 001) -->
+                            <!-- Visible (muestra el num_control de la obra relacionada) -->
                             <input type="text"
                                 class="form-control numero-w-input"
                                 placeholder="Seleccione una obra"
+                                value="{% if form.instance.pk %}{% for nc in form.instance.numeros_control.all %}{% if nc.obra_relacionada %}{{ nc.obra_relacionada.num_control }}{% endif %}{% endfor %}{% endif %}"
                                 readonly>
 
                             <!-- Botón lupa -->
                             <button type="button"
                                     class="btn btn-outline-secondary btn-buscar-obra"
-                                    data-enlace-id="{{ enlace.pk }}"
+                                    data-enlace-id="{{ form.instance.pk|default:'__prefix__' }}"
                                     data-campo="773"
                                     title="Buscar obra">
                                 <i class="bi bi-search"></i>
                             </button>
 
-                            <!-- 🔥 ESTE ES EL IMPORTANTE -->
+                            <!-- Hidden con ID de obra relacionada -->
                             <input type="hidden"
                                 class="obra-relacionada-id-input"
-                                name="w_773_{{ enlace.pk }}">
-
-                            <!-- Botón Auto eliminado: autocompletado ahora ocurre automáticamente
-                                 al seleccionar una obra del 774 desde el modal de búsqueda -->
+                                name="w_773_{{ form.instance.pk|default:'__prefix__' }}"
+                                value="{% if form.instance.pk %}{% for nc in form.instance.numeros_control.all %}{% if nc.obra_relacionada %}{{ nc.obra_relacionada.id }}{% endif %}{% endfor %}{% endif %}">
                         </div>
                     </div>
 
@@ -373,10 +372,9 @@ FORMSET 773 – Documento Fuente (R)
                 if (valorActual && valorActual !== ultimoValor && valorActual !== '') {
                     console.log('🔄 ¡CAMBIO DETECTADO! Valor anterior:', ultimoValor, 'Nuevo valor:', valorActual);
 
-                    // Actualizar input visible
-                    if (visibleInput) {
-                        visibleInput.value = valorActual;
-                    }
+                    // NO actualizar visibleInput aquí - ya lo hace selectObra774/selectObraNormal
+                    // con el num_control correcto. Si lo hacemos aquí, sobrescribiríamos
+                    // el num_control con el ID (que es lo que tiene el hidden input).
 
                     // Autocompletado ahora ocurre automáticamente desde el modal
                     // al seleccionar una obra del 774. Marcar como realizado.

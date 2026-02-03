@@ -93,9 +93,17 @@
 
                     <div class="formset-forms">
                         {% for form in datos_biograficos %}
-                        <div class="formset-row mb-3 border rounded p-3">
+                        <div class="formset-row mb-3 border rounded p-3 {% if form.instance.pk %}existing-form{% endif %}">
 
-                            {% if formset.can_delete %}
+                            {# IMPORTANTE: Campos ocultos para identificar registros existentes #}
+                            {# Renderizar explícitamente id y obra para OneToOneField #}
+                            {{ form.id }}
+                            {{ form.obra }}
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+
+                            {% if datos_biograficos.can_delete %}
                             <div class="text-end">
                                 {{ form.DELETE }} <label>Eliminar</label>
                             </div>

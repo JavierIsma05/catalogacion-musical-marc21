@@ -45,7 +45,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                             name="{{ form.prefix }}-materia_texto"
                             placeholder="Escriba materia…"
                             autocomplete="off"
-                            value="{% if form.instance.pk and form.materia.value %}{{ form.instance.materia.termino }}{% else %}Música para piano{% endif %}"
+                            value="{% if form.instance.pk and form.materia.value %}{{ form.instance.materia.termino }}{% endif %}"
                         >
                         <input
                             type="hidden"
@@ -239,7 +239,6 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                             name="{{ formset.prefix }}-__prefix__-materia_texto"
                             placeholder="Escriba materia…"
                             autocomplete="off"
-                            value="Música para piano"
                         >
                         <input
                             type="hidden"

@@ -35,11 +35,11 @@ class Materia650Form(forms.ModelForm):
         # Hacer materia no requerido para permitir filas vacías en el formset
         self.fields["materia"].required = False
 
+        # Cargar valor existente si hay instancia guardada
         if self.instance.pk and self.instance.materia:
             self.fields["materia_texto"].initial = self.instance.materia.termino
-        elif not self.instance.pk:
-            # Valor por defecto para nuevos registros
-            self.fields["materia_texto"].initial = "Música para piano"
+        # NO establecer valor por defecto para nuevos registros
+        # Esto evita que Django marque formularios vacíos como "changed"
 
     def clean(self):
         cleaned = super().clean()
