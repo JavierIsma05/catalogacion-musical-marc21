@@ -18,9 +18,9 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 0rem; /* Eliminado completamente para máxima compactación */
+  margin-top: 0rem;
   background: #fff;
-  padding: 0.125rem; /* Reducido a 0.125rem para mínimo espacio */
+  padding: 0.125rem;
   border-radius: 4px;
   border: 1px solid #e0e0e0;
 }
@@ -28,7 +28,7 @@
 .incipit-view-canvas {
   width: 100%;
   max-width: 500px;
-  height: 150px;      /* balance entre compacto y legible */
+  height: 150px;
   display: block;
   background: transparent;
   pointer-events: none;
@@ -39,7 +39,7 @@
   background: #f8f9fa;
   border: 1px solid #dee2e6;
   border-radius: 6px;
-  padding: 0.375rem; /* Reducido a 0.375rem para máxima compactación */
+  padding: 0.375rem;
 }
 
 .obra-incipit-card .obra-card-label {
@@ -87,14 +87,12 @@
                 <small>Signatura</small>
                 <span>{{ obra.signatura_publica_display }}</span>
             </div>
+            {% if obra.coleccion_publica_display %}
             <div class="detalle-meta-tag">
                 <small>Colección</small>
-                {% if obra.coleccion_publica_display %}
-                    <span>{{ obra.coleccion_publica_display }}</span>
-                {% else %}
-                    <span class="text-muted">Sin colección asociada</span>
-                {% endif %}
+                <span>{{ obra.coleccion_publica_display }}</span>
             </div>
+            {% endif %}
         </div>
     </div>
 
@@ -102,18 +100,16 @@
         <div class="col-lg-9">
             <div class="resumen-unified-card">
                 <!-- Lista simple de campos sin secciones -->
-                
+
                 <!-- Compositor -->
+                {% if obra.compositor %}
                 <div class="resumen-field">
                     <span class="resumen-field-label">Compositor</span>
                     <span class="resumen-field-value">
-                        {% if obra.compositor %}
-                            {{ obra.compositor.apellidos_nombres }}{% if obra.compositor.coordenadas_biograficas %} ({{ obra.compositor.coordenadas_biograficas }}){% endif %}{% if obra.autoria %} <em class="text-muted">[{{ obra.get_autoria_display|lower }}]</em>{% endif %}
-                        {% else %}
-                            <span class="text-muted">Sin compositor registrado</span>
-                        {% endif %}
+                        {{ obra.compositor.apellidos_nombres }}{% if obra.compositor.coordenadas_biograficas %} ({{ obra.compositor.coordenadas_biograficas }}){% endif %}{% if obra.autoria %} <em class="text-muted">[{{ obra.get_autoria_display|lower }}]</em>{% endif %}
                     </span>
                 </div>
+                {% endif %}
 
                 <!-- Títulos -->
                 {% if obra.titulo_uniforme %}
@@ -133,16 +129,14 @@
                         </span>
                     </div>
                     {% endif %}
+                    {% if obra.titulo_principal %}
                     <div class="resumen-field">
                         <span class="resumen-field-label">Título en fuente</span>
                         <span class="resumen-field-value">
-                            {% if obra.titulo_principal %}
-                                {{ obra.titulo_principal }}{% if obra.subtitulo %} : {{ obra.subtitulo }}{% endif %}{% if obra.mencion_responsabilidad %} / {{ obra.mencion_responsabilidad }}{% endif %}
-                            {% else %}
-                                <span class="text-muted">Sin título registrado</span>
-                            {% endif %}
+                            {{ obra.titulo_principal }}{% if obra.subtitulo %} : {{ obra.subtitulo }}{% endif %}{% if obra.mencion_responsabilidad %} / {{ obra.mencion_responsabilidad }}{% endif %}
                         </span>
                     </div>
+                    {% endif %}
                 {% endif %}
 
                 <!-- Producción -->
@@ -151,83 +145,77 @@
                     <span class="resumen-field-value">{{ obra.tecnica_340_publica_display }}</span>
                 </div>
 
+                {% if obra.publicacion_publica_display != "Sin datos de publicación" %}
                 <div class="resumen-field">
                     <span class="resumen-field-label">Producción de la obra</span>
                     <span class="resumen-field-value">{{ obra.publicacion_publica_display }}</span>
                 </div>
+                {% endif %}
 
+                {% if obra.descripcion_fisica_publica_display != "Sin descripción física" %}
                 <div class="resumen-field">
                     <span class="resumen-field-label">Descripción física</span>
                     <span class="resumen-field-value">{{ obra.descripcion_fisica_publica_display }}</span>
                 </div>
+                {% endif %}
 
                 <!-- Datos musicales -->
+                {% if obra.temas_publico_display != "Sin materias registradas" %}
                 <div class="resumen-field">
                     <span class="resumen-field-label">Materia (Género/Forma)</span>
                     <span class="resumen-field-value">{{ obra.temas_publico_display }}</span>
                 </div>
+                {% endif %}
 
+                {% with medios=obra.medios_interpretacion_resumen %}
+                {% if medios.0 != "Sin medios registrados" %}
                 <div class="resumen-field">
                     <span class="resumen-field-label">Medio de interpretación</span>
                     <span class="resumen-field-value">
-                        {% with medios=obra.medios_interpretacion_resumen %}
-                            {% if medios.0 != "Sin medios registrados" %}
-                                {{ medios.0 }}{% if medios.1 %} <span class="text-muted">| Solista: {{ medios.1 }}</span>{% endif %}
-                            {% else %}
-                                <span class="text-muted">Sin medio de interpretación registrado</span>
-                            {% endif %}
-                        {% endwith %}
+                        {{ medios.0 }}{% if medios.1 %} <span class="text-muted">| Solista: {{ medios.1 }}</span>{% endif %}
                     </span>
                 </div>
+                {% endif %}
+                {% endwith %}
 
+                {% if obra.tonalidad_publica_display %}
                 <div class="resumen-field">
                     <span class="resumen-field-label">Tonalidad</span>
-                    <span class="resumen-field-value">
-                        {% if obra.tonalidad_publica_display %}
-                            {{ obra.tonalidad_publica_display }}
-                        {% else %}
-                            <span class="text-muted">Sin tonalidad registrada</span>
-                        {% endif %}
-                    </span>
+                    <span class="resumen-field-value">{{ obra.tonalidad_publica_display }}</span>
                 </div>
+                {% endif %}
 
                 <!-- Íncipit musical -->
+                {% with primer_incipit=obra.incipits_musicales.first %}
+                {% if primer_incipit and primer_incipit.paec_full %}
                 <div class="resumen-field resumen-field-incipit">
                     <span class="resumen-field-label">Íncipit musical</span>
                     <div class="resumen-field-value">
-                        {% with primer_incipit=obra.incipits_musicales.first %}
-                            {% if primer_incipit and primer_incipit.paec_full %}
-                                <div class="incipit-info text-muted" style="font-size: 0.9em; margin-bottom: 0.5rem;">
-                                    {{ primer_incipit.numero_obra }}.{{ primer_incipit.numero_movimiento }}.{{ primer_incipit.numero_pasaje }}{% if primer_incipit.titulo_encabezamiento %}; {{ primer_incipit.titulo_encabezamiento }}{% endif %}{% if primer_incipit.voz_instrumento %}; {{ primer_incipit.voz_instrumento }}{% endif %}{% if primer_incipit.clave or primer_incipit.armadura or primer_incipit.tiempo %}; {% if primer_incipit.clave %}{{ primer_incipit.clave }}{% endif %}{% if primer_incipit.armadura %} {{ primer_incipit.armadura }}{% endif %}{% if primer_incipit.tiempo %} {{ primer_incipit.tiempo }}{% endif %}{% endif %}
-                                </div>
-                                <div class="incipit-canvas-container">
-                                    <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
-                                    <canvas
-                                        id="incipit_view_canvas_{{ primer_incipit.pk }}"
-                                        class="incipit-view-canvas"
-                                        width="500"
-                                        height="180"
-                                        data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
-                                    </canvas>
-                                </div>
-                            {% else %}
-                                <span class="text-muted">Sin íncipit musical registrado</span>
-                            {% endif %}
-                        {% endwith %}
+                        <div class="incipit-info text-muted" style="font-size: 0.9em; margin-bottom: 0.5rem;">
+                            {{ primer_incipit.numero_obra }}.{{ primer_incipit.numero_movimiento }}.{{ primer_incipit.numero_pasaje }}{% if primer_incipit.titulo_encabezamiento %}; {{ primer_incipit.titulo_encabezamiento }}{% endif %}{% if primer_incipit.voz_instrumento %}; {{ primer_incipit.voz_instrumento }}{% endif %}{% if primer_incipit.clave or primer_incipit.armadura or primer_incipit.tiempo %}; {% if primer_incipit.clave %}{{ primer_incipit.clave }}{% endif %}{% if primer_incipit.armadura %} {{ primer_incipit.armadura }}{% endif %}{% if primer_incipit.tiempo %} {{ primer_incipit.tiempo }}{% endif %}{% endif %}
+                        </div>
+                        <div class="incipit-canvas-container">
+                            <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
+                            <canvas
+                                id="incipit_view_canvas_{{ primer_incipit.pk }}"
+                                class="incipit-view-canvas"
+                                width="500"
+                                height="180"
+                                data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
+                            </canvas>
+                        </div>
                     </div>
                 </div>
+                {% endif %}
+                {% endwith %}
 
                 <!-- Nota general -->
+                {% if obra.nota_general_resumen %}
                 <div class="resumen-field">
                     <span class="resumen-field-label">Nota general</span>
-                    <span class="resumen-field-value">
-                        {% if obra.nota_general_resumen %}
-                            {{ obra.nota_general_resumen }}
-                        {% else %}
-                            <span class="text-muted">Sin notas generales registradas</span>
-                        {% endif %}
-                    </span>
+                    <span class="resumen-field-value">{{ obra.nota_general_resumen }}</span>
                 </div>
+                {% endif %}
             </div>
         </div>
 
