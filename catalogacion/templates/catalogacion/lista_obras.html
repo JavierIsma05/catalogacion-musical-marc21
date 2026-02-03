@@ -30,8 +30,14 @@
                                 {% else %}
                                     <span class="badge bg-info">Obra</span>
                                 {% endif %}
-                                {% if obra.estado == 'borrador' %}
-                                    <span class="badge bg-warning text-dark">Borrador</span>
+                                {% if obra.publicada %}
+                                    <span class="badge bg-success" title="Visible en catálogo público">
+                                        <i class="bi bi-globe"></i> Publicada
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary" title="No visible en catálogo público">
+                                        <i class="bi bi-eye-slash"></i> Sin publicar
+                                    </span>
                                 {% endif %}
                             </div>
 

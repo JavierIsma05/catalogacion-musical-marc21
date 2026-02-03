@@ -420,7 +420,13 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
                         enlace_787=enlace, obra_relacionada_id=obra_id
                     )
 
-        messages.success(self.request, "Obra registrada exitosamente.")
+        # Verificar si se solicitó publicar
+        publicar = self.request.POST.get("accion") == "publicar"
+        if publicar:
+            self.object.publicar(usuario=self.request.user)
+            messages.success(self.request, "Obra registrada y publicada exitosamente.")
+        else:
+            messages.success(self.request, "Obra registrada exitosamente.")
         return redirect(self.get_success_url())
 
 
@@ -584,10 +590,22 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
         # Guardar todos los formsets y sus subcampos
         self._guardar_formsets(formsets, self.object)
 
-        # Mensaje de éxito
-        messages.success(
-            self.request, f"{self.config_obra['titulo']} actualizada exitosamente."
-        )
+        # Verificar si se solicitó publicar/despublicar
+        accion = self.request.POST.get("accion")
+        if accion == "publicar" and not self.object.publicada:
+            self.object.publicar(usuario=self.request.user)
+            messages.success(
+                self.request, f"{self.config_obra['titulo']} actualizada y publicada exitosamente."
+            )
+        elif accion == "despublicar" and self.object.publicada:
+            self.object.despublicar(usuario=self.request.user)
+            messages.success(
+                self.request, f"{self.config_obra['titulo']} actualizada y retirada del catálogo público."
+            )
+        else:
+            messages.success(
+                self.request, f"{self.config_obra['titulo']} actualizada exitosamente."
+            )
 
         return redirect(self.get_success_url())
 
@@ -817,6 +835,36 @@ class PurgarObraView(CatalogadorRequiredMixin, DetailView):
             f'Obra "{titulo}" eliminada permanentemente de la base de datos.',
         )
         return redirect("catalogacion:papelera_obras")
+
+
+class PublicarObraView(CatalogadorRequiredMixin, DetailView):
+    """Vista para publicar una obra en el catálogo público"""
+
+    model = ObraGeneral
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.publicar(usuario=request.user)
+        messages.success(
+            request,
+            f'Obra "{self.object.titulo_principal}" publicada exitosamente en el catálogo público.',
+        )
+        return redirect("catalogacion:detalle_obra", pk=self.object.pk)
+
+
+class DespublicarObraView(CatalogadorRequiredMixin, DetailView):
+    """Vista para retirar una obra del catálogo público"""
+
+    model = ObraGeneral
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.despublicar(usuario=request.user)
+        messages.success(
+            request,
+            f'Obra "{self.object.titulo_principal}" retirada del catálogo público.',
+        )
+        return redirect("catalogacion:detalle_obra", pk=self.object.pk)
 
 
 class PurgarTodoView(CatalogadorRequiredMixin, TemplateView):

@@ -63,16 +63,51 @@
                     <span id="autosave-status">Guardado automático activo</span>
                 </div>
 
+                <!-- Estado de publicación (solo en edición) -->
+                {% if object and object.pk %}
+                <div class="publication-status mb-3 text-center">
+                    {% if object.publicada %}
+                        <span class="badge bg-success">
+                            <i class="bi bi-globe"></i> Publicada
+                        </span>
+                    {% else %}
+                        <span class="badge bg-secondary">
+                            <i class="bi bi-eye-slash"></i> Sin publicar
+                        </span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
                 <!-- Botones de acción -->
                 <div class="sidebar-actions">
-                    <!-- <button type="button" class="sidebar-btn sidebar-btn-preview" id="btn-vista-previa">
-                        <i class="bi bi-eye"></i>
-                        <span>Vista Previa</span>
-                    </button> -->
-                    <button type="button" class="sidebar-btn sidebar-btn-publish" id="btn-publicar-obra">
-                        <i class="bi bi-check-circle-fill"></i>
-                        <span>Publicar Obra</span>
-                    </button>
+                    {% if object and object.pk %}
+                        {# Modo edición #}
+                        <button type="button" class="sidebar-btn sidebar-btn-secondary" id="btn-registrar-obra">
+                            <i class="bi bi-floppy"></i>
+                            <span>Guardar cambios</span>
+                        </button>
+                        {% if object.publicada %}
+                            <button type="button" class="sidebar-btn sidebar-btn-warning" id="btn-despublicar-obra">
+                                <i class="bi bi-eye-slash"></i>
+                                <span>Despublicar</span>
+                            </button>
+                        {% else %}
+                            <button type="button" class="sidebar-btn sidebar-btn-publish" id="btn-publicar-obra">
+                                <i class="bi bi-globe"></i>
+                                <span>Publicar Obra</span>
+                            </button>
+                        {% endif %}
+                    {% else %}
+                        {# Modo creación #}
+                        <button type="button" class="sidebar-btn sidebar-btn-secondary" id="btn-registrar-obra">
+                            <i class="bi bi-floppy"></i>
+                            <span>Registrar Obra</span>
+                        </button>
+                        <button type="button" class="sidebar-btn sidebar-btn-publish" id="btn-publicar-obra">
+                            <i class="bi bi-globe"></i>
+                            <span>Publicar Obra</span>
+                        </button>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -88,6 +123,7 @@
                 id="id_tipo_registro">
             <input type="hidden" name="nivel_bibliografico" value="{{ form.nivel_bibliografico.value|default:'' }}"
                 id="id_nivel_bibliografico">
+            <input type="hidden" name="accion" id="id_accion" value="registrar">
 
             <!-- Header del formulario -->
             <div class="card mb-3">
@@ -235,13 +271,59 @@
                         <button type="button" class="btn btn-outline-secondary" onclick="prevTab()">
                             <i class="bi bi-arrow-left"></i> Anterior
                         </button>
-                        <button type="button" class="btn btn-primary" onclick="confirmarPublicacion()">
-                            <i class="bi bi-check-circle-fill"></i> Registrar Obra
-                        </button>
+                        {% if object and object.pk %}
+                            {# Modo edición #}
+                            <button type="button" class="btn btn-secondary me-2" onclick="confirmarRegistro()">
+                                <i class="bi bi-floppy"></i> Guardar cambios
+                            </button>
+                            {% if object.publicada %}
+                                <button type="button" class="btn btn-warning" onclick="confirmarDespublicacion()">
+                                    <i class="bi bi-eye-slash"></i> Despublicar
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-success" onclick="confirmarPublicacion()">
+                                    <i class="bi bi-globe"></i> Publicar Obra
+                                </button>
+                            {% endif %}
+                        {% else %}
+                            {# Modo creación #}
+                            <button type="button" class="btn btn-secondary me-2" onclick="confirmarRegistro()">
+                                <i class="bi bi-floppy"></i> Registrar Obra
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="confirmarPublicacion()">
+                                <i class="bi bi-globe"></i> Publicar Obra
+                            </button>
+                        {% endif %}
                     </div>
                 </div>
             </div> <!-- /tabs-content -->
         </form>
+    </div>
+</div>
+
+<!-- ================= MODAL CONFIRMAR REGISTRO ================= -->
+<div class="modal fade" id="modalConfirmarRegistro" tabindex="-1" aria-labelledby="modalConfirmarRegistroLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmarRegistroLabel">
+                    <i class="bi bi-floppy text-secondary"></i> Confirmar registro
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">¿Estás seguro de que deseas <strong>registrar</strong> esta obra?</p>
+                <p class="text-muted small mb-0">La obra quedará guardada pero <strong>no será visible</strong> en el catálogo público hasta que la publiques.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-secondary" id="btnConfirmarSoloRegistro">
+                    <i class="bi bi-floppy"></i> Sí, registrar
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -251,20 +333,46 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalConfirmarPublicacionLabel">
-                    <i class="bi bi-check-circle text-success"></i> Confirmar registro
+                    <i class="bi bi-globe text-success"></i> Confirmar publicación
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-2">¿Estás seguro de que deseas registrar esta obra en el catálogo?</p>
-                <p class="text-muted small mb-0">Una vez registrada, podrás editarla desde la sección "Editar Obras".</p>
+                <p class="mb-2">¿Estás seguro de que deseas <strong>publicar</strong> esta obra?</p>
+                <p class="text-muted small mb-0">La obra será visible inmediatamente en el <strong>catálogo público</strong>.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     Cancelar
                 </button>
                 <button type="button" class="btn btn-success" id="btnConfirmarRegistro">
-                    <i class="bi bi-check-circle-fill"></i> Sí, registrar
+                    <i class="bi bi-globe"></i> Sí, publicar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= MODAL CONFIRMAR DESPUBLICACIÓN ================= -->
+<div class="modal fade" id="modalConfirmarDespublicacion" tabindex="-1" aria-labelledby="modalConfirmarDespublicacionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmarDespublicacionLabel">
+                    <i class="bi bi-eye-slash text-warning"></i> Confirmar despublicación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">¿Estás seguro de que deseas <strong>retirar</strong> esta obra del catálogo público?</p>
+                <p class="text-muted small mb-0">La obra dejará de ser visible para el público pero se mantendrán todos los datos.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-warning" id="btnConfirmarDespublicar">
+                    <i class="bi bi-eye-slash"></i> Sí, despublicar
                 </button>
             </div>
         </div>
@@ -319,9 +427,19 @@
     // Pasar tipo de obra al JavaScript
     window.TIPO_OBRA_ACTUAL = '{{ tipo_obra }}';
 
-    // ==================== MODAL DE CONFIRMACIÓN PARA PUBLICAR ====================
+    // ==================== MODAL DE CONFIRMACIÓN PARA REGISTRAR/PUBLICAR ====================
     // Variable global para controlar si estamos publicando
     window.permitirSalida = false;
+
+    function confirmarRegistro() {
+        const modalEl = document.getElementById('modalConfirmarRegistro');
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        } else {
+            console.error('Modal de confirmación de registro no encontrado');
+        }
+    }
 
     function confirmarPublicacion() {
         const modalEl = document.getElementById('modalConfirmarPublicacion');
@@ -329,33 +447,87 @@
             const modal = new bootstrap.Modal(modalEl);
             modal.show();
         } else {
-            console.error('Modal de confirmación no encontrado');
+            console.error('Modal de confirmación de publicación no encontrado');
         }
     }
 
-    // Manejar confirmación del modal
+    function confirmarDespublicacion() {
+        const modalEl = document.getElementById('modalConfirmarDespublicacion');
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        } else {
+            console.error('Modal de confirmación de despublicación no encontrado');
+        }
+    }
+
+    function enviarFormulario(accion) {
+        // Marcar que permitimos la salida
+        window.permitirSalida = true;
+
+        // Establecer la acción
+        document.getElementById('id_accion').value = accion;
+
+        // Notificar al sistema de borradores
+        if (window.BorradorSystem && typeof window.BorradorSystem.permitirPublicacion === 'function') {
+            window.BorradorSystem.permitirPublicacion();
+        }
+
+        // Pequeño delay y luego enviar formulario
+        setTimeout(function() {
+            document.getElementById('obra-form').submit();
+        }, 100);
+    }
+
+    // Manejar confirmación de los modales
     document.addEventListener('DOMContentLoaded', function() {
-        const btnConfirmar = document.getElementById('btnConfirmarRegistro');
-        if (btnConfirmar) {
-            btnConfirmar.addEventListener('click', function() {
-                // Marcar que permitimos la salida
-                window.permitirSalida = true;
-                
-                // Notificar al sistema de borradores
-                if (window.BorradorSystem && typeof window.BorradorSystem.permitirPublicacion === 'function') {
-                    window.BorradorSystem.permitirPublicacion();
-                }
-                
-                // Cerrar modal
+        // Botón "Sí, registrar" (solo registrar sin publicar)
+        const btnSoloRegistro = document.getElementById('btnConfirmarSoloRegistro');
+        if (btnSoloRegistro) {
+            btnSoloRegistro.addEventListener('click', function() {
+                const modalEl = document.getElementById('modalConfirmarRegistro');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+                enviarFormulario('registrar');
+            });
+        }
+
+        // Botón "Sí, publicar" (registrar y publicar)
+        const btnPublicar = document.getElementById('btnConfirmarRegistro');
+        if (btnPublicar) {
+            btnPublicar.addEventListener('click', function() {
                 const modalEl = document.getElementById('modalConfirmarPublicacion');
                 const modal = bootstrap.Modal.getInstance(modalEl);
                 if (modal) modal.hide();
-                
-                // Pequeño delay y luego enviar formulario
-                setTimeout(function() {
-                    document.getElementById('obra-form').submit();
-                }, 100);
+                enviarFormulario('publicar');
             });
+        }
+
+        // Botón "Sí, despublicar"
+        const btnDespublicar = document.getElementById('btnConfirmarDespublicar');
+        if (btnDespublicar) {
+            btnDespublicar.addEventListener('click', function() {
+                const modalEl = document.getElementById('modalConfirmarDespublicacion');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+                enviarFormulario('despublicar');
+            });
+        }
+
+        // Botones del sidebar
+        const btnSidebarRegistrar = document.getElementById('btn-registrar-obra');
+        if (btnSidebarRegistrar) {
+            btnSidebarRegistrar.addEventListener('click', confirmarRegistro);
+        }
+
+        const btnSidebarPublicar = document.getElementById('btn-publicar-obra');
+        if (btnSidebarPublicar) {
+            btnSidebarPublicar.addEventListener('click', confirmarPublicacion);
+        }
+
+        const btnSidebarDespublicar = document.getElementById('btn-despublicar-obra');
+        if (btnSidebarDespublicar) {
+            btnSidebarDespublicar.addEventListener('click', confirmarDespublicacion);
         }
     });
 

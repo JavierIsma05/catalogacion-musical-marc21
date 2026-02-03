@@ -449,6 +449,18 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     fecha_creacion_sistema = models.DateTimeField(auto_now_add=True)
     fecha_modificacion_sistema = models.DateTimeField(auto_now=True)
 
+    # Estado de publicación
+    publicada = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="Indica si la obra está publicada en el catálogo público",
+    )
+    fecha_publicacion = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Fecha y hora en que se publicó la obra",
+    )
+
     # Manager personalizado
     objects = ObraGeneralManager()
 
@@ -511,6 +523,44 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
     def es_parte_de_coleccion(self):
         """Retorna True si forma parte de una colección"""
         return self.nivel_bibliografico == "a"
+
+    @property
+    def estado_publicacion_display(self):
+        """Retorna el estado de publicación para mostrar en UI"""
+        return "Publicada" if self.publicada else "Sin publicar"
+
+    @property
+    def estado_publicacion_badge_class(self):
+        """Retorna la clase CSS del badge según estado de publicación"""
+        return "bg-success" if self.publicada else "bg-secondary"
+
+    def publicar(self, usuario=None):
+        """
+        Publica la obra en el catálogo público.
+
+        Args:
+            usuario: Usuario que publica la obra (opcional)
+        """
+        from django.utils import timezone
+
+        self.publicada = True
+        self.fecha_publicacion = timezone.now()
+        if usuario:
+            self.modificado_por = usuario
+        self.save(update_fields=["publicada", "fecha_publicacion", "modificado_por", "fecha_modificacion_sistema"])
+
+    def despublicar(self, usuario=None):
+        """
+        Retira la obra del catálogo público.
+
+        Args:
+            usuario: Usuario que despublica la obra (opcional)
+        """
+        self.publicada = False
+        self.fecha_publicacion = None
+        if usuario:
+            self.modificado_por = usuario
+        self.save(update_fields=["publicada", "fecha_publicacion", "modificado_por", "fecha_modificacion_sistema"])
 
     @property
     def signatura_completa(self):

@@ -123,21 +123,21 @@
                 <span class="text-muted">Sin ubicación registrada</span>
             </div>
             {% endfor %}
- 
+
 
         </div>
     </div>
 
     <!-- Contenido en 2 columnas -->
     <div class="detalle-content">
-        
+
         <!-- ==================== NOMBRES Y TÍTULOS ==================== -->
         <section class="detalle-section">
             <h2 class="detalle-section-title">
                 <i class="bi bi-person-badge"></i> Nombres y títulos
             </h2>
             <div class="detalle-section-body">
-                
+
                 <!-- Compositor -->
                 <div class="detalle-field">
                     <span class="detalle-field-label">Compositor</span>
@@ -246,7 +246,7 @@
                 <i class="bi bi-file-earmark-text"></i> Producción/edición
             </h2>
             <div class="detalle-section-body">
-                
+
                 <!-- Manuscrito/Impreso -->
                 <div class="detalle-field">
                     <span class="detalle-field-label">Manuscrito/Impreso</span>
@@ -345,7 +345,7 @@
                 <i class="bi bi-tags"></i> Materias/serie
             </h2>
             <div class="detalle-section-body">
-                
+
                 <!-- Materia -->
                 {% for materia in obra.materias_650.all %}
                 <div class="detalle-field">
@@ -399,7 +399,7 @@
                 <i class="bi bi-music-note-beamed"></i> Datos musicales
             </h2>
             <div class="detalle-section-body">
-                
+
                 <!-- Formato de presentación musical -->
                 <div class="detalle-field">
                     <span class="detalle-field-label">Formato de presentación musical</span>
@@ -493,7 +493,7 @@
                 <i class="bi bi-journal-text"></i> Notas
             </h2>
             <div class="detalle-section-body">
-                
+
                 <!-- Nota general (solo primera incidencia) -->
                 <div class="detalle-field">
                     <span class="detalle-field-label">Nota general</span>
@@ -557,7 +557,7 @@
                 <i class="bi bi-diagram-3"></i> Relaciones
             </h2>
             <div class="detalle-section-body">
-                
+
                 <!-- Colección -->
                 {% for enlace in obra.enlaces_documento_fuente_773.all %}
                 <div class="detalle-field">

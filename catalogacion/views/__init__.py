@@ -17,6 +17,8 @@ from .obra_views import (
     RestaurarObraView,
     PurgarObraView,
     PurgarTodoView,
+    PublicarObraView,
+    DespublicarObraView,
 )
 
 # Views de autoridades
@@ -51,6 +53,8 @@ __all__ = [
     'RestaurarObraView',
     'PurgarObraView',
     'PurgarTodoView',
+    'PublicarObraView',
+    'DespublicarObraView',
     
     # Autoridades - Personas
     'ListaPersonasView',

@@ -7,11 +7,13 @@ from django.urls import include, path
 from catalogacion.views import (
     CrearObraView,
     DetalleObraView,
+    DespublicarObraView,
     EditarObraView,
     EliminarObraView,
     IndexView,
     ListaObrasView,
     PapeleraObrasView,
+    PublicarObraView,
     PurgarObraView,
     PurgarTodoView,
     RestaurarObraView,
@@ -47,6 +49,16 @@ urlpatterns = [
                     "<int:pk>/eliminar/",
                     EliminarObraView.as_view(),
                     name="eliminar_obra",
+                ),
+                path(
+                    "<int:pk>/publicar/",
+                    PublicarObraView.as_view(),
+                    name="publicar_obra",
+                ),
+                path(
+                    "<int:pk>/despublicar/",
+                    DespublicarObraView.as_view(),
+                    name="despublicar_obra",
                 ),
             ]
         ),
