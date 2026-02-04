@@ -747,11 +747,11 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
 
     @property
     def coleccion_publica_display(self):
-        """Retorna el título de la colección padre (773 $t)."""
-        colecciones = [
-            str(enlace.titulo) for enlace in self.enlaces_documento_fuente_773.all()
-        ]
-        return "; ".join(colecciones)
+        """
+        Retorna la signatura de la colección padre (773 $w).
+        Solo muestra si hay una obra relacionada configurada.
+        """
+        return self.signatura_coleccion_padre or ""
 
     @property
     def signatura_coleccion_padre(self):
