@@ -10,8 +10,8 @@ class Materia650(models.Model):
     Campo repetible (R)
     Subcampos:
       $a Materia (NR)
-      $x Subdivisión de materia (R)
-      $z Subdivisión cronológica (R)
+      $y Subdivisión cronológica (R)
+      $z Subdivisión geográfica (R)
     """
     obra = models.ForeignKey(
         'ObraGeneral',
@@ -40,7 +40,7 @@ class Materia650(models.Model):
 
 class SubdivisionMateria650(models.Model):
     """
-    650 $x — Subdivisión de materia (R)
+    650 $y — Subdivisión cronológica (R)
     """
     materia650 = models.ForeignKey(
         Materia650,
@@ -49,15 +49,14 @@ class SubdivisionMateria650(models.Model):
     )
 
     subdivision = models.CharField(
-        max_length=200,
-        help_text="650 $x — Subdivisión de materia (R)"
+        max_length=200, help_text="650 $y — Subdivisión cronológica  (R)"
     )
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "650 $x — Subdivisión de materia"
-        verbose_name_plural = "650 $x — Subdivisiones de materia (R)"
+        verbose_name = "650 $y — Subdivisión cronológica"
+        verbose_name_plural = "650 $y — Subdivisión cronológica (R)"
         ordering = ['materia650', 'id']
 
     def __str__(self):
@@ -66,24 +65,23 @@ class SubdivisionMateria650(models.Model):
 
 class SubdivisionCronologica650(models.Model):
     """
-    650 $z — Subdivisión cronológica (R)
+    650 $z — Subdivisión geográfica (R)
     """
     materia650 = models.ForeignKey(
         Materia650,
         on_delete=models.CASCADE,
-        related_name='subdivisiones_cronologicas',
+        related_name='subdivisiones_geograficas',
     )
 
     subdivision = models.CharField(
-        max_length=200,
-        help_text="650 $z — Subdivisión cronológica (R)"
+        max_length=200, help_text="650 $z — Subdivisión geográfica (R)"
     )
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "650 $z — Subdivisión cronológica"
-        verbose_name_plural = "650 $z — Subdivisiones cronológicas (R)"
+        verbose_name = "650 $z — Subdivisión geográfica"
+        verbose_name_plural = "650 $z — Subdivisiones geográficas (R)"
         ordering = ['materia650', 'id']
 
     def __str__(self):

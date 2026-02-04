@@ -1,7 +1,7 @@
 {% comment %}
 Template para campo 650 - Materia (Tema)
 Estilo unificado con 852 y 856
-Campo repetible + subcampo $x repetible
+Campo repetible + subcampos $y y $z repetibles
 Autocomplete con el mismo look (list-group / list-group-item) como en tu versión
 Botón de agregar subdivisión a la izquierda usando input-group para estabilidad
 {% endcomment %}
@@ -62,7 +62,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
 
                 <!-- 650 $x – Subdivisiones -->
                 <div class="col-full">
-                    <label class="form-label small">650 $x – Subdivisión de materia</label>
+                    <label class="form-label small">650 $y – Subdivisión cronológica</label>
                     <div class="subcampo-repetible-container subdivisiones-container"
                          data-subdivisiones-container="{{ forloop.counter0 }}"
                          data-borrador-container="subdivision_materia_650"
@@ -78,7 +78,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                             data-materia-index="{{ forloop.parentloop.counter0 }}"
                                             data-borrador-add="subdivision_materia_650"
                                             data-borrador-parent="{{ forloop.parentloop.counter0 }}"
-                                            title="Agregar subdivisión">
+                                            title="Agregar subdivisión cronológica">
                                         <i class="bi bi-plus"></i>
                                     </button>
                                     {% else %}
@@ -89,7 +89,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                            class="form-control subdivision-input"
                                            name="subdivision_materia_650_{{ forloop.parentloop.counter0 }}_{{ subdivision.pk }}"
                                            value="{{ subdivision.subdivision }}"
-                                           placeholder="Subdivisión de materia">
+                                           placeholder="Ej: Siglo XIX, 1800-1900">
 
                                     <button type="button"
                                             class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
@@ -108,14 +108,14 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                             data-materia-index="{{ forloop.counter0 }}"
                                             data-borrador-add="subdivision_materia_650"
                                             data-borrador-parent="{{ forloop.counter0 }}"
-                                            title="Agregar subdivisión">
+                                            title="Agregar subdivisión cronológica">
                                         <i class="bi bi-plus"></i>
                                     </button>
 
                                     <input type="text"
                                            class="form-control subdivision-input"
                                            name="subdivision_materia_650_{{ forloop.counter0 }}_0"
-                                           placeholder="Subdivisión de materia">
+                                           placeholder="Ej: Siglo XIX, 1800-1900">
 
                                     <button type="button"
                                             class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
@@ -130,23 +130,23 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                     </div>
                 </div>
 
-                <!-- 650 $z – Subdivisión cronológica -->
+                <!-- 650 $z – Subdivisión geográfica -->
                 <div class="col-full">
-                    <label class="form-label small">650 $z – Subdivisión cronológica</label>
+                    <label class="form-label small">650 $z – Subdivisión geográfica</label>
                     <div class="subcampo-repetible-container subdivisiones-cronologicas-container"
                          data-subdivisiones-cronologicas-container="{{ forloop.counter0 }}"
                          data-borrador-container="subdivision_cronologica_650"
                          data-borrador-parent="{{ forloop.counter0 }}">
 
                         {% if form.instance.pk %}
-                            {% for subdivision in form.instance.subdivisiones_cronologicas.all %}
+                            {% for subdivision in form.instance.subdivisiones_geograficas.all %}
                             <div class="subcampo-row subdivision-cronologica-form-row d-flex mb-2">
                                 <div class="input-group">
                                     {% if forloop.first %}
                                     <button type="button"
                                             class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
                                             data-materia-index="{{ forloop.parentloop.counter0 }}"
-                                            title="Agregar subdivisión cronológica">
+                                            title="Agregar subdivisión geográfica">
                                         <i class="bi bi-plus"></i>
                                     </button>
                                     {% else %}
@@ -157,7 +157,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                            class="form-control subdivision-cronologica-input"
                                            name="subdivision_cronologica_650_{{ forloop.parentloop.counter0 }}_{{ subdivision.pk }}"
                                            value="{{ subdivision.subdivision }}"
-                                           placeholder="Ej: Siglo XIX, 1800-1900">
+                                           placeholder="Ej: Ecuador, Loja">
 
                                     <button type="button"
                                             class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
@@ -173,14 +173,14 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                     <button type="button"
                                             class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
                                             data-materia-index="{{ forloop.counter0 }}"
-                                            title="Agregar subdivisión cronológica">
+                                            title="Agregar subdivisión geográfica">
                                         <i class="bi bi-plus"></i>
                                     </button>
 
                                     <input type="text"
                                            class="form-control subdivision-cronologica-input"
                                            name="subdivision_cronologica_650_{{ forloop.counter0 }}_0"
-                                           placeholder="Ej: Siglo XIX, 1800-1900">
+                                           placeholder="Ej: Ecuador, Loja">
 
                                     <button type="button"
                                             class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
@@ -197,14 +197,14 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                     <button type="button"
                                             class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
                                             data-materia-index="{{ forloop.counter0 }}"
-                                            title="Agregar subdivisión cronológica">
+                                            title="Agregar subdivisión geográfica">
                                         <i class="bi bi-plus"></i>
                                     </button>
 
                                     <input type="text"
                                            class="form-control subdivision-cronologica-input"
                                            name="subdivision_cronologica_650_{{ forloop.counter0 }}_0"
-                                           placeholder="Ej: Siglo XIX, 1800-1900">
+                                           placeholder="Ej: Ecuador, Loja">
 
                                     <button type="button"
                                             class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
@@ -250,7 +250,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                 </div>
 
                 <div class="col-full">
-                    <label class="form-label small">650 $x – Subdivisión de materia</label>
+                    <label class="form-label small">650 $y – Subdivisión cronológica</label>
                     <div class="subcampo-repetible-container subdivisiones-container"
                          data-subdivisiones-container="__prefix__"
                          data-borrador-container="subdivision_materia_650"
@@ -263,14 +263,14 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                         data-materia-index="__prefix__"
                                         data-borrador-add="subdivision_materia_650"
                                         data-borrador-parent="__prefix__"
-                                        title="Agregar subdivisión">
+                                        title="Agregar subdivisión cronológica">
                                     <i class="bi bi-plus"></i>
                                 </button>
 
                                 <input type="text"
                                        class="form-control subdivision-input"
                                        name="subdivision_materia_650___prefix___0"
-                                       placeholder="Subdivisión de materia">
+                                       placeholder="Ej: Siglo XIX, 1800-1900">
 
                                 <button type="button"
                                         class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
@@ -285,7 +285,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                 </div>
 
                 <div class="col-full">
-                    <label class="form-label small">650 $z – Subdivisión cronológica</label>
+                    <label class="form-label small">650 $z – Subdivisión geográfica</label>
                     <div class="subcampo-repetible-container subdivisiones-cronologicas-container"
                          data-subdivisiones-cronologicas-container="__prefix__"
                          data-borrador-container="subdivision_cronologica_650"
@@ -296,14 +296,14 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                 <button type="button"
                                         class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
                                         data-materia-index="__prefix__"
-                                        title="Agregar subdivisión cronológica">
+                                        title="Agregar subdivisión geográfica">
                                     <i class="bi bi-plus"></i>
                                 </button>
 
                                 <input type="text"
                                        class="form-control subdivision-cronologica-input"
                                        name="subdivision_cronologica_650___prefix___0"
-                                       placeholder="Ej: Siglo XIX, 1800-1900">
+                                       placeholder="Ej: Ecuador, Loja">
 
                                 <button type="button"
                                         class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
@@ -476,8 +476,8 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                         data-materia-index="${index}"
                         data-borrador-add="subdivision_materia_650"
                         data-borrador-parent="${index}"
-                        title="Agregar subdivisión"><i class="bi bi-plus"></i></button>
-                    <input type="text" class="form-control subdivision-input" name="subdivision_materia_650_${index}_${Date.now()}" placeholder="Subdivisión de materia">
+                        title="Agregar subdivisión cronológica"><i class="bi bi-plus"></i></button>
+                    <input type="text" class="form-control subdivision-input" name="subdivision_materia_650_${index}_${Date.now()}" placeholder="Ej: Siglo XIX, 1800-1900">
                     <button type="button" class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger" title="Eliminar"><i class="bi bi-x-lg"></i></button>
                 </div>
             `;
@@ -497,8 +497,8 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                 <div class="input-group">
                     <button type="button" class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
                         data-materia-index="${index}"
-                        title="Agregar subdivisión cronológica"><i class="bi bi-plus"></i></button>
-                    <input type="text" class="form-control subdivision-cronologica-input" name="subdivision_cronologica_650_${index}_${Date.now()}" placeholder="Ej: Siglo XIX, 1800-1900">
+                        title="Agregar subdivisión geográfica"><i class="bi bi-plus"></i></button>
+                    <input type="text" class="form-control subdivision-cronologica-input" name="subdivision_cronologica_650_${index}_${Date.now()}" placeholder="Ej: Ecuador, Loja">
                     <button type="button" class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger" title="Eliminar"><i class="bi bi-x-lg"></i></button>
                 </div>
             `;

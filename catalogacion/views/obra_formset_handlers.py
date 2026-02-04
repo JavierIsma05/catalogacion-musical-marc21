@@ -93,6 +93,20 @@ def save_subdivisiones_650(request_post, formset):
     )
 
 
+def save_subdivisiones_geograficas_650(request_post, formset):
+    """Guarda subdivisiones geográficas (650 $z)"""
+    from catalogacion.models import SubdivisionCronologica650
+
+    handler = FormsetSubcampoHandler(request_post)
+    handler.procesar_subcampo_simple(
+        formset=formset,
+        prefijo_input="subdivision_cronologica_650_",
+        modelo_subcampo=SubdivisionCronologica650,
+        campo_fk="materia650",
+        campo_valor="subdivision",
+    )
+
+
 def save_subdivisiones_655(request_post, formset):
     from catalogacion.models import SubdivisionGeneral655
 
@@ -333,6 +347,7 @@ def save_volumenes_490(request_post, formset):
 
 SUBCAMPO_HANDLERS = {
     "_save_subdivisiones_650": save_subdivisiones_650,
+    "_save_subdivisiones_geograficas_650": save_subdivisiones_geograficas_650,
     "_save_subdivisiones_655": save_subdivisiones_655,
     "_save_estanterias_852": save_estanterias_852,
     "_save_urls_856": _save_urls_856,

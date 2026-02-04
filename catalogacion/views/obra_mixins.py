@@ -365,7 +365,7 @@ class ObraFormsetMixin:
             "menciones_serie_490": ["_save_titulos_490", "_save_volumenes_490"],
             "ubicaciones_852": ["_save_estanterias_852"],
             "disponibles_856": ["_save_urls_856", "_save_textos_enlace_856"],
-            "materias_650": ["_save_subdivisiones_650"],
+            "materias_650": ["_save_subdivisiones_650", "_save_subdivisiones_geograficas_650"],
             "materias_genero_655": ["_save_subdivisiones_655"],
         }
 
