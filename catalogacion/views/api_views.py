@@ -225,6 +225,7 @@ def obtener_obras_774(request):
                 "id": obra.id,
                 "num_control": obra.num_control,
                 "titulo": obra.titulo_principal,
+                "compositor": str(obra.compositor) if obra.compositor else "",
             },
             "obras_774": entries
         })

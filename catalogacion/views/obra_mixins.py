@@ -40,6 +40,7 @@ from catalogacion.forms.formsets import (
     TituloAlternativoFormSet,
     Ubicacion852FormSet,
 )
+from catalogacion.models.bloque_5xx import DatosBiograficos545
 from catalogacion.models.bloque_8xx import Disponible856
 from catalogacion.views.obra_formset_handlers import SUBCAMPO_HANDLERS
 
@@ -364,7 +365,7 @@ class ObraFormsetMixin:
             "menciones_serie_490": ["_save_titulos_490", "_save_volumenes_490"],
             "ubicaciones_852": ["_save_estanterias_852"],
             "disponibles_856": ["_save_urls_856", "_save_textos_enlace_856"],
-            "materias_650": ["_save_subdivisiones_650"],
+            "materias_650": ["_save_subdivisiones_650", "_save_subdivisiones_geograficas_650"],
             "materias_genero_655": ["_save_subdivisiones_655"],
         }
 
@@ -428,6 +429,38 @@ class ObraFormsetMixin:
                     disponibles_para_textos,
                 )
 
+                continue
+
+            # ---------------------------
+            # 🔥 CASO ESPECIAL 545: OneToOneField requiere update_or_create
+            # ---------------------------
+            if key == "datos_biograficos":
+                for form in formset:
+                    if getattr(form, "cleaned_data", None) and not form.cleaned_data.get(
+                        "DELETE", False
+                    ):
+                        texto = form.cleaned_data.get("texto_biografico", "")
+                        uri = form.cleaned_data.get("uri", "")
+
+                        # Si ambos campos están vacíos, eliminar el registro existente
+                        if not texto and not uri:
+                            DatosBiograficos545.objects.filter(obra=instance).delete()
+                            logger.info(f"🗑️ 545: Datos biográficos eliminados para obra {instance.pk}")
+                        else:
+                            # Usar update_or_create para manejar OneToOneField correctamente
+                            obj, created = DatosBiograficos545.objects.update_or_create(
+                                obra=instance,
+                                defaults={
+                                    "texto_biografico": texto,
+                                    "uri": uri,
+                                }
+                            )
+                            action = "creado" if created else "actualizado"
+                            logger.info(f"📝 545: Datos biográficos {action} para obra {instance.pk}")
+                    elif getattr(form, "cleaned_data", None) and form.cleaned_data.get("DELETE", False):
+                        # Si se marcó para eliminar
+                        DatosBiograficos545.objects.filter(obra=instance).delete()
+                        logger.info(f"🗑️ 545: Datos biográficos eliminados (DELETE) para obra {instance.pk}")
                 continue
 
             # ---------------------------

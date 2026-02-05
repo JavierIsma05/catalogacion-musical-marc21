@@ -830,20 +830,40 @@
               <li>Para continuar luego, ve a <strong>Borradores</strong> desde el menú.</li>
               <li>Si ${accion}, podrás recuperar este borrador más tarde.</li>
             </ul>
+            <hr>
+            <p class="text-muted small mb-0">
+              <i class="bi bi-trash"></i> También puedes descartar el borrador si no lo necesitas.
+            </p>
           </div>
         `,
         showCancelButton: true,
         showDenyButton: true,
         confirmButtonText:
           '<i class="bi bi-file-earmark-text"></i> Ir a Borradores',
-        denyButtonText: '<i class="bi bi-box-arrow-right"></i> Salir',
+        denyButtonText: '<i class="bi bi-box-arrow-right"></i> Salir (mantener borrador)',
         cancelButtonText: "Cancelar",
+        footer: '<div class="text-center w-100 pt-2 border-top"><button type="button" class="btn btn-outline-danger btn-sm" id="btn-descartar-salir"><i class="bi bi-trash"></i> Descartar borrador y salir</button></div>',
         focusCancel: true,
         customClass: {
           confirmButton: "btn btn-primary",
           denyButton: "btn btn-secondary",
           cancelButton: "btn btn-outline-secondary",
+          footer: "swal2-footer-visible",
         },
+        didOpen: () => {
+          const btnDescartar = document.getElementById('btn-descartar-salir');
+          if (btnDescartar) {
+            btnDescartar.addEventListener('click', async () => {
+              // Eliminar el borrador
+              if (state.borradorId) {
+                await eliminarBorrador(state.borradorId);
+              }
+              state.allowUnloadOnce = true;
+              Swal.close();
+              onContinue();
+            });
+          }
+        }
       });
 
       if (result.isConfirmed) {
@@ -1037,7 +1057,10 @@
 
   // Función para permitir publicación (llamada desde el modal de confirmación)
   function permitirPublicacion() {
+    state.allowUnloadOnce = true;
     state.isPublishing = true;
+    state.hasUnsavedChanges = false;
+    state.borradorId = null;
   }
 
   // API pública

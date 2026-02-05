@@ -312,7 +312,36 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
         formsets_validos, formsets = self._validar_formsets(context)
 
         if not formsets_validos:
-            messages.error(self.request, "Hay errores en los formsets.")
+            # Extraer errores específicos de cada formset
+            errores_detallados = []
+            for key, formset in formsets.items():
+                if not formset.is_valid():
+                    for i, frm in enumerate(formset.forms):
+                        if frm.errors:
+                            for field, errs in frm.errors.items():
+                                for err in errs:
+                                    # Traducir campo __all__ y mensajes técnicos
+                                    if field == "__all__":
+                                        if "already exists" in str(err):
+                                            # Error de unicidad - explicar mejor según el formset
+                                            if "incipit" in key.lower():
+                                                err = "Numeración duplicada (la combinación obra.movimiento.pasaje debe ser única para cada íncipit)"
+                                            else:
+                                                err = "Registro duplicado - verifique que no haya entradas repetidas con los mismos datos"
+                                        errores_detallados.append(f"{key} #{i+1}: {err}")
+                                    else:
+                                        errores_detallados.append(f"{key} #{i+1}, campo '{field}': {err}")
+                    if formset.non_form_errors():
+                        for err in formset.non_form_errors():
+                            errores_detallados.append(f"{key}: {err}")
+
+            if errores_detallados:
+                messages.error(
+                    self.request,
+                    f"Errores encontrados: {'; '.join(errores_detallados[:5])}"
+                )
+            else:
+                messages.error(self.request, "Hay errores en los formsets.")
             return self.form_invalid(form)
 
         errores_autores = validar_autores_principales_y_secundarios(
@@ -563,9 +592,38 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
         formsets_validos, formsets = self._validar_formsets(context)
 
         if not formsets_validos:
-            messages.error(
-                self.request, "Por favor corrija los errores en los formularios."
-            )
+            # Extraer errores específicos de cada formset
+            errores_detallados = []
+            for key, formset in formsets.items():
+                if not formset.is_valid():
+                    for i, frm in enumerate(formset.forms):
+                        if frm.errors:
+                            for field, errs in frm.errors.items():
+                                for err in errs:
+                                    # Traducir campo __all__ y mensajes técnicos
+                                    if field == "__all__":
+                                        if "already exists" in str(err):
+                                            # Error de unicidad - explicar mejor según el formset
+                                            if "incipit" in key.lower():
+                                                err = "Numeración duplicada (la combinación obra.movimiento.pasaje debe ser única para cada íncipit)"
+                                            else:
+                                                err = "Registro duplicado - verifique que no haya entradas repetidas con los mismos datos"
+                                        errores_detallados.append(f"{key} #{i+1}: {err}")
+                                    else:
+                                        errores_detallados.append(f"{key} #{i+1}, campo '{field}': {err}")
+                    if formset.non_form_errors():
+                        for err in formset.non_form_errors():
+                            errores_detallados.append(f"{key}: {err}")
+
+            if errores_detallados:
+                messages.error(
+                    self.request,
+                    f"Errores encontrados: {'; '.join(errores_detallados[:5])}"
+                )
+            else:
+                messages.error(
+                    self.request, "Por favor corrija los errores en los formularios."
+                )
             return self.form_invalid(form)
 
         errores_autores = validar_autores_principales_y_secundarios(
@@ -589,6 +647,77 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
 
         # Guardar todos los formsets y sus subcampos
         self._guardar_formsets(formsets, self.object)
+
+        # =====================================================
+        # 773 / 774 / 787 $w (DESPUÉS DE GUARDAR FORMSETS)
+        # En edición: limpiar existentes y recrear
+        # =====================================================
+
+        # Procesar 773 $w
+        w_773_map = {}
+        for k, vals in self.request.POST.lists():
+            if k.startswith("w_773_"):
+                try:
+                    suffix = int(k.split("w_773_")[1])
+                except Exception:
+                    continue
+                w_773_map[suffix] = vals
+        logger.debug(f"EDIT POST w_773_map: {w_773_map}")
+
+        for idx, enlace in enumerate(self.object.enlaces_documento_fuente_773.all()):
+            # Limpiar NumeroControl773 existentes para este enlace
+            enlace.numeros_control.all().delete()
+            # Crear nuevos
+            obra_ids = w_773_map.get(enlace.pk) or w_773_map.get(idx) or []
+            logger.debug(f"  EDIT w_773 processing: idx={idx}, enlace.pk={enlace.pk}, obra_ids={obra_ids}")
+            for obra_id in obra_ids:
+                if obra_id and int(obra_id) != self.object.pk:
+                    NumeroControl773.objects.create(
+                        enlace_773=enlace, obra_relacionada_id=obra_id
+                    )
+                    logger.debug(f"    ✅ NC773 creado para obra_id={obra_id}")
+
+        # Procesar 774 $w
+        w_774_map = {}
+        for k, vals in self.request.POST.lists():
+            if k.startswith("w_774_"):
+                try:
+                    suffix = int(k.split("w_774_")[1])
+                except Exception:
+                    continue
+                w_774_map[suffix] = vals
+
+        for idx, enlace in enumerate(self.object.enlaces_unidades_774.all()):
+            # Limpiar NumeroControl774 existentes para este enlace
+            enlace.numeros_control.all().delete()
+            # Crear nuevos
+            obra_ids = w_774_map.get(enlace.pk) or w_774_map.get(idx) or []
+            for obra_id in obra_ids:
+                if obra_id and int(obra_id) != self.object.pk:
+                    NumeroControl774.objects.create(
+                        enlace_774=enlace, obra_relacionada_id=obra_id
+                    )
+
+        # Procesar 787 $w
+        w_787_map = {}
+        for k, vals in self.request.POST.lists():
+            if k.startswith("w_787_"):
+                try:
+                    suffix = int(k.split("w_787_")[1])
+                except Exception:
+                    continue
+                w_787_map[suffix] = vals
+
+        for idx, enlace in enumerate(self.object.otras_relaciones_787.all()):
+            # Limpiar NumeroControl787 existentes para este enlace
+            enlace.numeros_control.all().delete()
+            # Crear nuevos
+            obra_ids = w_787_map.get(enlace.pk) or w_787_map.get(idx) or []
+            for obra_id in obra_ids:
+                if obra_id and int(obra_id) != self.object.pk:
+                    NumeroControl787.objects.create(
+                        enlace_787=enlace, obra_relacionada_id=obra_id
+                    )
 
         # Verificar si se solicitó publicar/despublicar
         accion = self.request.POST.get("accion")

@@ -927,6 +927,27 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
                 targetHiddenInput.value = coleccion.id;
             }
 
+            // 1.5. Rellenar campos 773 $a y $t del formset (compositor y título de la COLECCIÓN)
+            if (targetContainer) {
+                // 773 $a - Compositor de la colección
+                const personaWrapper = targetContainer.querySelector('.autocomplete-wrapper[data-autocomplete="persona"]');
+                if (personaWrapper) {
+                    const inp = personaWrapper.querySelector('input');
+                    if (inp && coleccion.compositor) {
+                        inp.value = coleccion.compositor;
+                    }
+                }
+
+                // 773 $t - Título de la colección
+                const tituloWrapper = targetContainer.querySelector('.autocomplete-wrapper[data-autocomplete="titulo"]');
+                if (tituloWrapper) {
+                    const inp = tituloWrapper.querySelector('input');
+                    if (inp && coleccion.titulo) {
+                        inp.value = coleccion.titulo;
+                    }
+                }
+            }
+
             // 2. Rellenar campo 100 (compositor) desde la obra 774
             const compositorTexto = document.getElementById("id_compositor_texto");
             const compositorId = document.getElementById("id_compositor");
