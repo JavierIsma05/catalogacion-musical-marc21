@@ -548,6 +548,16 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
         if usuario:
             self.modificado_por = usuario
         self.save(update_fields=["publicada", "fecha_publicacion", "modificado_por", "fecha_modificacion_sistema"])
+        
+        # Actualizar el borrador correspondiente a estado "convertido"
+        from .borradores import BorradorObra
+        BorradorObra.objects.filter(
+            obra_objetivo=self,
+            estado="activo"
+        ).update(
+            estado="convertido",
+            obra_creada=self
+        )
 
     def despublicar(self, usuario=None):
         """

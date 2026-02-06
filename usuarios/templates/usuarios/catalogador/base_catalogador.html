@@ -71,6 +71,12 @@
                <i class="bi bi-file-earmark-text"></i>
                <span>Borradores</span>
             </a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'lista_obras' or request.resolver_match.url_name == 'detalle_obra' or request.resolver_match.url_name == 'editar_obra' %}active{% endif %}"
+               href="{% url 'catalogacion:lista_obras' %}"
+               data-tooltip="Gestionar Obras">
+                <i class="bi bi-brush"></i>
+                <span>Gestionar Obras</span>
+            </a>
             <!-- <a class="nav-link {% if request.resolver_match.url_name == 'lista_obras' %}active{% endif %}"
                href="{% url 'catalogacion:lista_obras' %}"
                data-tooltip="Mis Obras">
@@ -107,12 +113,7 @@
                 <i class="bi-file-text"></i>
                 <span>Títulos Uniformes</span>
             </a>
-            <a class="nav-link {% if request.resolver_match.url_name == 'lista_obras' or request.resolver_match.url_name == 'detalle_obra' or request.resolver_match.url_name == 'editar_obra' %}active{% endif %}"
-               href="{% url 'catalogacion:lista_obras' %}"
-               data-tooltip="Editar Obras">
-                <i class="bi bi-brush"></i>
-                <span>Editar/Borrar Obras</span>
-            </a>
+            
         </div>
         <div class="sidebar-footer">
             <a href="{% url 'catalogo_publico:home' %}" class="nav-link" data-tooltip="Ver Sitio Público">
