@@ -1,3 +1,4 @@
+console.log("[incipitManager.js] VERSIÓN ACTUALIZADA - " + new Date().toISOString());
 var currenteNotePressed = "f";
 var positionNoteSelected = null;
 var CanvasIncipit = new CanvasClass(); //Define the object Canvas
@@ -558,7 +559,7 @@ function CanvasClass() {
   this.stepY = 0; //8 pixels for pixels 320 (height)
   this.stepX = 0; //50 pixels for pixels 800 (width)
   this.maxStepY = 29;
-  this.minStepY = 11;
+  this.minStepY = 10; // Permitir hover hasta 3ª línea arriba (yPosition = -1)
 
   this.defaultClefAlt = new Array(21);
   this.drawXPosition = new Array();
@@ -882,8 +883,9 @@ function CanvasClass() {
       cursor.y = context.maxStepY;
     }
 
-    if (cursor.y < context.minStepY) {
-      cursor.y = context.minStepY;
+    // Permitir cursor.y hasta minStepY - 1 para que yPosition pueda ser -1 (3ª línea arriba)
+    if (cursor.y < context.minStepY - 1) {
+      cursor.y = context.minStepY - 1;
     }
 
     return cursor;
@@ -1056,6 +1058,14 @@ function CanvasClass() {
         notePosition.x,
         notePosition.y
       );
+
+      // Dibujar líneas adicionales para la nota sombra (hover)
+      if (!note.isRest) {
+        context.gDrawingContext.beginPath();
+        context.gDrawingContext.strokeStyle = "grey";
+        context.noteNeedLine(context, notePosition.x, eleCoord.y);
+        context.gDrawingContext.stroke();
+      }
     }
 
     context.drawPentagram(context);
@@ -1563,16 +1573,17 @@ function CanvasClass() {
     var upOrDown = 1;
 
     // Arriba (por encima del pentagrama) usamos -1, abajo +1
-    if (yPosition < 4) upOrDown = -1;
+    // El pentagrama ocupa posiciones ~7-13, así que < 10 es "arriba"
+    if (yPosition < 10) upOrDown = -1;
 
     // 1ª línea auxiliar (más cercana al pentagrama)
     if (
-      (upOrDown === -1 && yPosition <= 3) || // arriba
+      (upOrDown === -1 && yPosition <= 6) || // arriba
       (upOrDown === 1 && yPosition >= 15) // abajo
     ) {
       pixelsToAdd = context.stepY * 2 * 3 * upOrDown + context.stepY / 2;
       context.gDrawingContext.moveTo(
-        xPosition + context.ratioX(context, -5),
+        xPosition + context.ratioX(context, -6),
         halfScreenYpx + pixelsToAdd
       );
       context.gDrawingContext.lineTo(
@@ -1583,7 +1594,7 @@ function CanvasClass() {
 
     // 2ª línea auxiliar
     if (
-      (upOrDown === -1 && yPosition <= 1) || // arriba
+      (upOrDown === -1 && yPosition <= 2) || // arriba
       (upOrDown === 1 && yPosition >= 17) // abajo
     ) {
       pixelsToAdd = context.stepY * 2 * 4 * upOrDown + context.stepY / 2;
@@ -1597,21 +1608,18 @@ function CanvasClass() {
       );
     }
 
-    // 3ª línea auxiliar (más alejada)
-    // if (
-    //   (upOrDown === -1 && yPosition <= 0) || // arriba
-    //   (upOrDown === 1 && yPosition >= 18) // abajo
-    // ) {
-    //   pixelsToAdd = context.stepY * 2 * 5 * upOrDown + context.stepY / 2;
-    //   context.gDrawingContext.moveTo(
-    //     xPosition + context.ratioX(context, -5),
-    //     halfScreenYpx + pixelsToAdd
-    //   );
-    //   context.gDrawingContext.lineTo(
-    //     xPosition + context.ratioX(context, 18),
-    //     halfScreenYpx + pixelsToAdd
-    //   );
-    // }
+    // 3ª línea auxiliar (solo arriba - más alejada del pentagrama)
+    if (upOrDown === -1 && yPosition <= 0) {
+      pixelsToAdd = context.stepY * 2 * 5 * upOrDown + context.stepY / 2;
+      context.gDrawingContext.moveTo(
+        xPosition + context.ratioX(context, -5),
+        halfScreenYpx + pixelsToAdd
+      );
+      context.gDrawingContext.lineTo(
+        xPosition + context.ratioX(context, 18),
+        halfScreenYpx + pixelsToAdd
+      );
+    }
   };
 
   //Main function that draw incipit

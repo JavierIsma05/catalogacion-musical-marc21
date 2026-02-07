@@ -36,11 +36,11 @@ class IncipitMusical(models.Model):
         default=1, help_text="031 $c – Número de pasaje o sistema (predeterminado: 1)"
     )
 
-    # Subcampo $d - Título o encabezamiento (NR)
+    # Subcampo $d - Tempo (NR)
     titulo_encabezamiento = models.CharField(
         max_length=200,
         blank=True,
-        help_text="031 $d – Nombre del tempo o movimiento (ej: Aria, Allegro, Andante)",
+        help_text="031 $d – Tempo",
     )
     #  Subcampo $e – Personaje
     personaje = models.CharField(
@@ -67,9 +67,9 @@ class IncipitMusical(models.Model):
         max_length=20, blank=True, help_text="031 $n – Armadura"
     )
 
-    # Subcampo $o – Tiempo (ej. 4/4)
+    # Subcampo $o – Compás (ej. 4/4)
     tiempo = models.CharField(
-        max_length=20, blank=True, help_text="031 $o – Tiempo"
+        max_length=20, blank=True, help_text="031 $o – Compás"
     )
 
     # Subcampo $p - Notación musical (Cuerpo PAE)

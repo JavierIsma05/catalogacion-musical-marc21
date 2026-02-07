@@ -282,4 +282,8 @@ media/**
 *.jpg
 *.jpeg
 *.png
+# Claude Code local settings
 .claude/
+# Windows reserved device names (cannot be deleted normally)
+/nul
+nul
