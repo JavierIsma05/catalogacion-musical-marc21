@@ -368,7 +368,7 @@
                             {% if incipit.voz_instrumento %}{{ incipit.voz_instrumento }}{% endif %}
                             {% if incipit.clave %} · Clave: {{ incipit.clave }}{% endif %}
                             {% if incipit.armadura %} · Armadura: {{ incipit.armadura }}{% endif %}
-                            {% if incipit.tiempo %} · Tiempo: {{ incipit.tiempo }}{% endif %}
+                            {% if incipit.tiempo %} · Compás: {{ incipit.tiempo }}{% endif %}
                         </div>
 
 
@@ -418,7 +418,7 @@
                                             <td style="padding: 4px; color: #666;">"{{ incipit.armadura|default:"vacío" }}"</td>
                                         </tr>
                                         <tr style="background: #fff;">
-                                            <td style="padding: 4px;"><strong>Tiempo (DB):</strong></td>
+                                            <td style="padding: 4px;"><strong>Compás (DB):</strong></td>
                                             <td style="padding: 4px; color: #666;">"{{ incipit.tiempo|default:"vacío" }}"</td>
                                         </tr>
                                         <tr>

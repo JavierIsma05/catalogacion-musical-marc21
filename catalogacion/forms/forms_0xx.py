@@ -100,7 +100,7 @@ class IncipitMusicalForm(forms.ModelForm):
             "titulo_encabezamiento": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "031 $d - Título/tempo",
+                    "placeholder": "allegro",
                 }
             ),
             "personaje": forms.TextInput(
@@ -155,7 +155,7 @@ class IncipitMusicalForm(forms.ModelForm):
             "titulo_encabezamiento": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "031 $d - Título/tempo",
+                    "placeholder": "allegro",
                 }
             ),
             "personaje": forms.TextInput(
