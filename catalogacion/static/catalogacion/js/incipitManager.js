@@ -1,4 +1,3 @@
-console.log("[incipitManager.js] VERSIÓN ACTUALIZADA - " + new Date().toISOString());
 var currenteNotePressed = "f";
 var positionNoteSelected = null;
 var CanvasIncipit = new CanvasClass(); //Define the object Canvas
@@ -178,7 +177,6 @@ function IncipitClass() {
       }
     ];
 
-
     context.Time = [
       {
         name: "tiempo1",
@@ -345,7 +343,8 @@ function IncipitClass() {
         yPosition: 8,
         paec: "4-"
       },
-      {//6 Silencio corchea
+      {
+        //6 Silencio corchea
         name: "restQuaver",
         value: "'",
         font: 55,
@@ -354,7 +353,8 @@ function IncipitClass() {
         paec: "8-"
       },
 
-      {//7 Silencio semicorchea
+      {
+        //7 Silencio semicorchea
         name: "restSemiqua",
         value: "(",
         font: 55,
@@ -362,7 +362,8 @@ function IncipitClass() {
         yPosition: 4.8,
         paec: "6-"
       },
-      { //8 Silencio fusa
+      {
+        //8 Silencio fusa
         name: "restDemsemqu",
         value: ")",
         font: 55,
@@ -370,7 +371,8 @@ function IncipitClass() {
         yPosition: 6.8,
         paec: "3-"
       },
-      { //9 Silencio semifusa
+      {
+        //9 Silencio semifusa
         name: "restHemdemsemqu",
         value: "*",
         font: 55,
@@ -763,7 +765,11 @@ function CanvasClass() {
     var cursor = context.getCursorPosition(context, event);
 
     // Escalar la posición de referencia igual que en clickOnCanvas
-    var nextDrawPos = context.setDrawPosition(context, context.drawXPosition.length, true);
+    var nextDrawPos = context.setDrawPosition(
+      context,
+      context.drawXPosition.length,
+      true
+    );
     var scaledNextPos = context.ratioX(context, nextDrawPos);
 
     if (cursor.x >= scaledNextPos) {
@@ -1578,7 +1584,7 @@ function CanvasClass() {
 
     // 1ª línea auxiliar (más cercana al pentagrama)
     if (
-      (upOrDown === -1 && yPosition <= 6) || // arriba
+      (upOrDown === -1 && yPosition <= 5) || // arriba
       (upOrDown === 1 && yPosition >= 15) // abajo
     ) {
       pixelsToAdd = context.stepY * 2 * 3 * upOrDown + context.stepY / 2;
