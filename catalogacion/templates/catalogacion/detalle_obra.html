@@ -25,6 +25,61 @@
   cursor: default;
 }
 
+/* Badges de tipo de obra con colores específicos */
+.tipo-badge.manuscrito.coleccion {
+    background: #007bff;
+    color: white;
+    border-color: #0056b3;
+}
+
+.tipo-badge.manuscrito.obra-coleccion {
+    background: #6f42c1;
+    color: white;
+    border-color: #5a32a3;
+}
+
+.tipo-badge.manuscrito.obra-individual {
+    background: #17a2b8;
+    color: white;
+    border-color: #138496;
+}
+
+.tipo-badge.impreso.coleccion {
+    background: #28a745;
+    color: white;
+    border-color: #1e7e34;
+}
+
+.tipo-badge.impreso.obra-coleccion {
+    background: #fd7e14;
+    color: #212529;
+    border-color: #d63384;
+}
+
+.tipo-badge.impreso.obra-individual {
+    background: #6c757d;
+    color: white;
+    border-color: #5c636a;
+}
+
+.tipo-badge.obra {
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    color: #4527a0;
+    border-color: #ce93d8;
+}
+
+/* Estados de publicación con mismos estilos que tipo-badge */
+.tipo-badge.publicada {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    color: #2e7d32;
+    border-color: #a5d6a7;
+}
+
+.tipo-badge.no-publicada {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    color: #6c757d;
+    border-color: #adb5bd;
+}
 
 </style>
 {% endblock %}
@@ -56,10 +111,22 @@
 
                     {# Badges de tipo y publicación #}
                     <div class="d-flex align-items-center gap-2 ms-3">
-                        {% if obra.nivel_bibliografico == "c" %}
-                            <span class="badge bg-primary">Colección</span>
+                        {% if obra.tipo_registro == 'd' %}
+                            {% if obra.nivel_bibliografico == 'c' %}
+                                <span class="badge bg-info">Colección Manuscrita</span>
+                            {% elif obra.nivel_bibliografico == 'a' %}
+                                <span class="badge bg-info">Obra en Colección Manuscrita</span>
+                            {% else %}
+                                <span class="badge bg-info">Obra Individual Manuscrita</span>
+                            {% endif %}
                         {% else %}
-                            <span class="badge bg-info">Obra</span>
+                            {% if obra.nivel_bibliografico == 'c' %}
+                                <span class="badge bg-primary">Colección Impresa</span>
+                            {% elif obra.nivel_bibliografico == 'a' %}
+                                <span class="badge bg-primary">Obra en Colección Impresa</span>
+                            {% else %}
+                                <span class="badge bg-primary">Obra Individual Impresa</span>
+                            {% endif %}
                         {% endif %}
                         {% if obra.publicada %}
                             <span class="badge bg-success" title="Visible en catálogo público">

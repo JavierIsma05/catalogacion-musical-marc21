@@ -85,6 +85,29 @@
     .action-btn.eliminar:hover {
         background: #c82333;
     }
+    
+    /* Mejorar posición de tooltips */
+    .estado-badge[title] {
+        position: relative;
+        cursor: help;
+    }
+    
+    .estado-badge[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        white-space: nowrap;
+        z-index: 1000;
+        margin-bottom: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
 </style>
 {% endblock catalogacion_css %}
 
@@ -139,7 +162,7 @@
                     <tr>
                         <th>Estado</th>
                         <th>Tipo</th>
-                        <th>ID_RISM</th>
+                        <th>N° Control</th>
                         <th>Título uniforme</th>
                         <th>Compositor</th>
                         <th class="text-end">Acciones</th>
@@ -150,31 +173,33 @@
                     <tr>
                         <td>
                             {% if obra.publicada %}
-                                <span class="estado-badge publicada">PUB</span>
+                                <span class="badge bg-success" title="Visible en catálogo público">
+                                <i class="bi bi-globe"></i> Publicada
+                            </span>
                             {% else %}
-                                <span class="estado-badge no_publicada">UNP</span>
+                                <span class="badge bg-secondary" title="No visible en catálogo público">
+                                <i class="bi bi-eye-slash"></i> Sin publicar
+                            </span>
                             {% endif %}
                         </td>
                         <td>
-                            <span class="tipo-badge {% if obra.tipo_registro == 'd' %}manuscrito{% else %}impreso{% endif %} {% if obra.nivel_bibliografico == 'c' %}coleccion{% else %}obra{% endif %}">
-                                {% if obra.tipo_registro == 'd' %}
-                                    {% if obra.nivel_bibliografico == 'c' %}
-                                        MSC
-                                    {% elif obra.nivel_bibliografico == 'a' %}
-                                        OCM
-                                    {% else %}
-                                        OBI
-                                    {% endif %}
-                                {% else %}
-                                    {% if obra.nivel_bibliografico == 'c' %}
-                                        MSI
-                                    {% elif obra.nivel_bibliografico == 'a' %}
-                                        OCI
-                                    {% else %}
-                                        OII
-                                    {% endif %}
-                                {% endif %}
-                            </span>
+                           {% if obra.tipo_registro == 'd' %}
+                            {% if obra.nivel_bibliografico == 'c' %}
+                                <span class="badge bg-info">Colección Manuscrita</span>
+                            {% elif obra.nivel_bibliografico == 'a' %}
+                                <span class="badge bg-info">Obra en Colección Manuscrita</span>
+                            {% else %}
+                                <span class="badge bg-info">Obra Individual Manuscrita</span>
+                            {% endif %}
+                        {% else %}
+                            {% if obra.nivel_bibliografico == 'c' %}
+                                <span class="badge bg-primary">Colección Impresa</span>
+                            {% elif obra.nivel_bibliografico == 'a' %}
+                                <span class="badge bg-primary">Obra en Colección Impresa</span>
+                            {% else %}
+                                <span class="badge bg-primary">Obra Individual Impresa</span>
+                            {% endif %}
+                        {% endif %}
                         </td>
                         <td>
                             <code>{{ obra.num_control|default:"—" }}</code>
