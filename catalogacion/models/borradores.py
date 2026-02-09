@@ -137,9 +137,13 @@ class BorradorObra(models.Model):
                 titulo = titulo[0] if titulo else ""
             self.titulo_temporal = (titulo or "Sin título")[:500]
 
-            # Extraer tipo de registro y nivel bibliográfico
-            self.tipo_registro = campos.get("tipo_registro", "") or ""
-            self.nivel_bibliografico = campos.get("nivel_bibliografico", "") or ""
+            # Extraer tipo de registro y nivel bibliográfico del formulario
+            # Si no existen, usar la configuración del tipo_obra
+            from catalogacion.views.obra_config import TIPO_OBRA_CONFIG
+            
+            config = TIPO_OBRA_CONFIG.get(self.tipo_obra, {})
+            self.tipo_registro = campos.get("tipo_registro") or config.get("tipo_registro", "")
+            self.nivel_bibliografico = campos.get("nivel_bibliografico") or config.get("nivel_bibliografico", "")
 
             # Extraer número de control si existe
             self.num_control_temporal = (

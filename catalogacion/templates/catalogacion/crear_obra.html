@@ -556,7 +556,12 @@
 // ============================================================================
 // SISTEMA DE BORRADORES
 // ============================================================================
-const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
+const BORRADOR_A_RECUPERAR = "{{ borrador_id_recuperar|default:'null' }}";
+
+const borradorId = BORRADOR_A_RECUPERAR !== "null"
+    ? parseInt(BORRADOR_A_RECUPERAR, 10)
+    : null;
+
 </script>
 
 <script src="{% static 'catalogacion/js/autocomplete-core.js' %}"></script>

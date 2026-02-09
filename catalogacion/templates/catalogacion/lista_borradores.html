@@ -172,40 +172,24 @@
                             </div>
                         </td>
                         <td>
-                            <span class="tipo-badge {{ borrador.tipo_obra }}">
-                                {% if borrador.tipo_registro == 'd' %}
-                                    <i class="bi bi-pen"></i> 
-                                {% elif borrador.tipo_registro == 'c' %}
-                                    <i class="bi bi-printer"></i> 
-                                {% endif %}
-                                {% if borrador.tipo_obra == 'coleccion_manuscrita' %}
-                                    Colección Manuscrita
-                                {% elif borrador.tipo_obra == 'obra_en_coleccion_manuscrita' %}
-                                    Obra en Colección Manuscrita
-                                {% elif borrador.tipo_obra == 'obra_manuscrita_individual' %}
-                                    Obra Manuscrita Individual
-                                {% elif borrador.tipo_obra == 'coleccion_impresa' %}
-                                    Colección Impresa
-                                {% elif borrador.tipo_obra == 'obra_en_coleccion_impresa' %}
-                                    Obra en Colección Impresa
-                                {% elif borrador.tipo_obra == 'obra_impresa_individual' %}
-                                    Obra Impresa Individual
-                                {% else %}
-                                    {{ borrador.get_descripcion_tipo|default:borrador.tipo_obra }}
-                                {% endif %}
-                            </span>
-                            {% if borrador.nivel_bibliografico %}
-                                <br>
-                                <small class="text-muted">
-                                    {% if borrador.nivel_bibliografico == 'c' %}
-                                        <i class="bi bi-collection"></i> Colección
-                                    {% elif borrador.nivel_bibliografico == 'm' %}
-                                        <i class="bi bi-book"></i> Monografía
-                                    {% elif borrador.nivel_bibliografico == 'a' %}
-                                        <i class="bi bi-layers"></i> Parte
-                                    {% endif %}
-                                </small>
+                        {% if borrador.tipo_registro == 'd' %}
+                            {% if borrador.nivel_bibliografico == 'c' %}
+                                <span class="badge bg-info">Colección Manuscrita</span>
+                            {% elif borrador.nivel_bibliografico == 'a' %}
+                                <span class="badge bg-info">Obra en Colección Manuscrita</span>
+                            {% else %}
+                                <span class="badge bg-info">Obra Individual Manuscrita</span>
                             {% endif %}
+                        {% else %}
+                            {% if borrador.nivel_bibliografico == 'c' %}
+                                <span class="badge bg-primary">Colección Impresa</span>
+                            {% elif borrador.nivel_bibliografico == 'a' %}
+                                <span class="badge bg-primary">Obra en Colección Impresa</span>
+                            {% else %}
+                                <span class="badge bg-primary">Obra Individual Impresa</span>
+                            {% endif %}
+                        {% endif %}
+                        
                         </td>
                         
                         <td class="muted">
@@ -316,12 +300,21 @@
 
 {% block catalogacion_js %}
 <script>
-function confirmarDescarte(borradorId, titulo) {
-    document.getElementById('borrador-titulo').textContent = titulo || 'Sin título';
-    const deleteBase = "{% url 'catalogacion:descartar_borrador' pk=0 %}".replace('/0/', `/${borradorId}/`);
-    document.getElementById('delete-form').action = deleteBase;
-    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    modal.show();
-}
+    
+    const URL_DESCARTE_BASE = `{% url 'catalogacion:descartar_borrador' pk=0 %}`;
+
+    function confirmarDescarte(borradorId, titulo) {
+        document.getElementById('borrador-titulo').textContent = titulo || 'Sin título';
+
+        const deleteBase = URL_DESCARTE_BASE.replace('0', borradorId);
+
+        document.getElementById('delete-form').action = deleteBase;
+
+        const modal = new bootstrap.Modal(
+            document.getElementById('deleteModal')
+        );
+        modal.show();
+    }
 </script>
 {% endblock catalogacion_js %}
+
