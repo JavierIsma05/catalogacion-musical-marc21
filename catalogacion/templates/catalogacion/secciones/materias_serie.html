@@ -1,7 +1,7 @@
 {# Bloque 6XX - Materias y términos de acceso temático #}
 <section id="bloque-6xx" class="bloque-section">
     <div class="card">
-        
+
         <div class="card-body">
 
             {# Campo 650 - Encabezamiento de Materia (Repetible) #}
@@ -29,7 +29,8 @@
             </div>
             {% endif %}
 
-            {# Campo 655 - Término de Género/Forma (Repetible) #}
+            {# Campo 655 - Término de Género/Forma (Repetible) - OCULTO temporalmente #}
+            {% comment "Campo 655 oculto temporalmente" %}
             {% if '655' in campos_visibles and 'materias_genero_655' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
@@ -52,6 +53,7 @@
                 {% include 'catalogacion/includes/formset_655_template.html' with formset=materias_genero_655 %}
             </div>
             {% endif %}
+            {% endcomment %}
 
         </div>
     </div>
@@ -60,12 +62,12 @@
 </section>
 
 {# Bloque 4XX - Series #}
+{% if '490' in campos_visibles and 'menciones_serie_490' in formsets_visibles %}
 <section id="bloque-4xx" class="bloque-section">
     <div class="card">
-        
+
         <div class="card-body">
             {# Campo 490 - Mención de serie (Repetible) #}
-            {% if '490' in campos_visibles and 'menciones_serie_490' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">490</span>
@@ -77,7 +79,7 @@
                         <i class="bi bi-question-circle"></i>
                     </span>
                 </div>
-                
+
                 {% include 'catalogacion/includes/formset_490_template.html' with formset=menciones_serie_490 %}
             </div>
             {% endif %}

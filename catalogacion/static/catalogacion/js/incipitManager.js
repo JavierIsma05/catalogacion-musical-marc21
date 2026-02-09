@@ -103,23 +103,23 @@ function IncipitClass() {
     ];
 
     context.AlterationClefPositionSostenido = [
-      { xPosition: 50, yPosition: -6 }, // antes -6
-      { xPosition: 60, yPosition: 20 }, // antes 20
-      { xPosition: 70, yPosition: -14 }, // antes -14
-      { xPosition: 80, yPosition: 10 }, // antes 10
-      { xPosition: 90, yPosition: 36 }, // antes 36
-      { xPosition: 100, yPosition: 2 }, // antes 2
-      { xPosition: 110, yPosition: 24 } // antes 28
+      { xPosition: 50, yPosition: -1 }, // antes -6
+      { xPosition: 60, yPosition: 24 }, // antes 18
+      { xPosition: 70, yPosition: -10 }, // antes -14
+      { xPosition: 80, yPosition: 16 }, // antes 10
+      { xPosition: 90, yPosition: 40 }, // antes 34
+      { xPosition: 100, yPosition: 6 }, // antes 2
+      { xPosition: 110, yPosition: 32 } // antes 26
     ];
 
     context.AlterationClefPositionBemol = [
-      { xPosition: 50, yPosition: 20 }, //antes 22
-      { xPosition: 60, yPosition: -3 }, //antes -2
-      { xPosition: 70, yPosition: 29 }, //antes 30
-      { xPosition: 80, yPosition: 6 }, //antes 6
-      { xPosition: 90, yPosition: 38 }, //antes 38
-      { xPosition: 100, yPosition: 13 }, //antes 14
-      { xPosition: 110, yPosition: 45 } //antes 45
+      { xPosition: 50, yPosition: 25 }, //antes 22
+      { xPosition: 60, yPosition: -0 }, //antes -2
+      { xPosition: 70, yPosition: 32 }, //antes 30
+      { xPosition: 80, yPosition: 8 }, //antes 6
+      { xPosition: 90, yPosition: 40 }, //antes 38
+      { xPosition: 100, yPosition: 16 }, //antes 14
+      { xPosition: 110, yPosition: 48 } //antes 45
     ];
 
     context.DotNote = [
@@ -138,41 +138,41 @@ function IncipitClass() {
       {
         name: "barra1",
         value: ";",
-        font: 30,
+        font: 24,
         paec: "/",
-        yPosition: 12.5,
+        yPosition: 12.9,
         xPosition: 35
       },
       {
         name: "barra2",
         value: "<",
-        font: 30,
+        font: 24,
         paec: "//",
-        yPosition: 12.5,
+        yPosition: 12.9,
         xPosition: 35
       },
       {
         name: "barra4",
         value: ">",
-        font: 30,
+        font: 24,
         paec: "//:",
-        yPosition: 12.5,
+        yPosition: 12.9,
         xPosition: 35
       },
       {
         name: "barra6",
         value: "?",
-        font: 30,
+        font: 24,
         paec: "://",
-        yPosition: 12.5,
+        yPosition: 12.9,
         xPosition: 35
       },
       {
         name: "barra5",
         value: "@",
-        font: 30,
+        font: 24,
         paec: "://:",
-        yPosition: 12.5,
+        yPosition: 12.9,
         xPosition: 35
       }
     ];
@@ -261,7 +261,7 @@ function IncipitClass() {
         isRest: false,
         yPosition: 7,
         paec: "%G-2"
-      }, //46 for clef
+      }, //46 for clef SOL
       {
         name: "alto",
         value: "2",
@@ -269,7 +269,7 @@ function IncipitClass() {
         isRest: false,
         yPosition: 4,
         paec: "%C-3"
-      }, //46 for clef
+      }, //46 for clef DO
       {
         name: "bass",
         value: "3",
@@ -277,7 +277,7 @@ function IncipitClass() {
         isRest: false,
         yPosition: 2,
         paec: "%F-4"
-      }, //46 for clef
+      }, //46 for clef FA
 
       //Notas
       { name: "longa", value: "b", font: 38, isRest: false, paec: "0" },
@@ -306,50 +306,50 @@ function IncipitClass() {
       {
         name: "restSemirev",
         value: "$",
-        font: 38,
+        font: 34,
         isRest: true,
-        yPosition: 7.7,
+        yPosition: 8.5,
         paec: "1-"
       },
       {
         name: "restMinim",
         value: "%",
-        font: 38,
+        font: 34,
         isRest: true,
-        yPosition: 8.3,
+        yPosition: 8.9,
         paec: "2-"
       },
       {
         name: "restLon",
         value: '"',
-        font: 46,
+        font: 34,
         isRest: true,
-        yPosition: 7.5,
+        yPosition: 9,
         paec: "0-"
       },
       {
         name: "restBrev",
         value: "#",
-        font: 46,
+        font: 34,
         isRest: true,
-        yPosition: 7.5,
+        yPosition: 8.9,
         paec: "9-"
       },
       {
         name: "restCrotchet",
         value: "&",
-        font: 38,
+        font: 34,
         isRest: true,
-        yPosition: 8,
+        yPosition: 9,
         paec: "4-"
       },
       {
         //6 Silencio corchea
         name: "restQuaver",
         value: "'",
-        font: 55,
+        font: 34,
         isRest: true,
-        yPosition: 6.8,
+        yPosition: 9.5,
         paec: "8-"
       },
 
@@ -357,27 +357,27 @@ function IncipitClass() {
         //7 Silencio semicorchea
         name: "restSemiqua",
         value: "(",
-        font: 55,
+        font: 34,
         isRest: true,
-        yPosition: 4.8,
+        yPosition: 8.5,
         paec: "6-"
       },
       {
         //8 Silencio fusa
         name: "restDemsemqu",
         value: ")",
-        font: 55,
+        font: 34,
         isRest: true,
-        yPosition: 6.8,
+        yPosition: 9.5,
         paec: "3-"
       },
       {
         //9 Silencio semifusa
         name: "restHemdemsemqu",
         value: "*",
-        font: 55,
+        font: 34,
         isRest: true,
-        yPosition: 6.8,
+        yPosition: 9.5,
         paec: "5-"
       }
     ];
@@ -1561,7 +1561,7 @@ function CanvasClass() {
         step*6 + pixelsToAdd occurs, to set it on the mouse position */
     var pixelsToAdd = 2;
     if (context.operation == "list") pixelsToAdd = 3;
-    context.verticalOffset = -1.5;
+    context.verticalOffset = 0;
     var positionY =
       (elementY + drawingProblemYPatchAmountFix + context.minStepY) *
         context.stepY -
