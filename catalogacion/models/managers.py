@@ -7,9 +7,14 @@ from django.db import models
 class ObraGeneralManager(models.Manager):
     """Manager con métodos de consulta comunes"""
 
+    # COMENTADO: Funcionalidad de borrado desactivada temporalmente
+    # def activos(self):
+    #     """Retorna solo obras activas (no eliminadas)"""
+    #     return self.exclude(estado_registro='d')  # Excluir registros eliminados
+    
     def activos(self):
-        """Retorna solo obras activas (no eliminadas)"""
-        return self.filter(activo=True)
+        """Retorna todas las obras (funcionalidad de borrado desactivada)"""
+        return self.all()  # Retorna todas sin filtrar por estado_registro
 
     def manuscritas(self):
         """Retorna solo obras manuscritas"""

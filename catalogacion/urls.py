@@ -9,7 +9,7 @@ from catalogacion.views import (
     DetalleObraView,
     DespublicarObraView,
     EditarObraView,
-    EliminarObraView,
+    EliminarObraView,  # COMENTADO: Funcionalidad de borrado desactivada temporalmente
     IndexView,
     ListaObrasView,
     PapeleraObrasView,

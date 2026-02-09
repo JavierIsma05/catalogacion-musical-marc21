@@ -548,6 +548,16 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
         if usuario:
             self.modificado_por = usuario
         self.save(update_fields=["publicada", "fecha_publicacion", "modificado_por", "fecha_modificacion_sistema"])
+        
+        # Actualizar el borrador correspondiente a estado "convertido"
+        from .borradores import BorradorObra
+        BorradorObra.objects.filter(
+            obra_objetivo=self,
+            estado="activo"
+        ).update(
+            estado="convertido",
+            obra_creada=self
+        )
 
     def despublicar(self, usuario=None):
         """
@@ -1134,3 +1144,13 @@ class ObraGeneral(SoftDeleteMixin, models.Model):
                 )
 
         return campos_heredables
+
+    # COMENTADO: Funcionalidad de borrado desactivada temporalmente
+    # def soft_delete(self):
+    #     """
+    #     Marca la obra como inactiva (soft delete).
+    #     No elimina físicamente el registro, solo cambia el estado.
+    #     """
+    #     self.estado_registro = 'd'  # 'd' = deleted según MARC21
+    #     self.fecha_hora_ultima_transaccion = actualizar_fecha_hora_transaccion()
+    #     self.save(update_fields=['estado_registro', 'fecha_hora_ultima_transaccion'])

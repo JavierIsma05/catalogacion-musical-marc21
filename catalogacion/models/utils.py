@@ -77,12 +77,10 @@ def obtener_pais_principal(obra):
     """
     try:
         paises = obra.codigos_pais_entidad.all()
-        print(
-            f"🔍 DEBUG: Países encontrados para obra {obra.num_control}: {[p.codigo_pais for p in paises]}"
-        )
+        #print(f"🔍 DEBUG: Países encontrados para obra {obra.num_control}: {[p.codigo_pais for p in paises]}")
         primer_pais = obra.codigos_pais_entidad.order_by("id").first()
         resultado = (primer_pais.codigo_pais if primer_pais else "EC").upper()
-        print(f"🔍 DEBUG: País seleccionado: {resultado}")
+        #print(f"🔍 DEBUG: País seleccionado: {resultado}")
         return resultado
     except Exception as e:
         print(f"❌ ERROR en obtener_pais_principal: {e}")

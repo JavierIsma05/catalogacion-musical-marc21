@@ -43,8 +43,67 @@
     .action-btn.continuar:hover {
         background: var(--admin-primary-hover);
     }
+    
+    /* Colores por tipo de obra */
+    .tipo-badge.coleccion_manuscrita {
+        background: #e8f5e8;
+        color: #2d6a2d;
+        border: 1px solid #b8e6b8;
+    }
+    .tipo-badge.obra_en_coleccion_manuscrita {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+    .tipo-badge.obra_manuscrita_individual {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    .tipo-badge.coleccion_impresa {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+    .tipo-badge.obra_en_coleccion_impresa {
+        background: #e2e3e5;
+        color: #383d41;
+        border: 1px solid #d6d8db;
+    }
+    .tipo-badge.obra_impresa_individual {
+        background: #f4ebff;
+        color: #4c1d95;
+        border: 1px solid #e9d5ff;
+    }
+    .tipo-badge.edicion {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+    }
+    
+    /* Estados de publicación */
+    .estado-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .estado-badge.activo {
+        background: #dc3545;
+        color: white;
+    }
+    .estado-badge.convertido {
+        background: #198754;
+        color: white;
+    }
+    .estado-badge.descartado {
+        background: #6c757d;
+        color: white;
+    }
 </style>
-{% endblock %}
+{% endblock catalogacion_css %}
 
 {% block catalogacion_content %}
 <nav aria-label="breadcrumb">
@@ -113,32 +172,26 @@
                             </div>
                         </td>
                         <td>
-                            {% if borrador.tipo_registro == 'd' %}
-                                <span class="tipo-badge manuscrito">
-                                    <i class="bi bi-pen"></i> Manuscrito
-                                </span>
-                            {% elif borrador.tipo_registro == 'c' %}
-                                <span class="tipo-badge impreso">
-                                    <i class="bi bi-printer"></i> Impreso
-                                </span>
+                        {% if borrador.tipo_registro == 'd' %}
+                            {% if borrador.nivel_bibliografico == 'c' %}
+                                <span class="badge bg-info">Colección Manuscrita</span>
+                            {% elif borrador.nivel_bibliografico == 'a' %}
+                                <span class="badge bg-info">Obra en Colección Manuscrita</span>
                             {% else %}
-                                <span class="tipo-badge">
-                                    {{ borrador.get_descripcion_tipo|default:borrador.tipo_obra }}
-                                </span>
+                                <span class="badge bg-info">Obra Individual Manuscrita</span>
                             {% endif %}
-                            {% if borrador.nivel_bibliografico %}
-                                <br>
-                                <small class="text-muted">
-                                    {% if borrador.nivel_bibliografico == 'c' %}
-                                        <i class="bi bi-collection"></i> Colección
-                                    {% elif borrador.nivel_bibliografico == 'm' %}
-                                        <i class="bi bi-book"></i> Monografía
-                                    {% elif borrador.nivel_bibliografico == 'a' %}
-                                        <i class="bi bi-layers"></i> Parte
-                                    {% endif %}
-                                </small>
+                        {% else %}
+                            {% if borrador.nivel_bibliografico == 'c' %}
+                                <span class="badge bg-primary">Colección Impresa</span>
+                            {% elif borrador.nivel_bibliografico == 'a' %}
+                                <span class="badge bg-primary">Obra en Colección Impresa</span>
+                            {% else %}
+                                <span class="badge bg-primary">Obra Individual Impresa</span>
                             {% endif %}
+                        {% endif %}
+                        
                         </td>
+                        
                         <td class="muted">
                             {% with tab=tab_labels|get_item:borrador.pestana_actual %}
                                 {{ tab|default:"—" }}
@@ -243,16 +296,25 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock catalogacion_content %}
 
 {% block catalogacion_js %}
 <script>
-function confirmarDescarte(borradorId, titulo) {
-    document.getElementById('borrador-titulo').textContent = titulo || 'Sin título';
-    const deleteBase = "{% url 'catalogacion:descartar_borrador' pk=0 %}".replace('/0/', `/${borradorId}/`);
-    document.getElementById('delete-form').action = deleteBase;
-    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    modal.show();
-}
+    
+    const URL_DESCARTE_BASE = `{% url 'catalogacion:descartar_borrador' pk=0 %}`;
+
+    function confirmarDescarte(borradorId, titulo) {
+        document.getElementById('borrador-titulo').textContent = titulo || 'Sin título';
+
+        const deleteBase = URL_DESCARTE_BASE.replace('0', borradorId);
+
+        document.getElementById('delete-form').action = deleteBase;
+
+        const modal = new bootstrap.Modal(
+            document.getElementById('deleteModal')
+        );
+        modal.show();
+    }
 </script>
-{% endblock %}
+{% endblock catalogacion_js %}
+

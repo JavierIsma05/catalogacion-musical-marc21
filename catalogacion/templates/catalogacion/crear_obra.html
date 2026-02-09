@@ -556,7 +556,12 @@
 // ============================================================================
 // SISTEMA DE BORRADORES
 // ============================================================================
-const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
+const BORRADOR_A_RECUPERAR = "{{ borrador_id_recuperar|default:'null' }}";
+
+const borradorId = BORRADOR_A_RECUPERAR !== "null"
+    ? parseInt(BORRADOR_A_RECUPERAR, 10)
+    : null;
+
 </script>
 
 <script src="{% static 'catalogacion/js/autocomplete-core.js' %}"></script>
@@ -867,6 +872,10 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
         let targetHiddenInput = null;
         let targetContainer = null;
         let coleccionSeleccionada = null;
+        // Si queremos a futuro seleccionar una obra para cada coleccion M con M y I con I pero ahora querremos mixtas
+        //let tipoColeccionActual = null; 
+        // 'M' = Manuscrita | 'I' = Impresa
+
 
         // ===== ELEMENTOS DEL DOM =====
         const modalEl = document.getElementById("modalBuscarObra");
@@ -1229,6 +1238,17 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
             const btn = e.target.closest(".btn-buscar-obra");
             if (!btn) return;
 
+            // Detectar tipo de colección desde el formulario
+//            const tipoRegistroSelect = document.getElementById('id_tipo_registro');
+
+//            if (tipoRegistroSelect) {
+//                //d = manuscrita → M | otro = impresa → I
+//                tipoColeccionActual = tipoRegistroSelect.value === 'd' ? 'M' : 'I';
+//            } else {
+//                tipoColeccionActual = null;
+//            }
+
+
             const group = btn.closest(".input-group");
             if (!group) return;
 
@@ -1267,14 +1287,36 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
                     }
 
                     data.results.forEach(o => {
+                        // 🔒 FILTRO POR TIPO DE COLECCIÓN
+//                        if (tipoColeccionActual) {
+//                            if (!o.num_control || !o.num_control.startsWith(tipoColeccionActual)) {
+//                                return; // ocultar esta obra
+//                            }
+//                        }
+
+                    // 🔒 MOSTRAR SOLO OBRAS PADRE (COLECCIONES)
+                        if (o.nivel_bibliografico !== 'c') {
+                            return; // no renderiza obras hijas ni individuales
+                        }
                         const li = document.createElement("li");
                         li.className = "list-group-item list-group-item-action";
 
-                        // Mostrar badge si es colección
+                        // Verificar si es colección
                         const isColeccion = o.nivel_bibliografico === 'c';
-                        const badge = isColeccion
-                            ? '<span class="badge bg-info ms-2">Colección</span>'
-                            : '';
+
+                        // Verificar tipo de obra según el número de control
+                        // M = Manuscrita | I = Impresa // OTRA OPCION al final en vez de startsWith poner o.tipo_registro
+                        const isManuscrita = o.num_control && o.num_control.startsWith('M');
+
+                        let badge = '';
+
+                        if (isColeccion) {
+                            if (isManuscrita) {
+                                badge = '<span class="badge bg-info ms-2">Colección Manuscrita</span>';
+                            } else {
+                                badge = '<span class="badge bg-primary ms-2">Colección Impresa</span>';
+                            }
+                        }
 
                         li.innerHTML = `
                             <div class="d-flex justify-content-between align-items-start">
@@ -1287,6 +1329,7 @@ const BORRADOR_A_RECUPERAR = {{ borrador_id_recuperar|default:'null' }};
                                 <i class="bi bi-chevron-right text-muted"></i>
                             </div>
                         `;
+
 
                         li.addEventListener("click", async () => {
                             // Verificar si es colección y tiene obras 774

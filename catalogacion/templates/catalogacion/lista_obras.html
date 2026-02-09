@@ -2,90 +2,272 @@
 {% load static %}
 
 {% block title %}Listado de obras{% endblock %}
-{% block page_title %}Obras en progreso{% endblock %}
+{% block page_title %}Obras Registradas{% endblock %}
+
+{% block catalogacion_css %}
+<link rel="stylesheet" href="{% static 'usuarios/css/admin.css' %}">
+<link rel="stylesheet" href="{% static 'usuarios/css/autoridades.css' %}">
+<style>
+    .tipo-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        background: var(--admin-bg);
+        color: var(--admin-text-light);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    .tipo-badge.manuscrito {
+        background: #e8f4f8;
+        color: #0369a1;
+    }
+    .tipo-badge.impreso {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    .tipo-badge.coleccion {
+        background: #e8f5e8;
+        color: #2d6a2d;
+        border: 1px solid #b8e6b8;
+    }
+    .tipo-badge.obra {
+        background: #f4ebff;
+        color: #4c1d95;
+        border: 1px solid #e9d5ff;
+    }
+    
+    /* Estados de publicación */
+    .estado-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .estado-badge.publicada {
+        background: #198754;
+        color: white;
+    }
+    .estado-badge.no_publicada {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .obra-titulo {
+        font-weight: 600;
+        color: var(--admin-text);
+        margin-bottom: 0.125rem;
+    }
+    .obra-subtitulo {
+        font-size: 0.8125rem;
+        color: var(--admin-text-light);
+    }
+    .action-btn.editar {
+        background: var(--admin-primary);
+        color: white;
+    }
+    .action-btn.editar:hover {
+        background: var(--admin-primary-hover);
+    }
+    .action-btn.ver {
+        background: #6c757d;
+        color: white;
+    }
+    .action-btn.ver:hover {
+        background: #5a6268;
+    }
+    .action-btn.eliminar {
+        background: #dc3545;
+        color: white;
+    }
+    .action-btn.eliminar:hover {
+        background: #c82333;
+    }
+    
+    /* Mejorar posición de tooltips */
+    .estado-badge[title] {
+        position: relative;
+        cursor: help;
+    }
+    
+    .estado-badge[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        white-space: nowrap;
+        z-index: 1000;
+        margin-bottom: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock catalogacion_css %}
 
 {% block catalogacion_content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'catalogacion:index' %}">Inicio</a></li>
+        <li class="breadcrumb-item active">Obras</li>
+    </ol>
+</nav>
 
-<div class="container">
-
-    <!-- Enlace a papelera -->
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{% url 'catalogacion:papelera_obras' %}" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-trash3"></i> Ver papelera
-        </a>
+<div class="admin-card autoridad-card">
+    <div class="admin-card-header">
+        <h2 class="admin-card-title">
+            <i class="bi bi-music-note-list"></i>
+            Obras Registradas
+        </h2>
+        <div class="d-flex gap-2">
+            <a href="{% url 'catalogacion:papelera_obras' %}" class="admin-btn admin-btn-secondary admin-btn-sm" title="Ver papelera">
+                <i class="bi bi-trash3"></i> Papelera
+            </a>
+            <a href="{% url 'catalogacion:seleccionar_tipo' %}" class="admin-btn admin-btn-primary admin-btn-sm">
+                <i class="bi bi-plus"></i> Nueva obra
+            </a>
+        </div>
     </div>
 
-    {% if obras %}
-        <div class="list-group mt-4">
-            {% for obra in obras %}
-                <div class="list-group-item">
-                    <div class="d-flex justify-content-between align-items-start">
-                        {# Contenido principal #}
-                        <div class="flex-grow-1">
-                            {# Fila 1: Título + Badges #}
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <h6 class="mb-0">{{ obra.titulo_principal }}</h6>
-                                {% if obra.nivel_bibliografico == "c" %}
-                                    <span class="badge bg-primary">Colección</span>
-                                {% else %}
-                                    <span class="badge bg-info">Obra</span>
-                                {% endif %}
+    <div class="admin-card-body">
+        <div class="row g-3 align-items-center mb-3">
+            <div class="col-lg-8">
+                <form method="get" class="autoridad-search" role="search">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar por título" value="{{ request.GET.q }}">
+                    <button type="submit" class="admin-btn admin-btn-secondary admin-btn-sm" aria-label="Buscar">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    {% if request.GET.q %}
+                    <a href="{% url 'catalogacion:lista_obras' %}" class="admin-btn admin-btn-light admin-btn-sm" aria-label="Limpiar búsqueda">
+                        <i class="bi bi-x"></i>
+                    </a>
+                    {% endif %}
+                </form>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <span class="autoridad-meta">Total: {{ obras|length }} obra{{ obras|length|pluralize:"s" }}</span>
+            </div>
+        </div>
+
+        {% if obras %}
+        <div class="admin-table-wrapper autoridad-table">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Estado</th>
+                        <th>Tipo</th>
+                        <th>N° Control</th>
+                        <th>Título uniforme</th>
+                        <th>Compositor</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for obra in obras %}
+                    <tr>
+                        <td>
+                            {% if obra.publicada %}
+                                <span class="badge bg-success" title="Visible en catálogo público">
+                                <i class="bi bi-globe"></i> Publicada
+                            </span>
+                            {% else %}
+                                <span class="badge bg-secondary" title="No visible en catálogo público">
+                                <i class="bi bi-eye-slash"></i> Sin publicar
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                        {% if obra.tipo_registro == 'd' %}
+                            {% if obra.nivel_bibliografico == 'c' %}
+                                <span class="badge bg-info">Colección Manuscrita</span>
+                            {% elif obra.nivel_bibliografico == 'a' %}
+                                <span class="badge bg-info">Obra en Colección Manuscrita</span>
+                            {% else %}
+                                <span class="badge bg-info">Obra Individual Manuscrita</span>
+                            {% endif %}
+                        {% else %}
+                            {% if obra.nivel_bibliografico == 'c' %}
+                                <span class="badge bg-primary">Colección Impresa</span>
+                            {% elif obra.nivel_bibliografico == 'a' %}
+                                <span class="badge bg-primary">Obra en Colección Impresa</span>
+                            {% else %}
+                                <span class="badge bg-primary">Obra Individual Impresa</span>
+                            {% endif %}
+                        {% endif %}
+                        </td>
+                        <td>
+                            <code>{{ obra.num_control|default:"—" }}</code>
+                        </td>
+                        <td>
+                            <div class="obra-titulo">
+                                {{ obra.titulo_uniforme_240_display|default:obra.titulo_uniforme_130_display|default:obra.titulo_principal|default:"Sin título"|truncatewords:8 }}
+                            </div>
+                            
+                        </td>
+                        <td>
+                            {% if obra.compositor %}
+                                {{ obra.compositor.apellidos_nombres }}
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="autoridad-actions">
+                                <a href="{% url 'catalogacion:detalle_obra' obra.pk %}" 
+                                   class="action-btn ver" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'catalogacion:editar_obra' obra.pk %}" 
+                                   class="action-btn editar" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
                                 {% if obra.publicada %}
-                                    <span class="badge bg-success" title="Visible en catálogo público">
-                                        <i class="bi bi-globe"></i> Publicada
-                                    </span>
+                                    <form method="post" action="{% url 'catalogacion:despublicar_obra' obra.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="action-btn" title="Despublicar" style="background: #ffc107; color: #000;">
+                                            <i class="bi bi-eye-slash"></i>
+                                        </button>
+                                    </form>
                                 {% else %}
-                                    <span class="badge bg-secondary" title="No visible en catálogo público">
-                                        <i class="bi bi-eye-slash"></i> Sin publicar
-                                    </span>
+                                    <form method="post" action="{% url 'catalogacion:publicar_obra' obra.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="action-btn" title="Publicar" style="background: #28a745; color: white;">
+                                            <i class="bi bi-globe"></i>
+                                        </button>
+                                    </form>
                                 {% endif %}
+                                <button type="button" 
+                                        class="action-btn eliminar" 
+                                        title="Eliminar"
+                                        onclick="confirmarEliminacion({{ obra.pk }}, '{{ obra.titulo_principal|escapejs }}', '{{ obra.num_control|escapejs }}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </div>
-
-                            {# Fila 2: Metadatos en línea #}
-                            <div class="d-flex flex-wrap gap-3 text-muted small">
-                                <span>
-                                    <i class="bi bi-bookmark"></i>
-                                    {{ obra.signatura_publica_display|default:"Sin signatura" }}
-                                </span>
-                                {% if obra.compositor %}
-                                <span>
-                                    <i class="bi bi-person"></i>
-                                    {{ obra.compositor }}
-                                </span>
-                                {% endif %}
-                                {% if obra.num_control %}
-
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        {# Botones de acción #}
-                        <div class="d-flex gap-1 ms-3">
-                            <a href="{% url 'catalogacion:detalle_obra' obra.pk %}" class="btn btn-outline-secondary btn-sm" title="Ver detalles">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="{% url 'catalogacion:editar_obra' obra.pk %}" class="btn btn-primary btn-sm" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button type="button"
-                                    class="btn btn-outline-danger btn-sm"
-                                    onclick="confirmarEliminacion({{ obra.pk }}, '{{ obra.titulo_principal|escapejs }}', '{{ obra.num_control|default:''|escapejs }}')"
-                                    title="Eliminar obra">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
-    {% else %}
-        <div class="alert alert-info mt-4">
-            <i class="bi bi-info-circle"></i>
-            No hay obras registradas aún.
+        {% else %}
+        <!-- Estado vacío -->
+        <div class="autoridad-empty">
+            <div class="icon"><i class="bi bi-music-note-list"></i></div>
+            <p>No hay obras registradas{% if request.GET.q %} para "{{ request.GET.q }}"{% endif %}.</p>
+            <p class="text-muted">Comienza creando tu primera obra musical.</p>
+            <a href="{% url 'catalogacion:seleccionar_tipo' %}" class="admin-btn admin-btn-primary admin-btn-sm">
+                <i class="bi bi-plus"></i> Crear nueva obra
+            </a>
         </div>
-    {% endif %}
-
+        {% endif %}
+    </div>
 </div>
 
 <!-- Modal de confirmación de eliminación -->
@@ -122,8 +304,7 @@
         </div>
     </div>
 </div>
-
-{% endblock %}
+{% endblock catalogacion_content %}
 
 {% block catalogacion_js %}
 {{ block.super }}
@@ -140,4 +321,4 @@ function confirmarEliminacion(obraId, titulo, numControl) {
     modal.show();
 }
 </script>
-{% endblock %}
+{% endblock catalogacion_js %}
