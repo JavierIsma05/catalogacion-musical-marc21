@@ -36,7 +36,7 @@
                 </div>
 
 
-                <!-- Estadísticas 
+                <!-- Estadísticas
                 <div class="progress-stats">
                     <div class="progress-stat-row">
                         <span class="progress-stat-label">Completados</span>
@@ -707,7 +707,7 @@ const borradorId = BORRADOR_A_RECUPERAR !== "null"
             const formData = new FormData(form);
             const entries = Array.from(formData.entries());
             const filledEntries = entries.filter(([key, value]) => value && value !== '');
-            
+
             console.log('[SUBMIT] Total campos:', entries.length, '| Campos con datos:', filledEntries.length);
 
             // Verificar validación HTML5
@@ -717,7 +717,7 @@ const borradorId = BORRADOR_A_RECUPERAR !== "null"
             if (!isValid) {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 const invalidFields = form.querySelectorAll(':invalid');
                 console.log('[SUBMIT] Campos inválidos encontrados:', invalidFields.length);
 
@@ -749,7 +749,7 @@ const borradorId = BORRADOR_A_RECUPERAR !== "null"
             // Formulario válido - permitir envío tradicional
             console.log('[SUBMIT] Formulario válido, enviando al servidor...');
             form.classList.add('was-validated');
-            
+
             // NO llamamos preventDefault() aquí - dejamos que el formulario se envíe normalmente
             return true;
         }, { capture: true });
@@ -765,9 +765,9 @@ const borradorId = BORRADOR_A_RECUPERAR !== "null"
         // Función para actualizar el indicador de autoguardado
         function updateAutosaveIndicator(status, message) {
             if (!autosaveIndicator || !autosaveStatus) return;
-            
+
             autosaveIndicator.classList.remove('saving', 'saved', 'error');
-            
+
             if (status === 'saving') {
                 autosaveIndicator.classList.add('saving');
                 autosaveIndicator.querySelector('i').className = 'bi bi-arrow-repeat spin';
@@ -776,7 +776,7 @@ const borradorId = BORRADOR_A_RECUPERAR !== "null"
                 autosaveIndicator.classList.add('saved');
                 autosaveIndicator.querySelector('i').className = 'bi bi-cloud-check-fill';
                 autosaveStatus.textContent = message || 'Guardado';
-                
+
                 // Volver al estado normal después de 3 segundos
                 setTimeout(() => {
                     autosaveIndicator.classList.remove('saved');
@@ -801,10 +801,10 @@ const borradorId = BORRADOR_A_RECUPERAR !== "null"
                     updateAutosaveIndicator('saving', 'Guardando para vista previa...');
                     try {
                         const resultado = await window.BorradorSystem.guardar();
-                        
+
                         if (resultado && resultado.success) {
                             updateAutosaveIndicator('saved', 'Guardado');
-                            
+
                             // Obtener el ID del borrador (del resultado o del estado)
                             const borradorId = resultado.borradorId || window.BorradorSystem.getBorradorId();
                             if (borradorId) {
@@ -873,7 +873,7 @@ const borradorId = BORRADOR_A_RECUPERAR !== "null"
         let targetContainer = null;
         let coleccionSeleccionada = null;
         // Si queremos a futuro seleccionar una obra para cada coleccion M con M y I con I pero ahora querremos mixtas
-        //let tipoColeccionActual = null; 
+        //let tipoColeccionActual = null;
         // 'M' = Manuscrita | 'I' = Impresa
 
 

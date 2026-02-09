@@ -1,7 +1,7 @@
 {# Bloque 5XX - Notas #}
 <section id="bloque-5xx" class="bloque-section">
     <div class="card">
-        
+
 
         <div class="card-body">
 
@@ -15,14 +15,13 @@
                     <button type="button"
                             class="campo-add-btn"
                             data-formset-target="{{ notas_generales.prefix }}"  title="Agregar nota">
-                        <i class="bi bi-plus"></i> 
+                        <i class="bi bi-plus"></i>
                     </button>
                     <!-- Botón de ayuda -->
                     <span class="campo-help-btn" data-field-code="500" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
                     </span>
                 </div>
-
 
                 {% include 'catalogacion/includes/formset_500_template.html' with formset=notas_generales %}
             </div>
@@ -38,7 +37,7 @@
                     <button type="button"
                             class="campo-add-btn"
                             data-formset-target="{{ contenidos.prefix }}" title="Agregar contenido">
-                        <i class="bi bi-plus"></i> 
+                        <i class="bi bi-plus"></i>
                     </button>
 
                     <!-- Botón de ayuda -->
@@ -63,9 +62,9 @@
                     <button type="button"
                             class="campo-add-btn"
                             data-formset-target="{{ sumarios.prefix }}" title="Agregar sumario">
-                        <i class="bi bi-plus"></i> 
+                        <i class="bi bi-plus"></i>
                     </button>
-                    
+
                     <!-- Botón de ayuda -->
                     <span class="campo-help-btn" data-field-code="520" tabindex="0" title="Ayuda">
                         <i class="bi bi-question-circle"></i>
@@ -92,7 +91,7 @@
                     </span>
                 </div>
 
-    
+
 
                 <div class="formset-container" data-formset-prefix="{{ datos_biograficos.prefix }}">
 
