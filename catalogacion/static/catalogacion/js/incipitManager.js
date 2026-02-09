@@ -103,23 +103,23 @@ function IncipitClass() {
     ];
 
     context.AlterationClefPositionSostenido = [
-      { xPosition: 50, yPosition: -1 }, // antes -6
-      { xPosition: 60, yPosition: 24 }, // antes 18
+      { xPosition: 50, yPosition: -2 }, // antes -6
+      { xPosition: 60, yPosition: 22 }, // antes 18
       { xPosition: 70, yPosition: -10 }, // antes -14
-      { xPosition: 80, yPosition: 16 }, // antes 10
-      { xPosition: 90, yPosition: 40 }, // antes 34
+      { xPosition: 80, yPosition: 12 }, // antes 10
+      { xPosition: 90, yPosition: 38 }, // antes 34
       { xPosition: 100, yPosition: 6 }, // antes 2
-      { xPosition: 110, yPosition: 32 } // antes 26
+      { xPosition: 110, yPosition: 30 } // antes 26
     ];
 
     context.AlterationClefPositionBemol = [
-      { xPosition: 50, yPosition: 25 }, //antes 22
+      { xPosition: 50, yPosition: 24 }, //antes 22
       { xPosition: 60, yPosition: -0 }, //antes -2
-      { xPosition: 70, yPosition: 32 }, //antes 30
+      { xPosition: 70, yPosition: 31 }, //antes 30
       { xPosition: 80, yPosition: 8 }, //antes 6
-      { xPosition: 90, yPosition: 40 }, //antes 38
+      { xPosition: 90, yPosition: 38 }, //antes 38
       { xPosition: 100, yPosition: 16 }, //antes 14
-      { xPosition: 110, yPosition: 48 } //antes 45
+      { xPosition: 110, yPosition: 46 } //antes 45
     ];
 
     context.DotNote = [
