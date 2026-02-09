@@ -308,7 +308,7 @@ function IncipitClass() {
         value: "$",
         font: 34,
         isRest: true,
-        yPosition: 8.5,
+        yPosition: 8.3,
         paec: "1-"
       },
       {
@@ -316,7 +316,7 @@ function IncipitClass() {
         value: "%",
         font: 34,
         isRest: true,
-        yPosition: 8.9,
+        yPosition: 8.7,
         paec: "2-"
       },
       {
@@ -324,7 +324,7 @@ function IncipitClass() {
         value: '"',
         font: 34,
         isRest: true,
-        yPosition: 9,
+        yPosition: 8.9,
         paec: "0-"
       },
       {
@@ -332,7 +332,7 @@ function IncipitClass() {
         value: "#",
         font: 34,
         isRest: true,
-        yPosition: 8.9,
+        yPosition: 8.5,
         paec: "9-"
       },
       {
