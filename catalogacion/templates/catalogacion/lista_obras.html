@@ -85,6 +85,17 @@
     .action-btn.eliminar:hover {
         background: #c82333;
     }
+
+    /* Animación de eliminación de fila */
+    tr.fila-eliminando td {
+        background: #f8d7da !important;
+        transition: all 0.4s ease;
+    }
+    tr.fila-saliendo {
+        opacity: 0;
+        transform: translateX(30px);
+        transition: all 0.5s ease;
+    }
     
     /* Mejorar posición de tooltips */
     .estado-badge[title] {
@@ -170,7 +181,7 @@
                 </thead>
                 <tbody>
                     {% for obra in obras %}
-                    <tr>
+                    <tr data-obra-id="{{ obra.pk }}">
                         <td>
                             {% if obra.publicada %}
                                 <span class="badge bg-success" title="Visible en catálogo público">
@@ -309,16 +320,106 @@
 {% block catalogacion_js %}
 {{ block.super }}
 <script>
+let obraIdPendiente = null;
+
 function confirmarEliminacion(obraId, titulo, numControl) {
+    obraIdPendiente = obraId;
     document.getElementById('obra-titulo').textContent = titulo || 'Sin título';
     document.getElementById('obra-num-control').textContent = numControl || '';
 
-    // Construir URL de eliminación
     const deleteUrl = "{% url 'catalogacion:eliminar_obra' pk=99999 %}".replace('99999', obraId);
     document.getElementById('delete-form').action = deleteUrl;
 
     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     modal.show();
+}
+
+// Interceptar submit del formulario de eliminación para usar AJAX
+document.getElementById('delete-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const form = this;
+    const url = form.action;
+    const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+    const btnEliminar = form.querySelector('button[type="submit"]');
+
+    // Deshabilitar botón mientras se procesa
+    btnEliminar.disabled = true;
+    btnEliminar.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Eliminando...';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        // Cerrar modal
+        bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+
+        // Restaurar botón
+        btnEliminar.disabled = false;
+        btnEliminar.innerHTML = '<i class="bi bi-trash"></i> Eliminar';
+
+        if (data.ok) {
+            // Animar la fila saliendo
+            var fila = document.querySelector('tr[data-obra-id="' + obraIdPendiente + '"]');
+            if (fila) {
+                fila.classList.add('fila-eliminando');
+                setTimeout(function() {
+                    fila.classList.add('fila-saliendo');
+                    fila.addEventListener('transitionend', function() {
+                        fila.remove();
+                        // Actualizar contador
+                        var totalSpan = document.querySelector('.autoridad-meta');
+                        if (totalSpan) {
+                            var filas = document.querySelectorAll('tbody tr[data-obra-id]');
+                            var n = filas.length;
+                            totalSpan.textContent = 'Total: ' + n + ' obra' + (n !== 1 ? 's' : '');
+                        }
+                    }, { once: true });
+                }, 300);
+            }
+            // Mostrar toast de éxito
+            mostrarToast(data.mensaje, 'success');
+        } else {
+            mostrarToast(data.mensaje || 'Error al eliminar la obra.', 'danger');
+        }
+    })
+    .catch(function() {
+        bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+        btnEliminar.disabled = false;
+        btnEliminar.innerHTML = '<i class="bi bi-trash"></i> Eliminar';
+        mostrarToast('Error de conexión. Intente nuevamente.', 'danger');
+    });
+});
+
+function mostrarToast(mensaje, tipo) {
+    var container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        container.style.zIndex = '1090';
+        document.body.appendChild(container);
+    }
+    var iconos = {
+        success: 'bi-check-circle',
+        danger: 'bi-x-circle',
+        warning: 'bi-exclamation-triangle',
+    };
+    var icono = iconos[tipo] || 'bi-info-circle';
+    var toastHtml = '<div class="toast align-items-center text-bg-' + tipo + ' border-0 show" role="alert">' +
+        '<div class="d-flex"><div class="toast-body"><i class="bi ' + icono + ' me-1"></i> ' + mensaje + '</div>' +
+        '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>' +
+        '</div></div>';
+    container.insertAdjacentHTML('beforeend', toastHtml);
+    var toastEl = container.lastElementChild;
+    setTimeout(function() {
+        var bsToast = bootstrap.Toast.getOrCreateInstance(toastEl);
+        bsToast.hide();
+    }, 4000);
 }
 </script>
 {% endblock catalogacion_js %}

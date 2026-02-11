@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
@@ -850,6 +851,8 @@ class EliminarObraView(CatalogadorRequiredMixin, DeleteView):
 
         Nota: En Django 4.0+ DeleteView usa form_valid() en lugar de delete().
         """
+        is_ajax = self.request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
         # Verificar relaciones PROTECT antes de eliminar
         from catalogacion.models import (
             NumeroControl773,
@@ -862,20 +865,24 @@ class EliminarObraView(CatalogadorRequiredMixin, DeleteView):
             or NumeroControl774.objects.filter(obra_relacionada=self.object).exists()
             or NumeroControl787.objects.filter(obra_relacionada=self.object).exists()
         ):
-            messages.error(
-                self.request,
+            msg = (
                 f'No se puede eliminar "{self.object.titulo_principal}". '
-                "Existen obras que hacen referencia a esta.",
+                "Existen obras que hacen referencia a esta."
             )
+            if is_ajax:
+                return JsonResponse({"ok": False, "mensaje": msg})
+            messages.error(self.request, msg)
             return redirect("catalogacion:lista_obras")
 
         # Realizar soft delete con usuario (NO llamar a super() que haría delete real)
         self.object.soft_delete(usuario=self.request.user.get_username())
-        messages.success(
-            self.request,
+        msg = (
             f'Obra "{self.object.titulo_principal}" movida a la papelera. '
-            "Puede restaurarla en los próximos 30 días.",
+            "Puede restaurarla en los próximos 30 días."
         )
+        if is_ajax:
+            return JsonResponse({"ok": True, "mensaje": msg})
+        messages.success(self.request, msg)
         return redirect(self.success_url)
 
 
@@ -978,6 +985,9 @@ class PublicarObraView(CatalogadorRequiredMixin, DetailView):
             request,
             f'Obra "{self.object.titulo_principal}" publicada exitosamente en el catálogo público.',
         )
+        next_url = request.POST.get("next") or request.META.get("HTTP_REFERER")
+        if next_url:
+            return redirect(next_url)
         return redirect("catalogacion:detalle_obra", pk=self.object.pk)
 
 
@@ -993,6 +1003,9 @@ class DespublicarObraView(CatalogadorRequiredMixin, DetailView):
             request,
             f'Obra "{self.object.titulo_principal}" retirada del catálogo público.',
         )
+        next_url = request.POST.get("next") or request.META.get("HTTP_REFERER")
+        if next_url:
+            return redirect(next_url)
         return redirect("catalogacion:detalle_obra", pk=self.object.pk)
 
 
