@@ -13,7 +13,14 @@
     const REQUIRED_FIELDS_CONFIG = {
         coleccion_manuscrita: [
             { id: "id_centro_catalogador", label: "040", tab: 7 },
-            { id: "id_titulo_uniforme_texto", label: "130", tab: 0, hidden: true },
+            {
+                id: "grupo_100_130",
+                label: "100/130",
+                tab: 0,
+                hidden: true,
+                group: true,
+                fields: ["id_compositor_texto", "id_titulo_uniforme_texto"],
+            },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
@@ -53,7 +60,14 @@
 
         coleccion_impresa: [
             { id: "id_centro_catalogador", label: "040", tab: 7 },
-            { id: "id_compositor_texto", label: "100", tab: 0 },
+            {
+                id: "grupo_100_130",
+                label: "100/130",
+                tab: 0,
+                hidden: true,
+                group: true,
+                fields: ["id_compositor_texto", "id_titulo_uniforme_texto"],
+            },
             { id: "id_titulo_principal", label: "245", tab: 0 },
             { id: "id_ms_imp", label: "340", tab: 1 },
             {
@@ -211,8 +225,11 @@
                     setTimeout(() => {
                         let fieldElement = null;
 
+                        // Manejar campos agrupados (100/130)
+                        if (field.group) {
+                            fieldElement = document.getElementById(field.fields[0]);
                         // Manejar campos especiales (como 382)
-                        if (field.special && field.id === "id_medio_interpretacion_382") {
+                        } else if (field.special && field.id === "id_medio_interpretacion_382") {
                             // Buscar el contenedor del formset 382 o el primer select de medio
                             fieldElement = document.querySelector('[data-formset-prefix="medios_382"]') ||
                                            document.querySelector('.medio-select');
@@ -246,7 +263,23 @@
      */
     function setupFieldListeners() {
         requiredFields.forEach((field) => {
-            if (field.special) {
+            if (field.group) {
+                // Campos agrupados (al menos uno del grupo debe estar lleno)
+                field.fields.forEach((subFieldId) => {
+                    const element = document.getElementById(subFieldId);
+                    if (element) {
+                        element.addEventListener("input", () =>
+                            checkField(field.id)
+                        );
+                        element.addEventListener("change", () =>
+                            checkField(field.id)
+                        );
+                        element.addEventListener("blur", () =>
+                            checkField(field.id)
+                        );
+                    }
+                });
+            } else if (field.special) {
                 // Campos especiales como 382 que son formsets
                 setupSpecialFieldListener(field);
             } else {
@@ -321,7 +354,13 @@
 
         let isComplete = false;
 
-        if (field.special) {
+        if (field.group) {
+            // Verificar si al menos un campo del grupo tiene valor
+            isComplete = field.fields.some((subFieldId) => {
+                const el = document.getElementById(subFieldId);
+                return el && el.value && el.value.trim() !== "";
+            });
+        } else if (field.special) {
             isComplete = checkSpecialField(field);
         } else {
             const element = document.getElementById(fieldId);

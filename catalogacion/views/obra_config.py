@@ -160,7 +160,7 @@ CAMPOS_POR_TIPO_OBRA = {
         # Igual que coleccion_manuscrita pero con tipo_registro='c'
         'campos_simples': [
             '001', '005', '008', '020', '024', '028', '040', '041', '044', '092',  # 0XX
-            '100',  # 1XX
+            '100', '130',  # 1XX - Compositor y título uniforme principal
             '240', '245', '246', '250', '264',  # 2XX
             '300', '340', '348', '382',  # 3XX
             '490',  # 4XX

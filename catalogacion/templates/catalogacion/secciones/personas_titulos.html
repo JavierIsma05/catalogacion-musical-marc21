@@ -4,6 +4,14 @@
         
         <div class="card-body">
 
+            {# Nota de obligatoriedad cuando ambos campos 100 y 130 son visibles #}
+            {% if '100' in campos_visibles and '130' in campos_visibles %}
+            <div class="alert alert-info py-2 mb-3" role="alert">
+                <i class="bi bi-info-circle me-1"></i>
+                <small>Debe completar al menos uno: <strong>Compositor (100)</strong> o <strong>Título Uniforme (130)</strong>.</small>
+            </div>
+            {% endif %}
+
             {# Campo 100 - Compositor #}
             {% if '100' in campos_visibles %}
             <div class="campo-marc">
@@ -21,7 +29,7 @@
                         value="{{ form.compositor.value|default:'' }}">
 
                     <div class="col-full">
-                        <label class="form-label" for="id_compositor_texto">{{ form.compositor_texto.label }} <span class="text-danger">*</span></label>
+                        <label class="form-label" for="id_compositor_texto">{{ form.compositor_texto.label }}{% if '130' not in campos_visibles %} <span class="text-danger">*</span>{% endif %}</label>
                         <div class="autocomplete-wrapper">
                             {{ form.compositor_texto }}
                             <div id="compositor-suggestions" class="autocomplete-suggestions"></div>
