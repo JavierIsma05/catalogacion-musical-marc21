@@ -4,6 +4,10 @@ Cada subcampo repetible que llega vía JavaScript se agrupa por índice de
 formset y se guarda de forma encadenada en la base de datos.
 """
 
+import logging
+
+logger = logging.getLogger("obra_views")
+
 
 class FormsetSubcampoHandler:
     """Procesa los subcampos repetibles enviados desde inputs dinámicos."""
@@ -191,7 +195,7 @@ def save_lugares_264(request_post, formset, obra=None):
 
     handler = FormsetSubcampoHandler(request_post)
     valores = handler._agrupar_subcampos_por_indice("lugar_produccion_264_", 2)
-    print(f"[264] Lugares recibidos: {valores}")
+    logger.info(f"[264] Lugares recibidos: {valores}")
 
     for index, form in enumerate(formset):
         if not form.instance.pk:
@@ -217,7 +221,7 @@ def save_entidades_264(request_post, formset, obra=None):
 
     handler = FormsetSubcampoHandler(request_post)
     valores = handler._agrupar_subcampos_por_indice("entidad_produccion_264_", 2)
-    print(f"[264] Entidades recibidas: {valores}")
+    logger.info(f"[264] Entidades recibidas: {valores}")
 
     for index, form in enumerate(formset):
         if not form.instance.pk:
@@ -243,7 +247,7 @@ def save_fechas_264(request_post, formset, obra=None):
 
     handler = FormsetSubcampoHandler(request_post)
     valores = handler._agrupar_subcampos_por_indice("fecha_produccion_264_", 2)
-    print(f"[264] Fechas recibidas: {valores}")
+    logger.info(f"[264] Fechas recibidas: {valores}")
 
     for index, form in enumerate(formset):
         if not form.instance.pk:
@@ -325,37 +329,55 @@ def save_terminos_asociados_700(request_post, formset):
                         nombre_700=form.instance, termino=val
                     )
 
+    logger.info(f"[700 $c] Términos asociados recibidos: {valores}")
+
 
 def save_funciones_700(request_post, formset):
-    """Guarda funciones (700 $e) desde el nested formset en POST."""
-    from catalogacion.forms.formsets import Funcion700FormSet
+    """Guarda funciones (700 $e) parseando directamente del POST.
+
+    Los selects tienen name como:
+    - Existentes: funcion700-nombres_700-0-0-funcion, funcion700-nombres_700-0-1-funcion
+    - Nuevos (empty form): funcion700-0-0-funcion, funcion700-1-0-funcion
+
+    Estrategia: buscar ambos patrones de prefix para cada form.
+    """
     from catalogacion.models import Funcion700
 
     for index, form in enumerate(formset):
         if not form.instance.pk:
             continue
 
-        prefix = f"funcion700-{form.prefix}"
-        func_formset = Funcion700FormSet(
-            data=request_post,
-            instance=form.instance,
-            prefix=prefix,
-        )
+        # Saltar forms marcados para eliminación
+        if getattr(form, "cleaned_data", None) and form.cleaned_data.get(
+            "DELETE", False
+        ):
+            continue
+
+        # Recopilar funciones desde el POST para este form
+        # El prefix con nombre completo (forms existentes renderizados por Django)
+        prefix_full = f"funcion700-{form.prefix}-"
+        # El prefix corto (forms nuevos creados desde empty form)
+        prefix_short = f"funcion700-{index}-"
+
+        funciones = []
+        for key, value in request_post.items():
+            if (
+                key.startswith(prefix_full) or key.startswith(prefix_short)
+            ) and key.endswith("-funcion"):
+                if value.strip():
+                    funciones.append(value.strip())
 
         # Limpiar funciones anteriores y guardar las nuevas
         form.instance.funciones.all().delete()
 
-        if func_formset.is_valid():
-            for fform in func_formset:
-                if (
-                    getattr(fform, "cleaned_data", None)
-                    and not fform.cleaned_data.get("DELETE", False)
-                    and fform.cleaned_data.get("funcion")
-                ):
-                    Funcion700.objects.create(
-                        nombre_700=form.instance,
-                        funcion=fform.cleaned_data["funcion"],
-                    )
+        for funcion_val in funciones:
+            Funcion700.objects.create(
+                nombre_700=form.instance,
+                funcion=funcion_val,
+            )
+
+        if funciones:
+            logger.info(f"[700 $e] Funciones guardadas para #{index}: {funciones}")
 
 
 # ================================================================

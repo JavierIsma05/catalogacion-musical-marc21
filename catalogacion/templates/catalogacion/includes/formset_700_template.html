@@ -168,6 +168,7 @@ Orden vertical limpio
 
         <!-- EMPTY FORM -->
         <div class="formset-row empty-form mb-3" style="display:none;">
+            <input type="hidden" name="{{ formset.prefix }}-__prefix__-id" value="">
             <button type="button" class="delete-row-btn" title="Eliminar nombre relacionado">
                 <i class="bi bi-x-lg"></i>
             </button>
@@ -245,6 +246,9 @@ Orden vertical limpio
                                 </button>
                                 <select class="form-select funcion-select" name="funcion700-__prefix__-0-funcion">
                                     <option value="">---------</option>
+                                    {% for value, label in funciones_opciones %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
                                 </select>
                                 <button type="button" class="subcampo-delete-btn delete-funcion-btn" style="visibility:hidden;">
                                     <i class="bi bi-x-lg"></i>
@@ -361,7 +365,7 @@ Orden vertical limpio
     }
 
     /* ======================================================
-       REINDEXAR FORMSET 700 (SIN CAMBIOS)
+       REINDEXAR FORMSET 700 (SOLO PADRE, NO TOCA NESTED)
        ====================================================== */
     function reindex700() {
         const rows = root.querySelectorAll(".formset-row:not(.empty-form)");
@@ -372,20 +376,58 @@ Orden vertical limpio
                 ["name", "id", "for"].forEach(attr => {
                     const val = el.getAttribute(attr);
                     if (!val) return;
-                    el.setAttribute(
-                        attr,
-                        val.replace(/-\d+-/g, `-${index}-`)
-                           .replace(/__prefix__/g, index)
-                    );
+
+                    // ─── Solo reindexar campos del formset padre (nombres_700) ───
+                    // Patrón: nombres_700-NUMERO-campo
+                    // NO tocar campos de formsets anidados (funcion700-*)
+                    if (val.startsWith(prefix + "-") || val.startsWith("id_" + prefix + "-")) {
+                        const idPrefix = val.startsWith("id_") ? "id_" : "";
+                        const rest = val.slice((idPrefix + prefix + "-").length);
+                        // rest = "0-campo" → reemplazar solo el primer número
+                        const newRest = rest.replace(/^\d+/, String(index));
+                        el.setAttribute(attr, idPrefix + prefix + "-" + newRest);
+                    }
+                    // Reindexar __prefix__ solo para el padre
+                    else if (val.includes("__prefix__")) {
+                        el.setAttribute(attr, val.replace(/__prefix__/g, index));
+                    }
                 });
             });
 
-            // ✅ Reindexar nombres custom de 700$c (no son formset Django)
+            // ─── Reindexar nombres custom de 700$c (no son formset Django) ───
             row.querySelectorAll('input[name^="termino_asociado_700_"]').forEach(input => {
                 const name = input.getAttribute('name');
                 if (!name) return;
-                // termino_asociado_700_{idx}_...
                 input.setAttribute('name', name.replace(/^termino_asociado_700_\d+_/, `termino_asociado_700_${index}_`));
+            });
+
+            // ─── Reindexar management form de funciones anidadas ───
+            row.querySelectorAll('input[name^="funcion700-"]').forEach(input => {
+                const name = input.getAttribute('name');
+                if (!name) return;
+                // Patrones posibles:
+                // funcion700-nombres_700-OLD-TOTAL_FORMS → funcion700-nombres_700-NEW-TOTAL_FORMS
+                // funcion700-nombres_700-OLD-N-funcion   → funcion700-nombres_700-NEW-N-funcion
+                // funcion700-OLD-N-funcion (del empty form clonado) → funcion700-NEW-N-funcion
+                const reNested = new RegExp(`^funcion700-${prefix}-(\\d+)-`);
+                const reShort = /^funcion700-(\d+)-/;
+                if (reNested.test(name)) {
+                    input.setAttribute('name', name.replace(reNested, `funcion700-${prefix}-${index}-`));
+                } else if (reShort.test(name)) {
+                    input.setAttribute('name', name.replace(reShort, `funcion700-${index}-`));
+                }
+            });
+            // Lo mismo para selects de funciones
+            row.querySelectorAll('select[name^="funcion700-"]').forEach(sel => {
+                const name = sel.getAttribute('name');
+                if (!name) return;
+                const reNested = new RegExp(`^funcion700-${prefix}-(\\d+)-`);
+                const reShort = /^funcion700-(\d+)-/;
+                if (reNested.test(name)) {
+                    sel.setAttribute('name', name.replace(reNested, `funcion700-${prefix}-${index}-`));
+                } else if (reShort.test(name)) {
+                    sel.setAttribute('name', name.replace(reShort, `funcion700-${index}-`));
+                }
             });
 
             row.querySelectorAll("[data-nombre-index]").forEach(btn =>
