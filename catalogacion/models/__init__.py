@@ -6,57 +6,41 @@ Estructura refactorizada y coherente con los modelos actuales.
 # ============================================
 # BORRADORES
 # ============================================
-from .borradores import BorradorObra
+# ============================================
+# ACTIVAR SIGNALS
+# ============================================
+from . import signals_auditoria  # noqa: F401
 
 # ============================================
 # AUTORIDADES
 # ============================================
 from .autoridades import (
+    AutoridadEntidad,
+    AutoridadFormaMusical,
+    AutoridadMateria,
     AutoridadPersona,
     AutoridadTituloUniforme,
-    AutoridadFormaMusical,
-    AutoridadEntidad,
-    AutoridadMateria,
-)
-
-# ============================================
-# MODELO PRINCIPAL
-# ============================================
-from .obra_general import (
-    ObraGeneral,
-    NumeroControlSecuencia,
 )
 
 # ============================================
 # MODELOS AUXILIARES
 # ============================================
 from .auxiliares import (
-    SoftDeleteMixin,
-    HistorialCambio,
     EncabezamientoEnlace,
+    HistorialCambio,
     ObraLengua,
-)
-
-# ============================================
-# VALIDADORES
-# ============================================
-from .validadores import (
-    ValidadorBase,
-    ValidadorColeccion,
-    ValidadorObraEnColeccion,
-    ValidadorObraIndependiente,
-    obtener_validador,
+    SoftDeleteMixin,
 )
 
 # ============================================
 # BLOQUE 0XX
 # ============================================
 from .bloque_0xx import (
+    CodigoLengua,
+    CodigoPaisEntidad,
+    IdiomaObra,
     IncipitMusical,
     IncipitURL,
-    CodigoLengua,
-    IdiomaObra,
-    CodigoPaisEntidad,
 )
 
 # ============================================
@@ -70,12 +54,12 @@ from .bloque_1xx import (
 # BLOQUE 2XX
 # ============================================
 from .bloque_2xx import (
-    TituloAlternativo,
     Edicion,
-    ProduccionPublicacion,
+    Fecha264,
     Lugar264,
     NombreEntidad264,
-    Fecha264,
+    ProduccionPublicacion,
+    TituloAlternativo,
 )
 
 # ============================================
@@ -99,10 +83,10 @@ from .bloque_4xx import (
 # BLOQUE 5XX
 # ============================================
 from .bloque_5xx import (
-    NotaGeneral500,
     Contenido505,
-    Sumario520,
     DatosBiograficos545,
+    NotaGeneral500,
+    Sumario520,
 )
 
 # ============================================
@@ -110,39 +94,41 @@ from .bloque_5xx import (
 # ============================================
 from .bloque_6xx import (
     Materia650,
-    SubdivisionMateria650,
-    SubdivisionCronologica650,
     MateriaGenero655,
-    SubdivisionGeneral655,
+    SubdivisionCronologica650,
     SubdivisionCronologica655,
+    SubdivisionGeneral655,
+    SubdivisionMateria650,
 )
 
 # ============================================
 # BLOQUE 7XX
 # ============================================
 from .bloque_7xx import (
-    NombreRelacionado700,
-    TerminoAsociado700,
-    Funcion700,
-    EntidadRelacionada710,
     EnlaceDocumentoFuente773,
-    NumeroControl773,
     EnlaceUnidadConstituyente774,
+    EntidadRelacionada710,
+    Funcion700,
+    FuncionInstitucional710,
+    NombreRelacionado700,
+    NumeroControl773,
     NumeroControl774,
-    OtrasRelaciones787,
     NumeroControl787,
+    OtrasRelaciones787,
+    TerminoAsociado700,
 )
 
 # ============================================
 # BLOQUE 8XX
 # ============================================
 from .bloque_8xx import (
-    Ubicacion852,
-    Estanteria852,
-    Disponible856,
     URL856,
+    Disponible856,
+    Estanteria852,
     TextoEnlace856,
+    Ubicacion852,
 )
+from .borradores import BorradorObra
 
 # ============================================
 # UTILIDADES / MANAGERS
@@ -150,131 +136,128 @@ from .bloque_8xx import (
 from .managers import ObraGeneralManager
 
 # ============================================
-# ACTIVAR SIGNALS
+# MODELO PRINCIPAL
 # ============================================
-from . import signals_auditoria  # noqa: F401
+from .obra_general import (
+    NumeroControlSecuencia,
+    ObraGeneral,
+)
 
+# ============================================
+# VALIDADORES
+# ============================================
+from .validadores import (
+    ValidadorBase,
+    ValidadorColeccion,
+    ValidadorObraEnColeccion,
+    ValidadorObraIndependiente,
+    obtener_validador,
+)
 
 # ============================================
 # __all__ para import *
 # ============================================
 __all__ = [
-
     # -------------------------------
     # AUTORIDADES
     # -------------------------------
-    'AutoridadPersona',
-    'AutoridadTituloUniforme',
-    'AutoridadFormaMusical',
-    'AutoridadEntidad',
-    'AutoridadMateria',
-
+    "AutoridadPersona",
+    "AutoridadTituloUniforme",
+    "AutoridadFormaMusical",
+    "AutoridadEntidad",
+    "AutoridadMateria",
     # -------------------------------
     # MODELO PRINCIPAL
     # -------------------------------
-    'ObraGeneral',
-    'NumeroControlSecuencia',
-
+    "ObraGeneral",
+    "NumeroControlSecuencia",
     # -------------------------------
     # AUXILIARES
     # -------------------------------
-    'SoftDeleteMixin',
-    'HistorialCambio',
-    'EncabezamientoEnlace',
-    'ObraLengua',
-
+    "SoftDeleteMixin",
+    "HistorialCambio",
+    "EncabezamientoEnlace",
+    "ObraLengua",
     # -------------------------------
     # VALIDADORES
     # -------------------------------
-    'ValidadorBase',
-    'ValidadorColeccion',
-    'ValidadorObraEnColeccion',
-    'ValidadorObraIndependiente',
-    'obtener_validador',
-
+    "ValidadorBase",
+    "ValidadorColeccion",
+    "ValidadorObraEnColeccion",
+    "ValidadorObraIndependiente",
+    "obtener_validador",
     # -------------------------------
     # 0XX
     # -------------------------------
-    'IncipitMusical',
-    'IncipitURL',
-    'CodigoLengua',
-    'IdiomaObra',
-    'CodigoPaisEntidad',
-
+    "IncipitMusical",
+    "IncipitURL",
+    "CodigoLengua",
+    "IdiomaObra",
+    "CodigoPaisEntidad",
     # -------------------------------
     # 1XX
     # -------------------------------
-    'FuncionCompositor',
-
+    "FuncionCompositor",
     # -------------------------------
     # 2XX
     # -------------------------------
-    'TituloAlternativo',
-    'Edicion',
-    'ProduccionPublicacion',
-    'Lugar264',
-    'NombreEntidad264',
-    'Fecha264',
-
+    "TituloAlternativo",
+    "Edicion",
+    "ProduccionPublicacion",
+    "Lugar264",
+    "NombreEntidad264",
+    "Fecha264",
     # -------------------------------
     # 3XX
     # -------------------------------
-    'MedioInterpretacion382',
-    'MedioInterpretacion382_a',
-
+    "MedioInterpretacion382",
+    "MedioInterpretacion382_a",
     # -------------------------------
     # 4XX
     # -------------------------------
-    'MencionSerie490',
-    'TituloSerie490',
-    'VolumenSerie490',
-
+    "MencionSerie490",
+    "TituloSerie490",
+    "VolumenSerie490",
     # -------------------------------
     # 5XX
     # -------------------------------
-    'NotaGeneral500',
-    'Contenido505',
-    'Sumario520',
-    'DatosBiograficos545',
-
+    "NotaGeneral500",
+    "Contenido505",
+    "Sumario520",
+    "DatosBiograficos545",
     # -------------------------------
     # 6XX
     # -------------------------------
-    'Materia650',
-    'SubdivisionMateria650',
-    'SubdivisionCronologica650',
-    'MateriaGenero655',
-    'SubdivisionGeneral655',
-    'SubdivisionCronologica655',
-
+    "Materia650",
+    "SubdivisionMateria650",
+    "SubdivisionCronologica650",
+    "MateriaGenero655",
+    "SubdivisionGeneral655",
+    "SubdivisionCronologica655",
     # -------------------------------
     # 7XX
     # -------------------------------
-    'NombreRelacionado700',
-    'TerminoAsociado700',
-    'Funcion700',
-    'EntidadRelacionada710',
-
-    'EnlaceDocumentoFuente773',
-    'NumeroControl773',
-
-    'EnlaceUnidadConstituyente774',
-    'NumeroControl774',
-
-    'OtrasRelaciones787',
-    'NumeroControl787',
-
+    "NombreRelacionado700",
+    "TerminoAsociado700",
+    "Funcion700",
+    "EntidadRelacionada710",
+    "FuncionInstitucional710",
+    "EnlaceDocumentoFuente773",
+    "NumeroControl773",
+    "EnlaceUnidadConstituyente774",
+    "NumeroControl774",
+    "OtrasRelaciones787",
+    "NumeroControl787",
     # -------------------------------
     # 8XX
     # -------------------------------
-    'Ubicacion852',
-    'Estanteria852',
-    'Disponible856',
-    'URL856',
-    'TextoEnlace856',
-
+    "Ubicacion852",
+    "Estanteria852",
+    "Disponible856",
+    "URL856",
+    "TextoEnlace856",
     # -------------------------------
     # UTILIDADES
     # -------------------------------
-    'ObraGeneralManager',
+    "ObraGeneralManager",
 ]

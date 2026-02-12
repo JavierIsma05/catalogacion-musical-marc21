@@ -380,6 +380,47 @@ def save_funciones_700(request_post, formset):
             logger.info(f"[700 $e] Funciones guardadas para #{index}: {funciones}")
 
 
+def save_funciones_institucionales_710(request_post, formset):
+    """Guarda funciones institucionales (710 $e) parseando directamente del POST.
+
+    Los selects tienen name como: funcion_institucional_710_X_Y
+    donde X = índice de la entidad, Y = índice de la función.
+    """
+    from catalogacion.models import FuncionInstitucional710
+
+    for index, form in enumerate(formset):
+        if not form.instance.pk:
+            continue
+
+        # Saltar forms marcados para eliminación
+        if getattr(form, "cleaned_data", None) and form.cleaned_data.get(
+            "DELETE", False
+        ):
+            continue
+
+        # Recopilar funciones desde el POST para este form
+        prefix = f"funcion_institucional_710_{index}_"
+
+        funciones = []
+        for key, value in request_post.items():
+            if key.startswith(prefix) and value.strip():
+                funciones.append(value.strip())
+
+        # Limpiar funciones anteriores y guardar las nuevas
+        form.instance.funciones_institucionales.all().delete()
+
+        for funcion_val in funciones:
+            FuncionInstitucional710.objects.create(
+                entidad_710=form.instance,
+                funcion=funcion_val,
+            )
+
+        if funciones:
+            logger.info(
+                f"[710 $e] Funciones institucionales guardadas para #{index}: {funciones}"
+            )
+
+
 # ================================================================
 # MAPEO DE HANDLERS REGISTRADOS
 # ================================================================
@@ -399,4 +440,5 @@ SUBCAMPO_HANDLERS = {
     "_save_volumenes_490": save_volumenes_490,
     "_save_terminos_asociados_700": save_terminos_asociados_700,
     "_save_funciones_700": save_funciones_700,
+    "_save_funciones_institucionales_710": save_funciones_institucionales_710,
 }

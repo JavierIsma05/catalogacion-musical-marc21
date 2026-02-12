@@ -370,6 +370,9 @@ class ObraFormsetMixin:
                 "_save_terminos_asociados_700",
                 "_save_funciones_700",
             ],
+            "entidades_relacionadas_710": [
+                "_save_funciones_institucionales_710",
+            ],
         }
 
         for key, formset in formsets.items():

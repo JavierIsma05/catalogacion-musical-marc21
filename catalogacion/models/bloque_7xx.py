@@ -1,40 +1,40 @@
 from django.db import models
 
-
 # =====================================================
 # ⚙️ Choices (listas controladas)
 # =====================================================
 
 FUNCIONES_PERSONA = [
-    ('arreglista', 'Arreglista'),
-    ('coeditor', 'Coeditor'),
-    ('compilador', 'Compilador'),
-    ('compositor', 'Compositor'),
-    ('copista', 'Copista'),
-    ('dedicatario', 'Dedicatorio'),  # ojo: aquí el label es "Dedicatorio" como pusiste
-    ('editor', 'Editor'),
-    ('prologuista', 'Prologuista'),
+    ("arreglista", "Arreglista"),
+    ("coeditor", "Coeditor"),
+    ("compilador", "Compilador"),
+    ("compositor", "Compositor"),
+    ("copista", "Copista"),
+    ("dedicatario", "Dedicatario"),
+    ("editor", "Editor"),
+    ("prologuista", "Prologuista"),
 ]
 
 AUTORIAS_CHOICES = [
-    ('atribuida', 'Atribuida'),
-    ('certificada', 'Certificada'),
-    ('erronea', 'Errónea'),
+    ("atribuida", "Atribuida"),
+    ("certificada", "Certificada"),
+    ("erronea", "Errónea"),
 ]
 
 FUNCIONES_ENTIDAD = [
-    ('coeditor', 'Coeditor'),
-    ('dedicatario', 'Dedicatorio'),
-    ('editor', 'Editor'),
-    ('lugar_ejecucion', 'Lugar de ejecución'),
-    ('lugar_estreno', 'Lugar de estreno'),
-    ('patrocinante', 'Patrocinante'),
+    ("coeditor", "Coeditor"),
+    ("dedicatario", "Dedicatario"),
+    ("editor", "Editor"),
+    ("lugar_ejecucion", "Lugar de ejecución"),
+    ("lugar_estreno", "Lugar de estreno"),
+    ("patrocinante", "Patrocinante"),
 ]
 
 
 # =====================================================
 # 🧑 700 1# Punto de acceso adicional – Nombre de persona (R)
 # =====================================================
+
 
 class NombreRelacionado700(models.Model):
     """
@@ -45,33 +45,30 @@ class NombreRelacionado700(models.Model):
       $j autoría
       $t título de la obra
     """
+
     obra = models.ForeignKey(
-        'ObraGeneral',
+        "ObraGeneral",
         on_delete=models.CASCADE,
-        related_name='nombres_relacionados_700',
+        related_name="nombres_relacionados_700",
     )
 
     persona = models.ForeignKey(
-        'AutoridadPersona',
+        "AutoridadPersona",
         on_delete=models.PROTECT,
         blank=True,
         null=True,
-        help_text="700 $a – Apellidos, Nombres (NR, autoridad)"
-        
+        help_text="700 $a – Apellidos, Nombres (NR, autoridad)",
     )
 
     coordenadas_biograficas = models.CharField(
         max_length=50,
         blank=True,
         null=True,
-        help_text="700 $d – Coordenadas biográficas (NR)"
+        help_text="700 $d – Coordenadas biográficas (NR)",
     )
 
     relacion = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True,
-        help_text="700 $i – Relación (NR)"
+        max_length=200, blank=True, null=True, help_text="700 $i – Relación (NR)"
     )
 
     autoria = models.CharField(
@@ -79,14 +76,14 @@ class NombreRelacionado700(models.Model):
         choices=AUTORIAS_CHOICES,
         blank=True,
         null=True,
-        help_text="700 $j – Autoría (NR)"
+        help_text="700 $j – Autoría (NR)",
     )
 
     titulo_obra = models.CharField(
         max_length=250,
         blank=True,
         null=True,
-        help_text="700 $t – Título de la obra (NR)"
+        help_text="700 $t – Título de la obra (NR)",
     )
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -121,16 +118,14 @@ class TerminoAsociado700(models.Model):
     700 $c – Término asociado (R)
     Ej: Dr., Lic., etc.
     """
+
     nombre_700 = models.ForeignKey(
         NombreRelacionado700,
         on_delete=models.CASCADE,
-        related_name='terminos_asociados',
-        
+        related_name="terminos_asociados",
     )
     termino = models.CharField(
-        max_length=100,
-        help_text="700 $c – Término asociado (R)"
-       
+        max_length=100, help_text="700 $c – Término asociado (R)"
     )
 
     class Meta:
@@ -145,16 +140,14 @@ class Funcion700(models.Model):
     """
     700 $e – Función (R)
     """
+
     nombre_700 = models.ForeignKey(
         NombreRelacionado700,
         on_delete=models.CASCADE,
-        related_name='funciones',
-        
+        related_name="funciones",
     )
     funcion = models.CharField(
-        max_length=30,
-        choices=FUNCIONES_PERSONA,
-        help_text="700 $e – Función (R)"
+        max_length=30, choices=FUNCIONES_PERSONA, help_text="700 $e – Función (R)"
     )
 
     class Meta:
@@ -170,6 +163,7 @@ class Funcion700(models.Model):
 # 🏛️ 710 2# Entidad relacionada (R)
 # =====================================================
 
+
 class EntidadRelacionada710(models.Model):
     """
     710 2# – Entidad relacionada (R)
@@ -178,21 +172,20 @@ class EntidadRelacionada710(models.Model):
     """
 
     obra = models.ForeignKey(
-        'ObraGeneral',
+        "ObraGeneral",
         on_delete=models.CASCADE,
-        related_name='entidades_relacionadas_710',
+        related_name="entidades_relacionadas_710",
         blank=True,
         null=True,
-        help_text="710 $a – Entidad relacionada (NR)"
+        help_text="710 $a – Entidad relacionada (NR)",
     )
-    
 
     entidad = models.ForeignKey(
-        'AutoridadEntidad',
+        "AutoridadEntidad",
         on_delete=models.PROTECT,
         blank=True,
         null=True,
-        help_text="710 $a – Entidad relacionada (NR)"
+        help_text="710 $a – Entidad relacionada (NR)",
     )
 
     funcion = models.CharField(
@@ -200,7 +193,7 @@ class EntidadRelacionada710(models.Model):
         choices=FUNCIONES_ENTIDAD,
         blank=True,
         null=True,
-        help_text="710 $e – Función institucional (R)"
+        help_text="710 $e – Función institucional (R)",
     )
 
     class Meta:
@@ -215,9 +208,35 @@ class EntidadRelacionada710(models.Model):
         return f"Entidad relacionada 710 (id={self.pk or 'nuevo'})"
 
 
+class FuncionInstitucional710(models.Model):
+    """
+    710 $e – Función institucional (R)
+    Modelo separado para soportar múltiples funciones por entidad.
+    """
+
+    entidad_710 = models.ForeignKey(
+        EntidadRelacionada710,
+        on_delete=models.CASCADE,
+        related_name="funciones_institucionales",
+    )
+    funcion = models.CharField(
+        max_length=50,
+        choices=FUNCIONES_ENTIDAD,
+        help_text="710 $e – Función institucional",
+    )
+
+    class Meta:
+        verbose_name = "710 $e – Función institucional"
+        verbose_name_plural = "710 $e – Funciones institucionales"
+
+    def __str__(self):
+        return dict(FUNCIONES_ENTIDAD).get(self.funcion, self.funcion)
+
+
 # =====================================================
 # 📘 773 – Enlace a documento fuente (R)
 # =====================================================
+
 
 class EnlaceDocumentoFuente773(models.Model):
     """
@@ -226,23 +245,22 @@ class EnlaceDocumentoFuente773(models.Model):
       $t Título (AutoridadTituloUniforme)
     """
 
-
     obra = models.ForeignKey(
-        'ObraGeneral',
+        "ObraGeneral",
         on_delete=models.CASCADE,
-        related_name='enlaces_documento_fuente_773',
+        related_name="enlaces_documento_fuente_773",
     )
 
     encabezamiento_principal = models.ForeignKey(
-        'AutoridadPersona',
+        "AutoridadPersona",
         on_delete=models.PROTECT,
-        help_text="773 $a – Encabezamiento principal (NR)"
+        help_text="773 $a – Encabezamiento principal (NR)",
     )
 
     titulo = models.ForeignKey(
-        'AutoridadTituloUniforme',
+        "AutoridadTituloUniforme",
         on_delete=models.PROTECT,
-        help_text="773 $t – Título (NR)"
+        help_text="773 $t – Título (NR)",
     )
 
     class Meta:
@@ -260,16 +278,17 @@ class NumeroControl773(models.Model):
     773 $w – Número de control del registro relacionado (R)
     Apunta a otra ObraGeneral cuyo 001 (num_control) se mostrará.
     """
+
     enlace_773 = models.ForeignKey(
         EnlaceDocumentoFuente773,
         on_delete=models.CASCADE,
-        related_name='numeros_control',
+        related_name="numeros_control",
     )
 
     obra_relacionada = models.ForeignKey(
-        'ObraGeneral',
+        "ObraGeneral",
         on_delete=models.PROTECT,
-        help_text="Referencia al registro cuyo 001 se usará en $w"
+        help_text="Referencia al registro cuyo 001 se usará en $w",
     )
 
     class Meta:
@@ -278,7 +297,9 @@ class NumeroControl773(models.Model):
 
     def __str__(self):
         # evitamos romper si la obra_relacionada no tiene num_control aún
-        if getattr(self, "obra_relacionada", None) and getattr(self.obra_relacionada, "num_control", None):
+        if getattr(self, "obra_relacionada", None) and getattr(
+            self.obra_relacionada, "num_control", None
+        ):
             return self.obra_relacionada.num_control
         return f"Número de control 773 (id={self.pk or 'nuevo'})"
 
@@ -286,6 +307,7 @@ class NumeroControl773(models.Model):
 # =====================================================
 # 📗 774 – Unidad constituyente (R)
 # =====================================================
+
 
 class EnlaceUnidadConstituyente774(models.Model):
     """
@@ -295,21 +317,21 @@ class EnlaceUnidadConstituyente774(models.Model):
     """
 
     obra = models.ForeignKey(
-        'ObraGeneral',
+        "ObraGeneral",
         on_delete=models.CASCADE,
-        related_name='enlaces_unidades_774',
+        related_name="enlaces_unidades_774",
     )
 
     encabezamiento_principal = models.ForeignKey(
-        'AutoridadPersona',
+        "AutoridadPersona",
         on_delete=models.PROTECT,
-        help_text="774 $a – Encabezamiento principal (NR)"
+        help_text="774 $a – Encabezamiento principal (NR)",
     )
 
     titulo = models.ForeignKey(
-        'AutoridadTituloUniforme',
+        "AutoridadTituloUniforme",
         on_delete=models.PROTECT,
-        help_text="774 $t – Título (NR)"
+        help_text="774 $t – Título (NR)",
     )
 
     class Meta:
@@ -328,13 +350,13 @@ class NumeroControl774(models.Model):
     enlace_774 = models.ForeignKey(
         EnlaceUnidadConstituyente774,
         on_delete=models.CASCADE,
-        related_name='numeros_control',
+        related_name="numeros_control",
     )
 
     obra_relacionada = models.ForeignKey(
-        'ObraGeneral',
+        "ObraGeneral",
         on_delete=models.PROTECT,
-        help_text="Obra cuyo 001 aparecerá en $w"
+        help_text="Obra cuyo 001 aparecerá en $w",
     )
 
     class Meta:
@@ -342,7 +364,9 @@ class NumeroControl774(models.Model):
         verbose_name_plural = "774 $w – Números de control (R)"
 
     def __str__(self):
-        if getattr(self, "obra_relacionada", None) and getattr(self.obra_relacionada, "num_control", None):
+        if getattr(self, "obra_relacionada", None) and getattr(
+            self.obra_relacionada, "num_control", None
+        ):
             return self.obra_relacionada.num_control
         return f"Número de control 774 (id={self.pk or 'nuevo'})"
 
@@ -350,6 +374,7 @@ class NumeroControl774(models.Model):
 # =====================================================
 # 🔗 787 – Otras relaciones (R)
 # =====================================================
+
 
 class OtrasRelaciones787(models.Model):
     """
@@ -359,21 +384,18 @@ class OtrasRelaciones787(models.Model):
     """
 
     obra = models.ForeignKey(
-        'ObraGeneral',
+        "ObraGeneral",
         on_delete=models.CASCADE,
-        related_name='otras_relaciones_787',
+        related_name="otras_relaciones_787",
     )
 
     encabezamiento_principal = models.ForeignKey(
-        'AutoridadPersona',
+        "AutoridadPersona",
         on_delete=models.PROTECT,
-        help_text="787 $a – Encabezamiento principal (NR)"
+        help_text="787 $a – Encabezamiento principal (NR)",
     )
 
-    titulo = models.CharField(
-        max_length=250,
-        help_text="787 $t – Título (NR)"
-    )
+    titulo = models.CharField(max_length=250, help_text="787 $t – Título (NR)")
 
     class Meta:
         verbose_name = "787 – Otra relación"
@@ -391,13 +413,13 @@ class NumeroControl787(models.Model):
     enlace_787 = models.ForeignKey(
         OtrasRelaciones787,
         on_delete=models.CASCADE,
-        related_name='numeros_control',
+        related_name="numeros_control",
     )
 
     obra_relacionada = models.ForeignKey(
-        'ObraGeneral',
+        "ObraGeneral",
         on_delete=models.PROTECT,
-        help_text="Obra cuyo 001 aparecerá en $w"
+        help_text="Obra cuyo 001 aparecerá en $w",
     )
 
     class Meta:
@@ -405,6 +427,8 @@ class NumeroControl787(models.Model):
         verbose_name_plural = "787 $w – Números de control (R)"
 
     def __str__(self):
-        if getattr(self, "obra_relacionada", None) and getattr(self.obra_relacionada, "num_control", None):
+        if getattr(self, "obra_relacionada", None) and getattr(
+            self.obra_relacionada, "num_control", None
+        ):
             return self.obra_relacionada.num_control
         return f"Número de control 787 (id={self.pk or 'nuevo'})"

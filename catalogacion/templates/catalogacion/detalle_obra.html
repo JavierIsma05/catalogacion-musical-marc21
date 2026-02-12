@@ -318,7 +318,11 @@
                                 <div class="linea-principal">
                                     <strong>$a {{ entidad.entidad }}</strong>
                                 </div>
-                                {% if entidad.funcion %}
+                                {% if entidad.funciones_institucionales.exists %}
+                                <div class="linea-secundaria">
+                                    {% for fi in entidad.funciones_institucionales.all %}$e {{ fi.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                </div>
+                                {% elif entidad.funcion %}
                                 <div class="linea-secundaria">
                                     $e {{ entidad.get_funcion_display }}
                                 </div>
