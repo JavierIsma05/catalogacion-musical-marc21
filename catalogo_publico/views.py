@@ -1,17 +1,15 @@
 from pathlib import Path
 
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
 
 from catalogacion.models import ObraGeneral
-
-from django.core.files.storage import default_storage
-from django.urls import reverse
-
 from digitalizacion.models import DigitalPage, DigitalSet, WorkSegment
 
 
@@ -26,9 +24,7 @@ class HomePublicoView(TemplateView):
         # Solo contar obras publicadas
         context["total_obras"] = ObraGeneral.objects.filter(publicada=True).count()
         # Últimas obras PUBLICADAS (no solo registradas)
-        context["ultimas_obras"] = ObraGeneral.objects.filter(
-            publicada=True
-        ).order_by(
+        context["ultimas_obras"] = ObraGeneral.objects.filter(publicada=True).order_by(
             "-fecha_creacion_sistema"
         )[:6]
         return context
@@ -79,8 +75,10 @@ class ListaObrasPublicaView(ListView):
             queryset = queryset.filter(
                 Q(titulo_principal__icontains=busqueda)
                 | Q(compositor__apellidos_nombres__icontains=busqueda)
-                | Q(centro_catalogador__icontains=busqueda)  # Búsqueda por signatura (parte 1)
-                | Q(num_control__icontains=busqueda)        # Búsqueda por signatura (parte 2)
+                | Q(
+                    centro_catalogador__icontains=busqueda
+                )  # Búsqueda por signatura (parte 1)
+                | Q(num_control__icontains=busqueda)  # Búsqueda por signatura (parte 2)
             )
 
         # Filtro por tipo de obra
@@ -127,7 +125,9 @@ class ListaObrasPublicaView(ListView):
             if ds_propio:
                 ds = ds_propio
                 page_n = 1
-                visor_url = reverse("digitalizacion:visor_obra", kwargs={"obra_id": o.id})
+                visor_url = reverse(
+                    "digitalizacion:visor_obra", kwargs={"obra_id": o.id}
+                )
                 pdf_path = getattr(ds, "pdf_path", "") if ds else ""
             else:
                 # PRIORIDAD 2: Segmento en colección
@@ -135,12 +135,16 @@ class ListaObrasPublicaView(ListView):
                 if seg:
                     ds = seg.digital_set
                     page_n = seg.start_page
-                    visor_url = reverse("digitalizacion:visor_obra", kwargs={"obra_id": o.id})
+                    visor_url = reverse(
+                        "digitalizacion:visor_obra", kwargs={"obra_id": o.id}
+                    )
                     pdf_path = getattr(ds, "pdf_path", "") if ds else ""
                 else:
                     ds = None
                     page_n = 1
-                    visor_url = reverse("digitalizacion:visor_digital", kwargs={"pk": o.id})
+                    visor_url = reverse(
+                        "digitalizacion:visor_digital", kwargs={"pk": o.id}
+                    )
                     pdf_path = ""
 
             ds_id = ds.id if ds else None
@@ -156,13 +160,16 @@ class ListaObrasPublicaView(ListView):
 
         # 3) Buscar derivative JPG para esas páginas
         from django.db.models import Q
+
         q = Q()
         for ds_id, page_n in wanted_pairs:
             q |= Q(digital_set_id=ds_id, page_number=page_n)
 
         dp_map = {}
         if q:
-            pages = DigitalPage.objects.filter(q).only("digital_set_id", "page_number", "derivative_path")
+            pages = DigitalPage.objects.filter(q).only(
+                "digital_set_id", "page_number", "derivative_path"
+            )
             for dp in pages:
                 if dp.derivative_path:
                     dp_map[(dp.digital_set_id, dp.page_number)] = dp.derivative_path
@@ -170,7 +177,7 @@ class ListaObrasPublicaView(ListView):
         # 4) Inyectar cover_url + visor_url en cada obra
         from digitalizacion.services.thumbnail_service import (
             get_pdf_thumbnail_for_digital_set,
-            get_pdf_thumbnail_for_segment
+            get_pdf_thumbnail_for_segment,
         )
 
         for o in obras_list:
@@ -214,7 +221,6 @@ class ListaObrasPublicaView(ListView):
             o.visor_url = meta.get("visor_url")
 
         return context
-
 
 
 class DetalleObraPublicaView(DetailView):
@@ -269,15 +275,24 @@ class DetalleObraPublicaView(DetailView):
             has_pdf = True
         else:
             # Prioridad 2: Segmento en colección
-            seg = WorkSegment.objects.filter(obra=obra).select_related("digital_set").first()
+            seg = (
+                WorkSegment.objects.filter(obra=obra)
+                .select_related("digital_set")
+                .first()
+            )
             if seg and seg.digital_set:
                 # Hay PDF si hay imágenes (genera PDF) o si hay PDF de colección
                 from digitalizacion.models import DigitalPage
-                has_images = DigitalPage.objects.filter(
-                    digital_set=seg.digital_set,
-                    page_number__gte=seg.start_page,
-                    page_number__lte=seg.end_page
-                ).exclude(derivative_path="").exists()
+
+                has_images = (
+                    DigitalPage.objects.filter(
+                        digital_set=seg.digital_set,
+                        page_number__gte=seg.start_page,
+                        page_number__lte=seg.end_page,
+                    )
+                    .exclude(derivative_path="")
+                    .exists()
+                )
                 has_pdf = has_images or bool(getattr(seg.digital_set, "pdf_path", ""))
 
         context["has_pdf"] = has_pdf
@@ -361,6 +376,7 @@ class VistaDetalladaObraView(DetailView):
         if seg and seg.digital_set:
             # Usar PDF segmentado (prioridad: imágenes > PDF colección)
             from digitalizacion.services.pdf_service import get_segment_pdf
+
             segment_pdf_path = get_segment_pdf(seg)
             if segment_pdf_path:
                 pdf_url = default_storage.url(segment_pdf_path)
@@ -383,7 +399,6 @@ class VistaDetalladaObraView(DetailView):
         context["has_pdf"] = False
 
         return context
-
 
 
 class FormatoMARC21View(DetailView):
@@ -474,6 +489,7 @@ class DescargarPDFObraView(View):
 
         # Prioridad 2: Segmento en colección (genera PDF segmentado)
         from digitalizacion.services.pdf_service import get_segment_pdf
+
         segment = WorkSegment.objects.filter(obra=obra).first()
         if segment:
             segment_pdf = get_segment_pdf(segment)
@@ -531,33 +547,36 @@ class VistaMARCCrudoView(DetailView):
         lines.append(leader)
 
         # 001 - Número de control
-        if hasattr(obra, 'num_control') and obra.num_control:
+        if hasattr(obra, "num_control") and obra.num_control:
             lines.append(f"=001  {obra.num_control}")
 
         # 005 - Fecha/hora última transacción
-        if hasattr(obra, 'fecha_hora_ultima_transaccion') and obra.fecha_hora_ultima_transaccion:
+        if (
+            hasattr(obra, "fecha_hora_ultima_transaccion")
+            and obra.fecha_hora_ultima_transaccion
+        ):
             lines.append(f"=005  {obra.fecha_hora_ultima_transaccion}")
 
         # 008 - Código de información
-        if hasattr(obra, 'codigo_informacion') and obra.codigo_informacion:
+        if hasattr(obra, "codigo_informacion") and obra.codigo_informacion:
             lines.append(f"=008  {obra.codigo_informacion}")
 
         # 020 - ISBN
-        if hasattr(obra, 'isbn') and obra.isbn:
+        if hasattr(obra, "isbn") and obra.isbn:
             lines.append(f"=020 ##${obra.isbn}")
 
         # 024 - ISMN
-        if hasattr(obra, 'ismn') and obra.ismn:
+        if hasattr(obra, "ismn") and obra.ismn:
             lines.append(f"=024 2#${obra.ismn}")
 
         # 028 - Número de editor
-        if hasattr(obra, 'numero_editor') and obra.numero_editor:
-            tipo = getattr(obra, 'tipo_numero_028', '2')
-            control = getattr(obra, 'control_nota_028', '0')
+        if hasattr(obra, "numero_editor") and obra.numero_editor:
+            tipo = getattr(obra, "tipo_numero_028", "2")
+            control = getattr(obra, "control_nota_028", "0")
             lines.append(f"=028 {tipo}{control}${obra.numero_editor}")
 
         # 031 - Íncipits musicales
-        if hasattr(obra, 'incipits_musicales') and obra.incipits_musicales.exists():
+        if hasattr(obra, "incipits_musicales") and obra.incipits_musicales.exists():
             for incipit in obra.incipits_musicales.all():
                 parts_031 = ["=031 ##"]
                 if incipit.numero_obra:
@@ -575,19 +594,21 @@ class VistaMARCCrudoView(DetailView):
                     lines.append("".join(parts_031))
 
         # 040 - Centro catalogador
-        if hasattr(obra, 'centro_catalogador') and obra.centro_catalogador:
-            lines.append(f"=040 ##${obra.centro_catalogador}$bspa$c{obra.centro_catalogador}")
+        if hasattr(obra, "centro_catalogador") and obra.centro_catalogador:
+            lines.append(
+                f"=040 ##${obra.centro_catalogador}$bspa$c{obra.centro_catalogador}"
+            )
 
         # 041 - Códigos de lengua
-        if hasattr(obra, 'codigos_lengua') and obra.codigos_lengua.exists():
+        if hasattr(obra, "codigos_lengua") and obra.codigos_lengua.exists():
             for codigo in obra.codigos_lengua.all():
                 indicadores = f"{codigo.indicacion_traduccion}{codigo.fuente_codigo}"
-                if hasattr(codigo, 'idiomas') and codigo.idiomas.exists():
+                if hasattr(codigo, "idiomas") and codigo.idiomas.exists():
                     for idioma in codigo.idiomas.all():
                         lines.append(f"=041 {indicadores}${idioma.codigo_idioma}")
 
         # 044 - Códigos de país
-        if hasattr(obra, 'codigos_pais_entidad') and obra.codigos_pais_entidad.exists():
+        if hasattr(obra, "codigos_pais_entidad") and obra.codigos_pais_entidad.exists():
             parts_044 = ["=044 ##"]
             for pais in obra.codigos_pais_entidad.all():
                 parts_044.append(f"${pais.codigo_pais}")
@@ -595,61 +616,71 @@ class VistaMARCCrudoView(DetailView):
                 lines.append("".join(parts_044))
 
         # 100 - Compositor
-        if hasattr(obra, 'compositor') and obra.compositor:
+        if hasattr(obra, "compositor") and obra.compositor:
             parts_100 = [f"=100 1#${obra.compositor.apellidos_nombres}"]
             if obra.compositor.coordenadas_biograficas:
                 parts_100.append(f"${obra.compositor.coordenadas_biograficas}")
-            if hasattr(obra, 'termino_asociado') and obra.termino_asociado:
+            if hasattr(obra, "termino_asociado") and obra.termino_asociado:
                 parts_100.append(f"${obra.termino_asociado}")
-            if hasattr(obra, 'funciones_compositor') and obra.funciones_compositor.exists():
+            if (
+                hasattr(obra, "funciones_compositor")
+                and obra.funciones_compositor.exists()
+            ):
                 for funcion in obra.funciones_compositor.all():
                     parts_100.append(f"${funcion.get_funcion_display()}")
-            if hasattr(obra, 'autoria') and obra.autoria:
+            if hasattr(obra, "autoria") and obra.autoria:
                 parts_100.append(f"${obra.get_autoria_display()}")
 
             lines.append("".join(parts_100))
 
         # 130 - Título uniforme (sin compositor)
-        if hasattr(obra, 'titulo_uniforme') and obra.titulo_uniforme and not obra.compositor:
+        if (
+            hasattr(obra, "titulo_uniforme")
+            and obra.titulo_uniforme
+            and not obra.compositor
+        ):
             parts_130 = [f"=130 0#${obra.titulo_uniforme}"]
-            if hasattr(obra, 'forma_130') and obra.forma_130:
+            if hasattr(obra, "forma_130") and obra.forma_130:
                 parts_130.append(f"${obra.forma_130}")
-            if hasattr(obra, 'numero_parte_130') and obra.numero_parte_130:
+            if hasattr(obra, "numero_parte_130") and obra.numero_parte_130:
                 parts_130.append(f"${obra.numero_parte_130}")
-            if hasattr(obra, 'nombre_parte_130') and obra.nombre_parte_130:
+            if hasattr(obra, "nombre_parte_130") and obra.nombre_parte_130:
                 parts_130.append(f"${obra.nombre_parte_130}")
 
             lines.append("".join(parts_130))
 
         # 240 - Título uniforme (con compositor)
-        if hasattr(obra, 'titulo_240') and obra.titulo_240 and obra.compositor:
+        if hasattr(obra, "titulo_240") and obra.titulo_240 and obra.compositor:
             parts_240 = [f"=240 10${obra.titulo_240}"]
-            if hasattr(obra, 'forma_240') and obra.forma_240:
+            if hasattr(obra, "forma_240") and obra.forma_240:
                 parts_240.append(f"${obra.forma_240}")
-            if hasattr(obra, 'numero_parte_240') and obra.numero_parte_240:
+            if hasattr(obra, "numero_parte_240") and obra.numero_parte_240:
                 parts_240.append(f"${obra.numero_parte_240}")
-            if hasattr(obra, 'nombre_parte_240') and obra.nombre_parte_240:
+            if hasattr(obra, "nombre_parte_240") and obra.nombre_parte_240:
                 parts_240.append(f"${obra.nombre_parte_240}")
-            if hasattr(obra, 'tonalidad_240') and obra.tonalidad_240:
+            if hasattr(obra, "tonalidad_240") and obra.tonalidad_240:
                 parts_240.append(f"${obra.get_tonalidad_240_display()}")
 
             lines.append("".join(parts_240))
 
         # 245 - Título
-        if hasattr(obra, 'titulo_245_display') and obra.titulo_245_display:
+        if hasattr(obra, "titulo_245_display") and obra.titulo_245_display:
             lines.append(f"=245 10${obra.titulo_245_display}")
 
         # 260/264 - Producción/Publicación
-        if hasattr(obra, 'producciones_publicaciones') and obra.producciones_publicaciones.exists():
+        if (
+            hasattr(obra, "producciones_publicaciones")
+            and obra.producciones_publicaciones.exists()
+        ):
             for pub in obra.producciones_publicaciones.all():
                 parts_264 = [f"=264 #{pub.funcion}"]
-                if hasattr(pub, 'lugares') and pub.lugares.exists():
+                if hasattr(pub, "lugares") and pub.lugares.exists():
                     for lugar in pub.lugares.all():
                         parts_264.append(f"${lugar.lugar}")
-                if hasattr(pub, 'entidades') and pub.entidades.exists():
+                if hasattr(pub, "entidades") and pub.entidades.exists():
                     for entidad in pub.entidades.all():
                         parts_264.append(f"${entidad.nombre}")
-                if hasattr(pub, 'fechas') and pub.fechas.exists():
+                if hasattr(pub, "fechas") and pub.fechas.exists():
                     for fecha in pub.fechas.all():
                         parts_264.append(f"${fecha.fecha}")
 
@@ -657,28 +688,32 @@ class VistaMARCCrudoView(DetailView):
                     lines.append("".join(parts_264))
 
         # 300 - Descripción física (igual que formato_marc21.html)
-        if (hasattr(obra, 'extension') and obra.extension) or \
-           (hasattr(obra, 'otras_caracteristicas') and obra.otras_caracteristicas) or \
-           (hasattr(obra, 'dimension') and obra.dimension) or \
-           (hasattr(obra, 'material_acompanante') and obra.material_acompanante):
-
+        if (
+            (hasattr(obra, "extension") and obra.extension)
+            or (hasattr(obra, "otras_caracteristicas") and obra.otras_caracteristicas)
+            or (hasattr(obra, "dimension") and obra.dimension)
+            or (hasattr(obra, "material_acompanante") and obra.material_acompanante)
+        ):
             parts_300 = ["=300 ##"]
-            if hasattr(obra, 'extension') and obra.extension:
+            if hasattr(obra, "extension") and obra.extension:
                 parts_300.append(f"${obra.extension}")
-            if hasattr(obra, 'otras_caracteristicas') and obra.otras_caracteristicas:
+            if hasattr(obra, "otras_caracteristicas") and obra.otras_caracteristicas:
                 parts_300.append(f"${obra.otras_caracteristicas}")
-            if hasattr(obra, 'dimension') and obra.dimension:
+            if hasattr(obra, "dimension") and obra.dimension:
                 parts_300.append(f"${obra.dimension}")
-            if hasattr(obra, 'material_acompanante') and obra.material_acompanante:
+            if hasattr(obra, "material_acompanante") and obra.material_acompanante:
                 parts_300.append(f"${obra.material_acompanante}")
 
             lines.append("".join(parts_300))
 
         # 382 - Medio de interpretación
-        if hasattr(obra, 'medios_interpretacion_382') and obra.medios_interpretacion_382.exists():
+        if (
+            hasattr(obra, "medios_interpretacion_382")
+            and obra.medios_interpretacion_382.exists()
+        ):
             for medio382 in obra.medios_interpretacion_382.all():
                 parts_382 = ["=382 ##"]
-                if hasattr(medio382, 'medios') and medio382.medios.exists():
+                if hasattr(medio382, "medios") and medio382.medios.exists():
                     for medio in medio382.medios.all():
                         parts_382.append(f"${medio.get_medio_display()}")
                 if medio382.solista:
@@ -688,80 +723,95 @@ class VistaMARCCrudoView(DetailView):
                     lines.append("".join(parts_382))
 
         # 500 - Notas generales
-        if hasattr(obra, 'notas_generales_500') and obra.notas_generales_500.exists():
+        if hasattr(obra, "notas_generales_500") and obra.notas_generales_500.exists():
             for nota in obra.notas_generales_500.all():
                 if nota.nota_general:
                     lines.append(f"=500 ##${nota.nota_general}")
 
         # 505 - Contenidos
-        if hasattr(obra, 'contenidos_505') and obra.contenidos_505.exists():
+        if hasattr(obra, "contenidos_505") and obra.contenidos_505.exists():
             for contenido in obra.contenidos_505.all():
                 if contenido.contenido:
                     lines.append(f"=505 00${contenido.contenido}")
 
         # 520 - Sumarios
-        if hasattr(obra, 'sumarios_520') and obra.sumarios_520.exists():
+        if hasattr(obra, "sumarios_520") and obra.sumarios_520.exists():
             for sumario in obra.sumarios_520.all():
-                if hasattr(sumario, 'sumario') and sumario.sumario:
+                if hasattr(sumario, "sumario") and sumario.sumario:
                     lines.append(f"=520 ##${sumario.sumario}")
 
         # 650 - Materias temáticas
-        if hasattr(obra, 'materias_650') and obra.materias_650.exists():
+        if hasattr(obra, "materias_650") and obra.materias_650.exists():
             for materia in obra.materias_650.all():
                 if materia.materia:
                     parts_650 = [f"=650 04${materia.materia}"]
-                    if hasattr(materia, 'subdivisiones') and materia.subdivisiones.exists():
+                    if (
+                        hasattr(materia, "subdivisiones")
+                        and materia.subdivisiones.exists()
+                    ):
                         for subdiv in materia.subdivisiones.all():
                             if subdiv.subdivision:
                                 parts_650.append(f"${subdiv.subdivision}")
                     lines.append("".join(parts_650))
 
         # 655 - Materias género/forma
-        if hasattr(obra, 'materias_655') and obra.materias_655.exists():
+        if hasattr(obra, "materias_655") and obra.materias_655.exists():
             for materia in obra.materias_655.all():
                 if materia.materia:
                     parts_655 = [f"=655 #4${materia.materia}"]
-                    if hasattr(materia, 'subdivisiones') and materia.subdivisiones.exists():
+                    if (
+                        hasattr(materia, "subdivisiones")
+                        and materia.subdivisiones.exists()
+                    ):
                         for subdiv in materia.subdivisiones.all():
                             if subdiv.subdivision:
                                 parts_655.append(f"${subdiv.subdivision}")
                     lines.append("".join(parts_655))
 
         # 700 - Nombres relacionados
-        if hasattr(obra, 'nombres_relacionados_700') and obra.nombres_relacionados_700.exists():
+        if (
+            hasattr(obra, "nombres_relacionados_700")
+            and obra.nombres_relacionados_700.exists()
+        ):
             for nombre in obra.nombres_relacionados_700.all():
-                if hasattr(nombre, 'persona') and nombre.persona:
+                if hasattr(nombre, "persona") and nombre.persona:
                     parts_700 = [f"=700 1#${nombre.persona.apellidos_nombres}"]
-                    if hasattr(nombre, 'funciones') and nombre.funciones.exists():
+                    if hasattr(nombre, "funciones") and nombre.funciones.exists():
                         for funcion in nombre.funciones.all():
                             parts_700.append(f"${funcion.get_funcion_display()}")
                     lines.append("".join(parts_700))
 
         # 710 - Entidades relacionadas
-        if hasattr(obra, 'entidades_relacionadas_710') and obra.entidades_relacionadas_710.exists():
+        if (
+            hasattr(obra, "entidades_relacionadas_710")
+            and obra.entidades_relacionadas_710.exists()
+        ):
             for entidad in obra.entidades_relacionadas_710.all():
-                if hasattr(entidad, 'entidad') and entidad.entidad:
+                if hasattr(entidad, "entidad") and entidad.entidad:
                     lines.append(f"=710 2#${entidad.entidad}")
 
         # 856 - Recursos electrónicos
-        if hasattr(obra, 'disponibles_856') and obra.disponibles_856.exists():
+        if hasattr(obra, "disponibles_856") and obra.disponibles_856.exists():
             for enlace in obra.disponibles_856.all():
-                if hasattr(enlace, 'urls_856') and enlace.urls_856.exists():
+                if hasattr(enlace, "urls_856") and enlace.urls_856.exists():
                     for url in enlace.urls_856.all():
                         if url.url:
                             lines.append(f"=856 40${url.url}")
-                if hasattr(enlace, 'textos_enlace_856') and enlace.textos_enlace_856.exists():
+                if (
+                    hasattr(enlace, "textos_enlace_856")
+                    and enlace.textos_enlace_856.exists()
+                ):
                     for texto in enlace.textos_enlace_856.all():
                         if texto.texto_enlace:
                             lines.append(f"=856 40$y{texto.texto_enlace}")
 
         # 852 - Ubicación
-        if hasattr(obra, 'ubicaciones_852') and obra.ubicaciones_852.exists():
+        if hasattr(obra, "ubicaciones_852") and obra.ubicaciones_852.exists():
             for ubicacion in obra.ubicaciones_852.all():
                 parts_852 = ["=852 0#"]
                 if ubicacion.signatura_original:
                     parts_852.append(f"${ubicacion.signatura_original}")
-                if hasattr(ubicacion, 'estanterias') and ubicacion.estanterias.exists():
+                if hasattr(ubicacion, "estanterias") and ubicacion.estanterias.exists():
                     for estanteria in ubicacion.estanterias.all():
                         if estanteria.estanteria:
                             parts_852.append(f"${estanteria.estanteria}")
@@ -769,7 +819,11 @@ class VistaMARCCrudoView(DetailView):
                 if len(parts_852) > 1:
                     lines.append("".join(parts_852))
 
-        return "\n".join(lines) if lines else "No hay datos MARC disponibles para esta obra."
+        return (
+            "\n".join(lines)
+            if lines
+            else "No hay datos MARC disponibles para esta obra."
+        )
 
     def _generar_marc_hexadecimal(self, obra):
         """Genera contenido MARC en formato hexadecimal (estilo Biblioteca Nacional)"""
@@ -777,17 +831,30 @@ class VistaMARCCrudoView(DetailView):
 
         # Líder en formato hexadecimal (posición por posición)
         posiciones_hex = {
-            0: "0", 1: "0", 2: "0", 3: "0", 4: "0",  # 00000
+            0: "0",
+            1: "0",
+            2: "0",
+            3: "0",
+            4: "0",  # 00000
             5: "n",  # Estado del registro
             6: obra.tipo_registro or "d",  # Tipo de registro
             7: obra.nivel_bibliografico or "m",  # Nivel bibliográfico
-            8: "a", 9: "2",  # Tipo de bibliográfica
-            10: "2", 11: "0", 12: "0", 13: "0", 14: "0", 15: "0", 16: "0",  # Base de datos
+            8: "a",
+            9: "2",  # Tipo de bibliográfica
+            10: "2",
+            11: "0",
+            12: "0",
+            13: "0",
+            14: "0",
+            15: "0",
+            16: "0",  # Base de datos
             17: "7",  # Nivel de codificación
             18: "a",  # Forma de catalogación descriptiva
             19: "2",  # Nivel de recurso
             20: "2",  # Tipo de control
-            21: "0", 22: "0", 23: " "  # Resto
+            21: "0",
+            22: "0",
+            23: " ",  # Resto
         }
 
         # Agregar cada posición del líder
@@ -795,39 +862,45 @@ class VistaMARCCrudoView(DetailView):
             lines.append(f"=h-{pos:03d} {valor}")
 
         # 001 - Número de control
-        if hasattr(obra, 'num_control') and obra.num_control:
+        if hasattr(obra, "num_control") and obra.num_control:
             lines.append(f"=h-001 {obra.num_control}")
 
         # 005 - Fecha/hora última transacción
-        if hasattr(obra, 'fecha_hora_ultima_transaccion') and obra.fecha_hora_ultima_transaccion:
+        if (
+            hasattr(obra, "fecha_hora_ultima_transaccion")
+            and obra.fecha_hora_ultima_transaccion
+        ):
             lines.append(f"=h-005 {obra.fecha_hora_ultima_transaccion}")
 
         # 008 - Código de información
-        if hasattr(obra, 'codigo_informacion') and obra.codigo_informacion:
+        if hasattr(obra, "codigo_informacion") and obra.codigo_informacion:
             lines.append(f"=h-008 {obra.codigo_informacion}")
 
         # 100 - Compositor
-        if hasattr(obra, 'compositor') and obra.compositor:
+        if hasattr(obra, "compositor") and obra.compositor:
             parts_100 = [f"=h-100 1#{obra.compositor.apellidos_nombres}"]
             if obra.compositor.coordenadas_biograficas:
                 parts_100.append(f"${obra.compositor.coordenadas_biograficas}")
             lines.append("".join(parts_100))
 
         # 245 - Título
-        if hasattr(obra, 'titulo_245_display') and obra.titulo_245_display:
+        if hasattr(obra, "titulo_245_display") and obra.titulo_245_display:
             lines.append(f"=h-245 10${obra.titulo_245_display}")
 
         # 264 - Producción/Publicación
-        if hasattr(obra, 'producciones_publicaciones') and obra.producciones_publicaciones.exists():
+        if (
+            hasattr(obra, "producciones_publicaciones")
+            and obra.producciones_publicaciones.exists()
+        ):
             for pub in obra.producciones_publicaciones.all():
                 parts_264 = [f"=h-264 #{pub.funcion}"]
-                if hasattr(pub, 'lugares') and pub.lugares.exists():
+                if hasattr(pub, "lugares") and pub.lugares.exists():
                     for lugar in pub.lugares.all():
                         parts_264.append(f"${lugar.lugar}")
-                if hasattr(pub, 'entidades') and pub.entidades.exists():
+                if hasattr(pub, "entidades") and pub.entidades.exists():
                     for entidad in pub.entidades.all():
                         parts_264.append(f"${entidad.nombre}")
-                if hasattr(pub, 'fechas') and pub.fechas.exists():
+                if hasattr(pub, "fechas") and pub.fechas.exists():
                     for fecha in pub.fechas.all():
                         parts_264.append(f"${fecha.fecha}")
 
@@ -835,40 +908,48 @@ class VistaMARCCrudoView(DetailView):
                     lines.append("".join(parts_264))
 
         # 300 - Descripción física
-        if (hasattr(obra, 'extension') and obra.extension) or \
-           (hasattr(obra, 'otras_caracteristicas') and obra.otras_caracteristicas) or \
-           (hasattr(obra, 'dimension') and obra.dimension) or \
-           (hasattr(obra, 'material_acompanante') and obra.material_acompanante):
-
+        if (
+            (hasattr(obra, "extension") and obra.extension)
+            or (hasattr(obra, "otras_caracteristicas") and obra.otras_caracteristicas)
+            or (hasattr(obra, "dimension") and obra.dimension)
+            or (hasattr(obra, "material_acompanante") and obra.material_acompanante)
+        ):
             parts_300 = ["=h-300 ##"]
-            if hasattr(obra, 'extension') and obra.extension:
+            if hasattr(obra, "extension") and obra.extension:
                 parts_300.append(f"${obra.extension}")
-            if hasattr(obra, 'otras_caracteristicas') and obra.otras_caracteristicas:
+            if hasattr(obra, "otras_caracteristicas") and obra.otras_caracteristicas:
                 parts_300.append(f"${obra.otras_caracteristicas}")
-            if hasattr(obra, 'dimension') and obra.dimension:
+            if hasattr(obra, "dimension") and obra.dimension:
                 parts_300.append(f"${obra.dimension}")
-            if hasattr(obra, 'material_acompanante') and obra.material_acompanante:
+            if hasattr(obra, "material_acompanante") and obra.material_acompanante:
                 parts_300.append(f"${obra.material_acompanante}")
 
             lines.append("".join(parts_300))
 
         # 650 - Materias temáticas
-        if hasattr(obra, 'materias_650') and obra.materias_650.exists():
+        if hasattr(obra, "materias_650") and obra.materias_650.exists():
             for materia in obra.materias_650.all():
                 if materia.materia:
                     parts_650 = [f"=h-650 04${materia.materia}"]
-                    if hasattr(materia, 'subdivisiones') and materia.subdivisiones.exists():
+                    if (
+                        hasattr(materia, "subdivisiones")
+                        and materia.subdivisiones.exists()
+                    ):
                         for subdiv in materia.subdivisiones.all():
                             if subdiv.subdivision:
                                 parts_650.append(f"${subdiv.subdivision}")
                     lines.append("".join(parts_650))
 
         # 856 - Recursos electrónicos
-        if hasattr(obra, 'disponibles_856') and obra.disponibles_856.exists():
+        if hasattr(obra, "disponibles_856") and obra.disponibles_856.exists():
             for enlace in obra.disponibles_856.all():
-                if hasattr(enlace, 'urls_856') and enlace.urls_856.exists():
+                if hasattr(enlace, "urls_856") and enlace.urls_856.exists():
                     for url in enlace.urls_856.all():
                         if url.url:
                             lines.append(f"=h-856 40${url.url}")
 
-        return "\n".join(lines) if lines else "No hay datos MARC disponibles para esta obra."
+        return (
+            "\n".join(lines)
+            if lines
+            else "No hay datos MARC disponibles para esta obra."
+        )

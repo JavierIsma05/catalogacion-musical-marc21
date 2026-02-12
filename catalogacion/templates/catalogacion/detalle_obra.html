@@ -348,7 +348,12 @@
                         {% for prod in obra.producciones_publicaciones.all %}
                         <div class="data-row">
                             <span class="campo-tag">264</span>
-                            <span>$a {{ prod.get_funcion_display }}</span>
+                            <span>
+                                [{{ prod.get_funcion_display }}]
+                                {% for lugar in prod.lugares.all %}$a {{ lugar.lugar }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                {% if prod.entidades.exists %} {% for entidad in prod.entidades.all %}$b {{ entidad.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+                                {% if prod.fechas.exists %} {% for fecha in prod.fechas.all %}$c {{ fecha.fecha }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+                            </span>
                         </div>
                         {% endfor %}
                     {% endif %}

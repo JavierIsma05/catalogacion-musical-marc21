@@ -231,16 +231,14 @@
                 </div>
 
                 <!-- Producción de la obra -->
-                {% with produccion=obra.producciones_publicaciones.first %}
-                {% if produccion %}
+                {% for produccion in obra.producciones_publicaciones.all %}
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Producción de la obra</span>
+                    <span class="detalle-field-label">{{ produccion.get_funcion_display }} de la obra</span>
                     <span class="detalle-field-value">
                         {% for lugar in produccion.lugares.all %}{{ lugar.lugar }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if produccion.entidades.exists %} : {% for entidad in produccion.entidades.all %}{{ entidad.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if produccion.fechas.exists %}, {% for fecha in produccion.fechas.all %}{{ fecha.fecha }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
                     </span>
                 </div>
-                {% endif %}
-                {% endwith %}
+                {% endfor %}
 
                 <!-- Edición -->
                 {% for edicion in obra.ediciones.all %}

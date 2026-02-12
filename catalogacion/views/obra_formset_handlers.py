@@ -12,22 +12,28 @@ class FormsetSubcampoHandler:
         self.request_post = request_post
 
     def _agrupar_subcampos_por_indice(self, prefijo_input, indice_posicion=3):
-        """Agrupa los valores por índice de formset (0, 1, 2, ...)."""
+        """Agrupa los valores por índice de formset (0, 1, 2, ...).
+
+        El prefijo_input tiene formato como 'lugar_produccion_264_'
+        y las keys del POST son como 'lugar_produccion_264_0_0'
+        donde el primer número después del prefijo es el índice del formset.
+        """
         agrupados = {}
 
         for key, value in self.request_post.items():
             if key.startswith(prefijo_input) and value.strip():
                 try:
-                    parts = key.split('_')
-                    # 🔥 CORRECCIÓN: Manejar tanto creación como edición
-                    if len(parts) >= 4:
-                        # Formato: lugar_produccion_264_0_123 (editar) o lugar_produccion_264_0_0 (crear)
-                        # El índice del formset siempre está en posición 2
-                        indice_formset = int(parts[2])
-                        # Ignorar el último número (puede ser PK o índice)
-                    else:
+                    # Extraer la parte después del prefijo
+                    # Ej: key='lugar_produccion_264_0_0', prefijo='lugar_produccion_264_'
+                    # sufijo = '0_0' → primer número es el índice del formset
+                    sufijo = key[len(prefijo_input) :]
+                    partes_sufijo = sufijo.split("_")
+
+                    # Ignorar __prefix__ (template vacío)
+                    if partes_sufijo[0] == "_" or "_prefix_" in sufijo:
                         continue
 
+                    indice_formset = int(partes_sufijo[0])
                     agrupados.setdefault(indice_formset, []).append(value.strip())
                 except (ValueError, IndexError):
                     continue
@@ -79,6 +85,7 @@ class FormsetSubcampoHandler:
 # ================================================================
 # HANDLERS ESPECÍFICOS
 # ================================================================
+
 
 def save_subdivisiones_650(request_post, formset):
     from catalogacion.models import SubdivisionMateria650
@@ -155,10 +162,7 @@ def _save_urls_856(request_post, disponibles):
         except IndexError:
             break  # no hay más padres
 
-        URL856.objects.create(
-            disponible=disponible,
-            url=value.strip()
-        )
+        URL856.objects.create(disponible=disponible, url=value.strip())
 
 
 def _save_textos_enlace_856(request_post, disponibles):
@@ -176,10 +180,7 @@ def _save_textos_enlace_856(request_post, disponibles):
         except IndexError:
             break
 
-        TextoEnlace856.objects.create(
-            disponible=disponible,
-            texto_enlace=value.strip()
-        )
+        TextoEnlace856.objects.create(disponible=disponible, texto_enlace=value.strip())
 
 
 def save_lugares_264(request_post, formset, obra=None):
@@ -187,39 +188,25 @@ def save_lugares_264(request_post, formset, obra=None):
     Handler especial para guardar lugares del 264
     """
     from catalogacion.models import Lugar264
-    
-    print(f"🔥 DEBUG save_lugares_264: obra={obra}, formset={formset}")
-    
-    # Agrupar valores por índice (ahora usa posición 2)
+
     handler = FormsetSubcampoHandler(request_post)
     valores = handler._agrupar_subcampos_por_indice("lugar_produccion_264_", 2)
-    
-    print(f"🔥 DEBUG save_lugares_264: valores={valores}")
-    
+    print(f"[264] Lugares recibidos: {valores}")
+
     for index, form in enumerate(formset):
-        print(f"🔥 DEBUG save_lugares_264: procesando form {index}, pk={form.instance.pk}")
-        
-        # 1. Asegurar que el ProduccionPublicacion exista y tenga obra
         if not form.instance.pk:
             parent = form.save(commit=False)
-            # CORRECCIÓN: Usar la obra pasada como parámetro
             parent.obra = obra
-            print(f"🔥 DEBUG save_lugares_264: guardando parent con obra={obra}")
             parent.save()
-            print(f"🔥 DEBUG save_lugares_264: parent guardado con pk={parent.pk}")
-        
-        # 2. Eliminar lugares existentes para este ProduccionPublicacion
+
         form.instance.lugares.all().delete()
-        
-        # 3. Agregar nuevos lugares si hay valores
+
         if index in valores:
             for valor in valores[index]:
-                if valor.strip():  # Solo guardar si no está vacío
-                    lugar = Lugar264.objects.create(
-                        produccion_publicacion=form.instance,
-                        lugar=valor.strip()
+                if valor.strip():
+                    Lugar264.objects.create(
+                        produccion_publicacion=form.instance, lugar=valor.strip()
                     )
-                    print(f"🔥 DEBUG save_lugares_264: lugar creado={lugar.lugar} (pk={lugar.pk})")
 
 
 def save_entidades_264(request_post, formset, obra=None):
@@ -227,39 +214,25 @@ def save_entidades_264(request_post, formset, obra=None):
     Handler especial para guardar entidades del 264
     """
     from catalogacion.models import NombreEntidad264
-    
-    print(f"🔥 DEBUG save_entidades_264: obra={obra}, formset={formset}")
-    
-    # Agrupar valores por índice (ahora usa posición 2)
+
     handler = FormsetSubcampoHandler(request_post)
     valores = handler._agrupar_subcampos_por_indice("entidad_produccion_264_", 2)
-    
-    print(f"🔥 DEBUG save_entidades_264: valores={valores}")
-    
+    print(f"[264] Entidades recibidas: {valores}")
+
     for index, form in enumerate(formset):
-        print(f"🔥 DEBUG save_entidades_264: procesando form {index}, pk={form.instance.pk}")
-        
-        # 1. Asegurar que el ProduccionPublicacion exista y tenga obra
         if not form.instance.pk:
             parent = form.save(commit=False)
-            # CORRECCIÓN: Usar la obra pasada como parámetro
             parent.obra = obra
-            print(f"🔥 DEBUG save_entidades_264: guardando parent con obra={obra}")
             parent.save()
-            print(f"🔥 DEBUG save_entidades_264: parent guardado con pk={parent.pk}")
-        
-        # 2. Eliminar entidades existentes para este ProduccionPublicacion
+
         form.instance.entidades.all().delete()
-        
-        # 3. Agregar nuevas entidades si hay valores
+
         if index in valores:
             for valor in valores[index]:
-                if valor.strip():  # Solo guardar si no está vacío
-                    entidad = NombreEntidad264.objects.create(
-                        produccion_publicacion=form.instance,
-                        nombre=valor.strip()
+                if valor.strip():
+                    NombreEntidad264.objects.create(
+                        produccion_publicacion=form.instance, nombre=valor.strip()
                     )
-                    print(f"🔥 DEBUG save_entidades_264: entidad creada={entidad.nombre} (pk={entidad.pk})")
 
 
 def save_fechas_264(request_post, formset, obra=None):
@@ -267,39 +240,25 @@ def save_fechas_264(request_post, formset, obra=None):
     Handler especial para guardar fechas del 264
     """
     from catalogacion.models import Fecha264
-    
-    print(f"🔥 DEBUG save_fechas_264: obra={obra}, formset={formset}")
-    
-    # Agrupar valores por índice (ahora usa posición 2)
+
     handler = FormsetSubcampoHandler(request_post)
     valores = handler._agrupar_subcampos_por_indice("fecha_produccion_264_", 2)
-    
-    print(f"🔥 DEBUG save_fechas_264: valores={valores}")
-    
+    print(f"[264] Fechas recibidas: {valores}")
+
     for index, form in enumerate(formset):
-        print(f"🔥 DEBUG save_fechas_264: procesando form {index}, pk={form.instance.pk}")
-        
-        # 1. Asegurar que el ProduccionPublicacion exista y tenga obra
         if not form.instance.pk:
             parent = form.save(commit=False)
-            # CORRECCIÓN: Usar la obra pasada como parámetro
             parent.obra = obra
-            print(f"🔥 DEBUG save_fechas_264: guardando parent con obra={obra}")
             parent.save()
-            print(f"🔥 DEBUG save_fechas_264: parent guardado con pk={parent.pk}")
-        
-        # 2. Eliminar fechas existentes para este ProduccionPublicacion
+
         form.instance.fechas.all().delete()
-        
-        # 3. Agregar nuevas fechas si hay valores
+
         if index in valores:
             for valor in valores[index]:
-                if valor.strip():  # Solo guardar si no está vacío
-                    fecha = Fecha264.objects.create(
-                        produccion_publicacion=form.instance,
-                        fecha=valor.strip()
+                if valor.strip():
+                    Fecha264.objects.create(
+                        produccion_publicacion=form.instance, fecha=valor.strip()
                     )
-                    print(f"🔥 DEBUG save_fechas_264: fecha creada={fecha.fecha} (pk={fecha.pk})")
 
 
 def save_medios_382(request_post, formset):

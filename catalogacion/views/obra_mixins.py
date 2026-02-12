@@ -229,8 +229,6 @@ class ObraFormsetMixin:
         Returns:
             tuple: (formsets_validos: bool, formsets: dict)
         """
-        logger.info("🔍 Iniciando validación de formsets...")
-
         formsets_validos = True
         formsets = {}
 
@@ -261,13 +259,9 @@ class ObraFormsetMixin:
             if key in formsets_inhabilitados:
                 logger.debug(f"  ⏭️  {key}: SALTADO (inhabilitado en UI V2)")
                 continue
-            
-            if key == "codigos_pais":
-                logger.info(f"  🔍 PROCESANDO {key}: Campo 044 de países")
 
             formset = context.get(key)
 
-            # 🚨 IGNORAR FORMSETS NO VISIBLES (aunque tengan datos en POST)
             if key not in formsets_visibles:
                 logger.debug(
                     f"  ⏭️  {key}: SALTADO COMPLETAMENTE (no visible en este tipo de obra)"
@@ -283,7 +277,6 @@ class ObraFormsetMixin:
             if not formset:
                 continue
 
-            # ⚠️ 856 se maneja por subcampos JS → no usar has_changed
             if key == "disponibles_856":
                 # Comprobamos si hay algún cambio en los campos $u o $y en el POST
                 hay_urls = any(
@@ -299,36 +292,35 @@ class ObraFormsetMixin:
                     logger.debug("⏭️  disponibles_856: sin URLs ni textos, se omite")
                     continue
             else:
-                # 🔥 CASO ESPECIAL 264: Guardar si hay subcampos aunque el principal esté vacío
                 if key == "produccion_publicacion":
-                    # Verificar si hay datos en subcampos del POST
-                    tiene_lugares = any(k.startswith("lugar_produccion_264_") and self.request.POST.get(k, "").strip() for k in self.request.POST.keys())
-                    tiene_entidades = any(k.startswith("entidad_produccion_264_") and self.request.POST.get(k, "").strip() for k in self.request.POST.keys())
-                    tiene_fechas = any(k.startswith("fecha_produccion_264_") and self.request.POST.get(k, "").strip() for k in self.request.POST.keys())
-                    
-                    print(f"🔥 DEBUG VALIDACIÓN 264: lugares={tiene_lugares}, entidades={tiene_entidades}, fechas={tiene_fechas}")
-                    
-                    # Mostrar todos los keys del POST relacionados con 264
-                    keys_264 = [k for k in self.request.POST.keys() if any(x in k for x in ["lugar_produccion_264_", "entidad_produccion_264_", "fecha_produccion_264_"])]
-                    print(f"🔥 DEBUG VALIDACIÓN 264: keys encontrados={keys_264}")
-                    
+                    tiene_lugares = any(
+                        k.startswith("lugar_produccion_264_")
+                        and self.request.POST.get(k, "").strip()
+                        for k in self.request.POST.keys()
+                    )
+                    tiene_entidades = any(
+                        k.startswith("entidad_produccion_264_")
+                        and self.request.POST.get(k, "").strip()
+                        for k in self.request.POST.keys()
+                    )
+                    tiene_fechas = any(
+                        k.startswith("fecha_produccion_264_")
+                        and self.request.POST.get(k, "").strip()
+                        for k in self.request.POST.keys()
+                    )
+
                     if tiene_lugares or tiene_entidades or tiene_fechas:
-                        logger.info(f"  🔥 264: GUARDAR POR SUBCAMPOS (lugares={tiene_lugares}, entidades={tiene_entidades}, fechas={tiene_fechas})")
-                        # Forzar guardado aunque el principal esté vacío
-                        pass
+                        pass  # Forzar guardado aunque el principal esté vacío
                     elif all(not form.has_changed() for form in formset.forms):
-                        logger.debug(f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)")
+                        logger.debug(
+                            f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)"
+                        )
                         continue
                 elif all(not form.has_changed() for form in formset.forms):
                     logger.debug(f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)")
                     continue
 
             formsets[key] = formset
-
-            # 856 se valida/guarda manualmente (borra y recrea), no usar is_valid()
-            if key == "disponibles_856":
-                logger.debug(f"  ✅ {key}: VÁLIDO (validación manual por subcampos)")
-                continue
 
             if formset.is_valid():
                 logger.debug(f"  ✅ {key}: VÁLIDO")
@@ -345,10 +337,6 @@ class ObraFormsetMixin:
                         f"     Deleted objects: {len(formset.deleted_objects)}"
                     )
 
-        # 🔥 RETURN ÚNICO Y SEGURO
-        logger.info(
-            f"✅ Resultado final: {'TODOS VÁLIDOS' if formsets_validos else 'HAY ERRORES'}"
-        )
         return formsets_validos, formsets
 
     def _guardar_formsets(self, formsets, instance):
@@ -370,7 +358,10 @@ class ObraFormsetMixin:
             "menciones_serie_490": ["_save_titulos_490", "_save_volumenes_490"],
             "ubicaciones_852": ["_save_estanterias_852"],
             "disponibles_856": ["_save_urls_856", "_save_textos_enlace_856"],
-            "materias_650": ["_save_subdivisiones_650", "_save_subdivisiones_geograficas_650"],
+            "materias_650": [
+                "_save_subdivisiones_650",
+                "_save_subdivisiones_geograficas_650",
+            ],
             "materias_genero_655": ["_save_subdivisiones_655"],
         }
 
@@ -379,8 +370,7 @@ class ObraFormsetMixin:
             if key == "disponibles_856":
                 # Limpiar los registros previos en edición para evitar duplicados
                 if getattr(instance, "pk", None):
-                    eliminados, _ = instance.disponibles_856.all().delete()
-                    logger.info(f"🧹 Registros 856 previos eliminados: {eliminados}")
+                    instance.disponibles_856.all().delete()
 
                 disponibles_creados = []
 
@@ -416,7 +406,7 @@ class ObraFormsetMixin:
                     disponible = Disponible856.objects.create(obra=instance)
                     disponibles_creados.append(disponible)
 
-                logger.info(f"🟢 856 padres creados: {len(disponibles_creados)}")
+                logger.debug(f"856 padres creados: {len(disponibles_creados)}")
                 # 🔥 LLAMADAS CORRECTAS A LOS HANDLERS
                 disponibles_para_urls = list(disponibles_creados)
                 disponibles_para_textos = list(disponibles_creados)
@@ -441,31 +431,28 @@ class ObraFormsetMixin:
             # ---------------------------
             if key == "datos_biograficos":
                 for form in formset:
-                    if getattr(form, "cleaned_data", None) and not form.cleaned_data.get(
-                        "DELETE", False
-                    ):
+                    if getattr(
+                        form, "cleaned_data", None
+                    ) and not form.cleaned_data.get("DELETE", False):
                         texto = form.cleaned_data.get("texto_biografico", "")
                         uri = form.cleaned_data.get("uri", "")
 
                         # Si ambos campos están vacíos, eliminar el registro existente
                         if not texto and not uri:
                             DatosBiograficos545.objects.filter(obra=instance).delete()
-                            logger.info(f"🗑️ 545: Datos biográficos eliminados para obra {instance.pk}")
+                            DatosBiograficos545.objects.filter(obra=instance).delete()
                         else:
-                            # Usar update_or_create para manejar OneToOneField correctamente
-                            obj, created = DatosBiograficos545.objects.update_or_create(
+                            DatosBiograficos545.objects.update_or_create(
                                 obra=instance,
                                 defaults={
                                     "texto_biografico": texto,
                                     "uri": uri,
-                                }
+                                },
                             )
-                            action = "creado" if created else "actualizado"
-                            logger.info(f"📝 545: Datos biográficos {action} para obra {instance.pk}")
-                    elif getattr(form, "cleaned_data", None) and form.cleaned_data.get("DELETE", False):
-                        # Si se marcó para eliminar
+                    elif getattr(form, "cleaned_data", None) and form.cleaned_data.get(
+                        "DELETE", False
+                    ):
                         DatosBiograficos545.objects.filter(obra=instance).delete()
-                        logger.info(f"🗑️ 545: Datos biográficos eliminados (DELETE) para obra {instance.pk}")
                 continue
 
             # ---------------------------
@@ -485,24 +472,28 @@ class ObraFormsetMixin:
 
                     # 🔥 CASO ESPECIAL 264: Si el formulario está vacío pero hay subcampos, crear de todos modos
                     if key == "produccion_publicacion" and not form.has_changed():
-                        # Verificar si hay subcampos en el POST
-                        tiene_lugares = any(k.startswith("lugar_produccion_264_") and self.request.POST.get(k, "").strip() for k in self.request.POST.keys())
-                        tiene_entidades = any(k.startswith("entidad_produccion_264_") and self.request.POST.get(k, "").strip() for k in self.request.POST.keys())
-                        tiene_fechas = any(k.startswith("fecha_produccion_264_") and self.request.POST.get(k, "").strip() for k in self.request.POST.keys())
-                        
+                        tiene_lugares = any(
+                            k.startswith("lugar_produccion_264_")
+                            and self.request.POST.get(k, "").strip()
+                            for k in self.request.POST.keys()
+                        )
+                        tiene_entidades = any(
+                            k.startswith("entidad_produccion_264_")
+                            and self.request.POST.get(k, "").strip()
+                            for k in self.request.POST.keys()
+                        )
+                        tiene_fechas = any(
+                            k.startswith("fecha_produccion_264_")
+                            and self.request.POST.get(k, "").strip()
+                            for k in self.request.POST.keys()
+                        )
+
                         if tiene_lugares or tiene_entidades or tiene_fechas:
-                            logger.info(f"  🔥 264: CREANDO ProduccionPublicacion vacía para subcampos")
-                            # Forzar la creación aunque esté vacía
-                            obj.funcion = '0'  # Valor por defecto para manuscritos
-                            logger.info(f"  📝 264: ProduccionPublicacion creada con función='{obj.funcion}'")
+                            obj.funcion = "0"
 
                     obj.save()
-                    
-                    # Log específico para países
-                    if key == "codigos_pais":
-                        logger.info(f"🌍 PAÍS GUARDADO: {obj.codigo_pais} - Obra: {obj.obra.num_control}")
-                    
-                    logger.info(f"📝 Guardado formset {key}: {obj.pk}")
+
+                    logger.debug(f"Guardado {key}: pk={obj.pk}")
 
                     # ------------------------------
                     # 🔥 Subcampos 852$c
@@ -527,23 +518,6 @@ class ObraFormsetMixin:
                             if sub.disponible_id is None:
                                 sub.disponible = obj
                                 sub.save()
-
-            if key == "incipits_musicales":
-                incipits_guardados = list(instance.incipits_musicales.all())
-                logger.info(
-                    "🎼 Campo 031: %s íncipit(s) guardado(s) para la obra %s",
-                    len(incipits_guardados),
-                    instance.pk,
-                )
-                for incipit in incipits_guardados:
-                    logger.debug(
-                        "   · Íncipit ID=%s | %s | Clave=%s | Armadura=%s | Tiempo=%s",
-                        incipit.id,
-                        incipit.identificador_completo,
-                        incipit.clave or "-",
-                        incipit.armadura or "-",
-                        incipit.tiempo or "-",
-                    )
 
             # Procesar subcampos dinámicos si el formset los tiene
             if key in formset_subcampo_mapping:

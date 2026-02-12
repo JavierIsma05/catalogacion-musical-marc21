@@ -89,7 +89,8 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                 
                 {# Subcampo $b - Entidades (Repetible) con botón + a la izquierda #}
                 <div class="col-full">
-                    <label class="form-label small">264 $b - Nombre de entidad</label>
+                    <label class="form-label small">264 $b - Nombre
+                    </label>
                     <div class="subcampo-repetible-container entidades-container" data-entidades-container="{{ forloop.counter0 }}" data-borrador-container="entidad_produccion_264" data-borrador-parent="{{ forloop.counter0 }}">
                         {% if form.instance.pk %}
                             {# Cargar entidades existentes #}
