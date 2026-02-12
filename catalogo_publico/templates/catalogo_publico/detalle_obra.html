@@ -105,16 +105,14 @@
         <div class="detalle-header-right">
             <!-- Signatura -->
             <div class="detalle-meta-tag">
-                <small>Signatura</small>
+                <small>Signatura (092)</small>
                 <span>{{ obra.signatura_publica_display }}</span>
             </div>
             <!-- Ubicación -->
             {% for ubicacion in obra.ubicaciones_852.all %}
             <div class="detalle-meta-tag">
-                <small>Ubicación</small>
-                <span>
-                    {% if ubicacion.codigo_o_nombre %}{{ ubicacion.codigo_o_nombre }}{% endif %}{% if ubicacion.signatura_original %}.{{ ubicacion.signatura_original }}{% endif %}{% for estanteria in ubicacion.estanterias.all %}.{{ estanteria.estanteria }}{% endfor %}
-                </span>
+                <small>Ubicación (852)</small>
+                <span>{% if ubicacion.codigo_o_nombre %}{{ ubicacion.codigo_o_nombre }}{% endif %}{% if ubicacion.signatura_original %}{% if ubicacion.codigo_o_nombre %}.{% endif %}{{ ubicacion.signatura_original }}{% endif %}{% for estanteria in ubicacion.estanterias.all %}.{{ estanteria.estanteria }}{% endfor %}</span>
             </div>
             {% endfor %}
         </div>

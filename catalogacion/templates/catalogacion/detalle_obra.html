@@ -743,17 +743,7 @@
                     {% for ubicacion in obra.ubicaciones_852.all %}
                     <div class="data-row">
                         <span class="campo-tag">852</span>
-                        <span>
-                            {% if ubicacion.signatura_original %}
-                                $a {{ ubicacion.signatura_original }}
-                            {% endif %}
-                            {% if ubicacion.estanterias.all %}
-                                $b {% for estanteria in ubicacion.estanterias.all %}{{ estanteria.estanteria }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                            {% endif %}
-                            {% if ubicacion.codigo_o_nombre %}
-                                $c {{ ubicacion.codigo_o_nombre }}
-                            {% endif %}
-                        </span>
+                        <span>{% if ubicacion.codigo_o_nombre %}{{ ubicacion.codigo_o_nombre }}{% endif %}{% if ubicacion.signatura_original %}{% if ubicacion.codigo_o_nombre %}.{% endif %}{{ ubicacion.signatura_original }}{% endif %}{% for estanteria in ubicacion.estanterias.all %}.{{ estanteria.estanteria }}{% endfor %}</span>
                     </div>
                     {% endfor %}
                 </div>
