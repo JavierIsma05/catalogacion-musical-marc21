@@ -14,16 +14,16 @@ from catalogacion.models import (
 
 class TituloAlternativoForm(forms.ModelForm):
     """Formulario para campo 246 - Título alternativo"""
-    
+
     class Meta:
         model = TituloAlternativo
-        fields = ['titulo', 'resto_titulo', 'texto_visualizacion']
+        fields = ['titulo', 'subtitulo', 'texto_visualizacion']
         widgets = {
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ej. Alma Llanera',
             }),
-            'resto_titulo': forms.TextInput(attrs={
+            'subtitulo': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ej. Venezuela Joropo',
             }),
@@ -34,14 +34,14 @@ class TituloAlternativoForm(forms.ModelForm):
         }
         labels = {
             'titulo': '246 $a - Título alternativo',
-            'resto_titulo': '246 $b - Resto del título',
+            'subtitulo': '246 $b - Subtítulo',
             'texto_visualizacion': '246 $i - Texto de visualización',
         }
 
 
 class EdicionForm(forms.ModelForm):
     """Formulario para campo 250 - Edición"""
-    
+
     class Meta:
         model = Edicion
         fields = ['edicion']
@@ -55,7 +55,7 @@ class EdicionForm(forms.ModelForm):
 
 class ProduccionPublicacionForm(forms.ModelForm):
     """Formulario para campo 264 - Producción/Publicación"""
-    
+
     class Meta:
         model = ProduccionPublicacion
         fields = ['funcion']
@@ -68,7 +68,7 @@ class ProduccionPublicacionForm(forms.ModelForm):
         labels = {
             'funcion': '264 - Función de la entidad',
         }
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -85,7 +85,7 @@ class ProduccionPublicacionForm(forms.ModelForm):
 
 class Lugar264Form(forms.ModelForm):
     """Formulario para campo 264 $a - Lugar"""
-    
+
     class Meta:
         model = Lugar264
         fields = ['lugar']
@@ -98,7 +98,7 @@ class Lugar264Form(forms.ModelForm):
 
 class NombreEntidad264Form(forms.ModelForm):
     """Formulario para campo 264 $b - Nombre de entidad"""
-    
+
     class Meta:
         model = NombreEntidad264
         fields = ['nombre']
@@ -111,7 +111,7 @@ class NombreEntidad264Form(forms.ModelForm):
 
 class Fecha264Form(forms.ModelForm):
     """Formulario para campo 264 $c - Fecha"""
-    
+
     class Meta:
         model = Fecha264
         fields = ['fecha']

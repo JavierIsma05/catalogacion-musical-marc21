@@ -708,7 +708,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('titulo', models.CharField(help_text='246 $a – Título abreviado o alternativo', max_length=500)),
-                ('resto_titulo', models.CharField(blank=True, help_text='246 $b – Resto del título variante', max_length=500, null=True)),
+                ('subtitulo', models.CharField(blank=True, help_text='246 $b – Subtítulo', max_length=500, null=True)),
                 ('texto_visualizacion', models.CharField(blank=True, help_text='246 $i – Texto de visualización', max_length=500, null=True)),
                 ('fecha_creacion', models.DateTimeField(auto_now_add=True)),
                 ('obra', models.ForeignKey(help_text='Obra a la que pertenece este título alternativo', on_delete=django.db.models.deletion.CASCADE, related_name='titulos_alternativos', to='catalogacion.obrageneral')),

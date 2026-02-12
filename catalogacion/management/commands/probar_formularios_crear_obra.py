@@ -241,12 +241,12 @@ class CrearObraPayloadBuilder:
         entries = [
             {
                 "titulo": "Titulo alternativo A",
-                "resto_titulo": "Parte 1",
+                "subtitulo": "Parte 1",
                 "texto_visualizacion": "En portada",
             },
             {
                 "titulo": "Titulo alternativo B",
-                "resto_titulo": "Parte 2",
+                "subtitulo": "Parte 2",
                 "texto_visualizacion": "En lomo",
             },
         ]
@@ -419,13 +419,13 @@ class CrearObraPayloadBuilder:
     def _build_enlaces_773(self):
         entries = [
             {
-                
+
                 "encabezamiento_principal": str(self.sample["personas"][2].pk),
                 "encabezamiento_principal_texto": "",
                 "titulo": "Documento fuente A",
             },
             {
-                
+
                 "encabezamiento_principal": str(self.sample["personas"][3].pk),
                 "encabezamiento_principal_texto": self.sample["personas"][3].apellidos_nombres,
                 "titulo": "Documento fuente B",

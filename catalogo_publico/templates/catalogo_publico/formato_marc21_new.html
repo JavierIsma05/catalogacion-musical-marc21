@@ -14,7 +14,7 @@
         max-width: 1400px;
         margin: 0 auto;
     }
-    
+
     @media (max-width: 900px) {
         .marc-container {
             grid-template-columns: 1fr;
@@ -24,7 +24,7 @@
             top: 0 !important;
         }
     }
-    
+
     /* Sidebar */
     .marc-sidebar {
         position: sticky;
@@ -33,7 +33,7 @@
         max-height: calc(100vh - 120px);
         overflow-y: auto;
     }
-    
+
     .sidebar-card {
         background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
         border-radius: 12px;
@@ -41,7 +41,7 @@
         color: white;
         margin-bottom: 16px;
     }
-    
+
     .sidebar-card h3 {
         font-size: 14px;
         font-weight: 600;
@@ -50,19 +50,19 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    
+
     .sidebar-card .obra-titulo {
         font-size: 16px;
         font-weight: 700;
         line-height: 1.3;
         margin-bottom: 8px;
     }
-    
+
     .sidebar-card .obra-compositor {
         font-size: 14px;
         color: #c8e0f0;
     }
-    
+
     .sidebar-card .num-control {
         display: inline-block;
         background: rgba(255,255,255,0.15);
@@ -72,7 +72,7 @@
         font-size: 13px;
         margin-top: 12px;
     }
-    
+
     /* Navegación rápida */
     .nav-section {
         background: white;
@@ -80,20 +80,20 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         padding: 16px;
     }
-    
+
     .nav-section h4 {
         font-size: 13px;
         color: #666;
         margin-bottom: 12px;
         font-weight: 600;
     }
-    
+
     .nav-links {
         display: flex;
         flex-direction: column;
         gap: 4px;
     }
-    
+
     .nav-links a {
         display: flex;
         align-items: center;
@@ -105,12 +105,12 @@
         border-radius: 6px;
         transition: all 0.2s;
     }
-    
+
     .nav-links a:hover {
         background: #e8f4fc;
         color: #1e3a5f;
     }
-    
+
     .nav-links a .nav-tag {
         background: #e8f4fc;
         color: #2d5a87;
@@ -120,7 +120,7 @@
         font-family: 'JetBrains Mono', monospace;
         font-weight: 600;
     }
-    
+
     /* Contenido principal */
     .marc-content {
         background: white;
@@ -128,39 +128,39 @@
         box-shadow: 0 2px 12px rgba(0,0,0,0.08);
         overflow: hidden;
     }
-    
+
     .marc-header {
         background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
         color: white;
         padding: 24px 32px;
     }
-    
+
     .marc-header h1 {
         font-size: 24px;
         margin: 0 0 8px 0;
     }
-    
+
     .marc-header .subtitle {
         font-size: 14px;
         opacity: 0.85;
     }
-    
+
     .marc-body {
         padding: 24px 32px;
     }
-    
+
     /* Secciones MARC */
     .marc-section {
         margin-bottom: 28px;
         padding-bottom: 24px;
         border-bottom: 1px solid #eee;
     }
-    
+
     .marc-section:last-child {
         border-bottom: none;
         margin-bottom: 0;
     }
-    
+
     .marc-section h2 {
         font-size: 16px;
         color: #1e3a5f;
@@ -169,7 +169,7 @@
         align-items: center;
         gap: 10px;
     }
-    
+
     .marc-section h2 .section-tag {
         background: #e8f4fc;
         color: #2d5a87;
@@ -179,7 +179,7 @@
         font-weight: 600;
         font-family: 'JetBrains Mono', monospace;
     }
-    
+
     /* Campo MARC individual */
     .marc-field {
         display: grid;
@@ -195,41 +195,41 @@
         align-items: start;
         transition: all 0.2s;
     }
-    
+
     .marc-field:hover {
         background: #f0f7fc;
     }
-    
+
     .marc-field .tag {
         font-weight: 700;
         color: #1e3a5f;
     }
-    
+
     .marc-field .indicators {
         color: #888;
         text-align: center;
     }
-    
+
     .marc-field .content {
         color: #333;
         word-break: break-word;
     }
-    
+
     .marc-field .content .subfield {
         color: #0066cc;
         font-weight: 600;
     }
-    
+
     /* Campo líder especial */
     .leader-field {
         background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
         border: 2px solid #0ea5e9;
     }
-    
+
     .leader-field .tag {
         color: #0369a1;
     }
-    
+
     /* Explicación del LDR */
     .ldr-explanation {
         background: #f0f9ff;
@@ -239,46 +239,46 @@
         margin-bottom: 16px;
         font-size: 13px;
     }
-    
+
     .ldr-explanation h4 {
         color: #0369a1;
         margin: 0 0 12px 0;
         font-size: 14px;
     }
-    
+
     .ldr-explanation table {
         width: 100%;
         border-collapse: collapse;
     }
-    
+
     .ldr-explanation td {
         padding: 4px 8px;
         border-bottom: 1px solid #bae6fd;
         vertical-align: top;
     }
-    
+
     .ldr-explanation td:first-child {
         font-family: 'JetBrains Mono', monospace;
         font-weight: 600;
         color: #0c4a6e;
         width: 100px;
     }
-    
+
     /* Campo de control */
     .control-field {
         background: #f0f9ff;
         border-left: 3px solid #0ea5e9;
     }
-    
+
     .control-field .tag {
         color: #0369a1;
     }
-    
+
     /* Campos repetibles */
     .marc-field-group {
         margin-bottom: 12px;
     }
-    
+
     .marc-field-group .group-label {
         font-size: 12px;
         color: #666;
@@ -286,7 +286,7 @@
         padding-left: 14px;
         font-weight: 600;
     }
-    
+
     /* Subcampos anidados */
     .nested-subfields {
         margin-left: 113px;
@@ -295,11 +295,11 @@
         border-left: 2px solid #ddd;
         font-size: 12px;
     }
-    
+
     .nested-subfields .subfield-item {
         padding: 3px 0;
     }
-    
+
     /* Badges para indicadores */
     .indicator-badge {
         display: inline-block;
@@ -311,7 +311,7 @@
         margin-left: 8px;
         font-family: sans-serif;
     }
-    
+
     /* Botón volver */
     .btn-volver {
         display: inline-flex;
@@ -326,12 +326,12 @@
         transition: all 0.2s;
         margin-top: 16px;
     }
-    
+
     .btn-volver:hover {
         background: #2d5a87;
         color: white;
     }
-    
+
     /* Nota vacía */
     .empty-note {
         color: #999;
@@ -376,7 +376,7 @@
             {% endif %}
             <div class="num-control">{{ obra.numero_control_display }}</div>
         </div>
-        
+
         <!-- Navegación -->
         <nav class="nav-section">
             <h4>Navegación rápida</h4>
@@ -393,34 +393,34 @@
                 <a href="#bloque7xx"><span class="nav-tag">7XX</span> Asientos secundarios</a>
                 <a href="#bloque8xx"><span class="nav-tag">8XX</span> Ubicación</a>
             </div>
-            
+
             <a href="{% url 'catalogo_publico:detalle' obra.pk %}" class="btn-volver">
                 <i class="bi bi-arrow-left"></i> Volver al resumen
             </a>
         </nav>
     </aside>
-    
+
     <!-- Contenido principal -->
     <main class="marc-content">
         <div class="marc-header">
             <h1>Formato MARC21 Completo</h1>
             <div class="subtitle">Visualización de todos los campos del registro bibliográfico</div>
         </div>
-        
+
         <div class="marc-body">
-            
+
             <!-- =========================================== -->
             <!-- LEADER (LDR) -->
             <!-- =========================================== -->
             <section class="marc-section" id="leader">
                 <h2><span class="section-tag">LDR</span> Leader (Cabecera del registro)</h2>
-                
+
                 <div class="marc-field leader-field">
                     <span class="tag">LDR</span>
                     <span class="indicators"></span>
                     <span class="content">00000n{{ obra.tipo_registro }}{{ obra.nivel_bibliografico }} a2200000 i 4500</span>
                 </div>
-                
+
                 <div class="ldr-explanation">
                     <h4>Desglose del Leader</h4>
                     <table>
@@ -451,34 +451,34 @@
                     </table>
                 </div>
             </section>
-            
+
             <!-- =========================================== -->
             <!-- CAMPOS DE CONTROL -->
             <!-- =========================================== -->
             <section class="marc-section" id="control">
                 <h2><span class="section-tag">00X</span> Campos de control</h2>
-                
+
                 <!-- 001 - Número de control -->
                 <div class="marc-field control-field">
                     <span class="tag">001</span>
                     <span class="indicators"></span>
                     <span class="content">{{ obra.numero_control_display }}</span>
                 </div>
-                
+
                 <!-- 003 - Identificador del número de control -->
                 <div class="marc-field control-field">
                     <span class="tag">003</span>
                     <span class="indicators"></span>
                     <span class="content">{{ obra.centro_catalogador }}</span>
                 </div>
-                
+
                 <!-- 005 - Fecha y hora de la última transacción -->
                 <div class="marc-field control-field">
                     <span class="tag">005</span>
                     <span class="indicators"></span>
                     <span class="content">{{ obra.fecha_modificacion|date:"YmdHis" }}.0</span>
                 </div>
-                
+
                 <!-- 007 - Campo fijo de descripción física -->
                 {% if obra.campo_007 %}
                 <div class="marc-field control-field">
@@ -487,7 +487,7 @@
                     <span class="content">{{ obra.campo_007 }}</span>
                 </div>
                 {% endif %}
-                
+
                 <!-- 008 - Datos de longitud fija -->
                 <div class="marc-field control-field">
                     <span class="tag">008</span>
@@ -495,13 +495,13 @@
                     <span class="content">{{ obra.campo_008 }}</span>
                 </div>
             </section>
-            
+
             <!-- =========================================== -->
             <!-- BLOQUE 0XX - NÚMEROS Y CÓDIGOS -->
             <!-- =========================================== -->
             <section class="marc-section" id="bloque0xx">
                 <h2><span class="section-tag">0XX</span> Números y códigos de identificación</h2>
-                
+
                 <!-- 024 - Otros identificadores (R) -->
                 {% for ident in obra.otros_identificadores.all %}
                 <div class="marc-field">
@@ -513,7 +513,7 @@
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 028 - Número de editor de música (R) -->
                 {% for num_ed in obra.numeros_editor.all %}
                 <div class="marc-field">
@@ -525,7 +525,7 @@
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 031 - Íncipit musical (R) -->
                 {% for incipit in obra.incipits_musicales.all %}
                 <div class="marc-field">
@@ -546,7 +546,7 @@
                 {% empty %}
                 <div class="empty-note">No hay íncipits musicales registrados (campo 031)</div>
                 {% endfor %}
-                
+
                 <!-- 040 - Centro catalogador -->
                 <div class="marc-field">
                     <span class="tag">040</span>
@@ -557,7 +557,7 @@
                         <span class="subfield">$c</span>{{ obra.centro_catalogador }}
                     </span>
                 </div>
-                
+
                 <!-- 041 - Códigos de lengua (R) -->
                 {% for codigo in obra.codigos_lengua.all %}
                 <div class="marc-field">
@@ -568,7 +568,7 @@
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 044 - Códigos de país (R) -->
                 {% if obra.codigos_pais_entidad.exists %}
                 <div class="marc-field">
@@ -580,13 +580,13 @@
                 </div>
                 {% endif %}
             </section>
-            
+
             <!-- =========================================== -->
             <!-- BLOQUE 1XX - PUNTOS DE ACCESO PRINCIPALES -->
             <!-- =========================================== -->
             <section class="marc-section" id="bloque1xx">
                 <h2><span class="section-tag">1XX</span> Puntos de acceso principales</h2>
-                
+
                 <!-- 100 - Compositor (punto de acceso principal) -->
                 {% if obra.compositor %}
                 <div class="marc-field">
@@ -600,7 +600,7 @@
                     </span>
                 </div>
                 {% endif %}
-                
+
                 <!-- 130 - Título uniforme (sin compositor) -->
                 {% if obra.titulo_uniforme and not obra.compositor %}
                 <div class="marc-field">
@@ -617,18 +617,18 @@
                     </span>
                 </div>
                 {% endif %}
-                
+
                 {% if not obra.compositor and not obra.titulo_uniforme %}
                 <div class="empty-note">No hay punto de acceso principal registrado</div>
                 {% endif %}
             </section>
-            
+
             <!-- =========================================== -->
             <!-- BLOQUE 2XX - TÍTULO Y EDICIÓN -->
             <!-- =========================================== -->
             <section class="marc-section" id="bloque2xx">
                 <h2><span class="section-tag">2XX</span> Título, edición y publicación</h2>
-                
+
                 <!-- 240 - Título uniforme (con compositor) -->
                 {% if obra.titulo_240 and obra.compositor %}
                 <div class="marc-field">
@@ -645,7 +645,7 @@
                     </span>
                 </div>
                 {% endif %}
-                
+
                 <!-- 245 - Título principal -->
                 <div class="marc-field">
                     <span class="tag">245</span>
@@ -654,7 +654,7 @@
                         <span class="subfield">$a</span>{{ obra.titulo_principal }}{% if obra.subtitulo %} : <span class="subfield">$b</span>{{ obra.subtitulo }}{% endif %}{% if obra.mencion_responsabilidad %} / <span class="subfield">$c</span>{{ obra.mencion_responsabilidad }}{% endif %}
                     </span>
                 </div>
-                
+
                 <!-- 246 - Títulos alternativos (R) -->
                 {% for titulo_alt in obra.titulos_alternativos.all %}
                 <div class="marc-field">
@@ -663,11 +663,11 @@
                     <span class="content">
                         {% if titulo_alt.texto_visualizacion %}<span class="subfield">$i</span>{{ titulo_alt.texto_visualizacion }}: {% endif %}
                         <span class="subfield">$a</span>{{ titulo_alt.titulo }}
-                        {% if titulo_alt.resto_titulo %}<span class="subfield">$b</span>{{ titulo_alt.resto_titulo }}{% endif %}
+                        {% if titulo_alt.subtitulo %}<span class="subfield">$b</span>{{ titulo_alt.subtitulo }}{% endif %}
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 250 - Edición (R) -->
                 {% for edicion in obra.ediciones.all %}
                 <div class="marc-field">
@@ -676,7 +676,7 @@
                     <span class="content"><span class="subfield">$a</span>{{ edicion.edicion }}</span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 264 - Producción/Publicación (R) -->
                 {% for prod in obra.producciones_publicaciones.all %}
                 <div class="marc-field">
@@ -692,13 +692,13 @@
                 <div class="empty-note">No hay información de publicación registrada (campo 264)</div>
                 {% endfor %}
             </section>
-            
+
             <!-- =========================================== -->
             <!-- BLOQUE 3XX - DESCRIPCIÓN FÍSICA -->
             <!-- =========================================== -->
             <section class="marc-section" id="bloque3xx">
                 <h2><span class="section-tag">3XX</span> Descripción física y técnica</h2>
-                
+
                 <!-- 300 - Descripción física -->
                 {% if obra.extension or obra.otras_caracteristicas or obra.dimension or obra.material_acompanante %}
                 <div class="marc-field">
@@ -712,7 +712,7 @@
                     </span>
                 </div>
                 {% endif %}
-                
+
                 <!-- 340 - Técnica -->
                 {% if obra.ms_imp %}
                 <div class="marc-field">
@@ -721,7 +721,7 @@
                     <span class="content"><span class="subfield">$d</span>{{ obra.get_ms_imp_display }}</span>
                 </div>
                 {% endif %}
-                
+
                 <!-- 348 - Formato de música notada -->
                 {% if obra.formato %}
                 <div class="marc-field">
@@ -730,7 +730,7 @@
                     <span class="content"><span class="subfield">$a</span>{{ obra.get_formato_display }}</span>
                 </div>
                 {% endif %}
-                
+
                 <!-- 382 - Medio de interpretación (R) -->
                 {% for medio382 in obra.medios_interpretacion_382.all %}
                 <div class="marc-field">
@@ -742,7 +742,7 @@
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 383 - Número de obra -->
                 {% if obra.numero_obra or obra.opus %}
                 <div class="marc-field">
@@ -754,7 +754,7 @@
                     </span>
                 </div>
                 {% endif %}
-                
+
                 <!-- 384 - Tonalidad -->
                 {% if obra.tonalidad_384 %}
                 <div class="marc-field">
@@ -764,13 +764,13 @@
                 </div>
                 {% endif %}
             </section>
-            
+
             <!-- =========================================== -->
             <!-- BLOQUE 4XX - SERIES -->
             <!-- =========================================== -->
             <section class="marc-section" id="bloque4xx">
                 <h2><span class="section-tag">4XX</span> Menciones de serie</h2>
-                
+
                 <!-- 490 - Mención de serie (R) -->
                 {% for serie in obra.menciones_serie.all %}
                 <div class="marc-field">
@@ -785,13 +785,13 @@
                 <div class="empty-note">No hay menciones de serie registradas (campo 490)</div>
                 {% endfor %}
             </section>
-            
+
             <!-- =========================================== -->
             <!-- BLOQUE 5XX - NOTAS -->
             <!-- =========================================== -->
             <section class="marc-section" id="bloque5xx">
                 <h2><span class="section-tag">5XX</span> Notas</h2>
-                
+
                 <!-- 500 - Notas generales (R) -->
                 {% for nota in obra.notas_generales_500.all %}
                 <div class="marc-field">
@@ -800,7 +800,7 @@
                     <span class="content"><span class="subfield">$a</span>{{ nota.nota_general }}</span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 505 - Contenido (R) -->
                 {% for contenido in obra.contenidos_505.all %}
                 <div class="marc-field">
@@ -809,7 +809,7 @@
                     <span class="content"><span class="subfield">$a</span>{{ contenido.contenido }}</span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 520 - Sumario (R) -->
                 {% for sumario in obra.sumarios_520.all %}
                 <div class="marc-field">
@@ -818,7 +818,7 @@
                     <span class="content"><span class="subfield">$a</span>{{ sumario.sumario }}</span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 545 - Datos biográficos -->
                 {% if datos_biograficos %}
                 <div class="marc-field">
@@ -830,18 +830,18 @@
                     </span>
                 </div>
                 {% endif %}
-                
+
                 {% if not obra.notas_generales_500.exists and not obra.contenidos_505.exists and not obra.sumarios_520.exists and not datos_biograficos %}
                 <div class="empty-note">No hay notas registradas en este bloque</div>
                 {% endif %}
             </section>
-            
+
             <!-- =========================================== -->
             <!-- BLOQUE 6XX - MATERIAS -->
             <!-- =========================================== -->
             <section class="marc-section" id="bloque6xx">
                 <h2><span class="section-tag">6XX</span> Puntos de acceso de materia</h2>
-                
+
                 <!-- 650 - Materias temáticas (R) -->
                 {% for materia in obra.materias_650.all %}
                 <div class="marc-field">
@@ -853,7 +853,7 @@
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 655 - Género/Forma (R) -->
                 {% for genero in obra.materias_655.all %}
                 <div class="marc-field">
@@ -865,18 +865,18 @@
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 {% if not obra.materias_650.exists and not obra.materias_655.exists %}
                 <div class="empty-note">No hay materias registradas (campos 650/655)</div>
                 {% endif %}
             </section>
-            
+
             <!-- =========================================== -->
             <!-- BLOQUE 7XX - ASIENTOS SECUNDARIOS -->
             <!-- =========================================== -->
             <section class="marc-section" id="bloque7xx">
                 <h2><span class="section-tag">7XX</span> Asientos secundarios y enlaces</h2>
-                
+
                 <!-- 700 - Nombres relacionados (R) -->
                 {% for nombre in obra.nombres_relacionados_700.all %}
                 <div class="marc-field">
@@ -892,7 +892,7 @@
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 710 - Entidades relacionadas (R) -->
                 {% for entidad in obra.entidades_relacionadas_710.all %}
                 <div class="marc-field">
@@ -904,7 +904,7 @@
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 773 - Enlaces a documento fuente (R) -->
                 {% for enlace773 in obra.enlaces_documento_fuente_773.all %}
                 <div class="marc-field">
@@ -917,7 +917,7 @@
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 774 - Unidades constituyentes (R) -->
                 {% for enlace774 in obra.enlaces_unidades_774.all %}
                 <div class="marc-field">
@@ -930,7 +930,7 @@
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 787 - Otras relaciones (R) -->
                 {% for otra787 in obra.otras_relaciones_787.all %}
                 <div class="marc-field">
@@ -943,18 +943,18 @@
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 {% if not obra.nombres_relacionados_700.exists and not obra.entidades_relacionadas_710.exists and not obra.enlaces_documento_fuente_773.exists and not obra.enlaces_unidades_774.exists and not obra.otras_relaciones_787.exists %}
                 <div class="empty-note">No hay asientos secundarios registrados en este bloque</div>
                 {% endif %}
             </section>
-            
+
             <!-- =========================================== -->
             <!-- BLOQUE 8XX - UBICACIÓN Y DISPONIBILIDAD -->
             <!-- =========================================== -->
             <section class="marc-section" id="bloque8xx">
                 <h2><span class="section-tag">8XX</span> Ubicación y acceso electrónico</h2>
-                
+
                 <!-- 852 - Ubicación (R) -->
                 {% for ubicacion in obra.ubicaciones_852.all %}
                 <div class="marc-field">
@@ -967,7 +967,7 @@
                     </span>
                 </div>
                 {% endfor %}
-                
+
                 <!-- 856 - Recursos disponibles (R) -->
                 {% for disponible in obra.disponibles_856.all %}
                     {% for url856 in disponible.urls_856.all %}
@@ -983,7 +983,7 @@
                 {% empty %}
                 <div class="empty-note">No hay recursos electrónicos disponibles (campo 856)</div>
                 {% endfor %}
-                
+
                 <!-- Signatura generada -->
                 {% if obra.signatura_completa %}
                 <div class="marc-field signatura-field">
@@ -993,7 +993,7 @@
                 </div>
                 {% endif %}
             </section>
-            
+
         </div><!-- /.marc-body -->
     </main>
 </div>

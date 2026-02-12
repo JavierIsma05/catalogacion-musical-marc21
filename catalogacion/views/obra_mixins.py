@@ -325,6 +325,11 @@ class ObraFormsetMixin:
 
             formsets[key] = formset
 
+            # 856 se valida/guarda manualmente (borra y recrea), no usar is_valid()
+            if key == "disponibles_856":
+                logger.debug(f"  ✅ {key}: VÁLIDO (validación manual por subcampos)")
+                continue
+
             if formset.is_valid():
                 logger.debug(f"  ✅ {key}: VÁLIDO")
             else:

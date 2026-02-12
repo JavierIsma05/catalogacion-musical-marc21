@@ -178,7 +178,7 @@
                 <div class="detalle-field">
                     <span class="detalle-field-label">Título alternativo</span>
                     <span class="detalle-field-value">
-                        {% if titulo_alt.texto_visualizacion %}{{ titulo_alt.texto_visualizacion }}: {% endif %}{{ titulo_alt.titulo }}{% if titulo_alt.resto_titulo %} : {{ titulo_alt.resto_titulo }}{% endif %}
+                        {% if titulo_alt.texto_visualizacion %}{{ titulo_alt.texto_visualizacion }}: {% endif %}{{ titulo_alt.titulo }}{% if titulo_alt.subtitulo %} : {{ titulo_alt.subtitulo }}{% endif %}
                     </span>
                 </div>
                 {% endfor %}

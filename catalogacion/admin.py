@@ -90,7 +90,7 @@ class FuncionCompositorInline(admin.TabularInline):
 class TituloAlternativoInline(admin.TabularInline):
     model = TituloAlternativo
     extra = 0
-    fields = ['titulo', 'resto_titulo']
+    fields = ['titulo', 'subtitulo']
     verbose_name = "Título Alternativo (246)"
     verbose_name_plural = "📚 Títulos Alternativos (246 - R)"
 
