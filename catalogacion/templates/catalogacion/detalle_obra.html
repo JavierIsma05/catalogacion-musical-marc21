@@ -299,14 +299,12 @@
                             <span class="campo-tag">700</span>
                             <div class="data-cell">
                                 <div class="linea-principal">
-                                    <strong>$a {{ nombre.persona }}</strong>
-                                    {% if nombre.coordenadas_biograficas %} $d ({{ nombre.coordenadas_biograficas }}){% endif %}
+                                    <strong>$a {% if nombre.persona %}{{ nombre.persona.apellidos_nombres }}{% endif %}</strong>
+                                    {% if nombre.coordenadas_biograficas %} $d ({{ nombre.coordenadas_biograficas }}){% endif %}{% if nombre.funciones.exists %},
+                                    {% for funcion in nombre.funciones.all %}$e {{ funcion.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if nombre.terminos_asociados.exists %},
+                                    {% for termino in nombre.terminos_asociados.all %}$c {{ termino.termino }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+                                    {% if nombre.autoria %} $j [{{ nombre.get_autoria_display|lower }}]{% endif %}
                                 </div>
-                                {% if nombre.funciones.exists %}
-                                <div class="linea-secundaria">
-                                    {% for funcion in nombre.funciones.all %}$e {{ funcion.get_funcion_display }}{% if not forloop.last %} ; {% endif %}{% endfor %}
-                                </div>
-                                {% endif %}
                             </div>
                         </div>
                         {% endfor %}

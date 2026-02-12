@@ -191,7 +191,7 @@
                 <div class="detalle-field">
                     <span class="detalle-field-label">Nombre relacionado</span>
                     <span class="detalle-field-value">
-                        {% if nombre.persona %}{{ nombre.persona }}{% endif %}{% if nombre.coordenadas_biograficas %} ({{ nombre.coordenadas_biograficas }}){% endif %}{% for funcion in nombre.funciones.all %}, {{ funcion.get_funcion_display }}{% endfor %}{% for termino in nombre.terminos_asociados.all %}, {{ termino.termino }}{% endfor %}
+                        {% if nombre.persona %}{{ nombre.persona.apellidos_nombres }}{% endif %}{% if nombre.coordenadas_biograficas %} ({{ nombre.coordenadas_biograficas }}){% endif %}{% for funcion in nombre.funciones.all %}, {{ funcion.get_funcion_display }}{% endfor %}{% for termino in nombre.terminos_asociados.all %}, {{ termino.termino }}{% endfor %}
                         {% if nombre.autoria %}
                             <span class="detalle-field-autoria">[{{ nombre.get_autoria_display|lower }}]</span>
                         {% endif %}

@@ -416,20 +416,8 @@
             console.log(`✅ TOTAL_FORMS actualizado a: ${rows.length}`);
         }
         
-        // Event delegation para eliminar filas del formset
-        container.addEventListener('click', function(e) {
-            const deleteBtn = e.target.closest('.delete-row-btn');
-            if (deleteBtn) {
-                console.log('🗑️ Botón eliminar fila 710 clickeado');
-                const row = deleteBtn.closest('.formset-row');
-                if (row) {
-                    row.remove();
-                    reindex710();
-                    console.log('✅ Fila 710 eliminada y reindexada');
-                }
-                return;
-            }
-        });
+        // delete-row-btn es manejado por formset-manager.js
+        // NO duplicar aquí para evitar desincronizar TOTAL_FORMS
         
         // Cuando se agrega desde el gestor global (formset-manager.js)
         container.addEventListener('formset:added', function(e) {

@@ -301,6 +301,64 @@ def save_volumenes_490(request_post, formset):
 
 
 # ================================================================
+# HANDLERS 700 – Términos asociados ($c) y Funciones ($e)
+# ================================================================
+
+
+def save_terminos_asociados_700(request_post, formset):
+    """Guarda los términos asociados (700 $c) desde inputs dinámicos POST."""
+    from catalogacion.models import TerminoAsociado700
+
+    handler = FormsetSubcampoHandler(request_post)
+    valores = handler._agrupar_subcampos_por_indice("termino_asociado_700_")
+
+    for index, form in enumerate(formset):
+        if not form.instance.pk:
+            continue  # solo procesar padres ya guardados
+
+        form.instance.terminos_asociados.all().delete()
+
+        if index in valores:
+            for valor in valores[index]:
+                if val := valor.strip():
+                    TerminoAsociado700.objects.create(
+                        nombre_700=form.instance, termino=val
+                    )
+
+
+def save_funciones_700(request_post, formset):
+    """Guarda funciones (700 $e) desde el nested formset en POST."""
+    from catalogacion.forms.formsets import Funcion700FormSet
+    from catalogacion.models import Funcion700
+
+    for index, form in enumerate(formset):
+        if not form.instance.pk:
+            continue
+
+        prefix = f"funcion700-{form.prefix}"
+        func_formset = Funcion700FormSet(
+            data=request_post,
+            instance=form.instance,
+            prefix=prefix,
+        )
+
+        # Limpiar funciones anteriores y guardar las nuevas
+        form.instance.funciones.all().delete()
+
+        if func_formset.is_valid():
+            for fform in func_formset:
+                if (
+                    getattr(fform, "cleaned_data", None)
+                    and not fform.cleaned_data.get("DELETE", False)
+                    and fform.cleaned_data.get("funcion")
+                ):
+                    Funcion700.objects.create(
+                        nombre_700=form.instance,
+                        funcion=fform.cleaned_data["funcion"],
+                    )
+
+
+# ================================================================
 # MAPEO DE HANDLERS REGISTRADOS
 # ================================================================
 
@@ -317,4 +375,6 @@ SUBCAMPO_HANDLERS = {
     "_save_medios_382": save_medios_382,
     "_save_titulos_490": save_titulos_490,
     "_save_volumenes_490": save_volumenes_490,
+    "_save_terminos_asociados_700": save_terminos_asociados_700,
+    "_save_funciones_700": save_funciones_700,
 }

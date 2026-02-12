@@ -526,11 +526,8 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
             return;
         }
 
-        const delRowBtn=e.target.closest(".delete-row-btn");
-        if(delRowBtn){
-            const row=delRowBtn.closest(".formset-row");
-            if(row) row.remove();
-        }
+        // delete-row-btn es manejado por formset-manager.js
+        // NO duplicar aquí para evitar desincronizar TOTAL_FORMS
     });
 
     container.addEventListener('formset:added', (ev) => {

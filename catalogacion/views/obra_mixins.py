@@ -316,9 +316,12 @@ class ObraFormsetMixin:
                             f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)"
                         )
                         continue
-                elif all(not form.has_changed() for form in formset.forms):
-                    logger.debug(f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)")
-                    continue
+                else:
+                    if all(not form.has_changed() for form in formset.forms):
+                        logger.debug(
+                            f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)"
+                        )
+                        continue
 
             formsets[key] = formset
 
@@ -363,6 +366,10 @@ class ObraFormsetMixin:
                 "_save_subdivisiones_geograficas_650",
             ],
             "materias_genero_655": ["_save_subdivisiones_655"],
+            "nombres_relacionados_700": [
+                "_save_terminos_asociados_700",
+                "_save_funciones_700",
+            ],
         }
 
         for key, formset in formsets.items():
