@@ -461,35 +461,14 @@ class ObraFormsetMixin:
             for form in formset:
                 if getattr(form, "cleaned_data", None) and not form.cleaned_data.get(
                     "DELETE", False
-                ):
+                ) and form.has_changed():
                     obj = form.save(commit=False)
 
-                    # 🔥 Asignar FK a la obra
+                    # Asignar FK a la obra
                     if hasattr(obj, "obra_general"):
                         obj.obra_general = instance
                     elif hasattr(obj, "obra"):
                         obj.obra = instance
-
-                    # 🔥 CASO ESPECIAL 264: Si el formulario está vacío pero hay subcampos, crear de todos modos
-                    if key == "produccion_publicacion" and not form.has_changed():
-                        tiene_lugares = any(
-                            k.startswith("lugar_produccion_264_")
-                            and self.request.POST.get(k, "").strip()
-                            for k in self.request.POST.keys()
-                        )
-                        tiene_entidades = any(
-                            k.startswith("entidad_produccion_264_")
-                            and self.request.POST.get(k, "").strip()
-                            for k in self.request.POST.keys()
-                        )
-                        tiene_fechas = any(
-                            k.startswith("fecha_produccion_264_")
-                            and self.request.POST.get(k, "").strip()
-                            for k in self.request.POST.keys()
-                        )
-
-                        if tiene_lugares or tiene_entidades or tiene_fechas:
-                            obj.funcion = "0"
 
                     obj.save()
 

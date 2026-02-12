@@ -296,12 +296,14 @@
 
                 <!-- Materia -->
                 {% for materia in obra.materias_650.all %}
+                {% if materia.materia %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Materia</span>
                     <span class="detalle-field-value">
-                        {{ materia.materia }}{% for sub in materia.subdivisiones.all %} – {{ sub.subdivision }}{% endfor %}
+                        {{ materia.materia }}{% for sub in materia.subdivisiones.all %} – {{ sub.subdivision }}{% endfor %}{% for sub in materia.subdivisiones_geograficas.all %} – {{ sub.subdivision }}{% endfor %}
                     </span>
                 </div>
+                {% endif %}
                 {% endfor %}
 
                 <!-- Materia (Género/Forma) -->
@@ -349,7 +351,7 @@
                     <span class="detalle-field-label">Medio de interpretación</span>
                     <span class="detalle-field-value">
                         {{ medios.0 }}
-                        {% if medios.1 %}<br><strong>Solista:</strong> {{ medios.1 }}{% endif %}
+                        {% if medios.1 %}<br>{{ medios.1 }}{% endif %}
                     </span>
                 </div>
                 {% endif %}
