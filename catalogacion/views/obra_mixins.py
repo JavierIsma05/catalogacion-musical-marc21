@@ -459,9 +459,11 @@ class ObraFormsetMixin:
             # Guardado NORMAL para otros formsets
             # ---------------------------
             for form in formset:
-                if getattr(form, "cleaned_data", None) and not form.cleaned_data.get(
-                    "DELETE", False
-                ) and form.has_changed():
+                if (
+                    getattr(form, "cleaned_data", None)
+                    and not form.cleaned_data.get("DELETE", False)
+                    and form.has_changed()
+                ):
                     obj = form.save(commit=False)
 
                     # Asignar FK a la obra

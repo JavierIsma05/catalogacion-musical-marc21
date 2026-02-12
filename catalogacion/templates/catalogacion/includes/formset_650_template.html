@@ -225,6 +225,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
 
         <!-- EMPTY FORM -->
         <div class="formset-row empty-form mb-3" style="display:none;">
+            <input type="hidden" name="{{ formset.prefix }}-__prefix__-id" value="">
             <button type="button" class="delete-row-btn" title="Eliminar materia">
                 <i class="bi bi-x-lg"></i>
             </button>
@@ -535,34 +536,146 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
     container.addEventListener('formset:added', (ev) => {
         if (!ev || !ev.detail || ev.detail.prefix !== PREFIX) return;
         
-        console.log('formset:added evento recibido en 650', ev.detail);
-        
         // small timeout to let DOM settle
         setTimeout(() => {
-            // 🔥 CLAVE: Buscar SOLO en el nuevo formulario agregado
             const newForm = ev.detail.newForm;
-            if (!newForm) {
-                console.log('🚫 No se encontró newForm en el evento');
-                return;
+            if (!newForm) return;
+            
+            // ── Copiar subdivisiones $y y $z del último 650 existente ──
+            const allForms = container.querySelectorAll('.formset-row:not(.empty-form)');
+            // El penúltimo es el último "existente" (el nuevo es el último)
+            const prevForm = allForms.length >= 2 ? allForms[allForms.length - 2] : null;
+            
+            if (prevForm) {
+                const newIndex = ev.detail.totalForms - 1;
+                
+                // Copiar $a (materia) del form anterior
+                const prevMateriaText = prevForm.querySelector('.materia-input');
+                const prevMateriaId = prevForm.querySelector('.materia-id');
+                const newMateriaText = newForm.querySelector('.materia-input');
+                const newMateriaId = newForm.querySelector('.materia-id');
+                if (prevMateriaText && prevMateriaId && newMateriaText && newMateriaId) {
+                    newMateriaText.value = prevMateriaText.value;
+                    newMateriaId.value = prevMateriaId.value;
+                }
+                
+                // Copiar subdivisiones cronológicas ($y)
+                const prevSubsY = prevForm.querySelectorAll('.subdivisiones-container .subdivision-input');
+                const newSubContainerY = newForm.querySelector('.subdivisiones-container');
+                if (newSubContainerY && prevSubsY.length > 0) {
+                    // Limpiar el contenedor del nuevo form
+                    newSubContainerY.innerHTML = '';
+                    prevSubsY.forEach((prevInput, subIdx) => {
+                        if (!prevInput.value.trim()) return;
+                        const row = document.createElement('div');
+                        row.className = 'subcampo-row subdivision-form-row d-flex mb-2';
+                        row.innerHTML = `
+                            <div class="input-group">
+                                ${subIdx === 0 ? `
+                                <button type="button"
+                                        class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary"
+                                        data-materia-index="${newIndex}"
+                                        data-borrador-add="subdivision_materia_650"
+                                        data-borrador-parent="${newIndex}"
+                                        title="Agregar subdivisión cronológica">
+                                    <i class="bi bi-plus"></i>
+                                </button>` : `<div class="subcampo-placeholder"></div>`}
+                                <input type="text"
+                                       class="form-control subdivision-input"
+                                       name="subdivision_materia_650_${newIndex}_${subIdx}"
+                                       value="${prevInput.value}"
+                                       placeholder="Ej: Siglo XIX, 1800-1900">
+                                <button type="button"
+                                        class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
+                                        title="Eliminar"
+                                        ${subIdx === 0 && prevSubsY.length <= 1 ? 'style="visibility:hidden;"' : ''}>
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        `;
+                        newSubContainerY.appendChild(row);
+                    });
+                    // Si no se copió nada (todos vacíos), restaurar el campo vacío por defecto
+                    if (newSubContainerY.children.length === 0) {
+                        newSubContainerY.innerHTML = `
+                            <div class="subcampo-row subdivision-form-row d-flex mb-2">
+                                <div class="input-group">
+                                    <button type="button" class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary"
+                                        data-materia-index="${newIndex}" data-borrador-add="subdivision_materia_650"
+                                        data-borrador-parent="${newIndex}" title="Agregar subdivisión cronológica">
+                                        <i class="bi bi-plus"></i></button>
+                                    <input type="text" class="form-control subdivision-input"
+                                           name="subdivision_materia_650_${newIndex}_0" placeholder="Ej: Siglo XIX, 1800-1900">
+                                    <button type="button" class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
+                                        title="Eliminar" style="visibility:hidden;"><i class="bi bi-x-lg"></i></button>
+                                </div>
+                            </div>`;
+                    }
+                    // Actualizar data attributes
+                    newSubContainerY.dataset.subdivisionesContainer = newIndex;
+                    newSubContainerY.dataset.borradorParent = newIndex;
+                    updateDeleteVisibility(newSubContainerY);
+                }
+                
+                // Copiar subdivisiones geográficas ($z)
+                const prevSubsZ = prevForm.querySelectorAll('.subdivisiones-cronologicas-container .subdivision-cronologica-input');
+                const newSubContainerZ = newForm.querySelector('.subdivisiones-cronologicas-container');
+                if (newSubContainerZ && prevSubsZ.length > 0) {
+                    newSubContainerZ.innerHTML = '';
+                    prevSubsZ.forEach((prevInput, subIdx) => {
+                        if (!prevInput.value.trim()) return;
+                        const row = document.createElement('div');
+                        row.className = 'subcampo-row subdivision-cronologica-form-row d-flex mb-2';
+                        row.innerHTML = `
+                            <div class="input-group">
+                                ${subIdx === 0 ? `
+                                <button type="button"
+                                        class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
+                                        data-materia-index="${newIndex}"
+                                        title="Agregar subdivisión geográfica">
+                                    <i class="bi bi-plus"></i>
+                                </button>` : `<div class="subcampo-placeholder"></div>`}
+                                <input type="text"
+                                       class="form-control subdivision-cronologica-input"
+                                       name="subdivision_cronologica_650_${newIndex}_${subIdx}"
+                                       value="${prevInput.value}"
+                                       placeholder="Ej: Ecuador, Loja">
+                                <button type="button"
+                                        class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
+                                        title="Eliminar"
+                                        ${subIdx === 0 && prevSubsZ.length <= 1 ? 'style="visibility:hidden;"' : ''}>
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        `;
+                        newSubContainerZ.appendChild(row);
+                    });
+                    if (newSubContainerZ.children.length === 0) {
+                        newSubContainerZ.innerHTML = `
+                            <div class="subcampo-row subdivision-cronologica-form-row d-flex mb-2">
+                                <div class="input-group">
+                                    <button type="button" class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
+                                        data-materia-index="${newIndex}" title="Agregar subdivisión geográfica">
+                                        <i class="bi bi-plus"></i></button>
+                                    <input type="text" class="form-control subdivision-cronologica-input"
+                                           name="subdivision_cronologica_650_${newIndex}_0" placeholder="Ej: Ecuador, Loja">
+                                    <button type="button" class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
+                                        title="Eliminar" style="visibility:hidden;"><i class="bi bi-x-lg"></i></button>
+                                </div>
+                            </div>`;
+                    }
+                    newSubContainerZ.dataset.subdivisionesCronologicasContainer = newIndex;
+                    newSubContainerZ.dataset.borradorParent = newIndex;
+                    updateDeleteVisibilityCronologica(newSubContainerZ);
+                }
             }
             
-            console.log('🔍 Nuevo formulario encontrado:', newForm);
-            
-            // Inicializar autocomplete SOLO en los inputs del nuevo formulario
+            // Inicializar autocomplete en el nuevo formulario
             const newInputs = newForm.querySelectorAll(".materia-input");
-            console.log('Inputs de materia encontrados en nuevo formulario:', newInputs.length);
-            
-            newInputs.forEach((input, index) => {
-                console.log(`Inicializando input ${index} del nuevo formulario:`, input);
-                // 🔥 CLAVE: Limpiar el flag para permitir reinicialización
+            newInputs.forEach((input) => {
                 delete input.dataset.materiaInit;
                 initMateriaAutocomplete(input);
             });
-            
-            // Inicializar subdivisiones en las nuevas filas
-            const subdivisionContainers = newForm.querySelectorAll(".subdivisiones-container");
-            console.log('Contenedores de subdivisiones encontrados en nuevo formulario:', subdivisionContainers.length);
-            subdivisionContainers.forEach(updateDeleteVisibility);
         }, 50);
     });
 
