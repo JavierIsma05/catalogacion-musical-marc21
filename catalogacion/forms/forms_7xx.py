@@ -226,10 +226,9 @@ class EntidadRelacionada710Form(forms.ModelForm):
 
     class Meta:
         model = EntidadRelacionada710
-        fields = ["entidad", "funcion"]
+        fields = ["entidad"]
         widgets = {
             "entidad": forms.HiddenInput(),  # 👉 Escondido como en 700/787
-            "funcion": forms.Select(attrs={"class": "form-select"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -246,10 +245,9 @@ class EntidadRelacionada710Form(forms.ModelForm):
 
         entidad = cleaned_data.get("entidad")
         texto = cleaned_data.get("entidad_texto", "").strip()
-        funcion = cleaned_data.get("funcion", "")
 
         # 🟩 1. SI EL FORM ESTÁ COMPLETAMENTE VACÍO → borrar
-        if not (entidad or texto or funcion):
+        if not (entidad or texto):
             self.cleaned_data["DELETE"] = True
             return cleaned_data
 

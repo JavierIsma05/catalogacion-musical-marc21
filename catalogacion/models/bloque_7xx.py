@@ -188,22 +188,16 @@ class EntidadRelacionada710(models.Model):
         help_text="710 $a – Entidad relacionada (NR)",
     )
 
-    funcion = models.CharField(
-        max_length=50,
-        choices=FUNCIONES_ENTIDAD,
-        blank=True,
-        null=True,
-        help_text="710 $e – Función institucional (R)",
-    )
-
     class Meta:
         verbose_name = "710 – Entidad relacionada"
         verbose_name_plural = "710 – Entidades relacionadas (R)"
 
     def __str__(self):
         if getattr(self, "entidad", None):
-            if self.funcion:
-                return f"{self.entidad} ({self.get_funcion_display()})"
+            funciones = self.funciones_institucionales.all() if self.pk else []
+            if funciones:
+                funcs_str = ", ".join(str(f) for f in funciones)
+                return f"{self.entidad} ({funcs_str})"
             return str(self.entidad)
         return f"Entidad relacionada 710 (id={self.pk or 'nuevo'})"
 
@@ -211,7 +205,6 @@ class EntidadRelacionada710(models.Model):
 class FuncionInstitucional710(models.Model):
     """
     710 $e – Función institucional (R)
-    Modelo separado para soportar múltiples funciones por entidad.
     """
 
     entidad_710 = models.ForeignKey(

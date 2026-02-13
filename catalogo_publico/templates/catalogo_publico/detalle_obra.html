@@ -201,7 +201,7 @@
                 <div class="detalle-field">
                     <span class="detalle-field-label">Entidad relacionada</span>
                     <span class="detalle-field-value">
-                        {% if entidad.entidad %}{{ entidad.entidad }}{% endif %}{% if entidad.funciones_institucionales.exists %}, {% for fi in entidad.funciones_institucionales.all %}{{ fi.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}{% elif entidad.funcion %}, {{ entidad.get_funcion_display }}{% endif %}
+                        {% if entidad.entidad %}{{ entidad.entidad }}{% endif %}{% if entidad.funciones_institucionales.exists %}, {% for fi in entidad.funciones_institucionales.all %}{{ fi.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
                     </span>
                 </div>
                 {% endfor %}
