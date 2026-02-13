@@ -216,16 +216,16 @@
 }
 
 .detalle-field-label {
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 0.875rem;
+    font-weight: 600;
     color: var(--pro-text-secondary);
     line-height: 1.4;
 }
 
 .detalle-field-value {
-    font-size: 0.8125rem;
+    font-size: 0.9375rem;
     color: var(--pro-text);
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .detalle-field-note {
@@ -481,12 +481,12 @@
     }
 
     .detalle-field-label {
-        font-size: 0.6875rem;
+        font-size: 0.8125rem;
         font-weight: 600;
     }
 
     .detalle-field-value {
-        font-size: 0.75rem;
+        font-size: 0.875rem;
     }
 
     .pdf-viewer-container {
