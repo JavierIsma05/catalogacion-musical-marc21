@@ -1,3 +1,10 @@
+{% comment %}
+Template 710 – Entidades Corporativas Relacionadas
+Corregido: hidden fields, prefixes, autocomplete, reindex
+{% endcomment %}
+
+{% load catalogacion_tags %}
+
 <div class="formset-container" data-formset-prefix="{{ formset.prefix }}">
     <div style="display:none;">
         {% for hidden in formset.management_form %}
@@ -10,58 +17,51 @@
         {% for form in formset %}
         <div class="formset-row {% if form.instance.pk %}existing-form{% endif %} mb-3 position-relative">
 
+            {# ── Hidden fields: id, obra (NO entidad, se renderiza abajo) ── #}
+            {% for hidden in form.hidden_fields %}
+                {% if hidden.name != 'entidad' %}
+                    {{ hidden }}
+                {% endif %}
+            {% endfor %}
+
             {% if formset.can_delete %}
             <div class="d-none">{{ form.DELETE }}</div>
             {% endif %}
 
-            <!-- Botón delete -->
-            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger position-absolute"
-                style="right: 8px; top: 8px;" title="Eliminar 710">
+            <button type="button" class="delete-row-btn" title="Eliminar 710">
                 <i class="bi bi-x-lg"></i>
             </button>
 
             <div class="campo-grid">
 
-                <!-- AUTOCOMPLETE 710 $a -->
+                <!-- 710 $a – Entidad relacionada (AUTOCOMPLETE) -->
                 <div class="col-full">
-                    {{ form.entidad }} {# hidden FK #}
-                    <label class="form-label" for="{{ form.entidad_texto.id_for_label }}">
-                        710 $a – Entidad relacionada
-                    </label>
+                    {{ form.entidad }}
+                    <label class="form-label">710 $a – Entidad Relacionada</label>
 
                     <div class="autocomplete-wrapper">
                         <input type="text" class="form-control entidad-autocomplete"
-                            id="{{ form.entidad_texto.id_for_label }}" name="{{ form.entidad_texto.name }}"
-                            value="{{ form.entidad_texto.value|default:'' }}" placeholder="Escriba para buscar o crear…"
+                            id="{{ form.entidad_texto.id_for_label }}"
+                            name="{{ form.entidad_texto.html_name }}"
+                            value="{{ form.entidad_texto.value|default:'' }}"
+                            placeholder="Escriba para buscar una entidad existente o crear una nueva."
                             autocomplete="off">
-
                         <div class="autocomplete-suggestions entidad710-suggestions"></div>
-
-                        {{ form.entidad }} {# hidden ID #}
-
-
-                        <div class="autocomplete-suggestions entidad710-suggestions"></div>
-                    </div>
-
-                    <div class="form-text">
-                        Escriba para buscar una entidad existente o crear una nueva.
                     </div>
                 </div>
 
-                <!-- 710 $e - Función institucional (Repetible) -->
+                <!-- 710 $e – Función (REPETIBLE) -->
                 <div class="col-full">
-                    <label class="form-label small">710 $e – Función institucional</label>
-                    
+                    <label class="form-label small">$e Función</label>
+
                     <div class="funciones-710e-container" data-funciones-710e-index="{{ forloop.counter0 }}">
-                        
-                        {% if form.instance.pk %}
-                            {% for funcion in form.instance.funciones_institucionales.all %}
-                            <div class="funcion-710e-row {% if forloop.first %}primera-fila{% endif %} mb-2">
+                        {% if form.instance.pk and form.instance.funciones_institucionales.exists %}
+                            {% for fi in form.instance.funciones_institucionales.all %}
+                            <div class="funcion-710e-row mb-2">
                                 <div class="input-group">
-                                    
                                     {% if forloop.first %}
                                     <button type="button"
-                                            class="subcampo-add-btn add-funcion-710e-btn btn btn-outline-primary"
+                                            class="subcampo-add-btn add-funcion-710e-btn"
                                             title="Agregar función">
                                         <i class="bi bi-plus"></i>
                                     </button>
@@ -70,18 +70,20 @@
                                     {% endif %}
 
                                     <select class="form-select"
-                                            name="funcion_institucional_710_{{ forloop.parentloop.counter0 }}_{{ funcion.pk }}">
-                                        <option value="">Seleccione una función...</option>
-                                        {% for value, label in form.funcion.field.choices %}
-                                        <option value="{{ value }}" 
-                                                {% if funcion.funcion == value %}selected{% endif %}>
-                                            {{ label }}
+                                            name="funcion_institucional_710_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}">
+                                        <option value="">---------</option>
+                                        {% for val, lbl in form.funcion.field.choices %}
+                                        {% if val %}
+                                        <option value="{{ val }}"
+                                                {% if fi.funcion == val %}selected{% endif %}>
+                                            {{ lbl }}
                                         </option>
+                                        {% endif %}
                                         {% endfor %}
                                     </select>
 
                                     <button type="button"
-                                            class="subcampo-delete-btn delete-funcion-710e-btn btn btn-outline-danger"
+                                            class="subcampo-delete-btn delete-funcion-710e-btn"
                                             title="Eliminar"
                                             {% if forloop.first and forloop.last %}style="visibility:hidden;"{% endif %}>
                                         <i class="bi bi-x-lg"></i>
@@ -90,24 +92,27 @@
                             </div>
                             {% endfor %}
                         {% else %}
-                            <div class="funcion-710e-row primera-fila mb-2">
+                            {# Nueva entidad o sin funciones → select vacío #}
+                            <div class="funcion-710e-row mb-2">
                                 <div class="input-group">
                                     <button type="button"
-                                            class="subcampo-add-btn add-funcion-710e-btn btn btn-outline-primary"
+                                            class="subcampo-add-btn add-funcion-710e-btn"
                                             title="Agregar función">
                                         <i class="bi bi-plus"></i>
                                     </button>
 
                                     <select class="form-select"
                                             name="funcion_institucional_710_{{ forloop.counter0 }}_0">
-                                        <option value="">Seleccione una función...</option>
-                                        {% for value, label in form.funcion.field.choices %}
-                                        <option value="{{ value }}">{{ label }}</option>
+                                        <option value="">---------</option>
+                                        {% for val, lbl in form.funcion.field.choices %}
+                                        {% if val %}
+                                        <option value="{{ val }}">{{ lbl }}</option>
+                                        {% endif %}
                                         {% endfor %}
                                     </select>
 
                                     <button type="button"
-                                            class="subcampo-delete-btn delete-funcion-710e-btn btn btn-outline-danger"
+                                            class="subcampo-delete-btn delete-funcion-710e-btn"
                                             title="Eliminar"
                                             style="visibility:hidden;">
                                         <i class="bi bi-x-lg"></i>
@@ -115,7 +120,6 @@
                                 </div>
                             </div>
                         {% endif %}
-                        
                     </div>
                 </div>
 
@@ -123,59 +127,58 @@
         </div>
         {% endfor %}
 
-        <!-- Empty Form -->
-        <div class="formset-row empty-form mb-3 d-none position-relative">
+        <!-- ═══════ EMPTY FORM ═══════ -->
+        <div class="formset-row empty-form mb-3" style="display:none;">
+            <input type="hidden" name="{{ formset.prefix }}-__prefix__-id" value="">
+            <input type="hidden" name="{{ formset.prefix }}-__prefix__-entidad" value=""
+                   class="entidad710-hidden-id">
 
-            <button type="button" class="delete-row-btn btn btn-sm btn-outline-danger position-absolute"
-                style="right: 8px; top: 8px;" title="Eliminar 710">
+            <button type="button" class="delete-row-btn" title="Eliminar 710">
                 <i class="bi bi-x-lg"></i>
             </button>
 
             <div class="campo-grid">
 
                 <div class="col-full">
-                    <input type="hidden" name="__prefix__-entidad">
-                    <label class="form-label">710 $a – Entidad relacionada</label>
-
+                    <label class="form-label">710 $a – Entidad Relacionada</label>
                     <div class="autocomplete-wrapper">
-                        <input type="text" class="form-control entidad-autocomplete" name="__prefix__-entidad_texto"
-                            placeholder="Escriba para buscar o crear…" autocomplete="off">
-
-                       
+                        <input type="text" class="form-control entidad-autocomplete"
+                            name="{{ formset.prefix }}-__prefix__-entidad_texto"
+                            placeholder="Escriba para buscar una entidad existente o crear una nueva."
+                            autocomplete="off">
                         <div class="autocomplete-suggestions entidad710-suggestions"></div>
                     </div>
                 </div>
 
                 <div class="col-full">
-                    <label class="form-label small">710 $e – Función institucional</label>
-                    
+                    <label class="form-label small">$e Función</label>
                     <div class="funciones-710e-container" data-funciones-710e-index="__prefix__">
-                        
-                        <div class="funcion-710e-row primera-fila mb-2">
+                        <div class="funcion-710e-row mb-2">
                             <div class="input-group">
                                 <button type="button"
-                                        class="subcampo-add-btn add-funcion-710e-btn btn btn-outline-primary"
+                                        class="subcampo-add-btn add-funcion-710e-btn"
                                         title="Agregar función">
                                     <i class="bi bi-plus"></i>
                                 </button>
 
                                 <select class="form-select"
                                         name="funcion_institucional_710___prefix___0">
-                                    <option value="">Seleccione una función...</option>
-                                    {% for value, label in formset.empty_form.fields.funcion.choices %}
-                                    <option value="{{ value }}">{{ label }}</option>
+                                    <option value="">---------</option>
+                                    {% for val, lbl in formset.empty_form.funcion.field.choices %}
+                                    {% if val %}
+                                    <option value="{{ val }}">{{ lbl }}</option>
+                                    {% endif %}
                                     {% endfor %}
                                 </select>
 
                                 <button type="button"
-                                        class="subcampo-delete-btn delete-funcion-710e-btn btn btn-outline-danger"
+                                        class="subcampo-delete-btn delete-funcion-710e-btn"
                                         title="Eliminar"
                                         style="visibility:hidden;">
                                     <i class="bi bi-x-lg"></i>
                                 </button>
                             </div>
                         </div>
-                        
                     </div>
                 </div>
 
@@ -184,341 +187,215 @@
 
     </div>
 </div>
+
 <script>
-    document.addEventListener("input", function (e) {
-        const input = e.target.closest(".entidad-autocomplete");
-        if (!input) return;
+(function () {
+    "use strict";
 
-        const row = input.closest(".formset-row");
-        const hiddenId = row.querySelector('input[type="hidden"]');
+    const prefix = "{{ formset.prefix }}";
+    const root = document.querySelector(`.formset-container[data-formset-prefix="${prefix}"]`);
+    if (!root) return;
+
+    /* ======================================================
+       AUTOCOMPLETE 710 $a
+       ====================================================== */
+    function initEntidadAutocomplete(row) {
+        const input = row.querySelector(".entidad-autocomplete");
+        if (!input || input.dataset.acInit) return;
+        input.dataset.acInit = "1";
+
+        const hidden = row.querySelector('input[type="hidden"][name$="-entidad"]');
         const box = row.querySelector(".entidad710-suggestions");
+        if (!hidden || !box) return;
 
-        const query = input.value.trim();
-        hiddenId.value = "";
+        let timer = null;
+        function hide() { box.innerHTML = ""; box.classList.remove("show"); }
 
-        if (query.length < 2) {
-            box.innerHTML = "";
-            box.classList.remove("show");
-            return;
-        }
-
-        fetch(`/catalogacion/api/autocompletar/entidad/?q=${encodeURIComponent(query)}`)
-            .then(r => r.json())
-            .then(data => {
-                box.innerHTML = "";
-
-                data.results.forEach(ent => {
-                    const div = document.createElement("div");
-                    div.className = "autocomplete-item";
-                    div.innerHTML = ent.text;
-                    div.addEventListener("click", () => {
-                        input.value = ent.nombre_entidad || ent.text;
-                        hiddenId.value = ent.id;
-                        box.innerHTML = "";
-                        box.classList.remove("show");
-                    });
-                    box.appendChild(div);
-                });
-
-                const nuevo = document.createElement("div");
-                nuevo.className = "autocomplete-item new-item";
-                nuevo.innerHTML = `<strong>+ Crear nuevo:</strong> "${query}"`;
-                nuevo.addEventListener("click", () => {
-                    input.value = query;
-                    hiddenId.value = "";
+        function search(q) {
+            fetch(`/catalogacion/api/autocompletar/entidad/?q=${encodeURIComponent(q)}`)
+                .then(r => r.json())
+                .then(data => {
                     box.innerHTML = "";
-                    box.classList.remove("show");
+
+                    data.results.forEach(ent => {
+                        const div = document.createElement("div");
+                        div.className = "autocomplete-item";
+                        div.innerHTML = ent.text;
+                        div.addEventListener("click", () => {
+                            input.value = ent.nombre_entidad || ent.text;
+                            hidden.value = ent.id;
+                            hide();
+                        });
+                        box.appendChild(div);
+                    });
+
+                    const nuevo = document.createElement("div");
+                    nuevo.className = "autocomplete-item new-item";
+                    nuevo.innerHTML = `<strong>+ Crear nuevo:</strong> "${q}"`;
+                    nuevo.addEventListener("click", () => {
+                        input.value = q;
+                        hidden.value = "";
+                        hide();
+                    });
+                    box.appendChild(nuevo);
+                    box.classList.add("show");
                 });
-                box.appendChild(nuevo);
-
-                box.classList.add("show");
-            });
-    });
-
-    document.addEventListener("click", function (e) {
-        document.querySelectorAll(".entidad710-suggestions.show")
-            .forEach(box => {
-                if (!box.contains(e.target)) box.classList.remove("show");
-            });
-    });
-
-    // =====================================================
-    // MANEJO DE FUNCIONES 710 $e REPETIBLES (MANTENIENDO LÓGICA EXISTENTE)
-    // =====================================================
-    (function() {
-        const container = document.querySelector('.formset-container[data-formset-prefix="{{ formset.prefix }}"]');
-        if (!container) return;
-        
-        console.log('🚀 Inicializando funciones 710 $e repetibles');
-        
-        function updateFuncionesLayout(container) {
-            const visibleRows = Array.from(
-                container.querySelectorAll('.funcion-710e-row:not(.empty-form)')
-            ).filter(r => r.style.display !== 'none');
-
-            // Asegurar que solo la primera visible tenga la clase
-            visibleRows.forEach(r => r.classList.remove('primera-fila'));
-            if (visibleRows[0]) visibleRows[0].classList.add('primera-fila');
-
-            visibleRows.forEach((row, index) => {
-                const isFirst = index === 0;
-                const addBtn = row.querySelector('.add-funcion-710e-btn');
-                const placeholder = row.querySelector('.subcampo-placeholder');
-                const deleteBtn = row.querySelector('.delete-funcion-710e-btn');
-
-                // Izquierda: primera => [+]; resto => placeholder
-                if (isFirst) {
-                    if (!addBtn) {
-                        const newBtn = document.createElement('button');
-                        newBtn.type = 'button';
-                        newBtn.className = 'subcampo-add-btn add-funcion-710e-btn btn btn-outline-primary';
-                        newBtn.title = 'Agregar función';
-                        newBtn.innerHTML = '<i class="bi bi-plus"></i>';
-                        if (placeholder) {
-                            placeholder.replaceWith(newBtn);
-                        } else {
-                            const inputGroup = row.querySelector('.input-group');
-                            if (inputGroup) inputGroup.insertBefore(newBtn, inputGroup.firstChild);
-                        }
-                    }
-                } else {
-                    if (addBtn) {
-                        const newPlaceholder = document.createElement('div');
-                        newPlaceholder.className = 'subcampo-placeholder';
-                        newPlaceholder.setAttribute('aria-hidden', 'true');
-                        addBtn.replaceWith(newPlaceholder);
-                    }
-                }
-
-                // Derecha: primera => oculto si es única; resto => visible
-                if (deleteBtn) {
-                    deleteBtn.style.visibility = (isFirst && visibleRows.length === 1) ? 'hidden' : 'visible';
-                }
-            });
         }
-        
-        // Event delegation para agregar/eliminar funciones
-        container.addEventListener('click', function(e) {
-            const addBtn = e.target.closest('.add-funcion-710e-btn');
-            if (addBtn) {
-                console.log('🔥 Botón + función 710e clickeado');
-                const funcContainer = addBtn.closest('.funciones-710e-container');
-                const rows = funcContainer.querySelectorAll('.funcion-710e-row:not(.empty-form)');
-                const formsetIndex = funcContainer.dataset.funciones710eIndex;
-                
-                console.log('🔍 Formset index:', formsetIndex, 'Filas actuales:', rows.length);
-                
-                // Clonar la primera fila
-                const firstRow = rows[0];
-                const clone = firstRow.cloneNode(true);
-                
-                // Limpiar el clon
-                clone.classList.remove('primera-fila');
-                const select = clone.querySelector('select');
-                if (select) {
-                    select.selectedIndex = 0;
-                    // 🔥 CLAVE: Usar el formsetIndex correcto para el nombre
-                    const newName = `funcion_institucional_710_${formsetIndex}_${rows.length}`;
-                    console.log('🔍 Nuevo select name:', newName);
-                    select.name = newName;
+
+        input.addEventListener("input", () => {
+            const q = input.value.trim();
+            hidden.value = "";
+            if (q.length < 2) return hide();
+            clearTimeout(timer);
+            timer = setTimeout(() => search(q), 300);
+        });
+
+        document.addEventListener("click", e => {
+            if (!row.contains(e.target)) hide();
+        });
+    }
+
+    /* ======================================================
+       FUNCIONES 710 $e – Layout
+       ====================================================== */
+    function updateFuncionesLayout(container) {
+        const rows = Array.from(
+            container.querySelectorAll('.funcion-710e-row')
+        ).filter(r => r.style.display !== 'none');
+
+        rows.forEach((row, i) => {
+            const isFirst = i === 0;
+            const addBtn = row.querySelector('.add-funcion-710e-btn');
+            const placeholder = row.querySelector('.subcampo-placeholder');
+            const deleteBtn = row.querySelector('.delete-funcion-710e-btn');
+
+            if (isFirst) {
+                if (!addBtn && placeholder) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'subcampo-add-btn add-funcion-710e-btn';
+                    btn.title = 'Agregar función';
+                    btn.innerHTML = '<i class="bi bi-plus"></i>';
+                    placeholder.replaceWith(btn);
                 }
-                
-                // Agregar al contenedor
-                funcContainer.appendChild(clone);
-                updateFuncionesLayout(funcContainer);
-                
-                console.log('✅ Función 710e agregada. Total filas:', rows.length + 1);
-                return;
+            } else {
+                if (addBtn) {
+                    const ph = document.createElement('div');
+                    ph.className = 'subcampo-placeholder';
+                    ph.setAttribute('aria-hidden', 'true');
+                    addBtn.replaceWith(ph);
+                }
             }
-            
-            const deleteBtn = e.target.closest('.delete-funcion-710e-btn');
             if (deleteBtn) {
-                console.log('🗑️ Botón eliminar función 710e clickeado');
-                const row = deleteBtn.closest('.funcion-710e-row');
-                const funcContainer = row.closest('.funciones-710e-container');
-                
-                row.remove();
-                updateFuncionesLayout(funcContainer);
-                
-                console.log('✅ Función 710e eliminada');
-                return;
+                deleteBtn.style.visibility = (isFirst && rows.length === 1) ? 'hidden' : 'visible';
             }
         });
-        
-        // Inicializar layout para todos los contenedores existentes
-        document.querySelectorAll('.funciones-710e-container').forEach(updateFuncionesLayout);
-        
-    })();
+    }
 
-    // =====================================================
-    // MANEJO DEL FORMSET 710 COMPLETO
-    // =====================================================
-    (function() {
-        const container = document.querySelector('.formset-container[data-formset-prefix="{{ formset.prefix }}"]');
-        if (!container) {
-            console.log('� No se encontró container para 710');
+    /* ======================================================
+       CLICK: Agregar / Eliminar función $e
+       ====================================================== */
+    root.addEventListener('click', function (e) {
+        const addBtn = e.target.closest('.add-funcion-710e-btn');
+        if (addBtn) {
+            const funcContainer = addBtn.closest('.funciones-710e-container');
+            if (!funcContainer) return;
+            const visibleRows = Array.from(funcContainer.querySelectorAll('.funcion-710e-row'))
+                .filter(r => r.style.display !== 'none');
+            const formsetIndex = funcContainer.dataset.funciones710eIndex;
+
+            const first = visibleRows[0];
+            if (!first) return;
+            const clone = first.cloneNode(true);
+
+            const select = clone.querySelector('select');
+            if (select) {
+                select.selectedIndex = 0;
+                select.name = `funcion_institucional_710_${formsetIndex}_${visibleRows.length}`;
+            }
+
+            const addInClone = clone.querySelector('.add-funcion-710e-btn');
+            if (addInClone) {
+                const ph = document.createElement('div');
+                ph.className = 'subcampo-placeholder';
+                ph.setAttribute('aria-hidden', 'true');
+                addInClone.replaceWith(ph);
+            }
+
+            funcContainer.appendChild(clone);
+            updateFuncionesLayout(funcContainer);
             return;
         }
-        
-        console.log('🚀 Inicializando formset 710 completo');
-        
-        // Función para reindexar todos los elementos del formset 710
-        function reindex710() {
-            const rows = container.querySelectorAll('.formset-row:not(.empty-form)');
-            const managementForm = container.querySelector('input[name$="-TOTAL_FORMS"]');
-            
-            if (!managementForm) {
-                console.log('🚫 No se encontró management form para 710');
-                return;
-            }
-            
-            console.log('🔍 Reindexando 710. Filas encontradas:', rows.length);
-            
-            rows.forEach((row, index) => {
-                console.log(`🔄 Procesando fila ${index}:`, row);
-                
-                // Actualizar todos los atributos name, id y for
-                row.querySelectorAll('[name], [id], label[for]').forEach(el => {
-                    ['name', 'id', 'for'].forEach(attr => {
-                        const val = el.getAttribute(attr);
-                        if (!val) return;
-                        
-                        // Reemplazar __prefix__ o índices antiguos con el nuevo índice
-                        const newVal = val
-                            .replace(/__prefix__/g, index)
-                            .replace(/-\d+-/g, `-${index}-`);
-                        
-                        if (newVal !== val) {
-                            el.setAttribute(attr, newVal);
-                            console.log(`🔍 ${attr} actualizado: ${val} -> ${newVal}`);
-                        }
-                    });
-                });
-                
-                // Actualizar data-funciones-710e-index
-                const funcContainer = row.querySelector('.funciones-710e-container');
-                if (funcContainer) {
-                    funcContainer.dataset.funciones710eIndex = index;
-                    console.log(`🔍 Índice de contenedor de funciones actualizado a: ${index}`);
-                    
-                    // Actualizar names de los selects de funciones
-                    const selects = funcContainer.querySelectorAll('select');
-                    selects.forEach((select, selectIndex) => {
-                        const newName = `funcion_institucional_710_${index}_${selectIndex}`;
-                        select.name = newName;
-                        console.log(`🔍 Select name actualizado: ${newName}`);
-                    });
-                }
-            });
-            
-            // Actualizar TOTAL_FORMS
-            managementForm.value = rows.length;
-            console.log(`✅ TOTAL_FORMS actualizado a: ${rows.length}`);
+
+        const delBtn = e.target.closest('.delete-funcion-710e-btn');
+        if (delBtn) {
+            const row = delBtn.closest('.funcion-710e-row');
+            const funcContainer = row ? row.closest('.funciones-710e-container') : null;
+            if (row) row.remove();
+            if (funcContainer) updateFuncionesLayout(funcContainer);
+            return;
         }
-        
-        // Event delegation para eliminar filas del formset
-        container.addEventListener('click', function(e) {
-            const deleteBtn = e.target.closest('.delete-row-btn');
-            if (deleteBtn) {
-                console.log('🗑️ Botón eliminar fila 710 clickeado');
-                const row = deleteBtn.closest('.formset-row');
-                if (row) {
-                    row.remove();
-                    reindex710();
-                    console.log('✅ Fila 710 eliminada y reindexada');
-                }
-                return;
-            }
-        });
-        
-        // Cuando se agrega desde el gestor global (formset-manager.js)
-        container.addEventListener('formset:added', function(e) {
-            if (!e.detail || e.detail.prefix !== '{{ formset.prefix }}') {
-                console.log('🚫 Evento formset:added no es para este prefix 710:', '{{ formset.prefix }}');
-                return;
-            }
-            
-            console.log('🔥 formset:added recibido en 710', e.detail);
-            
-            // Timeout para que el DOM se estabilice
-            setTimeout(() => {
-                reindex710();
-                
-                // Inicializar layout de funciones 710e en el nuevo formulario
-                const newForm = e.detail.newForm;
-                if (newForm) {
-                    const funcContainer = newForm.querySelector('.funciones-710e-container');
-                    if (funcContainer) {
-                        console.log('🔍 Inicializando layout de funciones 710e en nuevo formulario');
-                        updateFuncionesLayout(funcContainer);
+    });
+
+    /* ======================================================
+       REINDEXAR FORMSET 710 (SEGURO, SIN REGEX GLOBAL)
+       ====================================================== */
+    function reindex710() {
+        const rows = root.querySelectorAll(".formset-row:not(.empty-form)");
+        const totalInput = root.querySelector(`[name="${prefix}-TOTAL_FORMS"]`);
+
+        rows.forEach((row, index) => {
+            row.querySelectorAll("[name], [id], label[for]").forEach(el => {
+                ["name", "id", "for"].forEach(attr => {
+                    const val = el.getAttribute(attr);
+                    if (!val) return;
+
+                    if (val.startsWith(prefix + "-") || val.startsWith("id_" + prefix + "-")) {
+                        const idPfx = val.startsWith("id_") ? "id_" : "";
+                        const rest = val.slice((idPfx + prefix + "-").length);
+                        const newRest = rest.replace(/^\d+/, String(index));
+                        el.setAttribute(attr, idPfx + prefix + "-" + newRest);
                     }
-                }
-                
-                console.log('✅ Nuevo formulario 710 procesado completamente');
-            }, 100);
-        });
-        
-        // 🔥 CLONACIÓN MANUAL SI NO HAY GESTOR GLOBAL
-        // Buscar el botón + externo que tiene data-formset-target
-        setTimeout(() => {
-            const addBtn = document.querySelector(`[data-formset-target="{{ formset.prefix }}"]`);
-            if (addBtn) {
-                console.log('🔍 Botón + externo encontrado para 710:', addBtn);
-                
-                addBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    console.log('� Botón + externo de 710 clickeado - iniciando clonación manual');
-                    
-                    const container = document.querySelector('.formset-container[data-formset-prefix="{{ formset.prefix }}"]');
-                    const emptyForm = container.querySelector('.empty-form');
-                    
-                    if (!emptyForm) {
-                        console.log('🚫 No se encontró empty form para 710');
-                        return;
+                    else if (val.includes("__prefix__")) {
+                        el.setAttribute(attr, val.replace(/__prefix__/g, index));
                     }
-                    
-                    // Clonar el empty form
-                    const newForm = emptyForm.cloneNode(true);
-                    newForm.classList.remove('empty-form', 'd-none');
-                    newForm.style.display = 'block';
-                    newForm.classList.add('mb-3', 'position-relative');
-                    
-                    // Agregar botón de eliminar
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.type = 'button';
-                    deleteBtn.className = 'delete-row-btn btn btn-sm btn-outline-danger position-absolute';
-                    deleteBtn.style.cssText = 'right: 8px; top: 8px;';
-                    deleteBtn.title = 'Eliminar 710';
-                    deleteBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
-                    newForm.appendChild(deleteBtn);
-                    
-                    // Agregar al container
-                    const formsContainer = container.querySelector('.formset-forms');
-                    formsContainer.appendChild(newForm);
-                    
-                    console.log('✅ Formulario 710 clonado manualmente');
-                    
-                    // Reindexar todo
-                    reindex710();
-                    
-                    // Inicializar layout de funciones
-                    const funcContainer = newForm.querySelector('.funciones-710e-container');
-                    if (funcContainer) {
-                        updateFuncionesLayout(funcContainer);
-                    }
-                    
-                    console.log('✅ Clonación manual de 710 completada');
                 });
-            } else {
-                console.log('🚫 No se encontró botón + externo para 710 con data-formset-target="{{ formset.prefix }}"');
+            });
+
+            const funcContainer = row.querySelector('.funciones-710e-container');
+            if (funcContainer) {
+                funcContainer.dataset.funciones710eIndex = index;
+                const selects = funcContainer.querySelectorAll('select');
+                selects.forEach((sel, si) => {
+                    sel.name = `funcion_institucional_710_${index}_${si}`;
+                });
             }
-        }, 500);
-        
-        // Inicializar al cargar
-        setTimeout(() => {
-            reindex710();
-            console.log('✅ Formset 710 inicializado correctamente');
-        }, 200);
-        
-    })();
+
+            initEntidadAutocomplete(row);
+        });
+
+        if (totalInput) totalInput.value = rows.length;
+    }
+
+    /* ======================================================
+       INICIALIZACIÓN
+       ====================================================== */
+    root.querySelectorAll('.formset-row:not(.empty-form)').forEach(initEntidadAutocomplete);
+    root.querySelectorAll('.funciones-710e-container').forEach(updateFuncionesLayout);
+    reindex710();
+
+    const formsHost = root.querySelector('.formset-forms');
+    if (formsHost) {
+        let timer = null;
+        const observer = new MutationObserver(() => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                reindex710();
+                root.querySelectorAll('.funciones-710e-container').forEach(updateFuncionesLayout);
+            }, 50);
+        });
+        observer.observe(formsHost, { childList: true, subtree: false });
+    }
+
+})();
 </script>

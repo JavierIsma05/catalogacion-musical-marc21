@@ -105,7 +105,7 @@
         <div class="detalle-header-right">
             <!-- Signatura -->
             <div class="detalle-meta-tag">
-                <small>Signatura</small>
+                <small>Signatura (092)</small>
                 <span>{{ obra.signatura_publica_display }}</span>
             </div>
             <!-- Ubicación -->
@@ -200,7 +200,7 @@
                 <div class="detalle-field">
                     <span class="detalle-field-label">Entidad relacionada</span>
                     <span class="detalle-field-value">
-                        {% if entidad.entidad %}{{ entidad.entidad }}{% endif %}{% if entidad.funcion %}, {{ entidad.get_funcion_display }}{% endif %}
+                        {% if entidad.entidad %}{{ entidad.entidad }}{% endif %}{% if entidad.funciones_institucionales.exists %}, {% for fi in entidad.funciones_institucionales.all %}{{ fi.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
                     </span>
                 </div>
                 {% endfor %}
@@ -228,16 +228,14 @@
                 </div>
 
                 <!-- Producción de la obra -->
-                {% with produccion=obra.producciones_publicaciones.first %}
-                {% if produccion %}
+                {% for produccion in obra.producciones_publicaciones.all %}
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Producción de la obra</span>
+                    <span class="detalle-field-label">{{ produccion.get_funcion_display }} de la obra</span>
                     <span class="detalle-field-value">
                         {% if produccion.lugares.exists %}Lugar: {% for lugar in produccion.lugares.all %}{{ lugar.lugar }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if produccion.entidades.exists %} / {% for entidad in produccion.entidades.all %}{{ entidad.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if produccion.fechas.exists %} / {% for fecha in produccion.fechas.all %}{{ fecha.fecha }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
                     </span>
                 </div>
-                {% endif %}
-                {% endwith %}
+                {% endfor %}
 
                 <!-- Edición -->
                 {% for edicion in obra.ediciones.all %}
@@ -310,12 +308,14 @@
 
                 <!-- Materia -->
                 {% for materia in obra.materias_650.all %}
+                {% if materia.materia %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Materia</span>
                     <span class="detalle-field-value">
                         {{ materia.materia }}{% for sub_crono in materia.subdivisiones.all %} / {{ sub_crono.subdivision }}{% endfor %}{% for sub_geo in materia.subdivisiones_geograficas.all %} / {{ sub_geo.subdivision }}{% endfor %}
                     </span>
                 </div>
+                {% endif %}
                 {% endfor %}
 
                 <!-- Materia (Género/Forma) -->
@@ -363,7 +363,7 @@
                     <span class="detalle-field-label">Medio de interpretación</span>
                     <span class="detalle-field-value">
                         {{ medios.0 }}
-                        {% if medios.1 %}<br><strong>Solista:</strong> {{ medios.1 }}{% endif %}
+                        {% if medios.1 %}<br>{{ medios.1 }}{% endif %}
                     </span>
                 </div>
                 {% endif %}

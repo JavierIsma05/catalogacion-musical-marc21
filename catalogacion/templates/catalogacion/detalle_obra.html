@@ -299,14 +299,12 @@
                             <span class="campo-tag">700</span>
                             <div class="data-cell">
                                 <div class="linea-principal">
-                                    <strong>$a {{ nombre.persona }}</strong>
-                                    {% if nombre.coordenadas_biograficas %} $d ({{ nombre.coordenadas_biograficas }}){% endif %}
+                                    <strong>$a {% if nombre.persona %}{{ nombre.persona.apellidos_nombres }}{% endif %}</strong>
+                                    {% if nombre.coordenadas_biograficas %} $d ({{ nombre.coordenadas_biograficas }}){% endif %}{% if nombre.funciones.exists %},
+                                    {% for funcion in nombre.funciones.all %}$e {{ funcion.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if nombre.terminos_asociados.exists %},
+                                    {% for termino in nombre.terminos_asociados.all %}$c {{ termino.termino }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+                                    {% if nombre.autoria %} $j [{{ nombre.get_autoria_display|lower }}]{% endif %}
                                 </div>
-                                {% if nombre.funciones.exists %}
-                                <div class="linea-secundaria">
-                                    {% for funcion in nombre.funciones.all %}$e {{ funcion.get_funcion_display }}{% if not forloop.last %} ; {% endif %}{% endfor %}
-                                </div>
-                                {% endif %}
                             </div>
                         </div>
                         {% endfor %}
@@ -320,9 +318,9 @@
                                 <div class="linea-principal">
                                     <strong>$a {{ entidad.entidad }}</strong>
                                 </div>
-                                {% if entidad.funcion %}
+                                {% if entidad.funciones_institucionales.exists %}
                                 <div class="linea-secundaria">
-                                    $e {{ entidad.get_funcion_display }}
+                                    {% for fi in entidad.funciones_institucionales.all %}$e {{ fi.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}
                                 </div>
                                 {% endif %}
                             </div>
@@ -348,7 +346,12 @@
                         {% for prod in obra.producciones_publicaciones.all %}
                         <div class="data-row">
                             <span class="campo-tag">264</span>
-                            <span>$a {{ prod.get_funcion_display }}</span>
+                            <span>
+                                [{{ prod.get_funcion_display }}]
+                                {% for lugar in prod.lugares.all %}$a {{ lugar.lugar }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                {% if prod.entidades.exists %} {% for entidad in prod.entidades.all %}$b {{ entidad.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+                                {% if prod.fechas.exists %} {% for fecha in prod.fechas.all %}$c {{ fecha.fecha }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+                            </span>
                         </div>
                         {% endfor %}
                     {% endif %}
@@ -736,17 +739,7 @@
                     {% for ubicacion in obra.ubicaciones_852.all %}
                     <div class="data-row">
                         <span class="campo-tag">852</span>
-                        <span>
-                            {% if ubicacion.signatura_original %}
-                                $a {{ ubicacion.signatura_original }}
-                            {% endif %}
-                            {% if ubicacion.estanterias.all %}
-                                $b {% for estanteria in ubicacion.estanterias.all %}{{ estanteria.estanteria }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                            {% endif %}
-                            {% if ubicacion.codigo_o_nombre %}
-                                $c {{ ubicacion.codigo_o_nombre }}
-                            {% endif %}
-                        </span>
+                        <span>{% if ubicacion.codigo_o_nombre %}{{ ubicacion.codigo_o_nombre }}{% endif %}{% if ubicacion.signatura_original %}{% if ubicacion.codigo_o_nombre %}.{% endif %}{{ ubicacion.signatura_original }}{% endif %}{% for estanteria in ubicacion.estanterias.all %}.{{ estanteria.estanteria }}{% endfor %}</span>
                     </div>
                     {% endfor %}
                 </div>

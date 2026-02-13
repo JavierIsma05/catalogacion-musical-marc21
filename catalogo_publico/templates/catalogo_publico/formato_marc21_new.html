@@ -900,7 +900,7 @@
                     <span class="indicators">2#</span>
                     <span class="content">
                         {% if entidad.entidad %}<span class="subfield">$a</span>{{ entidad.entidad }}{% endif %}
-                        {% if entidad.funcion %}<span class="subfield">$e</span>{{ entidad.get_funcion_display }}{% endif %}
+                        {% for fi in entidad.funciones_institucionales.all %}<span class="subfield">$e</span>{{ fi.get_funcion_display }}{% endfor %}
                     </span>
                 </div>
                 {% endfor %}

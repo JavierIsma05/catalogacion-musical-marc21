@@ -1,30 +1,29 @@
 """
 Formularios para bloque 7XX - Puntos de acceso adicionales y enlaces
 """
+
 from django import forms
+
 from catalogacion.models import (
-    # 700
-    NombreRelacionado700,
-    TerminoAsociado700,
-    Funcion700,
-
-    # 710
-    EntidadRelacionada710,
-
-    # 773, 774, 787
-    EnlaceDocumentoFuente773,
-    NumeroControl773,
-    EnlaceUnidadConstituyente774,
-    NumeroControl774,
-    OtrasRelaciones787,
-    NumeroControl787,
-
+    AutoridadEntidad,
     # Autoridades
     AutoridadPersona,
-    AutoridadEntidad,
     AutoridadTituloUniforme,
-    EncabezamientoEnlace,
+    # 773, 774, 787
+    EnlaceDocumentoFuente773,
+    EnlaceUnidadConstituyente774,
+    # 710
+    EntidadRelacionada710,
+    Funcion700,
+    # 700
+    NombreRelacionado700,
+    NumeroControl773,
+    NumeroControl774,
+    NumeroControl787,
+    OtrasRelaciones787,
+    TerminoAsociado700,
 )
+
 from .widgets import Select2Widget
 
 
@@ -34,9 +33,7 @@ def ensure_titulo_uniforme_registrado(valor):
     if not titulo:
         return None
 
-    existente = AutoridadTituloUniforme.objects.filter(
-        titulo__iexact=titulo
-    ).first()
+    existente = AutoridadTituloUniforme.objects.filter(titulo__iexact=titulo).first()
 
     if existente:
         return existente
@@ -52,63 +49,62 @@ def ensure_titulo_uniforme_registrado(valor):
 # 700 – Nombre relacionado
 # ========================================================================
 
+
 class NombreRelacionado700Form(forms.ModelForm):
     # Campos extra para autocomplete (igual idea que 100)
     persona_texto = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control persona700-input',
-            'placeholder': 'Escriba o seleccione una persona…',
-            'autocomplete': 'off',
-        }),
-        label='700 $a – Nombre de persona'
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control persona700-input",
+                "placeholder": "Escriba o seleccione una persona…",
+                "autocomplete": "off",
+            }
+        ),
+        label="700 $a – Nombre de persona",
     )
 
     persona_coordenadas = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control persona700-coord-input',
-            'placeholder': 'Ej: 1900-1980',
-        }),
-        label='700 $d – Coordenadas biográficas'
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control persona700-coord-input",
+                "placeholder": "Ej: 1900-1980",
+            }
+        ),
+        label="700 $d – Coordenadas biográficas",
     )
 
     class Meta:
         model = NombreRelacionado700
         fields = [
-            'persona',
-            'coordenadas_biograficas',
-            'relacion',
-            'autoria',
-            'titulo_obra'
+            "persona",
+            "coordenadas_biograficas",
+            "relacion",
+            "autoria",
+            "titulo_obra",
         ]
         widgets = {
             # ahora el FK va oculto, lo maneja el autocomplete
-            'persona': forms.HiddenInput(attrs={
-                'class': 'persona700-id'
-            }),
-            'coordenadas_biograficas': forms.TextInput(attrs={
-                'class': 'form-control'
-            }),
-            'relacion': forms.TextInput(attrs={
-                'class': 'form-control'
-            }),
-            'autoria': forms.Select(attrs={
-                'class': 'form-select'
-            }),
-            'titulo_obra': forms.TextInput(attrs={
-                'class': 'form-control',
-                'data-autocomplete': 'titulo',
-                'placeholder': 'Ej.: Emma Mercedes, Vals N° 3, etc',
-                'autocomplete': 'off'
-            }),
+            "persona": forms.HiddenInput(attrs={"class": "persona700-id"}),
+            "coordenadas_biograficas": forms.TextInput(attrs={"class": "form-control"}),
+            "relacion": forms.TextInput(attrs={"class": "form-control"}),
+            "autoria": forms.Select(attrs={"class": "form-select"}),
+            "titulo_obra": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "data-autocomplete": "titulo",
+                    "placeholder": "Ej.: Emma Mercedes, Vals N° 3, etc",
+                    "autocomplete": "off",
+                }
+            ),
         }
         labels = {
-            'persona': '700 $a – Nombre de persona',
-            'coordenadas_biograficas': '700 $d – Coordenadas biográficas',
-            'relacion': '700 $i – Relación',
-            'autoria': '700 $j – Autoría',
-            'titulo_obra': '700 $t – Título de la obra',
+            "persona": "700 $a – Nombre de persona",
+            "coordenadas_biograficas": "700 $d – Coordenadas biográficas",
+            "relacion": "700 $i – Relación",
+            "autoria": "700 $j – Autoría",
+            "titulo_obra": "700 $t – Título de la obra",
         }
 
     def __init__(self, *args, **kwargs):
@@ -117,9 +113,9 @@ class NombreRelacionado700Form(forms.ModelForm):
         # Si estoy editando y ya hay persona, rellenar los campos de texto
         if self.instance.pk and self.instance.persona_id:
             persona = self.instance.persona
-            self.fields['persona_texto'].initial = persona.apellidos_nombres
-            self.fields['persona_coordenadas'].initial = (
-                persona.coordenadas_biograficas or ''
+            self.fields["persona_texto"].initial = persona.apellidos_nombres
+            self.fields["persona_coordenadas"].initial = (
+                persona.coordenadas_biograficas or ""
             )
 
     def clean(self):
@@ -151,7 +147,7 @@ class NombreRelacionado700Form(forms.ModelForm):
             except AutoridadPersona.DoesNotExist:
                 persona = AutoridadPersona.objects.create(
                     apellidos_nombres=persona_texto,
-                    coordenadas_biograficas=coords or None
+                    coordenadas_biograficas=coords or None,
                 )
             cleaned_data["persona"] = persona
 
@@ -168,7 +164,6 @@ class NombreRelacionado700Form(forms.ModelForm):
                 coords or persona.coordenadas_biograficas or None
             )
 
-
         # ============================================================
         # 3️⃣ REGISTRAR TÍTULO UNIFORME AUTOMÁTICAMENTE
         # ============================================================
@@ -183,7 +178,10 @@ class NombreRelacionado700Form(forms.ModelForm):
 
         if compositor_100 and persona:
             # ❌ PROHIBIDO: duplicar exactamente el del 100
-            if compositor_100.apellidos_nombres.strip().lower() == persona.apellidos_nombres.strip().lower():
+            if (
+                compositor_100.apellidos_nombres.strip().lower()
+                == persona.apellidos_nombres.strip().lower()
+            ):
                 raise forms.ValidationError(
                     "La persona del campo 700 no puede ser la misma que el compositor del campo 100."
                 )
@@ -192,37 +190,28 @@ class NombreRelacionado700Form(forms.ModelForm):
         return cleaned_data
 
 
-
 class TerminoAsociado700Form(forms.ModelForm):
     class Meta:
         model = TerminoAsociado700
-        fields = ['termino']
-        widgets = {
-            'termino': forms.TextInput(attrs={'class': 'form-control'})
-        }
-        labels = {
-            'termino': '700 $c – Término asociado'
-        }
+        fields = ["termino"]
+        widgets = {"termino": forms.TextInput(attrs={"class": "form-control"})}
+        labels = {"termino": "700 $c – Término asociado"}
 
 
 class Funcion700Form(forms.ModelForm):
     class Meta:
         model = Funcion700
-        fields = ['funcion']
-        widgets = {
-            'funcion': forms.Select(attrs={'class': 'form-select'})
-        }
-        labels = {
-            'funcion': '700 $e – Función'
-        }
+        fields = ["funcion"]
+        widgets = {"funcion": forms.Select(attrs={"class": "form-select"})}
+        labels = {"funcion": "700 $e – Función"}
 
 
 # ========================================================================
 # 710 – Entidad relacionada
 # ========================================================================
 
-class EntidadRelacionada710Form(forms.ModelForm):
 
+class EntidadRelacionada710Form(forms.ModelForm):
     entidad_texto = forms.CharField(
         required=False,
         label="710 $a – Entidad relacionada",
@@ -237,79 +226,86 @@ class EntidadRelacionada710Form(forms.ModelForm):
 
     class Meta:
         model = EntidadRelacionada710
-        fields = ["entidad", "funcion"]
+        fields = ["entidad"]
         widgets = {
             "entidad": forms.HiddenInput(),  # 👉 Escondido como en 700/787
-            "funcion": forms.Select(attrs={"class": "form-select"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # El campo 'id' lo agrega el inline formset; para forms nuevos llega vacío
+        if "id" in self.fields:
+            self.fields["id"].required = False
+        # Si estamos editando, rellenar el texto de la entidad
+        if self.instance.pk and self.instance.entidad_id:
+            self.fields["entidad_texto"].initial = self.instance.entidad.nombre
 
     def clean(self):
         cleaned_data = super().clean()
 
         entidad = cleaned_data.get("entidad")
         texto = cleaned_data.get("entidad_texto", "").strip()
-        funcion = cleaned_data.get("funcion", "")
 
         # 🟩 1. SI EL FORM ESTÁ COMPLETAMENTE VACÍO → borrar
-        if not (entidad or texto or funcion):
+        if not (entidad or texto):
             self.cleaned_data["DELETE"] = True
             return cleaned_data
 
-        # 🟩 2. SI EL USUARIO ESCRIBIÓ TEXTO PERO NO SELECCIONÓ NADA → crear
+        # 🟩 2. SI EL USUARIO ESCRIBIÓ TEXTO PERO NO SELECCIONÓ NADA → buscar o crear
         if texto and not entidad:
-            entidad = AutoridadEntidad.objects.create(nombre=texto)
+            entidad, _created = AutoridadEntidad.objects.get_or_create(nombre=texto)
             cleaned_data["entidad"] = entidad
 
         return cleaned_data
-
 
 
 # ========================================================================
 # 773 – Enlace a documento fuente
 # ========================================================================
 
-class EnlaceDocumentoFuente773Form(forms.ModelForm):
 
+class EnlaceDocumentoFuente773Form(forms.ModelForm):
     # Campo editable para el nombre (autocomplete)
     encabezamiento_principal_texto = forms.CharField(
         required=False,
         label="773 $a – Encabezamiento principal",
-        widget=forms.TextInput(attrs={
-            "class": "form-control autoridad-input",
-            "placeholder": "Buscar en Autoridades de Personas…",
-            "autocomplete": "off",
-            "data-autoridad-input": "1",
-            "data-hidden-field": "encabezamiento_principal",
-        })
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control autoridad-input",
+                "placeholder": "Buscar en Autoridades de Personas…",
+                "autocomplete": "off",
+                "data-autoridad-input": "1",
+                "data-hidden-field": "encabezamiento_principal",
+            }
+        ),
     )
 
     titulo_texto = forms.CharField(
         required=False,
         label="773 $t – Título",
-        widget=forms.TextInput(attrs={
-            "class": "form-control",
-            "placeholder": "Buscar en Títulos Uniformes…",
-            "autocomplete": "off",
-            "data-autocomplete": "titulo",
-            "data-hidden-field": "titulo",
-        })
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Buscar en Títulos Uniformes…",
+                "autocomplete": "off",
+                "data-autocomplete": "titulo",
+                "data-hidden-field": "titulo",
+            }
+        ),
     )
 
     class Meta:
         model = EnlaceDocumentoFuente773
         fields = [
-        
             "encabezamiento_principal",
             "titulo",
         ]
         widgets = {
             # 👇 YA NO ES SELECT2 → ahora es hidden
             "encabezamiento_principal": forms.HiddenInput(),
-
             "titulo": forms.HiddenInput(),
         }
         labels = {
-       
             "encabezamiento_principal": "773 $a – Encabezamiento principal",
             "titulo": "773 $t – Título",
         }
@@ -325,9 +321,9 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
         if self.instance.pk:
             if self.instance.encabezamiento_principal_id:
                 persona = self.instance.encabezamiento_principal
-                self.fields["encabezamiento_principal_texto"].initial = (
-                    persona.apellidos_nombres
-                )
+                self.fields[
+                    "encabezamiento_principal_texto"
+                ].initial = persona.apellidos_nombres
             if self.instance.titulo_id:
                 self.fields["titulo"].initial = str(self.instance.titulo_id)
                 self.fields["titulo_texto"].initial = self.instance.titulo.titulo
@@ -373,7 +369,9 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
         if titulo_value and hasattr(titulo_value, "pk"):
             titulo_obj = titulo_value
         elif titulo_field.isdigit():
-            titulo_obj = AutoridadTituloUniforme.objects.filter(pk=int(titulo_field)).first()
+            titulo_obj = AutoridadTituloUniforme.objects.filter(
+                pk=int(titulo_field)
+            ).first()
 
         # Si no existe, buscar por texto
         if not titulo_obj and titulo_texto:
@@ -386,7 +384,9 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
         if titulo_obj:
             data["titulo"] = titulo_obj
         else:
-            self.add_error("titulo_texto", "Debe ingresar o seleccionar un título válido.")
+            self.add_error(
+                "titulo_texto", "Debe ingresar o seleccionar un título válido."
+            )
 
         return data
 
@@ -394,14 +394,16 @@ class EnlaceDocumentoFuente773Form(forms.ModelForm):
 class NumeroControl773Form(forms.ModelForm):
     class Meta:
         model = NumeroControl773
-        fields = ['obra_relacionada']
+        fields = ["obra_relacionada"]
         widgets = {
-            'obra_relacionada': Select2Widget(attrs={
-                'data-url': '/catalogacion/autocompletar/obra/',
-            })
+            "obra_relacionada": Select2Widget(
+                attrs={
+                    "data-url": "/catalogacion/autocompletar/obra/",
+                }
+            )
         }
         labels = {
-            'obra_relacionada': '773 $w – Número de control (001)',
+            "obra_relacionada": "773 $w – Número de control (001)",
         }
 
 
@@ -409,60 +411,57 @@ class NumeroControl773Form(forms.ModelForm):
 # 774 – Enlace a unidad constituyente
 # ========================================================================
 class EnlaceUnidadConstituyente774Form(forms.ModelForm):
-
     # Campo visible tipo "Muscat"
     encabezamiento_principal_texto = forms.CharField(
         required=False,
         label="774 $a – Encabezamiento principal",
-        widget=forms.TextInput(attrs={
-            'class': 'form-control autoridad-input',
-            'placeholder': 'Buscar en Autoridades de Personas…',
-            'autocomplete': 'off',
-            'data-autoridad-input': '1',
-            'data-hidden-field': 'encabezamiento_principal'
-        })
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control autoridad-input",
+                "placeholder": "Buscar en Autoridades de Personas…",
+                "autocomplete": "off",
+                "data-autoridad-input": "1",
+                "data-hidden-field": "encabezamiento_principal",
+            }
+        ),
     )
 
     titulo_texto = forms.CharField(
         required=False,
         label="774 $t – Título",
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Buscar en Títulos Uniformes…',
-            'autocomplete': 'off',
-            'data-autocomplete': 'titulo',
-            'data-hidden-field': 'titulo'
-        })
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Buscar en Títulos Uniformes…",
+                "autocomplete": "off",
+                "data-autocomplete": "titulo",
+                "data-hidden-field": "titulo",
+            }
+        ),
     )
 
     class Meta:
         model = EnlaceUnidadConstituyente774
-        fields = [
-           
-            'encabezamiento_principal',
-            'titulo'
-        ]
+        fields = ["encabezamiento_principal", "titulo"]
         widgets = {
             # Campo real oculto
-            'encabezamiento_principal': forms.HiddenInput(),
-
-            'titulo': forms.HiddenInput(),
+            "encabezamiento_principal": forms.HiddenInput(),
+            "titulo": forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['encabezamiento_principal'].required = False
-        self.fields['titulo'].required = False
-
+        self.fields["encabezamiento_principal"].required = False
+        self.fields["titulo"].required = False
 
         if self.instance.pk:
             if self.instance.encabezamiento_principal_id:
-                self.fields['encabezamiento_principal_texto'].initial = (
-                    self.instance.encabezamiento_principal.apellidos_nombres
-                )
+                self.fields[
+                    "encabezamiento_principal_texto"
+                ].initial = self.instance.encabezamiento_principal.apellidos_nombres
             if self.instance.titulo_id:
-                self.fields['titulo'].initial = str(self.instance.titulo_id)
-                self.fields['titulo_texto'].initial = self.instance.titulo.titulo
+                self.fields["titulo"].initial = str(self.instance.titulo_id)
+                self.fields["titulo_texto"].initial = self.instance.titulo.titulo
 
     def clean(self):
         data = super().clean()
@@ -492,10 +491,9 @@ class EnlaceUnidadConstituyente774Form(forms.ModelForm):
         if (titulo_field or titulo_texto) and not (encabez or encabez_texto):
             self.add_error(
                 "encabezamiento_principal_texto",
-                "Debe ingresar un encabezamiento para 774 $a si incluye un título."
+                "Debe ingresar un encabezamiento para 774 $a si incluye un título.",
             )
             return data
-
 
         # 🟩 2. Resolver encabezamiento principal
         if encabez_texto and not encabez:
@@ -517,7 +515,9 @@ class EnlaceUnidadConstituyente774Form(forms.ModelForm):
 
         # Caso 2: vino como ID string
         elif titulo_field.isdigit():
-            titulo_obj = AutoridadTituloUniforme.objects.filter(pk=int(titulo_field)).first()
+            titulo_obj = AutoridadTituloUniforme.objects.filter(
+                pk=int(titulo_field)
+            ).first()
 
         # Caso 3: buscar por texto
         if not titulo_obj and titulo_texto:
@@ -531,24 +531,26 @@ class EnlaceUnidadConstituyente774Form(forms.ModelForm):
         if titulo_obj:
             data["titulo"] = titulo_obj
         else:
-            self.add_error("titulo_texto", "Debe ingresar o seleccionar un título para 774 $t.")
+            self.add_error(
+                "titulo_texto", "Debe ingresar o seleccionar un título para 774 $t."
+            )
 
         return data
-
-    
 
 
 class NumeroControl774Form(forms.ModelForm):
     class Meta:
         model = NumeroControl774
-        fields = ['obra_relacionada']
+        fields = ["obra_relacionada"]
         widgets = {
-            'obra_relacionada': Select2Widget(attrs={
-                'data-url': '/catalogacion/autocompletar/obra/',
-            })
+            "obra_relacionada": Select2Widget(
+                attrs={
+                    "data-url": "/catalogacion/autocompletar/obra/",
+                }
+            )
         }
         labels = {
-            'obra_relacionada': '774 $w – Número de control (001)',
+            "obra_relacionada": "774 $w – Número de control (001)",
         }
 
 
@@ -556,35 +558,32 @@ class NumeroControl774Form(forms.ModelForm):
 # 787 – Otras relaciones
 # ========================================================================
 
-class OtrasRelaciones787Form(forms.ModelForm):
 
+class OtrasRelaciones787Form(forms.ModelForm):
     encabezamiento_principal_texto = forms.CharField(
         required=False,
         label="787 $a – Encabezamiento principal",
-        widget=forms.TextInput(attrs={
-            'class': 'form-control autocomplete-787',
-            'placeholder': 'Escriba para buscar o agregar…',
-            'autocomplete': 'off'
-        })
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control autocomplete-787",
+                "placeholder": "Escriba para buscar o agregar…",
+                "autocomplete": "off",
+            }
+        ),
     )
 
     class Meta:
         model = OtrasRelaciones787
-        fields = [
-            
-            'encabezamiento_principal',
-            'titulo'
-        ]
+        fields = ["encabezamiento_principal", "titulo"]
         widgets = {
-            
-
-            'encabezamiento_principal': forms.HiddenInput(),
-
-            'titulo': forms.TextInput(attrs={
-                'class': 'form-control',
-                'data-autocomplete': 'titulo',
-                'autocomplete': 'off'
-            }),
+            "encabezamiento_principal": forms.HiddenInput(),
+            "titulo": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "data-autocomplete": "titulo",
+                    "autocomplete": "off",
+                }
+            ),
         }
 
     def clean(self):
@@ -620,21 +619,23 @@ class OtrasRelaciones787Form(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Permitir que el formulario esté completamente vacío y sea marcado para borrado
         # evitando errores de "This field is required" a nivel de campo.
-        if 'encabezamiento_principal' in self.fields:
-            self.fields['encabezamiento_principal'].required = False
-        if 'titulo' in self.fields:
-            self.fields['titulo'].required = False
+        if "encabezamiento_principal" in self.fields:
+            self.fields["encabezamiento_principal"].required = False
+        if "titulo" in self.fields:
+            self.fields["titulo"].required = False
 
 
 class NumeroControl787Form(forms.ModelForm):
     class Meta:
         model = NumeroControl787
-        fields = ['obra_relacionada']
+        fields = ["obra_relacionada"]
         widgets = {
-            'obra_relacionada': Select2Widget(attrs={
-                'data-url': '/catalogacion/autocompletar/obra/',
-            })
+            "obra_relacionada": Select2Widget(
+                attrs={
+                    "data-url": "/catalogacion/autocompletar/obra/",
+                }
+            )
         }
         labels = {
-            'obra_relacionada': '787 $w – Número de control (001)',
+            "obra_relacionada": "787 $w – Número de control (001)",
         }

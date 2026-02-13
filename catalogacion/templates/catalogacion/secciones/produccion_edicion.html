@@ -53,6 +53,7 @@
                 {% include 'catalogacion/includes/formset_264_template.html' with formset=produccion_publicacion %}
             </div>
             {# Campo 250 - Edición (Repetible) #}
+            {% if 'ediciones' in formsets_visibles %}
             <div class="campo-marc">
                 <div class="campo-titulo">
                     <span class="badge-marc">250</span>
@@ -67,6 +68,7 @@
                 
                 {% include 'catalogacion/includes/formset_template.html' with formset=ediciones titulo="Edición" %}
             </div>
+            {% endif %}
             {# Campo 340 - Características técnicas #}
             {% if '340' in campos_visibles %}
             <div class="campo-marc">
