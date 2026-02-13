@@ -250,6 +250,7 @@ TituloAlternativoFormSet = inlineformset_factory(
     ObraGeneral,
     TituloAlternativo,
     form=TituloAlternativoForm,
+    formset=BaseDynamicExtraFormSet,
     extra=1,
     can_delete=True,
 )
