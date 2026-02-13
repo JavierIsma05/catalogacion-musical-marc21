@@ -70,7 +70,7 @@
   function getTipoObra() {
     const tipoRegistro = document.getElementById("id_tipo_registro")?.value;
     const nivelBibliografico = document.getElementById(
-      "id_nivel_bibliografico"
+      "id_nivel_bibliografico",
     )?.value;
 
     if (!tipoRegistro || !nivelBibliografico) return null;
@@ -166,7 +166,7 @@
         result.formsets[prefix].rows[index][field] = value;
         result.formsets[prefix].count = Math.max(
           result.formsets[prefix].count,
-          index + 1
+          index + 1,
         );
         continue;
       }
@@ -199,7 +199,7 @@
 
         // Si solo tiene campos de management, excluir
         const realFields = Object.keys(row).filter(
-          (k) => !["id", "DELETE", "ORDER"].includes(k)
+          (k) => !["id", "DELETE", "ORDER"].includes(k),
         );
         const hasRealData = realFields.some((k) => {
           const v = row[k];
@@ -335,7 +335,7 @@
   async function restaurarFormsets(formsets) {
     for (const [prefix, data] of Object.entries(formsets)) {
       const container = document.querySelector(
-        `[data-formset-prefix="${prefix}"]`
+        `[data-formset-prefix="${prefix}"]`,
       );
       if (!container) continue;
 
@@ -344,7 +344,7 @@
 
       // Contar filas actuales (excluyendo empty-form)
       const currentRows = container.querySelectorAll(
-        ".formset-row:not(.empty-form)"
+        ".formset-row:not(.empty-form)",
       );
       let currentCount = currentRows.length;
 
@@ -384,7 +384,7 @@
 
     // Opción 2: Botón en el header
     const headerBtn = document.querySelector(
-      `.campo-add-btn[data-formset-target="${prefix}"]`
+      `.campo-add-btn[data-formset-target="${prefix}"]`,
     );
     if (headerBtn) {
       headerBtn.click();
@@ -440,15 +440,15 @@
 
         // Buscar contenedor y botón usando data-borrador-*
         const container = document.querySelector(
-          `[data-borrador-container="${groupKey}"][data-borrador-parent="${newParentIndex}"]`
+          `[data-borrador-container="${groupKey}"][data-borrador-parent="${newParentIndex}"]`,
         );
         const addButton = document.querySelector(
-          `[data-borrador-add="${groupKey}"][data-borrador-parent="${newParentIndex}"]`
+          `[data-borrador-add="${groupKey}"][data-borrador-parent="${newParentIndex}"]`,
         );
 
         if (!container || !addButton) {
           console.warn(
-            `No se encontró contenedor para ${groupKey} parent=${newParentIndex}`
+            `No se encontró contenedor para ${groupKey} parent=${newParentIndex}`,
           );
           continue;
         }
@@ -524,7 +524,7 @@
    */
   async function rehidratarEnlacesObras() {
     const hiddenInputs = form.querySelectorAll(
-      'input.obra-relacionada-id-input[name^="w_"]'
+      'input.obra-relacionada-id-input[name^="w_"]',
     );
     if (!hiddenInputs.length) return;
 
@@ -536,7 +536,7 @@
 
       try {
         const resp = await fetch(
-          `${API_URLS.buscarObras}?id=${encodeURIComponent(id)}`
+          `${API_URLS.buscarObras}?id=${encodeURIComponent(id)}`,
         );
         const data = await resp.json();
         const num = data?.results?.[0]?.num_control || null;
@@ -614,13 +614,17 @@
         mostrarNotificacion(
           esAutoguardado ? "Autoguardado" : result.message,
           "success",
-          esAutoguardado ? 2000 : 3000
+          esAutoguardado ? 2000 : 3000,
         );
         actualizarIndicadorGuardado();
 
         // Agregar estado al historial para detectar botón atrás (solo la primera vez)
         if (esPrimerGuardado) {
-          window.history.pushState({ borrador: true }, "", window.location.href);
+          window.history.pushState(
+            { borrador: true },
+            "",
+            window.location.href,
+          );
         }
 
         return { success: true, borradorId: state.borradorId };
@@ -678,7 +682,7 @@
         mostrarNotificacion(
           "Error: Este borrador es de otro tipo de obra.",
           "error",
-          5000
+          5000,
         );
         return;
       }
@@ -796,7 +800,7 @@
     if (state.changeTimer) clearTimeout(state.changeTimer);
     state.changeTimer = setTimeout(
       () => guardarBorrador(true),
-      CONFIG.MIN_CHANGE_DELAY
+      CONFIG.MIN_CHANGE_DELAY,
     );
   }
 
@@ -840,9 +844,11 @@
         showDenyButton: true,
         confirmButtonText:
           '<i class="bi bi-file-earmark-text"></i> Ir a Borradores',
-        denyButtonText: '<i class="bi bi-box-arrow-right"></i> Salir (mantener borrador)',
+        denyButtonText:
+          '<i class="bi bi-box-arrow-right"></i> Salir (mantener borrador)',
         cancelButtonText: "Cancelar",
-        footer: '<div class="text-center w-100 pt-2 border-top"><button type="button" class="btn btn-outline-danger btn-sm" id="btn-descartar-salir"><i class="bi bi-trash"></i> Descartar borrador y salir</button></div>',
+        footer:
+          '<div class="text-center w-100 pt-2 border-top"><button type="button" class="btn btn-outline-danger btn-sm" id="btn-descartar-salir"><i class="bi bi-trash"></i> Descartar borrador y salir</button></div>',
         focusCancel: true,
         customClass: {
           confirmButton: "btn btn-primary",
@@ -851,9 +857,9 @@
           footer: "swal2-footer-visible",
         },
         didOpen: () => {
-          const btnDescartar = document.getElementById('btn-descartar-salir');
+          const btnDescartar = document.getElementById("btn-descartar-salir");
           if (btnDescartar) {
-            btnDescartar.addEventListener('click', async () => {
+            btnDescartar.addEventListener("click", async () => {
               // Eliminar el borrador
               if (state.borradorId) {
                 await eliminarBorrador(state.borradorId);
@@ -863,7 +869,7 @@
               onContinue();
             });
           }
-        }
+        },
       });
 
       if (result.isConfirmed) {
@@ -876,7 +882,7 @@
       // Fallback a confirm nativo
       if (
         confirm(
-          "Tu avance está guardado como borrador.\n\n¿Salir de todos modos?"
+          "Tu avance está guardado como borrador.\n\n¿Salir de todos modos?",
         )
       ) {
         onContinue();
@@ -917,7 +923,7 @@
           window.location.reload();
         });
       },
-      true
+      true,
     );
 
     // 3. Interceptar clicks en enlaces internos
@@ -941,9 +947,7 @@
         try {
           const dest = new URL(href, window.location.href);
           // Si es la misma URL (solo cambia el hash), permitir
-          if (
-            dest.href.split("#")[0] === window.location.href.split("#")[0]
-          ) {
+          if (dest.href.split("#")[0] === window.location.href.split("#")[0]) {
             return;
           }
         } catch {
@@ -958,7 +962,7 @@
           window.location.href = href;
         });
       },
-      true
+      true,
     );
 
     // 4. Interceptar botón atrás del navegador
@@ -985,7 +989,7 @@
     const esperarFormularioListo = () => {
       const tipoRegistro = document.getElementById("id_tipo_registro");
       const nivelBibliografico = document.getElementById(
-        "id_nivel_bibliografico"
+        "id_nivel_bibliografico",
       );
       const obraObjetivoId = getObraObjetivoId();
 
@@ -1007,9 +1011,15 @@
       // Cargar borrador si viene desde lista de borradores
       if (
         typeof BORRADOR_A_RECUPERAR !== "undefined" &&
-        BORRADOR_A_RECUPERAR !== null
+        BORRADOR_A_RECUPERAR !== null &&
+        BORRADOR_A_RECUPERAR !== "null" &&
+        BORRADOR_A_RECUPERAR !== "" &&
+        !isNaN(parseInt(BORRADOR_A_RECUPERAR, 10))
       ) {
-        setTimeout(() => cargarBorrador(BORRADOR_A_RECUPERAR), 300);
+        setTimeout(
+          () => cargarBorrador(parseInt(BORRADOR_A_RECUPERAR, 10)),
+          300,
+        );
       }
 
       // En edición: cargar borrador activo de la obra
