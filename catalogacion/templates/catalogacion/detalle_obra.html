@@ -560,7 +560,10 @@
                         <span>
                             {% if mat.materia %}$a {{ mat.materia }}{% else %}—{% endif %}
                             {% if mat.subdivisiones.all %}
-                                {% for sub in mat.subdivisiones.all %}$x {{ sub.subdivision }}{% if not forloop.last %} $v {% endif %}{% endfor %}
+                                {% for sub in mat.subdivisiones.all %}$y {{ sub.subdivision }}{% if not forloop.last %} $v {% endif %}{% endfor %}
+                            {% endif %}
+                            {% if mat.subdivisiones_geograficas.all %}
+                                {% for sub_geo in mat.subdivisiones_geograficas.all %}$z {{ sub_geo.subdivision }}{% if not forloop.last %} $v {% endif %}{% endfor %}
                             {% endif %}
                         </span>
                     </div>
@@ -737,14 +740,16 @@
                     <div class="data-row">
                         <span class="campo-tag">852</span>
                         <span>
+                            {% if ubicacion.autoridad %}
+                                $a {{ ubicacion.autoridad }}
+                            {% elif ubicacion.codigo_o_nombre %}
+                                $a {{ ubicacion.codigo_o_nombre }}
+                            {% endif %}
                             {% if ubicacion.signatura_original %}
-                                $a {{ ubicacion.signatura_original }}
+                                $h {{ ubicacion.signatura_original }}
                             {% endif %}
                             {% if ubicacion.estanterias.all %}
-                                $b {% for estanteria in ubicacion.estanterias.all %}{{ estanteria.estanteria }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                            {% endif %}
-                            {% if ubicacion.codigo_o_nombre %}
-                                $c {{ ubicacion.codigo_o_nombre }}
+                                {% for estanteria in ubicacion.estanterias.all %}$c {{ estanteria.estanteria }}{% if not forloop.last %} {% endif %}{% endfor %}
                             {% endif %}
                         </span>
                     </div>

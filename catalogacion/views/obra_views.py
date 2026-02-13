@@ -764,6 +764,20 @@ class DetalleObraView(CatalogadorRequiredMixin, DetailView):
     template_name = "catalogacion/detalle_obra.html"
     context_object_name = "obra"
 
+    def get_object(self, queryset=None):
+        """
+        Optimiza la consulta con prefetch_related para evitar N+1 queries
+        """
+        obj = super().get_object(queryset)
+
+        # Prefetch para campo 650 (subdivisiones cronológicas $y y geográficas $z)
+        obj = ObraGeneral.objects.filter(pk=obj.pk).prefetch_related(
+            "materias_650__subdivisiones",  # $y cronológica
+            "materias_650__subdivisiones_geograficas",  # $z geográfica
+        ).first()
+
+        return obj
+
 
 class ListaObrasView(CatalogadorRequiredMixin, ListView):
     """
