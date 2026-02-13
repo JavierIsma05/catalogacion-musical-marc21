@@ -52,6 +52,7 @@ class ListaObrasPublicaView(ListView):
             .prefetch_related(
                 "medios_interpretacion_382__medios",
                 "materias_650__subdivisiones",
+                "materias_650__subdivisiones_geograficas",
                 "materias_655__subdivisiones",
                 "producciones_publicaciones__lugares",
                 "producciones_publicaciones__entidades",
@@ -244,6 +245,7 @@ class DetalleObraPublicaView(DetailView):
             .prefetch_related(
                 "medios_interpretacion_382__medios",
                 "materias_650__subdivisiones",
+                "materias_650__subdivisiones_geograficas",
                 "materias_655__subdivisiones",
                 "producciones_publicaciones__lugares",
                 "producciones_publicaciones__entidades",
@@ -320,6 +322,7 @@ class VistaDetalladaObraView(DetailView):
             .prefetch_related(
                 "medios_interpretacion_382__medios",
                 "materias_650__subdivisiones",
+                "materias_650__subdivisiones_geograficas",
                 "materias_655__subdivisiones",
                 "producciones_publicaciones__lugares",
                 "producciones_publicaciones__entidades",
@@ -334,6 +337,7 @@ class VistaDetalladaObraView(DetailView):
                 "nombres_relacionados_700__funciones",
                 "nombres_relacionados_700__terminos_asociados",
                 "entidades_relacionadas_710__entidad",
+                "entidades_relacionadas_710__funciones_institucionales",
                 "menciones_serie__titulos",
                 "menciones_serie__volumenes",
                 "enlaces_unidades_774__encabezamiento_principal",
@@ -441,13 +445,15 @@ class FormatoMARC21View(DetailView):
                 "contenidos_505",  # 505
                 "sumarios_520",  # 520
                 # Bloque 6XX
-                "materias_650__subdivisiones",  # 650 con $x
-                "materias_655__subdivisiones",  # 655 con $x
+                "materias_650__subdivisiones",  # 650 $y (cronológica)
+                "materias_650__subdivisiones_geograficas",  # 650 $z (geográfica)
+                "materias_655__subdivisiones",  # 655 $x
                 # Bloque 7XX
                 "nombres_relacionados_700__persona",
                 "nombres_relacionados_700__funciones",
                 "nombres_relacionados_700__terminos_asociados",
                 "entidades_relacionadas_710__entidad",
+                "entidades_relacionadas_710__funciones_institucionales",  # 710 $e
                 "enlaces_documento_fuente_773__titulo",
                 "enlaces_documento_fuente_773__encabezamiento_principal",
                 "enlaces_documento_fuente_773__numeros_control",
