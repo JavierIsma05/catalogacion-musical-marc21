@@ -264,10 +264,14 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
 
         if formset_700:
             for form in formset_700:
-                form.funcion700_formset = Funcion700FormSet(
+                fs = Funcion700FormSet(
                     instance=form.instance,
                     prefix=f"funcion700-{form.prefix}",
                 )
+                # extra=0 si ya tiene funciones guardadas para no agregar fila vacía
+                if form.instance.pk and form.instance.funciones.exists():
+                    fs.extra = 0
+                form.funcion700_formset = fs
             # Attach a Funcion700FormSet for the empty_form template so
             # the client-side can clone a proper nested inline formset.
             try:
@@ -329,9 +333,13 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
                                                 err = "Numeración duplicada (la combinación obra.movimiento.pasaje debe ser única para cada íncipit)"
                                             else:
                                                 err = "Registro duplicado - verifique que no haya entradas repetidas con los mismos datos"
-                                        errores_detallados.append(f"{key} #{i+1}: {err}")
+                                        errores_detallados.append(
+                                            f"{key} #{i + 1}: {err}"
+                                        )
                                     else:
-                                        errores_detallados.append(f"{key} #{i+1}, campo '{field}': {err}")
+                                        errores_detallados.append(
+                                            f"{key} #{i + 1}, campo '{field}': {err}"
+                                        )
                     if formset.non_form_errors():
                         for err in formset.non_form_errors():
                             errores_detallados.append(f"{key}: {err}")
@@ -339,7 +347,7 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
             if errores_detallados:
                 messages.error(
                     self.request,
-                    f"Errores encontrados: {'; '.join(errores_detallados[:5])}"
+                    f"Errores encontrados: {'; '.join(errores_detallados[:5])}",
                 )
             else:
                 messages.error(self.request, "Hay errores en los formsets.")
@@ -550,10 +558,14 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
 
         if formset_700:
             for form in formset_700:
-                form.funcion700_formset = Funcion700FormSet(
+                fs = Funcion700FormSet(
                     instance=form.instance,
                     prefix=f"funcion700-{form.prefix}",
                 )
+                # extra=0 si ya tiene funciones guardadas para no agregar fila vacía
+                if form.instance.pk and form.instance.funciones.exists():
+                    fs.extra = 0
+                form.funcion700_formset = fs
 
             # 🔥 Empty formset para nuevas filas (clonado en frontend)
             context["funcion700_empty_formset"] = Funcion700FormSet(
@@ -609,9 +621,13 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
                                                 err = "Numeración duplicada (la combinación obra.movimiento.pasaje debe ser única para cada íncipit)"
                                             else:
                                                 err = "Registro duplicado - verifique que no haya entradas repetidas con los mismos datos"
-                                        errores_detallados.append(f"{key} #{i+1}: {err}")
+                                        errores_detallados.append(
+                                            f"{key} #{i + 1}: {err}"
+                                        )
                                     else:
-                                        errores_detallados.append(f"{key} #{i+1}, campo '{field}': {err}")
+                                        errores_detallados.append(
+                                            f"{key} #{i + 1}, campo '{field}': {err}"
+                                        )
                     if formset.non_form_errors():
                         for err in formset.non_form_errors():
                             errores_detallados.append(f"{key}: {err}")
@@ -619,7 +635,7 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
             if errores_detallados:
                 messages.error(
                     self.request,
-                    f"Errores encontrados: {'; '.join(errores_detallados[:5])}"
+                    f"Errores encontrados: {'; '.join(errores_detallados[:5])}",
                 )
             else:
                 messages.error(
@@ -670,7 +686,9 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
             enlace.numeros_control.all().delete()
             # Crear nuevos
             obra_ids = w_773_map.get(enlace.pk) or w_773_map.get(idx) or []
-            logger.debug(f"  EDIT w_773 processing: idx={idx}, enlace.pk={enlace.pk}, obra_ids={obra_ids}")
+            logger.debug(
+                f"  EDIT w_773 processing: idx={idx}, enlace.pk={enlace.pk}, obra_ids={obra_ids}"
+            )
             for obra_id in obra_ids:
                 if obra_id and int(obra_id) != self.object.pk:
                     NumeroControl773.objects.create(
@@ -725,12 +743,14 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
         if accion == "publicar" and not self.object.publicada:
             self.object.publicar(usuario=self.request.user)
             messages.success(
-                self.request, f"{self.config_obra['titulo']} actualizada y publicada exitosamente."
+                self.request,
+                f"{self.config_obra['titulo']} actualizada y publicada exitosamente.",
             )
         elif accion == "despublicar" and self.object.publicada:
             self.object.despublicar(usuario=self.request.user)
             messages.success(
-                self.request, f"{self.config_obra['titulo']} actualizada y retirada del catálogo público."
+                self.request,
+                f"{self.config_obra['titulo']} actualizada y retirada del catálogo público.",
             )
         else:
             messages.success(
@@ -921,14 +941,15 @@ class PapeleraObrasView(CatalogadorRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        from django.utils import timezone
         from datetime import timedelta
+
+        from django.utils import timezone
 
         # Calcular obras que se purgarán pronto (más de 25 días)
         limite_alerta = timezone.now() - timedelta(days=25)
-        context["obras_por_purgar"] = self.get_queryset().filter(
-            fecha_eliminacion__lt=limite_alerta
-        ).count()
+        context["obras_por_purgar"] = (
+            self.get_queryset().filter(fecha_eliminacion__lt=limite_alerta).count()
+        )
         context["dias_retencion"] = 30
         return context
 
@@ -1027,8 +1048,9 @@ class PurgarTodoView(CatalogadorRequiredMixin, TemplateView):
     """Vista para purgar todas las obras antiguas de la papelera"""
 
     def post(self, request, *args, **kwargs):
-        from django.utils import timezone
         from datetime import timedelta
+
+        from django.utils import timezone
 
         # Obtener obras eliminadas hace más de 30 días
         limite = timezone.now() - timedelta(days=30)

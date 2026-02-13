@@ -105,16 +105,14 @@
         <div class="detalle-header-right">
             <!-- Signatura -->
             <div class="detalle-meta-tag">
-                <small>Signatura</small>
+                <small>Signatura (092)</small>
                 <span>{{ obra.signatura_publica_display }}</span>
             </div>
             <!-- Ubicación -->
             {% for ubicacion in obra.ubicaciones_852.all %}
             <div class="detalle-meta-tag">
-                <small>Ubicación</small>
-                <span>
-                    {% if ubicacion.codigo_o_nombre %}{{ ubicacion.codigo_o_nombre }}{% endif %}{% if ubicacion.signatura_original %}.{{ ubicacion.signatura_original }}{% endif %}{% for estanteria in ubicacion.estanterias.all %}.{{ estanteria.estanteria }}{% endfor %}
-                </span>
+                <small>Ubicación (852)</small>
+                <span>{% if ubicacion.codigo_o_nombre %}{{ ubicacion.codigo_o_nombre }}{% endif %}{% if ubicacion.signatura_original %}{% if ubicacion.codigo_o_nombre %}.{% endif %}{{ ubicacion.signatura_original }}{% endif %}{% for estanteria in ubicacion.estanterias.all %}.{{ estanteria.estanteria }}{% endfor %}</span>
             </div>
             {% endfor %}
         </div>
@@ -191,7 +189,7 @@
                 <div class="detalle-field">
                     <span class="detalle-field-label">Nombre relacionado</span>
                     <span class="detalle-field-value">
-                        {% if nombre.persona %}{{ nombre.persona }}{% endif %}{% if nombre.coordenadas_biograficas %} ({{ nombre.coordenadas_biograficas }}){% endif %}{% for funcion in nombre.funciones.all %}, {{ funcion.get_funcion_display }}{% endfor %}{% for termino in nombre.terminos_asociados.all %}, {{ termino.termino }}{% endfor %}
+                        {% if nombre.persona %}{{ nombre.persona.apellidos_nombres }}{% endif %}{% if nombre.coordenadas_biograficas %} ({{ nombre.coordenadas_biograficas }}){% endif %}{% for funcion in nombre.funciones.all %}, {{ funcion.get_funcion_display }}{% endfor %}{% for termino in nombre.terminos_asociados.all %}, {{ termino.termino }}{% endfor %}
                         {% if nombre.autoria %}
                             <span class="detalle-field-autoria">[{{ nombre.get_autoria_display|lower }}]</span>
                         {% endif %}
@@ -203,7 +201,7 @@
                 <div class="detalle-field">
                     <span class="detalle-field-label">Entidad relacionada</span>
                     <span class="detalle-field-value">
-                        {% if entidad.entidad %}{{ entidad.entidad }}{% endif %}{% if entidad.funcion %}, {{ entidad.get_funcion_display }}{% endif %}
+                        {% if entidad.entidad %}{{ entidad.entidad }}{% endif %}{% if entidad.funciones_institucionales.exists %}, {% for fi in entidad.funciones_institucionales.all %}{{ fi.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
                     </span>
                 </div>
                 {% endfor %}
@@ -231,16 +229,14 @@
                 </div>
 
                 <!-- Producción de la obra -->
-                {% with produccion=obra.producciones_publicaciones.first %}
-                {% if produccion %}
+                {% for produccion in obra.producciones_publicaciones.all %}
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Producción de la obra</span>
+                    <span class="detalle-field-label">{{ produccion.get_funcion_display }} de la obra</span>
                     <span class="detalle-field-value">
                         {% for lugar in produccion.lugares.all %}{{ lugar.lugar }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if produccion.entidades.exists %} : {% for entidad in produccion.entidades.all %}{{ entidad.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if produccion.fechas.exists %}, {% for fecha in produccion.fechas.all %}{{ fecha.fecha }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
                     </span>
                 </div>
-                {% endif %}
-                {% endwith %}
+                {% endfor %}
 
                 <!-- Edición -->
                 {% for edicion in obra.ediciones.all %}
@@ -298,12 +294,14 @@
 
                 <!-- Materia -->
                 {% for materia in obra.materias_650.all %}
+                {% if materia.materia %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Materia</span>
                     <span class="detalle-field-value">
-                        {{ materia.materia }}{% for sub in materia.subdivisiones.all %} – {{ sub.subdivision }}{% endfor %}
+                        {{ materia.materia }}{% for sub in materia.subdivisiones.all %} – {{ sub.subdivision }}{% endfor %}{% for sub in materia.subdivisiones_geograficas.all %} – {{ sub.subdivision }}{% endfor %}
                     </span>
                 </div>
+                {% endif %}
                 {% endfor %}
 
                 <!-- Materia (Género/Forma) -->
@@ -351,7 +349,7 @@
                     <span class="detalle-field-label">Medio de interpretación</span>
                     <span class="detalle-field-value">
                         {{ medios.0 }}
-                        {% if medios.1 %}<br><strong>Solista:</strong> {{ medios.1 }}{% endif %}
+                        {% if medios.1 %}<br>{{ medios.1 }}{% endif %}
                     </span>
                 </div>
                 {% endif %}

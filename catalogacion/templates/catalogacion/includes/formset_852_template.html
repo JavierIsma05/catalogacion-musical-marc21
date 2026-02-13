@@ -264,8 +264,8 @@ Autocomplete estable en $a (incluye clonados)
             updateDeleteVisibility(c);
         }
 
-        const delForm = e.target.closest(".delete-row-btn");
-        if (delForm) delForm.closest(".formset-row").remove();
+        // delete-row-btn es manejado por formset-manager.js
+        // NO duplicar aquí para evitar desincronizar TOTAL_FORMS
     });
 
     // Inicialización de estanterías existentes

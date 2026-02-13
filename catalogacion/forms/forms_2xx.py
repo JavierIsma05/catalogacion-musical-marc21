@@ -1,14 +1,16 @@
 """
 Formularios para bloque 2XX - Títulos y publicación
 """
+
 from django import forms
+
 from catalogacion.models import (
-    TituloAlternativo,
     Edicion,
-    ProduccionPublicacion,
+    Fecha264,
     Lugar264,
     NombreEntidad264,
-    Fecha264,
+    ProduccionPublicacion,
+    TituloAlternativo,
 )
 
 
@@ -17,25 +19,31 @@ class TituloAlternativoForm(forms.ModelForm):
 
     class Meta:
         model = TituloAlternativo
-        fields = ['titulo', 'subtitulo', 'texto_visualizacion']
+        fields = ["titulo", "subtitulo", "texto_visualizacion"]
         widgets = {
-            'titulo': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ej. Alma Llanera',
-            }),
-            'subtitulo': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ej. Venezuela Joropo',
-            }),
-            'texto_visualizacion': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ej. Título en cubierta',
-            }),
+            "titulo": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Ej. Alma Llanera",
+                }
+            ),
+            "subtitulo": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Ej. Venezuela Joropo",
+                }
+            ),
+            "texto_visualizacion": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Ej. Título en cubierta",
+                }
+            ),
         }
         labels = {
-            'titulo': '246 $a - Título alternativo',
-            'subtitulo': '246 $b - Subtítulo',
-            'texto_visualizacion': '246 $i - Texto de visualización',
+            "titulo": "246 $a - título",
+            "subtitulo": "246 $b - subtítulo",
+            "texto_visualizacion": "246 $i - Texto de visualización",
         }
 
 
@@ -44,12 +52,14 @@ class EdicionForm(forms.ModelForm):
 
     class Meta:
         model = Edicion
-        fields = ['edicion']
+        fields = ["edicion"]
         widgets = {
-            'edicion': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '4ta edición, edición revisada',
-            }),
+            "edicion": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "4ta edición, edición revisada",
+                }
+            ),
         }
 
 
@@ -58,29 +68,33 @@ class ProduccionPublicacionForm(forms.ModelForm):
 
     class Meta:
         model = ProduccionPublicacion
-        fields = ['funcion']
+        fields = ["funcion"]
         widgets = {
-            'funcion': forms.Select(attrs={
-                'class': 'form-select no-select2',
-                'data-no-select2': '1',
-            }),
+            "funcion": forms.Select(
+                attrs={
+                    "class": "form-select no-select2",
+                    "data-no-select2": "1",
+                }
+            ),
         }
         labels = {
-            'funcion': '264 - Función de la entidad',
+            "funcion": "264 - Función de la entidad",
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Asegurar que este select sea siempre nativo (sin Select2)
-        self.fields['funcion'].widget.attrs.update({
-            'class': 'form-select no-select2',
-            'data-no-select2': '1',
-        })
+        self.fields["funcion"].widget.attrs.update(
+            {
+                "class": "form-select no-select2",
+                "data-no-select2": "1",
+            }
+        )
 
         # Establecer valor inicial para manuscritos (Producción = 0)
-        if not self.instance.pk and not self.initial.get('funcion'):
-            self.initial['funcion'] = '0'
+        if not self.instance.pk and not self.initial.get("funcion"):
+            self.initial["funcion"] = "0"
 
 
 class Lugar264Form(forms.ModelForm):
@@ -88,11 +102,13 @@ class Lugar264Form(forms.ModelForm):
 
     class Meta:
         model = Lugar264
-        fields = ['lugar']
+        fields = ["lugar"]
         widgets = {
-            'lugar': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
+            "lugar": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
         }
 
 
@@ -101,11 +117,13 @@ class NombreEntidad264Form(forms.ModelForm):
 
     class Meta:
         model = NombreEntidad264
-        fields = ['nombre']
+        fields = ["nombre"]
         widgets = {
-            'nombre': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
+            "nombre": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
         }
 
 
@@ -114,10 +132,12 @@ class Fecha264Form(forms.ModelForm):
 
     class Meta:
         model = Fecha264
-        fields = ['fecha']
+        fields = ["fecha"]
         widgets = {
-            'fecha': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '264 $c - Fecha de publicación',
-            }),
+            "fecha": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "264 $c - Fecha de publicación",
+                }
+            ),
         }
