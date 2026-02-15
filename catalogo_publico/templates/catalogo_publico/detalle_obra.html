@@ -111,8 +111,10 @@
             <!-- Ubicación -->
             {% for ubicacion in obra.ubicaciones_852.all %}
             <div class="detalle-meta-tag">
-                <small>Ubicación (852)</small>
-                <span>{% if ubicacion.codigo_o_nombre %}{{ ubicacion.codigo_o_nombre }}{% endif %}{% if ubicacion.signatura_original %}{% if ubicacion.codigo_o_nombre %}.{% endif %}{{ ubicacion.signatura_original }}{% endif %}{% for estanteria in ubicacion.estanterias.all %}.{{ estanteria.estanteria }}{% endfor %}</span>
+                <small>Ubicación</small>
+                <span>
+                    {% if ubicacion.autoridad %}{{ ubicacion.autoridad }}{% elif ubicacion.codigo_o_nombre %}{{ ubicacion.codigo_o_nombre }}{% endif %}{% if ubicacion.signatura_original %} / {{ ubicacion.signatura_original }}{% endif %}{% for estanteria in ubicacion.estanterias.all %} / {{ estanteria.estanteria }}{% endfor %}
+                </span>
             </div>
             {% endfor %}
         </div>
@@ -147,7 +149,7 @@
                 <div class="detalle-field">
                     <span class="detalle-field-label">Título uniforme (punto de acceso principal)</span>
                     <span class="detalle-field-value">
-                        {{ obra.titulo_uniforme }}{% if obra.medio_interpretacion_130 %}, {{ obra.get_medio_interpretacion_130_display }}{% endif %}{% if obra.tonalidad_130 %}, {{ obra.get_tonalidad_130_display }}{% endif %}{% if obra.nombre_parte_130 %}, {{ obra.nombre_parte_130 }}{% endif %}{% if obra.numero_parte_130 %}, {{ obra.numero_parte_130 }}{% endif %}{% if obra.forma_130 %}, {{ obra.forma_130 }}{% endif %}{% if obra.arreglo_130 %}, {{ obra.get_arreglo_130_display }}{% endif %}
+                        {{ obra.titulo_uniforme }}{% if obra.medio_interpretacion_130 %}, {{ obra.get_medio_interpretacion_130_display }}{% endif %}{% if obra.tonalidad_130 %}, {{ obra.get_tonalidad_130_display }}{% endif %}{% if obra.numero_parte_130 %}, {{ obra.numero_parte_130 }}{% endif %}{% if obra.nombre_parte_130 %}, {{ obra.nombre_parte_130 }}{% endif %}{% if obra.forma_130 %}, {{ obra.forma_130 }}{% endif %}{% if obra.arreglo_130 %}, {{ obra.get_arreglo_130_display }}{% endif %}
                     </span>
                 </div>
                 {% else %}
@@ -156,7 +158,7 @@
                     <div class="detalle-field">
                         <span class="detalle-field-label">Título uniforme</span>
                         <span class="detalle-field-value">
-                            {{ obra.titulo_240 }}{% if obra.medio_interpretacion_240 %}, {{ obra.get_medio_interpretacion_240_display }}{% endif %}{% if obra.tonalidad_240 %}, {{ obra.get_tonalidad_240_display }}{% endif %}{% if obra.nombre_parte_240 %}, {{ obra.nombre_parte_240 }}{% endif %}{% if obra.numero_parte_240 %}, {{ obra.numero_parte_240 }}{% endif %}{% if obra.forma_240 %}, {{ obra.forma_240 }}{% endif %}{% if obra.arreglo_240 %}, {{ obra.get_arreglo_240_display }}{% endif %}
+                            {{ obra.titulo_240 }}{% if obra.medio_interpretacion_240 %}, {{ obra.get_medio_interpretacion_240_display }}{% endif %}{% if obra.tonalidad_240 %}, {{ obra.get_tonalidad_240_display }}{% endif %}{% if obra.numero_parte_240 %}, {{ obra.numero_parte_240 }}{% endif %}{% if obra.nombre_parte_240 %}, {{ obra.nombre_parte_240 }}{% endif %}{% if obra.forma_240 %}, {{ obra.forma_240 }}{% endif %}{% if obra.arreglo_240 %}, {{ obra.get_arreglo_240_display }}{% endif %}
                         </span>
                     </div>
                     {% endif %}
@@ -176,7 +178,7 @@
                 <div class="detalle-field">
                     <span class="detalle-field-label">Título alternativo</span>
                     <span class="detalle-field-value">
-                        {% if titulo_alt.texto_visualizacion %}{{ titulo_alt.texto_visualizacion }}: {% endif %}{{ titulo_alt.titulo }}{% if titulo_alt.subtitulo %} : {{ titulo_alt.subtitulo }}{% endif %}
+                        {% if titulo_alt.texto_visualizacion %}[{{ titulo_alt.texto_visualizacion }}:] {% endif %}{{ titulo_alt.titulo }}{% if titulo_alt.subtitulo %} : {{ titulo_alt.subtitulo }}{% endif %}
                     </span>
                 </div>
                 {% endfor %}
@@ -189,10 +191,7 @@
                 <div class="detalle-field">
                     <span class="detalle-field-label">Nombre relacionado</span>
                     <span class="detalle-field-value">
-                        {% if nombre.persona %}{{ nombre.persona.apellidos_nombres }}{% endif %}{% if nombre.coordenadas_biograficas %} ({{ nombre.coordenadas_biograficas }}){% endif %}{% for funcion in nombre.funciones.all %}, {{ funcion.get_funcion_display }}{% endfor %}{% for termino in nombre.terminos_asociados.all %}, {{ termino.termino }}{% endfor %}
-                        {% if nombre.autoria %}
-                            <span class="detalle-field-autoria">[{{ nombre.get_autoria_display|lower }}]</span>
-                        {% endif %}
+                        {% if nombre.persona %}{{ nombre.persona }}{% endif %}{% if nombre.coordenadas_biograficas %} ({{ nombre.coordenadas_biograficas }}){% endif %}{% if nombre.funciones.exists %} / {% for funcion in nombre.funciones.all %}{{ funcion.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if nombre.terminos_asociados.exists %} / {% for termino in nombre.terminos_asociados.all %}{{ termino.termino }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
                     </span>
                 </div>
                 {% endfor %}
@@ -233,7 +232,7 @@
                 <div class="detalle-field">
                     <span class="detalle-field-label">{{ produccion.get_funcion_display }} de la obra</span>
                     <span class="detalle-field-value">
-                        {% for lugar in produccion.lugares.all %}{{ lugar.lugar }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if produccion.entidades.exists %} : {% for entidad in produccion.entidades.all %}{{ entidad.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if produccion.fechas.exists %}, {% for fecha in produccion.fechas.all %}{{ fecha.fecha }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+                        {% if produccion.lugares.exists %}Lugar: {% for lugar in produccion.lugares.all %}{{ lugar.lugar }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if produccion.entidades.exists %} / {% for entidad in produccion.entidades.all %}{{ entidad.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if produccion.fechas.exists %} / {% for fecha in produccion.fechas.all %}{{ fecha.fecha }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
                     </span>
                 </div>
                 {% endfor %}
@@ -280,6 +279,21 @@
                     <span class="detalle-field-value">{{ obra.numero_editor }}</span>
                 </div>
                 {% endif %}
+
+                <!-- Disponible (856) -->
+                {% for disponible in obra.disponibles_856.all %}
+                <div class="detalle-field">
+                    <span class="detalle-field-label">Disponible</span>
+                    <span class="detalle-field-value">
+                        {% for url in disponible.urls_856.all %}
+                            <a href="{{ url.url }}" target="_blank" rel="noopener">{{ url.url }}</a>{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                        {% for texto in disponible.textos_enlace_856.all %}
+                            {% if disponible.urls_856.exists %}<br>{% endif %}{{ texto.texto_enlace }}
+                        {% endfor %}
+                    </span>
+                </div>
+                {% endfor %}
                 {% endif %}
             </div>
         </section>
@@ -298,7 +312,7 @@
                 <div class="detalle-field">
                     <span class="detalle-field-label">Materia</span>
                     <span class="detalle-field-value">
-                        {{ materia.materia }}{% for sub in materia.subdivisiones.all %} – {{ sub.subdivision }}{% endfor %}{% for sub in materia.subdivisiones_geograficas.all %} – {{ sub.subdivision }}{% endfor %}
+                        {{ materia.materia }}{% for sub_crono in materia.subdivisiones.all %} / {{ sub_crono.subdivision }}{% endfor %}{% for sub_geo in materia.subdivisiones_geograficas.all %} / {{ sub_geo.subdivision }}{% endfor %}
                     </span>
                 </div>
                 {% endif %}
@@ -508,6 +522,13 @@
             <h3 class="pdf-viewer-title">
                 <i class="bi bi-file-pdf"></i> Documento
             </h3>
+            <!-- Ubicación antes del PDF/imagen -->
+            {% for ubicacion in obra.ubicaciones_852.all %}
+            <div class="text-muted small mt-2">
+                <i class="bi bi-geo-alt"></i> Ubicación:
+                {% if ubicacion.autoridad %}{{ ubicacion.autoridad }}{% elif ubicacion.codigo_o_nombre %}{{ ubicacion.codigo_o_nombre }}{% endif %}{% if ubicacion.signatura_original %} / {{ ubicacion.signatura_original }}{% endif %}{% for estanteria in ubicacion.estanterias.all %} / {{ estanteria.estanteria }}{% endfor %}
+            </div>
+            {% endfor %}
         </div>
         {% if pdf_url %}
             <div class="ratio ratio-16x9 pdf-viewer-container">
