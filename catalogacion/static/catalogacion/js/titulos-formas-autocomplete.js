@@ -105,6 +105,12 @@
                 const item = data?.results?.[0];
                 if (!item) return;
                 input.value = item[config.fieldName];
+                // Notificar al tracker de campos obligatorios
+                // Solo dispatch "change" (no "input" para no disparar búsqueda de autocomplete)
+                input.dispatchEvent(new Event("change", { bubbles: true }));
+                if (window.RequiredFieldsTracker) {
+                    window.RequiredFieldsTracker.updateProgress();
+                }
             })
             .catch((error) =>
                 console.error(`Error al precargar ${config.fieldName}`, error)

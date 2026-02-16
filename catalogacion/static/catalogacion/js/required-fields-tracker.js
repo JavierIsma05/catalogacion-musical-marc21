@@ -146,6 +146,10 @@
 
         // Primera actualización
         updateProgress();
+
+        // Re-verificar tras carga asíncrona de campos (compositor, título uniforme)
+        // que se llenan vía fetch después del DOMContentLoaded
+        setTimeout(updateProgress, 1500);
     }
 
     /**

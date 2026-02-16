@@ -99,6 +99,31 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                     </button>
                                 </div>
                             </div>
+                            {% empty %}
+                            <div class="subcampo-row subdivision-form-row d-flex mb-2">
+                                <div class="input-group">
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary"
+                                            data-materia-index="{{ forloop.counter0 }}"
+                                            data-borrador-add="subdivision_materia_650"
+                                            data-borrador-parent="{{ forloop.counter0 }}"
+                                            title="Agregar subdivisión cronológica">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+
+                                    <input type="text"
+                                           class="form-control subdivision-input"
+                                           name="subdivision_materia_650_{{ forloop.counter0 }}_0"
+                                           placeholder="Ej: Siglo XIX, 1800-1900">
+
+                                    <button type="button"
+                                            class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
+                                            title="Eliminar"
+                                            style="visibility:hidden;">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
                             {% endfor %}
                         {% else %}
                             <div class="subcampo-row subdivision-form-row d-flex mb-2">

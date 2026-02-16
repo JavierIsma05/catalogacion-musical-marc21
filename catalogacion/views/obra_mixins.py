@@ -291,6 +291,14 @@ class ObraFormsetMixin:
                 if not hay_urls and not hay_textos:
                     logger.debug("⏭️  disponibles_856: sin URLs ni textos, se omite")
                     continue
+
+                # Saltar formset.is_valid() para 856: el form tiene fields=[]
+                # y el guardado es 100% custom (delete all + recrear desde POST).
+                # La validación estándar del campo 'id' falla cuando los PKs
+                # fueron recreados en un guardado previo.
+                formsets[key] = formset
+                logger.debug("  ✅ disponibles_856: tiene URLs/textos, validación custom OK")
+                continue
             else:
                 if key == "produccion_publicacion":
                     tiene_lugares = any(
@@ -314,6 +322,22 @@ class ObraFormsetMixin:
                     elif all(not form.has_changed() for form in formset.forms):
                         logger.debug(
                             f"  ⏭️  {key}: SALTADO (todos los formularios vacíos)"
+                        )
+                        continue
+                elif key == "medios_interpretacion":
+                    # 382: los subcampos $a (medios) son selects dinámicos fuera
+                    # del form Django. Si hay datos de medios en POST, forzar
+                    # guardado aunque el form del solista ($b) no haya cambiado.
+                    tiene_medios = any(
+                        k.startswith("medio_interpretacion_382_")
+                        and self.request.POST.get(k, "").strip()
+                        for k in self.request.POST.keys()
+                    )
+                    if not tiene_medios and all(
+                        not form.has_changed() for form in formset.forms
+                    ):
+                        logger.debug(
+                            f"  ⏭️  {key}: SALTADO (sin medios ni cambios)"
                         )
                         continue
                 else:
@@ -512,6 +536,9 @@ class ObraFormsetMixin:
 
             # Procesar subcampos dinámicos si el formset los tiene
             if key in formset_subcampo_mapping:
+                # Asegurar que formset.instance apunte a la obra guardada
+                # (en CrearObraView, formset.instance es un ObraGeneral() sin pk)
+                formset.instance = instance
                 for handler_name in formset_subcampo_mapping[key]:
                     handler = SUBCAMPO_HANDLERS[handler_name]
                     # 🔥 CASO ESPECIAL 264: Pasar la obra como parámetro

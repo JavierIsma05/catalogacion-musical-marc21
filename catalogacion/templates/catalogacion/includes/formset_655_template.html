@@ -80,6 +80,27 @@ Botón + a la izquierda (input-group) — ESTABLE
                                     </button>
                                 </div>
                             </div>
+                            {% empty %}
+                            <div class="subcampo-row subdivision-form-row mb-2">
+                                <div class="input-group">
+
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+
+                                    <input type="text"
+                                           class="form-control subdivision-input"
+                                           name="{{ form.prefix }}-subdivision_0"
+                                           placeholder="Subdivisión general">
+
+                                    <button type="button"
+                                            class="subcampo-delete-btn btn btn-outline-danger"
+                                            style="visibility:hidden">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
                             {% endfor %}
                         {% else %}
                             <div class="subcampo-row subdivision-form-row mb-2">

@@ -92,6 +92,12 @@
                     coordenadasInput.value =
                         compositor.coordenadas_biograficas || "";
                 }
+                // Notificar al tracker de campos obligatorios
+                // Solo dispatch "change" (no "input" para no disparar búsqueda de autocomplete)
+                compositorInput.dispatchEvent(new Event("change", { bubbles: true }));
+                if (window.RequiredFieldsTracker) {
+                    window.RequiredFieldsTracker.updateProgress();
+                }
             })
             .catch((error) =>
                 console.error("Error al precargar compositor", error)

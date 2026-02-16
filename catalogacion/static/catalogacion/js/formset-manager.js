@@ -105,7 +105,7 @@
             /__prefix__/g,
             totalForms
         );
-        newForm.classList.remove("empty-form");
+        newForm.classList.remove("empty-form", "d-none");
         newForm.style.display = "";
 
         // Insertar antes del template vacío
@@ -123,12 +123,13 @@
         // Emitir evento para que otras lógicas (plantillas específicas) puedan
         // reindexar o reinicializar elementos dentro del formset recién añadido.
         try {
-            const ev = new CustomEvent('formset:added', { 
-                detail: { 
+            const ev = new CustomEvent('formset:added', {
+                bubbles: true,
+                detail: {
                     prefix,
                     newForm: newForm,
                     totalForms: totalForms + 1
-                } 
+                }
             });
             container.dispatchEvent(ev);
             console.log(`FormsetManager: Evento formset:added emitido para ${prefix}`, { prefix, newForm, totalForms: totalForms + 1 });

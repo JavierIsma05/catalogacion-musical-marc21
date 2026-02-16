@@ -80,6 +80,19 @@ Orden vertical limpio
                                 <i class="bi bi-x-lg"></i>
                             </button>
                         </div>
+                        {% empty %}
+                        <div class="subcampo-row termino-form-row">
+                            <button type="button" class="subcampo-add-btn add-termino-btn"
+                                data-nombre-index="{{ forloop.counter0 }}" data-borrador-add="termino_asociado_700" data-borrador-parent="{{ forloop.counter0 }}">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                            <input type="text" class="form-control termino-input"
+                                name="termino_asociado_700_{{ forloop.counter0 }}_0" placeholder="Dr., Lic., etc.">
+                            <button type="button" class="subcampo-delete-btn delete-termino-btn"
+                                style="visibility:hidden;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
                         {% endfor %}
                         {% else %}
                         <div class="subcampo-row termino-form-row">

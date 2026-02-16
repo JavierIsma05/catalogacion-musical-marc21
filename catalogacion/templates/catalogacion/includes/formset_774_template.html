@@ -139,32 +139,37 @@ Estilo compatible con 856 / 700
 
 <script>
 (function () {
+    "use strict";
+
+    const PREFIX = "{{ formset.prefix|escapejs }}";
+    const container = document.querySelector(
+        '[data-formset-prefix="' + PREFIX + '"]'
+    );
+    if (!container) return;
+
+    const formsContainer = container.querySelector(".formset-forms");
+    const emptyForm = formsContainer
+        ? formsContainer.querySelector(".empty-form")
+        : null;
 
     /* =====================================================
        AUTOCOMPLETE GENÉRICO (persona / título)
        ===================================================== */
     function initAutocomplete(wrapper) {
-
-        // 🔥 CLAVE: permitir reinicializar
-        wrapper.removeAttribute("data-autocomplete-init");
-
         if (!wrapper || wrapper.dataset.autocompleteInit === "1") return;
         wrapper.dataset.autocompleteInit = "1";
 
-        const type  = wrapper.dataset.autocomplete;
+        const type = wrapper.dataset.autocomplete;
         const input = wrapper.querySelector("input");
-        const box   = wrapper.querySelector(".autocomplete-suggestions");
+        const box = wrapper.querySelector(".autocomplete-suggestions");
 
         if (!type || !input || !box) return;
 
         let endpoint = null;
-
-        if (type === "persona") {
+        if (type === "persona")
             endpoint = "/catalogacion/api/autocompletar/persona/";
-        }
-        if (type === "titulo") {
+        if (type === "titulo")
             endpoint = "/catalogacion/api/autocompletar/titulo/";
-        }
         if (!endpoint) return;
 
         let timer = null;
@@ -176,46 +181,30 @@ Estilo compatible con 856 / 700
 
         input.addEventListener("input", () => {
             const q = input.value.trim();
-            if (q.length < 2) {
-                hide();
-                return;
-            }
+            if (q.length < 2) { hide(); return; }
 
             clearTimeout(timer);
             timer = setTimeout(() => {
-                fetch(`${endpoint}?q=${encodeURIComponent(q)}`)
+                fetch(endpoint + "?q=" + encodeURIComponent(q))
                     .then(r => r.json())
                     .then(data => {
                         box.innerHTML = "";
                         const results = data.results || [];
 
-                        if (!results.length) {
-                            box.innerHTML = `
-                                <div class="autocomplete-item autocomplete-item-new">
-                                    <i class="bi bi-plus-circle me-2"></i>
-                                    Crear: "${q}"
-                                </div>`;
-                        } else {
-                            results.forEach(item => {
-                                const div = document.createElement("div");
-                                div.className = "autocomplete-item";
-                                div.textContent = item.text;
-                                div.onclick = () => {
-                                    input.value = item.text;
-                                    hide();
-                                };
-                                box.appendChild(div);
-                            });
+                        results.forEach(item => {
+                            const div = document.createElement("div");
+                            div.className = "autocomplete-item";
+                            div.textContent = item.text;
+                            div.onclick = () => { input.value = item.text; hide(); };
+                            box.appendChild(div);
+                        });
 
-                            const crear = document.createElement("div");
-                            crear.className = "autocomplete-item autocomplete-item-new";
-                            crear.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${q}"`;
-                            crear.onclick = () => {
-                                input.value = q;
-                                hide();
-                            };
-                            box.appendChild(crear);
-                        }
+                        const crear = document.createElement("div");
+                        crear.className = "autocomplete-item autocomplete-item-new";
+                        crear.innerHTML = '<i class="bi bi-plus-circle me-2"></i> Crear: "' +
+                            escapeHtml(q) + '"';
+                        crear.onclick = () => { input.value = q; hide(); };
+                        box.appendChild(crear);
 
                         box.classList.add("show");
                     });
@@ -227,148 +216,91 @@ Estilo compatible con 856 / 700
         });
     }
 
+    function escapeHtml(text) {
+        const d = document.createElement("div");
+        d.textContent = text || "";
+        return d.innerHTML;
+    }
+
     /* =====================================================
-       HOOK: reinicializar autocomplete al agregar fila
-       (evita duplicar filas por handlers globales)
+       AGREGAR NUEVO FORMULARIO 774
+       Manejo directo del botón "+" (no depende de FormsetManager)
        ===================================================== */
-    const THIS_FORMSET_PREFIX = "{{ formset.prefix|escapejs }}";
+    function addForm774() {
+        if (!formsContainer || !emptyForm) return;
 
-    console.log('🔍 774 Formset prefix:', THIS_FORMSET_PREFIX);
+        const totalFormsInput = container.querySelector(
+            '[name="' + PREFIX + '-TOTAL_FORMS"]'
+        );
+        if (!totalFormsInput) return;
 
-    // Si existe el gestor central (FormsetManager), él es el único que agrega filas.
-    // Aquí solo reinicializamos autocompletes cuando se agrega una nueva fila.
-    document.addEventListener("formset:added", function (ev) {
-        console.log('🔥 formset:added event fired:', ev.detail);
-        
-        const detail = ev && ev.detail ? ev.detail : null;
-        if (!detail || detail.prefix !== THIS_FORMSET_PREFIX) {
-            console.log('🚫 Event not for this formset:', detail?.prefix, 'expected:', THIS_FORMSET_PREFIX);
-            return;
-        }
+        const totalForms = parseInt(totalFormsInput.value, 10) || 0;
 
-        console.log('✅ Processing formset:added for 774');
-        const root = detail.newForm;
-        if (!root || !root.querySelectorAll) {
-            console.log('🚫 No root or no querySelectorAll');
-            return;
-        }
+        // Clonar el template vacío
+        const newForm = emptyForm.cloneNode(true);
 
-        console.log('🔍 New form element:', root);
-        
-        const wrappers = root.querySelectorAll(".autocomplete-wrapper[data-autocomplete]");
-        console.log('🔍 Found autocomplete wrappers:', wrappers.length);
+        // Reemplazar __prefix__ con el nuevo índice
+        newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, totalForms);
 
-        wrappers.forEach((w, index) => {
-            console.log(`🔄 Processing wrapper ${index}:`, w.dataset.autocomplete);
-            w.removeAttribute("data-autocomplete-init");
-            initAutocomplete(w);
-        });
+        // Hacer visible: quitar clases de ocultación
+        newForm.classList.remove("empty-form", "d-none");
+        newForm.style.display = "";
+        newForm.classList.add("mb-3");
 
-        // 🔥 También inicializar el bloqueo del campo $w en el nuevo formulario
-        const wInputs = root.querySelectorAll('.campo-774-w');
-        console.log('🔍 Found 774 $w inputs:', wInputs.length);
-        wInputs.forEach((input, index) => {
-            console.log(`🔒 Configuring 774 $w input ${index}:`, input);
-        });
+        // Insertar antes del template vacío
+        formsContainer.insertBefore(newForm, emptyForm);
+
+        // Incrementar TOTAL_FORMS
+        totalFormsInput.value = totalForms + 1;
+
+        // Inicializar autocompletes en el nuevo formulario
+        newForm.querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
+            .forEach(w => {
+                w.removeAttribute("data-autocomplete-init");
+                initAutocomplete(w);
+            });
+    }
+
+    // Conectar al botón "+" global (está fuera del container, en relaciones.html).
+    // Usa setTimeout(0) para ejecutarse DESPUÉS de que FormsetManager haya
+    // clonado/reemplazado los botones en su propio DOMContentLoaded handler.
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+            const addBtn = document.querySelector(
+                '[data-formset-target="' + PREFIX + '"]'
+            );
+            if (!addBtn) return;
+
+            // Reemplazar el botón (elimina handlers de FormsetManager)
+            // y agregar nuestro propio handler directo.
+            const freshBtn = addBtn.cloneNode(true);
+            addBtn.parentNode.replaceChild(freshBtn, addBtn);
+            freshBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                addForm774();
+            });
+        }, 0);
     });
 
     /* =====================================================
-       INICIALIZAR AL CARGAR PÁGINA
+       INIT INICIAL: autocompletes en formularios existentes
        ===================================================== */
-    console.log('🚀 774 Formset script loaded');
-    
-    // Verificar que el botón + existe
-    setTimeout(() => {
-        const addBtn = document.querySelector('[data-formset-target="{{ formset.prefix|escapejs }}"]');
-        console.log('🔍 Add button found:', addBtn);
-        
-        if (addBtn) {
-            console.log('✅ Add button exists, adding click listener for debugging');
-            addBtn.addEventListener('click', function() {
-                console.log('🔥 Add button clicked!');
-                
-                // 🔥 CLONACIÓN MANUAL DIRECTA
-                setTimeout(() => {
-                    console.log('🔧 Starting manual formset cloning...');
-                    
-                    const container = document.querySelector('.formset-forms');
-                    const emptyForm = document.querySelector('.empty-form');
-                    
-                    if (!container || !emptyForm) {
-                        console.log('🚫 Container or empty form not found');
-                        return;
-                    }
-                    
-                    // Clonar el empty form
-                    const newForm = emptyForm.cloneNode(true);
-                    newForm.classList.remove('empty-form');
-                    newForm.classList.remove('d-none');
-                    newForm.style.display = 'block';
-                    newForm.classList.add('mb-3');
-                    
-                    // Reemplazar __prefix__ con el índice actual
-                    const totalForms = container.querySelectorAll('.formset-row:not(.empty-form)').length;
-                    const newHtml = newForm.innerHTML.replace(/__prefix__/g, totalForms);
-                    newForm.innerHTML = newHtml;
-                    
-                    // Agregar al container
-                    container.appendChild(newForm);
-                    
-                    console.log('✅ Form cloned manually:', newForm);
-                    
-                    // 🔥 Inicializar autocompletes en el nuevo formulario
-                    const wrappers = newForm.querySelectorAll(".autocomplete-wrapper[data-autocomplete]");
-                    console.log('🔍 Found autocomplete wrappers in cloned form:', wrappers.length);
-                    
-                    wrappers.forEach((w, index) => {
-                        console.log(`🔄 Processing wrapper ${index}:`, w.dataset.autocomplete);
-                        w.removeAttribute("data-autocomplete-init");
-                        initAutocomplete(w);
-                    });
-                    
-                    // 🔥 Actualizar management form
-                    const totalFormsInput = document.querySelector('input[name$="-TOTAL_FORMS"]');
-                    if (totalFormsInput) {
-                        totalFormsInput.value = totalForms + 1;
-                        console.log('✅ Updated TOTAL_FORMS to:', totalForms + 1);
-                    }
-                    
-                }, 100);
-            });
-        } else {
-            console.log('🚫 Add button NOT found!');
-        }
-    }, 1000);
-
-    /* =====================================================
-       INIT INICIAL
-       ===================================================== */
-    document
+    container
         .querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
         .forEach(initAutocomplete);
 
     /* =====================================================
-       BLOQUEAR ESCRITURA EN CAMPO 774 $w
+       BLOQUEAR ESCRITURA EN CAMPO 774 $w (readonly refuerzo)
        ===================================================== */
-    document.addEventListener('keydown', function(e) {
-        if (e.target.classList.contains('campo-774-w')) {
+    document.addEventListener("keydown", function (e) {
+        if (e.target.classList.contains("campo-774-w")) {
             e.preventDefault();
-            return false;
         }
     });
 
-    document.addEventListener('input', function(e) {
-        if (e.target.classList.contains('campo-774-w')) {
+    document.addEventListener("paste", function (e) {
+        if (e.target.classList.contains("campo-774-w")) {
             e.preventDefault();
-            e.target.value = e.target.defaultValue || '';
-            return false;
-        }
-    });
-
-    document.addEventListener('paste', function(e) {
-        if (e.target.classList.contains('campo-774-w')) {
-            e.preventDefault();
-            return false;
         }
     });
 
