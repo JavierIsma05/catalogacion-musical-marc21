@@ -56,19 +56,37 @@ class FormsetSubcampoHandler:
         """Reemplaza los subcampos asociados a cada formulario guardado."""
 
         valores = self._agrupar_subcampos_por_indice(prefijo_input, indice_posicion)
+        logger.debug(
+            f"procesar_subcampo_simple: prefijo={prefijo_input}, "
+            f"valores={valores}, formset.instance={formset.instance}, "
+            f"total_forms={len(list(formset))}"
+        )
 
         for index, form in enumerate(formset):
+            # Saltar forms marcados para eliminación
+            if getattr(form, "cleaned_data", None) and form.cleaned_data.get(
+                "DELETE", False
+            ):
+                logger.debug(f"  index={index}: marcado para DELETE, saltar")
+                continue
+
             # Sin datos de subcampos para este índice → saltar
             # (evita crear padres vacíos para forms sin datos)
             if index not in valores:
+                logger.debug(f"  index={index}: sin datos de subcampos, saltar")
                 continue
 
             # Asegurar que el form padre exista
             if not form.instance.pk:
+                logger.debug(
+                    f"  index={index}: padre sin PK, creando... "
+                    f"cleaned_data={getattr(form, 'cleaned_data', 'NO EXISTE')}"
+                )
                 parent = form.save(commit=False)
                 obra = formset.instance
                 parent.obra = obra
                 parent.save()
+                logger.debug(f"  index={index}: padre creado con pk={parent.pk}")
 
             relacionado = getattr(
                 form.instance,
@@ -82,6 +100,9 @@ class FormsetSubcampoHandler:
                         campo_fk: form.instance,
                         campo_valor: valor,
                     }
+                )
+                logger.debug(
+                    f"  index={index}: subcampo creado {campo_valor}={valor}"
                 )
 
 

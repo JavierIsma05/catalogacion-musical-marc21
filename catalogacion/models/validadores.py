@@ -76,17 +76,15 @@ class ValidadorColeccion(ValidadorBase):
 
 class ValidadorObraEnColeccion(ValidadorBase):
     """Validador para obras que forman parte de una colección (nivel_bibliografico = 'a')"""
-    
+
     def validar_reglas_especificas(self):
         """Validaciones específicas para obras en colección"""
-        # Debe tener referencia a la colección contenedora (773)
-        if self.obra.pk:
-            if not self.obra.enlaces_documento_fuente_773.exists():
-                self.errores['__all__'] = (
-                    "Una obra componente debe tener referencia a su colección "
-                    "contenedora (campo 773)."
-                )
-        
+        # NOTA: La verificación de existencia de 773 NO se hace aquí porque
+        # este validador se ejecuta en clean() (ANTES de guardar formsets).
+        # Los datos del 773 se envían como formset y aún no existen en la BD
+        # cuando clean() se ejecuta. La validación de 773 se hace post-guardado
+        # en la vista (form_valid).
+
         # No debe tener unidades constituyentes (774)
         if self.obra.pk and self.obra.enlaces_unidades_774.exists():
             self.errores['__all__'] = (

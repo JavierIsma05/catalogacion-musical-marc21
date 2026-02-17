@@ -320,6 +320,9 @@ class CrearObraView(CatalogadorRequiredMixin, ObraFormsetMixin, CreateView):
             # Extraer errores específicos de cada formset
             errores_detallados = []
             for key, formset in formsets.items():
+                # Saltar 856 que usa validación custom (no Django is_valid)
+                if key == "disponibles_856":
+                    continue
                 if not formset.is_valid():
                     for i, frm in enumerate(formset.forms):
                         if frm.errors:
@@ -608,6 +611,9 @@ class EditarObraView(CatalogadorRequiredMixin, ObraFormsetMixin, UpdateView):
             # Extraer errores específicos de cada formset
             errores_detallados = []
             for key, formset in formsets.items():
+                # Saltar 856 que usa validación custom (no Django is_valid)
+                if key == "disponibles_856":
+                    continue
                 if not formset.is_valid():
                     for i, frm in enumerate(formset.forms):
                         if frm.errors:

@@ -59,6 +59,9 @@
 
   const Utils = {
     getCsrf() {
+      // Leer de la cookie (siempre actualizada) con fallback al input hidden
+      const cookieMatch = document.cookie.match(/csrftoken=([^;]+)/);
+      if (cookieMatch) return cookieMatch[1];
       return (
         document.querySelector('[name="csrfmiddlewaretoken"]')?.value || ""
       );
@@ -1159,6 +1162,13 @@
 
       this.form.addEventListener("input", onChange);
       this.form.addEventListener("change", onChange);
+
+      // Sincronizar token CSRF antes de enviar (evita mismatch con ngrok)
+      this.form.addEventListener("submit", () => {
+        const fresh = Utils.getCsrf();
+        const input = this.form.querySelector('[name="csrfmiddlewaretoken"]');
+        if (input && fresh) input.value = fresh;
+      });
 
       // Eliminar borrador al publicar exitosamente
       this.form.addEventListener("submit", (e) => {

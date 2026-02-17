@@ -139,6 +139,104 @@
     }
 
     /**
+     * Reindexar todos los formularios nuevos (no existentes) de un formset
+     * para que los índices sean secuenciales (0, 1, 2...) sin huecos.
+     */
+    function reindexForms(container, prefix) {
+        const formsContainer = container.querySelector(".formset-forms");
+        if (!formsContainer) return;
+
+        // Obtener todos los formularios visibles (existentes + nuevos), excluyendo empty-form
+        const allRows = formsContainer.querySelectorAll(
+            ".formset-row:not(.empty-form)"
+        );
+
+        allRows.forEach((row, index) => {
+            // Reindexar todos los elementos con name o id que contengan el prefix
+            const elements = row.querySelectorAll(
+                `[name^="${prefix}-"], [id^="id_${prefix}-"]`
+            );
+            elements.forEach((el) => {
+                if (el.name) {
+                    el.name = el.name.replace(
+                        new RegExp(`${prefix}-\\d+`),
+                        `${prefix}-${index}`
+                    );
+                }
+                if (el.id) {
+                    el.id = el.id.replace(
+                        new RegExp(`id_${prefix}-\\d+`),
+                        `id_${prefix}-${index}`
+                    );
+                }
+            });
+
+            // Reindexar labels con for
+            const labels = row.querySelectorAll(`[for^="id_${prefix}-"]`);
+            labels.forEach((label) => {
+                label.setAttribute(
+                    "for",
+                    label.getAttribute("for").replace(
+                        new RegExp(`id_${prefix}-\\d+`),
+                        `id_${prefix}-${index}`
+                    )
+                );
+            });
+
+            // Reindexar campos con nombres dinámicos (ej: numero_control_774_X)
+            // Estos son subcampos que usan convención: prefijo_INDEX_SUBINDEX
+            const dynamicSelectors = [
+                "numero_control_774_",
+                "lugar_produccion_264_",
+                "entidad_produccion_264_",
+                "fecha_produccion_264_",
+                "medio_interpretacion_382_",
+                "funcion_institucional_710_",
+                "url_disponible_856_",
+                "texto_disponible_856_",
+                "subdivision_materia_650_",
+                "subdivision_cronologica_650_",
+                "subdivision_genero_655_",
+                "volumen_mencion_490_",
+                "estanteria_ubicacion_852_",
+            ];
+            const dynamicSelector = dynamicSelectors
+                .map((s) => `[name^="${s}"]`)
+                .join(", ");
+            const dynamicInputs = row.querySelectorAll(dynamicSelector);
+            // También campos funcion700- que usan guión en vez de _
+            const funcion700Inputs = row.querySelectorAll('[name^="funcion700-"]');
+
+            dynamicInputs.forEach((el) => {
+                // Reemplazar el índice del form padre: prefijo_INDEX_resto
+                el.name = el.name.replace(
+                    /^([a-zA-Z_]+\d*_)(\d+)/,
+                    `$1${index}`
+                );
+            });
+            funcion700Inputs.forEach((el) => {
+                // funcion700-PREFIX-INDEX-SUBINDEX-campo
+                el.name = el.name.replace(
+                    /^(funcion700-[^-]*-)(\d+)/,
+                    `$1${index}`
+                );
+            });
+        });
+
+        // Actualizar TOTAL_FORMS
+        const totalFormsInput = container.querySelector(
+            `#id_${prefix}-TOTAL_FORMS`
+        );
+        if (totalFormsInput) {
+            totalFormsInput.value = allRows.length;
+        }
+
+        console.log(
+            `FormsetManager: Reindexado ${prefix}, total: ${allRows.length}`
+        );
+    }
+
+    /**
      * Maneja clicks en botones de eliminar
      */
     function handleDeleteClick(e) {
@@ -152,9 +250,6 @@
         if (!container) return;
 
         const prefix = container.dataset.formsetPrefix;
-        const totalFormsInput = container.querySelector(
-            `#id_${prefix}-TOTAL_FORMS`
-        );
         const deleteCheckbox = row.querySelector('input[name*="DELETE"]');
 
         if (row.classList.contains("existing-form")) {
@@ -174,11 +269,9 @@
                 deleteBtn.title = "Cancelar eliminación";
             }
         } else {
-            // Formulario nuevo: eliminar completamente
+            // Formulario nuevo: eliminar y reindexar
             row.remove();
-            if (totalFormsInput) {
-                totalFormsInput.value = parseInt(totalFormsInput.value, 10) - 1;
-            }
+            reindexForms(container, prefix);
         }
     }
 

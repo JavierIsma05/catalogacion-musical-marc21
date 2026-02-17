@@ -26,9 +26,9 @@ SECRET_KEY = "django-insecure-u#)zn$bx21fz@5v(8c%ejx!p4d*s4d0m4*!y%+kn&u^u3&p&s$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*", "testserver", "localhost", "127.0.0.1", ".ngrok-free.app"]
+ALLOWED_HOSTS = ["*", "testserver", "localhost", "127.0.0.1", ".ngrok-free.app", ".ngrok-free.dev"]
 
-CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app"]
+CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app", "https://*.ngrok-free.dev"]
 
 # Application definition
 
@@ -182,6 +182,9 @@ LOGOUT_REDIRECT_URL = "/"
 LOGIN_URL = "/usuarios/login/"
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://industrious-unofficious-weston.ngrok-free.dev",
-]
+# Permitir que las cookies funcionen a través de ngrok (proxy HTTPS)
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+

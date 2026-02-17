@@ -365,11 +365,57 @@
                         {% endfor %}
                     {% endif %}
 
-                    {% if obra.extension or obra.dimension %}
+                    {% if obra.extension or obra.otras_caracteristicas or obra.dimension or obra.material_acompanante %}
                     <div class="data-row">
                         <span class="campo-tag">300</span>
-                        <span>$a {{ obra.extension }}{% if obra.dimension %} $c {{ obra.dimension }}{% endif %}</span>
+                        <span>
+                            {% if obra.extension %}$a {{ obra.extension }}{% endif %}
+                            {% if obra.otras_caracteristicas %}{% if obra.extension %} : {% endif %}$b {{ obra.otras_caracteristicas }}{% endif %}
+                            {% if obra.dimension %} $c {{ obra.dimension }}{% endif %}
+                            {% if obra.material_acompanante %} $+ {{ obra.material_acompanante }}{% endif %}
+                        </span>
                     </div>
+                    {% endif %}
+
+                    <!-- Identificadores (020, 024, 028) -->
+                    {% if obra.isbn %}
+                    <div class="data-row">
+                        <span class="campo-tag">020</span>
+                        <span>$a {{ obra.isbn }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if obra.ismn %}
+                    <div class="data-row">
+                        <span class="campo-tag">024</span>
+                        <span>$a {{ obra.ismn }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if obra.numero_editor %}
+                    <div class="data-row">
+                        <span class="campo-tag">028</span>
+                        <span>$a {{ obra.numero_editor }}</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Disponible (856) -->
+                    {% if obra.disponibles_856.exists %}
+                    {% for disponible in obra.disponibles_856.all %}
+                        {% for url in disponible.urls_856.all %}
+                        <div class="data-row">
+                            <span class="campo-tag">856</span>
+                            <a href="{{ url.url }}" class="acceso-link" target="_blank">
+                                {% if disponible.textos_enlace_856.first %}
+                                    {{ disponible.textos_enlace_856.first.texto_enlace }}
+                                {% else %}
+                                    $u {{ url.url }}
+                                {% endif %}
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    {% endfor %}
                     {% endif %}
                 </div>
             </section>
@@ -588,6 +634,20 @@
                 <p class="text-muted">No hay materias registradas.</p>
                 {% endif %}
 
+                <!-- Serie (490) -->
+                {% if obra.menciones_serie.exists %}
+                <div class="data-grid-compact mt-3">
+                    {% for mencion in obra.menciones_serie.all %}
+                    <div class="data-row">
+                        <span class="campo-tag">490</span>
+                        <span>
+                            {% for titulo in mencion.titulos.all %}$a {{ titulo.titulo_serie }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                            {% if mencion.volumenes.exists %} ; {% for vol in mencion.volumenes.all %}$v {{ vol.volumen }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
 
             </section>
             <!-- ================= NOTAS ================= -->

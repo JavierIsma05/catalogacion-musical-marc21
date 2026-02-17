@@ -147,11 +147,6 @@ Estilo compatible con 856 / 700
     );
     if (!container) return;
 
-    const formsContainer = container.querySelector(".formset-forms");
-    const emptyForm = formsContainer
-        ? formsContainer.querySelector(".empty-form")
-        : null;
-
     /* =====================================================
        AUTOCOMPLETE GENÉRICO (persona / título)
        ===================================================== */
@@ -223,63 +218,21 @@ Estilo compatible con 856 / 700
     }
 
     /* =====================================================
-       AGREGAR NUEVO FORMULARIO 774
-       Manejo directo del botón "+" (no depende de FormsetManager)
+       HOOK: reinicializar autocompletes cuando FormsetManager
+       agrega una fila nueva (evento formset:added con bubbles)
        ===================================================== */
-    function addForm774() {
-        if (!formsContainer || !emptyForm) return;
+    container.addEventListener("formset:added", function (ev) {
+        const detail = ev && ev.detail ? ev.detail : null;
+        if (!detail || detail.prefix !== PREFIX) return;
 
-        const totalFormsInput = container.querySelector(
-            '[name="' + PREFIX + '-TOTAL_FORMS"]'
-        );
-        if (!totalFormsInput) return;
+        const root = detail.newForm;
+        if (!root) return;
 
-        const totalForms = parseInt(totalFormsInput.value, 10) || 0;
-
-        // Clonar el template vacío
-        const newForm = emptyForm.cloneNode(true);
-
-        // Reemplazar __prefix__ con el nuevo índice
-        newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, totalForms);
-
-        // Hacer visible: quitar clases de ocultación
-        newForm.classList.remove("empty-form", "d-none");
-        newForm.style.display = "";
-        newForm.classList.add("mb-3");
-
-        // Insertar antes del template vacío
-        formsContainer.insertBefore(newForm, emptyForm);
-
-        // Incrementar TOTAL_FORMS
-        totalFormsInput.value = totalForms + 1;
-
-        // Inicializar autocompletes en el nuevo formulario
-        newForm.querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
+        root.querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
             .forEach(w => {
                 w.removeAttribute("data-autocomplete-init");
                 initAutocomplete(w);
             });
-    }
-
-    // Conectar al botón "+" global (está fuera del container, en relaciones.html).
-    // Usa setTimeout(0) para ejecutarse DESPUÉS de que FormsetManager haya
-    // clonado/reemplazado los botones en su propio DOMContentLoaded handler.
-    document.addEventListener("DOMContentLoaded", function () {
-        setTimeout(function () {
-            const addBtn = document.querySelector(
-                '[data-formset-target="' + PREFIX + '"]'
-            );
-            if (!addBtn) return;
-
-            // Reemplazar el botón (elimina handlers de FormsetManager)
-            // y agregar nuestro propio handler directo.
-            const freshBtn = addBtn.cloneNode(true);
-            addBtn.parentNode.replaceChild(freshBtn, addBtn);
-            freshBtn.addEventListener("click", function (e) {
-                e.preventDefault();
-                addForm774();
-            });
-        }, 0);
     });
 
     /* =====================================================

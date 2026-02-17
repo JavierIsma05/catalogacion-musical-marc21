@@ -328,10 +328,16 @@ class ObraFormsetMixin:
                     # 382: los subcampos $a (medios) son selects dinámicos fuera
                     # del form Django. Si hay datos de medios en POST, forzar
                     # guardado aunque el form del solista ($b) no haya cambiado.
-                    tiene_medios = any(
-                        k.startswith("medio_interpretacion_382_")
+                    medios_keys = [
+                        k for k in self.request.POST.keys()
+                        if k.startswith("medio_interpretacion_382_")
                         and self.request.POST.get(k, "").strip()
-                        for k in self.request.POST.keys()
+                    ]
+                    tiene_medios = bool(medios_keys)
+                    logger.debug(
+                        f"  🔍 {key}: tiene_medios={tiene_medios}, "
+                        f"medios_keys={medios_keys}, "
+                        f"forms_changed={[f.has_changed() for f in formset.forms]}"
                     )
                     if not tiene_medios and all(
                         not form.has_changed() for form in formset.forms
@@ -493,6 +499,16 @@ class ObraFormsetMixin:
             # Guardado NORMAL para otros formsets
             # ---------------------------
             for form in formset:
+                # Eliminar registros marcados con DELETE
+                if (
+                    getattr(form, "cleaned_data", None)
+                    and form.cleaned_data.get("DELETE", False)
+                    and form.instance.pk
+                ):
+                    logger.debug(f"Eliminando {key}: pk={form.instance.pk}")
+                    form.instance.delete()
+                    continue
+
                 if (
                     getattr(form, "cleaned_data", None)
                     and not form.cleaned_data.get("DELETE", False)
@@ -539,6 +555,10 @@ class ObraFormsetMixin:
                 # Asegurar que formset.instance apunte a la obra guardada
                 # (en CrearObraView, formset.instance es un ObraGeneral() sin pk)
                 formset.instance = instance
+                logger.debug(
+                    f"🔧 Subcampos para {key}: handlers={formset_subcampo_mapping[key]}, "
+                    f"instance.pk={instance.pk}"
+                )
                 for handler_name in formset_subcampo_mapping[key]:
                     handler = SUBCAMPO_HANDLERS[handler_name]
                     # 🔥 CASO ESPECIAL 264: Pasar la obra como parámetro

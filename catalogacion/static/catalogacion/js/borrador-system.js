@@ -59,6 +59,9 @@
   // ========================================
 
   function getCsrfToken() {
+    // Leer de la cookie (siempre actualizada) con fallback al input hidden
+    const cookieMatch = document.cookie.match(/csrftoken=([^;]+)/);
+    if (cookieMatch) return cookieMatch[1];
     const token = document.querySelector('[name="csrfmiddlewaretoken"]');
     return token ? token.value : "";
   }
