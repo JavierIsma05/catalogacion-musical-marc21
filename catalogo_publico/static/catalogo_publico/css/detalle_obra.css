@@ -226,6 +226,11 @@
     font-size: 0.9375rem;
     color: var(--pro-text);
     line-height: 1.5;
+    font-weight: 600;
+}
+
+.detalle-field-value.text-long {
+    font-weight: 400;
 }
 
 .detalle-field-note {

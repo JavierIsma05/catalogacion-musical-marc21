@@ -15,12 +15,14 @@
 }
 
 .incipit-view-canvas {
-  width: 100%;
-  max-width: 500px;
-  display: block;
-  background: transparent;
-  pointer-events: none;
-  cursor: default;
+    width: 100%;
+    max-width: 500px;
+    display: block;
+    background: #f8f9fa;
+    pointer-events: none;
+    cursor: default;
+    margin: 0 auto;
+    border-radius: 4px;
 }
 
 .detalle-field-autoria {
@@ -72,10 +74,7 @@
 .marc-info-tag .marc-tooltip {
     visibility: hidden;
     opacity: 0;
-    position: absolute;
-    bottom: 125%;
-    left: 70%;
-    transform: translateX(-50%);
+    position: fixed;
     background: #343a40;
     color: #f8f9fa;
     font-size: 0.72rem;
@@ -83,23 +82,35 @@
     padding: 5px 9px;
     border-radius: 4px;
     white-space: nowrap;
-    z-index: 1000;
+    z-index: 9999;
     pointer-events: none;
     transition: visibility 0s linear 0.6s, opacity 0.15s ease 0.6s;
+}
+
+/* Incipit meta grid: campos complementarios en doble fila */
+.detalle-incipit-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid #eee;
+}
+.detalle-incipit-meta-item {
+    display: flex;
+    flex-direction: column;
+}
+.detalle-incipit-meta-item small {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.detalle-incipit-meta-item span {
+    font-size: 0.9rem;
 }
 .marc-info-tag:hover .marc-tooltip {
     visibility: visible;
     opacity: 1;
-}
-.marc-info-tag .marc-tooltip::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 4px;
-    border-style: solid;
-    border-color: #343a40 transparent transparent transparent;
 }
 </style>
 {% endblock %}
@@ -190,9 +201,11 @@
                     </span>
                     <span class="detalle-field-value">
                         {{ obra.compositor.apellidos_nombres }}{% if obra.compositor.coordenadas_biograficas %} ({{ obra.compositor.coordenadas_biograficas }}){% endif %}
-                        {% if obra.termino_asociado %}, {{ obra.termino_asociado }}{% endif %}
+                        {% if obra.funciones_compositor.exists %}
+                            , {% for func in obra.funciones_compositor.all %}{{ func.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                        {% endif %}
                         {% if obra.autoria %}
-                            <span class="detalle-field-autoria">[{{ obra.get_autoria_display|lower }}]</span>
+                            <span class="detalle-field-autoria">Autoría: {{ obra.get_autoria_display }}</span>
                         {% endif %}
                     </span>
                 </div>
@@ -283,9 +296,21 @@
             </h2>
             <div class="detalle-section-body">
 
+                <!-- Campo 300: Descripción física - $a extensión, $b otras características, $c dimensión, $+ material acompañante -->
+                {% if obra.extension or obra.otras_caracteristicas or obra.dimension or obra.material_acompanante %}
+                <div class="detalle-field">
+                    <span class="detalle-field-label">Descripción física
+                        <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">300: Descripción física — $a extensión, $b otras caract., $c dimensión, $+ material acomp.</span></span>
+                    </span>
+                    <span class="detalle-field-value">
+                        {% if obra.extension %}{{ obra.extension }}{% endif %}{% if obra.otras_caracteristicas %}{% if obra.extension %} : {% endif %}{{ obra.otras_caracteristicas }}{% endif %}{% if obra.dimension %}{% if obra.extension or obra.otras_caracteristicas %} ; {% endif %}{{ obra.dimension }}{% endif %}{% if obra.material_acompanante %}{% if obra.extension or obra.otras_caracteristicas or obra.dimension %} + {% endif %}{{ obra.material_acompanante }}{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+
                 <!-- Campo 340: Medio/soporte físico - $a tipo de soporte -->
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Manuscrito/Impreso
+                    <span class="detalle-field-label">Técnica de producción
                         <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">340: Medio/soporte físico — $a tipo de soporte</span></span>
                     </span>
                     <span class="detalle-field-value">
@@ -304,7 +329,7 @@
                         <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">264: Producción/Publicación — $a lugar, $b entidad, $c fecha</span></span>
                     </span>
                     <span class="detalle-field-value">
-                        {% if produccion.lugares.exists %}Lugar: {% for lugar in produccion.lugares.all %}{{ lugar.lugar }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if produccion.entidades.exists %} / {% for entidad in produccion.entidades.all %}{{ entidad.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if produccion.fechas.exists %} / {% for fecha in produccion.fechas.all %}{{ fecha.fecha }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+                        {% if produccion.lugares.exists %}{% for lugar in produccion.lugares.all %}{{ lugar.lugar }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if produccion.entidades.exists %} / {% for entidad in produccion.entidades.all %}{{ entidad.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if produccion.fechas.exists %} / {% for fecha in produccion.fechas.all %}{{ fecha.fecha }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
                     </span>
                 </div>
                 {% endfor %}
@@ -318,18 +343,6 @@
                     <span class="detalle-field-value">{{ edicion.edicion }}</span>
                 </div>
                 {% endfor %}
-
-                <!-- Campo 300: Descripción física - $a extensión, $b otras características, $c dimensión, $+ material acompañante -->
-                {% if obra.extension or obra.otras_caracteristicas or obra.dimension or obra.material_acompanante %}
-                <div class="detalle-field">
-                    <span class="detalle-field-label">Descripción física
-                        <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">300: Descripción física — $a extensión, $b otras caract., $c dimensión, $+ material acomp.</span></span>
-                    </span>
-                    <span class="detalle-field-value">
-                        {% if obra.extension %}{{ obra.extension }}{% endif %}{% if obra.otras_caracteristicas %}{% if obra.extension %} : {% endif %}{{ obra.otras_caracteristicas }}{% endif %}{% if obra.dimension %}{% if obra.extension or obra.otras_caracteristicas %} ; {% endif %}{{ obra.dimension }}{% endif %}{% if obra.material_acompanante %}{% if obra.extension or obra.otras_caracteristicas or obra.dimension %} + {% endif %}{{ obra.material_acompanante }}{% endif %}
-                    </span>
-                </div>
-                {% endif %}
 
                 <!-- Identificadores (020, 024, 028) -->
                 {% if obra.isbn or obra.ismn or obra.numero_editor %}
@@ -385,6 +398,88 @@
             </div>
         </section>
 
+        <!-- ==================== DATOS MUSICALES ==================== -->
+        <section class="detalle-section">
+            <h2 class="detalle-section-title">
+                <i class="bi bi-music-note-beamed"></i> Datos musicales
+            </h2>
+            <div class="detalle-section-body">
+
+                <!-- Campo 031: Íncipit musical - Canvas arriba -->
+                {% if obra.incipits_musicales.exists %}
+                <div class="detalle-field detalle-field-incipit">
+                    <span class="detalle-field-label">Íncipit musical
+                        <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">031: Íncipit musical — $a obra, $b mov., $c pasaje, $d título, $m voz/instr., $g clave, $n arm., $o compás, $p notación</span></span>
+                    </span>
+                    <div class="detalle-field-value">
+                        {% for incipit in obra.incipits_musicales.all %}
+                            <div class="detalle-incipit-item">
+                                {% if incipit.paec_full %}
+                                    <script id="paec_json_{{ incipit.pk }}" type="application/json">{{ incipit.paec_full|safe }}</script>
+                                    <canvas
+                                        id="incipit_view_canvas_{{ incipit.pk }}"
+                                        class="incipit-view-canvas"
+                                        width="600"
+                                        height="190"
+                                        data-paec-json-id="paec_json_{{ incipit.pk }}">
+                                    </canvas>
+                                {% endif %}
+                                {% if incipit.titulo_encabezamiento %}
+                                <div class="detalle-incipit-info">{{ incipit.titulo_encabezamiento }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Campos 348, 382, 383, 384 en meta-grid -->
+                {% if obra.formato or obra.medios_interpretacion_382.exists or obra.numero_obra or obra.opus or obra.tonalidad_384 %}
+                <div class="detalle-incipit-meta-grid">
+                    {% if obra.formato %}
+                    <div class="detalle-incipit-meta-item">
+                        <small class="text-muted">Formato
+                            <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">348: Formato de presentación musical</span></span>
+                        </small>
+                        <span>{{ obra.get_formato_display }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if obra.medios_interpretacion_382.exists %}
+                    <div class="detalle-incipit-meta-item">
+                        <small class="text-muted">Medio de interpretación
+                            <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">382: Medio de interpretación</span></span>
+                        </small>
+                        <span>
+                            {% for medio in obra.medios_interpretacion_382.all %}
+                                {% if medio.medios.all %}{% for m in medio.medios.all %}{{ m.get_medio_display }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if medio.solista %} = {{ medio.solista }}{% endif %}{% if not forloop.last %}; {% endif %}
+                            {% endfor %}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    {% if obra.numero_obra or obra.opus %}
+                    <div class="detalle-incipit-meta-item">
+                        <small class="text-muted">Designación numérica
+                            <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">383: Designación numérica de obra musical</span></span>
+                        </small>
+                        <span>{% if obra.numero_obra %}{{ obra.numero_obra }}{% endif %}{% if obra.numero_obra and obra.opus %} / {% endif %}{% if obra.opus %}{{ obra.opus }}{% endif %}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if obra.tonalidad_384 %}
+                    <div class="detalle-incipit-meta-item">
+                        <small class="text-muted">Tonalidad
+                            <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">384: Tonalidad</span></span>
+                        </small>
+                        <span>{{ obra.get_tonalidad_384_display }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
         <!-- ==================== MATERIAS/SERIE ==================== -->
         {% if obra.materias_650.exists or obra.materias_655.exists or obra.menciones_serie.exists %}
         <section class="detalle-section">
@@ -401,7 +496,7 @@
                         <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">650: Materia — $a tema, $y subdiv. cronológica, $z subdiv. geográfica</span></span>
                     </span>
                     <span class="detalle-field-value">
-                        {{ materia.materia }}{% for sub_crono in materia.subdivisiones.all %} / {{ sub_crono.subdivision }}{% endfor %}{% for sub_geo in materia.subdivisiones_geograficas.all %} / {{ sub_geo.subdivision }}{% endfor %}
+                        {{ materia.materia }}{% for sub_crono in materia.subdivisiones.all %} – {{ sub_crono.subdivision }}{% endfor %}{% if materia.subdivisiones_geograficas.all %} – {% for sub_geo in materia.subdivisiones_geograficas.all %}{{ sub_geo.subdivision }}{% if not forloop.last %} - {% endif %}{% endfor %}{% endif %}
                     </span>
                 </div>
                 {% endif %}
@@ -410,7 +505,7 @@
                 <!-- Campo 655: Género/Forma - $a género, $x subdivisión general -->
                 {% for genero in obra.materias_655.all %}
                 <div class="detalle-field">
-                    <span class="detalle-field-label">Materia (Género/Forma)
+                    <span class="detalle-field-label">Género - Forma
                         <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">655: Género/Forma — $a género, $x subdivisión general</span></span>
                     </span>
                     <span class="detalle-field-value">
@@ -434,98 +529,6 @@
         </section>
         {% endif %}
 
-        <!-- ==================== DATOS MUSICALES ==================== -->
-        <section class="detalle-section">
-            <h2 class="detalle-section-title">
-                <i class="bi bi-music-note-beamed"></i> Datos musicales
-            </h2>
-            <div class="detalle-section-body">
-
-                <!-- Campo 348: Formato de presentación musical - $a formato -->
-                {% if obra.formato %}
-                <div class="detalle-field">
-                    <span class="detalle-field-label">Formato de presentación musical
-                        <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">348: Formato de presentación musical — $a formato</span></span>
-                    </span>
-                    <span class="detalle-field-value">{{ obra.get_formato_display }}</span>
-                </div>
-                {% endif %}
-
-                <!-- Campo 382: Medio de interpretación - $a medio, $n número de intérpretes -->
-                {% with medios=obra.medios_interpretacion_resumen %}
-                {% if medios.0 != "Sin medios registrados" %}
-                <div class="detalle-field">
-                    <span class="detalle-field-label">Medio de interpretación
-                        <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">382: Medio de interpretación — $a medio, $n número de intérpretes</span></span>
-                    </span>
-                    <span class="detalle-field-value">
-                        {{ medios.0 }}
-                        {% if medios.1 %}<br>{{ medios.1 }}{% endif %}
-                    </span>
-                </div>
-                {% endif %}
-                {% endwith %}
-
-                <!-- Campo 383: Designación numérica - $n número de obra, $o opus -->
-                {% if obra.numero_obra or obra.opus %}
-                <div class="detalle-field">
-                    <span class="detalle-field-label">Designación numérica de obra musical
-                        <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">383: Designación numérica — $n número de obra, $o opus</span></span>
-                    </span>
-                    <span class="detalle-field-value">
-                        {% if obra.numero_obra %}{{ obra.numero_obra }}{% endif %}{% if obra.numero_obra and obra.opus %} / {% endif %}{% if obra.opus %}{{ obra.opus }}{% endif %}
-                    </span>
-                </div>
-                {% endif %}
-
-                <!-- Campo 384: Tonalidad - $a tonalidad -->
-                {% if obra.tonalidad_384 %}
-                <div class="detalle-field">
-                    <span class="detalle-field-label">Tonalidad
-                        <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">384: Tonalidad — $a tonalidad</span></span>
-                    </span>
-                    <span class="detalle-field-value">{{ obra.get_tonalidad_384_display }}</span>
-                </div>
-                {% endif %}
-
-                <!-- Campo 031: Íncipit musical - $a obra, $b movimiento, $c pasaje, $d título, $m voz/instrumento, $g clave, $n armadura, $o compás, $p notación -->
-                {% if obra.incipits_musicales.exists %}
-                <div class="detalle-field detalle-field-incipit">
-                    <span class="detalle-field-label">Íncipit musical
-                        <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">031: Íncipit musical — $a obra, $b mov., $c pasaje, $d título, $m voz/instr., $g clave, $n arm., $o compás, $p notación</span></span>
-                    </span>
-                    <div class="detalle-field-value">
-                        {% for incipit in obra.incipits_musicales.all %}
-                            <div class="detalle-incipit-item">
-                                <!-- Información del íncipit -->
-                                <div class="detalle-incipit-info">
-                                    {{ incipit.numero_obra }}.{{ incipit.numero_movimiento }}.{{ incipit.numero_pasaje }}{% if incipit.titulo_encabezamiento %}; {{ incipit.titulo_encabezamiento }}{% endif %}{% if incipit.voz_instrumento %}; {{ incipit.voz_instrumento }}{% endif %}{% if incipit.clave or incipit.armadura or incipit.tiempo %}; {% if incipit.clave %}{{ incipit.clave }}{% endif %}{% if incipit.armadura %} {{ incipit.armadura }}{% endif %}{% if incipit.tiempo %} {{ incipit.tiempo }}{% endif %}{% endif %}
-                                </div>
-                                <!-- Canvas del íncipit -->
-                                {% if incipit.paec_full %}
-                                    <script id="paec_json_{{ incipit.pk }}" type="application/json">{{ incipit.paec_full|safe }}</script>
-                                    <canvas
-                                        id="incipit_view_canvas_{{ incipit.pk }}"
-                                        class="incipit-view-canvas"
-                                        width="600"
-                                        height="190"
-                                        data-paec-json-id="paec_json_{{ incipit.pk }}">
-                                    </canvas>
-                                {% endif %}
-                                <!-- Notación musical $p -->
-                                {% if incipit.notacion_musical %}
-                                    <div class="small text-muted mt-1">
-                                        <code>{{ incipit.notacion_musical }}</code>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </section>
-
         <!-- ==================== NOTAS ==================== -->
         {% if obra.notas_generales_500.exists or obra.contenidos_505.exists or obra.sumarios_520.exists or obra.datos_biograficos_545 %}
         <section class="detalle-section">
@@ -535,16 +538,14 @@
             <div class="detalle-section-body">
 
                 <!-- Campo 500: Nota general - $a nota -->
-                {% with primera_nota=obra.notas_generales_500.first %}
-                {% if primera_nota %}
+                {% for nota in obra.notas_generales_500.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Nota general
                         <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">500: Nota general — $a nota</span></span>
                     </span>
-                    <span class="detalle-field-value">{{ primera_nota.nota_general }}</span>
+                    <span class="detalle-field-value text-long">{{ nota.nota_general }}</span>
                 </div>
-                {% endif %}
-                {% endwith %}
+                {% endfor %}
 
                 <!-- Campo 505: Contenido - $a nota de contenido -->
                 {% for contenido in obra.contenidos_505.all %}
@@ -552,7 +553,7 @@
                     <span class="detalle-field-label">Contenido
                         <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">505: Contenido — $a nota de contenido</span></span>
                     </span>
-                    <span class="detalle-field-value">{{ contenido.contenido }}</span>
+                    <span class="detalle-field-value text-long">{{ contenido.contenido }}</span>
                 </div>
                 {% endfor %}
 
@@ -562,7 +563,7 @@
                     <span class="detalle-field-label">Sumario
                         <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">520: Sumario — $a resumen/sumario</span></span>
                     </span>
-                    <span class="detalle-field-value">{{ sumario.sumario }}</span>
+                    <span class="detalle-field-value text-long">{{ sumario.sumario }}</span>
                 </div>
                 {% endfor %}
 
@@ -572,7 +573,7 @@
                     <span class="detalle-field-label">Datos biográficos del compositor
                         <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">545: Datos biográficos — $a texto biográfico, $u URI fuente</span></span>
                     </span>
-                    <span class="detalle-field-value">
+                    <span class="detalle-field-value text-long">
                         {{ obra.datos_biograficos_545.texto_biografico }}
                         {% if obra.datos_biograficos_545.uri %}
                             <br><br><strong>Fuente:</strong> <a href="{{ obra.datos_biograficos_545.uri }}" target="_blank" rel="noopener">{{ obra.datos_biograficos_545.uri }}</a>
@@ -676,4 +677,16 @@
 
 <script src="{% static 'catalogacion/js/incipitManager.js' %}"></script>
 <script src="{% static 'catalogacion/js/incipitInit.js' %}"></script>
+<script>
+// Posicionar tooltips MARC21 con position:fixed para evitar overflow
+document.querySelectorAll('.marc-info-tag').forEach(tag => {
+    const tooltip = tag.querySelector('.marc-tooltip');
+    if (!tooltip) return;
+    tag.addEventListener('mouseenter', () => {
+        const rect = tag.getBoundingClientRect();
+        tooltip.style.left = rect.left + 'px';
+        tooltip.style.top = (rect.top - tooltip.offsetHeight - 6) + 'px';
+    });
+});
+</script>
 {% endblock %}
