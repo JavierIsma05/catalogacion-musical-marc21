@@ -92,7 +92,7 @@ class ObraGeneralForm(forms.ModelForm):
                 "autocomplete": "off",
             }
         ),
-        label="240 $k - Forma Musical",
+        label="240 $k - Subencabezamiento de forma",
     )
 
     class Meta:
@@ -287,7 +287,7 @@ class ObraGeneralForm(forms.ModelForm):
                 }
             ),
 
-           
+
             # TextAreas
             'mencion_responsabilidad': TextAreaAutosize(attrs={
                 'class': 'form-control',
@@ -315,7 +315,7 @@ class ObraGeneralForm(forms.ModelForm):
             "arreglo_130": "130 $o - Arreglo",
             "tonalidad_130": "130 $r - Tonalidad",
             "titulo_240": "240 $a - Título uniforme",
-            "forma_240": "240 $k - Forma musical",
+            "forma_240": "240 $k - Subencabezamiento de forma",
             "medio_interpretacion_240": "240 $m - Medio de interpretación",
             "numero_parte_240": "240 $n - Número de parte",
             "nombre_parte_240": "240 $p - Nombre de parte",

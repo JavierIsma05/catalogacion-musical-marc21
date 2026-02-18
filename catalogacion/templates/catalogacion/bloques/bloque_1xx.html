@@ -105,12 +105,26 @@
                     <input type="hidden" name="forma_130" id="id_forma_130" value="{{ form.forma_130.value|default:'' }}">
                     
                     <div class="col-half">
-                        <label class="form-label" for="id_forma_130_texto">{{ form.forma_130_texto.label }}</label>
-                        <div class="autocomplete-wrapper">
-                            {{ form.forma_130_texto }}
-                            <div id="forma-130-suggestions" class="autocomplete-suggestions"></div>
+                        <label class="form-label">{{ form.forma_130_texto.label }}</label>
+                        {# Campo oculto para submit — lo maneja el selector JS #}
+                        <input type="hidden" id="id_forma_130_texto" name="forma_130_texto"
+                               value="{{ form.forma_130_texto.value|default:'' }}">
+                        {# Selector de opciones fijas 130 $k #}
+                        <div class="forma-selector" id="forma-130-selector"
+                             data-texto-id="id_forma_130_texto" data-fk-id="id_forma_130"
+                             data-api="/catalogacion/api/autocompletar/forma-musical/">
+                            <button type="button" class="forma-opcion" data-valor="adaptación">adaptación</button>
+                            <button type="button" class="forma-opcion" data-valor="boceto">boceto</button>
+                            <button type="button" class="forma-opcion" data-valor="fragmento">fragmento</button>
+                            <button type="button" class="forma-opcion" data-valor="selección">selección</button>
+                            <button type="button" class="forma-opcion" data-valor="tema con variaciones">tema con variaciones</button>
+                            <button type="button" class="forma-opcion forma-opcion-otros" data-valor="__otros__">+ otros</button>
                         </div>
-                        <div class="form-text">Escriba para buscar formas musicales o ingrese una nueva</div>
+                        <div class="forma-otros-wrap d-none mt-1">
+                            <input type="text" class="form-control form-control-sm forma-otros-input"
+                                   placeholder="Especifique la forma musical...">
+                            <small class="text-muted">Se creará como nueva autoridad si no existe</small>
+                        </div>
                         {% if form.forma_130_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.forma_130_texto.errors }}</div>
                         {% endif %}
@@ -175,12 +189,26 @@
                     <input type="hidden" name="forma_240" id="id_forma_240" value="{{ form.forma_240.value|default:'' }}">
                     
                     <div class="col-half">
-                        <label class="form-label" for="id_forma_240_texto">{{ form.forma_240_texto.label }}</label>
-                        <div class="autocomplete-wrapper">
-                            {{ form.forma_240_texto }}
-                            <div id="forma-240-suggestions" class="autocomplete-suggestions"></div>
+                        <label class="form-label">{{ form.forma_240_texto.label }}</label>
+                        {# Campo oculto para submit — lo maneja el selector JS #}
+                        <input type="hidden" id="id_forma_240_texto" name="forma_240_texto"
+                               value="{{ form.forma_240_texto.value|default:'' }}">
+                        {# Selector de opciones fijas 240 $k #}
+                        <div class="forma-selector" id="forma-240-selector"
+                             data-texto-id="id_forma_240_texto" data-fk-id="id_forma_240"
+                             data-api="/catalogacion/api/autocompletar/forma-musical/">
+                            <button type="button" class="forma-opcion" data-valor="adaptación" >adaptación</button>
+                            <button type="button" class="forma-opcion" data-valor="boceto">boceto</button>
+                            <button type="button" class="forma-opcion" data-valor="fragmento">fragmento</button>
+                            <button type="button" class="forma-opcion" data-valor="selección">selección</button>
+                            <button type="button" class="forma-opcion" data-valor="tema con variaciones">tema con variaciones</button>
+                            <button type="button" class="forma-opcion forma-opcion-otros" data-valor="__otros__">+ otros</button>
                         </div>
-                        <div class="form-text">Escriba para buscar formas musicales o ingrese una nueva</div>
+                        <div class="forma-otros-wrap d-none mt-1">
+                            <input type="text" class="form-control form-control-sm forma-otros-input"
+                                   placeholder="Especifique la forma musical...">
+                            <small class="text-muted">Se creará como nueva autoridad si no existe</small>
+                        </div>
                         {% if form.forma_240_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.forma_240_texto.errors }}</div>
                         {% endif %}
@@ -217,3 +245,124 @@
         </div>
     </div>
 </section>
+
+<style>
+/* Selector de opciones fijas para 130/240 $k */
+.forma-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.forma-opcion {
+    font-size: 0.78rem;
+    padding: 3px 11px;
+    border: 1px solid #ced4da;
+    border-radius: 14px;
+    background: #f8f9fa;
+    color: #495057;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    line-height: 1.5;
+}
+.forma-opcion:hover {
+    background: #e2e6ea;
+    border-color: #adb5bd;
+}
+.forma-opcion.active {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
+}
+.forma-opcion-otros {
+    border-style: dashed;
+    color: #6c757d;
+}
+.forma-opcion-otros.active {
+    background: #6c757d;
+    border-color: #6c757d;
+    color: #fff;
+    border-style: solid;
+}
+</style>
+
+<script>
+/* Selector de opciones fijas para 130/240 $k */
+(function () {
+    var FORMAS_ESTANDAR = ['adaptación', 'boceto', 'fragmento', 'selección', 'tema con variaciones'];
+
+    document.querySelectorAll('.forma-selector').forEach(function (selector) {
+        var textoId    = selector.dataset.textoId;
+        var fkId       = selector.dataset.fkId;
+        var apiUrl     = selector.dataset.api;
+        var textoInput = document.getElementById(textoId);
+        var fkInput    = document.getElementById(fkId);
+        var otrosWrap  = selector.nextElementSibling;
+        var otrosInput = otrosWrap ? otrosWrap.querySelector('.forma-otros-input') : null;
+
+        /* Clic en cualquier botón de opción */
+        selector.querySelectorAll('.forma-opcion').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var valor = btn.dataset.valor;
+                selector.querySelectorAll('.forma-opcion').forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+
+                if (valor === '__otros__') {
+                    if (otrosWrap) otrosWrap.classList.remove('d-none');
+                    if (otrosInput) otrosInput.focus();
+                    setValor('');
+                } else {
+                    if (otrosWrap) otrosWrap.classList.add('d-none');
+                    if (otrosInput) otrosInput.value = '';
+                    setValor(valor);
+                }
+            });
+        });
+
+        /* Escritura en input "otros" */
+        if (otrosInput) {
+            otrosInput.addEventListener('input', function () {
+                setValor(otrosInput.value.trim());
+            });
+        }
+
+        /* Preselección al cargar (edición de obra existente) */
+        var textoActual = textoInput ? textoInput.value.trim() : '';
+        if (textoActual) {
+            aplicarPreseleccion(textoActual);
+        } else if (fkInput && fkInput.value) {
+            fetch(apiUrl + '?id=' + fkInput.value)
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    var item = data && data.results && data.results[0];
+                    if (item) aplicarPreseleccion(item.forma);
+                })
+                .catch(function () {});
+        }
+
+        function setValor(texto) {
+            if (textoInput) {
+                textoInput.value = texto;
+                textoInput.dispatchEvent(new Event('input',  { bubbles: true }));
+                textoInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            if (fkInput) fkInput.value = '';
+            if (window.RequiredFieldsTracker) window.RequiredFieldsTracker.updateProgress();
+        }
+
+        function aplicarPreseleccion(texto) {
+            var normalizado = texto.toLowerCase().trim();
+            var esEstandar  = FORMAS_ESTANDAR.indexOf(normalizado) !== -1;
+            selector.querySelectorAll('.forma-opcion').forEach(function (btn) {
+                var val = btn.dataset.valor;
+                if (val === normalizado) {
+                    btn.classList.add('active');
+                } else if (!esEstandar && val === '__otros__') {
+                    btn.classList.add('active');
+                    if (otrosWrap) otrosWrap.classList.remove('d-none');
+                    if (otrosInput) otrosInput.value = texto;
+                }
+            });
+        }
+    });
+})();
+</script>

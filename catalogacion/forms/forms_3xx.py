@@ -26,7 +26,9 @@ class MedioInterpretacion382Form(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Este formulario contiene el subcampo $b y agrupa los subcampos $a dinámicos
+        # Prellenar $b con 'piano' para nuevas instancias (sin pk guardado)
+        if not self.instance.pk:
+            self.fields['solista'].initial = 'piano'
 
 
 class MedioInterpretacion382_aForm(forms.ModelForm):

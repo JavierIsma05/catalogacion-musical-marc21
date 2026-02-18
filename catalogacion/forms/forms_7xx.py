@@ -23,6 +23,7 @@ from catalogacion.models import (
     OtrasRelaciones787,
     TerminoAsociado700,
 )
+from catalogacion.models.bloque_7xx import FUNCIONES_ENTIDAD
 
 from .widgets import Select2Widget
 
@@ -222,6 +223,15 @@ class EntidadRelacionada710Form(forms.ModelForm):
                 "autocomplete": "off",
             }
         ),
+    )
+
+    # Campo solo para exponer FUNCIONES_ENTIDAD al template via form.funcion.field.choices
+    # El guardado real se hace en obra_formset_handlers.py via POST data
+    funcion = forms.ChoiceField(
+        required=False,
+        choices=[("", "---------")] + FUNCIONES_ENTIDAD,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="710 $e – Función institucional",
     )
 
     class Meta:

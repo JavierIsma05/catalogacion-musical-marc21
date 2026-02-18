@@ -11,6 +11,8 @@
         return;
     }
 
+    // Nota: forma_130_texto y forma_240_texto ($k) usan selector de botones fijos
+    // definido en bloque_1xx.html — no requieren autocomplete aquí.
     const configs = [
         {
             inputId: "id_titulo_uniforme_texto",
@@ -21,28 +23,12 @@
             createLabel: "Crear nuevo título",
         },
         {
-            inputId: "id_forma_130_texto",
-            hiddenInputId: "id_forma_130",
-            suggestionsId: "forma-130-suggestions",
-            apiUrl: "/catalogacion/api/autocompletar/forma-musical/",
-            fieldName: "forma",
-            createLabel: "Crear nueva forma musical",
-        },
-        {
             inputId: "id_titulo_240_texto",
             hiddenInputId: "id_titulo_240",
             suggestionsId: "titulo-240-suggestions",
             apiUrl: "/catalogacion/api/autocompletar/titulo/",
             fieldName: "titulo",
             createLabel: "Crear nuevo título",
-        },
-        {
-            inputId: "id_forma_240_texto",
-            hiddenInputId: "id_forma_240",
-            suggestionsId: "forma-240-suggestions",
-            apiUrl: "/catalogacion/api/autocompletar/forma-musical/",
-            fieldName: "forma",
-            createLabel: "Crear nueva forma musical",
         },
     ];
 

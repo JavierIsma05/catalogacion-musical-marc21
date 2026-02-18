@@ -92,7 +92,8 @@
                 <div class="campo-grid">
                     {# Campo oculto para el ID del título uniforme - SOLO si 130 es visible #}
                     <input type="hidden" name="titulo_uniforme" id="id_titulo_uniforme" value="{{ form.titulo_uniforme.value|default:'' }}">
-                    
+
+                    {# 130 $a — Título uniforme principal (único subcampo activo) #}
                     <div class="col-full">
                         <label class="form-label" for="id_titulo_uniforme_texto">{{ form.titulo_uniforme_texto.label }}</label>
                         <div class="autocomplete-wrapper">
@@ -103,46 +104,6 @@
                         {% if form.titulo_uniforme_texto.errors %}
                             <div class="invalid-feedback d-block">{{ form.titulo_uniforme_texto.errors }}</div>
                         {% endif %}
-                    </div>
-                    
-                    {# Campo oculto para el ID de la forma musical 130 - SOLO si 130 es visible #}
-                    <input type="hidden" name="forma_130" id="id_forma_130" value="{{ form.forma_130.value|default:'' }}">
-                    
-                    <div class="col-half">
-                        <label class="form-label" for="id_forma_130_texto">{{ form.forma_130_texto.label }}</label>
-                        <div class="autocomplete-wrapper">
-                            {{ form.forma_130_texto }}
-                            <div id="forma-130-suggestions" class="autocomplete-suggestions"></div>
-                        </div>
-                        <div class="form-text">Escriba para buscar formas musicales o ingrese una nueva</div>
-                        {% if form.forma_130_texto.errors %}
-                            <div class="invalid-feedback d-block">{{ form.forma_130_texto.errors }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="col-half">
-                        <label class="form-label" for="{{ form.medio_interpretacion_130.id_for_label }}">{{ form.medio_interpretacion_130.label }}</label>
-                        {{ form.medio_interpretacion_130 }}
-                    </div>
-                    
-                    <div class="col-third">
-                        <label class="form-label" for="{{ form.tonalidad_130.id_for_label }}">{{ form.tonalidad_130.label }}</label>
-                        {{ form.tonalidad_130 }}
-                    </div>
-                    
-                    <div class="col-third">
-                        <label class="form-label" for="{{ form.numero_parte_130.id_for_label }}">{{ form.numero_parte_130.label }}</label>
-                        {{ form.numero_parte_130 }}
-                    </div>
-                    
-                    <div class="col-third">
-                        <label class="form-label" for="{{ form.nombre_parte_130.id_for_label }}">{{ form.nombre_parte_130.label }}</label>
-                        {{ form.nombre_parte_130 }}
-                    </div>
-                    
-                    <div class="col-full">
-                        <label class="form-label" for="{{ form.arreglo_130.id_for_label }}">{{ form.arreglo_130.label }}</label>
-                        {{ form.arreglo_130 }}
                     </div>
                 </div>
             </div>
@@ -181,12 +142,24 @@
                         value="{{ form.forma_240.value|default:'' }}">
 
                     <div class="col-half">
-                        <label class="form-label" for="id_forma_240_texto">{{ form.forma_240_texto.label }}</label>
-                        <div class="autocomplete-wrapper">
-                            {{ form.forma_240_texto }}
-                            <div id="forma-240-suggestions" class="autocomplete-suggestions"></div>
+                        <label class="form-label" for="forma_240_select">{{ form.forma_240_texto.label }}</label>
+                        {# Campo oculto para submit — lo maneja el JS #}
+                        <input type="hidden" id="id_forma_240_texto" name="forma_240_texto"
+                               value="{{ form.forma_240_texto.value|default:'' }}">
+                        <select id="forma_240_select" class="form-select form-select-sm">
+                            <option value="">— Sin forma —</option>
+                            <option value="adaptación">adaptación</option>
+                            <option value="boceto">boceto</option>
+                            <option value="fragmento">fragmento</option>
+                            <option value="selección">selección</option>
+                            <option value="tema con variaciones">tema con variaciones</option>
+                            <option value="__otro__">Otro...</option>
+                        </select>
+                        <div class="forma-otros-wrap d-none mt-1">
+                            <input type="text" class="form-control form-control-sm forma-otros-input"
+                                   placeholder="Especifique la forma musical...">
+                            <small class="text-muted">Se creará como nueva autoridad si no existe</small>
                         </div>
-                        <div class="form-text">Escriba para buscar formas musicales o ingrese una nueva</div>
                         {% if form.forma_240_texto.errors %}
                         <div class="invalid-feedback d-block">{{ form.forma_240_texto.errors }}</div>
                         {% endif %}
@@ -329,8 +302,80 @@
 
                 {% include 'catalogacion/includes/formset_710_template.html' with formset=entidades_relacionadas_710 titulo="Entidad" %}
             </div>
-            
+
 
         </div>
     </div>
 </section>
+
+<script>
+/* 240 $k — select con opción "Otro..." */
+(function () {
+    var FORMAS_ESTANDAR = ['adaptación', 'boceto', 'fragmento', 'selección', 'tema con variaciones'];
+
+    var sel        = document.getElementById('forma_240_select');
+    var textoInput = document.getElementById('id_forma_240_texto');
+    var fkInput    = document.getElementById('id_forma_240');
+    var otrosWrap  = sel ? sel.nextElementSibling : null;
+    var otrosInput = otrosWrap ? otrosWrap.querySelector('.forma-otros-input') : null;
+
+    if (!sel) return;
+
+    /* Cambio en el select */
+    sel.addEventListener('change', function () {
+        var val = sel.value;
+        if (val === '__otro__') {
+            if (otrosWrap) otrosWrap.classList.remove('d-none');
+            if (otrosInput) otrosInput.focus();
+            setValor('');
+        } else {
+            if (otrosWrap) otrosWrap.classList.add('d-none');
+            if (otrosInput) otrosInput.value = '';
+            setValor(val);
+        }
+    });
+
+    /* Escritura en input "otro" */
+    if (otrosInput) {
+        otrosInput.addEventListener('input', function () {
+            setValor(otrosInput.value.trim());
+        });
+    }
+
+    /* Preselección al cargar (edición de obra existente) */
+    var textoActual = textoInput ? textoInput.value.trim() : '';
+    if (textoActual) {
+        aplicarPreseleccion(textoActual);
+    } else if (fkInput && fkInput.value) {
+        fetch('/catalogacion/api/autocompletar/forma-musical/?id=' + fkInput.value)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                var item = data && data.results && data.results[0];
+                if (item) aplicarPreseleccion(item.forma);
+            })
+            .catch(function () {});
+    }
+
+    function setValor(texto) {
+        if (textoInput) {
+            textoInput.value = texto;
+            textoInput.dispatchEvent(new Event('input',  { bubbles: true }));
+            textoInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        if (fkInput) fkInput.value = '';
+        if (window.RequiredFieldsTracker) window.RequiredFieldsTracker.updateProgress();
+    }
+
+    function aplicarPreseleccion(texto) {
+        var normalizado = texto.toLowerCase().trim();
+        var esEstandar  = FORMAS_ESTANDAR.indexOf(normalizado) !== -1;
+        if (esEstandar) {
+            sel.value = normalizado;
+        } else if (texto) {
+            sel.value = '__otro__';
+            if (otrosWrap) otrosWrap.classList.remove('d-none');
+            if (otrosInput) otrosInput.value = texto;
+        }
+    }
+})();
+</script>
