@@ -67,14 +67,23 @@ Estilo compatible con 856 / 700
                     <!-- 774 $w -->
                     <div class="mb-3">
                         <label class="form-label small">
-                            774 $w – Número de esta obra en la colección 
+                            774 $w – Número de esta obra en la colección
                         </label>
+                        {# Display: muestra el num_control de las obras hijo vinculadas (solo lectura) #}
                         <input type="text"
                                class="form-control campo-774-w"
-                               name="numero_control_774_{{ forloop.counter0 }}"
-                               placeholder="Seleccione una obra"
+                               value="{% if form.instance.pk %}{% for nc in form.instance.numeros_control.all %}{{ nc.obra_relacionada.num_control }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}"
+                               placeholder="(se completa al crear la obra hijo)"
                                readonly
-                               style="background-color: #f8f9fa; color: #6c757d; cursor: not-allowed;">
+                               style="background-color: #f8f9fa; color: #6c757d;">
+                        {# Hidden: preserva el vínculo al guardar el formulario #}
+                        {% if form.instance.pk %}
+                            {% for nc in form.instance.numeros_control.all %}
+                                <input type="hidden"
+                                       name="w_774_{{ form.instance.pk }}"
+                                       value="{{ nc.obra_relacionada.id }}">
+                            {% endfor %}
+                        {% endif %}
                     </div>
 
                 </div>
@@ -122,12 +131,16 @@ Estilo compatible con 856 / 700
                         <label class="form-label small fw-semibold">
                             774 $w – Número de esta obra en la colección
                         </label>
+                        {# Display: vacío para nuevas filas, se llena automáticamente por señal #}
                         <input type="text"
                                class="form-control campo-774-w"
-                               name="numero_control_774___prefix__"
-                               placeholder="Seleccione una obra"
+                               placeholder="(se completa al crear la obra hijo)"
                                readonly
-                               style="background-color: #f8f9fa; color: #6c757d; cursor: not-allowed;">
+                               style="background-color: #f8f9fa; color: #6c757d;">
+                        {# Hidden: vacío para nuevas filas (JS reemplaza __prefix__ con índice) #}
+                        <input type="hidden"
+                               name="w_774___prefix__"
+                               value="">
                     </div>
 
                 </div>
@@ -242,20 +255,7 @@ Estilo compatible con 856 / 700
         .querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
         .forEach(initAutocomplete);
 
-    /* =====================================================
-       BLOQUEAR ESCRITURA EN CAMPO 774 $w (readonly refuerzo)
-       ===================================================== */
-    document.addEventListener("keydown", function (e) {
-        if (e.target.classList.contains("campo-774-w")) {
-            e.preventDefault();
-        }
-    });
-
-    document.addEventListener("paste", function (e) {
-        if (e.target.classList.contains("campo-774-w")) {
-            e.preventDefault();
-        }
-    });
+    /* El campo 774 $w display tiene atributo readonly; no se necesita bloqueo JS */
 
 })();
 </script>

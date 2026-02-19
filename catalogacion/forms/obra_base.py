@@ -507,44 +507,24 @@ class ObraGeneralForm(forms.ModelForm):
         arreglo_240 = cleaned_data.get("arreglo_240")
         tonalidad_240 = cleaned_data.get("tonalidad_240")
 
-        # CASO 1 → HAY COMPOSITOR → usar SIEMPRE 240
-        if compositor:
-            if titulo_130 and not titulo_240:
-                cleaned_data["titulo_240"] = titulo_130
-                cleaned_data["forma_240"] = forma_130
-                cleaned_data["medio_interpretacion_240"] = medio_130
-                cleaned_data["numero_parte_240"] = numero_parte_130
-                cleaned_data["nombre_parte_240"] = nombre_parte_130
-                cleaned_data["arreglo_240"] = arreglo_130
-                cleaned_data["tonalidad_240"] = tonalidad_130
+        # Si hay compositor pero solo 130 (sin 240) → copiar 130 → 240 como fallback
+        if compositor and titulo_130 and not titulo_240:
+            cleaned_data["titulo_240"] = titulo_130
+            cleaned_data["forma_240"] = forma_130
+            cleaned_data["medio_interpretacion_240"] = medio_130
+            cleaned_data["numero_parte_240"] = numero_parte_130
+            cleaned_data["nombre_parte_240"] = nombre_parte_130
+            cleaned_data["arreglo_240"] = arreglo_130
+            cleaned_data["tonalidad_240"] = tonalidad_130
 
-            # limpiar 130
-            cleaned_data["titulo_uniforme"] = None
-            cleaned_data["forma_130"] = None
-            cleaned_data["medio_interpretacion_130"] = None
-            cleaned_data["numero_parte_130"] = None
-            cleaned_data["nombre_parte_130"] = None
-            cleaned_data["arreglo_130"] = None
-            cleaned_data["tonalidad_130"] = None
-
-        # CASO 2 → NO HAY COMPOSITOR → usar SIEMPRE 130
-        else:
-            if titulo_240 and not titulo_130:
-                cleaned_data["titulo_uniforme"] = titulo_240
-                cleaned_data["forma_130"] = forma_240
-                cleaned_data["medio_interpretacion_130"] = medio_240
-                cleaned_data["numero_parte_130"] = numero_parte_240
-                cleaned_data["nombre_parte_130"] = nombre_parte_240
-                cleaned_data["arreglo_130"] = arreglo_240
-                cleaned_data["tonalidad_130"] = tonalidad_240
-
-            # limpiar 240
-            cleaned_data["titulo_240"] = None
-            cleaned_data["forma_240"] = None
-            cleaned_data["medio_interpretacion_240"] = None
-            cleaned_data["numero_parte_240"] = None
-            cleaned_data["nombre_parte_240"] = None
-            cleaned_data["arreglo_240"] = None
-            cleaned_data["tonalidad_240"] = None
+        # Si no hay compositor pero solo 240 (sin 130) → copiar 240 → 130 como fallback
+        if not compositor and titulo_240 and not titulo_130:
+            cleaned_data["titulo_uniforme"] = titulo_240
+            cleaned_data["forma_130"] = forma_240
+            cleaned_data["medio_interpretacion_130"] = medio_240
+            cleaned_data["numero_parte_130"] = numero_parte_240
+            cleaned_data["nombre_parte_130"] = nombre_parte_240
+            cleaned_data["arreglo_130"] = arreglo_240
+            cleaned_data["tonalidad_130"] = tonalidad_240
 
         return cleaned_data

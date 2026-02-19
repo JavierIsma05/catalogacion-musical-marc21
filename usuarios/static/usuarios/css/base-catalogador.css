@@ -353,11 +353,13 @@
             background: rgba(0,0,0,0.52);
             z-index: 999;
             opacity: 0;
+            pointer-events: none;
             transition: opacity var(--transition-speed) ease;
         }
 
         .sidebar-overlay.active {
             opacity: 1;
+            pointer-events: auto;
         }
 
         /* ===== TOOLTIPS PARA SIDEBAR COLAPSADO ===== */
