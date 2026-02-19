@@ -207,6 +207,11 @@
                         {% if obra.autoria %}
                             <span class="detalle-field-autoria">Autoría: {{ obra.get_autoria_display }}</span>
                         {% endif %}
+                        <a href="{% url 'catalogo_publico:lista_obras' %}?q={{ obra.compositor.apellidos_nombres|urlencode }}"
+                           class="ms-2 badge bg-primary text-decoration-none"
+                           title="Ver todas las obras de {{ obra.compositor.apellidos_nombres }}">
+                            Ver obras
+                        </a>
                     </span>
                 </div>
                 {% endif %}
@@ -593,26 +598,40 @@
             </h2>
             <div class="detalle-section-body">
 
-                <!-- Campo 773: Documento fuente (colección) - $a encabezamiento, $t título -->
+                <!-- Campo 773: Documento fuente (colección) - $a encabezamiento, $t título, $w num_control -->
                 {% for enlace in obra.enlaces_documento_fuente_773.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Colección
-                        <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">773: Documento fuente — $a encabezamiento, $t título</span></span>
+                        <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">773: Documento fuente — $a encabezamiento, $t título, $w número de control</span></span>
                     </span>
                     <span class="detalle-field-value">
                         {% if enlace.encabezamiento_principal %}{{ enlace.encabezamiento_principal }}. {% endif %}{{ enlace.titulo }}
+                        {% for nc in enlace.numeros_control.all %}
+                            <a href="{% url 'catalogo_publico:detalle' nc.obra_relacionada.pk %}"
+                               class="ms-2 badge bg-secondary text-decoration-none"
+                               title="Ver colección {{ nc.obra_relacionada.num_control }}">
+                                {{ nc.obra_relacionada.num_control }}
+                            </a>
+                        {% endfor %}
                     </span>
                 </div>
                 {% endfor %}
 
-                <!-- Campo 774: Unidad constituyente - $a encabezamiento, $t título -->
+                <!-- Campo 774: Unidad constituyente - $a encabezamiento, $t título, $w num_control -->
                 {% for enlace in obra.enlaces_unidades_774.all %}
                 <div class="detalle-field">
                     <span class="detalle-field-label">Obra en esta colección
-                        <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">774: Unidad constituyente — $a encabezamiento, $t título</span></span>
+                        <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">774: Unidad constituyente — $a encabezamiento, $t título, $w número de control</span></span>
                     </span>
                     <span class="detalle-field-value">
                         {% if enlace.encabezamiento_principal %}{{ enlace.encabezamiento_principal }}. {% endif %}{{ enlace.titulo }}
+                        {% for nc in enlace.numeros_control.all %}
+                            <a href="{% url 'catalogo_publico:detalle' nc.obra_relacionada.pk %}"
+                               class="ms-2 badge bg-secondary text-decoration-none"
+                               title="Ver obra {{ nc.obra_relacionada.num_control }}">
+                                {{ nc.obra_relacionada.num_control }}
+                            </a>
+                        {% endfor %}
                     </span>
                 </div>
                 {% endfor %}

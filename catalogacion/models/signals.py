@@ -11,6 +11,7 @@ from .bloque_7xx import (
     EnlaceUnidadConstituyente774,
     NumeroControl774,
 )
+from .autoridades import AutoridadTituloUniforme
 
 
 @receiver(post_save, sender=CodigoPaisEntidad)
@@ -95,8 +96,14 @@ def sincronizar_774_al_guardar_773(sender, instance, created, **kwargs):
         obra_hijo  = instance.enlace_773.obra
         obra_padre = instance.obra_relacionada
 
-        # Título y compositor de la obra hijo (usados en el 774 de la colección)
-        titulo_hijo  = obra_hijo.titulo_240 or obra_hijo.titulo_uniforme
+        # Título de la obra hijo: FK preferido, si no hay, buscar por titulo_principal
+        titulo_hijo = (
+            obra_hijo.titulo_240
+            or obra_hijo.titulo_uniforme
+            or AutoridadTituloUniforme.objects.filter(
+                titulo__iexact=obra_hijo.titulo_principal
+            ).first()
+        )
         persona_hijo = obra_hijo.compositor
 
         if not titulo_hijo or not persona_hijo:
@@ -136,7 +143,13 @@ def limpiar_774_al_borrar_773(sender, instance, **kwargs):
         obra_hijo  = instance.enlace_773.obra
         obra_padre = instance.obra_relacionada
 
-        titulo_hijo = obra_hijo.titulo_240 or obra_hijo.titulo_uniforme
+        titulo_hijo = (
+            obra_hijo.titulo_240
+            or obra_hijo.titulo_uniforme
+            or AutoridadTituloUniforme.objects.filter(
+                titulo__iexact=obra_hijo.titulo_principal
+            ).first()
+        )
         if not titulo_hijo:
             return
 
