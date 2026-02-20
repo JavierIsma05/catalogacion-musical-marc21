@@ -217,7 +217,7 @@
 
 .detalle-field-label {
     font-size: 0.875rem;
-    font-weight: 400;
+    font-weight: 650;
     color: var(--pro-text-secondary);
     line-height: 1.4;
 }
@@ -226,7 +226,7 @@
     font-size: 0.9375rem;
     color: var(--pro-text);
     line-height: 1.5;
-    font-weight: 500;
+    font-weight: 350;
 }
 
 .detalle-field-value.text-long {

@@ -170,16 +170,16 @@
                 <span>{{ obra.signatura_publica_display }}</span>
             </div>
             <!-- Campo 852: Ubicación - $a institución, $h signatura, $c estantería -->
-            {% for ubicacion in obra.ubicaciones_852.all %}
+            {% if obra.ubicaciones_852.exists %}
             <div class="detalle-meta-tag">
                 <small>Ubicación
                     <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">852: Ubicación — $a institución, $h signatura, $c estantería</span></span>
                 </small>
                 <span>
-                    {% if ubicacion.autoridad %}{{ ubicacion.autoridad }}{% elif ubicacion.codigo_o_nombre %}{{ ubicacion.codigo_o_nombre }}{% endif %}{% if ubicacion.signatura_original %} / {{ ubicacion.signatura_original }}{% endif %}{% for estanteria in ubicacion.estanterias.all %} / {{ estanteria.estanteria }}{% endfor %}
+                    {% for ubicacion in obra.ubicaciones_852.all %}{{ ubicacion.autoridad|default:ubicacion.codigo_o_nombre }}{% if ubicacion.signatura_original %} / {{ ubicacion.signatura_original }}{% endif %}{% if ubicacion.estanterias.all %} / {% for estanteria in ubicacion.estanterias.all %}{{ estanteria.estanteria }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if not forloop.last %}<br>{% endif %}{% endfor %}
                 </span>
             </div>
-            {% endfor %}
+            {% endif %}
         </div>
     </div>
 
@@ -457,7 +457,7 @@
                         </small>
                         <span>
                             {% for medio in obra.medios_interpretacion_382.all %}
-                                {% if medio.medios.all %}{% for m in medio.medios.all %}{{ m.get_medio_display }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if medio.solista %} = {{ medio.solista }}{% endif %}{% if not forloop.last %}; {% endif %}
+                                {% if medio.medios.all %}{% for m in medio.medios.all %}{{ m.medio }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if not forloop.last %}; {% endif %}
                             {% endfor %}
                         </span>
                     </div>
@@ -659,13 +659,6 @@
             <h3 class="pdf-viewer-title">
                 <i class="bi bi-file-pdf"></i> Documento
             </h3>
-            <!-- Campo 852: Ubicación - $a institución, $h signatura, $c estantería -->
-            {% for ubicacion in obra.ubicaciones_852.all %}
-            <div class="text-muted small mt-2">
-                <i class="bi bi-geo-alt"></i> Ubicación:
-                {% if ubicacion.autoridad %}{{ ubicacion.autoridad }}{% elif ubicacion.codigo_o_nombre %}{{ ubicacion.codigo_o_nombre }}{% endif %}{% if ubicacion.signatura_original %} / {{ ubicacion.signatura_original }}{% endif %}{% for estanteria in ubicacion.estanterias.all %} / {{ estanteria.estanteria }}{% endfor %}
-            </div>
-            {% endfor %}
         </div>
         {% if pdf_url %}
             <div class="ratio ratio-16x9 pdf-viewer-container">
