@@ -526,7 +526,7 @@
                         <span class="marc-info-tag"><i class="bi bi-info-circle-fill"></i><span class="marc-tooltip">490: Serie — $a título de serie, $v volumen</span></span>
                     </span>
                     <span class="detalle-field-value">
-                        {% for titulo in mencion.titulos.all %}{{ titulo.titulo_serie }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if mencion.volumenes.exists %} ; {% for vol in mencion.volumenes.all %}{{ vol.volumen }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+                        {% for titulo in mencion.titulos.all %}{{ titulo.titulo_serie }}{% if not forloop.last %} {% endif %}{% endfor %}{% if mencion.volumenes.exists %} ; {% for vol in mencion.volumenes.all %}{{ vol.volumen }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
                     </span>
                 </div>
                 {% endfor %}
