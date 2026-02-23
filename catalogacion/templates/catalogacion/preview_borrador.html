@@ -182,7 +182,7 @@
 
         <!-- ========== CONTENIDO PRINCIPAL ========== -->
         <main class="detalle-main">
-            
+
             <!-- ================= ADMINISTRACIÓN ================= -->
             <section id="admin" class="detalle-section">
                 <h3>Administración</h3>
@@ -191,7 +191,7 @@
                     <span>Centro catalogador:</span>
                     <strong>{{ preview_data.centro_catalogador|default:"UNL" }}</strong>
                 </div>
-                
+
                 {% if preview_data.tipo_registro %}
                 <div class="data-row">
                     <span class="campo-tag">LDR</span>
@@ -201,7 +201,7 @@
                     </strong>
                 </div>
                 {% endif %}
-                
+
                 {% if preview_data.nivel_bibliografico %}
                 <div class="data-row">
                     <span class="campo-tag">LDR</span>
@@ -212,7 +212,7 @@
                 </div>
                 {% endif %}
             </section>
-            
+
             <!-- ================= NOMBRES Y TÍTULOS ================= -->
             <section id="nombres_titulos" class="detalle-section">
                 <h3>Nombres y Títulos</h3>
@@ -274,8 +274,8 @@
                         <span class="campo-tag">246</span>
                         <div class="data-cell">
                             <div class="linea-principal">{{ titulo.titulo }}</div>
-                            {% if titulo.resto_titulo %}
-                            <div class="linea-secundaria text-muted">{{ titulo.resto_titulo }}</div>
+                            {% if titulo.subtitulo %}
+                            <div class="linea-secundaria text-muted">{{ titulo.subtitulo }}</div>
                             {% endif %}
                         </div>
                     </div>
@@ -307,7 +307,7 @@
                         <span class="campo-tag">710</span>
                         <div class="data-cell">
                             <div class="linea-principal">{{ entidad.entidad_texto }}</div>
-                            {% if entidad.funcion %}<div class="linea-secundaria text-muted">{{ entidad.funcion }}</div>{% endif %}
+                            {% if entidad.funciones %}<div class="linea-secundaria text-muted">{{ entidad.funciones }}</div>{% endif %}
                         </div>
                     </div>
                     {% endif %}
@@ -365,7 +365,7 @@
             <!-- ================= DATOS MUSICALES ================= -->
             <section id="datos_musicales" class="detalle-section">
                 <h3>Datos Musicales</h3>
-                
+
                 {% if preview_data.formato %}
                 <div class="data-row">
                     <span class="campo-tag">348</span>
@@ -407,8 +407,8 @@
                         <div class="incipit-card">
                             <div class="incipit-header">
                                 <strong>
-                                    Obra {{ incipit.numero_obra|default:"1" }}, 
-                                    mov. {{ incipit.numero_movimiento|default:"1" }}, 
+                                    Obra {{ incipit.numero_obra|default:"1" }},
+                                    mov. {{ incipit.numero_movimiento|default:"1" }},
                                     pas. {{ incipit.numero_pasaje|default:"1" }}
                                 </strong>
                             </div>
@@ -513,7 +513,7 @@
                 <p class="text-muted">No hay notas registradas.</p>
                 {% endif %}
             </section>
-                                
+
             <!-- ================= RELACIONES ================= -->
             <section id="relaciones" class="detalle-section">
                 <h3>Relaciones</h3>
@@ -574,7 +574,7 @@
             <!-- ================= EXISTENCIAS ================= -->
             <section id="existencias" class="detalle-section">
                 <h3>Existencias</h3>
-                
+
                 {% if preview_data.ubicaciones %}
                 <div class="ubicaciones-list">
                     {% for ubicacion in preview_data.ubicaciones %}

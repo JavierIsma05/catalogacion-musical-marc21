@@ -1,7 +1,7 @@
 {% comment %}
 Template para campo 650 - Materia (Tema)
 Estilo unificado con 852 y 856
-Campo repetible + subcampo $x repetible
+Campo repetible + subcampos $y y $z repetibles
 Autocomplete con el mismo look (list-group / list-group-item) como en tu versión
 Botón de agregar subdivisión a la izquierda usando input-group para estabilidad
 {% endcomment %}
@@ -62,7 +62,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
 
                 <!-- 650 $x – Subdivisiones -->
                 <div class="col-full">
-                    <label class="form-label small">650 $x – Subdivisión de materia</label>
+                    <label class="form-label small">650 $y – Subdivisión cronológica</label>
                     <div class="subcampo-repetible-container subdivisiones-container"
                          data-subdivisiones-container="{{ forloop.counter0 }}"
                          data-borrador-container="subdivision_materia_650"
@@ -78,7 +78,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                             data-materia-index="{{ forloop.parentloop.counter0 }}"
                                             data-borrador-add="subdivision_materia_650"
                                             data-borrador-parent="{{ forloop.parentloop.counter0 }}"
-                                            title="Agregar subdivisión">
+                                            title="Agregar subdivisión cronológica">
                                         <i class="bi bi-plus"></i>
                                     </button>
                                     {% else %}
@@ -89,12 +89,37 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                            class="form-control subdivision-input"
                                            name="subdivision_materia_650_{{ forloop.parentloop.counter0 }}_{{ subdivision.pk }}"
                                            value="{{ subdivision.subdivision }}"
-                                           placeholder="Subdivisión de materia">
+                                           placeholder="Ej: Siglo XIX, 1800-1900">
 
                                     <button type="button"
                                             class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
                                             title="Eliminar"
                                             {% if forloop.first and forloop.last %}style="visibility:hidden;"{% endif %}>
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="subcampo-row subdivision-form-row d-flex mb-2">
+                                <div class="input-group">
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary"
+                                            data-materia-index="{{ forloop.counter0 }}"
+                                            data-borrador-add="subdivision_materia_650"
+                                            data-borrador-parent="{{ forloop.counter0 }}"
+                                            title="Agregar subdivisión cronológica">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+
+                                    <input type="text"
+                                           class="form-control subdivision-input"
+                                           name="subdivision_materia_650_{{ forloop.counter0 }}_0"
+                                           placeholder="Ej: Siglo XIX, 1800-1900">
+
+                                    <button type="button"
+                                            class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
+                                            title="Eliminar"
+                                            style="visibility:hidden;">
                                         <i class="bi bi-x-lg"></i>
                                     </button>
                                 </div>
@@ -108,17 +133,106 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                             data-materia-index="{{ forloop.counter0 }}"
                                             data-borrador-add="subdivision_materia_650"
                                             data-borrador-parent="{{ forloop.counter0 }}"
-                                            title="Agregar subdivisión">
+                                            title="Agregar subdivisión cronológica">
                                         <i class="bi bi-plus"></i>
                                     </button>
 
                                     <input type="text"
                                            class="form-control subdivision-input"
                                            name="subdivision_materia_650_{{ forloop.counter0 }}_0"
-                                           placeholder="Subdivisión de materia">
+                                           placeholder="Ej: Siglo XIX, 1800-1900">
 
                                     <button type="button"
                                             class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
+                                            title="Eliminar"
+                                            style="visibility:hidden;">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <!-- 650 $z – Subdivisión geográfica -->
+                <div class="col-full">
+                    <label class="form-label small">650 $z – Subdivisión geográfica</label>
+                    <div class="subcampo-repetible-container subdivisiones-cronologicas-container"
+                         data-subdivisiones-cronologicas-container="{{ forloop.counter0 }}"
+                         data-borrador-container="subdivision_cronologica_650"
+                         data-borrador-parent="{{ forloop.counter0 }}">
+
+                        {% if form.instance.pk %}
+                            {% for subdivision in form.instance.subdivisiones_geograficas.all %}
+                            <div class="subcampo-row subdivision-cronologica-form-row d-flex mb-2">
+                                <div class="input-group">
+                                    {% if forloop.first %}
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
+                                            data-materia-index="{{ forloop.parentloop.counter0 }}"
+                                            title="Agregar subdivisión geográfica">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    {% else %}
+                                    <div class="subcampo-placeholder"></div>
+                                    {% endif %}
+
+                                    <input type="text"
+                                           class="form-control subdivision-cronologica-input"
+                                           name="subdivision_cronologica_650_{{ forloop.parentloop.counter0 }}_{{ subdivision.pk }}"
+                                           value="{{ subdivision.subdivision }}"
+                                           placeholder="Ej: Ecuador, Loja">
+
+                                    <button type="button"
+                                            class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
+                                            title="Eliminar"
+                                            {% if forloop.first and forloop.last %}style="visibility:hidden;"{% endif %}>
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="subcampo-row subdivision-cronologica-form-row d-flex mb-2">
+                                <div class="input-group">
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
+                                            data-materia-index="{{ forloop.counter0 }}"
+                                            title="Agregar subdivisión geográfica">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+
+                                    <input type="text"
+                                           class="form-control subdivision-cronologica-input"
+                                           name="subdivision_cronologica_650_{{ forloop.counter0 }}_0"
+                                           placeholder="Ej: Ecuador, Loja">
+
+                                    <button type="button"
+                                            class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
+                                            title="Eliminar"
+                                            style="visibility:hidden;">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="subcampo-row subdivision-cronologica-form-row d-flex mb-2">
+                                <div class="input-group">
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
+                                            data-materia-index="{{ forloop.counter0 }}"
+                                            title="Agregar subdivisión geográfica">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+
+                                    <input type="text"
+                                           class="form-control subdivision-cronologica-input"
+                                           name="subdivision_cronologica_650_{{ forloop.counter0 }}_0"
+                                           placeholder="Ej: Ecuador, Loja">
+
+                                    <button type="button"
+                                            class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
                                             title="Eliminar"
                                             style="visibility:hidden;">
                                         <i class="bi bi-x-lg"></i>
@@ -136,6 +250,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
 
         <!-- EMPTY FORM -->
         <div class="formset-row empty-form mb-3" style="display:none;">
+            <input type="hidden" name="{{ formset.prefix }}-__prefix__-id" value="">
             <button type="button" class="delete-row-btn" title="Eliminar materia">
                 <i class="bi bi-x-lg"></i>
             </button>
@@ -161,7 +276,7 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                 </div>
 
                 <div class="col-full">
-                    <label class="form-label small">650 $x – Subdivisión de materia</label>
+                    <label class="form-label small">650 $y – Subdivisión cronológica</label>
                     <div class="subcampo-repetible-container subdivisiones-container"
                          data-subdivisiones-container="__prefix__"
                          data-borrador-container="subdivision_materia_650"
@@ -174,17 +289,50 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
                                         data-materia-index="__prefix__"
                                         data-borrador-add="subdivision_materia_650"
                                         data-borrador-parent="__prefix__"
-                                        title="Agregar subdivisión">
+                                        title="Agregar subdivisión cronológica">
                                     <i class="bi bi-plus"></i>
                                 </button>
 
                                 <input type="text"
                                        class="form-control subdivision-input"
                                        name="subdivision_materia_650___prefix___0"
-                                       placeholder="Subdivisión de materia">
+                                       placeholder="Ej: Siglo XIX, 1800-1900">
 
                                 <button type="button"
                                         class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
+                                        title="Eliminar"
+                                        style="visibility:hidden;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-full">
+                    <label class="form-label small">650 $z – Subdivisión geográfica</label>
+                    <div class="subcampo-repetible-container subdivisiones-cronologicas-container"
+                         data-subdivisiones-cronologicas-container="__prefix__"
+                         data-borrador-container="subdivision_cronologica_650"
+                         data-borrador-parent="__prefix__">
+
+                        <div class="subcampo-row subdivision-cronologica-form-row d-flex mb-2">
+                            <div class="input-group">
+                                <button type="button"
+                                        class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
+                                        data-materia-index="__prefix__"
+                                        title="Agregar subdivisión geográfica">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+
+                                <input type="text"
+                                       class="form-control subdivision-cronologica-input"
+                                       name="subdivision_cronologica_650___prefix___0"
+                                       placeholder="Ej: Ecuador, Loja">
+
+                                <button type="button"
+                                        class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
                                         title="Eliminar"
                                         style="visibility:hidden;">
                                     <i class="bi bi-x-lg"></i>
@@ -332,7 +480,16 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
         });
     }
 
+    function updateDeleteVisibilityCronologica(cont){
+        const rows=cont.querySelectorAll(".subdivision-cronologica-form-row");
+        rows.forEach((row, idx)=>{
+            const btn=row.querySelector(".delete-subdivision-cronologica-btn");
+            if(btn) btn.style.visibility=(idx===0)?"hidden":"visible";
+        });
+    }
+
     container.addEventListener("click", e=>{
+        // Handler para $x - Subdivisión de materia
         const addBtn=e.target.closest(".add-subdivision-btn");
         if(addBtn){
             const cont=addBtn.closest(".subdivisiones-container");
@@ -341,17 +498,38 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
             newInput.className="subcampo-row subdivision-form-row d-flex mb-2";
             newInput.innerHTML=`
                 <div class="input-group">
-                    <button type="button" class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary" 
-                        data-materia-index="${index}" 
-                        data-borrador-add="subdivision_materia_650" 
-                        data-borrador-parent="${index}" 
-                        title="Agregar subdivisión"><i class="bi bi-plus"></i></button>
-                    <input type="text" class="form-control subdivision-input" name="subdivision_materia_650_${index}_${Date.now()}" placeholder="Subdivisión de materia">
+                    <button type="button" class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary"
+                        data-materia-index="${index}"
+                        data-borrador-add="subdivision_materia_650"
+                        data-borrador-parent="${index}"
+                        title="Agregar subdivisión cronológica"><i class="bi bi-plus"></i></button>
+                    <input type="text" class="form-control subdivision-input" name="subdivision_materia_650_${index}_${Date.now()}" placeholder="Ej: Siglo XIX, 1800-1900">
                     <button type="button" class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger" title="Eliminar"><i class="bi bi-x-lg"></i></button>
                 </div>
             `;
             cont.appendChild(newInput);
             updateDeleteVisibility(cont);
+            return;
+        }
+
+        // Handler para $z - Subdivisión cronológica
+        const addBtnCrono=e.target.closest(".add-subdivision-cronologica-btn");
+        if(addBtnCrono){
+            const cont=addBtnCrono.closest(".subdivisiones-cronologicas-container");
+            const index=cont.dataset.subdivisionesCronologicasContainer;
+            const newInput=document.createElement("div");
+            newInput.className="subcampo-row subdivision-cronologica-form-row d-flex mb-2";
+            newInput.innerHTML=`
+                <div class="input-group">
+                    <button type="button" class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
+                        data-materia-index="${index}"
+                        title="Agregar subdivisión geográfica"><i class="bi bi-plus"></i></button>
+                    <input type="text" class="form-control subdivision-cronologica-input" name="subdivision_cronologica_650_${index}_${Date.now()}" placeholder="Ej: Ecuador, Loja">
+                    <button type="button" class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger" title="Eliminar"><i class="bi bi-x-lg"></i></button>
+                </div>
+            `;
+            cont.appendChild(newInput);
+            updateDeleteVisibilityCronologica(cont);
             return;
         }
 
@@ -364,44 +542,162 @@ Botón de agregar subdivisión a la izquierda usando input-group para estabilida
             return;
         }
 
-        const delRowBtn=e.target.closest(".delete-row-btn");
-        if(delRowBtn){
-            const row=delRowBtn.closest(".formset-row");
+        const delBtnCrono=e.target.closest(".delete-subdivision-cronologica-btn");
+        if(delBtnCrono){
+            const row=delBtnCrono.closest(".subdivision-cronologica-form-row");
+            const cont=delBtnCrono.closest(".subdivisiones-cronologicas-container");
             if(row) row.remove();
+            updateDeleteVisibilityCronologica(cont);
+            return;
         }
+
+        // delete-row-btn es manejado por formset-manager.js
+        // NO duplicar aquí para evitar desincronizar TOTAL_FORMS
     });
 
     container.addEventListener('formset:added', (ev) => {
         if (!ev || !ev.detail || ev.detail.prefix !== PREFIX) return;
         
-        console.log('formset:added evento recibido en 650', ev.detail);
-        
         // small timeout to let DOM settle
         setTimeout(() => {
-            // 🔥 CLAVE: Buscar SOLO en el nuevo formulario agregado
             const newForm = ev.detail.newForm;
-            if (!newForm) {
-                console.log('🚫 No se encontró newForm en el evento');
-                return;
+            if (!newForm) return;
+            
+            // ── Copiar subdivisiones $y y $z del último 650 existente ──
+            const allForms = container.querySelectorAll('.formset-row:not(.empty-form)');
+            // El penúltimo es el último "existente" (el nuevo es el último)
+            const prevForm = allForms.length >= 2 ? allForms[allForms.length - 2] : null;
+            
+            if (prevForm) {
+                const newIndex = ev.detail.totalForms - 1;
+                
+                // Copiar $a (materia) del form anterior
+                const prevMateriaText = prevForm.querySelector('.materia-input');
+                const prevMateriaId = prevForm.querySelector('.materia-id');
+                const newMateriaText = newForm.querySelector('.materia-input');
+                const newMateriaId = newForm.querySelector('.materia-id');
+                if (prevMateriaText && prevMateriaId && newMateriaText && newMateriaId) {
+                    newMateriaText.value = prevMateriaText.value;
+                    newMateriaId.value = prevMateriaId.value;
+                }
+                
+                // Copiar subdivisiones cronológicas ($y)
+                const prevSubsY = prevForm.querySelectorAll('.subdivisiones-container .subdivision-input');
+                const newSubContainerY = newForm.querySelector('.subdivisiones-container');
+                if (newSubContainerY && prevSubsY.length > 0) {
+                    // Limpiar el contenedor del nuevo form
+                    newSubContainerY.innerHTML = '';
+                    prevSubsY.forEach((prevInput, subIdx) => {
+                        if (!prevInput.value.trim()) return;
+                        const row = document.createElement('div');
+                        row.className = 'subcampo-row subdivision-form-row d-flex mb-2';
+                        row.innerHTML = `
+                            <div class="input-group">
+                                ${subIdx === 0 ? `
+                                <button type="button"
+                                        class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary"
+                                        data-materia-index="${newIndex}"
+                                        data-borrador-add="subdivision_materia_650"
+                                        data-borrador-parent="${newIndex}"
+                                        title="Agregar subdivisión cronológica">
+                                    <i class="bi bi-plus"></i>
+                                </button>` : `<div class="subcampo-placeholder"></div>`}
+                                <input type="text"
+                                       class="form-control subdivision-input"
+                                       name="subdivision_materia_650_${newIndex}_${subIdx}"
+                                       value="${prevInput.value}"
+                                       placeholder="Ej: Siglo XIX, 1800-1900">
+                                <button type="button"
+                                        class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
+                                        title="Eliminar"
+                                        ${subIdx === 0 && prevSubsY.length <= 1 ? 'style="visibility:hidden;"' : ''}>
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        `;
+                        newSubContainerY.appendChild(row);
+                    });
+                    // Si no se copió nada (todos vacíos), restaurar el campo vacío por defecto
+                    if (newSubContainerY.children.length === 0) {
+                        newSubContainerY.innerHTML = `
+                            <div class="subcampo-row subdivision-form-row d-flex mb-2">
+                                <div class="input-group">
+                                    <button type="button" class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary"
+                                        data-materia-index="${newIndex}" data-borrador-add="subdivision_materia_650"
+                                        data-borrador-parent="${newIndex}" title="Agregar subdivisión cronológica">
+                                        <i class="bi bi-plus"></i></button>
+                                    <input type="text" class="form-control subdivision-input"
+                                           name="subdivision_materia_650_${newIndex}_0" placeholder="Ej: Siglo XIX, 1800-1900">
+                                    <button type="button" class="subcampo-delete-btn delete-subdivision-btn btn btn-outline-danger"
+                                        title="Eliminar" style="visibility:hidden;"><i class="bi bi-x-lg"></i></button>
+                                </div>
+                            </div>`;
+                    }
+                    // Actualizar data attributes
+                    newSubContainerY.dataset.subdivisionesContainer = newIndex;
+                    newSubContainerY.dataset.borradorParent = newIndex;
+                    updateDeleteVisibility(newSubContainerY);
+                }
+                
+                // Copiar subdivisiones geográficas ($z)
+                const prevSubsZ = prevForm.querySelectorAll('.subdivisiones-cronologicas-container .subdivision-cronologica-input');
+                const newSubContainerZ = newForm.querySelector('.subdivisiones-cronologicas-container');
+                if (newSubContainerZ && prevSubsZ.length > 0) {
+                    newSubContainerZ.innerHTML = '';
+                    prevSubsZ.forEach((prevInput, subIdx) => {
+                        if (!prevInput.value.trim()) return;
+                        const row = document.createElement('div');
+                        row.className = 'subcampo-row subdivision-cronologica-form-row d-flex mb-2';
+                        row.innerHTML = `
+                            <div class="input-group">
+                                ${subIdx === 0 ? `
+                                <button type="button"
+                                        class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
+                                        data-materia-index="${newIndex}"
+                                        title="Agregar subdivisión geográfica">
+                                    <i class="bi bi-plus"></i>
+                                </button>` : `<div class="subcampo-placeholder"></div>`}
+                                <input type="text"
+                                       class="form-control subdivision-cronologica-input"
+                                       name="subdivision_cronologica_650_${newIndex}_${subIdx}"
+                                       value="${prevInput.value}"
+                                       placeholder="Ej: Ecuador, Loja">
+                                <button type="button"
+                                        class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
+                                        title="Eliminar"
+                                        ${subIdx === 0 && prevSubsZ.length <= 1 ? 'style="visibility:hidden;"' : ''}>
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        `;
+                        newSubContainerZ.appendChild(row);
+                    });
+                    if (newSubContainerZ.children.length === 0) {
+                        newSubContainerZ.innerHTML = `
+                            <div class="subcampo-row subdivision-cronologica-form-row d-flex mb-2">
+                                <div class="input-group">
+                                    <button type="button" class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary"
+                                        data-materia-index="${newIndex}" title="Agregar subdivisión geográfica">
+                                        <i class="bi bi-plus"></i></button>
+                                    <input type="text" class="form-control subdivision-cronologica-input"
+                                           name="subdivision_cronologica_650_${newIndex}_0" placeholder="Ej: Ecuador, Loja">
+                                    <button type="button" class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
+                                        title="Eliminar" style="visibility:hidden;"><i class="bi bi-x-lg"></i></button>
+                                </div>
+                            </div>`;
+                    }
+                    newSubContainerZ.dataset.subdivisionesCronologicasContainer = newIndex;
+                    newSubContainerZ.dataset.borradorParent = newIndex;
+                    updateDeleteVisibilityCronologica(newSubContainerZ);
+                }
             }
             
-            console.log('🔍 Nuevo formulario encontrado:', newForm);
-            
-            // Inicializar autocomplete SOLO en los inputs del nuevo formulario
+            // Inicializar autocomplete en el nuevo formulario
             const newInputs = newForm.querySelectorAll(".materia-input");
-            console.log('Inputs de materia encontrados en nuevo formulario:', newInputs.length);
-            
-            newInputs.forEach((input, index) => {
-                console.log(`Inicializando input ${index} del nuevo formulario:`, input);
-                // 🔥 CLAVE: Limpiar el flag para permitir reinicialización
+            newInputs.forEach((input) => {
                 delete input.dataset.materiaInit;
                 initMateriaAutocomplete(input);
             });
-            
-            // Inicializar subdivisiones en las nuevas filas
-            const subdivisionContainers = newForm.querySelectorAll(".subdivisiones-container");
-            console.log('Contenedores de subdivisiones encontrados en nuevo formulario:', subdivisionContainers.length);
-            subdivisionContainers.forEach(updateDeleteVisibility);
         }, 50);
     });
 

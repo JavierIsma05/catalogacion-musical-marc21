@@ -14,7 +14,7 @@
         <div class="selection-header">
             <div>
                 <p class="eyebrow">Nueva obra</p>
-                <h2>Crear Nueva Obra MARC21</h2>
+                <h2>Crear Nueva Obra para la biblioteca de Musical para Piano</h2>
                 <p class="subtitle">Selecciona el tipo de obra musical que deseas catalogar</p>
             </div>
             <div class="selection-pill">
@@ -30,7 +30,7 @@
 
         <form method="post" action="{% url 'catalogacion:seleccionar_tipo' %}" id="tipo-form">
             {% csrf_token %}
-            
+
             <div class="categoria-accordion">
                 <!-- Obras Manuscritas -->
                 <div class="categoria-item" data-categoria="manuscrita">
@@ -46,7 +46,7 @@
                         </div>
                         <i class="bi bi-chevron-down categoria-arrow"></i>
                     </div>
-                    
+
                     <div class="categoria-content">
                         <div class="tipos-list">
                             <!-- Colección Manuscrita -->
@@ -65,7 +65,7 @@
                                     <span class="badge-tag">130</span>
                                 </div>
                             </label>
-                            
+
                             <!-- Obra en Colección Manuscrita -->
                             <label class="tipo-option" data-tipo="obra_en_coleccion_manuscrita">
                                 <input type="radio" name="tipo_obra" value="obra_en_coleccion_manuscrita" class="tipo-radio-input">
@@ -82,7 +82,7 @@
                                     <span class="badge-tag">100</span>
                                 </div>
                             </label>
-                            
+
                             <!-- Obra Manuscrita Individual -->
                             <label class="tipo-option" data-tipo="obra_manuscrita_individual">
                                 <input type="radio" name="tipo_obra" value="obra_manuscrita_individual" class="tipo-radio-input">
@@ -117,7 +117,7 @@
                         </div>
                         <i class="bi bi-chevron-down categoria-arrow"></i>
                     </div>
-                    
+
                     <div class="categoria-content">
                         <div class="tipos-list">
                             <!-- Colección Impresa -->
@@ -136,7 +136,7 @@
                                     <span class="badge-tag">020</span>
                                 </div>
                             </label>
-                            
+
                             <!-- Obra en Colección Impresa -->
                             <label class="tipo-option" data-tipo="obra_en_coleccion_impresa">
                                 <input type="radio" name="tipo_obra" value="obra_en_coleccion_impresa" class="tipo-radio-input">
@@ -153,7 +153,7 @@
                                     <span class="badge-tag">100</span>
                                 </div>
                             </label>
-                            
+
                             <!-- Obra Impresa Individual -->
                             <label class="tipo-option" data-tipo="obra_impresa_individual">
                                 <input type="radio" name="tipo_obra" value="obra_impresa_individual" class="tipo-radio-input">
@@ -195,70 +195,70 @@ document.addEventListener('DOMContentLoaded', function() {
     const tipoOptions = document.querySelectorAll('.tipo-option');
     const btnContinuar = document.getElementById('btn-continuar');
     const form = document.getElementById('tipo-form');
-    
+
     // Prefijo para localStorage de borradores activos
     const STORAGE_PREFIX = 'activeDraft:';
-    
+
     // Toggle categorías (acordeón)
     categorias.forEach(categoria => {
         const header = categoria.querySelector('.categoria-header');
-        
+
         header.addEventListener('click', function() {
             const wasActive = categoria.classList.contains('active');
-            
+
             // Cerrar todas las categorías
             categorias.forEach(c => c.classList.remove('active'));
-            
+
             // Si no estaba activa, abrirla
             if (!wasActive) {
                 categoria.classList.add('active');
             }
         });
     });
-    
+
     // Selección de tipo de obra
     tipoOptions.forEach(option => {
         option.addEventListener('click', function(e) {
             // Prevenir que el click cierre el acordeón
             e.stopPropagation();
-            
+
             // Remover selección previa
             tipoOptions.forEach(o => o.classList.remove('selected'));
-            
+
             // Seleccionar opción actual
             this.classList.add('selected');
-            
+
             // Marcar radio
             const radio = this.querySelector('.tipo-radio-input');
             radio.checked = true;
-            
+
             // Habilitar botón
             btnContinuar.disabled = false;
         });
     });
-    
+
     // Verificar si ya hay selección al cargar
     const checkedRadio = document.querySelector('.tipo-radio-input:checked');
     if (checkedRadio) {
         const option = checkedRadio.closest('.tipo-option');
         const categoria = option.closest('.categoria-item');
-        
+
         option.classList.add('selected');
         categoria.classList.add('active');
         btnContinuar.disabled = false;
     }
-    
+
     // Al enviar el formulario: limpiar borrador activo del tipo seleccionado
     form.addEventListener('submit', function(e) {
         const tipoSeleccionado = document.querySelector('.tipo-radio-input:checked');
         if (tipoSeleccionado) {
             const tipoObra = tipoSeleccionado.value;
-            
+
             // Limpiar borrador activo de localStorage para este tipo
             const key = STORAGE_PREFIX + tipoObra;
             localStorage.removeItem(key);
             console.log('[NuevaObra] Borrador activo limpiado:', key);
-            
+
             // También limpiar en el backend (borradores antiguos del mismo tipo)
             fetch('/catalogacion/api/borradores/limpiar-tipo/', {
                 method: 'POST',

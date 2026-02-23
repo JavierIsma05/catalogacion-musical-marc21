@@ -67,14 +67,23 @@ Estilo compatible con 856 / 700
                     <!-- 774 $w -->
                     <div class="mb-3">
                         <label class="form-label small">
-                            774 $w – Número de esta obra en la colección 
+                            774 $w – Número de esta obra en la colección
                         </label>
+                        {# Display: muestra el num_control de las obras hijo vinculadas (solo lectura) #}
                         <input type="text"
                                class="form-control campo-774-w"
-                               name="numero_control_774_{{ forloop.counter0 }}"
-                               placeholder="Seleccione una obra"
+                               value="{% if form.instance.pk %}{% for nc in form.instance.numeros_control.all %}{{ nc.obra_relacionada.num_control }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}"
+                               placeholder="(se completa al crear la obra hijo)"
                                readonly
-                               style="background-color: #f8f9fa; color: #6c757d; cursor: not-allowed;">
+                               style="background-color: #f8f9fa; color: #6c757d;">
+                        {# Hidden: preserva el vínculo al guardar el formulario #}
+                        {% if form.instance.pk %}
+                            {% for nc in form.instance.numeros_control.all %}
+                                <input type="hidden"
+                                       name="w_774_{{ form.instance.pk }}"
+                                       value="{{ nc.obra_relacionada.id }}">
+                            {% endfor %}
+                        {% endif %}
                     </div>
 
                 </div>
@@ -122,12 +131,16 @@ Estilo compatible con 856 / 700
                         <label class="form-label small fw-semibold">
                             774 $w – Número de esta obra en la colección
                         </label>
+                        {# Display: vacío para nuevas filas, se llena automáticamente por señal #}
                         <input type="text"
                                class="form-control campo-774-w"
-                               name="numero_control_774___prefix__"
-                               placeholder="Seleccione una obra"
+                               placeholder="(se completa al crear la obra hijo)"
                                readonly
-                               style="background-color: #f8f9fa; color: #6c757d; cursor: not-allowed;">
+                               style="background-color: #f8f9fa; color: #6c757d;">
+                        {# Hidden: vacío para nuevas filas (JS reemplaza __prefix__ con índice) #}
+                        <input type="hidden"
+                               name="w_774___prefix__"
+                               value="">
                     </div>
 
                 </div>
@@ -139,32 +152,32 @@ Estilo compatible con 856 / 700
 
 <script>
 (function () {
+    "use strict";
+
+    const PREFIX = "{{ formset.prefix|escapejs }}";
+    const container = document.querySelector(
+        '[data-formset-prefix="' + PREFIX + '"]'
+    );
+    if (!container) return;
 
     /* =====================================================
        AUTOCOMPLETE GENÉRICO (persona / título)
        ===================================================== */
     function initAutocomplete(wrapper) {
-
-        // 🔥 CLAVE: permitir reinicializar
-        wrapper.removeAttribute("data-autocomplete-init");
-
         if (!wrapper || wrapper.dataset.autocompleteInit === "1") return;
         wrapper.dataset.autocompleteInit = "1";
 
-        const type  = wrapper.dataset.autocomplete;
+        const type = wrapper.dataset.autocomplete;
         const input = wrapper.querySelector("input");
-        const box   = wrapper.querySelector(".autocomplete-suggestions");
+        const box = wrapper.querySelector(".autocomplete-suggestions");
 
         if (!type || !input || !box) return;
 
         let endpoint = null;
-
-        if (type === "persona") {
+        if (type === "persona")
             endpoint = "/catalogacion/api/autocompletar/persona/";
-        }
-        if (type === "titulo") {
+        if (type === "titulo")
             endpoint = "/catalogacion/api/autocompletar/titulo/";
-        }
         if (!endpoint) return;
 
         let timer = null;
@@ -176,46 +189,30 @@ Estilo compatible con 856 / 700
 
         input.addEventListener("input", () => {
             const q = input.value.trim();
-            if (q.length < 2) {
-                hide();
-                return;
-            }
+            if (q.length < 2) { hide(); return; }
 
             clearTimeout(timer);
             timer = setTimeout(() => {
-                fetch(`${endpoint}?q=${encodeURIComponent(q)}`)
+                fetch(endpoint + "?q=" + encodeURIComponent(q))
                     .then(r => r.json())
                     .then(data => {
                         box.innerHTML = "";
                         const results = data.results || [];
 
-                        if (!results.length) {
-                            box.innerHTML = `
-                                <div class="autocomplete-item autocomplete-item-new">
-                                    <i class="bi bi-plus-circle me-2"></i>
-                                    Crear: "${q}"
-                                </div>`;
-                        } else {
-                            results.forEach(item => {
-                                const div = document.createElement("div");
-                                div.className = "autocomplete-item";
-                                div.textContent = item.text;
-                                div.onclick = () => {
-                                    input.value = item.text;
-                                    hide();
-                                };
-                                box.appendChild(div);
-                            });
+                        results.forEach(item => {
+                            const div = document.createElement("div");
+                            div.className = "autocomplete-item";
+                            div.textContent = item.text;
+                            div.onclick = () => { input.value = item.text; hide(); };
+                            box.appendChild(div);
+                        });
 
-                            const crear = document.createElement("div");
-                            crear.className = "autocomplete-item autocomplete-item-new";
-                            crear.innerHTML = `<i class="bi bi-plus-circle me-2"></i> Crear: "${q}"`;
-                            crear.onclick = () => {
-                                input.value = q;
-                                hide();
-                            };
-                            box.appendChild(crear);
-                        }
+                        const crear = document.createElement("div");
+                        crear.className = "autocomplete-item autocomplete-item-new";
+                        crear.innerHTML = '<i class="bi bi-plus-circle me-2"></i> Crear: "' +
+                            escapeHtml(q) + '"';
+                        crear.onclick = () => { input.value = q; hide(); };
+                        box.appendChild(crear);
 
                         box.classList.add("show");
                     });
@@ -227,150 +224,38 @@ Estilo compatible con 856 / 700
         });
     }
 
+    function escapeHtml(text) {
+        const d = document.createElement("div");
+        d.textContent = text || "";
+        return d.innerHTML;
+    }
+
     /* =====================================================
-       HOOK: reinicializar autocomplete al agregar fila
-       (evita duplicar filas por handlers globales)
+       HOOK: reinicializar autocompletes cuando FormsetManager
+       agrega una fila nueva (evento formset:added con bubbles)
        ===================================================== */
-    const THIS_FORMSET_PREFIX = "{{ formset.prefix|escapejs }}";
-
-    console.log('🔍 774 Formset prefix:', THIS_FORMSET_PREFIX);
-
-    // Si existe el gestor central (FormsetManager), él es el único que agrega filas.
-    // Aquí solo reinicializamos autocompletes cuando se agrega una nueva fila.
-    document.addEventListener("formset:added", function (ev) {
-        console.log('🔥 formset:added event fired:', ev.detail);
-        
+    container.addEventListener("formset:added", function (ev) {
         const detail = ev && ev.detail ? ev.detail : null;
-        if (!detail || detail.prefix !== THIS_FORMSET_PREFIX) {
-            console.log('🚫 Event not for this formset:', detail?.prefix, 'expected:', THIS_FORMSET_PREFIX);
-            return;
-        }
+        if (!detail || detail.prefix !== PREFIX) return;
 
-        console.log('✅ Processing formset:added for 774');
         const root = detail.newForm;
-        if (!root || !root.querySelectorAll) {
-            console.log('🚫 No root or no querySelectorAll');
-            return;
-        }
+        if (!root) return;
 
-        console.log('🔍 New form element:', root);
-        
-        const wrappers = root.querySelectorAll(".autocomplete-wrapper[data-autocomplete]");
-        console.log('🔍 Found autocomplete wrappers:', wrappers.length);
-
-        wrappers.forEach((w, index) => {
-            console.log(`🔄 Processing wrapper ${index}:`, w.dataset.autocomplete);
-            w.removeAttribute("data-autocomplete-init");
-            initAutocomplete(w);
-        });
-
-        // 🔥 También inicializar el bloqueo del campo $w en el nuevo formulario
-        const wInputs = root.querySelectorAll('.campo-774-w');
-        console.log('🔍 Found 774 $w inputs:', wInputs.length);
-        wInputs.forEach((input, index) => {
-            console.log(`🔒 Configuring 774 $w input ${index}:`, input);
-        });
+        root.querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
+            .forEach(w => {
+                w.removeAttribute("data-autocomplete-init");
+                initAutocomplete(w);
+            });
     });
 
     /* =====================================================
-       INICIALIZAR AL CARGAR PÁGINA
+       INIT INICIAL: autocompletes en formularios existentes
        ===================================================== */
-    console.log('🚀 774 Formset script loaded');
-    
-    // Verificar que el botón + existe
-    setTimeout(() => {
-        const addBtn = document.querySelector('[data-formset-target="{{ formset.prefix|escapejs }}"]');
-        console.log('🔍 Add button found:', addBtn);
-        
-        if (addBtn) {
-            console.log('✅ Add button exists, adding click listener for debugging');
-            addBtn.addEventListener('click', function() {
-                console.log('🔥 Add button clicked!');
-                
-                // 🔥 CLONACIÓN MANUAL DIRECTA
-                setTimeout(() => {
-                    console.log('🔧 Starting manual formset cloning...');
-                    
-                    const container = document.querySelector('.formset-forms');
-                    const emptyForm = document.querySelector('.empty-form');
-                    
-                    if (!container || !emptyForm) {
-                        console.log('🚫 Container or empty form not found');
-                        return;
-                    }
-                    
-                    // Clonar el empty form
-                    const newForm = emptyForm.cloneNode(true);
-                    newForm.classList.remove('empty-form');
-                    newForm.classList.remove('d-none');
-                    newForm.style.display = 'block';
-                    newForm.classList.add('mb-3');
-                    
-                    // Reemplazar __prefix__ con el índice actual
-                    const totalForms = container.querySelectorAll('.formset-row:not(.empty-form)').length;
-                    const newHtml = newForm.innerHTML.replace(/__prefix__/g, totalForms);
-                    newForm.innerHTML = newHtml;
-                    
-                    // Agregar al container
-                    container.appendChild(newForm);
-                    
-                    console.log('✅ Form cloned manually:', newForm);
-                    
-                    // 🔥 Inicializar autocompletes en el nuevo formulario
-                    const wrappers = newForm.querySelectorAll(".autocomplete-wrapper[data-autocomplete]");
-                    console.log('🔍 Found autocomplete wrappers in cloned form:', wrappers.length);
-                    
-                    wrappers.forEach((w, index) => {
-                        console.log(`🔄 Processing wrapper ${index}:`, w.dataset.autocomplete);
-                        w.removeAttribute("data-autocomplete-init");
-                        initAutocomplete(w);
-                    });
-                    
-                    // 🔥 Actualizar management form
-                    const totalFormsInput = document.querySelector('input[name$="-TOTAL_FORMS"]');
-                    if (totalFormsInput) {
-                        totalFormsInput.value = totalForms + 1;
-                        console.log('✅ Updated TOTAL_FORMS to:', totalForms + 1);
-                    }
-                    
-                }, 100);
-            });
-        } else {
-            console.log('🚫 Add button NOT found!');
-        }
-    }, 1000);
-
-    /* =====================================================
-       INIT INICIAL
-       ===================================================== */
-    document
+    container
         .querySelectorAll(".autocomplete-wrapper[data-autocomplete]")
         .forEach(initAutocomplete);
 
-    /* =====================================================
-       BLOQUEAR ESCRITURA EN CAMPO 774 $w
-       ===================================================== */
-    document.addEventListener('keydown', function(e) {
-        if (e.target.classList.contains('campo-774-w')) {
-            e.preventDefault();
-            return false;
-        }
-    });
-
-    document.addEventListener('input', function(e) {
-        if (e.target.classList.contains('campo-774-w')) {
-            e.preventDefault();
-            e.target.value = e.target.defaultValue || '';
-            return false;
-        }
-    });
-
-    document.addEventListener('paste', function(e) {
-        if (e.target.classList.contains('campo-774-w')) {
-            e.preventDefault();
-            return false;
-        }
-    });
+    /* El campo 774 $w display tiene atributo readonly; no se necesita bloqueo JS */
 
 })();
 </script>

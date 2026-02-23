@@ -33,7 +33,7 @@ Patrón unificado con 773 / 774
             </button>
 
             <div class="card mt-3">
-                
+
 
                 <div class="card-body">
 
@@ -43,7 +43,7 @@ Patrón unificado con 773 / 774
                         {{ form.segundo_indicador }}
                     </div>
 
-                    <!-- ================= 787 $a ================= -->
+                    <!-- ================= 787 $a =================
                     <div class="mb-3">
                         <label class="form-label small">
                             787 $a – Compositor
@@ -58,10 +58,11 @@ Patrón unificado con 773 / 774
                         </small>
                     </div>
 
-                    <!-- ================= 787 $t ================= -->
-                    <div class="mb-3">
-                        <label class="form-label small">
-                            787 $t – Título
+                -->
+                <!-- ================= 787 $t =================
+                <div class="mb-3">
+                    <label class="form-label small">
+                        787 $t – Título
                         </label>
 
                         {{ form.titulo }}
@@ -71,6 +72,35 @@ Patrón unificado con 773 / 774
                         </small>
                     </div>
 
+                    -->
+                    <!-- ================= 787 $a ================= -->
+                    <div class="mb-3">
+                        <label class="form-label small">787 $a – Compositor</label>
+
+                        <div class="autocomplete-wrapper" data-autocomplete="persona">
+                            {{ form.encabezamiento_principal_texto }}
+                            {{ form.encabezamiento_principal }}
+                            <div class="autocomplete-suggestions"></div>
+                        </div>
+
+                        <small class="form-text text-muted">
+                            Texto libre (sin búsqueda).
+                        </small>
+                    </div>
+
+                    <!-- ================= 787 $t ================= -->
+                    <div class="mb-3">
+                        <label class="form-label small">787 $t – Título</label>
+
+                        <div class="autocomplete-wrapper" data-autocomplete="titulo">
+                            {{ form.titulo }}
+                            <div class="autocomplete-suggestions"></div>
+                        </div>
+
+                        <small class="form-text text-muted">
+                            Texto libre (sin búsqueda).
+                        </small>
+                    </div>
                     <!-- ================= 787 $w ================= -->
                     <div class="mt-4">
                         <label class="form-label small fw-semibold">
@@ -78,28 +108,21 @@ Patrón unificado con 773 / 774
                         </label>
 
                         <div class="input-group">
-                            <!-- Visible: muestra el 001 -->
+                            <!-- Visible -->
                             <input type="text"
-                                class="form-control numero-w-input"
+                                class="form-control campo-787-w"
                                 placeholder="Seleccione una obra"
-                                readonly>
+                                readonly
+                                style="background-color: #f8f9fa; color: #6c757d; cursor: not-allowed;">
 
-                            <!-- Botón lupa -->
-                            <button type="button"
-                                    class="btn btn-outline-secondary btn-buscar-obra"
-                                    data-enlace-id="{{ enlace.pk }}"
-                                    data-campo="787"
-                                    title="Buscar obra">
-                                <i class="bi bi-search"></i>
-                            </button>
 
-                            <!-- 🔥 FK real hacia ObraGeneral -->
+
+                            <!-- FK real -->
                             <input type="hidden"
                                 class="obra-relacionada-id-input"
                                 name="w_787_{{ enlace.pk }}">
                         </div>
                     </div>
-
 
                 </div>
             </div>

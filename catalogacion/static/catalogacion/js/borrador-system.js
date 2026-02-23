@@ -59,6 +59,9 @@
   // ========================================
 
   function getCsrfToken() {
+    // Leer de la cookie (siempre actualizada) con fallback al input hidden
+    const cookieMatch = document.cookie.match(/csrftoken=([^;]+)/);
+    if (cookieMatch) return cookieMatch[1];
     const token = document.querySelector('[name="csrfmiddlewaretoken"]');
     return token ? token.value : "";
   }
@@ -70,7 +73,7 @@
   function getTipoObra() {
     const tipoRegistro = document.getElementById("id_tipo_registro")?.value;
     const nivelBibliografico = document.getElementById(
-      "id_nivel_bibliografico"
+      "id_nivel_bibliografico",
     )?.value;
 
     if (!tipoRegistro || !nivelBibliografico) return null;
@@ -166,7 +169,7 @@
         result.formsets[prefix].rows[index][field] = value;
         result.formsets[prefix].count = Math.max(
           result.formsets[prefix].count,
-          index + 1
+          index + 1,
         );
         continue;
       }
@@ -199,7 +202,7 @@
 
         // Si solo tiene campos de management, excluir
         const realFields = Object.keys(row).filter(
-          (k) => !["id", "DELETE", "ORDER"].includes(k)
+          (k) => !["id", "DELETE", "ORDER"].includes(k),
         );
         const hasRealData = realFields.some((k) => {
           const v = row[k];
@@ -335,7 +338,7 @@
   async function restaurarFormsets(formsets) {
     for (const [prefix, data] of Object.entries(formsets)) {
       const container = document.querySelector(
-        `[data-formset-prefix="${prefix}"]`
+        `[data-formset-prefix="${prefix}"]`,
       );
       if (!container) continue;
 
@@ -344,7 +347,7 @@
 
       // Contar filas actuales (excluyendo empty-form)
       const currentRows = container.querySelectorAll(
-        ".formset-row:not(.empty-form)"
+        ".formset-row:not(.empty-form)",
       );
       let currentCount = currentRows.length;
 
@@ -384,7 +387,7 @@
 
     // Opción 2: Botón en el header
     const headerBtn = document.querySelector(
-      `.campo-add-btn[data-formset-target="${prefix}"]`
+      `.campo-add-btn[data-formset-target="${prefix}"]`,
     );
     if (headerBtn) {
       headerBtn.click();
@@ -440,15 +443,15 @@
 
         // Buscar contenedor y botón usando data-borrador-*
         const container = document.querySelector(
-          `[data-borrador-container="${groupKey}"][data-borrador-parent="${newParentIndex}"]`
+          `[data-borrador-container="${groupKey}"][data-borrador-parent="${newParentIndex}"]`,
         );
         const addButton = document.querySelector(
-          `[data-borrador-add="${groupKey}"][data-borrador-parent="${newParentIndex}"]`
+          `[data-borrador-add="${groupKey}"][data-borrador-parent="${newParentIndex}"]`,
         );
 
         if (!container || !addButton) {
           console.warn(
-            `No se encontró contenedor para ${groupKey} parent=${newParentIndex}`
+            `No se encontró contenedor para ${groupKey} parent=${newParentIndex}`,
           );
           continue;
         }
@@ -524,7 +527,7 @@
    */
   async function rehidratarEnlacesObras() {
     const hiddenInputs = form.querySelectorAll(
-      'input.obra-relacionada-id-input[name^="w_"]'
+      'input.obra-relacionada-id-input[name^="w_"]',
     );
     if (!hiddenInputs.length) return;
 
@@ -536,7 +539,7 @@
 
       try {
         const resp = await fetch(
-          `${API_URLS.buscarObras}?id=${encodeURIComponent(id)}`
+          `${API_URLS.buscarObras}?id=${encodeURIComponent(id)}`,
         );
         const data = await resp.json();
         const num = data?.results?.[0]?.num_control || null;
@@ -608,14 +611,25 @@
       const result = await response.json();
 
       if (result.success) {
+        const esPrimerGuardado = !state.borradorId;
         state.borradorId = result.borrador_id;
         state.hasUnsavedChanges = false;
         mostrarNotificacion(
           esAutoguardado ? "Autoguardado" : result.message,
           "success",
-          esAutoguardado ? 2000 : 3000
+          esAutoguardado ? 2000 : 3000,
         );
         actualizarIndicadorGuardado();
+
+        // Agregar estado al historial para detectar botón atrás (solo la primera vez)
+        if (esPrimerGuardado) {
+          window.history.pushState(
+            { borrador: true },
+            "",
+            window.location.href,
+          );
+        }
+
         return { success: true, borradorId: state.borradorId };
       } else {
         console.error("Error guardando:", result.error);
@@ -671,7 +685,7 @@
         mostrarNotificacion(
           "Error: Este borrador es de otro tipo de obra.",
           "error",
-          5000
+          5000,
         );
         return;
       }
@@ -750,7 +764,7 @@
       indicador = document.createElement("div");
       indicador.id = "save-indicator";
       indicador.style.cssText = `
-                position: fixed; bottom: 20px; left: 20px;
+                position: fixed; bottom: 20px; left: calc(var(--sidebar-width, 250px) + 20px);
                 padding: 8px 16px; border-radius: 20px;
                 font-size: 12px; font-weight: 500; z-index: 9999;
                 display: flex; align-items: center; gap: 8px;
@@ -789,7 +803,7 @@
     if (state.changeTimer) clearTimeout(state.changeTimer);
     state.changeTimer = setTimeout(
       () => guardarBorrador(true),
-      CONFIG.MIN_CHANGE_DELAY
+      CONFIG.MIN_CHANGE_DELAY,
     );
   }
 
@@ -803,8 +817,172 @@
     }, CONFIG.AUTOSAVE_INTERVAL);
   }
 
-  // El beforeunload ahora se maneja desde el template para tener más control
-  // sobre cuándo mostrar el diálogo del navegador
+  // ========================================
+  // ALERTAS DE SALIDA
+  // ========================================
+
+  /**
+   * Muestra un diálogo informativo cuando el usuario intenta salir
+   */
+  async function mostrarDialogoSalida(accion, onContinue) {
+    // Usar SweetAlert2 si está disponible
+    if (typeof Swal !== "undefined") {
+      const result = await Swal.fire({
+        icon: "info",
+        title: "Borrador guardado",
+        html: `
+          <div class="text-start">
+            <p>Tu avance está guardado como <strong>borrador</strong>.</p>
+            <ul>
+              <li>Para continuar luego, ve a <strong>Borradores</strong> desde el menú.</li>
+              <li>Si ${accion}, podrás recuperar este borrador más tarde.</li>
+            </ul>
+            <hr>
+            <p class="text-muted small mb-0">
+              <i class="bi bi-trash"></i> También puedes descartar el borrador si no lo necesitas.
+            </p>
+          </div>
+        `,
+        showCancelButton: true,
+        showDenyButton: true,
+        confirmButtonText:
+          '<i class="bi bi-file-earmark-text"></i> Ir a Borradores',
+        denyButtonText:
+          '<i class="bi bi-box-arrow-right"></i> Salir (mantener borrador)',
+        cancelButtonText: "Cancelar",
+        footer:
+          '<div class="text-center w-100 pt-2 border-top"><button type="button" class="btn btn-outline-danger btn-sm" id="btn-descartar-salir"><i class="bi bi-trash"></i> Descartar borrador y salir</button></div>',
+        focusCancel: true,
+        customClass: {
+          confirmButton: "btn btn-primary",
+          denyButton: "btn btn-secondary",
+          cancelButton: "btn btn-outline-secondary",
+          footer: "swal2-footer-visible",
+        },
+        didOpen: () => {
+          const btnDescartar = document.getElementById("btn-descartar-salir");
+          if (btnDescartar) {
+            btnDescartar.addEventListener("click", async () => {
+              // Eliminar el borrador
+              if (state.borradorId) {
+                await eliminarBorrador(state.borradorId);
+              }
+              state.allowUnloadOnce = true;
+              Swal.close();
+              onContinue();
+            });
+          }
+        },
+      });
+
+      if (result.isConfirmed) {
+        state.allowUnloadOnce = true;
+        window.location.href = "/catalogacion/borradores/";
+      } else if (result.isDenied) {
+        onContinue();
+      }
+    } else {
+      // Fallback a confirm nativo
+      if (
+        confirm(
+          "Tu avance está guardado como borrador.\n\n¿Salir de todos modos?",
+        )
+      ) {
+        onContinue();
+      }
+    }
+  }
+
+  /**
+   * Instala interceptores para alertar al usuario antes de salir
+   */
+  function instalarAlertasSalida() {
+    // 1. Evento beforeunload (navegador nativo - para cerrar pestaña/ventana)
+    window.addEventListener("beforeunload", (e) => {
+      if (state.allowUnloadOnce) {
+        state.allowUnloadOnce = false;
+        return;
+      }
+      // Solo mostrar si hay borrador activo o cambios sin guardar
+      if (state.hasUnsavedChanges || state.borradorId) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    });
+
+    // 2. Interceptar F5 / Ctrl+R
+    window.addEventListener(
+      "keydown",
+      async (e) => {
+        const isReload =
+          e.key === "F5" ||
+          ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r");
+        if (!isReload || !state.borradorId) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        await mostrarDialogoSalida("recargas la página", () => {
+          state.allowUnloadOnce = true;
+          window.location.reload();
+        });
+      },
+      true,
+    );
+
+    // 3. Interceptar clicks en enlaces internos
+    document.addEventListener(
+      "click",
+      async (e) => {
+        const link = e.target.closest("a[href]");
+        if (!link || !state.borradorId) return;
+
+        const href = link.getAttribute("href");
+        if (!href || href.startsWith("#") || href.startsWith("javascript:"))
+          return;
+        if (
+          link.getAttribute("target") &&
+          link.getAttribute("target") !== "_self"
+        )
+          return;
+        if (link.hasAttribute("download")) return;
+
+        // Verificar si es navegación a otra página
+        try {
+          const dest = new URL(href, window.location.href);
+          // Si es la misma URL (solo cambia el hash), permitir
+          if (dest.href.split("#")[0] === window.location.href.split("#")[0]) {
+            return;
+          }
+        } catch {
+          return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        await mostrarDialogoSalida("sales de la página", () => {
+          state.allowUnloadOnce = true;
+          window.location.href = href;
+        });
+      },
+      true,
+    );
+
+    // 4. Interceptar botón atrás del navegador
+    window.addEventListener("popstate", async (e) => {
+      // Solo interceptar si hay un borrador guardado
+      if (!state.borradorId) return;
+
+      // Volver a agregar el estado actual al historial para poder interceptar de nuevo
+      window.history.pushState({ borrador: true }, "", window.location.href);
+
+      await mostrarDialogoSalida("vuelves atrás", () => {
+        state.allowUnloadOnce = true;
+        // Navegar a la página de borradores en vez de ir atrás (más predecible)
+        window.location.href = "/catalogacion/borradores/";
+      });
+    });
+  }
 
   // ========================================
   // INICIALIZACIÓN
@@ -814,7 +992,7 @@
     const esperarFormularioListo = () => {
       const tipoRegistro = document.getElementById("id_tipo_registro");
       const nivelBibliografico = document.getElementById(
-        "id_nivel_bibliografico"
+        "id_nivel_bibliografico",
       );
       const obraObjetivoId = getObraObjetivoId();
 
@@ -836,9 +1014,15 @@
       // Cargar borrador si viene desde lista de borradores
       if (
         typeof BORRADOR_A_RECUPERAR !== "undefined" &&
-        BORRADOR_A_RECUPERAR !== null
+        BORRADOR_A_RECUPERAR !== null &&
+        BORRADOR_A_RECUPERAR !== "null" &&
+        BORRADOR_A_RECUPERAR !== "" &&
+        !isNaN(parseInt(BORRADOR_A_RECUPERAR, 10))
       ) {
-        setTimeout(() => cargarBorrador(BORRADOR_A_RECUPERAR), 300);
+        setTimeout(
+          () => cargarBorrador(parseInt(BORRADOR_A_RECUPERAR, 10)),
+          300,
+        );
       }
 
       // En edición: cargar borrador activo de la obra
@@ -861,6 +1045,7 @@
       }
 
       iniciarAutoguardado();
+      instalarAlertasSalida();
 
       form.addEventListener("input", onFormChange);
       form.addEventListener("change", onFormChange);
@@ -885,7 +1070,10 @@
 
   // Función para permitir publicación (llamada desde el modal de confirmación)
   function permitirPublicacion() {
+    state.allowUnloadOnce = true;
     state.isPublishing = true;
+    state.hasUnsavedChanges = false;
+    state.borradorId = null;
   }
 
   // API pública

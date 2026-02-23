@@ -13,7 +13,7 @@
         box-shadow: var(--pro-shadow);
         overflow: hidden;
     }
-    
+
     .marc-raw-header {
         padding: 0.75rem 1rem;
         background: var(--pro-surface);
@@ -22,7 +22,7 @@
         align-items: center;
         justify-content: space-between;
     }
-    
+
     .marc-raw-header h5 {
         margin: 0;
         font-size: 0.75rem;
@@ -34,12 +34,12 @@
         align-items: center;
         gap: 0.5rem;
     }
-    
+
     .marc-raw-header h5 i {
         color: var(--pro-accent);
         font-size: 0.875rem;
     }
-    
+
     .marc-record-count {
         font-size: 0.6875rem;
         color: var(--pro-text-muted);
@@ -48,7 +48,7 @@
         border: 1px solid var(--pro-border);
         border-radius: 3px;
     }
-    
+
     .marc-raw-body {
         padding: 1rem 1.25rem;
         font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
@@ -58,7 +58,7 @@
         background: var(--pro-white);
         overflow-x: auto;
     }
-    
+
     .marc-line {
         white-space: pre-wrap;
         word-break: break-word;
@@ -67,33 +67,33 @@
         border-radius: 3px;
         transition: background-color 0.15s ease;
     }
-    
+
     .marc-line:hover {
         background: var(--pro-surface);
     }
-    
+
     /* === COLORES MARC21 === */
     .marc-tag {
         color: #0066cc;
         font-weight: 600;
         letter-spacing: 0.02em;
     }
-    
+
     .marc-ind {
         color: #718096;
         font-weight: 400;
     }
-    
+
     .marc-sf {
         color: #d35400;
         font-weight: 500;
     }
-    
+
     .marc-val {
         color: #1a1d29;
         font-weight: 400;
     }
-    
+
     .marc-fixed {
         color: #6c757d;
         letter-spacing: 0.05em;
@@ -188,7 +188,7 @@
 {# === CAMPOS 2XX - TÍTULOS Y PUBLICACIÓN === #}
 {% if obra.titulo_240 and obra.compositor %}<div class="marc-line"><span class="marc-tag">=240</span>  <span class="marc-ind">10</span><span class="marc-sf">$a</span><span class="marc-val">{{ obra.titulo_240 }}</span>{% if obra.forma_240 %}<span class="marc-sf">$k</span><span class="marc-val">{{ obra.forma_240 }}</span>{% endif %}{% if obra.medio_interpretacion_240 %}<span class="marc-sf">$m</span><span class="marc-val">{{ obra.get_medio_interpretacion_240_display }}</span>{% endif %}{% if obra.numero_parte_240 %}<span class="marc-sf">$n</span><span class="marc-val">{{ obra.numero_parte_240 }}</span>{% endif %}{% if obra.arreglo_240 %}<span class="marc-sf">$o</span><span class="marc-val">{{ obra.get_arreglo_240_display }}</span>{% endif %}{% if obra.nombre_parte_240 %}<span class="marc-sf">$p</span><span class="marc-val">{{ obra.nombre_parte_240 }}</span>{% endif %}{% if obra.tonalidad_240 %}<span class="marc-sf">$r</span><span class="marc-val">{{ obra.get_tonalidad_240_display }}</span>{% endif %}</div>{% endif %}
 <div class="marc-line"><span class="marc-tag">=245</span>  <span class="marc-ind">{% if obra.compositor %}1{% else %}0{% endif %}0</span><span class="marc-sf">$a</span><span class="marc-val">{{ obra.titulo_principal }}</span>{% if obra.subtitulo %}<span class="marc-sf">$b</span><span class="marc-val">{{ obra.subtitulo }}</span>{% endif %}{% if obra.mencion_responsabilidad %}<span class="marc-sf">$c</span><span class="marc-val">{{ obra.mencion_responsabilidad }}</span>{% endif %}{% if obra.tipo_registro == 'd' %}<span class="marc-sf">$h</span><span class="marc-val">[música manuscrita]</span>{% elif obra.tipo_registro == 'c' %}<span class="marc-sf">$h</span><span class="marc-val">[música impresa]</span>{% endif %}</div>
-{% for titulo_alt in obra.titulos_alternativos.all %}<div class="marc-line"><span class="marc-tag">=246</span>  <span class="marc-ind">1#</span>{% if titulo_alt.texto_visualizacion %}<span class="marc-sf">$i</span><span class="marc-val">{{ titulo_alt.texto_visualizacion }}</span>{% endif %}<span class="marc-sf">$a</span><span class="marc-val">{{ titulo_alt.titulo }}</span>{% if titulo_alt.resto_titulo %}<span class="marc-sf">$b</span><span class="marc-val">{{ titulo_alt.resto_titulo }}</span>{% endif %}</div>{% endfor %}
+{% for titulo_alt in obra.titulos_alternativos.all %}<div class="marc-line"><span class="marc-tag">=246</span>  <span class="marc-ind">1#</span>{% if titulo_alt.texto_visualizacion %}<span class="marc-sf">$i</span><span class="marc-val">{{ titulo_alt.texto_visualizacion }}</span>{% endif %}<span class="marc-sf">$a</span><span class="marc-val">{{ titulo_alt.titulo }}</span>{% if titulo_alt.subtitulo %}<span class="marc-sf">$b</span><span class="marc-val">{{ titulo_alt.subtitulo }}</span>{% endif %}</div>{% endfor %}
 {% for edicion in obra.ediciones.all %}<div class="marc-line"><span class="marc-tag">=250</span>  <span class="marc-ind">##</span><span class="marc-sf">$a</span><span class="marc-val">{{ edicion.edicion }}</span></div>{% endfor %}
 {% for prod in obra.producciones_publicaciones.all %}<div class="marc-line"><span class="marc-tag">=264</span>  <span class="marc-ind">#{{ prod.funcion }}</span>{% for lugar in prod.lugares.all %}<span class="marc-sf">$a</span><span class="marc-val">{{ lugar.lugar }}</span>{% endfor %}{% for entidad in prod.entidades.all %}<span class="marc-sf">$b</span><span class="marc-val">{{ entidad.nombre }}</span>{% endfor %}{% for fecha in prod.fechas.all %}<span class="marc-sf">$c</span><span class="marc-val">{{ fecha.fecha }}</span>{% endfor %}</div>{% endfor %}
 
@@ -212,12 +212,12 @@
 {% with obra.datos_biograficos_545 as datos_bio %}{% if datos_bio %}<div class="marc-line"><span class="marc-tag">=545</span>  <span class="marc-ind">0#</span>{% if datos_bio.texto_biografico %}<span class="marc-sf">$a</span><span class="marc-val">{{ datos_bio.texto_biografico }}</span>{% endif %}{% if datos_bio.uri %}<span class="marc-sf">$u</span><span class="marc-val">{{ datos_bio.uri }}</span>{% endif %}</div>{% endif %}{% endwith %}
 
 {# === CAMPOS 6XX - MATERIAS === #}
-{% for materia in obra.materias_650.all %}<div class="marc-line"><span class="marc-tag">=650</span>  <span class="marc-ind">04</span><span class="marc-sf">$a</span><span class="marc-val">{{ materia.materia }}</span>{% for subdiv in materia.subdivisiones.all %}<span class="marc-sf">$x</span><span class="marc-val">{{ subdiv.subdivision }}</span>{% endfor %}</div>{% endfor %}
+{% for materia in obra.materias_650.all %}<div class="marc-line"><span class="marc-tag">=650</span>  <span class="marc-ind">04</span><span class="marc-sf">$a</span><span class="marc-val">{{ materia.materia }}</span>{% for subdiv in materia.subdivisiones.all %}<span class="marc-sf">$y</span><span class="marc-val">{{ subdiv.subdivision }}</span>{% endfor %}{% for subdiv in materia.subdivisiones_geograficas.all %}<span class="marc-sf">$z</span><span class="marc-val">{{ subdiv.subdivision }}</span>{% endfor %}</div>{% endfor %}
 {% for genero in obra.materias_655.all %}<div class="marc-line"><span class="marc-tag">=655</span>  <span class="marc-ind">#4</span><span class="marc-sf">$a</span><span class="marc-val">{{ genero.materia }}</span>{% for subdiv in genero.subdivisiones.all %}<span class="marc-sf">$x</span><span class="marc-val">{{ subdiv.subdivision }}</span>{% endfor %}</div>{% endfor %}
 
 {# === CAMPOS 7XX - PUNTOS DE ACCESO ADICIONALES === #}
 {% for nombre in obra.nombres_relacionados_700.all %}<div class="marc-line"><span class="marc-tag">=700</span>  <span class="marc-ind">1#</span>{% if nombre.persona %}<span class="marc-sf">$a</span><span class="marc-val">{{ nombre.persona.apellidos_nombres }}</span>{% if nombre.persona.coordenadas_biograficas %}<span class="marc-sf">$d</span><span class="marc-val">{{ nombre.persona.coordenadas_biograficas }}</span>{% endif %}{% endif %}{% for termino in nombre.terminos_asociados.all %}<span class="marc-sf">$c</span><span class="marc-val">{{ termino.termino }}</span>{% endfor %}{% for funcion in nombre.funciones.all %}<span class="marc-sf">$e</span><span class="marc-val">{{ funcion.get_funcion_display }}</span>{% endfor %}{% if nombre.relacion %}<span class="marc-sf">$i</span><span class="marc-val">{{ nombre.relacion }}</span>{% endif %}{% if nombre.autoria %}<span class="marc-sf">$j</span><span class="marc-val">{{ nombre.get_autoria_display }}</span>{% endif %}{% if nombre.titulo_obra %}<span class="marc-sf">$t</span><span class="marc-val">{{ nombre.titulo_obra }}</span>{% endif %}</div>{% endfor %}
-{% for entidad in obra.entidades_relacionadas_710.all %}<div class="marc-line"><span class="marc-tag">=710</span>  <span class="marc-ind">2#</span>{% if entidad.entidad %}<span class="marc-sf">$a</span><span class="marc-val">{{ entidad.entidad }}</span>{% endif %}{% if entidad.funcion %}<span class="marc-sf">$e</span><span class="marc-val">{{ entidad.get_funcion_display }}</span>{% endif %}</div>{% endfor %}
+{% for entidad in obra.entidades_relacionadas_710.all %}<div class="marc-line"><span class="marc-tag">=710</span>  <span class="marc-ind">2#</span>{% if entidad.entidad %}<span class="marc-sf">$a</span><span class="marc-val">{{ entidad.entidad }}</span>{% endif %}{% for fi in entidad.funciones_institucionales.all %}<span class="marc-sf">$e</span><span class="marc-val">{{ fi.get_funcion_display }}</span>{% endfor %}</div>{% endfor %}
 {% for enlace773 in obra.enlaces_documento_fuente_773.all %}<div class="marc-line"><span class="marc-tag">=773</span>  <span class="marc-ind">1#</span>{% if enlace773.encabezamiento_principal %}<span class="marc-sf">$a</span><span class="marc-val">{{ enlace773.encabezamiento_principal }}</span>{% endif %}{% if enlace773.titulo %}<span class="marc-sf">$t</span><span class="marc-val">{{ enlace773.titulo }}</span>{% endif %}{% for numctrl in enlace773.numeros_control.all %}<span class="marc-sf">$w</span><span class="marc-val">{{ numctrl }}</span>{% endfor %}</div>{% endfor %}
 {% for enlace774 in obra.enlaces_unidades_774.all %}<div class="marc-line"><span class="marc-tag">=774</span>  <span class="marc-ind">1#</span>{% if enlace774.encabezamiento_principal %}<span class="marc-sf">$a</span><span class="marc-val">{{ enlace774.encabezamiento_principal }}</span>{% endif %}{% if enlace774.titulo %}<span class="marc-sf">$t</span><span class="marc-val">{{ enlace774.titulo }}</span>{% endif %}{% for numctrl in enlace774.numeros_control.all %}<span class="marc-sf">$w</span><span class="marc-val">{{ numctrl }}</span>{% endfor %}</div>{% endfor %}
 {% for otra787 in obra.otras_relaciones_787.all %}<div class="marc-line"><span class="marc-tag">=787</span>  <span class="marc-ind">1#</span>{% if otra787.encabezamiento_principal %}<span class="marc-sf">$a</span><span class="marc-val">{{ otra787.encabezamiento_principal }}</span>{% endif %}{% if otra787.titulo %}<span class="marc-sf">$t</span><span class="marc-val">{{ otra787.titulo }}</span>{% endif %}{% for numctrl in otra787.numeros_control.all %}<span class="marc-sf">$w</span><span class="marc-val">{{ numctrl }}</span>{% endfor %}</div>{% endfor %}

@@ -15,21 +15,70 @@
   font-style: normal;
 }
 
-.incipit-canvas-wrap{
+.incipit-view-canvas {
   width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: .5rem;
-}
-
-.incipit-view-canvas{
-  width: 100%;
-  max-width: 700px;
-  height: 250px;      /* tamaño visual */
+  max-width: 500px;
   display: block;
-  background: #ffffffdc;
+  background: transparent;
+  pointer-events: none;
+  cursor: default;
 }
 
+/* Badges de tipo de obra con colores específicos */
+.tipo-badge.manuscrito.coleccion {
+    background: #007bff;
+    color: white;
+    border-color: #0056b3;
+}
+
+.tipo-badge.manuscrito.obra-coleccion {
+    background: #6f42c1;
+    color: white;
+    border-color: #5a32a3;
+}
+
+.tipo-badge.manuscrito.obra-individual {
+    background: #17a2b8;
+    color: white;
+    border-color: #138496;
+}
+
+.tipo-badge.impreso.coleccion {
+    background: #28a745;
+    color: white;
+    border-color: #1e7e34;
+}
+
+.tipo-badge.impreso.obra-coleccion {
+    background: #fd7e14;
+    color: #212529;
+    border-color: #d63384;
+}
+
+.tipo-badge.impreso.obra-individual {
+    background: #6c757d;
+    color: white;
+    border-color: #5c636a;
+}
+
+.tipo-badge.obra {
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    color: #4527a0;
+    border-color: #ce93d8;
+}
+
+/* Estados de publicación con mismos estilos que tipo-badge */
+.tipo-badge.publicada {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    color: #2e7d32;
+    border-color: #a5d6a7;
+}
+
+.tipo-badge.no-publicada {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    color: #6c757d;
+    border-color: #adb5bd;
+}
 
 </style>
 {% endblock %}
@@ -59,11 +108,58 @@
                     </div>
                     {% endif %}
 
+                    {# Badges de tipo y publicación #}
+                    <div class="d-flex align-items-center gap-2 ms-3">
+                        {% if obra.tipo_registro == 'd' %}
+                            {% if obra.nivel_bibliografico == 'c' %}
+                                <span class="badge bg-info">Colección Manuscrita</span>
+                            {% elif obra.nivel_bibliografico == 'a' %}
+                                <span class="badge bg-info">Obra en Colección Manuscrita</span>
+                            {% else %}
+                                <span class="badge bg-info">Obra Individual Manuscrita</span>
+                            {% endif %}
+                        {% else %}
+                            {% if obra.nivel_bibliografico == 'c' %}
+                                <span class="badge bg-primary">Colección Impresa</span>
+                            {% elif obra.nivel_bibliografico == 'a' %}
+                                <span class="badge bg-primary">Obra en Colección Impresa</span>
+                            {% else %}
+                                <span class="badge bg-primary">Obra Individual Impresa</span>
+                            {% endif %}
+                        {% endif %}
+                        {% if obra.publicada %}
+                            <span class="badge bg-success" title="Visible en catálogo público">
+                                <i class="bi bi-globe"></i> Publicada
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary" title="No visible en catálogo público">
+                                <i class="bi bi-eye-slash"></i> Sin publicar
+                            </span>
+                        {% endif %}
+                    </div>
+
                 </div>
 
-                <a href="{% url 'catalogacion:editar_obra' pk=obra.pk %}" class="btn-action">
-                    <i class="bi bi-pencil"></i> Editar
-                </a>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'catalogacion:editar_obra' pk=obra.pk %}" class="btn-action">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    {% if obra.publicada %}
+                        <form method="post" action="{% url 'catalogacion:despublicar_obra' pk=obra.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-warning btn-sm" title="Retirar del catálogo público">
+                                <i class="bi bi-eye-slash"></i> Despublicar
+                            </button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{% url 'catalogacion:publicar_obra' pk=obra.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm" title="Hacer visible en catálogo público">
+                                <i class="bi bi-globe"></i> Publicar
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
 
         </div>
@@ -94,13 +190,94 @@
             <!-- ================= ADMINISTRACIÓN ================= -->
             <section id="admin" class="detalle-section">
                 <h3>Administración</h3>
-                {% if obra.centro_catalogador %}
-                <div class="data-row">
-                    <span class="campo-tag">040</span>
-                    <span>Centro catalogador:</span>
-                    <strong>{{ obra.centro_catalogador }}</strong>
+                <div class="data-grid-compact">
+                    {% if obra.num_control %}
+                    <div class="data-row">
+                        <span class="campo-tag">001</span>
+                        <div class="data-cell">
+                            <span class="campo-label">Número de control</span>
+                            <div class="linea-principal"><strong>{{ obra.num_control }}</strong></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if obra.centro_catalogador %}
+                    <div class="data-row">
+                        <span class="campo-tag">040</span>
+                        <div class="data-cell">
+                            <span class="campo-label">Centro catalogador</span>
+                            <div class="linea-principal"><strong>{{ obra.centro_catalogador }}</strong></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if obra.codigos_lengua.exists %}
+                        {% for lengua in obra.codigos_lengua.all %}
+                        <div class="data-row">
+                            <span class="campo-tag">041</span>
+                            <div class="data-cell">
+                                <span class="campo-label">Código de lengua</span>
+                                <div class="linea-principal">
+                                    {% for idioma in lengua.idiomas.all %}$a <strong>{{ idioma.get_codigo_idioma_display }}</strong>{% if not forloop.last %}, {% endif %}{% endfor %}
+                                    {% if lengua.es_traduccion %} <em>(incluye traducción)</em>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if obra.codigos_pais_entidad.exists %}
+                        {% for pais in obra.codigos_pais_entidad.all %}
+                        <div class="data-row">
+                            <span class="campo-tag">044</span>
+                            <div class="data-cell">
+                                <span class="campo-label">País de publicación</span>
+                                <div class="linea-principal">$a <strong>{{ pais.get_codigo_pais_display }}</strong></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if obra.catalogador %}
+                    <div class="data-row">
+                        <span class="campo-tag"><i class="bi bi-person-badge"></i></span>
+                        <div class="data-cell">
+                            <span class="campo-label">Catalogador</span>
+                            <div class="linea-principal"><strong>{{ obra.catalogador.get_full_name|default:obra.catalogador.username }}</strong></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if obra.modificado_por %}
+                    <div class="data-row">
+                        <span class="campo-tag"><i class="bi bi-pencil-square"></i></span>
+                        <div class="data-cell">
+                            <span class="campo-label">Modificado por</span>
+                            <div class="linea-principal"><strong>{{ obra.modificado_por.get_full_name|default:obra.modificado_por.username }}</strong></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if obra.fecha_creacion_sistema %}
+                    <div class="data-row">
+                        <span class="campo-tag"><i class="bi bi-calendar-plus"></i></span>
+                        <div class="data-cell">
+                            <span class="campo-label">Fecha de creación</span>
+                            <div class="linea-principal"><strong>{{ obra.fecha_creacion_sistema|date:"d/m/Y H:i" }}</strong></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if obra.fecha_modificacion_sistema %}
+                    <div class="data-row">
+                        <span class="campo-tag"><i class="bi bi-calendar-check"></i></span>
+                        <div class="data-cell">
+                            <span class="campo-label">Última modificación</span>
+                            <div class="linea-principal"><strong>{{ obra.fecha_modificacion_sistema|date:"d/m/Y H:i" }}</strong></div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </section>
             <!-- ================= NOMBRES Y TÍTULOS ================= -->
             <section id="nombres_titulos" class="detalle-section">
@@ -111,13 +288,28 @@
                     <div class="data-row">
                         <span class="campo-tag">100</span>
                         <div class="data-cell">
+                            <span class="campo-label">Compositor</span>
                             <div class="linea-principal">
-                                <strong>$a {{ obra.compositor }}</strong>
-                                {% if obra.compositor.coordenadas_biograficas %} $d ({{ obra.compositor.coordenadas_biograficas }}){% endif %}
+                                $a - Nombre: <strong>{{ obra.compositor }}</strong>
                             </div>
+                            {% if obra.compositor.coordenadas_biograficas %}
+                                <div class="linea-secundaria">
+                                    $d - Coordenadas biográficas: <strong>{{ obra.compositor.coordenadas_biograficas }}</strong>
+                                </div>
+                            {% endif %}
                             {% if obra.termino_asociado %}
                                 <div class="linea-secundaria">
-                                    <em>$e {{ obra.termino_asociado }}</em>
+                                    $c - Término asociado: <strong>{{ obra.termino_asociado }}</strong>
+                                </div>
+                            {% endif %}
+                            {% if obra.funciones_compositor.exists %}
+                                <div class="linea-secundaria">
+                                    $e - Función: <strong>{% for func in obra.funciones_compositor.all %}{{ func.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
+                                </div>
+                            {% endif %}
+                            {% if obra.autoria %}
+                                <div class="linea-secundaria">
+                                    $j - Autoría: <strong>{{ obra.get_autoria_display }}</strong>
                                 </div>
                             {% endif %}
                         </div>
@@ -128,17 +320,28 @@
                     <div class="data-row">
                         <span class="campo-tag">130</span>
                         <div class="data-cell">
+                            <span class="campo-label">Título uniforme - Punto de acceso principal</span>
                             <div class="linea-principal">
-                                <strong>$a {{ obra.titulo_uniforme }}</strong>
+                                $a <strong>{{ obra.titulo_uniforme }}</strong>
                             </div>
-                            <div class="linea-secundaria">
-                                {% if obra.forma_130 %}$a {{ obra.forma_130 }}{% endif %}
-                                {% if obra.medio_interpretacion_130 %}{% if obra.forma_130 %} $b {% else %}$a {% endif %}{{ obra.medio_interpretacion_130 }}{% endif %}
-                                {% if obra.numero_parte_130 %} $n {{ obra.numero_parte_130 }}{% endif %}
-                                {% if obra.nombre_parte_130 %} $p {{ obra.nombre_parte_130 }}{% endif %}
-                                {% if obra.tonalidad_130 %} $r {{ obra.tonalidad_130 }}{% endif %}
-                                {% if obra.arreglo_130 %} $m {{ obra.get_arreglo_130_display|default:obra.arreglo_130 }}{% endif %}
-                            </div>
+                            {% if obra.forma_130 %}
+                                <div class="linea-secundaria">$k - Subencabezamiento de forma: <strong>{{ obra.forma_130 }}</strong></div>
+                            {% endif %}
+                            {% if obra.medio_interpretacion_130 %}
+                                <div class="linea-secundaria">$m - Medio de interpretación: <strong>{{ obra.medio_interpretacion_130 }}</strong></div>
+                            {% endif %}
+                            {% if obra.numero_parte_130 %}
+                                <div class="linea-secundaria">$n - Número de parte: <strong>{{ obra.numero_parte_130 }}</strong></div>
+                            {% endif %}
+                            {% if obra.nombre_parte_130 %}
+                                <div class="linea-secundaria">$p - Nombre de parte: <strong>{{ obra.nombre_parte_130 }}</strong></div>
+                            {% endif %}
+                            {% if obra.tonalidad_130 %}
+                                <div class="linea-secundaria">$r - Tonalidad: <strong>{{ obra.tonalidad_130 }}</strong></div>
+                            {% endif %}
+                            {% if obra.arreglo_130 %}
+                                <div class="linea-secundaria">$o - Arreglo: <strong>{{ obra.get_arreglo_130_display|default:obra.arreglo_130 }}</strong></div>
+                            {% endif %}
                         </div>
                     </div>
                     {% endif %}
@@ -147,17 +350,28 @@
                     <div class="data-row">
                         <span class="campo-tag">240</span>
                         <div class="data-cell">
+                            <span class="campo-label">Título uniforme</span>
                             <div class="linea-principal">
-                                <strong>$a {{ obra.titulo_240 }}</strong>
+                                $a <strong>{{ obra.titulo_240 }}</strong>
                             </div>
-                            <div class="linea-secundaria">
-                                {% if obra.forma_240 %}$a {{ obra.forma_240 }}{% endif %}
-                                {% if obra.medio_interpretacion_240 %}{% if obra.forma_240 %} $b {% else %}$a {% endif %}{{ obra.medio_interpretacion_240 }}{% endif %}
-                                {% if obra.numero_parte_240 %} $n {{ obra.numero_parte_240 }}{% endif %}
-                                {% if obra.nombre_parte_240 %} $p {{ obra.nombre_parte_240 }}{% endif %}
-                                {% if obra.tonalidad_240 %} $r {{ obra.tonalidad_240 }}{% endif %}
-                                {% if obra.arreglo_240 %} $m {{ obra.get_arreglo_240_display|default:obra.arreglo_240 }}{% endif %}
-                            </div>
+                            {% if obra.forma_240 %}
+                                <div class="linea-secundaria">$k - Subencabezamiento de forma: <strong>{{ obra.forma_240 }}</strong></div>
+                            {% endif %}
+                            {% if obra.medio_interpretacion_240 %}
+                                <div class="linea-secundaria">$m - Medio de interpretación: <strong>{{ obra.medio_interpretacion_240 }}</strong></div>
+                            {% endif %}
+                            {% if obra.numero_parte_240 %}
+                                <div class="linea-secundaria">$n - Número de parte: <strong>{{ obra.numero_parte_240 }}</strong></div>
+                            {% endif %}
+                            {% if obra.nombre_parte_240 %}
+                                <div class="linea-secundaria">$p - Nombre de parte: <strong>{{ obra.nombre_parte_240 }}</strong></div>
+                            {% endif %}
+                            {% if obra.tonalidad_240 %}
+                                <div class="linea-secundaria">$r - Tonalidad: <strong>{{ obra.tonalidad_240 }}</strong></div>
+                            {% endif %}
+                            {% if obra.arreglo_240 %}
+                                <div class="linea-secundaria">$o - Arreglo: <strong>{{ obra.get_arreglo_240_display|default:obra.arreglo_240 }}</strong></div>
+                            {% endif %}
                         </div>
                     </div>
                     {% endif %}
@@ -166,12 +380,18 @@
                     <div class="data-row">
                         <span class="campo-tag">245</span>
                         <div class="data-cell">
+                            <span class="campo-label">Título en fuente</span>
                             <div class="linea-principal">
-                                <strong>$a {{ obra.titulo_principal }}</strong>{% if obra.subtitulo %} $b {{ obra.subtitulo }}{% endif %}
+                                $a - Título: <strong>{{ obra.titulo_principal }}</strong>
                             </div>
+                            {% if obra.subtitulo %}
+                            <div class="linea-secundaria">
+                                $b - Subtítulo: <strong>{{ obra.subtitulo }}</strong>
+                            </div>
+                            {% endif %}
                             {% if obra.mencion_responsabilidad %}
                             <div class="linea-secundaria">
-                                $c {{ obra.mencion_responsabilidad }}
+                                $c - Mención de responsabilidad: <strong>{{ obra.mencion_responsabilidad }}</strong>
                             </div>
                             {% endif %}
                         </div>
@@ -183,13 +403,18 @@
                         <div class="data-row">
                             <span class="campo-tag">246</span>
                             <div class="data-cell">
+                                <span class="campo-label">Título alternativo</span>
                                 <div class="linea-principal">
-                                    $a {{ alt.titulo }}
-                                    {% if alt.resto_titulo %}$b {{ alt.resto_titulo }}{% endif %}
+                                    $a - Título: <strong>{{ alt.titulo }}</strong>
                                 </div>
+                                {% if alt.subtitulo %}
+                                <div class="linea-secundaria">
+                                    $b - Subtítulo: <strong>{{ alt.subtitulo }}</strong>
+                                </div>
+                                {% endif %}
                                 {% if alt.texto_visualizacion %}
                                 <div class="linea-secundaria">
-                                    $n [{{ alt.texto_visualizacion }}]
+                                    $i - Texto de visualización: <strong>{{ alt.texto_visualizacion }}</strong>
                                 </div>
                                 {% endif %}
                             </div>
@@ -202,14 +427,21 @@
                         <div class="data-row">
                             <span class="campo-tag">700</span>
                             <div class="data-cell">
+                                <span class="campo-label">Nombre relacionado</span>
                                 <div class="linea-principal">
-                                    <strong>$a {{ nombre.persona }}</strong>
-                                    {% if nombre.coordenadas_biograficas %} $d ({{ nombre.coordenadas_biograficas }}){% endif %}
+                                    $a - Nombre: <strong>{% if nombre.persona %}{{ nombre.persona.apellidos_nombres }}{% endif %}</strong>
                                 </div>
+                                {% if nombre.coordenadas_biograficas %}
+                                <div class="linea-secundaria">$d - Coordenadas biográficas: <strong>{{ nombre.coordenadas_biograficas }}</strong></div>
+                                {% endif %}
                                 {% if nombre.funciones.exists %}
-                                <div class="linea-secundaria">
-                                    {% for funcion in nombre.funciones.all %}$e {{ funcion.get_funcion_display }}{% if not forloop.last %} ; {% endif %}{% endfor %}
-                                </div>
+                                <div class="linea-secundaria">$e - Función: <strong>{% for funcion in nombre.funciones.all %}{{ funcion.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong></div>
+                                {% endif %}
+                                {% if nombre.terminos_asociados.exists %}
+                                <div class="linea-secundaria">$c - Término asociado: <strong>{% for termino in nombre.terminos_asociados.all %}{{ termino.termino }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong></div>
+                                {% endif %}
+                                {% if nombre.autoria %}
+                                <div class="linea-secundaria">$j - Autoría: <strong>{{ nombre.get_autoria_display }}</strong></div>
                                 {% endif %}
                             </div>
                         </div>
@@ -221,12 +453,13 @@
                         <div class="data-row">
                             <span class="campo-tag">710</span>
                             <div class="data-cell">
+                                <span class="campo-label">Entidad relacionada</span>
                                 <div class="linea-principal">
-                                    <strong>$a {{ entidad.entidad }}</strong>
+                                    $a <strong>{{ entidad.entidad }}</strong>
                                 </div>
-                                {% if entidad.funcion %}
+                                {% if entidad.funciones_institucionales.exists %}
                                 <div class="linea-secundaria">
-                                    $e {{ entidad.get_funcion_display }}
+                                    $e <strong>{% for fi in entidad.funciones_institucionales.all %}{{ fi.get_funcion_display }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
                                 </div>
                                 {% endif %}
                             </div>
@@ -244,7 +477,10 @@
                     {% if obra.ms_imp %}
                     <div class="data-row">
                         <span class="campo-tag">340</span>
-                        <span>$a {{ obra.get_ms_imp_display }}</span>
+                        <div class="data-cell">
+                            <span class="campo-label">Técnica de producción</span>
+                            <div class="linea-principal">$a <strong>{{ obra.get_ms_imp_display }}</strong></div>
+                        </div>
                     </div>
                     {% endif %}
 
@@ -252,7 +488,22 @@
                         {% for prod in obra.producciones_publicaciones.all %}
                         <div class="data-row">
                             <span class="campo-tag">264</span>
-                            <span>$a {{ prod.get_funcion_display }}</span>
+                            <div class="data-cell">
+                                <span class="campo-label">Producción de la obra [{{ prod.get_funcion_display }}]</span>
+                                <div class="linea-principal">
+                                    {% for lugar in prod.lugares.all %}$a <strong>{{ lugar.lugar }}</strong>{% if not forloop.last %}, {% endif %}{% endfor %}
+                                </div>
+                                {% if prod.entidades.exists %}
+                                <div class="linea-secundaria">
+                                    {% for entidad in prod.entidades.all %}$b <strong>{{ entidad.nombre }}</strong>{% if not forloop.last %}, {% endif %}{% endfor %}
+                                </div>
+                                {% endif %}
+                                {% if prod.fechas.exists %}
+                                <div class="linea-secundaria">
+                                    {% for fecha in prod.fechas.all %}$c <strong>{{ fecha.fecha }}</strong>{% if not forloop.last %}, {% endif %}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
                         {% endfor %}
                     {% endif %}
@@ -261,16 +512,82 @@
                         {% for ed in obra.ediciones.all %}
                         <div class="data-row">
                             <span class="campo-tag">250</span>
-                            <span>$a {{ ed.edicion }}</span>
+                            <div class="data-cell">
+                                <span class="campo-label">Edición</span>
+                                <div class="linea-principal">$a <strong>{{ ed.edicion }}</strong></div>
+                            </div>
                         </div>
                         {% endfor %}
                     {% endif %}
 
-                    {% if obra.extension or obra.dimension %}
+                    {% if obra.extension or obra.otras_caracteristicas or obra.dimension or obra.material_acompanante %}
                     <div class="data-row">
                         <span class="campo-tag">300</span>
-                        <span>$a {{ obra.extension }}{% if obra.dimension %} $c {{ obra.dimension }}{% endif %}</span>
+                        <div class="data-cell">
+                            <span class="campo-label">Descripción física</span>
+                            <div class="linea-principal">
+                                {% if obra.extension %}$a <strong>{{ obra.extension }}</strong>{% endif %}
+                                {% if obra.otras_caracteristicas %}{% if obra.extension %} : {% endif %}$b <strong>{{ obra.otras_caracteristicas }}</strong>{% endif %}
+                                {% if obra.dimension %} $c <strong>{{ obra.dimension }}</strong>{% endif %}
+                                {% if obra.material_acompanante %} $+ <strong>{{ obra.material_acompanante }}</strong>{% endif %}
+                            </div>
+                        </div>
                     </div>
+                    {% endif %}
+
+                    <!-- Identificadores (020, 024, 028) -->
+                    {% if obra.isbn %}
+                    <div class="data-row">
+                        <span class="campo-tag">020</span>
+                        <div class="data-cell">
+                            <span class="campo-label">ISBN</span>
+                            <div class="linea-principal">$a <strong>{{ obra.isbn }}</strong></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if obra.ismn %}
+                    <div class="data-row">
+                        <span class="campo-tag">024</span>
+                        <div class="data-cell">
+                            <span class="campo-label">ISMN</span>
+                            <div class="linea-principal">$a <strong>{{ obra.ismn }}</strong></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if obra.numero_editor %}
+                    <div class="data-row">
+                        <span class="campo-tag">028</span>
+                        <div class="data-cell">
+                            <span class="campo-label">Número de editor</span>
+                            <div class="linea-principal">$a <strong>{{ obra.numero_editor }}</strong></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Disponible (856) -->
+                    {% if obra.disponibles_856.exists %}
+                    {% for disponible in obra.disponibles_856.all %}
+                        {% for url in disponible.urls_856.all %}
+                        <div class="data-row">
+                            <span class="campo-tag">856</span>
+                            <div class="data-cell">
+                                <span class="campo-label">Recurso electrónico</span>
+                                <div class="linea-principal">
+                                    $u <strong><a href="{{ url.url }}" class="acceso-link" target="_blank">
+                                        {{ url.url }} <i class="bi bi-box-arrow-up-right"></i>
+                                    </a></strong>
+                                </div>
+                                {% if disponible.textos_enlace_856.first %}
+                                <div class="linea-secundaria">
+                                    $y <strong>{{ disponible.textos_enlace_856.first.texto_enlace }}</strong>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endfor %}
                     {% endif %}
                 </div>
             </section>
@@ -282,21 +599,24 @@
                     {% if obra.formato %}
                     <div class="data-row">
                         <span class="campo-tag">348</span>
-                        <span>$a {{ obra.get_formato_display }}</span>
+                        <div class="data-cell">
+                            <span class="campo-label">Formato</span>
+                            <div class="linea-principal">$a <strong>{{ obra.get_formato_display }}</strong></div>
+                        </div>
                     </div>
                     {% endif %}
 
                     {% if obra.medios_interpretacion_382.all %}
-                    <div class="data-row full">
+                    <div class="data-row">
                         <span class="campo-tag">382</span>
                         <div class="data-cell">
-                            <span>$a </span>
+                            <span class="campo-label">Medio de interpretación</span>
                             {% for medio in obra.medios_interpretacion_382.all %}
-                                <div class="medio-item">
+                                <div class="linea-{% if forloop.first %}principal{% else %}secundaria{% endif %}">
                                     {% if medio.medios.all %}
-                                        {% for m in medio.medios.all %}$a {{ m.get_medio_display }}{% if not forloop.last %} $b {% endif %}{% endfor %}
+                                        {% for m in medio.medios.all %}$a <strong>{{ m.get_medio_display }}</strong>{% if not forloop.last %}, {% endif %}{% endfor %}
                                     {% endif %}
-                                    {% if medio.solista %}$n Solista: {{ medio.solista }}{% endif %}
+                                    {% if medio.solista %} $n Solista: <strong>{{ medio.solista }}</strong>{% endif %}
                                 </div>
                             {% endfor %}
                         </div>
@@ -306,14 +626,23 @@
                     {% if obra.numero_obra or obra.opus %}
                     <div class="data-row">
                         <span class="campo-tag">383</span>
-                        <span>$n {% if obra.numero_obra %}{{ obra.numero_obra }}{% endif %}{% if obra.opus %}{% if obra.numero_obra %} $o {% endif %}Op. {{ obra.opus }}{% endif %}</span>
+                        <div class="data-cell">
+                            <span class="campo-label">Designación numérica de obra musical</span>
+                            <div class="linea-principal">
+                                {% if obra.numero_obra %}$a <strong>{{ obra.numero_obra }}</strong>{% endif %}
+                                {% if obra.opus %}{% if obra.numero_obra %} {% endif %}$b <strong>Op. {{ obra.opus }}</strong>{% endif %}
+                            </div>
+                        </div>
                     </div>
                     {% endif %}
 
                     {% if obra.tonalidad_384 %}
                     <div class="data-row">
                         <span class="campo-tag">384</span>
-                        <span>$a {{ obra.tonalidad_384 }}</span>
+                        <div class="data-cell">
+                            <span class="campo-label">Tonalidad</span>
+                            <div class="linea-principal">$a <strong>{{ obra.tonalidad_384 }}</strong></div>
+                        </div>
                     </div>
                     {% endif %}
                 </div>
@@ -338,7 +667,7 @@
                             {% if incipit.voz_instrumento %}{{ incipit.voz_instrumento }}{% endif %}
                             {% if incipit.clave %} · Clave: {{ incipit.clave }}{% endif %}
                             {% if incipit.armadura %} · Armadura: {{ incipit.armadura }}{% endif %}
-                            {% if incipit.tiempo %} · Tiempo: {{ incipit.tiempo }}{% endif %}
+                            {% if incipit.tiempo %} · Compás: {{ incipit.tiempo }}{% endif %}
                         </div>
 
 
@@ -346,18 +675,34 @@
                             {# ========== MÉTODO CORRECTO: json_script con ID fijo ========== #}
                             <script id="paec_json_{{ incipit.pk }}" type="application/json">{{ incipit.paec_full|safe }}</script>
 
-                            <div class="incipit-canvas-wrap">
-                                <canvas
-                                    id="incipit_view_canvas_{{ incipit.pk }}"
-                                    class="incipit-view-canvas"
-                                    widtzzzh="800"
-                                    height="320"
-                                    data-paec-json-id="paec_json_{{ incipit.pk }}">
-                                </canvas>
-                            </div>
+                            <div class="obra-card-body">
+                            {% with primer_incipit=obra.incipits_musicales.first %}
+                                {% if primer_incipit and primer_incipit.paec_full %}
+                                    {# Mostrar canvas del primer íncipit #}
+                                    <script id="paec_json_{{ primer_incipit.pk }}" type="application/json">{{ primer_incipit.paec_full|safe }}</script>
+                                        <canvas
+                                            id="incipit_view_canvas_{{ primer_incipit.pk }}"
+                                            class="incipit-view-canvas"
+                                            width="700"
+                                            height="205"
+                                            data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
+                                        </canvas>
+
+
+                                    {# Información textual del íncipit #}
+                                    {% if primer_incipit.titulo_encabezamiento %}
+                                        <p class="obra-inline-line" style="margin-top: 0.125rem; font-size: 0.9em; color: #666;">
+                                            {{ primer_incipit.titulo_encabezamiento }}
+                                        </p>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="meta-empty">Sin íncipit registrado</p>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
 
                             {# ========== PANEL DE DEBUG (quitar en producción) ========== #}
-                            <div class="debug-panel" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
+                            <!-- <div class="debug-panel" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
                                 <div style="font-size: 12px; font-family: monospace;">
                                     <div style="margin-bottom: 0.5rem;">
                                         <strong style="color: #0066cc;">🔍 DEBUG INCIPIT {{ incipit.pk }}</strong>
@@ -372,7 +717,7 @@
                                             <td style="padding: 4px; color: #666;">"{{ incipit.armadura|default:"vacío" }}"</td>
                                         </tr>
                                         <tr style="background: #fff;">
-                                            <td style="padding: 4px;"><strong>Tiempo (DB):</strong></td>
+                                            <td style="padding: 4px;"><strong>Compás (DB):</strong></td>
                                             <td style="padding: 4px; color: #666;">"{{ incipit.tiempo|default:"vacío" }}"</td>
                                         </tr>
                                         <tr>
@@ -391,7 +736,7 @@
                                         </tr>
                                     </table>
                                 </div>
-                            </div>
+                            </div> -->
 
                             {% elif incipit.notacion_musical %}
                             {# ========== FALLBACK: si paec_full está vacío pero hay body ========== #}
@@ -422,18 +767,6 @@
                     </div>
                     {% endif %}
 
-                    {% if obra.ediciones.all %}
-                        {% for edicion in obra.ediciones.all %}
-                        <div class="data-row">
-                            <span class="campo-tag">250</span>
-                            <span>{{ edicion.edicion }}</span>
-                        </div>
-                        {% endfor %}
-                    {% endif %}
-
-                {% if obra.tonalidad_384 %}
-                <div class="data-row"><span class="campo-tag">384</span>{{ obra.tonalidad_384 }}</div>
-                {% endif %}
             </section>
 
             <!-- ================= MATERIAS Y SERIE ================= -->
@@ -445,31 +778,57 @@
                     {% for mat in obra.materias_650.all %}
                     <div class="data-row">
                         <span class="campo-tag">650</span>
-                        <span>
-                            {% if mat.materia %}$a {{ mat.materia }}{% else %}—{% endif %}
-                            {% if mat.subdivisiones.all %}
-                                {% for sub in mat.subdivisiones.all %}$x {{ sub.subdivision }}{% if not forloop.last %} $v {% endif %}{% endfor %}
-                            {% endif %}
-                        </span>
+                        <div class="data-cell">
+                            <span class="campo-label">Materia - Temas</span>
+                            <div class="linea-principal">
+                                {% if mat.materia %}$a <strong>{{ mat.materia }}</strong>{% else %}—{% endif %}
+                                {% if mat.subdivisiones.all %}
+                                    {% for sub in mat.subdivisiones.all %} $y <strong>{{ sub.subdivision }}</strong>{% endfor %}
+                                {% endif %}
+                                {% if mat.subdivisiones_geograficas.all %}
+                                    $z {% for sub_geo in mat.subdivisiones_geograficas.all %}<strong>{{ sub_geo.subdivision }}</strong>{% if not forloop.last %} - {% endif %}{% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                     {% endfor %}
 
-                    {% for mat in obra.materias_655.all %}
+                    <!-- {% for mat in obra.materias_655.all %}
                     <div class="data-row">
                         <span class="campo-tag">655</span>
-                        <span>
-                            {% if mat.materia %}$a {{ mat.materia }}{% else %}—{% endif %}
-                            {% if mat.subdivisiones.all %}
-                                {% for sub in mat.subdivisiones.all %}$x {{ sub.subdivision }}{% if not forloop.last %} $v {% endif %}{% endfor %}
-                            {% endif %}
-                        </span>
+                        <div class="data-cell">
+                            <span class="campo-label">Género - Forma</span>
+                            <div class="linea-principal">
+                                {% if mat.materia %}$a <strong>{{ mat.materia }}</strong>{% else %}—{% endif %}
+                                {% if mat.subdivisiones.all %}
+                                    {% for sub in mat.subdivisiones.all %} $x <strong>{{ sub.subdivision }}</strong>{% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
                 {% else %}
                 <p class="text-muted">No hay materias registradas.</p>
-                {% endif %}
+                {% endif %} -->
 
+                <!-- Serie (490) -->
+                {% if obra.menciones_serie.exists %}
+                <div class="data-grid-compact mt-3">
+                    {% for mencion in obra.menciones_serie.all %}
+                    <div class="data-row">
+                        <span class="campo-tag">490</span>
+                        <div class="data-cell">
+                            <span class="campo-label">Serie</span>
+                            <div class="linea-principal">
+                                {% for titulo in mencion.titulos.all %}$a <strong>{{ titulo.titulo_serie }}</strong>{% if not forloop.last %}, {% endif %}{% endfor %}
+                                {% if mencion.volumenes.exists %} ; {% for vol in mencion.volumenes.all %}$v <strong>{{ vol.volumen }}</strong>{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
 
             </section>
             <!-- ================= NOTAS ================= -->
@@ -481,7 +840,10 @@
                     {% for nota in obra.notas_generales_500.all %}
                     <div class="data-row">
                         <span class="campo-tag">500</span>
-                        <span>$a {{ nota.nota_general }}</span>
+                        <div class="data-cell">
+                            <span class="campo-label">Nota general</span>
+                            <div class="linea-principal">$a {{ nota.nota_general }}</div>
+                        </div>
                     </div>
                     {% empty %}
                     <p class="text-muted">No hay notas generales registradas.</p>
@@ -493,7 +855,10 @@
                     {% for contenido in obra.contenidos_505.all %}
                     <div class="data-row">
                         <span class="campo-tag">505</span>
-                        <span>$a {{ contenido.contenido }}</span>
+                        <div class="data-cell">
+                            <span class="campo-label">Nota de contenido</span>
+                            <div class="linea-principal">$a {{ contenido.contenido }}</div>
+                        </div>
                     </div>
                     {% empty %}
                     <p class="text-muted">No hay contenidos registrados.</p>
@@ -505,7 +870,10 @@
                     {% for sumario in obra.sumarios_520.all %}
                     <div class="data-row">
                         <span class="campo-tag">520</span>
-                        <span>$a {{ sumario.sumario }}</span>
+                        <div class="data-cell">
+                            <span class="campo-label">Sumario</span>
+                            <div class="linea-principal">$a {{ sumario.sumario }}</div>
+                        </div>
                     </div>
                     {% empty %}
                     <p class="text-muted">No hay sumarios registrados.</p>
@@ -514,20 +882,21 @@
 
                 <!-- ===== 545 – Datos biográficos del compositor (NR) ===== -->
                 {% if obra.datos_biograficos_545 %}
-
                     <div class="data-row">
                         <span class="campo-tag">545</span>
-                        <span>
+                        <div class="data-cell">
+                            <span class="campo-label">Datos biográficos del compositor</span>
                             {% if obra.datos_biograficos_545.texto_biografico %}
-                                $a {{ obra.datos_biograficos_545.texto_biografico }}
+                            <div class="linea-principal">$a {{ obra.datos_biograficos_545.texto_biografico }}</div>
                             {% endif %}
-
                             {% if obra.datos_biograficos_545.uri %}
+                            <div class="linea-secundaria">
                                 $u <a href="{{ obra.datos_biograficos_545.uri }}" target="_blank">
                                     {{ obra.datos_biograficos_545.uri }}
                                 </a>
+                            </div>
                             {% endif %}
-                        </span>
+                        </div>
                     </div>
                 {% endif %}
             </section>
@@ -538,25 +907,22 @@
 
                 <!-- ===== 773 – Enlace a documento fuente (R) ===== -->
                 {% if obra.enlaces_documento_fuente_773.all %}
-                    <h4 class="subsection-title mt-3">Documento fuente</h4>
+                    <h4 class="subsection-title mt-3">Colección (773)</h4>
                     {% for enlace in obra.enlaces_documento_fuente_773.all %}
                     <div class="data-row">
                         <span class="campo-tag">773</span>
-                        <span>
-                            {% if enlace.encabezamiento_principal %}
-                                $a {{ enlace.encabezamiento_principal }}.
-                            {% endif %}
-
-                            {% if enlace.titulo %}
-                                $t <em>{{ enlace.titulo }}</em>.
-                            {% endif %}
-
+                        <div class="data-cell">
+                            <span class="campo-label">Colección</span>
+                            <div class="linea-principal">
+                                {% if enlace.encabezamiento_principal %}$a <strong>{{ enlace.encabezamiento_principal }}</strong>.{% endif %}
+                                {% if enlace.titulo %} $t <strong><em>{{ enlace.titulo }}</em></strong>.{% endif %}
+                            </div>
                             {% if enlace.numeros_control.all %}
-                                {% for w in enlace.numeros_control.all %}
-                                    $w ({{ w.obra_relacionada.num_control }})
-                                {% endfor %}
+                            <div class="linea-secundaria">
+                                {% for w in enlace.numeros_control.all %}$w (<strong>{{ w.obra_relacionada.num_control }}</strong>){% if not forloop.last %} {% endif %}{% endfor %}
+                            </div>
                             {% endif %}
-                        </span>
+                        </div>
                     </div>
                     {% empty %}
                     <p class="text-muted">No hay enlaces 773 registrados.</p>
@@ -565,24 +931,22 @@
 
                 <!-- ===== 774 – Unidad constituyente (R) ===== -->
                 {% if obra.enlaces_unidades_774.all %}
+                    <h4 class="subsection-title mt-3">Obras en esta colección (774)</h4>
                     {% for enlace in obra.enlaces_unidades_774.all %}
                     <div class="data-row">
                         <span class="campo-tag">774</span>
-                        <span>
-                            {% if enlace.encabezamiento_principal %}
-                                $a {{ enlace.encabezamiento_principal }}.
-                            {% endif %}
-
-                            {% if enlace.titulo %}
-                                $t <em>{{ enlace.titulo }}</em>.
-                            {% endif %}
-
+                        <div class="data-cell">
+                            <span class="campo-label">Obras en esta colección</span>
+                            <div class="linea-principal">
+                                {% if enlace.encabezamiento_principal %}$a <strong>{{ enlace.encabezamiento_principal }}</strong>.{% endif %}
+                                {% if enlace.titulo %} $t <strong><em>{{ enlace.titulo }}</em></strong>.{% endif %}
+                            </div>
                             {% if enlace.numeros_control.all %}
-                                {% for w in enlace.numeros_control.all %}
-                                    $w ({{ w.obra_relacionada.num_control }})
-                                {% endfor %}
+                            <div class="linea-secundaria">
+                                {% for w in enlace.numeros_control.all %}$w (<strong>{{ w.obra_relacionada.num_control }}</strong>){% if not forloop.last %} {% endif %}{% endfor %}
+                            </div>
                             {% endif %}
-                        </span>
+                        </div>
                     </div>
                     {% empty %}
                     <p class="text-muted">No hay unidades constituyentes 774 registradas.</p>
@@ -591,25 +955,22 @@
 
                 <!-- ===== 787 – Otras relaciones (R) ===== -->
                 {% if obra.otras_relaciones_787.all %}
-                    <h4 class="subsection-title mt-3">Otras relaciones</h4>
+                    <h4 class="subsection-title mt-3">Otras relaciones (787)</h4>
                     {% for enlace in obra.otras_relaciones_787.all %}
                     <div class="data-row">
                         <span class="campo-tag">787</span>
-                        <span>
-                            {% if enlace.encabezamiento_principal %}
-                                $a {{ enlace.encabezamiento_principal }}.
-                            {% endif %}
-
-                            {% if enlace.titulo %}
-                                $t <em>{{ enlace.titulo }}</em>.
-                            {% endif %}
-
+                        <div class="data-cell">
+                            <span class="campo-label">Otras relaciones</span>
+                            <div class="linea-principal">
+                                {% if enlace.encabezamiento_principal %}$a <strong>{{ enlace.encabezamiento_principal }}</strong>.{% endif %}
+                                {% if enlace.titulo %} $t <strong><em>{{ enlace.titulo }}</em></strong>.{% endif %}
+                            </div>
                             {% if enlace.numeros_control.all %}
-                                {% for w in enlace.numeros_control.all %}
-                                    $w ({{ w.obra_relacionada.num_control }})
-                                {% endfor %}
+                            <div class="linea-secundaria">
+                                {% for w in enlace.numeros_control.all %}$w (<strong>{{ w.obra_relacionada.num_control }}</strong>){% if not forloop.last %} {% endif %}{% endfor %}
+                            </div>
                             {% endif %}
-                        </span>
+                        </div>
                     </div>
                     {% empty %}
                     <p class="text-muted">No hay relaciones 787 registradas.</p>
@@ -624,39 +985,44 @@
                     {% for ubicacion in obra.ubicaciones_852.all %}
                     <div class="data-row">
                         <span class="campo-tag">852</span>
-                        <span>
-                            {% if ubicacion.signatura_original %}
-                                $a {{ ubicacion.signatura_original }}
-                            {% endif %}
+                        <div class="data-cell">
+                            <span class="campo-label">Ubicación</span>
+                            <div class="linea-principal">
+                                {% if ubicacion.autoridad %}$a <strong>{{ ubicacion.autoridad }}</strong>{% elif ubicacion.codigo_o_nombre %}$a <strong>{{ ubicacion.codigo_o_nombre }}</strong>{% endif %}
+                                {% if ubicacion.signatura_original %} $h <strong>{{ ubicacion.signatura_original }}</strong>{% endif %}
+                            </div>
                             {% if ubicacion.estanterias.all %}
-                                $b {% for estanteria in ubicacion.estanterias.all %}{{ estanteria.estanteria }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                            <div class="linea-secundaria">
+                                {% for estanteria in ubicacion.estanterias.all %}$c <strong>{{ estanteria.estanteria }}</strong>{% if not forloop.last %} {% endif %}{% endfor %}
+                            </div>
                             {% endif %}
-                            {% if ubicacion.codigo_o_nombre %}
-                                $c {{ ubicacion.codigo_o_nombre }}
-                            {% endif %}
-                        </span>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
                 {% endif %}
 
                 {% if obra.disponibles_856.exists %}
-
+                <div class="data-grid-compact{% if obra.ubicaciones_852.all %} mt-3{% endif %}">
                 {% for disponible in obra.disponibles_856.all %}
                     {% for url in disponible.urls_856.all %}
                     <div class="data-row">
                         <span class="campo-tag">856</span>
-                        <a href="{{ url.url }}" class="acceso-link" target="_blank">
+                        <div class="data-cell">
+                            <span class="campo-label">Recurso electrónico</span>
+                            <div class="linea-principal">
+                                $u <strong><a href="{{ url.url }}" class="acceso-link" target="_blank">
+                                    {{ url.url }} <i class="bi bi-box-arrow-up-right"></i>
+                                </a></strong>
+                            </div>
                             {% if disponible.textos_enlace_856.first %}
-                                $a {{ disponible.textos_enlace_856.first.texto_enlace }}
-                            {% else %}
-                                $u {{ url.url }}
+                            <div class="linea-secundaria">$y <strong>{{ disponible.textos_enlace_856.first.texto_enlace }}</strong></div>
                             {% endif %}
-                            <i class="bi bi-box-arrow-up-right"></i>
-                        </a>
+                        </div>
                     </div>
                     {% endfor %}
                 {% endfor %}
+                </div>
                 {% endif %}
             </section>
 

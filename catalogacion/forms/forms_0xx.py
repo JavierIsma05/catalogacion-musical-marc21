@@ -100,7 +100,7 @@ class IncipitMusicalForm(forms.ModelForm):
             "titulo_encabezamiento": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "031 $d - Título/tempo",
+                    "placeholder": "allegro",
                 }
             ),
             "personaje": forms.TextInput(
@@ -155,7 +155,7 @@ class IncipitMusicalForm(forms.ModelForm):
             "titulo_encabezamiento": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "031 $d - Título/tempo",
+                    "placeholder": "allegro",
                 }
             ),
             "personaje": forms.TextInput(
@@ -246,7 +246,6 @@ class IdiomaObraForm(forms.ModelForm):
 class CodigoPaisEntidadForm(forms.ModelForm):
     """Formulario para campo 044 $a - País de entidad"""
 
-
     class Meta:
         model = CodigoPaisEntidad
         fields = ['codigo_pais']
@@ -256,5 +255,5 @@ class CodigoPaisEntidadForm(forms.ModelForm):
             }),
         }
         labels = {
-            'codigo_pais': '044 $a - Código de país',
+            'codigo_pais': '044 $a - País',
         }

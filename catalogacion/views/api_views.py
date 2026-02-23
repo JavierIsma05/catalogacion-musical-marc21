@@ -3,6 +3,7 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.db.models import Q
 from catalogacion.models import ObraGeneral
 import json
 
@@ -40,15 +41,29 @@ def buscar_obras(request):
     if len(q) < 2:
         return JsonResponse({"results": []})
 
+    # Búsqueda ampliada: num_control, título, compositor, signatura
     qs = (
         ObraGeneral.objects
         .select_related("compositor", "titulo_uniforme")
-        .filter(num_control__icontains=q)
+        .prefetch_related("ubicaciones_852")
+        .filter(
+            Q(num_control__icontains=q) |
+            Q(titulo_principal__icontains=q) |
+            Q(compositor__apellidos_nombres__icontains=q) |
+            Q(ubicaciones_852__signatura_original__icontains=q)
+        )
+        .distinct()
         .order_by("num_control")[:20]
     )
 
     results = []
     for o in qs:
+        # Obtener signatura si existe
+        signatura = ""
+        ubicacion = o.ubicaciones_852.first()
+        if ubicacion and ubicacion.signatura_original:
+            signatura = ubicacion.signatura_original
+
         results.append({
             "id": o.id,
             "num_control": o.num_control,
@@ -60,6 +75,8 @@ def buscar_obras(request):
             "compositor_id": (o.compositor.id if o.compositor else None),
             "titulo_id": (o.titulo_uniforme.id if getattr(o, 'titulo_uniforme', None) else None),
             "tipo": o.get_nivel_bibliografico_display(),
+            "nivel_bibliografico": o.nivel_bibliografico,
+            "signatura": signatura,
         })
 
     return JsonResponse({"results": results})
@@ -168,3 +185,50 @@ class Autocompletado773View(View):
             return JsonResponse({
                 "error": f"Error del servidor: {str(e)}"
             }, status=500)
+
+
+@require_GET
+def obtener_obras_774(request):
+    """
+    Retorna las obras del campo 774 de una colección.
+    Se usa para que el usuario seleccione cuál obra del 774 va a catalogar.
+    """
+    obra_id = request.GET.get("obra_id")
+
+    if not obra_id:
+        return JsonResponse({"error": "obra_id requerido"}, status=400)
+
+    try:
+        obra = ObraGeneral.objects.get(id=obra_id)
+
+        if obra.nivel_bibliografico != 'c':
+            return JsonResponse({
+                "success": False,
+                "error": "La obra seleccionada no es una colección"
+            }, status=400)
+
+        entries = []
+        for enlace in obra.enlaces_unidades_774.select_related(
+            'encabezamiento_principal', 'titulo'
+        ).all():
+            entries.append({
+                "id": enlace.id,
+                "compositor_id": enlace.encabezamiento_principal.id if enlace.encabezamiento_principal else None,
+                "compositor_texto": str(enlace.encabezamiento_principal) if enlace.encabezamiento_principal else "",
+                "titulo_id": enlace.titulo.id if enlace.titulo else None,
+                "titulo_texto": str(enlace.titulo) if enlace.titulo else "",
+            })
+
+        return JsonResponse({
+            "success": True,
+            "coleccion": {
+                "id": obra.id,
+                "num_control": obra.num_control,
+                "titulo": obra.titulo_principal,
+                "compositor": str(obra.compositor) if obra.compositor else "",
+            },
+            "obras_774": entries
+        })
+
+    except ObraGeneral.DoesNotExist:
+        return JsonResponse({"error": "Obra no encontrada"}, status=404)

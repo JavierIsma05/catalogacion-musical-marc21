@@ -87,33 +87,27 @@ FORMSET 773 – Documento Fuente (R)
                         </label>
 
                         <div class="input-group">
-                            <!-- Visible (solo muestra el 001) -->
+                            <!-- Visible (muestra el num_control de la obra relacionada) -->
                             <input type="text"
                                 class="form-control numero-w-input"
                                 placeholder="Seleccione una obra"
+                                value="{% if form.instance.pk %}{% for nc in form.instance.numeros_control.all %}{% if nc.obra_relacionada %}{{ nc.obra_relacionada.num_control }}{% endif %}{% endfor %}{% endif %}"
                                 readonly>
 
                             <!-- Botón lupa -->
                             <button type="button"
                                     class="btn btn-outline-secondary btn-buscar-obra"
-                                    data-enlace-id="{{ enlace.pk }}"
+                                    data-enlace-id="{{ form.instance.pk|default:'__prefix__' }}"
                                     data-campo="773"
                                     title="Buscar obra">
                                 <i class="bi bi-search"></i>
                             </button>
 
-                            <!-- 🔥 ESTE ES EL IMPORTANTE -->
+                            <!-- Hidden con ID de obra relacionada -->
                             <input type="hidden"
                                 class="obra-relacionada-id-input"
-                                name="w_773_{{ enlace.pk }}">
-
-                            <!-- 🔥 Botón autocompletar -->
-                            <button type="button"
-                                    class="btn btn-success btn-autocompletar-773 d-none"
-                                    data-enlace-id="{{ enlace.pk }}"
-                                    title="Autocompletar campos desde obra padre">
-                                <i class="bi bi-magic"></i> Auto
-                            </button>
+                                name="w_773_{{ form.instance.pk|default:'__prefix__' }}"
+                                value="{% if form.instance.pk %}{% for nc in form.instance.numeros_control.all %}{% if nc.obra_relacionada %}{{ nc.obra_relacionada.id }}{% endif %}{% endfor %}{% endif %}">
                         </div>
                     </div>
 
@@ -329,9 +323,7 @@ FORMSET 773 – Documento Fuente (R)
                     this.handleBuscarObra(e.target.closest('.btn-buscar-obra'));
                 }
 
-                if (e.target.closest('.btn-autocompletar-773')) {
-                    this.handleAutocompletar(e.target.closest('.btn-autocompletar-773'));
-                }
+                // Botón Auto eliminado - autocompletado ocurre automáticamente desde modal
             });
 
             // Evento cuando cambia el input de obra relacionada
@@ -347,7 +339,6 @@ FORMSET 773 – Documento Fuente (R)
             const input = document.querySelector(`input[name="w_773_${enlaceId}"]`) ||
                           btn.parentElement.querySelector('.obra-relacionada-id-input');
             const visibleInput = btn.parentElement.querySelector('.numero-w-input');
-            const autoBtn = btn.parentElement.querySelector('.btn-autocompletar-773');
 
             if (!input) {
                 console.warn('⚠️ No se encontró input para enlaceId:', enlaceId);
@@ -381,29 +372,16 @@ FORMSET 773 – Documento Fuente (R)
                 if (valorActual && valorActual !== ultimoValor && valorActual !== '') {
                     console.log('🔄 ¡CAMBIO DETECTADO! Valor anterior:', ultimoValor, 'Nuevo valor:', valorActual);
 
-                    // Actualizar input visible
-                    if (visibleInput) {
-                        visibleInput.value = valorActual;
-                    }
+                    // NO actualizar visibleInput aquí - ya lo hace selectObra774/selectObraNormal
+                    // con el num_control correcto. Si lo hacemos aquí, sobrescribiríamos
+                    // el num_control con el ID (que es lo que tiene el hidden input).
 
-                    // Mostrar y configurar botón de autocompletar
-                    if (autoBtn) {
-                        autoBtn.classList.remove('d-none');
-                        autoBtn.dataset.obraId = valorActual;
-
-                        // Marcar como realizado ANTES de llamar
-                        autocompletadoRealizado = true;
-
-                        // Limpiar interval inmediatamente
-                        clearInterval(monitorInterval);
-                        this.activeIntervals.delete(enlaceId);
-
-                        // Autocompletar automáticamente
-                        setTimeout(() => {
-                            console.log('🚀 INICIANDO AUTOCOMPLETADO...');
-                            this.handleAutocompletar(autoBtn);
-                        }, 500);
-                    }
+                    // Autocompletado ahora ocurre automáticamente desde el modal
+                    // al seleccionar una obra del 774. Marcar como realizado.
+                    autocompletadoRealizado = true;
+                    clearInterval(monitorInterval);
+                    this.activeIntervals.delete(enlaceId);
+                    console.log('✅ Obra seleccionada desde modal');
 
                     ultimoValor = valorActual;
                 }
@@ -426,29 +404,14 @@ FORMSET 773 – Documento Fuente (R)
                 this.boundInputs.add(input);
 
                 input.addEventListener('change', (e) => {
-                    // Evitar si ya está procesando
-                    if (this.isProcessing) {
-                        console.log('⏸️ Ignorando evento change - ya está procesando');
-                        return;
-                    }
-
                     console.log('📝 Evento change detectado:', e.target.value);
-                    if (e.target.value && e.target.value !== '') {
-                        if (autoBtn && !autocompletadoRealizado) {
-                            autoBtn.classList.remove('d-none');
-                            autoBtn.dataset.obraId = e.target.value;
-                            autocompletadoRealizado = true;
-
-                            // Limpiar interval si existe
-                            if (this.activeIntervals.has(enlaceId)) {
-                                clearInterval(this.activeIntervals.get(enlaceId));
-                                this.activeIntervals.delete(enlaceId);
-                            }
-
-                            setTimeout(() => {
-                                console.log('🚀 AUTOCOMPLETADO POR EVENTO CHANGE...');
-                                this.handleAutocompletar(autoBtn);
-                            }, 500);
+                    // Autocompletado ahora ocurre desde el modal al seleccionar obra 774
+                    if (e.target.value && e.target.value !== '' && !autocompletadoRealizado) {
+                        autocompletadoRealizado = true;
+                        // Limpiar interval si existe
+                        if (this.activeIntervals.has(enlaceId)) {
+                            clearInterval(this.activeIntervals.get(enlaceId));
+                            this.activeIntervals.delete(enlaceId);
                         }
                     }
                 });
@@ -456,16 +419,11 @@ FORMSET 773 – Documento Fuente (R)
         }
 
         handleObraSeleccionada(input) {
+            // Botón Auto eliminado - autocompletado ahora ocurre desde el modal
+            // Esta función se mantiene por si se necesita lógica adicional al seleccionar obra
             const obraId = input.value;
             const enlaceId = input.name.replace('w_773_', '');
-            const autoBtn = document.querySelector(`.btn-autocompletar-773[data-enlace-id="${enlaceId}"]`);
-            
-            if (obraId && autoBtn) {
-                autoBtn.classList.remove('d-none');
-                autoBtn.dataset.obraId = obraId;
-            } else if (autoBtn) {
-                autoBtn.classList.add('d-none');
-            }
+            console.log('Obra seleccionada:', { obraId, enlaceId });
         }
 
         async handleAutocompletar(btn) {

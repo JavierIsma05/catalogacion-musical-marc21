@@ -323,13 +323,12 @@
 }
 
 .obra-info-card .obra-card-label {
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     font-weight: 600;
     letter-spacing: 0.05em;
     color: var(--pro-text-primary);
     margin: 0;
-    padding: 0.1rem 0.75rem;  /* reducido de 0.75rem 1rem */
-
+    padding: 0.1rem 0.75rem;
     border-bottom: 1px solid var(--pro-border-light);
 }
 

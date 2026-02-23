@@ -22,7 +22,6 @@
 .incipit-view-canvas {
   width: 100%;
   max-width: 500px;
-  height: 150px;      /* balance entre compacto y legible */
   display: block;
   background: transparent;
   pointer-events: none;
@@ -138,6 +137,66 @@
   color: var(--pro-text-secondary);
   font-weight: 400;
 }
+
+/* ============================================
+   DIFERENCIACIÓN VISUAL POR TIPO DE OBRA
+   ============================================ */
+
+/* Borde izquierdo: nivel bibliográfico */
+.obra-catalog-card.nivel-c { border-left: 4px solid #0f766e; }  /* teal sólido – colección */
+.obra-catalog-card.nivel-a { border-left: 4px solid #d97706; }  /* ámbar – en colección */
+.obra-catalog-card.nivel-m { border-left: 4px solid var(--pro-accent); }  /* azul – monografía */
+
+.obra-tipo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    align-self: flex-start;
+    margin-top: 10px;
+}
+/* Colección Manuscrita */
+.obra-tipo-badge.tipo-coleccion {
+    background: rgba(15, 118, 110, 0.12);
+    color: #0f766e;
+    border: 1px solid rgba(15, 118, 110, 0.35);
+}
+/* Colección Impresa (teal más claro) */
+.obra-tipo-badge.tipo-coleccion-imp {
+    background: rgba(15, 118, 110, 0.06);
+    color: #0f8a80;
+    border: 1px solid rgba(15, 118, 110, 0.2);
+}
+/* En colección Manuscrita */
+.obra-tipo-badge.tipo-componente {
+    background: rgba(217, 119, 6, 0.12);
+    color: #b45309;
+    border: 1px solid rgba(217, 119, 6, 0.35);
+}
+/* En colección Impresa (ámbar más claro) */
+.obra-tipo-badge.tipo-componente-imp {
+    background: rgba(217, 119, 6, 0.06);
+    color: #c46c0c;
+    border: 1px solid rgba(217, 119, 6, 0.2);
+}
+/* Obra suelta Manuscrita */
+.obra-tipo-badge.tipo-monografia {
+    background: rgba(0, 102, 204, 0.1);
+    color: var(--pro-accent);
+    border: 1px solid rgba(0, 102, 204, 0.25);
+}
+/* Obra suelta Impresa (azul más claro) */
+.obra-tipo-badge.tipo-monografia-imp {
+    background: rgba(0, 102, 204, 0.05);
+    color: #3385cc;
+    border: 1px solid rgba(0, 102, 204, 0.15);
+}
 </style>
 {% endblock %}
 
@@ -179,7 +238,7 @@
                     <input type="text"
                            class="form-control"
                            name="q"
-                           placeholder="Buscar por título, compositor..."
+                           placeholder="Buscar por título, compositor, signatura (ej: UNL, M000001)..."
                            value="{{ busqueda }}">
                 </div>
             </div>
@@ -208,16 +267,16 @@
     {% if obras %}
     <div class="catalogo-listado">
         {% for obra in obras %}
-        <article class="obra-catalog-card">
+        <article class="obra-catalog-card nivel-{{ obra.nivel_bibliografico }}">
             <div class="obra-cover">
                 <div class="cover-frame">
-                    {# COVER: solo la imagen es clickeable y abre el visor #}
+                    {# COVER: solo la imagen es clickeable y abre el detalle de la obra #}
                     <div class="mb-3">
-                    {% if obra.cover_url and obra.visor_url %}
-                        <a href="{{ obra.visor_url }}" title="Abrir visor">
+                    {% if obra.cover_url %}
+                        <a href="{% url 'catalogo_publico:detalle_obra' obra.pk %}" title="Ver detalles de la obra">
                         {% if obra.cover_kind == "jpg" %}
                             <img src="{{ obra.cover_url }}"
-                                alt="Portada"
+                                alt="Portada de {{ obra.titulo_principal }}"
                                 class="w-100 rounded"
                                 style="object-fit: cover;">
                         {% elif obra.cover_kind == "pdf" %}
@@ -275,18 +334,41 @@
                         </div>
                     </div>
                     <div class="obra-top-tags">
+                        {% if obra.nivel_bibliografico == 'c' and obra.tipo_registro == 'd' %}
+                        <span class="obra-tipo-badge tipo-coleccion">
+                            <i class="bi bi-collection-fill"></i> Colección Ms.
+                        </span>
+                        {% elif obra.nivel_bibliografico == 'c' %}
+                        <span class="obra-tipo-badge tipo-coleccion-imp">
+                            <i class="bi bi-collection-fill"></i> Colección Imp.
+                        </span>
+                        {% elif obra.nivel_bibliografico == 'a' and obra.tipo_registro == 'd' %}
+                        <span class="obra-tipo-badge tipo-componente">
+                            <i class="bi bi-file-earmark-music"></i> En colección Ms.
+                        </span>
+                        {% elif obra.nivel_bibliografico == 'a' %}
+                        <span class="obra-tipo-badge tipo-componente-imp">
+                            <i class="bi bi-file-earmark-music"></i> En colección Imp.
+                        </span>
+                        {% elif obra.tipo_registro == 'd' %}
+                        <span class="obra-tipo-badge tipo-monografia">
+                            <i class="bi bi-music-note-beamed"></i> Obra suelta Ms.
+                        </span>
+                        {% else %}
+                        <span class="obra-tipo-badge tipo-monografia-imp">
+                            <i class="bi bi-music-note-beamed"></i> Obra suelta Imp.
+                        </span>
+                        {% endif %}
                         <div class="obra-tag">
                             <span class="tag-label">Signatura</span>
                             <span class="tag-value">{{ obra.signatura_publica_display }}</span>
                         </div>
+                        {% if obra.signatura_coleccion_padre %}
                         <div class="obra-tag">
                             <span class="tag-label">Colección</span>
-                            {% if obra.coleccion_publica_display %}
-                                <span class="tag-value">{{ obra.coleccion_publica_display }}</span>
-                            {% else %}
-                                <span class="tag-value meta-empty">Sin colección asociada</span>
-                            {% endif %}
+                            <span class="tag-value">{{ obra.signatura_coleccion_padre }}</span>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -301,8 +383,8 @@
                                         <canvas
                                             id="incipit_view_canvas_{{ primer_incipit.pk }}"
                                             class="incipit-view-canvas"
-                                            width="500"
-                                            height="180"
+                                            width="600"
+                                            height="190"
                                             data-paec-json-id="paec_json_{{ primer_incipit.pk }}">
                                         </canvas>
 

@@ -19,52 +19,109 @@
 }
 
 /* ============================================
-   HEADER COMPACTO - MÁXIMA COMPACTACIÓN CON TIPOGRAFÍA CONSISTENTE
+   BREADCRUMB - MISMO ESTILO QUE VISTA DETALLADA
    ============================================ */
-.resumen-header {
+.breadcrumb {
+    font-size: 0.75rem;
+    padding: 0;
+    margin-bottom: 1.25rem;
+    background: transparent;
+}
+
+.breadcrumb-item a {
+    color: var(--pro-accent);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.breadcrumb-item a:hover {
+    color: #0052a3;
+}
+
+.breadcrumb-item.active {
+    color: var(--pro-text-secondary);
+}
+
+/* ============================================
+   HEADER - MISMO ESTILO QUE VISTA DETALLADA
+   ============================================ */
+.detalle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--pro-border);
 }
 
-.resumen-header h1 {
-    font-size: 0.8125rem; /* Igual que los valores de los tags para consistencia */
+.detalle-header-left {
+    flex: 1;
+}
+
+.detalle-main-title {
+    font-size: 1rem;
     font-weight: 600;
     color: var(--pro-text);
-    margin: 0;
+    margin: 0 0 0.5rem 0;
     letter-spacing: -0.01em;
-    line-height: 1.3;
-    text-transform: uppercase; /* Consistente con los labels de los tags */
 }
 
-.resumen-top-tags {
+.detalle-actions {
     display: flex;
-    gap: 0.875rem;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-.detalle-top-tag {
+.detalle-actions .btn {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--pro-border);
+    transition: all 0.2s ease;
+}
+
+.detalle-actions .btn-outline-secondary {
+    background: var(--pro-white);
+    color: var(--pro-text-secondary);
+}
+
+.detalle-actions .btn-outline-secondary:hover {
+    background: var(--pro-surface);
+    border-color: var(--pro-text-secondary);
+}
+
+.detalle-header-right {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: flex-start;
+    justify-content: flex-end;
+}
+
+.detalle-meta-tag {
     background: var(--pro-white);
     border: 1px solid var(--pro-border);
-    padding: 0.3125rem 0.625rem;
-    min-width: 130px;
+    padding: 0.5rem 0.75rem;
+    min-width: 140px;
 }
 
-.detalle-top-tag small {
+.detalle-meta-tag small {
     display: block;
-    font-size: 0.75rem; /* Mismo tamaño que los labels de las secciones */
-    font-weight: 500;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--pro-text-secondary);
-    margin-bottom: 0.125rem;
+    color: var(--pro-text-muted);
+    margin-bottom: 0.25rem;
+    font-weight: 500;
 }
 
-.detalle-top-tag span {
-    font-size: 0.8125rem; /* Mismo tamaño que los valores de las secciones */
+.detalle-meta-tag span {
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--pro-text);
-    line-height: 1.3;
 }
 
 /* ============================================
@@ -74,8 +131,68 @@
     background: var(--pro-white);
     border: 1px solid var(--pro-border);
     box-shadow: var(--pro-shadow);
+    padding: 1rem 1.25rem;
 }
 
+/* ============================================
+   CAMPOS SIMPLES - LISTA LIMPIA SIN SECCIONES
+   ============================================ */
+.resumen-field {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 1rem;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid var(--pro-border-light);
+    align-items: baseline;
+}
+
+.resumen-field:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.resumen-field:first-child {
+    padding-top: 0;
+}
+
+.resumen-field-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--pro-text-secondary);
+    line-height: 1.4;
+}
+
+.resumen-field-value {
+    font-size: 1rem;
+    color: var(--pro-text);
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+.resumen-field-value .text-muted {
+    color: var(--pro-text-muted);
+    font-style: italic;
+}
+
+/* Íncipit musical - campo especial */
+.resumen-field-incipit {
+    align-items: flex-start;
+    padding-top: 0.75rem;
+}
+
+.resumen-field-incipit .resumen-field-value {
+    width: 100%;
+}
+
+.incipit-canvas-container {
+    background: var(--pro-surface);
+    border: 1px solid var(--pro-border);
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+/* Estilos antiguos de sección (mantener por compatibilidad) */
 .resumen-section {
     padding: 0.5rem 1rem;
     border-bottom: 1px solid var(--pro-border-light);
@@ -374,12 +491,12 @@
     }
 
     .resumen-label {
-        font-size: 0.6875rem;
+        font-size: 0.8125rem;
         font-weight: 600;
     }
 
     .resumen-value {
-        font-size: 0.75rem;
+        font-size: 0.875rem;
     }
 
     .detalle-top-tag {

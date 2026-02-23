@@ -80,6 +80,27 @@ Botón + a la izquierda (input-group) — ESTABLE
                                     </button>
                                 </div>
                             </div>
+                            {% empty %}
+                            <div class="subcampo-row subdivision-form-row mb-2">
+                                <div class="input-group">
+
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-btn btn btn-outline-primary">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+
+                                    <input type="text"
+                                           class="form-control subdivision-input"
+                                           name="{{ form.prefix }}-subdivision_0"
+                                           placeholder="Subdivisión general">
+
+                                    <button type="button"
+                                            class="subcampo-delete-btn btn btn-outline-danger"
+                                            style="visibility:hidden">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
                             {% endfor %}
                         {% else %}
                             <div class="subcampo-row subdivision-form-row mb-2">
@@ -97,6 +118,84 @@ Botón + a la izquierda (input-group) — ESTABLE
 
                                     <button type="button"
                                             class="subcampo-delete-btn btn btn-outline-danger"
+                                            style="visibility:hidden">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <!-- 655 $z – Subdivisión cronológica -->
+                <div class="col-full">
+                    <label class="form-label small">655 $z – Subdivisión cronológica</label>
+
+                    <div class="subdivisiones-cronologicas-container" data-genero-crono-index="{{ forloop.counter0 }}">
+
+                        {% if form.instance.pk %}
+                            {% for sub in form.instance.subdivisiones_cronologicas.all %}
+                            <div class="subcampo-row subdivision-cronologica-form-row mb-2">
+                                <div class="input-group">
+                                    {% if forloop.first %}
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    {% else %}
+                                    <div class="subcampo-placeholder"></div>
+                                    {% endif %}
+
+                                    <input type="text"
+                                           class="form-control subdivision-cronologica-input"
+                                           name="{{ form.prefix }}-subdivision_cronologica_{{ forloop.counter0 }}"
+                                           value="{{ sub.subdivision }}"
+                                           placeholder="Ej: Siglo XIX, 1800-1900">
+
+                                    <button type="button"
+                                            class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
+                                            {% if forloop.first and forloop.last %}style="visibility:hidden"{% endif %}>
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="subcampo-row subdivision-cronologica-form-row mb-2">
+                                <div class="input-group">
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+
+                                    <input type="text"
+                                           class="form-control subdivision-cronologica-input"
+                                           name="{{ form.prefix }}-subdivision_cronologica_0"
+                                           placeholder="Ej: Siglo XIX, 1800-1900">
+
+                                    <button type="button"
+                                            class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
+                                            style="visibility:hidden">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="subcampo-row subdivision-cronologica-form-row mb-2">
+                                <div class="input-group">
+                                    <button type="button"
+                                            class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+
+                                    <input type="text"
+                                           class="form-control subdivision-cronologica-input"
+                                           name="{{ form.prefix }}-subdivision_cronologica_0"
+                                           placeholder="Ej: Siglo XIX, 1800-1900">
+
+                                    <button type="button"
+                                            class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
                                             style="visibility:hidden">
                                         <i class="bi bi-x-lg"></i>
                                     </button>
@@ -149,6 +248,33 @@ Botón + a la izquierda (input-group) — ESTABLE
 
                                 <button type="button"
                                         class="subcampo-delete-btn btn btn-outline-danger"
+                                        style="visibility:hidden">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-full">
+                    <label class="form-label small">655 $z – Subdivisión cronológica</label>
+                    <div class="subdivisiones-cronologicas-container" data-genero-crono-index="__prefix__">
+
+                        <div class="subcampo-row subdivision-cronologica-form-row mb-2">
+                            <div class="input-group">
+                                <button type="button"
+                                        class="subcampo-add-btn add-subdivision-cronologica-btn btn btn-outline-primary">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+
+                                <input type="text"
+                                       class="form-control subdivision-cronologica-input"
+                                       name="{{ formset.prefix }}-__prefix__-subdivision_cronologica_0"
+                                       placeholder="Ej: Siglo XIX, 1800-1900">
+
+                                <button type="button"
+                                        class="subcampo-delete-btn delete-subdivision-cronologica-btn btn btn-outline-danger"
                                         style="visibility:hidden">
                                     <i class="bi bi-x-lg"></i>
                                 </button>
@@ -314,48 +440,83 @@ Botón + a la izquierda (input-group) — ESTABLE
         });
     }
 
+    function updateDeleteButtonsCronologica(cont){
+        cont.querySelectorAll(".subdivision-cronologica-form-row").forEach((row,i)=>{
+            const del=row.querySelector(".delete-subdivision-cronologica-btn");
+            if(del) del.style.visibility = i===0 ? "hidden" : "visible";
+        });
+    }
+
     container.addEventListener("click", function(e){
+        // Handler para $x - Subdivisión general
         const addBtn=e.target.closest(".add-subdivision-btn");
         if(addBtn){
-            console.log("🔥 Botón + subdivisión clickeado en 655");
             const cont=addBtn.closest(".subdivisiones-container");
             const rows=cont.querySelectorAll(".subdivision-form-row");
-            console.log("🔍 Filas encontradas:", rows.length);
             const clone=rows[0].cloneNode(true);
-            console.log("✅ Clon creado");
 
             clone.querySelector(".subdivision-input").value="";
             clone.querySelector(".subdivision-input").name =
                 clone.querySelector(".subdivision-input").name.replace(/_\d+$/, `_${rows.length}`);
 
-            // 🔥 CORRECCIÓN: Buscar y limpiar SOLO si existe .genero-input en el clon
             const generoInput = clone.querySelector(".genero-input");
             if (generoInput) {
-                console.log('🔍 Limpiando flag generoInit en input clonado:', generoInput);
                 delete generoInput.dataset.generoInit;
                 initGeneroAutocomplete(generoInput);
-            } else {
-                console.log('ℹ️ No se encontró .genero-input en el clon (esto es normal)');
             }
-            
-            // Remover el botón + del clon
+
             const cloneAddBtn = clone.querySelector(".add-subdivision-btn");
             if (cloneAddBtn) {
                 cloneAddBtn.remove();
             }
-            
+
             cont.appendChild(clone);
             updateDeleteButtons(cont);
-            console.log("✅ Clon de subdivisión agregado al contenedor");
             return;
         }
 
-        const delBtn=e.target.closest(".subcampo-delete-btn");
+        // Handler para $z - Subdivisión cronológica
+        const addBtnCrono=e.target.closest(".add-subdivision-cronologica-btn");
+        if(addBtnCrono){
+            const cont=addBtnCrono.closest(".subdivisiones-cronologicas-container");
+            const rows=cont.querySelectorAll(".subdivision-cronologica-form-row");
+            const clone=rows[0].cloneNode(true);
+
+            clone.querySelector(".subdivision-cronologica-input").value="";
+            clone.querySelector(".subdivision-cronologica-input").name =
+                clone.querySelector(".subdivision-cronologica-input").name.replace(/_\d+$/, `_${rows.length}`);
+
+            const cloneAddBtn = clone.querySelector(".add-subdivision-cronologica-btn");
+            if (cloneAddBtn) {
+                cloneAddBtn.remove();
+            }
+
+            cont.appendChild(clone);
+            updateDeleteButtonsCronologica(cont);
+            return;
+        }
+
+        // Handler para eliminar $x
+        const delBtn=e.target.closest(".subcampo-delete-btn:not(.delete-subdivision-cronologica-btn)");
         if(delBtn){
             const row=delBtn.closest(".subdivision-form-row");
             const cont=delBtn.closest(".subdivisiones-container");
-            row.remove();
-            updateDeleteButtons(cont);
+            if(row && cont) {
+                row.remove();
+                updateDeleteButtons(cont);
+            }
+            return;
+        }
+
+        // Handler para eliminar $z
+        const delBtnCrono=e.target.closest(".delete-subdivision-cronologica-btn");
+        if(delBtnCrono){
+            const row=delBtnCrono.closest(".subdivision-cronologica-form-row");
+            const cont=delBtnCrono.closest(".subdivisiones-cronologicas-container");
+            if(row && cont) {
+                row.remove();
+                updateDeleteButtonsCronologica(cont);
+            }
         }
     });
 

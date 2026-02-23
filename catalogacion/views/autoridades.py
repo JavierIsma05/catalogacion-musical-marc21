@@ -5,6 +5,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DetailView, D
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
+from django.db.models import ProtectedError
 
 from django.http import JsonResponse
 from django.views import View
@@ -101,27 +102,35 @@ class EliminarPersonaView(DeleteView):
     """Eliminar autoridad de persona"""
     model = AutoridadPersona
     success_url = reverse_lazy('autoridades:lista_personas')
-    
-    def delete(self, request, *args, **kwargs):
+
+    def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         nombre = self.object.apellidos_nombres
-        
-        # Verificar si tiene obras relacionadas
-        obras_relacionadas = (
-            self.object.obras_compositor.count() +
-            self.object.obras_relacionadas_700.count()
-        )
-        
-        if obras_relacionadas > 0:
-            messages.warning(
-                request,
-                f'No se puede eliminar "{nombre}" porque tiene {obras_relacionadas} obra(s) relacionada(s).'
-            )
+
+        try:
+            self.object.delete()
+            messages.success(request, f'Autoridad de persona "{nombre}" eliminada exitosamente.')
+            return redirect(self.success_url)
+        except ProtectedError as e:
+            # Extraer los objetos que referencian a esta persona
+            objetos_relacionados = e.protected_objects
+
+            # Construir mensaje detallado
+            detalles = []
+            for obj in list(objetos_relacionados)[:5]:  # Máximo 5 ejemplos
+                if hasattr(obj, 'num_control'):
+                    detalles.append(f"Obra: {obj.num_control}")
+                elif hasattr(obj, 'titulo_texto'):
+                    detalles.append(f"Enlace 773: {obj.titulo_texto or 'Sin título'}")
+                else:
+                    detalles.append(str(obj))
+
+            mensaje = f'No se puede eliminar "{nombre}" porque está siendo utilizada en: {", ".join(detalles)}'
+            if len(objetos_relacionados) > 5:
+                mensaje += f" y {len(objetos_relacionados) - 5} registro(s) más."
+
+            messages.error(request, mensaje)
             return redirect('autoridades:lista_personas')
-        
-        self.object.delete()
-        messages.success(request, f'Autoridad de persona "{nombre}" eliminada exitosamente.')
-        return redirect(self.success_url)
 
 
 # =====================================================
@@ -200,27 +209,33 @@ class EliminarEntidadView(DeleteView):
     """Eliminar autoridad de entidad"""
     model = AutoridadEntidad
     success_url = reverse_lazy('autoridades:lista_entidades')
-    
-    def delete(self, request, *args, **kwargs):
+
+    def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         nombre = self.object.nombre
-        
-        # Verificar si tiene obras relacionadas
-        obras_relacionadas = (
-            self.object.obras_relacionadas_710.count() +
-            self.object.obras_ubicadas.count()
-        )
-        
-        if obras_relacionadas > 0:
-            messages.warning(
-                request,
-                f'No se puede eliminar "{nombre}" porque tiene {obras_relacionadas} obra(s) relacionada(s).'
-            )
+
+        try:
+            self.object.delete()
+            messages.success(request, f'Autoridad de entidad "{nombre}" eliminada exitosamente.')
+            return redirect(self.success_url)
+        except ProtectedError as e:
+            # Extraer los objetos que referencian a esta entidad
+            objetos_relacionados = e.protected_objects
+
+            # Construir mensaje detallado
+            detalles = []
+            for obj in list(objetos_relacionados)[:5]:
+                if hasattr(obj, 'num_control'):
+                    detalles.append(f"Obra: {obj.num_control}")
+                else:
+                    detalles.append(str(obj))
+
+            mensaje = f'No se puede eliminar "{nombre}" porque está siendo utilizada en: {", ".join(detalles)}'
+            if len(objetos_relacionados) > 5:
+                mensaje += f" y {len(objetos_relacionados) - 5} registro(s) más."
+
+            messages.error(request, mensaje)
             return redirect('autoridades:lista_entidades')
-        
-        self.object.delete()
-        messages.success(request, f'Autoridad de entidad "{nombre}" eliminada exitosamente.')
-        return redirect(self.success_url)
 
 
 # =====================================================

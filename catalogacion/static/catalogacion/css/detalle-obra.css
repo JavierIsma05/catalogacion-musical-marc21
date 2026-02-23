@@ -415,6 +415,19 @@
 }
 
 /* ============================================
+   CAMPO LABEL - Etiqueta descriptiva del campo MARC
+   ============================================ */
+.campo-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.15rem;
+}
+
+/* ============================================
    DATA CELL - Contenido de filas con múltiples líneas
    ============================================ */
 .data-cell {

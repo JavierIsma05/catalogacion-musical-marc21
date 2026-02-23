@@ -126,7 +126,6 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
     #incipit_canvas_0 {
         width: 100%;
         max-width: 700px;
-        height: auto;
         display: block;
     }
 </style>
@@ -147,7 +146,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
             <div class="campo-grid">
                 <div class="col-half">
                     <label class="form-label" for="{{ form.numero_obra.id_for_label }}">
-                        {{ form.numero_obra.label }}
+                        $a Número de la obra
                     </label>
                     {{ form.numero_obra }}
                     {% if form.numero_obra.errors %}
@@ -157,7 +156,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 
                 <div class="col-half">
                     <label class="form-label" for="{{ form.numero_movimiento.id_for_label }}">
-                        {{ form.numero_movimiento.label }}
+                        $b Número del movimiento
                     </label>
                     {{ form.numero_movimiento }}
                     {% if form.numero_movimiento.errors %}
@@ -167,7 +166,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 
                 <div class="col-half">
                     <label class="form-label" for="{{ form.numero_pasaje.id_for_label }}">
-                        {{ form.numero_pasaje.label }}
+                        $c Número de pasaje
                     </label>
                     {{ form.numero_pasaje }}
                     {% if form.numero_pasaje.errors %}
@@ -180,7 +179,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
             <div class="campo-grid mt-3">
                 <div class="col-third">
                     <label class="form-label" for="{{ form.titulo_encabezamiento.id_for_label }}">
-                        {{ form.titulo_encabezamiento.label }}
+                        $d Tempo
                     </label>
                     {{ form.titulo_encabezamiento }}
                     {% if form.titulo_encabezamiento.errors %}
@@ -188,9 +187,9 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                     {% endif %}
                 </div>
 
-                <div class="col-third">
+                <div class="col-third" style="display: none;">
                     <label class="form-label" for="{{ form.personaje.id_for_label }}">
-                        {{ form.personaje.label }}
+                        $e Personaje
                     </label>
                     {{ form.personaje }}
                     {% if form.personaje.errors %}
@@ -200,7 +199,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 
                 <div class="col-third">
                     <label class="form-label" for="{{ form.voz_instrumento.id_for_label }}">
-                        {{ form.voz_instrumento.label }}
+                        $m Voz/instrumento
                     </label>
                     {{ form.voz_instrumento }}
                     {% if form.voz_instrumento.errors %}
@@ -212,17 +211,17 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
             {# Fila 3: clave, armadura, tiempo (ahora como select) #}
             <div class="campo-grid mt-3">
                 <div class="col-third">
-                    <label class="form-label" for="{{ form.clave.id_for_label }}">Clave</label>
+                    <label class="form-label" for="{{ form.clave.id_for_label }}">$g Clave</label>
                     {{ form.clave }}
                 </div>
 
                 <div class="col-third">
-                    <label class="form-label" for="{{ form.armadura.id_for_label }}">Armadura</label>
+                    <label class="form-label" for="{{ form.armadura.id_for_label }}">$n Armadura</label>
                     {{ form.armadura }}
                 </div>
 
                 <div class="col-third">
-                    <label class="form-label" for="{{ form.tiempo.id_for_label }}">Tiempo</label>
+                    <label class="form-label" for="{{ form.tiempo.id_for_label }}">$o Compás</label>
                     {{ form.tiempo }}
                 </div>
 
@@ -451,7 +450,7 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
                             {# CANVAS WRAPPER #}
                             <div class="w-100 d-flex justify-content-center my-2">
                                 <div class="position-relative d-inline-block" style="max-width:700px;">
-                                    <canvas id="incipit_canvas_0" width="700" height="250"
+                                    <canvas id="incipit_canvas_0" width="700" height="205"
                                         style="display:block;"></canvas>
                                 </div>
 
@@ -492,63 +491,45 @@ El botón de agregar campo completo está en el header del campo (campo-add-btn)
 
         <div class="campo-grid">
             <div class="col-third">
-                <label class="form-label">
-                    {{ formset.empty_form.numero_obra.label }}
-                </label>
+                <label class="form-label">$a Número de la obra</label>
                 {{ formset.empty_form.numero_obra }}
             </div>
             <div class="col-third">
-                <label class="form-label">
-                    {{ formset.empty_form.numero_movimiento.label }}
-                </label>
+                <label class="form-label">$b Número del movimiento</label>
                 {{ formset.empty_form.numero_movimiento }}
             </div>
             <div class="col-third">
-                <label class="form-label">
-                    {{ formset.empty_form.numero_pasaje.label }}
-                </label>
+                <label class="form-label">$c Número de pasaje</label>
                 {{ formset.empty_form.numero_pasaje }}
             </div>
         </div>
 
         <div class="campo-grid mt-3">
             <div class="col-third">
-                <label class="form-label">
-                    {{ formset.empty_form.titulo_encabezamiento.label }}
-                </label>
+                <label class="form-label">$d Tempo</label>
                 {{ formset.empty_form.titulo_encabezamiento }}
             </div>
-            <div class="col-third">
-                <label class="form-label">
-                    {{ formset.empty_form.personaje.label }}
-                </label>
+            <div class="col-third" style="display: none;">
+                <label class="form-label">$e Personaje</label>
                 {{ formset.empty_form.personaje }}
             </div>
             <div class="col-third">
-                <label class="form-label">
-                    {{ formset.empty_form.voz_instrumento.label }}
-                </label>
+                <label class="form-label">$m Voz/instrumento</label>
                 {{ formset.empty_form.voz_instrumento }}
             </div>
         </div>
 
         <div class="campo-grid mt-3">
             <div class="col-third">
-                <label class="form-label">
-                    {{ formset.empty_form.clave.label }}
-                </label>
+                <label class="form-label">$g Clave</label>
                 {{ formset.empty_form.clave }}
             </div>
             <div class="col-third">
-                <label class="form-label">
-                    {{ formset.empty_form.armadura.label }}
-                </label>
+                <label class="form-label">$n Armadura</label>
                 {{ formset.empty_form.armadura }}
             </div>
             <div class="col-third">
-                <label class="form-label">
-                    {{ formset.empty_form.tiempo.label }}
-                </label>
+                <label class="form-label">$o Compás</label>
                 {{ formset.empty_form.tiempo }}
             </div>
         </div>

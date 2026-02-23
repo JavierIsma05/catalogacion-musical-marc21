@@ -8,7 +8,7 @@ class ObraGeneralManager(models.Manager):
     """Manager con métodos de consulta comunes"""
 
     def activos(self):
-        """Retorna solo obras activas (no eliminadas)"""
+        """Retorna solo obras activas (no eliminadas lógicamente)"""
         return self.filter(activo=True)
 
     def manuscritas(self):

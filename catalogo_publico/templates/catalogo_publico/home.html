@@ -8,13 +8,13 @@
     <div class="container">
         <h1>
             <i class="bi bi-music-note-beamed"></i>
-            Catálogo Musical MARC21
+            Sistema de Catalogación para la Biblioteca Latinoamericana de Música para Piano
         </h1>
         <p class="lead">
-            Sistema profesional de catalogación de obras musicales con estándares internacionales
+            Catalogación de obras musicales bajo el formato MARC21
         </p>
         <div class="hero-highlight">
-            <span><i class="bi bi-shield-check"></i> Catalogación profesional</span>
+            <!-- <span><i class="bi bi-shield-check"></i> Catalogación profesional</span> -->
             <span><i class="bi bi-search"></i> Búsqueda avanzada</span>
         </div>
         <a href="{% url 'catalogo_publico:lista_obras' %}" class="btn btn-light btn-lg">
@@ -38,7 +38,7 @@
                     <span class="stat-helper">Base de datos actualizada</span>
                 </div>
             </article>
-            
+
             <article class="home-stat-card">
                 <div class="home-stat-icon neutral">
                     <i class="bi bi-search"></i>
@@ -48,7 +48,7 @@
                     <span class="stat-helper">Encuentra obras por título, compositor y más criterios</span>
                 </div>
             </article>
-            
+
             <article class="home-stat-card">
                 <div class="home-stat-icon neutral">
                     <i class="bi bi-journal-text"></i>
@@ -79,10 +79,15 @@
                             <i class="bi bi-file-earmark-music"></i>
                             <span>{{ obra.titulo_principal|truncatechars:50 }}</span>
                         </h5>
-                        {% if obra.compositor %}
+                        {% if obra.compositor and obra.subtitulo %}
                         <p class="card-text">
                             <i class="bi bi-person"></i>
-                            {{ obra.compositor }}
+                            {{ obra.compositor }} :{{ obra.subtitulo }}
+                        </p>
+                        {% else %}
+                        <p class="card-text">
+                            <i class="bi bi-person"></i>
+                            {{ obra.compositor }} : Sin subtítulo registrado
                         </p>
                         {% endif %}
                         <span class="badge">
@@ -94,7 +99,7 @@
                         </span>
                     </div>
                     <div class="card-footer">
-                        <a href="{% url 'catalogo_publico:detalle_obra' obra.pk %}" 
+                        <a href="{% url 'catalogo_publico:detalle_obra' obra.pk %}"
                            class="btn btn-sm w-100">
                             <i class="bi bi-eye"></i>
                             Ver Detalle

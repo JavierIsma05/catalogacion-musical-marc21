@@ -64,6 +64,12 @@ class Sumario520Form(forms.ModelForm):
         }
 
 class DatosBiograficos545Form(forms.ModelForm):
+    """
+    Formulario para campo 545 - Datos biográficos del compositor.
+
+    Para OneToOneField, los campos texto_biografico y uri pueden estar vacíos
+    si el usuario quiere sobrescribir con datos vacíos.
+    """
     class Meta:
         model = DatosBiograficos545
         fields = ['texto_biografico', 'uri']
@@ -79,4 +85,10 @@ class DatosBiograficos545Form(forms.ModelForm):
             'texto_biografico': '545 $a – Datos biográficos',
             'uri': '545 $u – URL',
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Hacer campos no requeridos para permitir sobrescritura con vacíos
+        self.fields['texto_biografico'].required = False
+        self.fields['uri'].required = False
 

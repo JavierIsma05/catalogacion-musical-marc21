@@ -7,10 +7,10 @@
 console.log("✅ [FORM-VALIDATOR] Script cargado");
 
 document.addEventListener("DOMContentLoaded", function () {
-    const form = document.querySelector("form[method='POST']");
-    
+    const form = document.getElementById('obra-form');
+
     if (!form) {
-        console.log("⚠️  [FORM-VALIDATOR] No se encontró formulario POST");
+        console.log("⚠️  [FORM-VALIDATOR] No se encontró #obra-form");
         return;
     }
     

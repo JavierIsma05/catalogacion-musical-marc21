@@ -73,6 +73,24 @@ Autocomplete estable en $a (incluye clonados)
                                     <i class="bi bi-x-lg"></i>
                                 </button>
                             </div>
+                            {% empty %}
+                            <div class="subcampo-row estanteria-form-row">
+                                <button type="button"
+                                        class="subcampo-add-btn add-estanteria-btn"
+                                        data-ubicacion-index="{{ forloop.counter0 }}">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+
+                                <input type="text"
+                                       class="form-control estanteria-input"
+                                       name="estanteria_ubicacion_852_{{ forloop.counter0 }}_0">
+
+                                <button type="button"
+                                        class="subcampo-delete-btn delete-estanteria-btn"
+                                        style="visibility:hidden">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
                             {% endfor %}
                         {% else %}
                             <div class="subcampo-row estanteria-form-row">
@@ -264,8 +282,8 @@ Autocomplete estable en $a (incluye clonados)
             updateDeleteVisibility(c);
         }
 
-        const delForm = e.target.closest(".delete-row-btn");
-        if (delForm) delForm.closest(".formset-row").remove();
+        // delete-row-btn es manejado por formset-manager.js
+        // NO duplicar aquí para evitar desincronizar TOTAL_FORMS
     });
 
     // Inicialización de estanterías existentes
