@@ -306,7 +306,7 @@ def save_titulos_490(request_post, formset):
         formset,
         "titulo_mencion_490_",
         TituloSerie490,
-        "serie",
+        "mencion_serie",
         "titulo_serie",
     )
 
@@ -319,7 +319,7 @@ def save_volumenes_490(request_post, formset):
         formset,
         "volumen_mencion_490_",
         VolumenSerie490,
-        "serie",
+        "mencion_serie",
         "volumen",
     )
 

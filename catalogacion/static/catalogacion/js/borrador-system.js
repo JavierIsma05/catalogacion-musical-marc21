@@ -764,7 +764,7 @@
       indicador = document.createElement("div");
       indicador.id = "save-indicator";
       indicador.style.cssText = `
-                position: fixed; bottom: 20px; left: 20px;
+                position: fixed; bottom: 20px; left: calc(var(--sidebar-width, 250px) + 20px);
                 padding: 8px 16px; border-radius: 20px;
                 font-size: 12px; font-weight: 500; z-index: 9999;
                 display: flex; align-items: center; gap: 8px;

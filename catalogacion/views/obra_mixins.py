@@ -346,6 +346,25 @@ class ObraFormsetMixin:
                             f"  ⏭️  {key}: SALTADO (sin medios ni cambios)"
                         )
                         continue
+                elif key == "menciones_serie_490":
+                    # 490: el form tiene fields=[], sus subcampos ($a título, $v volumen)
+                    # son inputs dinámicos de JS. Si hay datos en POST, forzar guardado
+                    # aunque has_changed() sea siempre False.
+                    tiene_datos_490 = any(
+                        (
+                            k.startswith("titulo_mencion_490_")
+                            or k.startswith("volumen_mencion_490_")
+                        )
+                        and self.request.POST.get(k, "").strip()
+                        for k in self.request.POST.keys()
+                    )
+                    if not tiene_datos_490 and all(
+                        not form.has_changed() for form in formset.forms
+                    ):
+                        logger.debug(
+                            f"  ⏭️  {key}: SALTADO (sin menciones de serie)"
+                        )
+                        continue
                 else:
                     if all(not form.has_changed() for form in formset.forms):
                         logger.debug(

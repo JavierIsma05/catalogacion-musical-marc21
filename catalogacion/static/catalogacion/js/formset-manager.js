@@ -183,10 +183,9 @@
                 );
             });
 
-            // Reindexar campos con nombres dinámicos (ej: numero_control_774_X)
+            // Reindexar campos con nombres dinámicos (ej: lugar_produccion_264_X)
             // Estos son subcampos que usan convención: prefijo_INDEX_SUBINDEX
             const dynamicSelectors = [
-                "numero_control_774_",
                 "lugar_produccion_264_",
                 "entidad_produccion_264_",
                 "fecha_produccion_264_",
