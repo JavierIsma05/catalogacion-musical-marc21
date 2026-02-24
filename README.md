@@ -1,4 +1,4 @@
-# Sistema de Catalogación Musical MARC21
+# Biblioteca Latinoamericana de Musica para Pianos
 
 Sistema de catalogación de obras musicales basado en el estándar MARC21, desarrollado con Django. Permite registrar, editar y administrar obras musicales con soporte para encabezamientos de materia, géneros/forma, autoridades, subcampos dinámicos y autocompletado inteligente.
 
