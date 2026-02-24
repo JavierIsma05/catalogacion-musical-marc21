@@ -1,0 +1,20 @@
+{% extends 'usuarios/admin/base_admin.html' %}
+
+{% block page_title %}Clave Temporal{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h4>Clave temporal para {{ usuario.nombre_completo|default:usuario.email }}</h4>
+    </div>
+    <div class="card-body">
+        <p>Se ha generado una <strong>contraseña temporal</strong> para el usuario. Esta contraseña se mostrará UNA vez; cópiala y compártela de forma segura con el usuario.</p>
+        <div class="alert alert-warning">
+            <strong>Contraseña temporal:</strong>
+            <div class="mt-2"><code style="font-size:1.1rem;">{{ clave }}</code></div>
+        </div>
+        <p class="small text-muted">Por seguridad, la contraseña no se almacena en texto plano en la aplicación.</p>
+        <a href="{% url 'usuarios:lista_catalogadores' %}" class="btn btn-primary">Volver a Catalogadores</a>
+    </div>
+</div>
+{% endblock %}

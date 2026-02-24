@@ -1,0 +1,27 @@
+{% extends 'usuarios/admin/base_admin.html' %}
+
+{% block page_title %}Fijar nueva contraseña{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h4>Fijar nueva contraseña para {{ usuario.nombre_completo|default:usuario.email }}</h4>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ form.new_password1.label_tag }}
+                {{ form.new_password1 }}
+                {% for err in form.new_password1.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ form.new_password2.label_tag }}
+                {{ form.new_password2 }}
+                {% for err in form.new_password2.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+            </div>
+            <button class="btn btn-primary">Fijar contraseña</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

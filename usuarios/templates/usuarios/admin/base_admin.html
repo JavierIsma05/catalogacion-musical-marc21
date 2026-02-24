@@ -496,12 +496,27 @@
                 <i class="bi bi-people"></i>
                 <span>Catalogadores</span>
             </a>
+            {% if user.is_authenticated and user.es_admin %}
+            <a class="nav-link {% if request.resolver_match.url_name == 'admin_solicitudes' %}active{% endif %}" 
+               href="{% url 'usuarios:admin_solicitudes' %}" data-tooltip="Solicitudes de Cuenta">
+                <i class="bi bi-envelope-paper"></i>
+                <span>Solicitudes de Cuenta
+                    {% if solicitudes_pendientes_count and solicitudes_pendientes_count > 0 %}
+                        <span class="badge bg-danger ms-2">{{ solicitudes_pendientes_count }}</span>
+                    {% endif %}
+                </span>
+            </a>
+            {% endif %}
         </div>
         
         <div class="sidebar-footer">
             <a href="{% url 'catalogo_publico:home' %}" class="nav-link" data-tooltip="Ver Sitio Público">
                 <i class="bi bi-globe"></i>
                 <span>Ver Sitio Público</span>
+            </a>
+            <a href="{% url 'usuarios:perfil_editar' %}" class="nav-link" data-tooltip="Mi perfil">
+                <i class="bi bi-person-lines-fill"></i>
+                <span>Mi perfil</span>
             </a>
             <form method="post" action="{% url 'usuarios:logout' %}">
                 {% csrf_token %}
@@ -535,11 +550,43 @@
                 <h1>{% block page_title %}Dashboard{% endblock %}</h1>
             </div>
             <div class="topbar-right">
-                <div class="user-info">
-                    <i class="bi bi-person-circle"></i>
-                    <span>{{ user.nombre_completo|default:user.email }}</span>
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Notificaciones internas -->
+                    <div class="dropdown">
+                        <button class="btn btn-light position-relative" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-bell"></i>
+                            {% if notifications_unread_count and notifications_unread_count > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ notifications_unread_count }}</span>
+                            {% endif %}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="notifDropdown" style="min-width:300px;">
+                            <li class="dropdown-header">Notificaciones</li>
+                            {% if recent_notifications %}
+                                {% for n in recent_notifications %}
+                                <li>
+                                    <a class="dropdown-item d-flex justify-content-between align-items-start" href="{% url 'usuarios:detalle_solicitud' n.solicitud.pk %}">
+                                        <div>
+                                            <div class="small fw-bold">{{ n.mensaje }}</div>
+                                            <div class="small text-muted">{{ n.fecha|timesince }} atrás</div>
+                                        </div>
+                                        {% if not n.leido %}<span class="badge bg-primary">Nuevo</span>{% endif %}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-center" href="{% url 'usuarios:admin_solicitudes' %}">Ver todas las solicitudes</a></li>
+                            {% else %}
+                                <li class="px-3">No hay notificaciones</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <div class="user-info">
+                        <i class="bi bi-person-circle"></i>
+                        <span>{{ user.nombre_completo|default:user.email }}</span>
+                    </div>
+                    <span class="role-badge">Administrador</span>
                 </div>
-                <span class="role-badge">Administrador</span>
             </div>
         </header>
 

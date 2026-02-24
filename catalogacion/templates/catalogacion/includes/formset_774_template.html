@@ -64,7 +64,8 @@ Estilo compatible con 856 / 700
                         </div>
                     </div>
 
-                    <!-- 774 $w                     <div class="mb-3">
+                    <!-- 774 $w -->
+                    <div class="mb-3">
                         <label class="form-label small">
                             774 $w – Número de esta obra en la colección
                         </label>
@@ -74,9 +75,16 @@ Estilo compatible con 856 / 700
                                value="{% if form.instance.pk %}{% for nc in form.instance.numeros_control.all %}{{ nc.obra_relacionada.num_control }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}"
                                placeholder="(se completa al crear la obra hijo)"
                                readonly
-                               style="background-color: #f8f9fa; color: #6c757d; cursor: not-allowed;">
-                    </div>-->
-
+                               style="background-color: #f8f9fa; color: #6c757d;">
+                        {# Hidden: preserva el vínculo al guardar el formulario #}
+                        {% if form.instance.pk %}
+                            {% for nc in form.instance.numeros_control.all %}
+                                <input type="hidden"
+                                       name="w_774_{{ form.instance.pk }}"
+                                       value="{{ nc.obra_relacionada.id }}">
+                            {% endfor %}
+                        {% endif %}
+                    </div>
 
                 </div>
             </div>
@@ -119,8 +127,7 @@ Estilo compatible con 856 / 700
                         </div>
                     </div>
 
-                    <!-- Subcampo $w comentado temporalmente -->
-                    <!-- <div class="mt-4">
+                    <div class="mt-4">
                         <label class="form-label small fw-semibold">
                             774 $w – Número de esta obra en la colección
                         </label>
@@ -129,8 +136,12 @@ Estilo compatible con 856 / 700
                                class="form-control campo-774-w"
                                placeholder="(se completa al crear la obra hijo)"
                                readonly
-                               style="background-color: #f8f9fa; color: #6c757d; cursor: not-allowed;">
-                    </div> -->
+                               style="background-color: #f8f9fa; color: #6c757d;">
+                        {# Hidden: vacío para nuevas filas (JS reemplaza __prefix__ con índice) #}
+                        <input type="hidden"
+                               name="w_774___prefix__"
+                               value="">
+                    </div>
 
                 </div>
             </div>
