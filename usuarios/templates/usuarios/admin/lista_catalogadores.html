@@ -64,6 +64,12 @@
                                     onclick="confirmarDesactivar({{ catalogador.pk }}, '{{ catalogador.nombre_completo|default:catalogador.email }}')">
                                 <i class="bi bi-pause"></i>
                             </button>
+                            <form action="{% url 'usuarios:generar_clave_catalogador' catalogador.pk %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="action-btn" title="Ver / Generar clave temporal">
+                                    <i class="bi bi-key"></i>
+                                </button>
+                            </form>
                             {% else %}
                             <form action="{% url 'usuarios:toggle_activo_catalogador' catalogador.pk %}" 
                                   method="post" class="toggle-form">

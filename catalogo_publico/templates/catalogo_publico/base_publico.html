@@ -80,6 +80,12 @@
                                     </a>
                                 </li>
                                 {% endif %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'usuarios:password_change' %}">
+                                        <i class="bi bi-key"></i>
+                                        <span>Cambiar contraseña</span>
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="post" action="{% url 'usuarios:logout' %}" class="m-0">

@@ -1,0 +1,56 @@
+{% extends 'usuarios/admin/base_admin.html' %}
+
+{% block page_title %}Solicitudes de Cuenta{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Solicitudes de Cuenta</h2>
+    <div>
+        <a href="?estado=pendiente" class="btn btn-outline-secondary btn-sm">Pendientes</a>
+        <a href="?estado=aprobado" class="btn btn-outline-secondary btn-sm">Aprobadas</a>
+        <a href="?estado=rechazado" class="btn btn-outline-secondary btn-sm">Rechazadas</a>
+    </div>
+</div>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Cédula</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in solicitudes %}
+        <tr>
+            <td>{{ s.nombres }}</td>
+            <td>{{ s.correo }}</td>
+            <td>{{ s.cedula }}</td>
+            <td>{{ s.tipo_usuario }}</td>
+            <td>{{ s.get_estado_display }}</td>
+            <td>{{ s.fecha_creacion|date:'SHORT_DATETIME_FORMAT' }}</td>
+            <td>
+                <a href="{% url 'usuarios:detalle_solicitud' s.pk %}" class="btn btn-sm btn-primary">Ver</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center">No hay solicitudes</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if is_paginated %}
+<nav>
+  <ul class="pagination">
+    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a></li>{% endif %}
+    <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a></li>{% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+{% endblock %}
