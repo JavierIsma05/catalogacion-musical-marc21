@@ -136,6 +136,7 @@ STATICFILES_DIRS = [
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# DEFAULT_FILE_STORAGE  para manejar archivos media (como los covers) usando el sistema de archivos remoto
 
 
 # Default primary key field type
@@ -187,4 +188,3 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SAMESITE = "None"
-
