@@ -365,6 +365,19 @@ class ObraFormsetMixin:
                             f"  ⏭️  {key}: SALTADO (sin menciones de serie)"
                         )
                         continue
+                elif key == "nombres_relacionados_700":
+                    # Solo saltar si no hay filas existentes Y no hay cambios.
+                    # Permite guardar cuando solo cambian subcampos $c/$e.
+                    tiene_filas_existentes = any(
+                        form.instance.pk for form in formset.forms
+                    )
+                    if not tiene_filas_existentes and all(
+                        not form.has_changed() for form in formset.forms
+                    ):
+                        logger.debug(
+                            f"  ⏭️  {key}: SALTADO (sin filas existentes ni cambios)"
+                        )
+                        continue
                 else:
                     if all(not form.has_changed() for form in formset.forms):
                         logger.debug(

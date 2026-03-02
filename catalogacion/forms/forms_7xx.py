@@ -116,7 +116,7 @@ class NombreRelacionado700Form(forms.ModelForm):
             persona = self.instance.persona
             self.fields["persona_texto"].initial = persona.apellidos_nombres
             self.fields["persona_coordenadas"].initial = (
-                persona.coordenadas_biograficas or ""
+                self.instance.coordenadas_biograficas or persona.coordenadas_biograficas or ""
             )
 
     def clean(self):
@@ -162,7 +162,7 @@ class NombreRelacionado700Form(forms.ModelForm):
 
         if persona and not coords_relacion:
             cleaned_data["coordenadas_biograficas"] = (
-                coords or persona.coordenadas_biograficas or None
+                coords or self.instance.coordenadas_biograficas or persona.coordenadas_biograficas or None
             )
 
         # ============================================================
@@ -633,6 +633,10 @@ class OtrasRelaciones787Form(forms.ModelForm):
             self.fields["encabezamiento_principal"].required = False
         if "titulo" in self.fields:
             self.fields["titulo"].required = False
+        if self.instance.pk and self.instance.encabezamiento_principal_id:
+            self.fields["encabezamiento_principal_texto"].initial = (
+                self.instance.encabezamiento_principal.apellidos_nombres
+            )
 
 
 class NumeroControl787Form(forms.ModelForm):

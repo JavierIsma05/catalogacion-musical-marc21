@@ -59,6 +59,7 @@ class ListaObrasPublicaView(ListView):
                 "producciones_publicaciones__fechas",
                 "enlaces_documento_fuente_773__titulo",
                 "enlaces_documento_fuente_773__encabezamiento_principal",
+                "enlaces_documento_fuente_773__numeros_control__obra_relacionada",
                 "incipits_musicales",
                 # 🆕 NUEVO para mostrar 852 y 856
                 "ubicaciones_852",
@@ -252,6 +253,7 @@ class DetalleObraPublicaView(DetailView):
                 "producciones_publicaciones__fechas",
                 "enlaces_documento_fuente_773__titulo",
                 "enlaces_documento_fuente_773__encabezamiento_principal",
+                "enlaces_documento_fuente_773__numeros_control__obra_relacionada",
                 "incipits_musicales",
                 "notas_generales_500",
                 # 🆕 NUEVO para mostrar 852 y 856
@@ -329,6 +331,7 @@ class VistaDetalladaObraView(DetailView):
                 "producciones_publicaciones__fechas",
                 "enlaces_documento_fuente_773__titulo",
                 "enlaces_documento_fuente_773__encabezamiento_principal",
+                "enlaces_documento_fuente_773__numeros_control__obra_relacionada",
                 "incipits_musicales",
                 "notas_generales_500",
                 "titulos_alternativos",

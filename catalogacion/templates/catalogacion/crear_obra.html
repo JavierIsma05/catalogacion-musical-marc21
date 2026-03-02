@@ -810,6 +810,14 @@
       const tituloPrincipal = document.getElementById("id_titulo_principal");
       if (tituloPrincipal && obra774.titulo_texto) tituloPrincipal.value = obra774.titulo_texto;
 
+      const row773 = targetContainer.closest('.formset-row');
+      if (row773) {
+          const fkPersona = row773.querySelector('input[name$="-encabezamiento_principal"]');
+          const fkTitulo  = row773.querySelector('input[name$="-titulo"]');
+          if (fkPersona && obra774.compositor_id) fkPersona.value = obra774.compositor_id;
+          if (fkTitulo  && obra774.titulo_id)     fkTitulo.value  = obra774.titulo_id;
+      }
+
       bootstrap.Modal.getInstance(modalEl).hide();
     }
 

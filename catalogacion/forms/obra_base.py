@@ -384,6 +384,16 @@ class ObraGeneralForm(forms.ModelForm):
             if not self.initial.get("arreglo_240"):
                 self.initial["arreglo_240"] = "arreglo"
 
+        else:
+            # Rellenar campos de texto al editar una obra existente
+            if self.instance.compositor:
+                self.fields["compositor_texto"].initial = (
+                    self.instance.compositor.apellidos_nombres
+                )
+                self.fields["compositor_coordenadas"].initial = (
+                    self.instance.compositor.coordenadas_biograficas or ""
+                )
+
     def clean(self):
         """Validación personalizada y creación automática de autoridades"""
         cleaned_data = super().clean()
